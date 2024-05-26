@@ -1,4 +1,5 @@
 # ✈️ Jet
+###### **Note:** Jet is still very much WIP, Jet should **NOT** be used for normal servers _(yet!)_
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
 A brand new Minecraft server software made from scratch that aims to be multithreaded, user-friendly and to have a modern API.
@@ -17,10 +18,10 @@ Jet does not have any vanilla features reimplemented, such as combat or fluids, 
 - **Quality of Life** Jet includes many QoL features that you may or may not have seen in other servers, some of which include: setting a block only for a specific player, automatic resourcepack creation, any many more!
 
 ## Install
-To install Jet you need to download a server jar file from github, which you run like a normal java application.
+To install Jet you need to download a server jar file from Github, which you run like a normal java application.
 
 ## Usage
-Using Jet is not very different than Craftbukkit based software, except of not having vanilla features and their properties.
+Using Jet is not very different than Craftbukkit based software, except for not having vanilla features and their properties.
 
 You have a basic configuration file, which contains the most important settings for the server.
 
