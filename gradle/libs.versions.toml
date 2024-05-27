@@ -1,0 +1,11 @@
+[versions]
+checker-framework-plugin = "0.6.39"
+netty = "4.1.110.Final"
+
+[libraries]
+netty = { module = "io.netty:netty-all", version.ref = "netty" }
+
+[bundles]
+
+[plugins]
+checker-framework = { id = "org.checkerframework", version.ref = "checker-framework-plugin" }
