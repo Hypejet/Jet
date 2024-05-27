@@ -8,10 +8,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 public final class InboundManager extends ChannelInboundHandlerAdapter {
 
-    private final NetworkManager networkManager;
+    private final JetPlayerConnection playerConnection;
 
-    public InboundManager(@NonNull NetworkManager networkManager) {
-        this.networkManager = networkManager;
+    public InboundManager(@NonNull JetPlayerConnection playerConnection) {
+        this.playerConnection = playerConnection;
     }
 
     @Override
@@ -20,7 +20,7 @@ public final class InboundManager extends ChannelInboundHandlerAdapter {
             throw new IllegalStateException("A message received is not a server-bound packet");
 
         if (packet instanceof HandshakePacket handshakePacket) {
-            this.networkManager.setState(handshakePacket.nextState());
+            this.playerConnection.setProtocolState(handshakePacket.nextState());
         }
 
         System.out.println("Packet received: " + packet);

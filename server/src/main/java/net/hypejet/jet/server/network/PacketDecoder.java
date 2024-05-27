@@ -17,12 +17,12 @@ public final class PacketDecoder extends ByteToMessageDecoder {
     private static final int SEGMENT_BITS = 0x7F;
     private static final int CONTINUE_BIT = 0x80;
 
-    private final NetworkManager networkManager;
+    private final JetPlayerConnection playerConnection;
     private final ServerBoundPacketRegistry packetRegistry;
 
-    public PacketDecoder(@NonNull NetworkManager networkManager,
+    public PacketDecoder(@NonNull JetPlayerConnection playerConnection,
                          @NonNull ServerBoundPacketRegistry packetRegistry) {
-        this.networkManager = networkManager;
+        this.playerConnection = playerConnection;
         this.packetRegistry = packetRegistry;
     }
 
@@ -31,10 +31,10 @@ public final class PacketDecoder extends ByteToMessageDecoder {
         int packetSize = readVarInt(in);
         int packetId = readVarInt(in);
 
-        ProtocolState protocolState = this.networkManager.getState();
+        ProtocolState protocolState = this.playerConnection.getProtocolState();
         ServerBoundPacket packet = this.packetRegistry.read(packetId, protocolState, in);
 
-        if (packet == null) throw packetReaderNotFound(packetId, this.networkManager.getState());
+        if (packet == null) throw packetReaderNotFound(packetId, protocolState);
 
         out.add(packet);
     }
