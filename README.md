@@ -30,7 +30,7 @@ If you want to implement features on your server, you need to make plugins using
 ## Contributing
 You can contribute to Jet easily by creating pull requests, without any other needs.
 
-To not waste your time, make sure to join our [Discord server](https://discord.com/invite/kS4CuPvYD2) and ask if your controbution would be merged or not. You can also make that via an issue, however it may take longer to get a response.
+To not waste your time, make sure to join our [Discord server](https://discord.com/invite/kS4CuPvYD2) and ask if your contribution would be merged or not. You can also make that via an issue, however it may take longer to get a response.
 
 ## License
 All Jet components (except of API) are licensed under a GPL 3.0 license. However, the API is licensed under a MIT license to allow plugins to be done like their authors want.
