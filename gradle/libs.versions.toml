@@ -4,6 +4,7 @@ netty = "4.1.110.Final"
 
 [libraries]
 netty = { module = "io.netty:netty-all", version.ref = "netty" }
+netty-buffer = { module = "io.netty:netty-buffer", version.ref = "netty" }
 
 [bundles]
 

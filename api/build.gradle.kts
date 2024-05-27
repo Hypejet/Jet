@@ -4,5 +4,5 @@ plugins {
 }
 
 dependencies {
-
+    api(libs.netty.buffer)
 }
