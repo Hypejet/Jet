@@ -1,10 +1,16 @@
 [versions]
 checker-framework-plugin = "0.6.39"
 netty = "4.1.110.Final"
+adventure = "4.17.0"
+slf4j = "2.0.13"
 
 [libraries]
 netty = { module = "io.netty:netty-all", version.ref = "netty" }
-netty-buffer = { module = "io.netty:netty-buffer", version.ref = "netty" }
+
+adventure = { module = "net.kyori:adventure-api", version.ref = "adventure" }
+adventure-serializer-gson = { module = "net.kyori:adventure-text-serializer-gson", version.ref = "adventure" }
+
+slf4j = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 
 [bundles]
 

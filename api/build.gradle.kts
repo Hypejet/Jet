@@ -4,5 +4,6 @@ plugins {
 }
 
 dependencies {
-    api(libs.netty.buffer)
+    api(libs.adventure)
+    api(libs.slf4j)
 }

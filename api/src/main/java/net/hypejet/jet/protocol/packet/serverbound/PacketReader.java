@@ -1,6 +1,6 @@
 package net.hypejet.jet.protocol.packet.serverbound;
 
-import io.netty.buffer.ByteBuf;
+import net.hypejet.jet.buffer.ReadOnlyNetworkBuffer;
 import net.hypejet.jet.protocol.ProtocolState;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -48,10 +48,10 @@ public abstract class PacketReader<P extends ServerBoundPacket> {
     }
 
     /**
-     * Reads a {@link P packet} from a {@link ByteBuf byte buffer}
+     * Reads a {@link P packet} from a {@link ReadOnlyNetworkBuffer read-only network buffer}
      *
      * @param buffer the byte buffer
      * @return the {@link P packet}
      */
-    public abstract @NonNull P read(@NonNull ByteBuf buffer);
+    public abstract @NonNull P read(@NonNull ReadOnlyNetworkBuffer buffer);
 }

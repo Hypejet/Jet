@@ -1,10 +1,9 @@
-package net.hypejet.jet.server.protocol.packet.serverbound.handshake;
+package net.hypejet.jet.server.protocol.listener.handshake;
 
-import io.netty.buffer.ByteBuf;
+import net.hypejet.jet.buffer.ReadOnlyNetworkBuffer;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.serverbound.PacketReader;
 import net.hypejet.jet.protocol.packet.serverbound.handshake.HandshakePacket;
-import net.hypejet.jet.server.network.PacketDecoder;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public final class HandshakePacketReader extends PacketReader<HandshakePacket> {
@@ -14,12 +13,12 @@ public final class HandshakePacketReader extends PacketReader<HandshakePacket> {
     }
 
     @Override
-    public @NonNull HandshakePacket read(@NonNull ByteBuf buffer) {
+    public @NonNull HandshakePacket read(@NonNull ReadOnlyNetworkBuffer buffer) {
         return new HandshakePacket(
-                PacketDecoder.readVarInt(buffer),
-                PacketDecoder.readString(buffer),
+                buffer.readVarInt(),
+                buffer.readString(),
                 buffer.readUnsignedShort(),
-                PacketDecoder.readVarInt(buffer) == 1
+                buffer.readVarInt() == 1
                         ? ProtocolState.STATUS
                         : ProtocolState.LOGIN
         );

@@ -8,8 +8,8 @@ import java.util.UUID;
 /**
  * Represents a {@link ServerBoundPacket server-bound packet} that requests a server to send a login data.
  *
- * @param username an username of a player that sends the packet
- * @param uniqueId an unique id of a player that sends the packet
+ * @param username a username of a player that sends the packet
+ * @param uniqueId a unique id of a player that sends the packet
  * @since 1.0
  * @author Codestech
  */

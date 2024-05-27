@@ -1,21 +1,19 @@
-package net.hypejet.jet.server.network;
+package net.hypejet.jet.server.network.serialization;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import net.hypejet.jet.buffer.ReadOnlyNetworkBuffer;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.serverbound.ServerBoundPacket;
 import net.hypejet.jet.protocol.packet.serverbound.ServerBoundPacketRegistry;
+import net.hypejet.jet.server.buffer.ReadOnlyNetworkBufferImpl;
+import net.hypejet.jet.server.player.JetPlayerConnection;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.UUID;
 
 public final class PacketDecoder extends ByteToMessageDecoder {
-
-    private static final int SEGMENT_BITS = 0x7F;
-    private static final int CONTINUE_BIT = 0x80;
 
     private final JetPlayerConnection playerConnection;
     private final ServerBoundPacketRegistry packetRegistry;
@@ -28,11 +26,15 @@ public final class PacketDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-        int packetSize = readVarInt(in);
-        int packetId = readVarInt(in);
+        if (!this.playerConnection.getChannel().isActive()) return; // The connection was closed
+
+        ReadOnlyNetworkBuffer buffer = new ReadOnlyNetworkBufferImpl(in);
+
+        buffer.readVarInt(); // TODO: Check if it's necessary anywhere (the packet size)
+        int packetId = buffer.readVarInt();
 
         ProtocolState protocolState = this.playerConnection.getProtocolState();
-        ServerBoundPacket packet = this.packetRegistry.read(packetId, protocolState, in);
+        ServerBoundPacket packet = this.packetRegistry.read(packetId, protocolState, buffer);
 
         if (packet == null) throw packetReaderNotFound(packetId, protocolState);
 
@@ -42,40 +44,7 @@ public final class PacketDecoder extends ByteToMessageDecoder {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         cause.printStackTrace();
-    }
-
-    public static int readVarInt(ByteBuf in) {
-        int value = 0;
-        int position = 0;
-        byte currentByte;
-
-        while (true) {
-            currentByte = in.readByte();
-            value |= (currentByte & SEGMENT_BITS) << position;
-
-            if ((currentByte & CONTINUE_BIT) == 0) break;
-
-            position += 7;
-
-            if (position >= 32) throw new RuntimeException("VarInt is too big");
-        }
-
-        return value;
-    }
-
-    public static String readString(ByteBuf in) {
-        int length = readVarInt(in);
-        byte[] bytes = new byte[length];
-
-        for (int i = 0; i < length; i++) {
-            bytes[i] = in.readByte();
-        }
-
-        return new String(bytes, StandardCharsets.UTF_8);
-    }
-
-    public static UUID readUUID(ByteBuf in) {
-        return new UUID(in.readLong(), in.readLong());
+        this.playerConnection.close(); // Close the connection to avoid more issues
     }
 
     private static @NonNull Exception packetReaderNotFound(int packetId, @NonNull ProtocolState protocolState) {

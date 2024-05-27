@@ -1,6 +1,6 @@
 package net.hypejet.jet.protocol.packet.serverbound;
 
-import io.netty.buffer.ByteBuf;
+import net.hypejet.jet.buffer.ReadOnlyNetworkBuffer;
 import net.hypejet.jet.protocol.ProtocolState;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -14,7 +14,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public interface ServerBoundPacketRegistry {
     /**
      * Gets a {@link PacketReader packet reader}, which can read a specific packet  and reads it from
-     * a {@link ByteBuf byte buffer}.
+     * a {@link ReadOnlyNetworkBuffer read-only network buffer}.
      *
      * @param packetId an id of the packet
      * @param state a current state of the protocol
@@ -22,7 +22,8 @@ public interface ServerBoundPacketRegistry {
      * @return the packet, which may be null if the packet reader is not present
      * @since 1.0
      */
-    default @Nullable ServerBoundPacket read(int packetId, @NonNull ProtocolState state, @NonNull ByteBuf buffer) {
+    default @Nullable ServerBoundPacket read(int packetId, @NonNull ProtocolState state,
+                                             @NonNull ReadOnlyNetworkBuffer buffer) {
         PacketReader<?> packetReader = getReader(packetId, state);
         if (packetReader == null) return null;
         return packetReader.read(buffer);
