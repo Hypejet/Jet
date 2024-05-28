@@ -7,18 +7,32 @@ import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.serverbound.ServerBoundPacket;
 import net.hypejet.jet.server.buffer.NetworkBufferImpl;
-import net.hypejet.jet.server.player.JetPlayerConnection;
+import net.hypejet.jet.server.player.SocketPlayerConnection;
 import net.hypejet.jet.server.protocol.ServerBoundPacketRegistry;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 
+/**
+ * Represents a {@link ByteToMessageDecoder byte-to-message decoder}, which decodes Minecraft packets.
+ *
+ * @since 1.0
+ * @author Codestech
+ * @see ServerBoundPacket
+ */
 public final class PacketDecoder extends ByteToMessageDecoder {
 
-    private final JetPlayerConnection playerConnection;
+    private final SocketPlayerConnection playerConnection;
     private final ServerBoundPacketRegistry packetRegistry;
 
-    public PacketDecoder(@NonNull JetPlayerConnection playerConnection,
+    /**
+     * Constructs a {@link PacketDecoder}.
+     *
+     * @param playerConnection a player connection to decode packets for
+     * @param packetRegistry a registry of readable packets to read packets from
+     * @since 1.0
+     */
+    public PacketDecoder(@NonNull SocketPlayerConnection playerConnection,
                          @NonNull ServerBoundPacketRegistry packetRegistry) {
         this.playerConnection = playerConnection;
         this.packetRegistry = packetRegistry;

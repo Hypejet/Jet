@@ -9,18 +9,25 @@ import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a server implementation of {@link PlayerConnection}.
+ * Represents an implementation of {@link PlayerConnection}, which is handled by netty's
+ * {@link SocketChannel socket channel}.
  *
  * @since 1.0
  * @author Codestech
  */
-public final class JetPlayerConnection implements PlayerConnection {
+public final class SocketPlayerConnection implements PlayerConnection {
 
     private ProtocolState state = ProtocolState.HANDSHAKE;
 
     private final SocketChannel channel;
 
-    public JetPlayerConnection(@NonNull SocketChannel channel) {
+    /**
+     * Constructs a {@link SocketPlayerConnection socket player connection}.
+     *
+     * @param channel a {@link SocketChannel socket channel}, which handles the connection
+     * @since 1.0
+     */
+    public SocketPlayerConnection(@NonNull SocketChannel channel) {
         this.channel = channel;
     }
 

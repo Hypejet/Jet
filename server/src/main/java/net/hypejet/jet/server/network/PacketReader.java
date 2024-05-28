@@ -4,16 +4,24 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import net.hypejet.jet.protocol.packet.serverbound.ServerBoundPacket;
 import net.hypejet.jet.protocol.packet.serverbound.handshake.HandshakePacket;
-import net.hypejet.jet.server.player.JetPlayerConnection;
+import net.hypejet.jet.server.player.SocketPlayerConnection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+/**
+ * Represents a {@link ChannelInboundHandlerAdapter channel inbound handler adapter}, which processes
+ * Minecraft {@link ServerBoundPacket server-bound packets}.
+ *
+ * @since 1.0
+ * @author Codestech
+ * @see ServerBoundPacket
+ */
 public final class PacketReader extends ChannelInboundHandlerAdapter {
 
-    private final JetPlayerConnection playerConnection;
+    private final SocketPlayerConnection playerConnection;
 
-    public PacketReader(@NonNull JetPlayerConnection playerConnection) {
+    public PacketReader(@NonNull SocketPlayerConnection playerConnection) {
         this.playerConnection = playerConnection;
     }
 

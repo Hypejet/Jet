@@ -9,6 +9,13 @@ import net.hypejet.jet.protocol.packet.clientbound.ClientBoundPacket;
 import net.hypejet.jet.server.buffer.NetworkBufferImpl;
 import net.hypejet.jet.server.util.NetworkUtil;
 
+/**
+ * Represents a {@link MessageToByteEncoder message-to-byte encoder}, which encodes Minecraft packets.
+ *
+ * @since 1.0
+ * @author Codestech
+ * @see ClientBoundPacket
+ */
 public final class PacketEncoder extends MessageToByteEncoder<ClientBoundPacket> {
     @Override
     protected void encode(ChannelHandlerContext ctx, ClientBoundPacket msg, ByteBuf out) {
