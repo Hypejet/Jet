@@ -2,7 +2,7 @@ subprojects {
     apply<JavaPlugin>()
     apply<JavaLibraryPlugin>()
 
-    group = "net.hypejet"
+    group = "net.hypejet.jet"
     version = "1.0"
 
     repositories {
