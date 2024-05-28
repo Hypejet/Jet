@@ -47,7 +47,7 @@ public final class PacketEncoder extends MessageToByteEncoder<ClientBoundPacket>
             buffer.writeVarInt(msg.getPacketId());
             msg.write(buffer);
 
-            NetworkUtil.writeVarLong(out, buf.readableBytes());
+            NetworkUtil.writeVarInt(out, buf.readableBytes());
             out.writeBytes(buf);
         } catch (Throwable throwable) {
             this.playerConnection.close(); // Close the connection to avoid more issues
