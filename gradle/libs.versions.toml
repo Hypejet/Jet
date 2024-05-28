@@ -1,0 +1,26 @@
+[versions]
+checker-framework-plugin = "0.6.39"
+netty = "4.1.110.Final"
+adventure = "4.17.0"
+slf4j = "2.0.13"
+
+# Tests
+junit-jupiter = "5.10.2"
+junit-platform = "1.10.2"
+
+[libraries]
+netty = { module = "io.netty:netty-all", version.ref = "netty" }
+
+adventure = { module = "net.kyori:adventure-api", version.ref = "adventure" }
+adventure-serializer-gson = { module = "net.kyori:adventure-text-serializer-gson", version.ref = "adventure" }
+
+slf4j = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+
+# Tests
+junit-jupiter = { module =  "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
+junit-platform = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform" }
+
+[bundles]
+
+[plugins]
+checker-framework = { id = "org.checkerframework", version.ref = "checker-framework-plugin" }
