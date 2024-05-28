@@ -133,12 +133,12 @@ public final class NetworkBufferImpl implements NetworkBuffer {
 
     @Override
     public @NonNull Component readTextComponent() {
-        return null; // TODO
+        return null; // TODO, not implemented yet, because kyori adventure does not have an NBT serializer *yet*
     }
 
     @Override
     public void writeTextComponent(@NonNull Component value) {
-        // TODO
+        // TODO, not implemented yet, because kyori adventure does not have an NBT serializer *yet*
     }
 
     @Override
