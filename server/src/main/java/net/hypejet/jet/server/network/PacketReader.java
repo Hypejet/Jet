@@ -5,8 +5,6 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import net.hypejet.jet.protocol.packet.serverbound.ServerBoundPacket;
 import net.hypejet.jet.protocol.packet.serverbound.handshake.HandshakePacket;
 import net.hypejet.jet.server.player.SocketPlayerConnection;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,14 +36,6 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
 
         if (packet instanceof HandshakePacket handshakePacket) {
             this.playerConnection.setProtocolState(handshakePacket.nextState());
-            this.playerConnection.kick(
-                    Component.text("Disconnection", NamedTextColor.DARK_RED)
-                            .appendNewline()
-                            .append(Component.text(
-                                    "As Jet is still WIP, you got disconnected",
-                                    NamedTextColor.LIGHT_PURPLE)
-                            )
-            );
         }
     }
 
