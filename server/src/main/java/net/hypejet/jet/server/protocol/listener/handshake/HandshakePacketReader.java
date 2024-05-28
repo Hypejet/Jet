@@ -27,14 +27,18 @@ public final class HandshakePacketReader extends PacketReader<HandshakePacket> {
 
     @Override
     public @NonNull HandshakePacket read(@NonNull ReadOnlyNetworkBuffer buffer) {
-        return new HandshakePacketImpl(
-                buffer.readVarInt(),
-                buffer.readString(),
-                buffer.readUnsignedShort(),
-                buffer.readVarInt() == 1
-                        ? ProtocolState.STATUS
-                        : ProtocolState.LOGIN
-        );
+        int protocolVersion = buffer.readVarInt();
+        String serverAddress = buffer.readString();
+        int serverPort = buffer.readUnsignedShort();
+        int nextStateId = buffer.readVarInt();
+
+        ProtocolState nextState = switch (nextStateId) {
+            case 1 -> ProtocolState.STATUS;
+            case 2 -> ProtocolState.LOGIN;
+            default -> throw new IllegalStateException("Invalid protocol state: " + nextStateId);
+        };
+
+        return new HandshakePacketImpl(protocolVersion, serverAddress, serverPort, nextState);
     }
 
     /**
