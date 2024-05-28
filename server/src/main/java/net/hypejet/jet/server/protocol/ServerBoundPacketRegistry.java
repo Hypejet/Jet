@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.protocol;
 
-import net.hypejet.jet.buffer.ReadOnlyNetworkBuffer;
+import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.serverbound.ServerBoundPacket;
 import net.hypejet.jet.server.protocol.listener.handshake.HandshakePacketReader;
@@ -25,7 +25,7 @@ public final class ServerBoundPacketRegistry {
 
     /**
      * Gets a {@link PacketReader packet reader}, which can read a specific packet  and reads it from
-     * a {@link ReadOnlyNetworkBuffer read-only network buffer}.
+     * a {@link NetworkBuffer network buffer}.
      *
      * @param packetId an id of the packet
      * @param state a current state of the protocol
@@ -33,8 +33,7 @@ public final class ServerBoundPacketRegistry {
      * @return the packet, which may be null if the packet reader is not present
      * @since 1.0
      */
-    public @Nullable ServerBoundPacket read(int packetId, @NonNull ProtocolState state,
-                                            @NonNull ReadOnlyNetworkBuffer buffer) {
+    public @Nullable ServerBoundPacket read(int packetId, @NonNull ProtocolState state, @NonNull NetworkBuffer buffer) {
         PacketReader<?> packetReader = this.getReader(packetId, state);
         if (packetReader == null) return null;
         return packetReader.read(buffer);

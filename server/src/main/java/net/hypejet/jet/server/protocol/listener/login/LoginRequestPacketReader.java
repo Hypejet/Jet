@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.protocol.listener.login;
 
-import net.hypejet.jet.buffer.ReadOnlyNetworkBuffer;
+import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.server.protocol.PacketReader;
 import net.hypejet.jet.protocol.packet.serverbound.login.LoginRequestPacket;
@@ -27,7 +27,7 @@ public final class LoginRequestPacketReader extends PacketReader<LoginRequestPac
     }
 
     @Override
-    public @NonNull LoginRequestPacket read(@NonNull ReadOnlyNetworkBuffer buffer) {
+    public @NonNull LoginRequestPacket read(@NonNull NetworkBuffer buffer) {
         return new LoginRequestPacketImpl(buffer.readString(), buffer.readUniqueId());
     }
 

@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.protocol.listener.handshake;
 
-import net.hypejet.jet.buffer.ReadOnlyNetworkBuffer;
+import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.player.PlayerConnection;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.server.protocol.PacketReader;
@@ -26,7 +26,7 @@ public final class HandshakePacketReader extends PacketReader<HandshakePacket> {
     }
 
     @Override
-    public @NonNull HandshakePacket read(@NonNull ReadOnlyNetworkBuffer buffer) {
+    public @NonNull HandshakePacket read(@NonNull NetworkBuffer buffer) {
         int protocolVersion = buffer.readVarInt();
         String serverAddress = buffer.readString();
         int serverPort = buffer.readUnsignedShort();

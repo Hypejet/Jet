@@ -3,10 +3,10 @@ package net.hypejet.jet.server.network.serialization;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import net.hypejet.jet.buffer.ReadOnlyNetworkBuffer;
+import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.serverbound.ServerBoundPacket;
-import net.hypejet.jet.server.buffer.ReadOnlyNetworkBufferImpl;
+import net.hypejet.jet.server.buffer.NetworkBufferImpl;
 import net.hypejet.jet.server.player.JetPlayerConnection;
 import net.hypejet.jet.server.protocol.ServerBoundPacketRegistry;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -28,7 +28,7 @@ public final class PacketDecoder extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
         if (!this.playerConnection.getChannel().isActive()) return; // The connection was closed
 
-        ReadOnlyNetworkBuffer buffer = new ReadOnlyNetworkBufferImpl(in);
+        NetworkBuffer buffer = new NetworkBufferImpl(in);
 
         buffer.readVarInt(); // TODO: Check if it's necessary anywhere (the packet size)
         int packetId = buffer.readVarInt();

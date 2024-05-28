@@ -1,7 +1,6 @@
 package net.hypejet.jet.server.buffer;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
 import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.kyori.adventure.text.Component;
@@ -9,13 +8,32 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.common.value.qual.IntRange;
 
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-public final class NetworkBufferImpl extends ReadOnlyNetworkBufferImpl implements NetworkBuffer {
+/**
+ * Represents an implementation of {@link NetworkBuffer network buffer}, which reads data from
+ * netty's {@link ByteBuf byte buf}.
+ *
+ * @since 1.0
+ * @author Codestech
+ */
+public final class NetworkBufferImpl implements NetworkBuffer {
 
+    private final ByteBuf buf;
+
+    /**
+     * Constructs a {@link NetworkBufferImpl network buffer}.
+     *
+     * @param buf a netty's {@link ByteBuf byte buf} to read data from
+     * @since 1.0
+     */
     public NetworkBufferImpl(@NonNull ByteBuf buf) {
-        super(buf);
+        this.buf = buf;
+    }
+
+    @Override
+    public boolean readBoolean() {
+        return this.buf.readBoolean();
     }
 
     @Override
@@ -24,8 +42,18 @@ public final class NetworkBufferImpl extends ReadOnlyNetworkBufferImpl implement
     }
 
     @Override
+    public byte readByte() {
+        return this.buf.readByte();
+    }
+
+    @Override
     public void writeByte(byte value) {
         this.buf.writeByte(value);
+    }
+
+    @Override
+    public @IntRange(from = 0, to = 255) short readUnsignedByte() {
+        return this.buf.readUnsignedByte();
     }
 
     @Override
@@ -34,8 +62,18 @@ public final class NetworkBufferImpl extends ReadOnlyNetworkBufferImpl implement
     }
 
     @Override
+    public short readShort() {
+        return this.buf.readShort();
+    }
+
+    @Override
     public void writeShort(short value) {
         this.buf.writeShort(value);
+    }
+
+    @Override
+    public @IntRange(from = 0, to = 65535) int readUnsignedShort() {
+        return this.buf.readUnsignedShort();
     }
 
     @Override
@@ -44,8 +82,18 @@ public final class NetworkBufferImpl extends ReadOnlyNetworkBufferImpl implement
     }
 
     @Override
+    public int readInt() {
+        return this.buf.readInt();
+    }
+
+    @Override
     public void writeInt(int value) {
         this.buf.writeInt(value);
+    }
+
+    @Override
+    public long readLong() {
+        return this.buf.readLong();
     }
 
     @Override
@@ -54,8 +102,18 @@ public final class NetworkBufferImpl extends ReadOnlyNetworkBufferImpl implement
     }
 
     @Override
+    public float readFloat() {
+        return this.buf.readFloat();
+    }
+
+    @Override
     public void writeFloat(float value) {
         this.buf.writeFloat(value);
+    }
+
+    @Override
+    public double readDouble() {
+        return this.buf.readDouble();
     }
 
     @Override
@@ -64,8 +122,18 @@ public final class NetworkBufferImpl extends ReadOnlyNetworkBufferImpl implement
     }
 
     @Override
+    public @NonNull String readString() {
+        return NetworkUtil.readString(this.buf);
+    }
+
+    @Override
     public void writeString(@NonNull String value) {
         NetworkUtil.writeString(this.buf, value);
+    }
+
+    @Override
+    public @NonNull Component readTextComponent() {
+        return null; // TODO
     }
 
     @Override
@@ -74,8 +142,18 @@ public final class NetworkBufferImpl extends ReadOnlyNetworkBufferImpl implement
     }
 
     @Override
+    public @NonNull Component readJsonTextComponent() {
+        return GsonComponentSerializer.gson().deserialize(this.readString());
+    }
+
+    @Override
     public void writeJsonTextComponent(@NonNull Component value) {
         this.writeString(GsonComponentSerializer.gson().serialize(value));
+    }
+
+    @Override
+    public int readVarInt() {
+        return NetworkUtil.readVarInt(this.buf);
     }
 
     @Override
@@ -84,8 +162,18 @@ public final class NetworkBufferImpl extends ReadOnlyNetworkBufferImpl implement
     }
 
     @Override
+    public long readVarLong() {
+        return NetworkUtil.readVarLong(this.buf);
+    }
+
+    @Override
     public void writeVarLong(long value) {
         NetworkUtil.writeVarLong(this.buf, value);
+    }
+
+    @Override
+    public @NonNull UUID readUniqueId() {
+        return new UUID(this.buf.readLong(), this.buf.readLong());
     }
 
     @Override
