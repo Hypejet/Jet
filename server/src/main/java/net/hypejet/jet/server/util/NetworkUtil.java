@@ -89,8 +89,8 @@ public final class NetworkUtil {
         if (length < 0 || length > MAX_STRING_SIZE)
             throw new IllegalArgumentException("Invalid length of a string - " + length);
 
-        //if (this.buf.isReadable(length))
-        //throw new IllegalArgumentException("A buffer does not contain at least " + length + " readable bytes");
+        if (!buf.isReadable(length))
+            throw new IllegalArgumentException("A buffer does not contain at least " + length + " readable bytes");
 
         String string = buf.toString(buf.readerIndex(), length, StandardCharsets.UTF_8);
         buf.skipBytes(length);
