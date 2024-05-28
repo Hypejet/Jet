@@ -2,8 +2,9 @@ package net.hypejet.jet.server.protocol.listener.login;
 
 import net.hypejet.jet.buffer.ReadOnlyNetworkBuffer;
 import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.protocol.packet.serverbound.PacketReader;
+import net.hypejet.jet.server.protocol.PacketReader;
 import net.hypejet.jet.protocol.packet.serverbound.login.LoginRequestPacket;
+import net.hypejet.jet.server.protocol.serverbound.login.LoginRequestPacketImpl;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public final class LoginRequestPacketReader extends PacketReader<LoginRequestPacket> {
@@ -14,6 +15,6 @@ public final class LoginRequestPacketReader extends PacketReader<LoginRequestPac
 
     @Override
     public @NonNull LoginRequestPacket read(@NonNull ReadOnlyNetworkBuffer buffer) {
-        return new LoginRequestPacket(buffer.readString(), buffer.readUniqueId());
+        return new LoginRequestPacketImpl(buffer.readString(), buffer.readUniqueId());
     }
 }

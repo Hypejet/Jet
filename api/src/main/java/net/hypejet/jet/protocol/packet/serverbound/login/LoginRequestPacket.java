@@ -8,10 +8,23 @@ import java.util.UUID;
 /**
  * Represents a {@link ServerBoundPacket server-bound packet} that requests a server to send a login data.
  *
- * @param username a username of a player that sends the packet
- * @param uniqueId a unique id of a player that sends the packet
  * @since 1.0
  * @author Codestech
  */
-public record LoginRequestPacket(@NonNull String username, @NonNull UUID uniqueId)
-        implements ServerBoundPacket {}
+public interface LoginRequestPacket extends ServerBoundPacket {
+    /**
+     * Gets a username of a player that sends the packet.
+     *
+     * @return the username
+     * @since 1.0
+     */
+    @NonNull String username();
+
+    /**
+     * Gets a {@link UUID unique identifier} of a player that sends the packet.
+     *
+     * @return the unique identifier
+     * @since 1.0
+     */
+    @NonNull UUID uniqueId();
+}

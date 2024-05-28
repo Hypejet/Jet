@@ -6,9 +6,9 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import net.hypejet.jet.buffer.ReadOnlyNetworkBuffer;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.serverbound.ServerBoundPacket;
-import net.hypejet.jet.protocol.packet.serverbound.ServerBoundPacketRegistry;
 import net.hypejet.jet.server.buffer.ReadOnlyNetworkBufferImpl;
 import net.hypejet.jet.server.player.JetPlayerConnection;
+import net.hypejet.jet.server.protocol.ServerBoundPacketRegistry;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;

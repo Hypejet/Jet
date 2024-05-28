@@ -2,7 +2,7 @@ package net.hypejet.jet.player;
 
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.clientbound.ClientBoundPacket;
-import net.hypejet.jet.protocol.packet.clientbound.login.DisconnectPacket;
+import net.hypejet.jet.protocol.packet.clientbound.login.disconnect.DisconnectPacket;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

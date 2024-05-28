@@ -4,7 +4,7 @@ import io.netty.channel.socket.SocketChannel;
 import net.hypejet.jet.player.PlayerConnection;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.clientbound.ClientBoundPacket;
-import net.hypejet.jet.protocol.packet.clientbound.login.DisconnectPacket;
+import net.hypejet.jet.protocol.packet.clientbound.login.disconnect.DisconnectPacket;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -44,7 +44,9 @@ public final class JetPlayerConnection implements PlayerConnection {
 
     @Override
     public void kick(@NonNull Component reason) {
-        this.sendPacket(new DisconnectPacket(reason));
+        this.sendPacket(DisconnectPacket.builder()
+                .reason(reason)
+                .build());
         this.close();
     }
 

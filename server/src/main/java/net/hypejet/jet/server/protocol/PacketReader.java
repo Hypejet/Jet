@@ -1,7 +1,8 @@
-package net.hypejet.jet.protocol.packet.serverbound;
+package net.hypejet.jet.server.protocol;
 
 import net.hypejet.jet.buffer.ReadOnlyNetworkBuffer;
 import net.hypejet.jet.protocol.ProtocolState;
+import net.hypejet.jet.protocol.packet.serverbound.ServerBoundPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

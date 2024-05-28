@@ -2,11 +2,11 @@ package net.hypejet.jet.server.network;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
-import net.hypejet.jet.protocol.packet.serverbound.ServerBoundPacketRegistry;
 import net.hypejet.jet.server.network.serialization.PacketDecoder;
 import net.hypejet.jet.server.network.serialization.PacketEncoder;
 import net.hypejet.jet.server.network.serialization.PacketLengthEncoder;
 import net.hypejet.jet.server.player.JetPlayerConnection;
+import net.hypejet.jet.server.protocol.ServerBoundPacketRegistry;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public final class PlayerChannelInitializer extends ChannelInitializer<SocketChannel> {
