@@ -10,6 +10,8 @@ import net.hypejet.jet.server.buffer.NetworkBufferImpl;
 import net.hypejet.jet.server.player.SocketPlayerConnection;
 import net.hypejet.jet.server.protocol.ServerBoundPacketRegistry;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -21,6 +23,8 @@ import java.util.List;
  * @see ServerBoundPacket
  */
 public final class PacketDecoder extends ByteToMessageDecoder {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PacketDecoder.class);
 
     private final SocketPlayerConnection playerConnection;
     private final ServerBoundPacketRegistry packetRegistry;
@@ -57,8 +61,8 @@ public final class PacketDecoder extends ByteToMessageDecoder {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
         this.playerConnection.close(); // Close the connection to avoid more issues
+        LOGGER.error("An error occurred while decoding a packet", cause);
     }
 
     private static @NonNull Exception packetReaderNotFound(int packetId, @NonNull ProtocolState protocolState) {

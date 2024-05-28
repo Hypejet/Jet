@@ -8,6 +8,8 @@ import net.hypejet.jet.server.player.SocketPlayerConnection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents a {@link ChannelInboundHandlerAdapter channel inbound handler adapter}, which processes
@@ -18,6 +20,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see ServerBoundPacket
  */
 public final class PacketReader extends ChannelInboundHandlerAdapter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PacketReader.class);
 
     private final SocketPlayerConnection playerConnection;
 
@@ -47,7 +51,7 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
         this.playerConnection.close(); // Close the connection to avoid more issues
+        LOGGER.error("An error occurred while reading a packet", cause);
     }
 }
