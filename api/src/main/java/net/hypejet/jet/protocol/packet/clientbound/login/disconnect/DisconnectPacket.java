@@ -9,6 +9,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @since 1.0
  * @author Codestech
+ * @see ClientBoundPacket
  */
 public sealed interface DisconnectPacket extends ClientBoundPacket permits DisconnectPacketImpl {
     /**
@@ -34,8 +35,9 @@ public sealed interface DisconnectPacket extends ClientBoundPacket permits Disco
      *
      * @since 1.0
      * @author Codestech
+     * @see DisconnectPacket
      */
-    interface Builder {
+    sealed interface Builder permits DisconnectPacketImpl.Builder {
         /**
          * Sets a reason of the disconnection.
          *

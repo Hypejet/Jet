@@ -279,6 +279,37 @@ public interface NetworkBuffer {
         this.writeString(identifier.asString());
     }
 
+    /**
+     * Reads a byte array from the buffer.
+     *
+     * @return the byte array
+     * @since 1.0
+     */
+    default byte @NonNull [] readByteArray() {
+        int length = this.readVarInt();
+        byte[] array = new byte[length];
+
+        for (int i = 0; i < length; i++) {
+            array[i] = this.readByte();
+        }
+
+        return array;
+    }
+
+    /**
+     * Writes a byte array to the buffer.
+     *
+     * @param value the byte array
+     * @since 1.0
+     */
+    default void writeByteArray(byte @NonNull [] value) {
+        this.writeVarInt(value.length);
+
+        for (byte element : value) {
+            this.writeByte(element);
+        }
+    }
+
     private static @NonNull RuntimeException identifierNotParseable(@NonNull String identifier) {
         return new IllegalArgumentException("An identifier of \"" + identifier + "\" contains illegal characters");
     }
