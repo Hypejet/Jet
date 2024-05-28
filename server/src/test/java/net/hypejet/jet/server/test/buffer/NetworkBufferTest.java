@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -113,6 +114,21 @@ public final class NetworkBufferTest {
                 NetworkBuffer::readUniqueId, NetworkBuffer::writeUniqueId);
     }
 
+    @Test
+    public void testByteArray() {
+        NetworkBuffer buffer = new NetworkBufferImpl(Unpooled.buffer());
+
+        byte[] first = new byte[0];
+        byte[] second = new byte[6];
+
+        ThreadLocalRandom.current().nextBytes(second);
+
+        buffer.writeByteArray(first);
+        buffer.writeByteArray(second);
+
+        Assertions.assertArrayEquals(first, buffer.readByteArray());
+        Assertions.assertArrayEquals(second, buffer.readByteArray());
+    }
 
     /**
      * Tests reading and writing in {@link NetworkBuffer network buffer} with provided data.
@@ -124,10 +140,10 @@ public final class NetworkBufferTest {
      * @param <T> the type of values to test
      * @since 1.0
      */
-    private static  <T> void testValues(@NonNull T first, @NonNull T second,
+    private static <T> void testValues(@NonNull T first, @NonNull T second,
                                         @NonNull Function<NetworkBuffer, T> readFunction,
                                         @NonNull BiConsumer<NetworkBuffer, T> writeFunction) {
-        NetworkBuffer buffer =new NetworkBufferImpl(Unpooled.buffer());
+        NetworkBuffer buffer = new NetworkBufferImpl(Unpooled.buffer());
 
         writeFunction.accept(buffer, first);
         writeFunction.accept(buffer, second);
