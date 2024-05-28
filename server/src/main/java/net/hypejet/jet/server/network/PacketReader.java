@@ -2,8 +2,12 @@ package net.hypejet.jet.server.network;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import net.hypejet.jet.protocol.ProtocolState;
+import net.hypejet.jet.protocol.packet.clientbound.login.success.ServerLoginSuccessPacket;
 import net.hypejet.jet.protocol.packet.serverbound.ServerBoundPacket;
 import net.hypejet.jet.protocol.packet.serverbound.handshake.HandshakePacket;
+import net.hypejet.jet.protocol.packet.serverbound.login.ClientLoginAcknowledgePacket;
+import net.hypejet.jet.protocol.packet.serverbound.login.LoginRequestPacket;
 import net.hypejet.jet.server.player.SocketPlayerConnection;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
@@ -34,8 +38,14 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
         if (!(msg instanceof ServerBoundPacket packet))
             throw new IllegalStateException("A message received is not a server-bound packet");
 
-        if (packet instanceof HandshakePacket handshakePacket) {
-            this.playerConnection.setProtocolState(handshakePacket.nextState());
+        switch (packet) {
+            case HandshakePacket handshakePacket -> this.playerConnection.setProtocolState(handshakePacket.nextState());
+            case LoginRequestPacket requestPacket -> this.playerConnection.sendPacket(ServerLoginSuccessPacket.builder()
+                    .uniqueId(requestPacket.uniqueId())
+                    .username(requestPacket.username())
+                    .build());
+            case ClientLoginAcknowledgePacket ignored -> this.playerConnection.setProtocolState(ProtocolState.CONFIGURATION);
+            default -> {}
         }
     }
 
