@@ -17,9 +17,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class SocketPlayerConnection implements PlayerConnection {
 
-    private ProtocolState state = ProtocolState.HANDSHAKE;
-
     private final SocketChannel channel;
+
+    private ProtocolState state = ProtocolState.HANDSHAKE;
+    private int compressionThreshold = -1;
 
     /**
      * Constructs a {@link SocketPlayerConnection socket player connection}.
@@ -51,6 +52,11 @@ public final class SocketPlayerConnection implements PlayerConnection {
         this.close();
     }
 
+    @Override
+    public int compressionThreshold() {
+        return this.compressionThreshold;
+    }
+
     /**
      * Closes the {@link PlayerConnection player connection}.
      *
@@ -72,6 +78,16 @@ public final class SocketPlayerConnection implements PlayerConnection {
      */
     public void setProtocolState(@NonNull ProtocolState state) {
         this.state = state;
+    }
+
+    /**
+     * Sets a compression threshold of this connection.
+     *
+     * @param compressionThreshold the compression threshold
+     * @since 1.0
+     */
+    public void setCompressionThreshold(int compressionThreshold) {
+        this.compressionThreshold = compressionThreshold;
     }
 
     /**

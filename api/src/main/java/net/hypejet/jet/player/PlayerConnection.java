@@ -36,4 +36,12 @@ public interface PlayerConnection {
      * @since 1.0
      */
     void kick(@NonNull Component reason);
+
+    /**
+     * Gets a compression threshold of the connection, disabled if negative.
+     *
+     * @return the compression threshold
+     * @since 1.0
+     */
+    int compressionThreshold();
 }

@@ -14,7 +14,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see DisconnectPacket
  */
 record DisconnectPacketImpl(@NonNull Component reason) implements DisconnectPacket {
-
     @Override
     public void write(@NonNull NetworkBuffer buffer) {
         buffer.writeJsonTextComponent(this.reason);
