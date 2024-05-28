@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.protocol;
+package net.hypejet.jet.server.protocol.listener;
 
 import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.protocol.ProtocolState;

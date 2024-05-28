@@ -2,7 +2,7 @@ package net.hypejet.jet.server.protocol.listener.login;
 
 import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.server.protocol.PacketReader;
+import net.hypejet.jet.server.protocol.listener.PacketReader;
 import net.hypejet.jet.protocol.packet.serverbound.login.LoginRequestPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
