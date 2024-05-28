@@ -257,6 +257,15 @@ public interface NetworkBuffer {
     void writeUniqueId(@NonNull UUID value);
 
     /**
+     * Checks whether an amount of bytes is higher or equal to remaining bytes.
+     *
+     * @param length the amount of bytes
+     * @return true if an amount of bytes is higher or equal to remaining bytes, false otherwise
+     * @since 1.0
+     */
+    boolean isReadable(int length);
+
+    /**
      * Reads an identifier from the buffer.
      *
      * @return the identifier
@@ -283,11 +292,15 @@ public interface NetworkBuffer {
      * Reads a byte array from the buffer.
      *
      * @return the byte array
+     * @throws IllegalArgumentException if an amount of remaining bytes is lower than a string size
      * @since 1.0
      */
     default byte @NonNull [] readByteArray() {
         int length = this.readVarInt();
         byte[] array = new byte[length];
+
+        if (!this.isReadable(length))
+            throw new IllegalArgumentException("An amount of remaining bytes is lower than a string size");
 
         for (int i = 0; i < length; i++) {
             array[i] = this.readByte();

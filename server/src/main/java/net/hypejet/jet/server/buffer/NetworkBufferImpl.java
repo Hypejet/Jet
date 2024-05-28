@@ -181,4 +181,9 @@ public final class NetworkBufferImpl implements NetworkBuffer {
         this.buf.writeLong(value.getMostSignificantBits());
         this.buf.writeLong(value.getLeastSignificantBits());
     }
+
+    @Override
+    public boolean isReadable(int length) {
+        return this.buf.isReadable(length);
+    }
 }
