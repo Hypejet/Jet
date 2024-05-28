@@ -2,20 +2,15 @@ package net.hypejet.jet.server.buffer;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.buffer.ReadOnlyNetworkBuffer;
+import net.hypejet.jet.server.util.NetworkUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.common.value.qual.IntRange;
 
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public sealed class ReadOnlyNetworkBufferImpl implements ReadOnlyNetworkBuffer permits NetworkBufferImpl {
-
-    protected static final byte SEGMENT_BITS = 0x7F;
-    protected static final int CONTINUE_BIT = 0x80;
-
-    protected static final short MAX_STRING_SIZE = 32767;
 
     protected final ByteBuf buf;
 
@@ -70,18 +65,7 @@ public sealed class ReadOnlyNetworkBufferImpl implements ReadOnlyNetworkBuffer p
 
     @Override
     public @NonNull String readString() {
-        int length = this.readVarInt();
-
-        if (length < 0 || length > MAX_STRING_SIZE)
-            throw new IllegalArgumentException("Invalid length of a string - " + length);
-
-        //if (this.buf.isReadable(length))
-            //throw new IllegalArgumentException("A buffer does not contain at least " + length + " readable bytes");
-
-        String string = this.buf.toString(this.buf.readerIndex(), length, StandardCharsets.UTF_8);
-        this.buf.skipBytes(length);
-
-        return string;
+        return NetworkUtil.readString(this.buf);
     }
 
     @Override
@@ -96,42 +80,12 @@ public sealed class ReadOnlyNetworkBufferImpl implements ReadOnlyNetworkBuffer p
 
     @Override
     public int readVarInt() {
-        int value = 0;
-        int position = 0;
-        byte currentByte;
-
-        while (true) {
-            currentByte = this.buf.readByte();
-            value |= (currentByte & SEGMENT_BITS) << position;
-
-            if ((currentByte & CONTINUE_BIT) == 0) break;
-
-            position += 7;
-
-            if (position >= 32) throw new IllegalArgumentException("VarInt is too big");
-        }
-
-        return value;
+        return NetworkUtil.readVarInt(this.buf);
     }
 
     @Override
     public long readVarLong() {
-        long value = 0;
-        int position = 0;
-        byte currentByte;
-
-        while (true) {
-            currentByte = readByte();
-            value |= (long) (currentByte & SEGMENT_BITS) << position;
-
-            if ((currentByte & CONTINUE_BIT) == 0) break;
-
-            position += 7;
-
-            if (position >= 64) throw new IllegalArgumentException("VarLong is too big");
-        }
-
-        return value;
+        return NetworkUtil.readVarLong(this.buf);
     }
 
     @Override

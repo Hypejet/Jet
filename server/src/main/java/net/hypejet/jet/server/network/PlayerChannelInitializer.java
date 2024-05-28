@@ -4,7 +4,6 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import net.hypejet.jet.server.network.serialization.PacketDecoder;
 import net.hypejet.jet.server.network.serialization.PacketEncoder;
-import net.hypejet.jet.server.network.serialization.PacketLengthEncoder;
 import net.hypejet.jet.server.player.JetPlayerConnection;
 import net.hypejet.jet.server.protocol.ServerBoundPacketRegistry;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -22,7 +21,6 @@ public final class PlayerChannelInitializer extends ChannelInitializer<SocketCha
         JetPlayerConnection playerConnection = new JetPlayerConnection(ch);
         ch.pipeline()
                 .addFirst(new PacketEncoder())
-                .addFirst(new PacketLengthEncoder())
                 .addFirst(new PacketReader(playerConnection))
                 .addFirst(new PacketDecoder(playerConnection, this.serverBoundPacketRegistry));
     }

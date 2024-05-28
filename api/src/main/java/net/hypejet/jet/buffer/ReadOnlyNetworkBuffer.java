@@ -101,8 +101,7 @@ public interface ReadOnlyNetworkBuffer {
      *
      * @return the text component
      */
-    @NonNull
-    Component readTextComponent();
+    @NonNull Component readTextComponent();
 
     /**
      * Reads a text component, which is serialized as a json string.

@@ -3,6 +3,7 @@ package net.hypejet.jet.server.buffer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import net.hypejet.jet.buffer.NetworkBuffer;
+import net.hypejet.jet.server.util.NetworkUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -64,8 +65,7 @@ public final class NetworkBufferImpl extends ReadOnlyNetworkBufferImpl implement
 
     @Override
     public void writeString(@NonNull String value) {
-        this.writeVarInt(ByteBufUtil.utf8Bytes(value));
-        this.buf.writeCharSequence(value, StandardCharsets.UTF_8);
+        NetworkUtil.writeString(this.buf, value);
     }
 
     @Override
@@ -80,28 +80,12 @@ public final class NetworkBufferImpl extends ReadOnlyNetworkBufferImpl implement
 
     @Override
     public void writeVarInt(int value) {
-        while (true) {
-            if ((value & ~SEGMENT_BITS) == 0) {
-                this.buf.writeByte(value);
-                return;
-            }
-
-            this.buf.writeByte((value & SEGMENT_BITS) | CONTINUE_BIT);
-            value >>>= 7;
-        }
+        NetworkUtil.writeVarInt(this.buf, value);
     }
 
     @Override
     public void writeVarLong(long value) {
-        while (true) {
-            if ((value & ~((long) SEGMENT_BITS)) == 0) {
-                this.buf.writeByte((int) value);
-                return;
-            }
-
-            this.buf.writeByte((int) ((value & SEGMENT_BITS) | CONTINUE_BIT));
-            value >>>= 7;
-        }
+        NetworkUtil.writeVarLong(this.buf, value);
     }
 
     @Override
