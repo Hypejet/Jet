@@ -14,14 +14,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public interface PlayerConnection {
     /**
-     * Gets a protocol version of the connection, {@code -1} if unknown.
-     *
-     * @return the protocol version
-     * @since 1.0
-     */
-    int getProtocolVersion();
-
-    /**
      * Gets a protocol state of the connection.
      *
      * @return the protocol state

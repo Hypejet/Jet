@@ -16,18 +16,12 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class JetPlayerConnection implements PlayerConnection {
 
-    private int protocolVersion = -1;
     private ProtocolState state = ProtocolState.HANDSHAKE;
 
     private final SocketChannel channel;
 
     public JetPlayerConnection(@NonNull SocketChannel channel) {
         this.channel = channel;
-    }
-
-    @Override
-    public int getProtocolVersion() {
-        return this.protocolVersion;
     }
 
     @Override
@@ -61,16 +55,6 @@ public final class JetPlayerConnection implements PlayerConnection {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * Sets a protocol version of the connection.
-     *
-     * @param protocolVersion the protocol version
-     * @since 1.0
-     */
-    public void setProtocolVersion(int protocolVersion) {
-        this.protocolVersion = protocolVersion;
     }
 
     /**
