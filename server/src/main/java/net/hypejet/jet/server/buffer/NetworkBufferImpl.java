@@ -186,4 +186,11 @@ public final class NetworkBufferImpl implements NetworkBuffer {
     public boolean isReadable(int length) {
         return this.buf.isReadable(length);
     }
+
+    @Override
+    public void write(@NonNull NetworkBuffer buffer) {
+        if (!(buffer instanceof NetworkBufferImpl implementation))
+            throw new IllegalStateException("A network buffer implementation is invalid, expected NetworkBufferImpl");
+        implementation.buf.writeBytes(this.buf);
+    }
 }

@@ -1,10 +1,13 @@
 package net.hypejet.jet.buffer;
 
+import net.hypejet.jet.network.NetworkWritable;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.value.qual.IntRange;
 
+import java.util.Collection;
 import java.util.UUID;
 
 /**
@@ -13,7 +16,7 @@ import java.util.UUID;
  * @since 1.0
  * @author Codestech
  */
-public interface NetworkBuffer {
+public interface NetworkBuffer extends NetworkWritable {
     /**
      * Reads a boolean from the buffer.
      *
@@ -320,6 +323,45 @@ public interface NetworkBuffer {
 
         for (byte element : value) {
             this.writeByte(element);
+        }
+    }
+
+    /**
+     * Reads an optional string from the buffer.
+     *
+     * @return the optional string, which may be null
+     * @since 1.0
+     */
+    default @Nullable String readOptionalString() {
+        if (this.readBoolean()) return this.readString();
+        return null;
+    }
+
+
+    /**
+     * Writes an optional string to the buffer.
+     *
+     * @param value the optional string, which may be null
+     * @since 1.0
+     */
+    default void writeOptionalString(@Nullable String value) {
+        boolean isPresent = value != null;
+        this.writeBoolean(isPresent);
+        if (isPresent) this.writeString(value);
+    }
+
+    /**
+     * Writes a collection of {@link NetworkWritable network writable} objects to the buffer.
+     *
+     * @param collection the collection
+     * @since 1.0
+     */
+    default void writeCollection(@NonNull Collection<? extends NetworkWritable> collection) {
+        int size = collection.size();
+        this.writeVarInt(size);
+
+        if (size > 0) {
+            collection.forEach(writable -> writable.write(this));
         }
     }
 
