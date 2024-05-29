@@ -5,6 +5,7 @@ import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.serverbound.ServerBoundPacket;
 import net.hypejet.jet.server.protocol.listener.PacketReader;
 import net.hypejet.jet.server.protocol.listener.handshake.HandshakePacketReader;
+import net.hypejet.jet.server.protocol.listener.login.ClientEncryptionResponsePacketReader;
 import net.hypejet.jet.server.protocol.listener.login.ClientLoginAcknowledgePacketReader;
 import net.hypejet.jet.server.protocol.listener.login.LoginRequestPacketReader;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -23,7 +24,8 @@ public final class ServerBoundPacketRegistry {
     private final Set<PacketReader<?>> packetReaders = Set.of(
             new HandshakePacketReader(),
             new LoginRequestPacketReader(),
-            new ClientLoginAcknowledgePacketReader()
+            new ClientLoginAcknowledgePacketReader(),
+            new ClientEncryptionResponsePacketReader()
     );
 
     /**

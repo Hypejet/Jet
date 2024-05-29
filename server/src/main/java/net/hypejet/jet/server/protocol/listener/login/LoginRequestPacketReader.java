@@ -14,6 +14,7 @@ import java.util.UUID;
  * @since 1.0
  * @author Codestech
  * @see LoginRequestPacket
+ * @see PacketReader
  */
 public final class LoginRequestPacketReader extends PacketReader<LoginRequestPacket> {
 
