@@ -13,6 +13,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.zip.Deflater;
+
 /**
  * Represents a {@link MessageToByteEncoder message-to-byte encoder}, which encodes Minecraft packets.
  *
@@ -44,12 +46,43 @@ public final class PacketEncoder extends MessageToByteEncoder<ServerPacket> {
             ByteBuf buf = Unpooled.buffer();
 
             NetworkBuffer buffer = new NetworkBufferImpl(buf);
-            buffer.writeVarInt(msg.getPacketId());
+            buffer.writeVarInt(msg.getPacketId()); // Packet ID
             msg.write(buffer);
 
-            NetworkUtil.writeVarInt(out, buf.readableBytes());
-            out.writeBytes(buf);
+            int threshold = this.playerConnection.compressionThreshold();
+            int dataLength = buf.readableBytes();
+
+            if (threshold < 0) {
+                NetworkUtil.writeVarInt(out, dataLength);
+                out.writeBytes(buf);
+                return;
+            }
+
+            if (dataLength < threshold) {
+                NetworkUtil.writeVarInt(out, dataLength + 1); // TODO: Document why it is data length + 1
+                NetworkUtil.writeVarInt(out, 0);
+                out.writeBytes(buf);
+                return;
+            }
+
+            ByteBuf compressedBuf = Unpooled.buffer();
+            NetworkBuffer compressedBuffer = new NetworkBufferImpl(compressedBuf);
+
+            byte[] output = new byte[dataLength];
+
+            Deflater deflater = new Deflater();
+            deflater.setInput(buf.array());
+            deflater.finish();
+            deflater.deflate(output);
+            deflater.end();
+
+            compressedBuffer.writeVarInt(dataLength);
+            compressedBuffer.writeByteArray(output);
+
+            NetworkUtil.writeVarInt(out, compressedBuf.readableBytes());
+            out.writeBytes(compressedBuf);
         } catch (Throwable throwable) {
+            throwable.printStackTrace();
             this.playerConnection.close(); // Close the connection to avoid more issues
             LOGGER.error("An error occurred while encoding a packet", throwable);
         }

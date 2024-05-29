@@ -91,6 +91,8 @@ public final class SocketPlayerConnection implements PlayerConnection {
         this.sendPacket(ServerEnableCompressionPacket.builder()
                 .threshold(compressionThreshold)
                 .build());
+        /* The compression threshold should be set later than the packet, to avoid compression
+           while a client does not know about it yet. */
         this.compressionThreshold = compressionThreshold;
     }
 
