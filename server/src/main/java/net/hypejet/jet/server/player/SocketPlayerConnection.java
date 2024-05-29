@@ -4,6 +4,7 @@ import io.netty.channel.socket.SocketChannel;
 import net.hypejet.jet.player.PlayerConnection;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.clientbound.ClientBoundPacket;
+import net.hypejet.jet.protocol.packet.clientbound.login.compression.ServerEnableCompressionPacket;
 import net.hypejet.jet.protocol.packet.clientbound.login.disconnect.DisconnectPacket;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -87,6 +88,9 @@ public final class SocketPlayerConnection implements PlayerConnection {
      * @since 1.0
      */
     public void setCompressionThreshold(int compressionThreshold) {
+        this.sendPacket(ServerEnableCompressionPacket.builder()
+                .threshold(compressionThreshold)
+                .build());
         this.compressionThreshold = compressionThreshold;
     }
 
