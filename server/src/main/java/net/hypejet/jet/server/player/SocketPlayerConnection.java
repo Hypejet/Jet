@@ -3,9 +3,9 @@ package net.hypejet.jet.server.player;
 import io.netty.channel.socket.SocketChannel;
 import net.hypejet.jet.player.PlayerConnection;
 import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.protocol.packet.clientbound.ClientBoundPacket;
-import net.hypejet.jet.protocol.packet.clientbound.login.compression.ServerEnableCompressionPacket;
-import net.hypejet.jet.protocol.packet.clientbound.login.disconnect.DisconnectPacket;
+import net.hypejet.jet.protocol.packet.server.ServerPacket;
+import net.hypejet.jet.protocol.packet.server.login.compression.ServerEnableCompressionPacket;
+import net.hypejet.jet.protocol.packet.server.login.disconnect.ServerDisconnectPacket;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -39,7 +39,7 @@ public final class SocketPlayerConnection implements PlayerConnection {
     }
 
     @Override
-    public void sendPacket(@NonNull ClientBoundPacket packet) {
+    public void sendPacket(@NonNull ServerPacket packet) {
         if (this.state != packet.getProtocolState())
             throw unsupportedProtocolState(packet);
         this.channel.writeAndFlush(packet);
@@ -47,7 +47,7 @@ public final class SocketPlayerConnection implements PlayerConnection {
 
     @Override
     public void kick(@NonNull Component reason) {
-        this.sendPacket(DisconnectPacket.builder()
+        this.sendPacket(ServerDisconnectPacket.builder()
                 .reason(reason)
                 .build());
         this.close();
@@ -104,7 +104,7 @@ public final class SocketPlayerConnection implements PlayerConnection {
         return this.channel;
     }
 
-    private static @NonNull RuntimeException unsupportedProtocolState(@NonNull ClientBoundPacket packet) {
+    private static @NonNull RuntimeException unsupportedProtocolState(@NonNull ServerPacket packet) {
         return new IllegalArgumentException("The current protocol state does not support packet "
                 + packet.getClass().getSimpleName());
     }

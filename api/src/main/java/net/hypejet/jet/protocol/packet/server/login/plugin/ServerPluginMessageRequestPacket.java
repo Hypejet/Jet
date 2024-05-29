@@ -1,19 +1,20 @@
-package net.hypejet.jet.protocol.packet.clientbound.login.plugin;
+package net.hypejet.jet.protocol.packet.server.login.plugin;
 
-import net.hypejet.jet.protocol.packet.clientbound.ClientBoundPacket;
+import net.hypejet.jet.protocol.packet.server.ServerPacket;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@link ClientBoundPacket client-bound packet} used to implement a custom handshaking flow.
+ * Represents a {@linkplain ServerPacket server packet} used to implement a custom handshaking flow.
  *
  * @since 1.0
  * @author Codestech
- * @see ClientBoundPacket
+ * @see ServerPacket
  */
-public sealed interface ServerPluginRequestPacket extends ClientBoundPacket permits ServerPluginRequestPacketImpl {
+public sealed interface ServerPluginMessageRequestPacket extends ServerPacket
+        permits ServerPluginMessageRequestPacketImpl {
     /**
-     * Gets an identifier of a message, should be unique to the connection.
+     * Gets an identifier of the plugin message, should be unique to the connection.
      *
      * @return the identifier
      * @since 1.0
@@ -29,7 +30,7 @@ public sealed interface ServerPluginRequestPacket extends ClientBoundPacket perm
     @NonNull Key channel();
 
     /**
-     * Gets a data of a message.
+     * Gets a data of the plugin message.
      *
      * @return the data
      * @since 1.0
@@ -37,25 +38,25 @@ public sealed interface ServerPluginRequestPacket extends ClientBoundPacket perm
     byte @NonNull [] data();
 
     /**
-     * Creates a new {@link Builder plugin request packet builder}.
+     * Creates a new {@linkplain Builder plugin message request packet builder}.
      *
      * @return the builder
      * @since 1.0
      */
     static @NonNull Builder builder() {
-        return new ServerPluginRequestPacketImpl.Builder();
+        return new ServerPluginMessageRequestPacketImpl.Builder();
     }
 
     /**
-     * Represents a builder creating {@link ServerPluginRequestPacket plugin request packet}.
+     * Represents a builder creating {@linkplain ServerPluginMessageRequestPacket plugin message request packet}.
      *
      * @since 1.0
      * @author Codstech
-     * @see ServerPluginRequestPacket
+     * @see ServerPluginMessageRequestPacket
      */
-    sealed interface Builder permits ServerPluginRequestPacketImpl.Builder {
+    sealed interface Builder permits ServerPluginMessageRequestPacketImpl.Builder {
         /**
-         * Sets an identifier of a message, should be unique to the connection.
+         * Sets an identifier of the plugin message, should be unique to the connection.
          *
          * @param messageId the identifier
          * @return the builder
@@ -73,7 +74,7 @@ public sealed interface ServerPluginRequestPacket extends ClientBoundPacket perm
         @NonNull Builder channel(@NonNull Key channel);
 
         /**
-         * Sets a data of a message.
+         * Sets a data of the plugin message.
          *
          * @param data the data
          * @return the builder
@@ -82,11 +83,12 @@ public sealed interface ServerPluginRequestPacket extends ClientBoundPacket perm
         @NonNull Builder data(byte @NonNull [] data);
 
         /**
-         * Builds the {@link ServerPluginRequestPacket plugin request packet}.
+         * Builds the {@linkplain ServerPluginMessageRequestPacket plugin message request packet}.
          *
-         * @return the plugin request packet
+         * @return the plugin message request packet
          * @since 1.0
          */
-        @NonNull ServerPluginRequestPacket build();
+        @NonNull
+        ServerPluginMessageRequestPacket build();
     }
 }

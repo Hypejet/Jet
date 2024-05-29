@@ -5,7 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.protocol.packet.serverbound.ServerBoundPacket;
+import net.hypejet.jet.protocol.packet.client.ClientPacket;
 import net.hypejet.jet.server.buffer.NetworkBufferImpl;
 import net.hypejet.jet.server.player.SocketPlayerConnection;
 import net.hypejet.jet.server.protocol.ServerBoundPacketRegistry;
@@ -20,7 +20,7 @@ import java.util.List;
  *
  * @since 1.0
  * @author Codestech
- * @see ServerBoundPacket
+ * @see ClientPacket
  */
 public final class PacketDecoder extends ByteToMessageDecoder {
 
@@ -52,7 +52,7 @@ public final class PacketDecoder extends ByteToMessageDecoder {
         int packetId = buffer.readVarInt();
 
         ProtocolState protocolState = this.playerConnection.getProtocolState();
-        ServerBoundPacket packet = this.packetRegistry.read(packetId, protocolState, buffer);
+        ClientPacket packet = this.packetRegistry.read(packetId, protocolState, buffer);
 
         if (packet == null) throw packetReaderNotFound(packetId, protocolState);
 

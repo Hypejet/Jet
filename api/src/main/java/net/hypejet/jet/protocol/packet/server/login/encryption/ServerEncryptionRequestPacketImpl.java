@@ -1,11 +1,11 @@
-package net.hypejet.jet.protocol.packet.clientbound.login.encryption;
+package net.hypejet.jet.protocol.packet.server.login.encryption;
 
 import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.protocol.ProtocolState;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents an implementation of {@link EncryptionRequestPacket encryption request packet}.
+ * Represents an implementation of {@linkplain ServerEncryptionRequestPacket encryption request packet}.
  *
  * @param serverId an identifier of server requesting the encryption
  * @param publicKey a public key of server requesting the encryption
@@ -15,10 +15,12 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @since 1.0
  * @author Codestech
- * @see EncryptionRequestPacket
+ * @see ServerEncryptionRequestPacket
  */
-record EncryptionRequestPacketImpl(@NonNull String serverId, byte @NonNull [] publicKey, byte @NonNull [] verifyToken,
-                                   boolean shouldAuthenticate) implements EncryptionRequestPacket {
+record ServerEncryptionRequestPacketImpl(
+        @NonNull String serverId, byte @NonNull [] publicKey,
+        byte @NonNull [] verifyToken, boolean shouldAuthenticate
+) implements ServerEncryptionRequestPacket {
     @Override
     public int getPacketId() {
         return 1;
@@ -38,13 +40,14 @@ record EncryptionRequestPacketImpl(@NonNull String serverId, byte @NonNull [] pu
     }
 
     /**
-     * Represents an implementation of {@link EncryptionRequestPacket.Builder encryption request packet builder}.
+     * Represents an implementation of {@linkplain ServerEncryptionRequestPacket.Builder encryption request packet
+     * builder}.
      *
      * @since 1.0
      * @author Codestech
-     * @see EncryptionRequestPacket.Builder
+     * @see ServerEncryptionRequestPacket.Builder
      */
-    static final class Builder implements EncryptionRequestPacket.Builder {
+    static final class Builder implements ServerEncryptionRequestPacket.Builder {
 
         private String serverId = "";
         private byte[] publicKey = new byte[0];
@@ -70,14 +73,14 @@ record EncryptionRequestPacketImpl(@NonNull String serverId, byte @NonNull [] pu
         }
 
         @Override
-        public EncryptionRequestPacket.@NonNull Builder shouldAuthenticate(boolean shouldAuthenticate) {
+        public ServerEncryptionRequestPacket.@NonNull Builder shouldAuthenticate(boolean shouldAuthenticate) {
             this.shouldAuthenticate = shouldAuthenticate;
             return this;
         }
 
         @Override
-        public @NonNull EncryptionRequestPacket build() {
-            return new EncryptionRequestPacketImpl(this.serverId, this.publicKey, this.verifyToken,
+        public @NonNull ServerEncryptionRequestPacket build() {
+            return new ServerEncryptionRequestPacketImpl(this.serverId, this.publicKey, this.verifyToken,
                     this.shouldAuthenticate);
         }
     }

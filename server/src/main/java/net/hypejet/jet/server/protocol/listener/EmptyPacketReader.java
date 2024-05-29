@@ -2,7 +2,7 @@ package net.hypejet.jet.server.protocol.listener;
 
 import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.protocol.packet.serverbound.ServerBoundPacket;
+import net.hypejet.jet.protocol.packet.client.ClientPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.function.Supplier;
@@ -14,7 +14,7 @@ import java.util.function.Supplier;
  * @since 1.0
  * @author Codestech
  */
-public abstract class EmptyPacketReader<P extends ServerBoundPacket> extends PacketReader<P> {
+public abstract class EmptyPacketReader<P extends ClientPacket> extends PacketReader<P> {
 
     private final Supplier<P> packetSupplier;
 

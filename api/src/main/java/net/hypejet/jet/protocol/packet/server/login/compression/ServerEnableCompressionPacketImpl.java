@@ -1,11 +1,11 @@
-package net.hypejet.jet.protocol.packet.clientbound.login.compression;
+package net.hypejet.jet.protocol.packet.server.login.compression;
 
 import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.protocol.ProtocolState;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents an implementation of {@link ServerEnableCompressionPacket enable compression packet}.
+ * Represents an implementation of {@linkplain ServerEnableCompressionPacket enable compression packet}.
  *
  * @param threshold a maximum size of packet before it is compressed
  * @since 1.0
@@ -29,7 +29,8 @@ record ServerEnableCompressionPacketImpl(int threshold) implements ServerEnableC
     }
 
     /**
-     * Represents an implementation of {@link ServerEnableCompressionPacket.Builder enable compression packet builder}.
+     * Represents an implementation of {@linkplain ServerEnableCompressionPacket.Builder enable compression packet
+     * builder}.
      *
      * @since 1.0
      * @author Codestech

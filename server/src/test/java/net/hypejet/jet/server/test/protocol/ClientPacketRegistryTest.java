@@ -3,9 +3,9 @@ package net.hypejet.jet.server.test.protocol;
 import io.netty.buffer.Unpooled;
 import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.protocol.packet.serverbound.ServerBoundPacket;
-import net.hypejet.jet.protocol.packet.serverbound.handshake.HandshakePacket;
-import net.hypejet.jet.protocol.packet.serverbound.login.LoginRequestPacket;
+import net.hypejet.jet.protocol.packet.client.ClientPacket;
+import net.hypejet.jet.protocol.packet.client.handshake.ClientHandshakePacket;
+import net.hypejet.jet.protocol.packet.client.login.ClientLoginRequestPacket;
 import net.hypejet.jet.server.buffer.NetworkBufferImpl;
 import net.hypejet.jet.server.protocol.ServerBoundPacketRegistry;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -20,7 +20,7 @@ import java.util.UUID;
  * @since 1.0
  * @author Codestech
  */
-public final class ServerBoundPacketRegistryTest {
+public final class ClientPacketRegistryTest {
 
     private final ServerBoundPacketRegistry packetRegistry = new ServerBoundPacketRegistry();
 
@@ -42,15 +42,15 @@ public final class ServerBoundPacketRegistryTest {
         buffer.writeUnsignedShort(serverPort);
         buffer.writeVarInt(2);
 
-        ServerBoundPacket packet = this.packetRegistry.read(0, ProtocolState.HANDSHAKE, buffer);
-        Assertions.assertInstanceOf(HandshakePacket.class, packet);
+        ClientPacket packet = this.packetRegistry.read(0, ProtocolState.HANDSHAKE, buffer);
+        Assertions.assertInstanceOf(ClientHandshakePacket.class, packet);
 
-        HandshakePacket handshakePacket = (HandshakePacket) packet;
+        ClientHandshakePacket clientHandshakePacket = (ClientHandshakePacket) packet;
 
-        Assertions.assertEquals(protocolVersion, handshakePacket.protocolVersion());
-        Assertions.assertEquals(serverAddress, handshakePacket.serverAddress());
-        Assertions.assertEquals(serverPort, handshakePacket.serverPort());
-        Assertions.assertEquals(ProtocolState.LOGIN, handshakePacket.nextState());
+        Assertions.assertEquals(protocolVersion, clientHandshakePacket.protocolVersion());
+        Assertions.assertEquals(serverAddress, clientHandshakePacket.serverAddress());
+        Assertions.assertEquals(serverPort, clientHandshakePacket.serverPort());
+        Assertions.assertEquals(ProtocolState.LOGIN, clientHandshakePacket.nextState());
     }
 
     @Test
@@ -63,10 +63,10 @@ public final class ServerBoundPacketRegistryTest {
         buffer.writeString(username);
         buffer.writeUniqueId(uuid);
 
-        ServerBoundPacket packet = this.packetRegistry.read(0, ProtocolState.LOGIN, buffer);
-        Assertions.assertInstanceOf(LoginRequestPacket.class, packet);
+        ClientPacket packet = this.packetRegistry.read(0, ProtocolState.LOGIN, buffer);
+        Assertions.assertInstanceOf(ClientLoginRequestPacket.class, packet);
 
-        LoginRequestPacket requestPacket = (LoginRequestPacket) packet;
+        ClientLoginRequestPacket requestPacket = (ClientLoginRequestPacket) packet;
 
         Assertions.assertEquals(username, requestPacket.username());
         Assertions.assertEquals(uuid, requestPacket.uniqueId());

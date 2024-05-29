@@ -3,20 +3,20 @@ package net.hypejet.jet.server.protocol.listener.login;
 import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.server.protocol.listener.PacketReader;
-import net.hypejet.jet.protocol.packet.serverbound.login.LoginRequestPacket;
+import net.hypejet.jet.protocol.packet.client.login.ClientLoginRequestPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.UUID;
 
 /**
- * Represents a {@link PacketReader packet reader}, which reads a {@link LoginRequestPacket login request packet}.
+ * Represents a {@link PacketReader packet reader}, which reads a {@link ClientLoginRequestPacket login request packet}.
  *
  * @since 1.0
  * @author Codestech
- * @see LoginRequestPacket
+ * @see ClientLoginRequestPacket
  * @see PacketReader
  */
-public final class LoginRequestPacketReader extends PacketReader<LoginRequestPacket> {
+public final class LoginRequestPacketReader extends PacketReader<ClientLoginRequestPacket> {
 
     /**
      * Constructs a {@link LoginRequestPacketReader login request packet reader}.
@@ -28,17 +28,17 @@ public final class LoginRequestPacketReader extends PacketReader<LoginRequestPac
     }
 
     @Override
-    public @NonNull LoginRequestPacket read(@NonNull NetworkBuffer buffer) {
-        return new LoginRequestPacketImpl(buffer.readString(), buffer.readUniqueId());
+    public @NonNull ClientLoginRequestPacket read(@NonNull NetworkBuffer buffer) {
+        return new ClientLoginRequestPacketImpl(buffer.readString(), buffer.readUniqueId());
     }
 
     /**
-     * Represents an implementation of {@link LoginRequestPacket login request packet}.
+     * Represents an implementation of {@link ClientLoginRequestPacket login request packet}.
      *
      * @param username a username of a player that sends the packet
      * @param uniqueId a {@link UUID unique identifier} of a player that sends the packet
      * @since 1.0
      */
-    private record LoginRequestPacketImpl(@NonNull String username,
-                                          @NonNull UUID uniqueId) implements LoginRequestPacket {}
+    private record ClientLoginRequestPacketImpl(@NonNull String username,
+                                                @NonNull UUID uniqueId) implements ClientLoginRequestPacket {}
 }

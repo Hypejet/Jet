@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.protocol.listener.login;
 
 import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.protocol.packet.serverbound.login.ClientLoginAcknowledgePacket;
+import net.hypejet.jet.protocol.packet.client.login.ClientLoginAcknowledgePacket;
 import net.hypejet.jet.server.protocol.listener.EmptyPacketReader;
 
 /**

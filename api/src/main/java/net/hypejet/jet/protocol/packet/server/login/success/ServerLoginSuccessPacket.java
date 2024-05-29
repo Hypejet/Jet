@@ -1,7 +1,7 @@
-package net.hypejet.jet.protocol.packet.clientbound.login.success;
+package net.hypejet.jet.protocol.packet.server.login.success;
 
 import net.hypejet.jet.player.profile.properties.GameProfileProperties;
-import net.hypejet.jet.protocol.packet.clientbound.ClientBoundPacket;
+import net.hypejet.jet.protocol.packet.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -9,14 +9,14 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Represents a {@link  ClientBoundPacket client-bound packet}, which is sent when a server successfully logs in a
+ * Represents a {@linkplain ServerPacket server packet}, which is sent when a server successfully logs in a
  * player.
  *
  * @since 1.0
  * @author Codestech
- * @see ClientBoundPacket
+ * @see ServerPacket
  */
-public sealed interface ServerLoginSuccessPacket extends ClientBoundPacket permits ServerLoginSuccessPacketImpl {
+public sealed interface ServerLoginSuccessPacket extends ServerPacket permits ServerLoginSuccessPacketImpl {
     /**
      * Gets a unique identifier of a player that is logged in.
      *
@@ -34,7 +34,7 @@ public sealed interface ServerLoginSuccessPacket extends ClientBoundPacket permi
     @NonNull String username();
 
     /**
-     * Gets a {@link GameProfileProperties game profile properties} of a player that is logged in.
+     * Gets a {@linkplain GameProfileProperties game profile properties} of a player that is logged in.
      *
      * @return the game profile properties
      * @since 1.0
@@ -50,7 +50,7 @@ public sealed interface ServerLoginSuccessPacket extends ClientBoundPacket permi
     boolean strictErrorHandling();
 
     /**
-     * Creates a new {@link Builder login success packet builder}.
+     * Creates a new {@linkplain Builder login success packet builder}.
      *
      * @return the builder
      * @since 1.0
@@ -61,7 +61,7 @@ public sealed interface ServerLoginSuccessPacket extends ClientBoundPacket permi
     }
 
     /**
-     * Represents a builder of {@link ServerLoginSuccessPacket login success packet}.
+     * Represents a builder of {@linkplain ServerLoginSuccessPacket login success packet}.
      *
      * @since 1.0
      * @author Codestech
@@ -87,7 +87,7 @@ public sealed interface ServerLoginSuccessPacket extends ClientBoundPacket permi
         @NonNull Builder username(@NonNull String username);
 
         /**
-         * Sets a collection of {@link GameProfileProperties game profile properties} of a player logging in.
+         * Sets a collection of {@linkplain GameProfileProperties game profile properties} of a player logging in.
          *
          * @param properties the collection
          * @return the builder
@@ -105,7 +105,7 @@ public sealed interface ServerLoginSuccessPacket extends ClientBoundPacket permi
         @NonNull Builder strictErrorHandling(boolean strictErrorHandling);
 
         /**
-         * Builds the {@link ServerLoginSuccessPacket login success packet}.
+         * Builds the {@linkplain ServerLoginSuccessPacket login success packet}.
          *
          * @return the login success packet
          * @since 1.0
@@ -113,7 +113,7 @@ public sealed interface ServerLoginSuccessPacket extends ClientBoundPacket permi
         @NonNull ServerLoginSuccessPacket build();
 
         /**
-         * Sets a collection of {@link GameProfileProperties game profile properties} of a player logging in.
+         * Sets a collection of {@linkplain GameProfileProperties game profile properties} of a player logging in.
          *
          * @param properties the collection
          * @return the builder

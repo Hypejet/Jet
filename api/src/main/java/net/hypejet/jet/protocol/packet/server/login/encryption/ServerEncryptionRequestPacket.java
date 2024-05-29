@@ -1,16 +1,16 @@
-package net.hypejet.jet.protocol.packet.clientbound.login.encryption;
+package net.hypejet.jet.protocol.packet.server.login.encryption;
 
-import net.hypejet.jet.protocol.packet.clientbound.ClientBoundPacket;
+import net.hypejet.jet.protocol.packet.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@link ClientBoundPacket client-bound packet}, which requests an encryption from a Minecraft client.
+ * Represents a {@linkplain ServerPacket server packet}, which requests an encryption from a Minecraft client.
  *
  * @since 1.0
  * @author Codestech
- * @see ClientBoundPacket
+ * @see ServerPacket
  */
-public sealed interface EncryptionRequestPacket extends ClientBoundPacket permits EncryptionRequestPacketImpl {
+public sealed interface ServerEncryptionRequestPacket extends ServerPacket permits ServerEncryptionRequestPacketImpl {
     /**
      * Gets an identifier of a server requesting the encryption.
      *
@@ -44,22 +44,22 @@ public sealed interface EncryptionRequestPacket extends ClientBoundPacket permit
     boolean shouldAuthenticate();
 
     /**
-     * Creates a new {@link Builder encryption request packet builder}.
+     * Creates a new {@linkplain Builder encryption request packet builder}.
      *
      * @return the encryption request packet builder
      * @since 1.0
      */
     static @NonNull Builder builder() {
-        return new EncryptionRequestPacketImpl.Builder();
+        return new ServerEncryptionRequestPacketImpl.Builder();
     }
 
     /**
-     * Represents a builder that creates a {@link EncryptionRequestPacket encryption request packet}.
+     * Represents a builder that creates a {@linkplain ServerEncryptionRequestPacket encryption request packet}.
      *
      * @since 1.0
      * @author Codestech
      */
-    sealed interface Builder permits EncryptionRequestPacketImpl.Builder {
+    sealed interface Builder permits ServerEncryptionRequestPacketImpl.Builder {
         /**
          * Sets an identifier of a server requesting the encryption.
          *
@@ -97,11 +97,12 @@ public sealed interface EncryptionRequestPacket extends ClientBoundPacket permit
         @NonNull Builder shouldAuthenticate(boolean shouldAuthenticate);
 
         /**
-         * Builds the {@link EncryptionRequestPacket encryption request packet}.
+         * Builds the {@linkplain ServerEncryptionRequestPacket encryption request packet}.
          *
          * @return the encryption request packet
          * @since 1.0
          */
-        @NonNull EncryptionRequestPacket build();
+        @NonNull
+        ServerEncryptionRequestPacket build();
     }
 }

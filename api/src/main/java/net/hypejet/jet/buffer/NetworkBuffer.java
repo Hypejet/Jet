@@ -269,6 +269,14 @@ public interface NetworkBuffer extends NetworkWritable {
     boolean isReadable(int length);
 
     /**
+     * Converts this {@linkplain NetworkBuffer network buffer} to a byte array.
+     *
+     * @return the byte array
+     * @since 1.0
+     */
+    byte @NonNull [] toByteArray();
+
+    /**
      * Reads an identifier from the buffer.
      *
      * @return the identifier
@@ -364,7 +372,7 @@ public interface NetworkBuffer extends NetworkWritable {
     }
 
     /**
-     * Writes a collection of {@link NetworkWritable network writable} objects to the buffer.
+     * Writes a collection of {@linkplain NetworkWritable network writable} objects to the buffer.
      *
      * @param collection the collection
      * @since 1.0
@@ -376,6 +384,17 @@ public interface NetworkBuffer extends NetworkWritable {
         if (size > 0) {
             collection.forEach(writable -> writable.write(this));
         }
+    }
+
+    /**
+     * Writes this {@linkplain NetworkBuffer network buffer} to another .
+     *
+     * @param buffer the another network buffer
+     * @since 1.0
+     */
+    @Override
+    default void write(@NonNull NetworkBuffer buffer) {
+        buffer.writeByteArray(this.toByteArray(), false);
     }
 
     private static @NonNull RuntimeException identifierNotParseable(@NonNull String identifier) {

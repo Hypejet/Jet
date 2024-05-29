@@ -188,6 +188,11 @@ public final class NetworkBufferImpl implements NetworkBuffer {
     }
 
     @Override
+    public byte @NonNull [] toByteArray() {
+        return this.buf.array();
+    }
+
+    @Override
     public byte @NonNull [] readByteArray(boolean readLength) {
         byte[] array;
 
@@ -205,12 +210,5 @@ public final class NetworkBufferImpl implements NetworkBuffer {
         }
 
         return array;
-    }
-
-    @Override
-    public void write(@NonNull NetworkBuffer buffer) {
-        if (!(buffer instanceof NetworkBufferImpl implementation))
-            throw new IllegalStateException("A network buffer implementation is invalid, expected NetworkBufferImpl");
-        implementation.buf.writeBytes(this.buf);
     }
 }

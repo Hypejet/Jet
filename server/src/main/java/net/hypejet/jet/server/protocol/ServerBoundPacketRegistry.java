@@ -2,7 +2,7 @@ package net.hypejet.jet.server.protocol;
 
 import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.protocol.packet.serverbound.ServerBoundPacket;
+import net.hypejet.jet.protocol.packet.client.ClientPacket;
 import net.hypejet.jet.server.protocol.listener.PacketReader;
 import net.hypejet.jet.server.protocol.listener.handshake.HandshakePacketReader;
 import net.hypejet.jet.server.protocol.listener.login.ClientEncryptionResponsePacketReader;
@@ -15,7 +15,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.Set;
 
 /**
- * Represents a registry of a {@link ServerBoundPacket server-bound packet} readers.
+ * Represents a registry of a {@link ClientPacket server-bound packet} readers.
  *
  * @since 1.0
  * @author Codestech
@@ -40,7 +40,7 @@ public final class ServerBoundPacketRegistry {
      * @return the packet, which may be null if the packet reader is not present
      * @since 1.0
      */
-    public @Nullable ServerBoundPacket read(int packetId, @NonNull ProtocolState state, @NonNull NetworkBuffer buffer) {
+    public @Nullable ClientPacket read(int packetId, @NonNull ProtocolState state, @NonNull NetworkBuffer buffer) {
         PacketReader<?> packetReader = this.getReader(packetId, state);
         if (packetReader == null) return null;
         return packetReader.read(buffer);

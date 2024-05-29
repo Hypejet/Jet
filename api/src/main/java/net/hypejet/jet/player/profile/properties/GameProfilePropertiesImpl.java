@@ -7,9 +7,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.UUID;
 
 /**
- * Represents an implementation of {@link GameProfileProperties game profile properties}.
+ * Represents an implementation of {@linkplain GameProfileProperties game profile properties}.
  *
- * @param uniqueId an unique identifier of a Minecraft player
+ * @param uniqueId a unique identifier of a Minecraft player
  * @param username a username of a Minecraft player
  * @param signature an optional signature of a Minecraft player
  * @since 1.0
@@ -26,7 +26,7 @@ record GameProfilePropertiesImpl(@NonNull UUID uniqueId, @NonNull String usernam
     }
 
     /**
-     * Represents an implementation of {@link GameProfileProperties.Builder game profile properties builder}.
+     * Represents an implementation of {@linkplain GameProfileProperties.Builder game profile properties builder}.
      *
      * @since 1.0
      * @author Codestech

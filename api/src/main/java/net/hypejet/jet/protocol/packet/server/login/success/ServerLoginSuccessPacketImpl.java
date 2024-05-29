@@ -1,4 +1,4 @@
-package net.hypejet.jet.protocol.packet.clientbound.login.success;
+package net.hypejet.jet.protocol.packet.server.login.success;
 
 import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.player.profile.properties.GameProfileProperties;
@@ -10,11 +10,11 @@ import java.util.Collections;
 import java.util.UUID;
 
 /**
- * Represents an implementation of {@link ServerLoginSuccessPacket login success packet}.
+ * Represents an implementation of {@linkplain ServerLoginSuccessPacket login success packet}.
  *
  * @param uniqueId a unique identifier of a player logging in
  * @param username a username of a player logging in
- * @param properties a collection of {@link GameProfileProperties game profile properties} of a player logging in
+ * @param properties a collection of {@linkplain GameProfileProperties game profile properties} of a player logging in
  * @param strictErrorHandling whether a player logging in should use strict error handling
  * @since 1.0
  * @author Codestech
@@ -42,7 +42,7 @@ record ServerLoginSuccessPacketImpl(@NonNull UUID uniqueId, @NonNull String user
     }
 
     /**
-     * Represents an implementation of {@link ServerLoginSuccessPacket.Builder login success packet builder}.
+     * Represents an implementation of {@linkplain ServerLoginSuccessPacket.Builder login success packet builder}.
      *
      * @since 1.0
      * @author Codestech

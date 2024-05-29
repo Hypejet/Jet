@@ -1,17 +1,18 @@
-package net.hypejet.jet.protocol.packet.serverbound.login;
+package net.hypejet.jet.protocol.packet.client.login;
 
-import net.hypejet.jet.protocol.packet.serverbound.ServerBoundPacket;
+import net.hypejet.jet.protocol.packet.client.ClientPacket;
+import net.hypejet.jet.protocol.packet.server.login.encryption.ServerEncryptionRequestPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@link ServerBoundPacket server-bound packet}, which is being sent from a client when it authenticates.
+ * Represents a {@linkplain ClientPacket client packet}, which is being sent when a client finishes an authentication.
  *
  * @since 1.0
  * @author Codestech
- * @see ServerBoundPacket
- * @see net.hypejet.jet.protocol.packet.clientbound.login.encryption.EncryptionRequestPacket
+ * @see ClientPacket
+ * @see ServerEncryptionRequestPacket
  */
-public interface ClientEncryptionResponsePacket extends ServerBoundPacket {
+public interface ClientEncryptionResponsePacket extends ClientPacket {
     /**
      * Gets a shared secret value, which is encrypted with a public key of the server.
      *

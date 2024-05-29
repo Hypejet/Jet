@@ -1,16 +1,16 @@
-package net.hypejet.jet.protocol.packet.clientbound.login.compression;
+package net.hypejet.jet.protocol.packet.server.login.compression;
 
-import net.hypejet.jet.protocol.packet.clientbound.ClientBoundPacket;
+import net.hypejet.jet.protocol.packet.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@link ClientBoundPacket client-bound packet}, which is sent by a server to enable a packet compression.
+ * Represents a {@linkplain ServerPacket server packet}, which is sent to enable a packet compression.
  *
  * @since 1.0
  * @author Codestech
- * @see ClientBoundPacket
+ * @see ServerPacket
  */
-public sealed interface ServerEnableCompressionPacket extends ClientBoundPacket
+public sealed interface ServerEnableCompressionPacket extends ServerPacket
         permits ServerEnableCompressionPacketImpl {
     /**
      * Gets a maximum size of a packet before it is compressed.
@@ -21,7 +21,7 @@ public sealed interface ServerEnableCompressionPacket extends ClientBoundPacket
     int threshold();
 
     /**
-     * Creates a new {@link Builder enable compression packet builder}.
+     * Creates a new {@linkplain Builder enable compression packet builder}.
      *
      * @return the builder
      * @since 1.0
@@ -32,7 +32,7 @@ public sealed interface ServerEnableCompressionPacket extends ClientBoundPacket
     }
 
     /**
-     * Represents a builder for {@link ServerEnableCompressionPacket enable compression packet}.
+     * Represents a builder for {@linkplain ServerEnableCompressionPacket enable compression packet}.
      *
      * @since 1.0
      * @author Codestech
@@ -48,7 +48,7 @@ public sealed interface ServerEnableCompressionPacket extends ClientBoundPacket
         @NonNull Builder threshold(int threshold);
 
         /**
-         * Builds the {@link ServerEnableCompressionPacket enable compression packet}.
+         * Builds the {@linkplain ServerEnableCompressionPacket enable compression packet}.
          *
          * @return the enable compression packet
          * @since 1.0

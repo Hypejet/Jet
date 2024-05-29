@@ -39,7 +39,7 @@ public sealed interface GameProfileProperties extends NetworkWritable permits Ga
     @Nullable String signature();
 
     /**
-     * Creates a new {@link Builder game profile builder}.
+     * Creates a new {@linkplain Builder game profile builder}.
      *
      * @return the game profile builder
      * @since 1.0
@@ -49,7 +49,7 @@ public sealed interface GameProfileProperties extends NetworkWritable permits Ga
     }
 
     /**
-     * Represents a builder of {@link GameProfileProperties game profile properties}.
+     * Represents a builder of {@linkplain GameProfileProperties game profile properties}.
      *
      * @since 1.0
      * @author Codestech
@@ -83,7 +83,7 @@ public sealed interface GameProfileProperties extends NetworkWritable permits Ga
         @NonNull Builder signature(@Nullable String signature);
 
         /**
-         * Builds the {@link GameProfileProperties game profile properties}
+         * Builds the {@linkplain GameProfileProperties game profile properties}
          *
          * @return the game profile properties
          * @since 1.0

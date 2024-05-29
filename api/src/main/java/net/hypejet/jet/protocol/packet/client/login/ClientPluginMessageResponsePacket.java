@@ -1,19 +1,19 @@
-package net.hypejet.jet.protocol.packet.serverbound.login;
+package net.hypejet.jet.protocol.packet.client.login;
 
-import net.hypejet.jet.protocol.packet.clientbound.login.plugin.ServerPluginRequestPacket;
-import net.hypejet.jet.protocol.packet.serverbound.ServerBoundPacket;
+import net.hypejet.jet.protocol.packet.server.login.plugin.ServerPluginMessageRequestPacket;
+import net.hypejet.jet.protocol.packet.client.ClientPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain ServerBoundPacket server-bound packet}, which is a response for a
- * {@linkplain ServerPluginRequestPacket plugin request packet} sent by a server.
+ * Represents a {@linkplain ClientPacket client packet}, which is a response for a
+ * {@linkplain ServerPluginMessageRequestPacket plugin request packet} sent by a server.
  *
  * @since 1.0
  * @author Codestech
- * @see ServerPluginRequestPacket
- * @see ServerBoundPacket
+ * @see ServerPluginMessageRequestPacket
+ * @see ClientPacket
  */
-public interface ClientPluginMessageResponsePacket extends ServerBoundPacket {
+public interface ClientPluginMessageResponsePacket extends ClientPacket {
     /**
      * Gets an identifier of the plugin message.
      *
