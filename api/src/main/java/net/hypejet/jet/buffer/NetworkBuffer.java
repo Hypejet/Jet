@@ -299,18 +299,18 @@ public interface NetworkBuffer extends NetworkWritable {
      * @since 1.0
      */
     default byte @NonNull [] readByteArray() {
-        int length = this.readVarInt();
-        byte[] array = new byte[length];
-
-        if (!this.isReadable(length))
-            throw new IllegalArgumentException("An amount of remaining bytes is lower than a string size");
-
-        for (int i = 0; i < length; i++) {
-            array[i] = this.readByte();
-        }
-
-        return array;
+        return this.readByteArray(true);
     }
+
+    /**
+     * Reads a byte array from the buffer.
+     *
+     * @param readLength whether a length of the array should be read
+     * @return the byte array
+     * @throws IllegalArgumentException if an amount of remaining bytes is lower than a string size
+     * @since 1.0
+     */
+    byte @NonNull [] readByteArray(boolean readLength);
 
     /**
      * Writes a byte array to the buffer.
@@ -319,7 +319,20 @@ public interface NetworkBuffer extends NetworkWritable {
      * @since 1.0
      */
     default void writeByteArray(byte @NonNull [] value) {
-        this.writeVarInt(value.length);
+        this.writeByteArray(value, true);
+    }
+
+    /**
+     * Writes a byte array to the buffer.
+     *
+     * @param writeLength whether a length of the array should be written
+     * @param value the byte array
+     * @since 1.0
+     */
+    default void writeByteArray(byte @NonNull [] value, boolean writeLength) {
+        if (writeLength) {
+            this.writeVarInt(value.length);
+        }
 
         for (byte element : value) {
             this.writeByte(element);

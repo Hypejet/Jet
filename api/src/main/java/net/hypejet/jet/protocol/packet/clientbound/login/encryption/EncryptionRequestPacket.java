@@ -97,7 +97,7 @@ public sealed interface EncryptionRequestPacket extends ClientBoundPacket permit
         @NonNull Builder shouldAuthenticate(boolean shouldAuthenticate);
 
         /**
-         * Build the {@link EncryptionRequestPacket encryption request packet}.
+         * Builds the {@link EncryptionRequestPacket encryption request packet}.
          *
          * @return the encryption request packet
          * @since 1.0

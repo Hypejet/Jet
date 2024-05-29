@@ -188,6 +188,26 @@ public final class NetworkBufferImpl implements NetworkBuffer {
     }
 
     @Override
+    public byte @NonNull [] readByteArray(boolean readLength) {
+        byte[] array;
+
+        if (readLength) {
+            int length = this.readVarInt();
+            if (!this.isReadable(length))
+                throw new IllegalArgumentException("An amount of remaining bytes is lower than a string size");
+            array = new byte[length];
+        } else {
+            array = new byte[this.buf.readableBytes() - this.buf.writerIndex()];
+        }
+
+        for (int i = 0; i < array.length; i++) {
+            array[i] = this.readByte();
+        }
+
+        return array;
+    }
+
+    @Override
     public void write(@NonNull NetworkBuffer buffer) {
         if (!(buffer instanceof NetworkBufferImpl implementation))
             throw new IllegalStateException("A network buffer implementation is invalid, expected NetworkBufferImpl");
