@@ -61,7 +61,6 @@ public final class PacketDecoder extends ByteToMessageDecoder {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
         this.playerConnection.close(); // Close the connection to avoid more issues
         LOGGER.error("An error occurred while decoding a packet", cause);
     }
