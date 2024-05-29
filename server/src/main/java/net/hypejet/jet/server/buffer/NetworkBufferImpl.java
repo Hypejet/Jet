@@ -197,7 +197,7 @@ public final class NetworkBufferImpl implements NetworkBuffer {
                 throw new IllegalArgumentException("An amount of remaining bytes is lower than a string size");
             array = new byte[length];
         } else {
-            array = new byte[this.buf.readableBytes() - this.buf.writerIndex()];
+            array = new byte[this.buf.readableBytes()];
         }
 
         for (int i = 0; i < array.length; i++) {
