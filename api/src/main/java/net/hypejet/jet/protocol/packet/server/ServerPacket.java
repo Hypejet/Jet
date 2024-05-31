@@ -1,7 +1,9 @@
 package net.hypejet.jet.protocol.packet.server;
+
 import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.network.NetworkWritable;
 import net.hypejet.jet.protocol.ProtocolState;
+import net.hypejet.jet.protocol.packet.server.login.ServerLoginPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -10,7 +12,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 1.0
  * @author Codestech
  */
-public interface ServerPacket extends NetworkWritable {
+public sealed interface ServerPacket extends NetworkWritable permits ServerLoginPacket {
     /**
      * Gets an identifier of the packet.
      *

@@ -1,17 +1,17 @@
 package net.hypejet.jet.protocol.packet.server.login.disconnect;
 
-import net.hypejet.jet.protocol.packet.server.ServerPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerLoginPacket;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain ServerPacket server packet} sent by a server to disconnect a player.
+ * Represents a {@linkplain ServerLoginPacket server login packet} sent by a server to disconnect a player.
  *
  * @since 1.0
  * @author Codestech
- * @see ServerPacket
+ * @see ServerLoginPacket
  */
-public sealed interface ServerDisconnectPacket extends ServerPacket permits ServerDisconnectPacketImpl {
+public sealed interface ServerDisconnectPacket extends ServerLoginPacket permits ServerDisconnectPacketImpl {
     /**
      * Gets a reason of the disconnection.
      *

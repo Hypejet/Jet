@@ -23,11 +23,6 @@ record ServerPluginMessageRequestPacketImpl(int messageId, @NonNull Key channel,
     }
 
     @Override
-    public @NonNull ProtocolState getProtocolState() {
-        return ProtocolState.LOGIN;
-    }
-
-    @Override
     public void write(@NonNull NetworkBuffer buffer) {
         buffer.writeVarInt(this.messageId);
         buffer.writeIdentifier(this.channel);

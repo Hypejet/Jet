@@ -29,11 +29,6 @@ record ServerLoginSuccessPacketImpl(@NonNull UUID uniqueId, @NonNull String user
     }
 
     @Override
-    public @NonNull ProtocolState getProtocolState() {
-        return ProtocolState.LOGIN;
-    }
-
-    @Override
     public void write(@NonNull NetworkBuffer buffer) {
         buffer.writeUniqueId(this.uniqueId);
         buffer.writeString(this.username);

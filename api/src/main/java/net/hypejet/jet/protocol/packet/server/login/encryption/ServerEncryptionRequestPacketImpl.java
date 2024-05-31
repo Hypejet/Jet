@@ -27,11 +27,6 @@ record ServerEncryptionRequestPacketImpl(
     }
 
     @Override
-    public @NonNull ProtocolState getProtocolState() {
-        return ProtocolState.LOGIN;
-    }
-
-    @Override
     public void write(@NonNull NetworkBuffer buffer) {
         buffer.writeString(this.serverId);
         buffer.writeByteArray(this.publicKey);

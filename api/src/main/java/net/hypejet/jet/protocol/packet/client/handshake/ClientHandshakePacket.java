@@ -11,7 +11,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 1.0
  * @author Codestech
  */
-public interface ClientHandshakePacket extends ClientPacket {
+public non-sealed interface ClientHandshakePacket extends ClientPacket {
     /**
      * Gets a version of the Minecraft protocol.
      *

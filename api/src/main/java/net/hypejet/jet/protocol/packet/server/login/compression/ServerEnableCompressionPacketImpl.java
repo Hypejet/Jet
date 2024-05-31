@@ -19,11 +19,6 @@ record ServerEnableCompressionPacketImpl(int threshold) implements ServerEnableC
     }
 
     @Override
-    public @NonNull ProtocolState getProtocolState() {
-        return ProtocolState.LOGIN;
-    }
-
-    @Override
     public void write(@NonNull NetworkBuffer buffer) {
         buffer.writeVarInt(this.threshold);
     }

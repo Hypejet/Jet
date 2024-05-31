@@ -1,19 +1,19 @@
 package net.hypejet.jet.protocol.packet.client.login;
 
+import net.hypejet.jet.protocol.packet.client.ClientLoginPacket;
 import net.hypejet.jet.protocol.packet.server.login.plugin.ServerPluginMessageRequestPacket;
-import net.hypejet.jet.protocol.packet.client.ClientPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain ClientPacket client packet}, which is a response for a
+ * Represents a {@linkplain ClientLoginPacket client login packet}, which is a response for a
  * {@linkplain ServerPluginMessageRequestPacket plugin request packet} sent by a server.
  *
  * @since 1.0
  * @author Codestech
  * @see ServerPluginMessageRequestPacket
- * @see ClientPacket
+ * @see ClientLoginPacket
  */
-public interface ClientPluginMessageResponsePacket extends ClientPacket {
+public non-sealed interface ClientPluginMessageResponsePacket extends ClientLoginPacket {
     /**
      * Gets an identifier of the plugin message.
      *

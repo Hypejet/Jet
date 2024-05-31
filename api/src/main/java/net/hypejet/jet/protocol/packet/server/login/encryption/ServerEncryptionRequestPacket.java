@@ -1,16 +1,17 @@
 package net.hypejet.jet.protocol.packet.server.login.encryption;
 
-import net.hypejet.jet.protocol.packet.server.ServerPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerLoginPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain ServerPacket server packet}, which requests an encryption from a Minecraft client.
+ * Represents a {@linkplain ServerLoginPacket server login packet}, which requests an encryption from a Minecraft
+ * client.
  *
  * @since 1.0
  * @author Codestech
- * @see ServerPacket
+ * @see ServerLoginPacket
  */
-public sealed interface ServerEncryptionRequestPacket extends ServerPacket permits ServerEncryptionRequestPacketImpl {
+public sealed interface ServerEncryptionRequestPacket extends ServerLoginPacket permits ServerEncryptionRequestPacketImpl {
     /**
      * Gets an identifier of a server requesting the encryption.
      *

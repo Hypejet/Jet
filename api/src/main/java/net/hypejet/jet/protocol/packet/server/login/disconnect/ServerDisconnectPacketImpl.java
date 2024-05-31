@@ -24,11 +24,6 @@ record ServerDisconnectPacketImpl(@NonNull Component reason) implements ServerDi
         return 0;
     }
 
-    @Override
-    public @NonNull ProtocolState getProtocolState() {
-        return ProtocolState.LOGIN;
-    }
-
     /**
      * Represents an implementation of {@linkplain ServerDisconnectPacket.Builder disconnect packet builder}.
      *

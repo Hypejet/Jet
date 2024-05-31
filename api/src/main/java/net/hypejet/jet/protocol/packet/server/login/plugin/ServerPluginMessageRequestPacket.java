@@ -1,17 +1,17 @@
 package net.hypejet.jet.protocol.packet.server.login.plugin;
 
-import net.hypejet.jet.protocol.packet.server.ServerPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerLoginPacket;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain ServerPacket server packet} used to implement a custom handshaking flow.
+ * Represents a {@linkplain ServerLoginPacket server login packet} used to implement a custom handshaking flow.
  *
  * @since 1.0
  * @author Codestech
- * @see ServerPacket
+ * @see ServerLoginPacket
  */
-public sealed interface ServerPluginMessageRequestPacket extends ServerPacket
+public sealed interface ServerPluginMessageRequestPacket extends ServerLoginPacket
         permits ServerPluginMessageRequestPacketImpl {
     /**
      * Gets an identifier of the plugin message, should be unique to the connection.

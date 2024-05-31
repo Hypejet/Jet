@@ -1,17 +1,17 @@
 package net.hypejet.jet.protocol.packet.client.login;
 
-import net.hypejet.jet.protocol.packet.client.ClientPacket;
+import net.hypejet.jet.protocol.packet.client.ClientLoginPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.UUID;
 
 /**
- * Represents a {@linkplain ClientPacket server-bound packet} that requests a server to send a login data.
+ * Represents a {@linkplain ClientLoginPacket client login packet} that requests a server to send a login data.
  *
  * @since 1.0
  * @author Codestech
  */
-public interface ClientLoginRequestPacket extends ClientPacket {
+public non-sealed interface ClientLoginRequestPacket extends ClientLoginPacket {
     /**
      * Gets a username of a player that sends the packet.
      *

@@ -1,7 +1,7 @@
 package net.hypejet.jet.protocol.packet.server.login.success;
 
 import net.hypejet.jet.player.profile.properties.GameProfileProperties;
-import net.hypejet.jet.protocol.packet.server.ServerPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerLoginPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -9,14 +9,14 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Represents a {@linkplain ServerPacket server packet}, which is sent when a server successfully logs in a
+ * Represents a {@linkplain ServerLoginPacket server login packet}, which is sent when a server successfully logs in a
  * player.
  *
  * @since 1.0
  * @author Codestech
- * @see ServerPacket
+ * @see ServerLoginPacket
  */
-public sealed interface ServerLoginSuccessPacket extends ServerPacket permits ServerLoginSuccessPacketImpl {
+public sealed interface ServerLoginSuccessPacket extends ServerLoginPacket permits ServerLoginSuccessPacketImpl {
     /**
      * Gets a unique identifier of a player that is logged in.
      *

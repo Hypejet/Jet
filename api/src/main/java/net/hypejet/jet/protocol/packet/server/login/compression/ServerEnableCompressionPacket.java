@@ -1,17 +1,16 @@
 package net.hypejet.jet.protocol.packet.server.login.compression;
 
-import net.hypejet.jet.protocol.packet.server.ServerPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerLoginPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain ServerPacket server packet}, which is sent to enable a packet compression.
+ * Represents a {@linkplain ServerLoginPacket server login packet}, which is sent to enable a packet compression.
  *
  * @since 1.0
  * @author Codestech
- * @see ServerPacket
+ * @see ServerLoginPacket
  */
-public sealed interface ServerEnableCompressionPacket extends ServerPacket
-        permits ServerEnableCompressionPacketImpl {
+public sealed interface ServerEnableCompressionPacket extends ServerLoginPacket permits ServerEnableCompressionPacketImpl {
     /**
      * Gets a maximum size of a packet before it is compressed.
      *
