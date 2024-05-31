@@ -6,7 +6,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import net.hypejet.jet.server.network.PlayerChannelInitializer;
-import net.hypejet.jet.server.protocol.ServerBoundPacketRegistry;
+import net.hypejet.jet.server.protocol.ClientPacketRegistry;
 
 public class Main {
     public static void main(String[] args) {
@@ -17,7 +17,7 @@ public class Main {
             ServerBootstrap bootstrap = new ServerBootstrap()
                     .group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new PlayerChannelInitializer(new ServerBoundPacketRegistry()));
+                    .childHandler(new PlayerChannelInitializer(new ClientPacketRegistry()));
 
             ChannelFuture future = bootstrap.bind(25565).sync();
             future.channel().closeFuture().sync();

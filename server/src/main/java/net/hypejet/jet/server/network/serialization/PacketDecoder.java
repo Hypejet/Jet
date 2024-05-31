@@ -9,7 +9,7 @@ import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
 import net.hypejet.jet.server.buffer.NetworkBufferImpl;
 import net.hypejet.jet.server.player.SocketPlayerConnection;
-import net.hypejet.jet.server.protocol.ServerBoundPacketRegistry;
+import net.hypejet.jet.server.protocol.ClientPacketRegistry;
 import net.hypejet.jet.server.util.CompressionUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ public final class PacketDecoder extends ByteToMessageDecoder {
     private static final Logger LOGGER = LoggerFactory.getLogger(PacketDecoder.class);
 
     private final SocketPlayerConnection playerConnection;
-    private final ServerBoundPacketRegistry packetRegistry;
+    private final ClientPacketRegistry packetRegistry;
 
     /**
      * Constructs a {@link PacketDecoder}.
@@ -39,7 +39,7 @@ public final class PacketDecoder extends ByteToMessageDecoder {
      * @since 1.0
      */
     public PacketDecoder(@NonNull SocketPlayerConnection playerConnection,
-                         @NonNull ServerBoundPacketRegistry packetRegistry) {
+                         @NonNull ClientPacketRegistry packetRegistry) {
         this.playerConnection = playerConnection;
         this.packetRegistry = packetRegistry;
     }

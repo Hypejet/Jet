@@ -11,7 +11,7 @@ import net.hypejet.jet.protocol.packet.client.login.ClientEncryptionResponsePack
 import net.hypejet.jet.protocol.packet.client.login.ClientLoginRequestPacket;
 import net.hypejet.jet.protocol.packet.client.login.ClientPluginMessageResponsePacket;
 import net.hypejet.jet.server.buffer.NetworkBufferImpl;
-import net.hypejet.jet.server.protocol.ServerBoundPacketRegistry;
+import net.hypejet.jet.server.protocol.ClientPacketRegistry;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.Assertions;
@@ -21,14 +21,14 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Represents a test for {@link ServerBoundPacketRegistry server-bound packet registry}.
+ * Represents a test for {@link ClientPacketRegistry client packet registry}.
  *
  * @since 1.0
  * @author Codestech
  */
 public final class ClientPacketRegistryTest {
 
-    private final ServerBoundPacketRegistry packetRegistry = new ServerBoundPacketRegistry();
+    private final ClientPacketRegistry packetRegistry = new ClientPacketRegistry();
 
     @Test
     public void testValidPacket() {

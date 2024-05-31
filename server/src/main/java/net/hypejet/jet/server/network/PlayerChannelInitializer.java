@@ -6,7 +6,7 @@ import io.netty.channel.socket.SocketChannel;
 import net.hypejet.jet.server.network.serialization.PacketDecoder;
 import net.hypejet.jet.server.network.serialization.PacketEncoder;
 import net.hypejet.jet.server.player.SocketPlayerConnection;
-import net.hypejet.jet.server.protocol.ServerBoundPacketRegistry;
+import net.hypejet.jet.server.protocol.ClientPacketRegistry;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,16 +27,16 @@ public final class PlayerChannelInitializer extends ChannelInitializer<SocketCha
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PlayerChannelInitializer.class);
 
-    private final ServerBoundPacketRegistry serverBoundPacketRegistry;
+    private final ClientPacketRegistry clientPacketRegistry;
 
     /**
      * Constructs a {@link PlayerChannelInitializer player channel initializer}.
      *
-     * @param serverBoundPacketRegistry a server-bound packet registry to read packets from
+     * @param clientPacketRegistry a client packet registry to read packets from
      * @since 1.0
      */
-    public PlayerChannelInitializer(@NonNull ServerBoundPacketRegistry serverBoundPacketRegistry) {
-        this.serverBoundPacketRegistry = serverBoundPacketRegistry;
+    public PlayerChannelInitializer(@NonNull ClientPacketRegistry clientPacketRegistry) {
+        this.clientPacketRegistry = clientPacketRegistry;
     }
 
     @Override
@@ -45,7 +45,7 @@ public final class PlayerChannelInitializer extends ChannelInitializer<SocketCha
         ch.pipeline()
                 .addFirst(new PacketEncoder(playerConnection))
                 .addFirst(new PacketReader(playerConnection))
-                .addFirst(new PacketDecoder(playerConnection, this.serverBoundPacketRegistry));
+                .addFirst(new PacketDecoder(playerConnection, this.clientPacketRegistry));
     }
 
     @Override

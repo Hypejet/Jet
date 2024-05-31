@@ -16,12 +16,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.Set;
 
 /**
- * Represents a registry of a {@link ClientPacket server-bound packet} readers.
+ * Represents a registry of a {@linkplain ClientPacket client packet} readers.
  *
  * @since 1.0
  * @author Codestech
  */
-public final class ServerBoundPacketRegistry {
+public final class ClientPacketRegistry {
 
     private final Set<PacketReader<?>> packetReaders = Set.of(
             new HandshakePacketReader(),
@@ -33,8 +33,8 @@ public final class ServerBoundPacketRegistry {
     );
 
     /**
-     * Gets a {@link PacketReader packet reader}, which can read a specific packet  and reads it from
-     * a {@link NetworkBuffer network buffer}.
+     * Gets a {@linkplain PacketReader packet reader}, which can read a specific packet and reads it from
+     * a {@linkplain NetworkBuffer network buffer}.
      *
      * @param packetId an id of the packet
      * @param state a current state of the protocol
@@ -49,7 +49,7 @@ public final class ServerBoundPacketRegistry {
     }
 
     /**
-     * Gets a {@link PacketReader packet reader}, which can read a specific packet.
+     * Gets a {@linkplain PacketReader packet reader}, which can read a specific packet.
      *
      * @param packetId an id of the packet
      * @param state a current state of the protocol
