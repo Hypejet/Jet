@@ -1,8 +1,7 @@
 package net.hypejet.jet.server.test.buffer;
 
 import io.netty.buffer.Unpooled;
-import net.hypejet.jet.buffer.NetworkBuffer;
-import net.hypejet.jet.server.buffer.NetworkBufferImpl;
+import net.hypejet.jet.server.network.buffer.NetworkBuffer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -116,7 +115,7 @@ public final class NetworkBufferTest {
 
     @Test
     public void testByteArray() {
-        NetworkBuffer buffer = new NetworkBufferImpl(Unpooled.buffer());
+        NetworkBuffer buffer = new NetworkBuffer(Unpooled.buffer());
 
         byte[] first = new byte[0];
         byte[] second = new byte[6];
@@ -143,7 +142,7 @@ public final class NetworkBufferTest {
     private static <T> void testValues(@NonNull T first, @NonNull T second,
                                         @NonNull Function<NetworkBuffer, T> readFunction,
                                         @NonNull BiConsumer<NetworkBuffer, T> writeFunction) {
-        NetworkBuffer buffer = new NetworkBufferImpl(Unpooled.buffer());
+        NetworkBuffer buffer = new NetworkBuffer(Unpooled.buffer());
 
         writeFunction.accept(buffer, first);
         writeFunction.accept(buffer, second);

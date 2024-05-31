@@ -1,6 +1,5 @@
 package net.hypejet.jet.player.profile.properties;
 
-import net.hypejet.jet.buffer.NetworkBuffer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -18,13 +17,6 @@ import java.util.UUID;
  */
 record GameProfilePropertiesImpl(@NonNull UUID uniqueId, @NonNull String username,
                                  @Nullable String signature) implements GameProfileProperties {
-    @Override
-    public void write(@NonNull NetworkBuffer buffer) {
-        buffer.writeUniqueId(this.uniqueId);
-        buffer.writeString(this.username);
-        buffer.writeOptionalString(this.signature);
-    }
-
     /**
      * Represents an implementation of {@linkplain GameProfileProperties.Builder game profile properties builder}.
      *

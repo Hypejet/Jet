@@ -1,8 +1,6 @@
 package net.hypejet.jet.protocol.packet.server.login.success;
 
-import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.player.profile.properties.GameProfileProperties;
-import net.hypejet.jet.protocol.ProtocolState;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -23,19 +21,6 @@ import java.util.UUID;
 record ServerLoginSuccessPacketImpl(@NonNull UUID uniqueId, @NonNull String username,
                                     @NonNull Collection<GameProfileProperties> properties,
                                     boolean strictErrorHandling) implements ServerLoginSuccessPacket {
-    @Override
-    public int getPacketId() {
-        return 2;
-    }
-
-    @Override
-    public void write(@NonNull NetworkBuffer buffer) {
-        buffer.writeUniqueId(this.uniqueId);
-        buffer.writeString(this.username);
-        buffer.writeCollection(this.properties);
-        buffer.writeBoolean(this.strictErrorHandling);
-    }
-
     /**
      * Represents an implementation of {@linkplain ServerLoginSuccessPacket.Builder login success packet builder}.
      *

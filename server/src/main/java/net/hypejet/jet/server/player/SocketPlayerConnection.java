@@ -40,8 +40,6 @@ public final class SocketPlayerConnection implements PlayerConnection {
 
     @Override
     public void sendPacket(@NonNull ServerPacket packet) {
-        if (this.state != packet.getProtocolState())
-            throw unsupportedProtocolState(packet);
         this.channel.writeAndFlush(packet);
     }
 
@@ -102,10 +100,5 @@ public final class SocketPlayerConnection implements PlayerConnection {
      */
     public @NonNull SocketChannel getChannel() {
         return this.channel;
-    }
-
-    private static @NonNull RuntimeException unsupportedProtocolState(@NonNull ServerPacket packet) {
-        return new IllegalArgumentException("The current protocol state does not support packet "
-                + packet.getClass().getSimpleName());
     }
 }

@@ -4,9 +4,9 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
-import net.hypejet.jet.server.buffer.NetworkBufferImpl;
+import net.hypejet.jet.server.network.buffer.NetworkBuffer;
+import net.hypejet.jet.server.network.protocol.ServerPacketRegistry;
 import net.hypejet.jet.server.player.SocketPlayerConnection;
 import net.hypejet.jet.server.util.CompressionUtil;
 import net.hypejet.jet.server.util.NetworkUtil;
@@ -44,9 +44,8 @@ public final class PacketEncoder extends MessageToByteEncoder<ServerPacket> {
         try {
             ByteBuf buf = Unpooled.buffer();
 
-            NetworkBuffer buffer = new NetworkBufferImpl(buf);
-            buffer.writeVarInt(msg.getPacketId());
-            msg.write(buffer);
+            NetworkBuffer buffer = new NetworkBuffer(buf);
+            ServerPacketRegistry.write(buffer, msg);
 
             int dataLength = buf.readableBytes();
             int compressionThreshold = this.playerConnection.compressionThreshold();
@@ -58,11 +57,11 @@ public final class PacketEncoder extends MessageToByteEncoder<ServerPacket> {
             }
 
             ByteBuf compressionBuf = Unpooled.buffer();
-            NetworkBuffer compressionBuffer = new NetworkBufferImpl(compressionBuf);
+            NetworkBuffer compressionBuffer = new NetworkBuffer(compressionBuf);
 
             if (compressionThreshold > dataLength) {
                 compressionBuffer.writeVarInt(0);
-                buffer.write(compressionBuffer);
+                compressionBuffer.write(buffer);
             } else {
                 compressionBuffer.writeVarInt(dataLength);
                 compressionBuffer.writeByteArray(CompressionUtil.compress(buf.array()), false);

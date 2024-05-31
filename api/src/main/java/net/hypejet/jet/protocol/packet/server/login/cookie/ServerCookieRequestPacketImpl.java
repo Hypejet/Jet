@@ -1,6 +1,5 @@
 package net.hypejet.jet.protocol.packet.server.login.cookie;
 
-import net.hypejet.jet.buffer.NetworkBuffer;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -13,16 +12,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see ServerCookieRequestPacket
  */
 record ServerCookieRequestPacketImpl(@NonNull Key identifier) implements ServerCookieRequestPacket {
-    @Override
-    public int getPacketId() {
-        return 5;
-    }
-
-    @Override
-    public void write(@NonNull NetworkBuffer buffer) {
-        buffer.writeIdentifier(this.identifier);
-    }
-
     /**
      * Represents a {@link ServerCookieRequestPacket.Builder cookie request packet builder}.
      *

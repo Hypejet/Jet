@@ -1,7 +1,5 @@
 package net.hypejet.jet.protocol.packet.server.login.compression;
 
-import net.hypejet.jet.buffer.NetworkBuffer;
-import net.hypejet.jet.protocol.ProtocolState;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -13,16 +11,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see ServerEnableCompressionPacket
  */
 record ServerEnableCompressionPacketImpl(int threshold) implements ServerEnableCompressionPacket {
-    @Override
-    public int getPacketId() {
-        return 3;
-    }
-
-    @Override
-    public void write(@NonNull NetworkBuffer buffer) {
-        buffer.writeVarInt(this.threshold);
-    }
-
     /**
      * Represents an implementation of {@linkplain ServerEnableCompressionPacket.Builder enable compression packet
      * builder}.

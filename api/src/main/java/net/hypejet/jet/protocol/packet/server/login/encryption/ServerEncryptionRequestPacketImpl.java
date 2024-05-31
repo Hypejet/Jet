@@ -1,7 +1,5 @@
 package net.hypejet.jet.protocol.packet.server.login.encryption;
 
-import net.hypejet.jet.buffer.NetworkBuffer;
-import net.hypejet.jet.protocol.ProtocolState;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -21,19 +19,6 @@ record ServerEncryptionRequestPacketImpl(
         @NonNull String serverId, byte @NonNull [] publicKey,
         byte @NonNull [] verifyToken, boolean shouldAuthenticate
 ) implements ServerEncryptionRequestPacket {
-    @Override
-    public int getPacketId() {
-        return 1;
-    }
-
-    @Override
-    public void write(@NonNull NetworkBuffer buffer) {
-        buffer.writeString(this.serverId);
-        buffer.writeByteArray(this.publicKey);
-        buffer.writeByteArray(this.verifyToken);
-        buffer.writeBoolean(this.shouldAuthenticate);
-    }
-
     /**
      * Represents an implementation of {@linkplain ServerEncryptionRequestPacket.Builder encryption request packet
      * builder}.

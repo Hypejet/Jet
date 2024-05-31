@@ -1,8 +1,8 @@
-package net.hypejet.jet.server.protocol.listener;
+package net.hypejet.jet.server.network.protocol.listener;
 
-import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
+import net.hypejet.jet.server.network.buffer.NetworkBuffer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

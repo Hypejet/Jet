@@ -1,8 +1,8 @@
-package net.hypejet.jet.server.protocol.listener.login;
+package net.hypejet.jet.server.network.protocol.listener.login;
 
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.login.ClientLoginAcknowledgePacket;
-import net.hypejet.jet.server.protocol.listener.EmptyPacketReader;
+import net.hypejet.jet.server.network.protocol.listener.EmptyPacketReader;
 
 /**
  * Represents a {@link EmptyPacketReader empty packet reader}, which reads a

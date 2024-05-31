@@ -4,12 +4,11 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
-import net.hypejet.jet.server.buffer.NetworkBufferImpl;
+import net.hypejet.jet.server.network.buffer.NetworkBuffer;
+import net.hypejet.jet.server.network.protocol.ClientPacketRegistry;
 import net.hypejet.jet.server.player.SocketPlayerConnection;
-import net.hypejet.jet.server.protocol.ClientPacketRegistry;
 import net.hypejet.jet.server.util.CompressionUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
@@ -29,26 +28,22 @@ public final class PacketDecoder extends ByteToMessageDecoder {
     private static final Logger LOGGER = LoggerFactory.getLogger(PacketDecoder.class);
 
     private final SocketPlayerConnection playerConnection;
-    private final ClientPacketRegistry packetRegistry;
 
     /**
      * Constructs a {@link PacketDecoder}.
      *
      * @param playerConnection a player connection to decode packets for
-     * @param packetRegistry a registry of readable packets to read packets from
      * @since 1.0
      */
-    public PacketDecoder(@NonNull SocketPlayerConnection playerConnection,
-                         @NonNull ClientPacketRegistry packetRegistry) {
+    public PacketDecoder(@NonNull SocketPlayerConnection playerConnection) {
         this.playerConnection = playerConnection;
-        this.packetRegistry = packetRegistry;
     }
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         if (!this.playerConnection.getChannel().isActive()) return; // The connection was closed
 
-        NetworkBuffer buffer = new NetworkBufferImpl(in);
+        NetworkBuffer buffer = new NetworkBuffer(in);
         int compressionThreshold = this.playerConnection.compressionThreshold();
 
         buffer.readVarInt(); // TODO: Check if the packet length is necessary anywhere
@@ -68,7 +63,7 @@ public final class PacketDecoder extends ByteToMessageDecoder {
         byte[] compressed = buffer.readByteArray(false);
 
         ByteBuf uncompressedBuf = Unpooled.wrappedBuffer(CompressionUtil.decompress(compressed));
-        NetworkBuffer uncompressedBuffer = new NetworkBufferImpl(uncompressedBuf);
+        NetworkBuffer uncompressedBuffer = new NetworkBuffer(uncompressedBuf);
 
         out.add(this.readPacket(uncompressedBuffer));
     }
@@ -83,7 +78,7 @@ public final class PacketDecoder extends ByteToMessageDecoder {
         int packetId = buffer.readVarInt();
 
         ProtocolState protocolState = this.playerConnection.getProtocolState();
-        ClientPacket packet = this.packetRegistry.read(packetId, protocolState, buffer);
+        ClientPacket packet = ClientPacketRegistry.read(packetId, protocolState, buffer);
 
         if (packet == null) throw packetReaderNotFound(packetId, protocolState);
 

@@ -1,6 +1,5 @@
 package net.hypejet.jet.player.profile.properties;
 
-import net.hypejet.jet.network.NetworkWritable;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -11,9 +10,8 @@ import java.util.UUID;
  *
  * @since 1.0
  * @author Codestech
- * @see NetworkWritable
  */
-public sealed interface GameProfileProperties extends NetworkWritable permits GameProfilePropertiesImpl {
+public sealed interface GameProfileProperties permits GameProfilePropertiesImpl {
     /**
      * Gets a unique identifier of a Minecraft player.
      *

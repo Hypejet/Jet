@@ -1,10 +1,10 @@
-package net.hypejet.jet.server.protocol.listener.handshake;
+package net.hypejet.jet.server.network.protocol.listener.handshake;
 
-import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.player.PlayerConnection;
 import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.server.protocol.listener.PacketReader;
 import net.hypejet.jet.protocol.packet.client.handshake.ClientHandshakePacket;
+import net.hypejet.jet.server.network.buffer.NetworkBuffer;
+import net.hypejet.jet.server.network.protocol.listener.PacketReader;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

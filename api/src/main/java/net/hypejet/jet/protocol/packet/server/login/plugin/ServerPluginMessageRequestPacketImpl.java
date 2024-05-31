@@ -1,7 +1,5 @@
 package net.hypejet.jet.protocol.packet.server.login.plugin;
 
-import net.hypejet.jet.buffer.NetworkBuffer;
-import net.hypejet.jet.protocol.ProtocolState;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -17,18 +15,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 record ServerPluginMessageRequestPacketImpl(int messageId, @NonNull Key channel,
                                             byte @NonNull [] data) implements ServerPluginMessageRequestPacket {
-    @Override
-    public int getPacketId() {
-        return 4;
-    }
-
-    @Override
-    public void write(@NonNull NetworkBuffer buffer) {
-        buffer.writeVarInt(this.messageId);
-        buffer.writeIdentifier(this.channel);
-        buffer.writeByteArray(this.data, false);
-    }
-
     /**
      * Represents an implementation of {@linkplain ServerPluginMessageRequestPacket.Builder plugin message request
      * packet builder}.
