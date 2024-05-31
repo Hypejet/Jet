@@ -2,23 +2,22 @@ package net.hypejet.jet.server.network;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import net.hypejet.jet.player.login.LoginHandler;
 import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.protocol.packet.client.login.ClientCookieResponsePacket;
-import net.hypejet.jet.protocol.packet.server.login.cookie.ServerCookieRequestPacket;
-import net.hypejet.jet.protocol.packet.server.login.success.ServerLoginSuccessPacket;
+import net.hypejet.jet.protocol.packet.client.ClientLoginPacket;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
 import net.hypejet.jet.protocol.packet.client.handshake.ClientHandshakePacket;
 import net.hypejet.jet.protocol.packet.client.login.ClientLoginAcknowledgePacket;
 import net.hypejet.jet.protocol.packet.client.login.ClientLoginRequestPacket;
+import net.hypejet.jet.server.player.login.DefaultLoginHandler;
 import net.hypejet.jet.server.player.SocketPlayerConnection;
-import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Represents a {@link ChannelInboundHandlerAdapter channel inbound handler adapter}, which processes
- * Minecraft {@link ClientPacket server-bound packets}.
+ * Represents a {@linkplain ChannelInboundHandlerAdapter channel inbound handler adapter}, which processes
+ * Minecraft {@linkplain  ClientPacket client packets}.
  *
  * @since 1.0
  * @author Codestech
@@ -29,9 +28,11 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(PacketReader.class);
 
     private final SocketPlayerConnection playerConnection;
+    private final LoginHandler handler;
 
     public PacketReader(@NonNull SocketPlayerConnection playerConnection) {
         this.playerConnection = playerConnection;
+        this.handler = new DefaultLoginHandler(); // TODO: Built-in Mojang handler support and an event
     }
 
     @Override
@@ -39,19 +40,22 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
         if (!this.playerConnection.getChannel().isActive()) return; // The connection was closed
 
         if (!(msg instanceof ClientPacket packet))
-            throw new IllegalStateException("A message received is not a server-bound packet");
+            throw new IllegalStateException("A message received is not a client packet");
 
-        switch (packet) {
-            case ClientHandshakePacket clientHandshakePacket -> this.playerConnection.setProtocolState(clientHandshakePacket.nextState());
-            case ClientLoginRequestPacket requestPacket -> {
-                this.playerConnection.setCompressionThreshold(256);
-                this.playerConnection.sendPacket(ServerLoginSuccessPacket.builder()
-                        .uniqueId(requestPacket.uniqueId())
-                        .username(requestPacket.username())
-                        .build());
+        if (packet instanceof ClientHandshakePacket handshakePacket) {
+            this.playerConnection.setProtocolState(handshakePacket.nextState());
+            return;
+        }
+
+        if (packet instanceof ClientLoginPacket loginPacket) {
+            switch (loginPacket) {
+                case ClientLoginAcknowledgePacket ignored ->
+                        this.playerConnection.setProtocolState(ProtocolState.CONFIGURATION);
+                case ClientLoginRequestPacket ignored -> this.playerConnection.setCompressionThreshold(256);
+                default -> {}
             }
-            case ClientLoginAcknowledgePacket ignored -> this.playerConnection.setProtocolState(ProtocolState.CONFIGURATION);
-            default -> {}
+
+            this.handler.onPacket(loginPacket, this.playerConnection);
         }
     }
 
