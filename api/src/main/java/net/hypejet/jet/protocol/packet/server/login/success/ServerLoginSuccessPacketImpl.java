@@ -15,7 +15,7 @@ import java.util.UUID;
  * @param uniqueId a unique identifier of a player logging in
  * @param username a username of a player logging in
  * @param properties a collection of {@linkplain GameProfileProperties game profile properties} of a player logging in
- * @param strictErrorHandling whether a player logging in should use strict error handling
+ * @param strictErrorHandling whether a client should disconnect on invalid server data
  * @since 1.0
  * @author Codestech
  * @see ServerLoginSuccessPacket

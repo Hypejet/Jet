@@ -96,9 +96,9 @@ public sealed interface ServerLoginSuccessPacket extends ServerPacket permits Se
         @NonNull Builder properties(@NonNull Collection<GameProfileProperties> properties);
 
         /**
-         * Sets whether a player logging in should use strict error handling.
+         * Sets whether a client should disconnect on invalid server data.
          *
-         * @param strictErrorHandling true if a player logging in should use strict error handling, false otherwise
+         * @param strictErrorHandling true if a client should disconnect on invalid server data, false otherwise
          * @since 1.0
          * @return the builder
          */
