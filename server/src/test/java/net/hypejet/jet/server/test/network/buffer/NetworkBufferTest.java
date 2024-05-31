@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.test.buffer;
+package net.hypejet.jet.server.test.network.buffer;
 
 import io.netty.buffer.Unpooled;
 import net.hypejet.jet.server.network.buffer.NetworkBuffer;

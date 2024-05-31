@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.test.protocol;
+package net.hypejet.jet.server.test.network.protocol;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -24,6 +24,7 @@ import java.util.concurrent.ThreadLocalRandom;
  *
  * @since 1.0
  * @author Codestech
+ * @see ClientPacketRegistry
  */
 public final class ClientPacketRegistryTest {
     @Test
