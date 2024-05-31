@@ -1,5 +1,6 @@
 package net.hypejet.jet.protocol.packet.client;
 
+import net.hypejet.jet.protocol.packet.client.login.ClientCookieResponsePacket;
 import net.hypejet.jet.protocol.packet.client.login.ClientEncryptionResponsePacket;
 import net.hypejet.jet.protocol.packet.client.login.ClientLoginAcknowledgePacket;
 import net.hypejet.jet.protocol.packet.client.login.ClientLoginRequestPacket;
@@ -13,5 +14,6 @@ import net.hypejet.jet.protocol.packet.client.login.ClientPluginMessageResponseP
  * @author Codestech
  * @see ClientPacket
  */
-public sealed interface ClientLoginPacket extends ClientPacket permits ClientEncryptionResponsePacket,
-        ClientLoginAcknowledgePacket, ClientLoginRequestPacket, ClientPluginMessageResponsePacket {}
+public sealed interface ClientLoginPacket extends ClientPacket permits ClientCookieResponsePacket,
+        ClientEncryptionResponsePacket, ClientLoginAcknowledgePacket, ClientLoginRequestPacket,
+        ClientPluginMessageResponsePacket {}

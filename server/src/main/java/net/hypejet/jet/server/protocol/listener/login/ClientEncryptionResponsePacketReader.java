@@ -37,6 +37,7 @@ public final class ClientEncryptionResponsePacketReader extends PacketReader<Cli
      * @param sharedSecret a shared secret value, which is encrypted with a public key of the server
      * @param verifyToken a verify token value, which is encrypted with a public key of the server
      * @since 1.0
+     * @see ClientEncryptionResponsePacket
      */
     private record ClientEncryptionResponsePacketImpl(byte @NonNull [] sharedSecret, byte @NonNull [] verifyToken)
             implements ClientEncryptionResponsePacket {}

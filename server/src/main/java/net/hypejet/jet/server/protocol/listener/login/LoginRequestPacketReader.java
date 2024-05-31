@@ -38,6 +38,7 @@ public final class LoginRequestPacketReader extends PacketReader<ClientLoginRequ
      * @param username a username of a player that sends the packet
      * @param uniqueId a {@link UUID unique identifier} of a player that sends the packet
      * @since 1.0
+     * @see ClientLoginRequestPacket
      */
     private record ClientLoginRequestPacketImpl(@NonNull String username,
                                                 @NonNull UUID uniqueId) implements ClientLoginRequestPacket {}

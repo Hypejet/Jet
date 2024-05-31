@@ -10,7 +10,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @author Codestech
  * @see ServerLoginPacket
  */
-public sealed interface ServerEnableCompressionPacket extends ServerLoginPacket permits ServerEnableCompressionPacketImpl {
+public sealed interface ServerEnableCompressionPacket extends ServerLoginPacket
+        permits ServerEnableCompressionPacketImpl {
     /**
      * Gets a maximum size of a packet before it is compressed.
      *
@@ -41,7 +42,7 @@ public sealed interface ServerEnableCompressionPacket extends ServerLoginPacket 
         /**
          * Sets a maximum size of a packet before it is compressed.
          *
-         * @return the maximum size
+         * @return the builder
          * @since 1.0
          */
         @NonNull Builder threshold(int threshold);

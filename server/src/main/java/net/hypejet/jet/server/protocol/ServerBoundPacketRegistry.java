@@ -5,6 +5,7 @@ import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
 import net.hypejet.jet.server.protocol.listener.PacketReader;
 import net.hypejet.jet.server.protocol.listener.handshake.HandshakePacketReader;
+import net.hypejet.jet.server.protocol.listener.login.ClientCookieResponsePacketReader;
 import net.hypejet.jet.server.protocol.listener.login.ClientEncryptionResponsePacketReader;
 import net.hypejet.jet.server.protocol.listener.login.ClientLoginAcknowledgePacketReader;
 import net.hypejet.jet.server.protocol.listener.login.ClientPluginMessageResponsePacketReader;
@@ -27,7 +28,8 @@ public final class ServerBoundPacketRegistry {
             new LoginRequestPacketReader(),
             new ClientLoginAcknowledgePacketReader(),
             new ClientEncryptionResponsePacketReader(),
-            new ClientPluginMessageResponsePacketReader()
+            new ClientPluginMessageResponsePacketReader(),
+            new ClientCookieResponsePacketReader()
     );
 
     /**
