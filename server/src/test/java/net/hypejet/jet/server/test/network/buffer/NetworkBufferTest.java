@@ -1,7 +1,10 @@
 package net.hypejet.jet.server.test.network.buffer;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import net.hypejet.jet.player.profile.properties.GameProfileProperties;
 import net.hypejet.jet.server.network.buffer.NetworkBuffer;
+import net.hypejet.jet.server.network.buffer.codec.codecs.GameProfilePropertiesCodec;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -9,6 +12,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiConsumer;
@@ -115,7 +120,7 @@ public final class NetworkBufferTest {
 
     @Test
     public void testByteArray() {
-        NetworkBuffer buffer = new NetworkBuffer(Unpooled.buffer());
+        NetworkBuffer buffer = NetworkBuffer.create();
 
         byte[] first = new byte[0];
         byte[] second = new byte[6];
@@ -127,6 +132,96 @@ public final class NetworkBufferTest {
 
         Assertions.assertArrayEquals(first, buffer.readByteArray());
         Assertions.assertArrayEquals(second, buffer.readByteArray());
+    }
+
+    @Test
+    public void testByteArrayWithoutLength() {
+        NetworkBuffer buffer = NetworkBuffer.create();
+
+        byte[] value = new byte[5];
+        ThreadLocalRandom.current().nextBytes(value);
+
+        buffer.writeByteArray(value, false);
+        Assertions.assertArrayEquals(value, buffer.readByteArray(false));
+    }
+
+    @Test
+    public void testEmptyByteArrayWithoutLength() {
+        NetworkBuffer buffer = NetworkBuffer.create();
+
+        byte[] value = new byte[0];
+
+        buffer.writeByteArray(value, false);
+        Assertions.assertArrayEquals(value, buffer.readByteArray(false));
+    }
+
+    @Test
+    public void testOptionalString() {
+        testValues("first-string-test", "second-test-string", NetworkBuffer::readOptionalString,
+                NetworkBuffer::writeOptionalString);
+    }
+
+    @Test
+    public void testCollections() {
+        Collection<GameProfileProperties> list = List.of(
+                GameProfileProperties.builder()
+                        .username("aaaa-first")
+                        .signature("not-random")
+                        .build(),
+                GameProfileProperties.builder()
+                        .username("second-bbbbbbb")
+                        .signature("still-not-random")
+                        .build(),
+                GameProfileProperties.builder()
+                        .username("ccc")
+                        .signature("signature-for-ccc-is-STILL-not-random")
+                        .build()
+                );
+
+        NetworkBuffer buffer = NetworkBuffer.create();
+        buffer.writeCollection(GameProfilePropertiesCodec.instance(), list);
+
+        Assertions.assertEquals(list, buffer.readCollection(GameProfilePropertiesCodec.instance()));
+    }
+
+    @Test
+    public void writeBufferToAnotherTest() {
+        NetworkBuffer first = NetworkBuffer.create();
+
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+
+        int integer = random.nextInt();
+        long aLong = random.nextLong();
+        int aShort = random.nextInt(0, 65535);
+
+        System.out.println(aShort);
+
+        first.writeInt(integer);
+        first.writeVarLong(aLong);
+        first.writeUnsignedShort(aShort);
+
+        NetworkBuffer second = NetworkBuffer.create();
+        second.write(first);
+
+        Assertions.assertEquals(integer, second.readInt());
+        Assertions.assertEquals(aLong, second.readVarLong());
+        Assertions.assertEquals(aShort, second.readUnsignedShort());
+    }
+
+    @Test
+    public void testReadable() {
+        ByteBuf buf = Unpooled.buffer();
+
+        NetworkBuffer buffer = new NetworkBuffer(buf);
+        buffer.writeInt(5);
+
+        Assertions.assertTrue(buffer.isReadable(4));
+        Assertions.assertFalse(buffer.isReadable(5));
+
+        buffer.readInt();
+
+        Assertions.assertFalse(buffer.isReadable(1));
+        Assertions.assertTrue(buffer.isReadable(0));
     }
 
     /**
@@ -142,7 +237,7 @@ public final class NetworkBufferTest {
     private static <T> void testValues(@NonNull T first, @NonNull T second,
                                         @NonNull Function<NetworkBuffer, T> readFunction,
                                         @NonNull BiConsumer<NetworkBuffer, T> writeFunction) {
-        NetworkBuffer buffer = new NetworkBuffer(Unpooled.buffer());
+        NetworkBuffer buffer = NetworkBuffer.create();
 
         writeFunction.accept(buffer, first);
         writeFunction.accept(buffer, second);

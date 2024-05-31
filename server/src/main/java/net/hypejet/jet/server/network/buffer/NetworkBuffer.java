@@ -1,6 +1,7 @@
 package net.hypejet.jet.server.network.buffer;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.hypejet.jet.server.network.buffer.codec.NetworkCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.kyori.adventure.key.Key;
@@ -337,34 +338,6 @@ public final class NetworkBuffer {
     }
 
     /**
-     * Gets whether this buffer contains equal or more elements than a specified number.
-     *
-     * @param length the number
-     * @return true if this buffer contains equal or more elements than a specified number, false otherwise
-     * @since 1.0
-     */
-    public boolean isReadable(int length) {
-        return this.buf.isReadable(length);
-    }
-
-    /**
-     * Converts this buffer to a byte array.
-     *
-     * @return the byte array
-     * @since 1.0
-     */
-    public byte @NonNull [] toByteArray() {
-        int readerIndex = this.buf.readerIndex();
-        this.buf.resetReaderIndex();
-
-        byte[] array = new byte[this.buf.readableBytes()];
-        this.buf.readBytes(array);
-
-        this.buf.readerIndex(readerIndex);
-        return array;
-    }
-
-    /**
      * Reads an identifier from the buffer.
      *
      * @return the identifier
@@ -393,6 +366,30 @@ public final class NetworkBuffer {
      */
     public byte @NonNull [] readByteArray() {
         return this.readByteArray(true);
+    }
+
+    /**
+     * Reads a byte array from the buffer. If the {@code readLength} is false, the array size will be based on
+     * remaining buffer size.
+     *
+     * @param readLength whether the length should be read
+     * @return the byte array
+     * @since 1.0
+     */
+    public byte @NonNull [] readByteArray(boolean readLength) {
+        byte[] array;
+
+        if (readLength) {
+            int length = this.readVarInt();
+            if (!this.isReadable(length))
+                throw new IllegalArgumentException("An amount of remaining bytes is lower than a string size");
+            array = new byte[length];
+        } else {
+            array = new byte[this.buf.readableBytes()];
+        }
+
+        this.buf.readBytes(array);
+        return array;
     }
 
     /**
@@ -483,30 +480,6 @@ public final class NetworkBuffer {
     }
 
     /**
-     * Reads a byte array from the buffer. If the {@code readLength} is false, the array size will be based on
-     * remaining buffer size.
-     *
-     * @param readLength whether the length should be read
-     * @return the byte array
-     * @since 1.0
-     */
-    public byte @NonNull [] readByteArray(boolean readLength) {
-        byte[] array;
-
-        if (readLength) {
-            int length = this.readVarInt();
-            if (!this.isReadable(length))
-                throw new IllegalArgumentException("An amount of remaining bytes is lower than a string size");
-            array = new byte[length];
-        } else {
-            array = new byte[this.buf.readableBytes()];
-        }
-
-        this.buf.readBytes(array);
-        return array;
-    }
-
-    /**
      * Writes another buffer to this buffer.
      *
      * @param another the another buffer
@@ -514,5 +487,43 @@ public final class NetworkBuffer {
      */
     public void write(@NonNull NetworkBuffer another) {
         this.buf.writeBytes(another.buf);
+    }
+
+    /**
+     * Gets whether this buffer contains equal or more elements than a specified number.
+     *
+     * @param length the number
+     * @return true if this buffer contains equal or more elements than a specified number, false otherwise
+     * @since 1.0
+     */
+    public boolean isReadable(int length) {
+        return this.buf.isReadable(length);
+    }
+
+    /**
+     * Converts this buffer to a byte array.
+     *
+     * @return the byte array
+     * @since 1.0
+     */
+    public byte @NonNull [] toByteArray() {
+        int readerIndex = this.buf.readerIndex();
+        this.buf.resetReaderIndex();
+
+        byte[] array = new byte[this.buf.readableBytes()];
+        this.buf.readBytes(array);
+
+        this.buf.readerIndex(readerIndex);
+        return array;
+    }
+
+    /**
+     * Creates a new empty {@linkplain NetworkBuffer network buffer}.
+     *
+     * @return the network buffer
+     * @since 1.0
+     */
+    public static @NonNull NetworkBuffer create() {
+        return new NetworkBuffer(Unpooled.buffer());
     }
 }
