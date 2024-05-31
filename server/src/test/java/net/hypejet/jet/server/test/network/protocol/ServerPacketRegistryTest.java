@@ -2,6 +2,7 @@ package net.hypejet.jet.server.test.network.protocol;
 
 import io.netty.buffer.Unpooled;
 import net.hypejet.jet.player.profile.properties.GameProfileProperties;
+import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
 import net.hypejet.jet.protocol.packet.server.login.compression.ServerEnableCompressionPacket;
 import net.hypejet.jet.protocol.packet.server.login.cookie.ServerCookieRequestPacket;
@@ -45,7 +46,7 @@ public final class ServerPacketRegistryTest {
                 .reason(reason)
                 .build();
 
-        test(packet, buffer -> Assertions.assertEquals(reason, buffer.readJsonTextComponent()));
+        test(packet, buffer -> Assertions.assertEquals(reason, buffer.readJsonTextComponent()), ProtocolState.LOGIN);
     }
 
     @Test
@@ -56,7 +57,7 @@ public final class ServerPacketRegistryTest {
                 .threshold(compressionThreshold)
                 .build();
 
-        test(packet, buffer -> Assertions.assertEquals(compressionThreshold, buffer.readVarInt()));
+        test(packet, buffer -> Assertions.assertEquals(compressionThreshold, buffer.readVarInt()), ProtocolState.LOGIN);
     }
 
     @Test
@@ -67,7 +68,7 @@ public final class ServerPacketRegistryTest {
                 .identifier(identifier)
                 .build();
 
-        test(packet, buffer -> Assertions.assertEquals(identifier, buffer.readIdentifier()));
+        test(packet, buffer -> Assertions.assertEquals(identifier, buffer.readIdentifier()), ProtocolState.LOGIN);
     }
 
     @Test
@@ -96,7 +97,7 @@ public final class ServerPacketRegistryTest {
             Assertions.assertArrayEquals(publicKey, buffer.readByteArray());
             Assertions.assertArrayEquals(verifyToken, buffer.readByteArray());
             Assertions.assertEquals(shouldAuthenticate, buffer.readBoolean());
-        });
+        }, ProtocolState.LOGIN);
     }
 
     @Test
@@ -124,7 +125,7 @@ public final class ServerPacketRegistryTest {
             Assertions.assertEquals(username, buffer.readString());
             Assertions.assertEquals(List.of(properties), buffer.readCollection(GameProfilePropertiesCodec.instance()));
             Assertions.assertEquals(strictErrorHandling, buffer.readBoolean());
-        });
+        }, ProtocolState.LOGIN);
     }
 
     @Test
@@ -147,12 +148,22 @@ public final class ServerPacketRegistryTest {
             Assertions.assertEquals(identifier, buffer.readVarInt());
             Assertions.assertEquals(channel, buffer.readIdentifier());
             Assertions.assertArrayEquals(data, buffer.readByteArray(false));
-        });
+        }, ProtocolState.LOGIN);
     }
 
-    private static <P extends ServerPacket> void test(@NonNull P packet, @NonNull Consumer<NetworkBuffer> assertions) {
+    /**
+     * Tests writing of a {@linkplain P packet}.
+     *
+     * @param packet the packet
+     * @param assertions a consumer, which consumes network buffer to run test assertions on data
+     * @param state a protocol state of the packet
+     * @param <P> a type of the packet
+     * @since 1.0
+     */
+    private static <P extends ServerPacket> void test(@NonNull P packet, @NonNull Consumer<NetworkBuffer> assertions,
+                                                      @NonNull ProtocolState state) {
         NetworkBuffer buffer = new NetworkBuffer(Unpooled.buffer());
-        ServerPacketRegistry.write(buffer, packet);
+        ServerPacketRegistry.write(buffer, packet, state);
 
         buffer.readVarInt(); // Read packet identifier
         assertions.accept(buffer);

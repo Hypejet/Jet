@@ -16,7 +16,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.Set;
 
 /**
- * Represents a registry of a {@linkplain ClientPacket client packet} readers.
+ * Represents a registry of a {@linkplain PacketReader packet readers}.
  *
  * @since 1.0
  * @author Codestech

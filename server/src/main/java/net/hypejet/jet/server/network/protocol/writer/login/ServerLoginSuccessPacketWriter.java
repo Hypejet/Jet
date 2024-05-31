@@ -7,8 +7,21 @@ import net.hypejet.jet.server.network.buffer.codec.codecs.GameProfilePropertiesC
 import net.hypejet.jet.server.network.protocol.writer.PacketWriter;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+/**
+ * Represents a {@linkplain PacketWriter packet writer}, which writes a {@linkplain ServerLoginSuccessPacket login
+ * success packet}.
+ *
+ * @since 1.0
+ * @author Codestech
+ * @see ServerLoginSuccessPacket
+ * @see PacketWriter
+ */
 public final class ServerLoginSuccessPacketWriter extends PacketWriter<ServerLoginSuccessPacket> {
-
+    /**
+     * Constructs a {@linkplain ServerLoginSuccessPacketWriter login success packet writer}.
+     *
+     * @since 1.0
+     */
     public ServerLoginSuccessPacketWriter() {
         super(2, ProtocolState.LOGIN, ServerLoginSuccessPacket.class);
     }

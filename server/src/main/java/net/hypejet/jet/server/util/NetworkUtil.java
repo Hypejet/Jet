@@ -7,7 +7,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.nio.charset.StandardCharsets;
 
 /**
- * An utility used for serializing data allowed by Minecraft protocol, but unsupported by default
+ * A utility used for serializing data allowed by Minecraft protocol, but unsupported by default
  * via {@link ByteBuf byte buf}.
  *
  * @since 1.0

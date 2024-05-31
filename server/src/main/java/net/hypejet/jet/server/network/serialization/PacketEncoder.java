@@ -45,7 +45,7 @@ public final class PacketEncoder extends MessageToByteEncoder<ServerPacket> {
             ByteBuf buf = Unpooled.buffer();
 
             NetworkBuffer buffer = new NetworkBuffer(buf);
-            ServerPacketRegistry.write(buffer, msg);
+            ServerPacketRegistry.write(buffer, msg, this.playerConnection.getProtocolState());
 
             int dataLength = buf.readableBytes();
             int compressionThreshold = this.playerConnection.compressionThreshold();
