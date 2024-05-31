@@ -8,6 +8,7 @@ import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
 import net.hypejet.jet.server.buffer.NetworkBufferImpl;
 import net.hypejet.jet.server.player.SocketPlayerConnection;
+import net.hypejet.jet.server.util.CompressionUtil;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
@@ -47,8 +48,28 @@ public final class PacketEncoder extends MessageToByteEncoder<ServerPacket> {
             buffer.writeVarInt(msg.getPacketId());
             msg.write(buffer);
 
-            NetworkUtil.writeVarInt(out, buf.readableBytes());
-            out.writeBytes(buf);
+            int dataLength = buf.readableBytes();
+            int compressionThreshold = this.playerConnection.compressionThreshold();
+
+            if (compressionThreshold < 0) {
+                NetworkUtil.writeVarInt(out, dataLength);
+                out.writeBytes(buf);
+                return;
+            }
+
+            ByteBuf compressionBuf = Unpooled.buffer();
+            NetworkBuffer compressionBuffer = new NetworkBufferImpl(compressionBuf);
+
+            if (compressionThreshold > dataLength) {
+                compressionBuffer.writeVarInt(0);
+                buffer.write(compressionBuffer);
+            } else {
+                compressionBuffer.writeVarInt(dataLength);
+                compressionBuffer.writeByteArray(CompressionUtil.compress(buf.array()), false);
+            }
+
+            NetworkUtil.writeVarInt(out, compressionBuf.readableBytes());
+            out.writeBytes(compressionBuf);
         } catch (Throwable throwable) {
             this.playerConnection.close(); // Close the connection to avoid more issues
             LOGGER.error("An error occurred while encoding a packet", throwable);

@@ -189,7 +189,14 @@ public final class NetworkBufferImpl implements NetworkBuffer {
 
     @Override
     public byte @NonNull [] toByteArray() {
-        return this.buf.array();
+        int readerIndex = this.buf.readerIndex();
+        this.buf.resetReaderIndex();
+
+        byte[] array = new byte[this.buf.readableBytes()];
+        this.buf.readBytes(array);
+
+        this.buf.readerIndex(readerIndex);
+        return array;
     }
 
     @Override
@@ -205,10 +212,7 @@ public final class NetworkBufferImpl implements NetworkBuffer {
             array = new byte[this.buf.readableBytes()];
         }
 
-        for (int i = 0; i < array.length; i++) {
-            array[i] = this.readByte();
-        }
-
+        this.buf.readBytes(array);
         return array;
     }
 }

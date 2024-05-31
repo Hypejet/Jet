@@ -40,10 +40,13 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
 
         switch (packet) {
             case ClientHandshakePacket clientHandshakePacket -> this.playerConnection.setProtocolState(clientHandshakePacket.nextState());
-            case ClientLoginRequestPacket requestPacket -> this.playerConnection.sendPacket(ServerLoginSuccessPacket.builder()
-                    .uniqueId(requestPacket.uniqueId())
-                    .username(requestPacket.username())
-                    .build());
+            case ClientLoginRequestPacket requestPacket -> {
+                this.playerConnection.setCompressionThreshold(256);
+                this.playerConnection.sendPacket(ServerLoginSuccessPacket.builder()
+                        .uniqueId(requestPacket.uniqueId())
+                        .username(requestPacket.username())
+                        .build());
+            }
             case ClientLoginAcknowledgePacket ignored -> this.playerConnection.setProtocolState(ProtocolState.CONFIGURATION);
             default -> {}
         }
