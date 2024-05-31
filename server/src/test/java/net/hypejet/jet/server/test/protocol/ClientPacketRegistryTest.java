@@ -1,18 +1,24 @@
 package net.hypejet.jet.server.test.protocol;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.hypejet.jet.buffer.NetworkBuffer;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
 import net.hypejet.jet.protocol.packet.client.handshake.ClientHandshakePacket;
+import net.hypejet.jet.protocol.packet.client.login.ClientCookieResponsePacket;
+import net.hypejet.jet.protocol.packet.client.login.ClientEncryptionResponsePacket;
 import net.hypejet.jet.protocol.packet.client.login.ClientLoginRequestPacket;
+import net.hypejet.jet.protocol.packet.client.login.ClientPluginMessageResponsePacket;
 import net.hypejet.jet.server.buffer.NetworkBufferImpl;
 import net.hypejet.jet.server.protocol.ServerBoundPacketRegistry;
+import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Represents a test for {@link ServerBoundPacketRegistry server-bound packet registry}.
@@ -70,6 +76,86 @@ public final class ClientPacketRegistryTest {
 
         Assertions.assertEquals(username, requestPacket.username());
         Assertions.assertEquals(uuid, requestPacket.uniqueId());
+    }
+
+    @Test
+    public void testEncryptionResponse() {
+        NetworkBuffer buffer = createBuffer();
+
+        byte[] sharedSecret = new byte[4];
+        byte[] verifyToken = new byte[4];
+
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+
+        random.nextBytes(sharedSecret);
+        random.nextBytes(verifyToken);
+
+        buffer.writeByteArray(sharedSecret);
+        buffer.writeByteArray(verifyToken);
+
+        ClientPacket packet = this.packetRegistry.read(1, ProtocolState.LOGIN, buffer);
+        Assertions.assertInstanceOf(ClientEncryptionResponsePacket.class, packet);
+
+        ClientEncryptionResponsePacket responsePacket = (ClientEncryptionResponsePacket) packet;
+
+        Assertions.assertArrayEquals(sharedSecret, responsePacket.sharedSecret());
+        Assertions.assertArrayEquals(verifyToken, responsePacket.verifyToken());
+    }
+
+    @Test
+    public void testCookieResponse() {
+        ByteBuf buf = Unpooled.buffer();
+        NetworkBuffer buffer = new NetworkBufferImpl(buf);
+
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+
+        Key identifier = Key.key("hypejet", "jet");
+        byte[] data = random.nextBoolean() ? new byte[10] : null;
+
+        if (data != null) {
+            random.nextBytes(data);
+        }
+
+        buffer.writeIdentifier(identifier);
+        buffer.writeBoolean(data != null);
+
+        if (data != null) {
+            buffer.writeByteArray(data);
+        }
+
+        ClientPacket packet = this.packetRegistry.read(4, ProtocolState.LOGIN, buffer);
+        Assertions.assertInstanceOf(ClientCookieResponsePacket.class, packet);
+
+        ClientCookieResponsePacket responsePacket = (ClientCookieResponsePacket) packet;
+
+        Assertions.assertEquals(identifier, responsePacket.identifier());
+        Assertions.assertArrayEquals(data, responsePacket.data());
+    }
+
+    @Test
+    public void testPluginMessageResponse() {
+        NetworkBuffer buffer = createBuffer();
+
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+
+        int messageId = random.nextInt();
+        boolean successful = random.nextBoolean();
+        byte[] data = new byte[random.nextInt(35)];
+
+        random.nextBytes(data);
+
+        buffer.writeVarInt(messageId);
+        buffer.writeBoolean(successful);
+        buffer.writeByteArray(data, false);
+
+        ClientPacket packet = this.packetRegistry.read(2, ProtocolState.LOGIN, buffer);
+        Assertions.assertInstanceOf(ClientPluginMessageResponsePacket.class, packet);
+
+        ClientPluginMessageResponsePacket responsePacket = (ClientPluginMessageResponsePacket) packet;
+
+        Assertions.assertEquals(messageId, responsePacket.messageId());
+        Assertions.assertEquals(successful, responsePacket.successful());
+        Assertions.assertArrayEquals(data, responsePacket.data());
     }
 
     @Test
