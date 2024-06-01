@@ -14,7 +14,7 @@ What does Jet do over other servers?
 ### (Craft-)Bukkit based software (Spigot/Paper)
 Minecraft minigame servers are popular for a long time. The oldest ones started from simple minigame servers and ended up with a large server networks.
 
-Since Minecraft release, a lot features were added, affecting server performance. However, minigame servers don't need all of those features. Some servers may also want to have a multi-threaded solution, which Minecrafy doesn't have  That's why server software like Jet and Minestom came up.
+Since Minecraft release, a lot features were added, affecting server performance. However, minigame servers don't need all of those features. Some servers may also want to have a multi-threaded solution, which Minecraft doesn't have. That's why server software like Jet and Minestom came up.
 
 Jet doesn't have any vanilla features re-implemented by default, allowing for developers to implement their own mechanics and vanilla mechanics, but only these, which they need.
 
