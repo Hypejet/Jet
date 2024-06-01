@@ -60,7 +60,7 @@ public final class ServerPacketRegistry {
      * @param state a protocol state during which the packet is written
      * @return true if the packet writer was eligible for the packet, false otherwise
      * @param <P> a type of the packet
-     * @throws IllegalStateException if the packet writer is eligible, but the protocol state does not support
+     * @throws IllegalStateException if the packet writer is eligible or the protocol state does not support
      *                               the protocol state of writer
      * @since 1.0
      */
