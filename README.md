@@ -7,7 +7,8 @@ A brand new Minecraft server software made from scratch that aims to be multithr
 Jet does not have any vanilla features reimplemented, such as combat or fluids, making it good for simple minigame servers.
 
 ## Background
-#### What does Jet do over other servers?
+What does Jet do over other servers?
+
 ### Spigot/Paper
 - **See [Why Minestom?](https://github.com/Minestom/Minestom/?tab=readme-ov-file#why-minestom)**
 ### Minestom
