@@ -1,6 +1,8 @@
 # ✈️ Jet
-###### **Note:** Jet is still very much WIP, Jet should **NOT** be used for normal servers _(yet!)_
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
+
+> [!NOTE]
+> Jet is still very much WIP, Jet should **NOT** be used for normal servers _(yet!)_
 
 A brand new Minecraft server software made from scratch that aims to be multithreaded, user-friendly and to have a modern API.
 
