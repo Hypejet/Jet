@@ -25,7 +25,7 @@ Using Jet is not very different than Craftbukkit based software, except for not 
 
 You have a basic configuration file, which contains the most important settings for the server.
 
-If you want to implement features on your server, you need to make plugins using our [API](https://github.com/Hypejet/Jet/api), which you put into a `plugins` subdirectory.
+If you want to implement features on your server, you need to make plugins using our [API](https://github.com/Hypejet/Jet/tree/ver/1.0/api), which you put into a `plugins` subdirectory.
 
 ## Contributing
 You can contribute to Jet easily by creating pull requests, without any other needs.
