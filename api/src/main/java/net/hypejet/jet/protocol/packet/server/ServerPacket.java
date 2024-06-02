@@ -1,5 +1,6 @@
 package net.hypejet.jet.protocol.packet.server;
 
+import net.hypejet.jet.protocol.packet.Packet;
 import net.hypejet.jet.protocol.packet.server.login.ServerLoginPacket;
 
 /**
@@ -8,4 +9,4 @@ import net.hypejet.jet.protocol.packet.server.login.ServerLoginPacket;
  * @since 1.0
  * @author Codestech
  */
-public sealed interface ServerPacket permits ServerLoginPacket {}
+public sealed interface ServerPacket extends Packet permits ServerLoginPacket {}

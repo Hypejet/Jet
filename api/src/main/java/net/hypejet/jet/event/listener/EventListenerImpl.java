@@ -1,5 +1,6 @@
 package net.hypejet.jet.event.listener;
 
+import net.hypejet.jet.event.priority.EventPriority;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -11,7 +12,7 @@ import java.util.function.Predicate;
  * 
  * @param <E> the type of event that this listener listens to
  * @since 1.0
- * @author Codestech
+ * @author Codestech, Window5
  * @see EventListener
  */
 final class EventListenerImpl<E> implements EventListener<E> {
@@ -20,7 +21,7 @@ final class EventListenerImpl<E> implements EventListener<E> {
     private final Predicate<E> predicate;
     
     private final Class<? extends E> eventClass;
-    private final int priority;
+    private final EventPriority priority;
 
     /**
      * Constructs an {@linkplain EventListenerImpl event listener implementation}.
@@ -32,7 +33,7 @@ final class EventListenerImpl<E> implements EventListener<E> {
      * @since 1.0
      */
     EventListenerImpl(@NonNull Consumer<E> consumer, @NonNull Class<? extends E> eventClass,
-                      @Nullable Predicate<E> predicate, int priority) {
+                      @Nullable Predicate<E> predicate, EventPriority priority) {
         this.consumer = consumer;
         this.eventClass = eventClass;
         this.predicate = predicate;
@@ -50,7 +51,7 @@ final class EventListenerImpl<E> implements EventListener<E> {
     }
 
     @Override
-    public int priority() {
+    public EventPriority priority() {
         return this.priority;
     }
 
@@ -72,6 +73,6 @@ final class EventListenerImpl<E> implements EventListener<E> {
     
     @Override
     public int compareTo(@NonNull EventListener<?> listener) {
-        return Integer.compare(listener.priority(), this.priority());
+        return Integer.compare(listener.priority().ordinal(), this.priority().ordinal());
     }
 }

@@ -1,5 +1,6 @@
 package net.hypejet.jet.event.listener;
 
+import net.hypejet.jet.event.priority.EventPriority;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -11,7 +12,7 @@ import java.util.function.Predicate;
  *
  * @param <E> a type of the event
  * @since 1.0
- * @author Codestech
+ * @author Codestech, Window5
  */
 public sealed interface EventListener<E> extends Predicate<E>, Consumer<E>, Comparable<EventListener<?>>
         permits EventListenerImpl {
@@ -37,7 +38,7 @@ public sealed interface EventListener<E> extends Predicate<E>, Consumer<E>, Comp
      * @return the priority
      * @since 1.0
      */
-    int priority();
+    EventPriority priority();
 
     /**
      * Gets whether an event is eligible to call this listener.
@@ -81,11 +82,11 @@ public sealed interface EventListener<E> extends Predicate<E>, Consumer<E>, Comp
      * @since 1.0
      */
     static <E> EventListener<E> listener(@NonNull Consumer<E> eventConsumer, @NonNull Class<? extends E> eventClass) {
-        return listener(eventConsumer, eventClass, null);
+        return listener(eventConsumer, eventClass, (@Nullable Predicate<E>) null);
     }
 
     /**
-     * Creates a new {@linkplain EventListener event listener} with a priority of {@code 0}.
+     * Creates a new {@linkplain EventListener event listener} with a priority of {@code NORMAL}.
      *
      * @param eventClass a class of an event that the event listener should listen to
      * @param eventConsumer a consumer of that consumes called events
@@ -98,7 +99,7 @@ public sealed interface EventListener<E> extends Predicate<E>, Consumer<E>, Comp
      */
     static <E> EventListener<E> listener(@NonNull Consumer<E> eventConsumer, @NonNull Class<? extends E> eventClass,
                                          @Nullable Predicate<E> eventPredicate) {
-        return listener(eventConsumer, eventClass, eventPredicate, 0);
+        return listener(eventConsumer, eventClass, eventPredicate, EventPriority.NORMAL);
     }
 
     /**
@@ -113,7 +114,7 @@ public sealed interface EventListener<E> extends Predicate<E>, Consumer<E>, Comp
      * @since 1.0
      */
     static <E> EventListener<E> listener(@NonNull Consumer<E> eventConsumer, @NonNull Class<? extends E> eventClass,
-                                         int priority) {
+                                         EventPriority priority) {
         return listener(eventConsumer, eventClass, null, priority);
     }
 
@@ -131,7 +132,7 @@ public sealed interface EventListener<E> extends Predicate<E>, Consumer<E>, Comp
      * @since 1.0
      */
     static <E> EventListener<E> listener(@NonNull Consumer<E> eventConsumer, @NonNull Class<? extends E> eventClass,
-                                         @Nullable Predicate<E> eventPredicate, int priority) {
+                                         @Nullable Predicate<E> eventPredicate, EventPriority priority) {
         return new EventListenerImpl<>(eventConsumer, eventClass, eventPredicate, priority);
     }
 }

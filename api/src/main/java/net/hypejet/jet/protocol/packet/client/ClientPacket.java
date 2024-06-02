@@ -1,5 +1,6 @@
 package net.hypejet.jet.protocol.packet.client;
 
+import net.hypejet.jet.protocol.packet.Packet;
 import net.hypejet.jet.protocol.packet.client.handshake.ClientHandshakePacket;
 
 /**
@@ -8,4 +9,4 @@ import net.hypejet.jet.protocol.packet.client.handshake.ClientHandshakePacket;
  * @since 1.0
  * @author Codestech
  */
-public sealed interface ClientPacket permits ClientLoginPacket, ClientHandshakePacket {}
+public sealed interface ClientPacket extends Packet permits ClientLoginPacket, ClientHandshakePacket {}

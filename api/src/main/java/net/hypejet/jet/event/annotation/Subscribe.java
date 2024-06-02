@@ -1,6 +1,7 @@
 package net.hypejet.jet.event.annotation;
 
 import net.hypejet.jet.event.listener.EventListener;
+import net.hypejet.jet.event.priority.EventPriority;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -12,7 +13,7 @@ import java.lang.annotation.Target;
  * listener} and contains properties for it.
  *
  * @since 1.0
- * @author Codestech
+ * @author Codestech, Window5
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
@@ -23,5 +24,5 @@ public @interface Subscribe {
      * @return the event priority
      * @since 1.0
      */
-    int priority() default 0;
+    EventPriority priority() default EventPriority.NORMAL;
 }
