@@ -10,10 +10,11 @@ import java.util.function.Consumer;
 /**
  * Represents something that manages events.
  *
+ * @param <E> a type of event that this event node handles
  * @since 1.0
  * @author Codestech
  */
-public sealed interface EventNode extends Comparable<EventNode> permits EventNodeImpl {
+public sealed interface EventNode<E> extends Comparable<EventNode<?>> permits EventNodeImpl {
     /**
      * Adds a {@linkplain EventNode event node} as a child of this node.
      *
@@ -23,7 +24,7 @@ public sealed interface EventNode extends Comparable<EventNode> permits EventNod
      * @see EventNode
      */
     @This
-    @NonNull EventNode addChild(@NonNull EventNode node);
+    @NonNull EventNode<E> addChild(@NonNull EventNode<? extends E> node);
 
     /**
      * Adds an {@linkplain EventListener event listener} to this {@linkplain EventNode event node}.
@@ -34,20 +35,21 @@ public sealed interface EventNode extends Comparable<EventNode> permits EventNod
      * @see EventListener
      */
     @This
-    @NonNull EventNode addListener(@NonNull EventListener<?> listener);
+    @NonNull EventNode<E> addListener(@NonNull EventListener<? extends E> listener);
 
     /**
      * Creates and adds an {@linkplain EventListener event listener} to this {@linkplain EventNode event node}.
      *
      * @param eventConsumer a consumer of the event
      * @param eventClass a class of the event that the listener should listen to
-     * @param <E> a type of the event
+     * @param <T> a type of event that the listener should handle
      * @return this node
      * @since 1.0
      * @see EventListener
      */
     @This
-    <E> @NonNull EventNode addListener(@NonNull Consumer<E> eventConsumer, @NonNull Class<? extends E> eventClass);
+    <T extends E> @NonNull EventNode<E> addListener(@NonNull Consumer<T> eventConsumer,
+                                                    @NonNull Class<? extends T> eventClass);
 
     /**
      * Adds an annotation-based listener.
@@ -55,9 +57,10 @@ public sealed interface EventNode extends Comparable<EventNode> permits EventNod
      * @param listener the listener
      * @return this node
      * @since 1.0
+     * @see net.hypejet.jet.event.annotation.Subscribe
      */
     @This
-    @NonNull EventNode addListener(@NonNull Object listener);
+    @NonNull EventNode<E> addListener(@NonNull Object listener);
 
     /**
      * Calls an event.
@@ -67,7 +70,7 @@ public sealed interface EventNode extends Comparable<EventNode> permits EventNod
      * @since 1.0
      */
     @This
-    @NonNull EventNode call(@NonNull Object event);
+    @NonNull EventNode<E> call(@NonNull E event);
 
     /**
      * Gets listeners that were registered to this {@linkplain EventNode event node}.
@@ -75,7 +78,7 @@ public sealed interface EventNode extends Comparable<EventNode> permits EventNod
      * @return the listeners
      * @since 1.0
      */
-    @NonNull Collection<EventListener<?>> listeners();
+    @NonNull Collection<EventListener<? extends E>> listeners();
 
     /**
      * Gets children {@linkplain EventNode event nodes} of this node.
@@ -83,7 +86,7 @@ public sealed interface EventNode extends Comparable<EventNode> permits EventNod
      * @return the children event nodes
      * @since 1.0
      */
-    @NonNull Collection<EventNode> children();
+    @NonNull Collection<EventNode<? extends E>> children();
 
     /**
      * Gets a priority of this {@linkplain EventNode event node}.
@@ -94,23 +97,35 @@ public sealed interface EventNode extends Comparable<EventNode> permits EventNod
     int priority();
 
     /**
+     * Gets a class of an event that this {@linkplain EventNode event node} handles/
+     *
+     * @return the class
+     * @since 1.0
+     */
+    @NonNull Class<E> eventClass();
+
+    /**
      * Creates an event node with a priority of {@code 0}.
      *
+     * @param eventClass a class of an event that the event node should handle
+     * @param <E> a type of event that the event node should handle
      * @return the event node
      * @since 1.0
      */
-    static @NonNull EventNode create() {
-        return create(0);
+    static <E> @NonNull EventNode<E> create(@NonNull Class<E> eventClass) {
+        return create(eventClass, 0);
     }
 
     /**
      * Creates an event node.
      *
+     * @param eventClass a class of an event that the event node should handle
      * @param priority a priority of the event node
+     * @param <E> a type of event that the event node should handle
      * @return the event node
      * @since 1.0
      */
-    static @NonNull EventNode create(int priority) {
-        return new EventNodeImpl(priority);
+    static <E> @NonNull EventNode<E> create(@NonNull Class<E> eventClass, int priority) {
+        return new EventNodeImpl<>(eventClass, priority);
     }
 }
