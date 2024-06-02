@@ -2,8 +2,6 @@ package net.hypejet.jet.event.events;
 
 import net.hypejet.jet.event.annotation.Subscribe;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 /**
  * Represents any event that can be cancelled, this can be listened to but should not be used
  *
@@ -14,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public abstract class CancellableEvent {
 
-    private final AtomicBoolean cancel = new AtomicBoolean();
+    private boolean cancel;
 
     /**
      * Sets whether the event should be cancelled.
@@ -23,7 +21,7 @@ public abstract class CancellableEvent {
      * @since 1.0
      */
     public final void setCancelled(boolean cancel) {
-        this.cancel.set(cancel);
+        this.cancel = cancel;
     }
 
     /**
@@ -33,6 +31,6 @@ public abstract class CancellableEvent {
      * @since 1.0
      */
     public final boolean isCancelled() {
-        return this.cancel.get();
+        return this.cancel;
     }
 }
