@@ -3,8 +3,9 @@ package net.hypejet.jet.server.player;
 import io.netty.channel.socket.SocketChannel;
 import net.hypejet.jet.player.PlayerConnection;
 import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.protocol.packet.clientbound.ClientBoundPacket;
-import net.hypejet.jet.protocol.packet.clientbound.login.disconnect.DisconnectPacket;
+import net.hypejet.jet.protocol.packet.server.ServerPacket;
+import net.hypejet.jet.protocol.packet.server.login.compression.ServerEnableCompressionPacket;
+import net.hypejet.jet.protocol.packet.server.login.disconnect.ServerDisconnectPacket;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -17,9 +18,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class SocketPlayerConnection implements PlayerConnection {
 
-    private ProtocolState state = ProtocolState.HANDSHAKE;
-
     private final SocketChannel channel;
+
+    private ProtocolState state = ProtocolState.HANDSHAKE;
+    private int compressionThreshold = -1;
 
     /**
      * Constructs a {@link SocketPlayerConnection socket player connection}.
@@ -37,18 +39,21 @@ public final class SocketPlayerConnection implements PlayerConnection {
     }
 
     @Override
-    public void sendPacket(@NonNull ClientBoundPacket packet) {
-        if (this.state != packet.getProtocolState())
-            throw unsupportedProtocolState(packet);
+    public void sendPacket(@NonNull ServerPacket packet) {
         this.channel.writeAndFlush(packet);
     }
 
     @Override
     public void kick(@NonNull Component reason) {
-        this.sendPacket(DisconnectPacket.builder()
+        this.sendPacket(ServerDisconnectPacket.builder()
                 .reason(reason)
                 .build());
         this.close();
+    }
+
+    @Override
+    public int compressionThreshold() {
+        return this.compressionThreshold;
     }
 
     /**
@@ -75,6 +80,19 @@ public final class SocketPlayerConnection implements PlayerConnection {
     }
 
     /**
+     * Sets a compression threshold of this connection.
+     *
+     * @param compressionThreshold the compression threshold
+     * @since 1.0
+     */
+    public void setCompressionThreshold(int compressionThreshold) {
+        this.sendPacket(ServerEnableCompressionPacket.builder()
+                .threshold(compressionThreshold)
+                .build());
+        this.compressionThreshold = compressionThreshold;
+    }
+
+    /**
      * Gets a {@link SocketChannel socket channel} of the {@link PlayerConnection player connection}.
      *
      * @return the socket channel
@@ -82,10 +100,5 @@ public final class SocketPlayerConnection implements PlayerConnection {
      */
     public @NonNull SocketChannel getChannel() {
         return this.channel;
-    }
-
-    private static @NonNull RuntimeException unsupportedProtocolState(@NonNull ClientBoundPacket packet) {
-        return new IllegalArgumentException("The current protocol state does not support packet "
-                + packet.getClass().getSimpleName());
     }
 }
