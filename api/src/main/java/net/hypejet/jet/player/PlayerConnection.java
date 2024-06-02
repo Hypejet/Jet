@@ -1,5 +1,6 @@
 package net.hypejet.jet.player;
 
+import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
 import net.hypejet.jet.protocol.packet.server.login.disconnect.ServerDisconnectPacket;
@@ -44,4 +45,12 @@ public interface PlayerConnection {
      * @since 1.0
      */
     int compressionThreshold();
+
+    /**
+     * Gets a {@linkplain MinecraftServer minecraft server} owning this connection.
+     *
+     * @return the minecraft server
+     * @since 1.0
+     */
+    @NonNull MinecraftServer server();
 }

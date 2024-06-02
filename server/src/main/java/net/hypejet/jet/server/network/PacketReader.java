@@ -6,9 +6,11 @@ import net.hypejet.jet.player.login.LoginHandler;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.ClientLoginPacket;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
+import net.hypejet.jet.event.events.packet.PacketReceiveEvent;
 import net.hypejet.jet.protocol.packet.client.handshake.ClientHandshakePacket;
 import net.hypejet.jet.protocol.packet.client.login.ClientLoginAcknowledgePacket;
 import net.hypejet.jet.protocol.packet.client.login.ClientLoginRequestPacket;
+import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.player.SocketPlayerConnection;
 import net.hypejet.jet.server.player.login.DefaultLoginHandler;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -30,9 +32,19 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
     private final SocketPlayerConnection playerConnection;
     private final LoginHandler handler;
 
-    public PacketReader(@NonNull SocketPlayerConnection playerConnection) {
+    private final JetMinecraftServer server;
+
+    /**
+     * Constructs a {@linkplain PacketReader packet reader}.
+     *
+     * @param playerConnection a player connection to read packets for
+     * @param server a server that provides the {@code connection}
+     * @since 1.0
+     */
+    public PacketReader(@NonNull SocketPlayerConnection playerConnection, @NonNull JetMinecraftServer server) {
         this.playerConnection = playerConnection;
         this.handler = new DefaultLoginHandler(); // TODO: Built-in Mojang handler support and an event
+        this.server = server;
     }
 
     @Override
@@ -41,6 +53,11 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
 
         if (!(msg instanceof ClientPacket packet))
             throw new IllegalStateException("A message received is not a client packet");
+
+        PacketReceiveEvent event = new PacketReceiveEvent(packet);
+        this.server.eventNode().call(event);
+
+        if (event.isCancelled()) return;
 
         if (packet instanceof ClientHandshakePacket handshakePacket) {
             this.playerConnection.setProtocolState(handshakePacket.nextState());

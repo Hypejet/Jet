@@ -61,19 +61,9 @@ public enum EventPriority {
     /**
      * Represents an {@linkplain EventPriority event priority}.
      * </p>
-     * Listeners of this type are called second to last.
-     * No modification may be made after this priority.
-     *
-     * @since 1.0
-     */
-    LAST,
-    /**
-     * Represents an {@linkplain EventPriority event priority}.
-     * </p>
      * Listeners of this type are called last.
-     * This priority may only be used to read results, no values may be updated.
      *
      * @since 1.0
      */
-    MONITOR
+    LAST
 }

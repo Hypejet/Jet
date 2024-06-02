@@ -106,6 +106,16 @@ public sealed interface EventNode<E> extends Comparable<EventNode<?>> permits Ev
     @NonNull Class<E> eventClass();
 
     /**
+     * Creates an event node with a type of {@link Object} and a priority of {@linkplain EventPriority#NORMAL}.
+     *
+     * @return the event node
+     * @since 1.0
+     */
+    static @NonNull EventNode<Object> create() {
+        return create(Object.class, EventPriority.NORMAL);
+    }
+
+    /**
      * Creates an event node with a priority of {@linkplain EventPriority#NORMAL}.
      *
      * @param eventClass a class of an event that the event node should handle
