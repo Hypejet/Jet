@@ -7,8 +7,7 @@ import net.hypejet.jet.protocol.packet.server.ServerPacket;
  * Represents any Minecraft packet.
  *
  * @since 1.0
- * @author Window
+ * @author Window5
+ * @author Codestech
  */
-public sealed interface Packet permits ClientPacket, ServerPacket {
-    int getPacketId();
-}
+public sealed interface Packet permits ClientPacket, ServerPacket {}

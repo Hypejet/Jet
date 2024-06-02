@@ -12,7 +12,8 @@ import java.util.function.Predicate;
  *
  * @param <E> a type of the event
  * @since 1.0
- * @author Codestech, Window5
+ * @author Codestech
+ * @author Window5
  */
 public sealed interface EventListener<E> extends Predicate<E>, Consumer<E>, Comparable<EventListener<?>>
         permits EventListenerImpl {
@@ -22,7 +23,7 @@ public sealed interface EventListener<E> extends Predicate<E>, Consumer<E>, Comp
      * @param event the event
      * @since 1.0
      */
-    void call(E event);
+    void call(@NonNull E event);
 
     /**
      * Gets a type of event that this listener listens to.
@@ -30,15 +31,15 @@ public sealed interface EventListener<E> extends Predicate<E>, Consumer<E>, Comp
      * @return the type
      * @since 1.0
      */
-    Class<? extends E> eventClass();
+    @NonNull Class<? extends E> eventClass();
 
     /**
-     * Gets a priority of the listener.
+     * Gets an {@linkplain EventPriority event priority} of the listener.
      *
      * @return the priority
      * @since 1.0
      */
-    EventPriority priority();
+    @NonNull EventPriority priority();
 
     /**
      * Gets whether an event is eligible to call this listener.
@@ -46,7 +47,7 @@ public sealed interface EventListener<E> extends Predicate<E>, Consumer<E>, Comp
      * @param event the event
      * @return true if the event is eligible to call this listener, false otherwise
      */
-    boolean isEligible(E event);
+    boolean isEligible(@NonNull E event);
 
     /**
      * {@inheritDoc}
@@ -72,7 +73,7 @@ public sealed interface EventListener<E> extends Predicate<E>, Consumer<E>, Comp
 
     /**
      * Creates a new {@linkplain EventListener event listener} with a predicate, which always returns {@code true}
-     * a priority of {@code 0}.
+     * a priority of {@link EventPriority#NORMAL}.
      *
      * @param eventClass a class of an event that the event listener should listen to
      * @param eventConsumer a consumer of that consumes called events
@@ -86,7 +87,7 @@ public sealed interface EventListener<E> extends Predicate<E>, Consumer<E>, Comp
     }
 
     /**
-     * Creates a new {@linkplain EventListener event listener} with a priority of {@code NORMAL}.
+     * Creates a new {@linkplain EventListener event listener} with a priority of {@link EventPriority#NORMAL}.
      *
      * @param eventClass a class of an event that the event listener should listen to
      * @param eventConsumer a consumer of that consumes called events
@@ -107,14 +108,14 @@ public sealed interface EventListener<E> extends Predicate<E>, Consumer<E>, Comp
      *
      * @param eventClass a class of an event that the event listener should listen to
      * @param eventConsumer a consumer of that consumes called events
-     * @param priority a priority of the event listener
+     * @param priority an {@linkplain EventPriority event priority} of the event listener
      *
      * @return the event listener
      * @param <E> a type of event that the event listener listens to
      * @since 1.0
      */
     static <E> EventListener<E> listener(@NonNull Consumer<E> eventConsumer, @NonNull Class<? extends E> eventClass,
-                                         EventPriority priority) {
+                                         @NonNull EventPriority priority) {
         return listener(eventConsumer, eventClass, null, priority);
     }
 
@@ -125,14 +126,14 @@ public sealed interface EventListener<E> extends Predicate<E>, Consumer<E>, Comp
      * @param eventConsumer a consumer of that consumes called events
      * @param eventPredicate a predicate that checks whether an event called is eligible to be called by the event
      *                       listener
-     * @param priority a priority of the event listener
+     * @param priority an {@linkplain EventPriority event priority} of the event listener
      *
      * @return the event listener
      * @param <E> a type of event that the event listener listens to
      * @since 1.0
      */
     static <E> EventListener<E> listener(@NonNull Consumer<E> eventConsumer, @NonNull Class<? extends E> eventClass,
-                                         @Nullable Predicate<E> eventPredicate, EventPriority priority) {
+                                         @Nullable Predicate<E> eventPredicate, @NonNull EventPriority priority) {
         return new EventListenerImpl<>(eventConsumer, eventClass, eventPredicate, priority);
     }
 }

@@ -7,14 +7,23 @@ import net.hypejet.jet.event.annotation.Subscribe;
  *
  * @since 1.0
  * @author Window5
+ * @author Codestech
  * @see Subscribe
  */
-public class CancellableEvent extends JetEvent {
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
-    }
+public interface CancellableEvent {
+    /**
+     * Sets whether the event should be cancelled.
+     *
+     * @param cancel true if the event should be cancelled, false otherwise
+     * @since 1.0
+     */
+    void setCancelled(boolean cancel);
 
-    public boolean isCancelled() {
-        return cancelled;
-    }
+    /**
+     * Gets whether the event has been cancelled.
+     *
+     * @return true if the event was cancelled, false otherwise
+     * @since 1.0
+     */
+    boolean isCancelled();
 }

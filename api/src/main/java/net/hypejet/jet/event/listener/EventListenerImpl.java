@@ -3,6 +3,7 @@ package net.hypejet.jet.event.listener;
 import net.hypejet.jet.event.priority.EventPriority;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -12,7 +13,8 @@ import java.util.function.Predicate;
  * 
  * @param <E> the type of event that this listener listens to
  * @since 1.0
- * @author Codestech, Window5
+ * @author Codestech
+ * @author Window5
  * @see EventListener
  */
 final class EventListenerImpl<E> implements EventListener<E> {
@@ -29,7 +31,7 @@ final class EventListenerImpl<E> implements EventListener<E> {
      * @param consumer a consumer that consumes called events
      * @param eventClass a class of an event that this listener consumes
      * @param predicate a predicate that checks if this listener is eligible to call 
-     * @param priority a priority of this listener
+     * @param priority a {@linkplain EventPriority event priority} of this listener
      * @since 1.0
      */
     EventListenerImpl(@NonNull Consumer<E> consumer, @NonNull Class<? extends E> eventClass,
@@ -41,22 +43,22 @@ final class EventListenerImpl<E> implements EventListener<E> {
     }
     
     @Override
-    public void call(E event) {
+    public void call(@NonNull E event) {
         this.consumer.accept(event);
     }
 
     @Override
-    public Class<? extends E> eventClass() {
+    public @NonNull Class<? extends E> eventClass() {
         return this.eventClass;
     }
 
     @Override
-    public EventPriority priority() {
+    public @NonNull EventPriority priority() {
         return this.priority;
     }
 
     @Override
-    public boolean isEligible(E event) {
+    public boolean isEligible(@NotNull E event) {
         if (this.predicate == null) return true;
         return this.predicate.test(event);
     }
@@ -73,6 +75,6 @@ final class EventListenerImpl<E> implements EventListener<E> {
     
     @Override
     public int compareTo(@NonNull EventListener<?> listener) {
-        return Integer.compare(listener.priority().ordinal(), this.priority().ordinal());
+        return Integer.compare(this.priority().ordinal(), listener.priority().ordinal());
     }
 }

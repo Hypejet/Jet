@@ -2,6 +2,7 @@ package net.hypejet.jet.event.node;
 
 import net.hypejet.jet.event.listener.EventListener;
 import net.hypejet.jet.event.annotation.Subscribe;
+import net.hypejet.jet.event.priority.EventPriority;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.common.returnsreceiver.qual.This;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +32,7 @@ final class EventNodeImpl<E> implements EventNode<E> {
     private static final Logger LOGGER = LoggerFactory.getLogger(EventNode.class);
 
     private final Class<E> eventClass;
-    private final int priority;
+    private final EventPriority priority;
 
     private final Collection<EventListener<? extends E>> listeners = new CopyOnWriteArraySet<>();
     private final Collection<EventNode<? extends E>> children = new CopyOnWriteArraySet<>();
@@ -40,10 +41,10 @@ final class EventNodeImpl<E> implements EventNode<E> {
      * Creates an {@linkplain EventNodeImpl implementation of the event node}.
      *
      * @param eventClass a class of an event that this event node handles
-     * @param priority a priority of the event node
+     * @param priority a {@linkplain EventPriority event priority} of the event node
      * @since 1.0
      */
-    EventNodeImpl(@NonNull Class<E> eventClass, int priority) {
+    EventNodeImpl(@NonNull Class<E> eventClass, @NonNull EventPriority priority) {
         this.eventClass = eventClass;
         this.priority = priority;
     }
@@ -135,7 +136,7 @@ final class EventNodeImpl<E> implements EventNode<E> {
     }
 
     @Override
-    public int priority() {
+    public @NotNull EventPriority priority() {
         return this.priority;
     }
 
@@ -146,7 +147,7 @@ final class EventNodeImpl<E> implements EventNode<E> {
 
     @Override
     public int compareTo(@NonNull EventNode<?> node) {
-        return Integer.compare(node.priority(), this.priority());
+        return Integer.compare(this.priority().ordinal(), node.priority().ordinal());
     }
 
     private <T extends E> void callListener(@NonNull EventListener<T> listener, @NonNull E event) {

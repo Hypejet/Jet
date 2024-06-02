@@ -1,6 +1,7 @@
 package net.hypejet.jet.event.node;
 
 import net.hypejet.jet.event.listener.EventListener;
+import net.hypejet.jet.event.priority.EventPriority;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.common.returnsreceiver.qual.This;
 
@@ -94,7 +95,7 @@ public sealed interface EventNode<E> extends Comparable<EventNode<?>> permits Ev
      * @return the event priority
      * @since 1.0
      */
-    int priority();
+    @NonNull EventPriority priority();
 
     /**
      * Gets a class of an event that this {@linkplain EventNode event node} handles/
@@ -105,7 +106,7 @@ public sealed interface EventNode<E> extends Comparable<EventNode<?>> permits Ev
     @NonNull Class<E> eventClass();
 
     /**
-     * Creates an event node with a priority of {@code 0}.
+     * Creates an event node with a priority of {@linkplain EventPriority#NORMAL}.
      *
      * @param eventClass a class of an event that the event node should handle
      * @param <E> a type of event that the event node should handle
@@ -113,19 +114,19 @@ public sealed interface EventNode<E> extends Comparable<EventNode<?>> permits Ev
      * @since 1.0
      */
     static <E> @NonNull EventNode<E> create(@NonNull Class<E> eventClass) {
-        return create(eventClass, 0);
+        return create(eventClass, EventPriority.NORMAL);
     }
 
     /**
      * Creates an event node.
      *
      * @param eventClass a class of an event that the event node should handle
-     * @param priority a priority of the event node
+     * @param priority an {@linkplain EventPriority event priority} of the event node
      * @param <E> a type of event that the event node should handle
      * @return the event node
      * @since 1.0
      */
-    static <E> @NonNull EventNode<E> create(@NonNull Class<E> eventClass, int priority) {
+    static <E> @NonNull EventNode<E> create(@NonNull Class<E> eventClass, @NonNull EventPriority priority) {
         return new EventNodeImpl<>(eventClass, priority);
     }
 }
