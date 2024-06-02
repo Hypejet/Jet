@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 /**
  * Represents an implementation of an {@linkplain EventNode event node}.
  *
- * @param <E> a type of event that thiUnits event node handles
+ * @param <E> a type of event that this event node handles
  * @since 1.0
  * @author Codestech
  * @see EventNode
