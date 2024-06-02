@@ -14,7 +14,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public non-sealed interface PacketReceiveEvent extends PacketEvent {
     /**
-     * Gets a {@linkplain ClientPacket client packet} that was received.
+     * Gets the {@linkplain ClientPacket client packet} that was received.
      *
      * @return the client packet
      * @since 1.0
