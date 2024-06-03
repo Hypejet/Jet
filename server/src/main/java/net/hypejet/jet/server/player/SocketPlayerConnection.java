@@ -1,11 +1,14 @@
 package net.hypejet.jet.server.player;
 
 import io.netty.channel.socket.SocketChannel;
+import net.hypejet.jet.MinecraftServer;
+import net.hypejet.jet.event.events.packet.PacketSendEvent;
 import net.hypejet.jet.player.PlayerConnection;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
 import net.hypejet.jet.protocol.packet.server.login.compression.ServerEnableCompressionPacket;
 import net.hypejet.jet.protocol.packet.server.login.disconnect.ServerDisconnectPacket;
+import net.hypejet.jet.server.JetMinecraftServer;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -20,6 +23,8 @@ public final class SocketPlayerConnection implements PlayerConnection {
 
     private final SocketChannel channel;
 
+    private final JetMinecraftServer server;
+
     private ProtocolState state = ProtocolState.HANDSHAKE;
     private int compressionThreshold = -1;
 
@@ -27,10 +32,12 @@ public final class SocketPlayerConnection implements PlayerConnection {
      * Constructs a {@link SocketPlayerConnection socket player connection}.
      *
      * @param channel a {@link SocketChannel socket channel}, which handles the connection
+     * @param server a {@linkplain MinecraftServer minecraft server} owning the connection
      * @since 1.0
      */
-    public SocketPlayerConnection(@NonNull SocketChannel channel) {
+    public SocketPlayerConnection(@NonNull SocketChannel channel, @NonNull JetMinecraftServer server) {
         this.channel = channel;
+        this.server = server;
     }
 
     @Override
@@ -40,7 +47,9 @@ public final class SocketPlayerConnection implements PlayerConnection {
 
     @Override
     public void sendPacket(@NonNull ServerPacket packet) {
-        this.channel.writeAndFlush(packet);
+        PacketSendEvent event = new PacketSendEvent(packet);
+        this.server.eventNode().call(event);
+        if (!event.isCancelled()) this.channel.writeAndFlush(packet);
     }
 
     @Override
@@ -54,6 +63,11 @@ public final class SocketPlayerConnection implements PlayerConnection {
     @Override
     public int compressionThreshold() {
         return this.compressionThreshold;
+    }
+
+    @Override
+    public @NonNull MinecraftServer server() {
+        return this.server;
     }
 
     /**

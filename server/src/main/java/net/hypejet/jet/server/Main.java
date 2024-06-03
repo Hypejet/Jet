@@ -12,11 +12,13 @@ public class Main {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
+        JetMinecraftServer server = new JetMinecraftServer();
+
         try {
             ServerBootstrap bootstrap = new ServerBootstrap()
                     .group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new PlayerChannelInitializer());
+                    .childHandler(new PlayerChannelInitializer(server));
 
             ChannelFuture future = bootstrap.bind(25565).sync();
             future.channel().closeFuture().sync();

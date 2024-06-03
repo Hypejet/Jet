@@ -3,9 +3,11 @@ package net.hypejet.jet.server.network;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
+import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.network.serialization.PacketDecoder;
 import net.hypejet.jet.server.network.serialization.PacketEncoder;
 import net.hypejet.jet.server.player.SocketPlayerConnection;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,19 +27,24 @@ public final class PlayerChannelInitializer extends ChannelInitializer<SocketCha
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PlayerChannelInitializer.class);
 
+    private final JetMinecraftServer minecraftServer;
+
     /**
      * Constructs a {@link PlayerChannelInitializer player channel initializer}.
      *
+     * @param minecraftServer a {@linkplain JetMinecraftServer minecraft server}, which provides player connections
      * @since 1.0
      */
-    public PlayerChannelInitializer() {}
+    public PlayerChannelInitializer(@NonNull JetMinecraftServer minecraftServer) {
+        this.minecraftServer = minecraftServer;
+    }
 
     @Override
     protected void initChannel(SocketChannel ch) {
-        SocketPlayerConnection playerConnection = new SocketPlayerConnection(ch);
+        SocketPlayerConnection playerConnection = new SocketPlayerConnection(ch, this.minecraftServer);
         ch.pipeline()
                 .addFirst(new PacketEncoder(playerConnection))
-                .addFirst(new PacketReader(playerConnection))
+                .addFirst(new PacketReader(playerConnection, this.minecraftServer))
                 .addFirst(new PacketDecoder(playerConnection));
     }
 

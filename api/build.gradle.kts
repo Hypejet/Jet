@@ -6,6 +6,8 @@ plugins {
 dependencies {
     api(libs.adventure)
     api(libs.slf4j)
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform)
 }
 
 publishing {
