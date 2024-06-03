@@ -28,6 +28,17 @@ public sealed interface EventNode<E> extends Comparable<EventNode<?>> permits Ev
     @NonNull EventNode<E> addChild(@NonNull EventNode<? extends E> node);
 
     /**
+     * Removes a {@linkplain EventNode event node} as a child from this node.
+     *
+     * @param node the event node
+     * @return this node
+     * @since 1.0
+     * @see EventNode
+     */
+    @This
+    @NonNull EventNode<E> removeChild(@NonNull EventNode<? extends E> node);
+
+    /**
      * Adds an {@linkplain EventListener event listener} to this {@linkplain EventNode event node}.
      *
      * @param listener the listener
@@ -44,13 +55,23 @@ public sealed interface EventNode<E> extends Comparable<EventNode<?>> permits Ev
      * @param eventConsumer a consumer of the event
      * @param eventClass a class of the event that the listener should listen to
      * @param <T> a type of event that the listener should handle
-     * @return this node
+     * @return the listener created
      * @since 1.0
      * @see EventListener
      */
     @This
-    <T extends E> @NonNull EventNode<E> addListener(@NonNull Consumer<T> eventConsumer,
-                                                    @NonNull Class<? extends T> eventClass);
+    <T extends E> @NonNull EventListener<T> addListener(@NonNull Consumer<T> eventConsumer,
+                                                        @NonNull Class<? extends T> eventClass);
+
+    /**
+     * Removes a {@linkplain EventListener event listener} from this {@linkplain EventNode event node}.
+     *
+     * @param listener the listener
+     * @return this node
+     * @since 1.0
+     */
+    @This
+    @NonNull EventNode<E> removeListener(@NonNull EventListener<? extends E> listener);
 
     /**
      * Adds an annotation-based listener.

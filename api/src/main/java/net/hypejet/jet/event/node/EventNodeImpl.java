@@ -56,15 +56,29 @@ final class EventNodeImpl<E> implements EventNode<E> {
     }
 
     @Override
+    public @This @NonNull EventNode<E> removeChild(@NonNull EventNode<? extends E> node) {
+        this.children.remove(node);
+        return this;
+    }
+
+    @Override
     public @NotNull EventNode<E> addListener(@NotNull EventListener<? extends E> listener) {
         this.listeners.add(listener);
         return this;
     }
 
     @Override
-    public @This <T extends E> @NonNull EventNode<E> addListener(@NonNull Consumer<T> eventConsumer,
-                                                                 @NonNull Class<? extends T> eventClass) {
-        return this.addListener(EventListener.listener(eventConsumer, eventClass));
+    public @This <T extends E> @NonNull EventListener<T> addListener(@NonNull Consumer<T> eventConsumer,
+                                                                     @NonNull Class<? extends T> eventClass) {
+        EventListener<T> listener = EventListener.listener(eventConsumer, eventClass);
+        this.addListener(listener);
+        return listener;
+    }
+
+    @Override
+    public @This @NonNull EventNode<E> removeListener(@NonNull EventListener<? extends E> listener) {
+        this.listeners.remove(listener);
+        return this;
     }
 
     @Override
