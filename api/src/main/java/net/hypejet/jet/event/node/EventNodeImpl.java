@@ -51,6 +51,11 @@ final class EventNodeImpl<E> implements EventNode<E> {
 
     @Override
     public @NotNull EventNode<E> addChild(@NotNull EventNode<? extends E> node) {
+        if (!this.eventClass.isAssignableFrom(node.eventClass())) {
+            LOGGER.error("You cannot add a child with an event class, which is not assignable from an event class of" +
+                            "the parent node", new Throwable());
+            return this;
+        }
         this.children.add(node);
         return this;
     }
@@ -63,6 +68,11 @@ final class EventNodeImpl<E> implements EventNode<E> {
 
     @Override
     public @NotNull EventNode<E> addListener(@NotNull EventListener<? extends E> listener) {
+        if (!this.eventClass.isAssignableFrom(listener.eventClass())) {
+            LOGGER.error("You cannot add a listener with an event class, which is not assignable from an event class" +
+                    " the event node", new Throwable());
+            return this;
+        }
         this.listeners.add(listener);
         return this;
     }
