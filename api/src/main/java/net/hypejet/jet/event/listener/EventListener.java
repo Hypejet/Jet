@@ -15,15 +15,14 @@ import java.util.function.Predicate;
  * @author Codestech
  * @author Window5
  */
-public sealed interface EventListener<E> extends Predicate<E>, Consumer<E>, Comparable<EventListener<?>>
-        permits EventListenerImpl {
+public sealed interface EventListener<E> extends Comparable<EventListener<?>> permits EventListenerImpl {
     /**
-     * Calls the listener with an {@code event}.
+     * Gets a consumer, which consumes called events.
      *
-     * @param event the event
+     * @return the consumer
      * @since 1.0
      */
-    void call(@NonNull E event);
+    @NonNull Consumer<E> consumer();
 
     /**
      * Gets a type of event that this listener listens to.
@@ -42,28 +41,12 @@ public sealed interface EventListener<E> extends Predicate<E>, Consumer<E>, Comp
     @NonNull EventPriority priority();
 
     /**
-     * Gets whether an event is eligible to call this listener.
+     * Gets an optional predicate that checks whether an event is eligible to call this listener.
      *
-     * @param event the event
-     * @return true if the event is eligible to call this listener, false otherwise
+     * @return the predicate, which may be null
+     * @since 1.0
      */
-    boolean isEligible(@NonNull E event);
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see #isEligible(Object)
-     */
-    @Override
-    boolean test(E event);
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see #call(Object)
-     */
-    @Override
-    void accept(E event);
+    @Nullable Predicate<E> predicate();
 
     /**
      * {@inheritDoc}

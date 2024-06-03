@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
 
 /**
  * Represents a test for {@linkplain EventListener event listener}.
@@ -31,15 +32,19 @@ public final class EventListenerTest {
         EventListener<String> listener = EventListener.listener(event -> called.set(true), String.class);
 
         Assertions.assertFalse(called.get());
-        listener.call("Hello World, Hello Jet users!");
+        listener.consumer().accept("Hello World, Hello Jet users!");
         Assertions.assertTrue(called.get());
     }
 
     @Test
     public void testListenerEligible() {
         EventListener<String> listener = EventListener.listener(event -> {}, String.class, event -> event.equals("A"));
-        Assertions.assertFalse(listener.isEligible("a"));
-        Assertions.assertTrue(listener.isEligible("A"));
-        Assertions.assertFalse(listener.isEligible("B"));
+
+        Predicate<String> predicate = listener.predicate();
+        Assertions.assertNotNull(predicate);
+
+        Assertions.assertFalse(predicate.test("a"));
+        Assertions.assertTrue(predicate.test("A"));
+        Assertions.assertFalse(predicate.test("B"));
     }
 }
