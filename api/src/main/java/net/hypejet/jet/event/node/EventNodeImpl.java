@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.Consumer;
@@ -180,6 +181,24 @@ final class EventNodeImpl<E> implements EventNode<E> {
     @Override
     public int compareTo(@NonNull EventNode<?> node) {
         return Integer.compare(this.priority().ordinal(), node.priority().ordinal());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || this.getClass() != o.getClass()) return false;
+
+        EventNodeImpl<?> eventNode = (EventNodeImpl<?>) o;
+
+        return Objects.equals(this.eventClass, eventNode.eventClass())
+                && this.priority == eventNode.priority()
+                && Objects.equals(this.listeners, eventNode.listeners())
+                && Objects.equals(this.children, eventNode.children());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.eventClass, this.priority, this.listeners, this.children);
     }
 
     @Override
