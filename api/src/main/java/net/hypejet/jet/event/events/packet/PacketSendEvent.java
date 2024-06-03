@@ -3,6 +3,8 @@ package net.hypejet.jet.event.events.packet;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Objects;
+
 /**
  * Represents a {@linkplain PacketEvent packet event}, which is called when a {@linkplain ServerPacket server packet}
  * is being sent.
@@ -42,5 +44,17 @@ public final class PacketSendEvent extends PacketEvent {
         return "PacketSendEvent{" +
                 "packet=" + this.packet +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PacketSendEvent event)) return false;
+        return Objects.equals(this.packet, event.packet);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.packet);
     }
 }

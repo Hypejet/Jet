@@ -3,6 +3,8 @@ package net.hypejet.jet.event.events.packet;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Objects;
+
 /**
  * Represents a {@linkplain PacketEvent}, which is called when a {@linkplain ClientPacket client packet} is being
  * received.
@@ -42,5 +44,17 @@ public final class PacketReceiveEvent extends PacketEvent {
         return "PacketReceiveEvent{" +
                 "packet=" + this.packet +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PacketReceiveEvent that)) return false;
+        return Objects.equals(this.packet, that.packet);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.packet);
     }
 }
