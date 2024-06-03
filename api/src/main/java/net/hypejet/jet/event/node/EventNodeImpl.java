@@ -186,14 +186,12 @@ final class EventNodeImpl<E> implements EventNode<E> {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || this.getClass() != o.getClass()) return false;
+        if (!(o instanceof EventNodeImpl<?> eventNode)) return false;
 
-        EventNodeImpl<?> eventNode = (EventNodeImpl<?>) o;
-
-        return Objects.equals(this.eventClass, eventNode.eventClass())
-                && this.priority == eventNode.priority()
-                && Objects.equals(this.listeners, eventNode.listeners())
-                && Objects.equals(this.children, eventNode.children());
+        return Objects.equals(this.eventClass, eventNode.eventClass)
+                && this.priority == eventNode.priority
+                && Objects.equals(this.listeners, eventNode.listeners)
+                && Objects.equals(this.children, eventNode.children);
     }
 
     @Override
