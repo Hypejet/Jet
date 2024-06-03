@@ -77,4 +77,14 @@ final class EventListenerImpl<E> implements EventListener<E> {
     public int compareTo(@NonNull EventListener<?> listener) {
         return Integer.compare(this.priority().ordinal(), listener.priority().ordinal());
     }
+
+    @Override
+    public String toString() {
+        return "EventListenerImpl{" +
+                "consumer=" + this.consumer +
+                ", predicate=" + this.predicate +
+                ", eventClass=" + this.eventClass +
+                ", priority=" + this.priority +
+                '}';
+    }
 }

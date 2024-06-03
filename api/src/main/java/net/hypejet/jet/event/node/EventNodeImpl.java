@@ -150,6 +150,16 @@ final class EventNodeImpl<E> implements EventNode<E> {
         return Integer.compare(this.priority().ordinal(), node.priority().ordinal());
     }
 
+    @Override
+    public String toString() {
+        return "EventNodeImpl{" +
+                "eventClass=" + this.eventClass +
+                ", priority=" + this.priority +
+                ", listeners=" + this.listeners +
+                ", children=" + this.children +
+                '}';
+    }
+
     private <T extends E> void callListener(@NonNull EventListener<T> listener, @NonNull E event) {
         Class<? extends T> listenerEventClass = listener.eventClass();
 
