@@ -52,8 +52,8 @@ final class EventNodeImpl<E> implements EventNode<E> {
     @Override
     public @NotNull EventNode<E> addChild(@NotNull EventNode<? extends E> node) {
         if (!this.eventClass.isAssignableFrom(node.eventClass())) {
-            LOGGER.error("You cannot add a child with an event class, which is not assignable from an event class of" +
-                            "the parent node", new Throwable());
+            LOGGER.error("You cannot add a child to an event node, of which an event class is not assignable " +
+                    "from an event class of the child", new IllegalArgumentException(node.toString()));
             return this;
         }
         this.children.add(node);
@@ -69,8 +69,8 @@ final class EventNodeImpl<E> implements EventNode<E> {
     @Override
     public @NotNull EventNode<E> addListener(@NotNull EventListener<? extends E> listener) {
         if (!this.eventClass.isAssignableFrom(listener.eventClass())) {
-            LOGGER.error("You cannot add a listener with an event class, which is not assignable from an event class" +
-                    " the event node", new Throwable());
+            LOGGER.error("You cannot add a listener in an event node, of which an event class is not assignable " +
+                    "from an event class of the listener", new IllegalArgumentException(listener.toString()));
             return this;
         }
         this.listeners.add(listener);
@@ -94,7 +94,7 @@ final class EventNodeImpl<E> implements EventNode<E> {
     @Override
     public @NotNull EventNode<E> addListener(@NotNull Object listener) {
         Class<?> listenerClass = listener.getClass();
-        String listenerClassName = listenerClass.getName();
+        String listenerClassName = listenerClass.getSimpleName();
 
         for (Method method : listenerClass.getDeclaredMethods()) {
             Subscribe subscription = method.getAnnotation(Subscribe.class);
@@ -105,7 +105,7 @@ final class EventNodeImpl<E> implements EventNode<E> {
 
             if (parameters.length != 1) {
                 LOGGER.error("Could not register an event with method of \"{}#{}\", because length of its parameters" +
-                        " is not 1", listenerClass, methodName);
+                        " is not 1", listenerClass, methodName, new IllegalArgumentException());
                 continue;
             }
 
@@ -114,7 +114,8 @@ final class EventNodeImpl<E> implements EventNode<E> {
             if (!eventType.isAssignableFrom(this.eventClass) && !this.eventClass.isAssignableFrom(eventType)) {
                 LOGGER.error("Could not register an event listener with method of \"{}#{}\", because none of event " +
                                 "classes - \"{}\" and \"{}\" - is assignable from each other", listenerClassName,
-                        methodName, eventType.getSimpleName(), this.eventClass.getSimpleName());
+                        methodName, eventType.getSimpleName(), this.eventClass.getSimpleName(),
+                        new IllegalArgumentException());
                 continue;
             }
 
@@ -138,6 +139,12 @@ final class EventNodeImpl<E> implements EventNode<E> {
 
     @Override
     public @NotNull EventNode<E> call(@NotNull E event) {
+        if (!this.eventClass.isAssignableFrom(event.getClass())) {
+            LOGGER.error("You cannot call an event in an event node, of which event class is not assignable from an " +
+                    "event class of the event", new IllegalArgumentException(event.toString()));
+            return this;
+        }
+
         List<EventListener<? extends E>> copiedListeners = new ArrayList<>(this.listeners);
         Collections.sort(copiedListeners);
         copiedListeners.forEach(listener -> this.callListener(listener, event));
