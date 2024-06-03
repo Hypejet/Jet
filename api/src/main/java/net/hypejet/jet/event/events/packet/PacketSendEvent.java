@@ -39,6 +39,8 @@ public final class PacketSendEvent extends PacketEvent {
 
     @Override
     public String toString() {
-        return "PacketSendEvent[packet=" + this.packet + "]";
+        return "PacketSendEvent{" +
+                "packet=" + this.packet +
+                '}';
     }
 }

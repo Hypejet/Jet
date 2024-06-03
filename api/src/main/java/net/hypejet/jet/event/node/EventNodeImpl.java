@@ -153,7 +153,7 @@ final class EventNodeImpl<E> implements EventNode<E> {
     @Override
     public String toString() {
         return "EventNodeImpl{" +
-                "eventClass=" + this.eventClass +
+                "eventClass=" + this.eventClass.getName() +
                 ", priority=" + this.priority +
                 ", listeners=" + this.listeners +
                 ", children=" + this.children +

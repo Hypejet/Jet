@@ -81,9 +81,7 @@ final class EventListenerImpl<E> implements EventListener<E> {
     @Override
     public String toString() {
         return "EventListenerImpl{" +
-                "consumer=" + this.consumer +
-                ", predicate=" + this.predicate +
-                ", eventClass=" + this.eventClass +
+                "eventClass=" + this.eventClass.getName() +
                 ", priority=" + this.priority +
                 '}';
     }

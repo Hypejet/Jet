@@ -39,6 +39,8 @@ public final class PacketReceiveEvent extends PacketEvent {
 
     @Override
     public String toString() {
-        return "PacketReceiveEvent[packet=" + this.packet + "]";
+        return "PacketReceiveEvent{" +
+                "packet=" + this.packet +
+                '}';
     }
 }
