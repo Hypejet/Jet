@@ -58,6 +58,19 @@ final class EventNodeImpl<E> implements EventNode<E> {
                     "from an event class of the child", new IllegalArgumentException(node.toString()));
             return this;
         }
+
+        if (this.children().contains(node)) {
+            LOGGER.error("An event node is already added as a child of this node",
+                    new IllegalArgumentException(node.toString()));
+            return this;
+        }
+
+        if (this == node) {
+            LOGGER.error("You cannot add an event node as a child of itself",
+                    new IllegalArgumentException(node.toString()));
+            return this;
+        }
+
         this.children.add(node);
         return this;
     }
