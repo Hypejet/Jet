@@ -49,7 +49,7 @@ public final class SocketPlayerConnection implements PlayerConnection {
     public void sendPacket(@NonNull ServerPacket packet) {
         PacketSendEvent event = new PacketSendEvent(packet);
         this.server.eventNode().call(event);
-        if (!event.isCancelled()) this.channel.writeAndFlush(packet);
+        if (!event.isCancelled()) this.channel.writeAndFlush(packet, this.channel.voidPromise());
     }
 
     @Override
