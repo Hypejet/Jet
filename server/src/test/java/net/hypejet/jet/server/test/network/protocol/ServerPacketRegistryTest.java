@@ -11,7 +11,7 @@ import net.hypejet.jet.protocol.packet.server.login.encryption.ServerEncryptionR
 import net.hypejet.jet.protocol.packet.server.login.plugin.ServerPluginMessageRequestPacket;
 import net.hypejet.jet.protocol.packet.server.login.success.ServerLoginSuccessPacket;
 import net.hypejet.jet.server.network.buffer.NetworkBuffer;
-import net.hypejet.jet.server.network.buffer.codec.codecs.GameProfilePropertiesCodec;
+import net.hypejet.jet.server.network.codec.codecs.GameProfilePropertiesCodec;
 import net.hypejet.jet.server.network.protocol.ServerPacketRegistry;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;

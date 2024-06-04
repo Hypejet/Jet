@@ -8,25 +8,12 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Represents a {@linkplain ClientLoginPacket client login packet}, which is being sent when a client finishes
  * an authentication.
  *
+ * @param sharedSecret a shared secret value, which is encrypted with a public key of the server
+ * @param verifyToken a verify token value, which is encrypted with a public key of the server
  * @since 1.0
  * @author Codestech
  * @see ClientLoginPacket
  * @see ServerEncryptionRequestPacket
  */
-public non-sealed interface ClientEncryptionResponsePacket extends ClientLoginPacket {
-    /**
-     * Gets a shared secret value, which is encrypted with a public key of the server.
-     *
-     * @return the value
-     * @since 1.0
-     */
-    byte @NonNull [] sharedSecret();
-
-    /**
-     * Gets a verify token value, which is encrypted with a public key of the server.
-     *
-     * @return the value
-     * @since 1.0
-     */
-    byte @NonNull [] verifyToken();
-}
+public record ClientEncryptionResponsePacket(byte @NonNull [] sharedSecret, byte @NonNull [] verifyToken)
+        implements ClientLoginPacket {}

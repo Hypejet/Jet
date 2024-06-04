@@ -10,6 +10,7 @@ import net.hypejet.jet.server.network.buffer.NetworkBuffer;
 import net.hypejet.jet.server.network.protocol.ClientPacketRegistry;
 import net.hypejet.jet.server.player.SocketPlayerConnection;
 import net.hypejet.jet.server.util.CompressionUtil;
+import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,29 +44,26 @@ public final class PacketDecoder extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         if (!this.playerConnection.getChannel().isActive()) return; // The connection was closed
 
-        NetworkBuffer buffer = new NetworkBuffer(in);
         int compressionThreshold = this.playerConnection.compressionThreshold();
 
-        buffer.readVarInt(); // TODO: Check if the packet length is necessary anywhere
+        NetworkUtil.readVarInt(in); // TODO: byte buf framing to avoid issues with "connected" byte buffs
 
         if (compressionThreshold < 0) {
-            out.add(this.readPacket(buffer));
+            out.add(this.readPacket(in));
             return;
         }
 
-        int dataLength = buffer.readVarInt();
+        int dataLength = NetworkUtil.readVarInt(in);
 
         if (dataLength == 0) {
-            out.add(this.readPacket(buffer));
+            out.add(this.readPacket(in));
             return;
         }
 
-        byte[] compressed = buffer.readByteArray(false);
-
+        byte[] compressed = NetworkUtil.readRemainingBytes(in);
         ByteBuf uncompressedBuf = Unpooled.wrappedBuffer(CompressionUtil.decompress(compressed));
-        NetworkBuffer uncompressedBuffer = new NetworkBuffer(uncompressedBuf);
 
-        out.add(this.readPacket(uncompressedBuffer));
+        out.add(this.readPacket(uncompressedBuf));
     }
 
     @Override
@@ -74,11 +72,11 @@ public final class PacketDecoder extends ByteToMessageDecoder {
         LOGGER.error("An error occurred while decoding a packet", cause);
     }
 
-    private @NonNull ClientPacket readPacket(@NonNull NetworkBuffer buffer) {
-        int packetId = buffer.readVarInt();
+    private @NonNull ClientPacket readPacket(@NonNull ByteBuf buf) {
+        int packetId = NetworkUtil.readVarInt(buf);
 
         ProtocolState protocolState = this.playerConnection.getProtocolState();
-        ClientPacket packet = ClientPacketRegistry.read(packetId, protocolState, buffer);
+        ClientPacket packet = ClientPacketRegistry.read(packetId, protocolState, buf);
 
         if (packet == null) throw packetReaderNotFound(packetId, protocolState);
 

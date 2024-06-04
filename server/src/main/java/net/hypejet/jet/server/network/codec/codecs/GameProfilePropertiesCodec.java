@@ -1,8 +1,9 @@
-package net.hypejet.jet.server.network.buffer.codec.codecs;
+package net.hypejet.jet.server.network.codec.codecs;
 
+import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.player.profile.properties.GameProfileProperties;
-import net.hypejet.jet.server.network.buffer.NetworkBuffer;
-import net.hypejet.jet.server.network.buffer.codec.NetworkCodec;
+import net.hypejet.jet.server.network.codec.NetworkCodec;
+import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -21,19 +22,25 @@ public final class GameProfilePropertiesCodec implements NetworkCodec<GameProfil
     private GameProfilePropertiesCodec() {}
 
     @Override
-    public void write(@NonNull NetworkBuffer buffer, @NonNull GameProfileProperties object) {
-        buffer.writeUniqueId(object.uniqueId());
-        buffer.writeString(object.username());
-        buffer.writeOptionalString(object.signature());
+    public @NonNull GameProfileProperties read(@NonNull ByteBuf buf) {
+        return GameProfileProperties.builder()
+                .uniqueId(NetworkUtil.readUniqueId(buf))
+                .username(NetworkUtil.readString(buf))
+                .signature(buf.readBoolean() ? NetworkUtil.readString(buf) : null)
+                .build();
     }
 
     @Override
-    public @NonNull GameProfileProperties read(@NonNull NetworkBuffer buffer) {
-        return GameProfileProperties.builder()
-                .uniqueId(buffer.readUniqueId())
-                .username(buffer.readString())
-                .signature(buffer.readOptionalString())
-                .build();
+    public void write(@NonNull ByteBuf buf, @NonNull GameProfileProperties object) {
+        NetworkUtil.writeUniqueId(buf, object.uniqueId());
+        NetworkUtil.writeString(buf, object.username());
+
+        String signature = object.signature();
+        buf.writeBoolean(signature != null);
+
+        if (signature != null) {
+            NetworkUtil.writeString(buf, signature);
+        }
     }
 
     /**

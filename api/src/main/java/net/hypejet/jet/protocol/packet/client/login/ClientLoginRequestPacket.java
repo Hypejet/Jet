@@ -8,23 +8,9 @@ import java.util.UUID;
 /**
  * Represents a {@linkplain ClientLoginPacket client login packet} that requests a server to send a login data.
  *
+ * @param username a username of a player that sends the packet
+ * @param uniqueId a {@linkplain UUID unique identifier} of a player that sends the packet
  * @since 1.0
  * @author Codestech
  */
-public non-sealed interface ClientLoginRequestPacket extends ClientLoginPacket {
-    /**
-     * Gets a username of a player that sends the packet.
-     *
-     * @return the username
-     * @since 1.0
-     */
-    @NonNull String username();
-
-    /**
-     * Gets a {@linkplain UUID unique identifier} of a player that sends the packet.
-     *
-     * @return the unique identifier
-     * @since 1.0
-     */
-    @NonNull UUID uniqueId();
-}
+public record ClientLoginRequestPacket(@NonNull String username, @NonNull UUID uniqueId) implements ClientLoginPacket {}

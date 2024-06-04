@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.protocol.writer.login;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.server.login.success.ServerLoginSuccessPacket;
 import net.hypejet.jet.server.network.buffer.NetworkBuffer;
-import net.hypejet.jet.server.network.buffer.codec.codecs.GameProfilePropertiesCodec;
+import net.hypejet.jet.server.network.codec.codecs.GameProfilePropertiesCodec;
 import net.hypejet.jet.server.network.protocol.writer.PacketWriter;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
