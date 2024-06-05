@@ -126,6 +126,9 @@ public interface EventNode<E> extends Comparable<EventNode<?>> {
      */
     @NonNull Class<E> eventClass();
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     default int compareTo(@NonNull EventNode<?> node) {
         return Integer.compare(this.priority().ordinal(), node.priority().ordinal());

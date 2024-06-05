@@ -19,7 +19,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /**
  * Represents an implementation of an {@linkplain EventNode event node}.
@@ -223,12 +222,10 @@ final class EventNodeImpl<E> implements EventNode<E> {
         if (!listenerEventClass.isAssignableFrom(event.getClass())) return;
 
         T castEvent = listenerEventClass.cast(event);
-
-        Predicate<T> predicate = listener.predicate();
-        if (predicate != null && !predicate.test(castEvent)) return;
+        if (!listener.isEligible(castEvent)) return;
 
         try {
-            listener.consumer().accept(castEvent);
+            listener.call(castEvent);
         } catch (Throwable throwable) {
             // Plugins may throw an uncaught exception
             LOGGER.error("An error occurred while calling an event", throwable);
