@@ -2,21 +2,21 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.login;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.login.ClientCookieResponsePacket;
+import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
-import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain ClientPacketCodec client packet codec}, which reads and writes
+ * Represents a {@linkplain PacketCodec packet codec}, which reads and writes
  * a {@linkplain ClientCookieResponsePacket cookie response packet}.
  *
  * @since 1.0
  * @author Codestech
  * @see ClientCookieResponsePacket
- * @see ClientPacketCodec
+ * @see PacketCodec
  */
-public final class ClientCookieResponsePacketCodec extends ClientPacketCodec<ClientCookieResponsePacket> {
+public final class ClientCookieResponsePacketCodec extends PacketCodec<ClientCookieResponsePacket> {
     /**
      * Constructs the {@linkplain ClientCookieResponsePacketCodec cookie response packet codec}.
      *

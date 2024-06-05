@@ -3,21 +3,21 @@ package net.hypejet.jet.server.network.protocol.packet.server.codec.login;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.login.ServerLoginSuccessPacket;
 import net.hypejet.jet.server.network.protocol.codecs.GameProfilePropertiesCodec;
+import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
-import net.hypejet.jet.server.network.protocol.packet.server.codec.ServerPacketCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain ServerPacketCodec server packet codec}, which reads and writes
+ * Represents a {@linkplain PacketCodec server packet codec}, which reads and writes
  * a {@linkplain ServerLoginSuccessPacket login success packet}.
  *
  * @since 1.0
  * @author Codestech
  * @see ServerLoginSuccessPacket
- * @see ServerPacketCodec
+ * @see PacketCodec
  */
-public final class ServerLoginSuccessPacketCodec extends ServerPacketCodec<ServerLoginSuccessPacket> {
+public final class ServerLoginSuccessPacketCodec extends PacketCodec<ServerLoginSuccessPacket> {
     /**
      * Constructs the {@linkplain ServerLoginSuccessPacketCodec login success packet codec}.
      *

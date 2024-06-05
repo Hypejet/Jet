@@ -2,21 +2,21 @@ package net.hypejet.jet.server.network.protocol.packet.server.codec.login;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.login.ServerPluginMessageRequestPacket;
+import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
-import net.hypejet.jet.server.network.protocol.packet.server.codec.ServerPacketCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain ServerPacketCodec server packet codec}, which reads and writes
+ * Represents a {@linkplain PacketCodec server packet codec}, which reads and writes
  * a {@linkplain ServerPluginMessageRequestPacket plugin message request packet}.
  *
  * @since 1.0
  * @author Codestech
  * @see ServerPluginMessageRequestPacket
- * @see ServerPacketCodec
+ * @see PacketCodec
  */
-public final class ServerPluginMessageRequestPacketCodec extends ServerPacketCodec<ServerPluginMessageRequestPacket> {
+public final class ServerPluginMessageRequestPacketCodec extends PacketCodec<ServerPluginMessageRequestPacket> {
     /**
      * Constructs the {@linkplain ServerPluginMessageRequestPacketCodec plugin message request packet codec}.
      *

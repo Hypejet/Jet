@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.protocol.packet.server;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
-import net.hypejet.jet.server.network.protocol.packet.server.codec.ServerPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerCookieRequestPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerDisconnectPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerEnableCompressionPacketCodec;
@@ -17,8 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Represents a registry of {@linkplain ServerPacketCodec packet codecs}, which can read and write
- * {@linkplain ServerPacket server packets}..
+ * Represents a registry of {@linkplain PacketCodec packet codecs}, which can read and write {@linkplain ServerPacket
+ * server packets}..
  *
  * @since 1.0
  * @author Codestech
@@ -27,9 +27,11 @@ import java.util.Map;
  */
 public final class ServerPacketRegistry {
 
-    private static final Map<Class<? extends ServerPacket>, ServerPacketCodec<?>> packetCodecs = new HashMap<>();
+    private static final Map<Class<? extends ServerPacket>, PacketCodec<? extends ServerPacket>> packetCodecs;
 
     static {
+        packetCodecs = new HashMap<>();
+
         // Login packets
         register(new ServerDisconnectPacketCodec(), new ServerEncryptionRequestPacketCodec(),
                 new ServerLoginSuccessPacketCodec(), new ServerEnableCompressionPacketCodec(),
@@ -39,7 +41,7 @@ public final class ServerPacketRegistry {
     private ServerPacketRegistry() {}
 
     /**
-     * Finds a {@linkplain ServerPacketCodec server packet codec}, which can write a specific packet and writes it to
+     * Finds a {@linkplain PacketCodec packet codec}, which can write a specific packet and writes it to
      * a {@linkplain ByteBuf byte buf}.
      *
      * @param buf the byte buf
@@ -49,7 +51,7 @@ public final class ServerPacketRegistry {
      * @since 1.0
      */
     public static void write(@NonNull ByteBuf buf, @NonNull ServerPacket packet) {
-        ServerPacketCodec<? extends ServerPacket> codec = packetCodecs.get(packet.getClass());
+        PacketCodec<? extends ServerPacket> codec = packetCodecs.get(packet.getClass());
 
         if (codec == null) {
             String packetName = packet.getClass().getSimpleName();
@@ -61,7 +63,7 @@ public final class ServerPacketRegistry {
 
     /**
      * Writes a {@linkplain ServerPacket server packet} to a {@linkplain ByteBuf byte buf} using a specified
-     * {@linkplain ServerPacketCodec server packet codec}.
+     * {@linkplain PacketCodec packet codec}.
      *
      * @param codec the packet codec
      * @param packet the server packet
@@ -69,20 +71,21 @@ public final class ServerPacketRegistry {
      * @param <P> the type of the packet
      * @since 1.0
      */
-    private static <P extends ServerPacket> void write(@NonNull ServerPacketCodec<P> codec, @NonNull ServerPacket packet,
+    private static <P extends ServerPacket> void write(@NonNull PacketCodec<P> codec, @NonNull ServerPacket packet,
                                                        @NonNull ByteBuf buf) {
         NetworkUtil.writeVarInt(buf, codec.getPacketId());
         codec.write(buf, codec.getPacketClass().cast(packet));
     }
 
     /**
-     * Registers {@linkplain ServerPacketCodec server packet codecs} to the registry.
+     * Registers {@linkplain PacketCodec packet codecs} to the registry.
      *
      * @param codecs the packet codecs
      * @since 1.0
      */
-    private static void register(@NonNull ServerPacketCodec<?> @NonNull ... codecs) {
-        for (ServerPacketCodec<?> codec : codecs)
+    @SafeVarargs
+    private static void register(@NonNull PacketCodec<? extends ServerPacket> @NonNull ... codecs) {
+        for (PacketCodec<? extends ServerPacket> codec : codecs)
             packetCodecs.put(codec.getPacketClass(), codec);
     }
 }

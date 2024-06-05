@@ -2,20 +2,20 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.login;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.login.ClientLoginAcknowledgePacket;
+import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
-import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@link ClientPacketCodec client packet codec}, which reads and writes
- * a {@link ClientLoginAcknowledgePacket login acknlowledge packet}.
+ * Represents a {@link PacketCodec packet codec}, which reads and writes a {@link ClientLoginAcknowledgePacket login
+ * acknlowledge packet}.
  *
  * @since 1.0
  * @author Codestech
  * @see ClientLoginAcknowledgePacket
- * @see ClientPacketCodec
+ * @see PacketCodec
  */
-public final class ClientLoginAcknowledgePacketCodec extends ClientPacketCodec<ClientLoginAcknowledgePacket> {
+public final class ClientLoginAcknowledgePacketCodec extends PacketCodec<ClientLoginAcknowledgePacket> {
     /**
      * Constructs the {@linkplain ClientLoginAcknowledgePacketCodec login acknowledge packet codec}.
      *

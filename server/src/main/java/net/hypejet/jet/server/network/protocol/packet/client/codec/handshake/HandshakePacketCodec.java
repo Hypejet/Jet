@@ -3,22 +3,21 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.handshake;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.handshake.ClientHandshakePacket;
-import net.hypejet.jet.server.network.codec.NetworkCodec;
+import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
-import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@link NetworkCodec network codec}, which reads and writes
+ * Represents a {@link PacketCodec paket codec}, which reads and writes
  * a {@link ClientHandshakePacket handshake packet}.
  *
  * @since 1.0
  * @author Codestech
  * @see ClientHandshakePacket
- * @see NetworkCodec
+ * @see PacketCodec
  */
-public final class HandshakePacketCodec extends ClientPacketCodec<ClientHandshakePacket> {
+public final class HandshakePacketCodec extends PacketCodec<ClientHandshakePacket> {
     /**
      * Constructs the {@linkplain HandshakePacketCodec handshake packet codec}.
      *
