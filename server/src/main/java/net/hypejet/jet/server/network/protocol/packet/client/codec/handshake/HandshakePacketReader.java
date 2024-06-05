@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.network.protocol.reader.handshake;
+package net.hypejet.jet.server.network.protocol.packet.client.codec.handshake;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.ProtocolState;

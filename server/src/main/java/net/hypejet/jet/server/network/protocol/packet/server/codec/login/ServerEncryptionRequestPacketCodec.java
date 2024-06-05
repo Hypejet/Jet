@@ -1,28 +1,29 @@
-package net.hypejet.jet.server.network.protocol.writer.login;
+package net.hypejet.jet.server.network.protocol.packet.server.codec.login;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.login.ServerEncryptionRequestPacket;
-import net.hypejet.jet.server.network.protocol.writer.PacketWriter;
+import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.ServerPacketCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain PacketWriter packet writer}, which reads and writes
+ * Represents a {@linkplain ServerPacketCodec server packet codec}, which reads and writes
  * an {@linkplain ServerEncryptionRequestPacket encryption request packet}.
  *
  * @since 1.0
  * @author Codestech
  * @see ServerEncryptionRequestPacket
- * @see PacketWriter
+ * @see ServerPacketCodec
  */
-public final class ServerEncryptionRequestPacketWriter extends PacketWriter<ServerEncryptionRequestPacket> {
+public final class ServerEncryptionRequestPacketCodec extends ServerPacketCodec<ServerEncryptionRequestPacket> {
     /**
-     * Constructs the {@linkplain ServerEncryptionRequestPacketWriter encryption request packet writer}.
+     * Constructs the {@linkplain ServerEncryptionRequestPacketCodec encryption request packet codec}.
      *
      * @since 1.0
      */
-    public ServerEncryptionRequestPacketWriter() {
-        super(1, ServerEncryptionRequestPacket.class);
+    public ServerEncryptionRequestPacketCodec() {
+        super(ServerPacketIdentifiers.LOGIN_ENCRYPTION_REQUEST, ServerEncryptionRequestPacket.class);
     }
 
     @Override

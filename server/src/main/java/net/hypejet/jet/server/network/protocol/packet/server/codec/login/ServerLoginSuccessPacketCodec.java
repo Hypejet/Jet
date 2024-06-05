@@ -1,29 +1,30 @@
-package net.hypejet.jet.server.network.protocol.writer.login;
+package net.hypejet.jet.server.network.protocol.packet.server.codec.login;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.login.ServerLoginSuccessPacket;
 import net.hypejet.jet.server.network.codec.codecs.GameProfilePropertiesCodec;
-import net.hypejet.jet.server.network.protocol.writer.PacketWriter;
+import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.ServerPacketCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain PacketWriter packet writer}, which reads and writes
+ * Represents a {@linkplain ServerPacketCodec server packet codec}, which reads and writes
  * a {@linkplain ServerLoginSuccessPacket login success packet}.
  *
  * @since 1.0
  * @author Codestech
  * @see ServerLoginSuccessPacket
- * @see PacketWriter
+ * @see ServerPacketCodec
  */
-public final class ServerLoginSuccessPacketWriter extends PacketWriter<ServerLoginSuccessPacket> {
+public final class ServerLoginSuccessPacketCodec extends ServerPacketCodec<ServerLoginSuccessPacket> {
     /**
-     * Constructs the {@linkplain ServerLoginSuccessPacketWriter login success packet writer}.
+     * Constructs the {@linkplain ServerLoginSuccessPacketCodec login success packet codec}.
      *
      * @since 1.0
      */
-    public ServerLoginSuccessPacketWriter() {
-        super(2, ServerLoginSuccessPacket.class);
+    public ServerLoginSuccessPacketCodec() {
+        super(ServerPacketIdentifiers.LOGIN_SUCCESS, ServerLoginSuccessPacket.class);
     }
 
     @Override

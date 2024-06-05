@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.network.protocol.reader.login;
+package net.hypejet.jet.server.network.protocol.packet.client.codec.login;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.login.ClientEncryptionResponsePacket;

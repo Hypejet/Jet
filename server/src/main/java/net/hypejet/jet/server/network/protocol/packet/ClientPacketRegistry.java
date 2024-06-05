@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.network.protocol;
+package net.hypejet.jet.server.network.protocol.packet;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.util.collection.IntObjectHashMap;
@@ -6,11 +6,11 @@ import io.netty.util.collection.IntObjectMap;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
-import net.hypejet.jet.server.network.protocol.reader.handshake.HandshakePacketReader;
-import net.hypejet.jet.server.network.protocol.reader.login.ClientEncryptionResponsePacketReader;
-import net.hypejet.jet.server.network.protocol.reader.login.ClientLoginAcknowledgePacketReader;
-import net.hypejet.jet.server.network.protocol.reader.login.ClientLoginRequestPacketReader;
-import net.hypejet.jet.server.network.protocol.reader.login.ClientPluginMessageResponsePacketReader;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.handshake.HandshakePacketReader;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientEncryptionResponsePacketReader;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientLoginAcknowledgePacketReader;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientLoginRequestPacketReader;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientPluginMessageResponsePacketReader;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 

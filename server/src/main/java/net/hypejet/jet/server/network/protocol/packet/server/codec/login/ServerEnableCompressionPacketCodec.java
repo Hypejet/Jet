@@ -1,28 +1,29 @@
-package net.hypejet.jet.server.network.protocol.writer.login;
+package net.hypejet.jet.server.network.protocol.packet.server.codec.login;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.login.ServerEnableCompressionPacket;
-import net.hypejet.jet.server.network.protocol.writer.PacketWriter;
+import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.ServerPacketCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain PacketWriter packet writer}, which reads and writes
+ * Represents a {@linkplain ServerPacketCodec server packet codec}, which reads and writes
  * a {@linkplain ServerEnableCompressionPacket enable compression packet}.
  *
  * @since 1.0
  * @author Codestech
  * @see ServerEnableCompressionPacket
- * @see PacketWriter
+ * @see ServerPacketCodec
  */
-public final class ServerEnableCompressionPacketWriter extends PacketWriter<ServerEnableCompressionPacket> {
+public final class ServerEnableCompressionPacketCodec extends ServerPacketCodec<ServerEnableCompressionPacket> {
     /**
-     * Constructs the {@linkplain ServerEnableCompressionPacketWriter enable compression packet writer}.
+     * Constructs the {@linkplain ServerEnableCompressionPacketCodec enable compression packet codec}.
      *
      * @since 1.0
      */
-    public ServerEnableCompressionPacketWriter() {
-        super(3, ServerEnableCompressionPacket.class);
+    public ServerEnableCompressionPacketCodec() {
+        super(ServerPacketIdentifiers.LOGIN_ENABLE_COMPRESSION, ServerEnableCompressionPacket.class);
     }
 
     @Override
