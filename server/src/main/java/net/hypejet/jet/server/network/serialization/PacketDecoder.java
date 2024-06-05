@@ -26,6 +26,7 @@ import java.util.List;
 public final class PacketDecoder extends ByteToMessageDecoder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PacketDecoder.class);
+    private static final int MAX_PACKET_LENGTH = 8_388_608;
 
     private final SocketPlayerConnection playerConnection;
 
@@ -46,7 +47,7 @@ public final class PacketDecoder extends ByteToMessageDecoder {
         int compressionThreshold = this.playerConnection.compressionThreshold();
         int packetLength = NetworkUtil.readVarInt(in);
 
-        if (packetLength > in.readableBytes()) {
+        if (packetLength >= MAX_PACKET_LENGTH || packetLength > in.readableBytes()) {
             in.resetReaderIndex();
             return;
         }
