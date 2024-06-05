@@ -15,7 +15,7 @@ import java.util.function.Predicate;
  * @author Codestech
  * @author Window5
  */
-public interface EventListener<E> extends Comparable<EventListener<?>> {
+public interface EventListener<E> extends Comparable<EventListener<?>>, Consumer<E>, Predicate<E> {
     /**
      * Calls an {@linkplain E event}.
      *
@@ -59,6 +59,22 @@ public interface EventListener<E> extends Comparable<EventListener<?>> {
     @Override
     default int compareTo(@NonNull EventListener<?> listener) {
         return Integer.compare(this.priority().ordinal(), listener.priority().ordinal());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    default void accept(@NonNull E event) {
+        this.call(event);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    default boolean test(@NonNull E event) {
+        return this.isEligible(event);
     }
 
     /**

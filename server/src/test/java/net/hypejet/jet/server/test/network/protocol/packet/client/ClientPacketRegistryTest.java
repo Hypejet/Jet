@@ -6,7 +6,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Represents a test for reading and writing packets from a {@link ClientPacketRegistry client packet registry}.
+ * Represents a test for reading and writing {@linkplain net.hypejet.jet.protocol.packet.Packet packets} from
+ * a {@link ClientPacketRegistry client packet registry}.
  *
  * @since 1.0
  * @author Codestech
