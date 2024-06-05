@@ -1,7 +1,7 @@
 package net.hypejet.jet.protocol.packet.client.login;
 
 import net.hypejet.jet.protocol.packet.client.ClientLoginPacket;
-import net.hypejet.jet.protocol.packet.server.login.plugin.ServerPluginMessageRequestPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerPluginMessageRequestPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

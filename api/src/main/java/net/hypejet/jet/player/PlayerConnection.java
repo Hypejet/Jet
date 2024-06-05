@@ -3,7 +3,7 @@ package net.hypejet.jet.player;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
-import net.hypejet.jet.protocol.packet.server.login.disconnect.ServerDisconnectPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerDisconnectPacket;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

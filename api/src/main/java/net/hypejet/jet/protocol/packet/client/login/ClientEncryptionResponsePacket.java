@@ -1,7 +1,7 @@
 package net.hypejet.jet.protocol.packet.client.login;
 
 import net.hypejet.jet.protocol.packet.client.ClientLoginPacket;
-import net.hypejet.jet.protocol.packet.server.login.encryption.ServerEncryptionRequestPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerEncryptionRequestPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

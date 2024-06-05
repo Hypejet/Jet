@@ -4,13 +4,12 @@ import io.netty.buffer.Unpooled;
 import net.hypejet.jet.player.profile.properties.GameProfileProperties;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
-import net.hypejet.jet.protocol.packet.server.login.compression.ServerEnableCompressionPacket;
-import net.hypejet.jet.protocol.packet.server.login.cookie.ServerCookieRequestPacket;
-import net.hypejet.jet.protocol.packet.server.login.disconnect.ServerDisconnectPacket;
-import net.hypejet.jet.protocol.packet.server.login.encryption.ServerEncryptionRequestPacket;
-import net.hypejet.jet.protocol.packet.server.login.plugin.ServerPluginMessageRequestPacket;
-import net.hypejet.jet.protocol.packet.server.login.success.ServerLoginSuccessPacket;
-import net.hypejet.jet.server.network.buffer.NetworkBuffer;
+import net.hypejet.jet.protocol.packet.server.login.ServerEnableCompressionPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerCookieRequestPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerDisconnectPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerEncryptionRequestPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerPluginMessageRequestPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerLoginSuccessPacket;
 import net.hypejet.jet.server.network.codec.codecs.GameProfilePropertiesCodec;
 import net.hypejet.jet.server.network.protocol.ServerPacketRegistry;
 import net.kyori.adventure.key.Key;
@@ -24,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
 
 /**
  * Represents a test for {@link ServerPacketRegistry server packet registry}.

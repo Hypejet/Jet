@@ -1,7 +1,7 @@
 package net.hypejet.jet.protocol.packet.client.login;
 
 import net.hypejet.jet.protocol.packet.client.ClientLoginPacket;
-import net.hypejet.jet.protocol.packet.server.login.cookie.ServerCookieRequestPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerCookieRequestPacket;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;

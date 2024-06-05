@@ -15,9 +15,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.EnumMap;
+import java.util.Map;
 
 /**
- * Represents a registry of a {@linkplain NetworkCodec network codecs}, which can read and write
+ * Represents a registry of {@linkplain NetworkCodec network codecs}, which can read and write
  * {@linkplain ClientPacket client packets}.
  *
  * @since 1.0
@@ -27,7 +28,7 @@ import java.util.EnumMap;
  */
 public final class ClientPacketRegistry {
 
-    private static final EnumMap<ProtocolState, IntObjectMap<NetworkCodec<? extends ClientPacket>>> packetReaders;
+    private static final Map<ProtocolState, IntObjectMap<NetworkCodec<? extends ClientPacket>>> packetReaders;
 
     static {
         packetReaders = new EnumMap<>(ProtocolState.class);

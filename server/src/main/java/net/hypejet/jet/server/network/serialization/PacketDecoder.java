@@ -6,7 +6,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
-import net.hypejet.jet.server.network.buffer.NetworkBuffer;
 import net.hypejet.jet.server.network.protocol.ClientPacketRegistry;
 import net.hypejet.jet.server.player.SocketPlayerConnection;
 import net.hypejet.jet.server.util.CompressionUtil;

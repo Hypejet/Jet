@@ -1,14 +1,14 @@
 package net.hypejet.jet.server.network.protocol.writer.login;
 
-import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.protocol.packet.server.login.cookie.ServerCookieRequestPacket;
-import net.hypejet.jet.server.network.buffer.NetworkBuffer;
+import io.netty.buffer.ByteBuf;
+import net.hypejet.jet.protocol.packet.server.login.ServerCookieRequestPacket;
 import net.hypejet.jet.server.network.protocol.writer.PacketWriter;
+import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain PacketWriter packet writer}, which writes a {@linkplain ServerCookieRequestPacket cookie
- * request packet}.
+ * Represents a {@linkplain PacketWriter packet writer}, which reads and writes a {@linkplain ServerCookieRequestPacket
+ * cookie request packet}.
  *
  * @since 1.0
  * @author Codestech
@@ -17,16 +17,21 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class ServerCookieRequestPacketWriter extends PacketWriter<ServerCookieRequestPacket> {
     /**
-     * Constructs a {@linkplain ServerCookieRequestPacketWriter cookie request packet writer}.
+     * Constructs the {@linkplain ServerCookieRequestPacketWriter cookie request packet writer}.
      *
      * @since 1.0
      */
     public ServerCookieRequestPacketWriter() {
-        super(5, ProtocolState.LOGIN, ServerCookieRequestPacket.class);
+        super(5, ServerCookieRequestPacket.class);
     }
 
     @Override
-    public void write(@NonNull ServerCookieRequestPacket packet, @NonNull NetworkBuffer buffer) {
-        buffer.writeIdentifier(packet.identifier());
+    public @NonNull ServerCookieRequestPacket read(@NonNull ByteBuf buf) {
+        return new ServerCookieRequestPacket(NetworkUtil.readIdentifier(buf));
+    }
+
+    @Override
+    public void write(@NonNull ByteBuf buf, @NonNull ServerCookieRequestPacket object) {
+        NetworkUtil.writeIdentifier(buf, object.identifier());
     }
 }
