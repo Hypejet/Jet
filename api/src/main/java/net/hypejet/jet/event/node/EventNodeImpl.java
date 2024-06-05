@@ -192,11 +192,6 @@ final class EventNodeImpl<E> implements EventNode<E> {
     }
 
     @Override
-    public int compareTo(@NonNull EventNode<?> node) {
-        return Integer.compare(this.priority().ordinal(), node.priority().ordinal());
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof EventNodeImpl<?> eventNode)) return false;
