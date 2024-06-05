@@ -15,4 +15,12 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @author Codestech
  */
 public record ClientHandshakePacket(int protocolVersion, @NonNull String serverAddress, int serverPort,
-                                    @NonNull ProtocolState nextState) implements ClientPacket {}
+                                    @NonNull ProtocolState nextState) implements ClientPacket {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public @NonNull ProtocolState state() {
+        return ProtocolState.HANDSHAKE;
+    }
+}

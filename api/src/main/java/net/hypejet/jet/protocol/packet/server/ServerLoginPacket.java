@@ -7,6 +7,7 @@ import net.hypejet.jet.protocol.packet.server.login.ServerEnableCompressionPacke
 import net.hypejet.jet.protocol.packet.server.login.ServerEncryptionRequestPacket;
 import net.hypejet.jet.protocol.packet.server.login.ServerLoginSuccessPacket;
 import net.hypejet.jet.protocol.packet.server.login.ServerPluginMessageRequestPacket;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Represents a {@linkplain ServerPacket server packet}, which can be sent during a {@linkplain ProtocolState#LOGIN
@@ -18,4 +19,12 @@ import net.hypejet.jet.protocol.packet.server.login.ServerPluginMessageRequestPa
  */
 public sealed interface ServerLoginPacket extends ServerPacket permits ServerEnableCompressionPacket,
         ServerCookieRequestPacket, ServerDisconnectPacket, ServerEncryptionRequestPacket,
-        ServerPluginMessageRequestPacket, ServerLoginSuccessPacket {}
+        ServerPluginMessageRequestPacket, ServerLoginSuccessPacket {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    default @NonNull ProtocolState state() {
+        return ProtocolState.LOGIN;
+    }
+}
