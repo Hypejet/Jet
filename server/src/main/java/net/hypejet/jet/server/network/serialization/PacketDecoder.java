@@ -44,8 +44,15 @@ public final class PacketDecoder extends ByteToMessageDecoder {
         if (!this.playerConnection.getChannel().isActive()) return; // The connection was closed
 
         int compressionThreshold = this.playerConnection.compressionThreshold();
+        int packetLength = NetworkUtil.readVarInt(in);
 
-        NetworkUtil.readVarInt(in); // TODO: byte buf framing to avoid issues with "connected" byte buffs
+        if (packetLength > in.readableBytes()) {
+            in.resetReaderIndex();
+            return;
+        }
+
+        ByteBuf framedInput = Unpooled.buffer(packetLength);
+        in.readBytes(framedInput, packetLength);
 
         if (compressionThreshold < 0) {
             out.add(this.readPacket(in));
