@@ -23,4 +23,6 @@ public final class ClientPacketRegistryTest {
     public void testInvalidPacket() {
         Assertions.assertFalse(ClientPacketRegistry.hasCodec(1, ProtocolState.HANDSHAKE));
     }
+
+    // TODO: Writing/Reading tests
 }

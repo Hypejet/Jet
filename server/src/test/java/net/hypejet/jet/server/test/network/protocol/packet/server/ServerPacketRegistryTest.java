@@ -11,4 +11,5 @@ import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketRegistr
  * @see ServerPacketRegistry
  */
 public final class ServerPacketRegistryTest {
+    // TODO: Writing/Reading tests
 }
