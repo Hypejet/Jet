@@ -271,7 +271,6 @@ public final class NetworkUtil {
         return array;
     }
 
-
     /**
      * Writes a byte array to a {@linkplain ByteBuf byte buf}.
      *
