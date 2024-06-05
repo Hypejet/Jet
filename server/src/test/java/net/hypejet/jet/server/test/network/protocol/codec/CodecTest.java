@@ -21,11 +21,9 @@ import java.util.UUID;
 public final class CodecTest {
     @Test
     public void testGameProfileCodec() {
-        GameProfileProperties properties = GameProfileProperties.builder()
-                .signature("some-signature")
-                .uniqueId(UUID.randomUUID())
-                .username("some-username")
-                .build();
+        GameProfileProperties properties = new GameProfileProperties(
+                UUID.randomUUID(), "some-username", "some-signature"
+        );
 
         GameProfilePropertiesCodec codec = GameProfilePropertiesCodec.instance();
         ByteBuf buf = Unpooled.buffer();

@@ -23,11 +23,11 @@ public final class GameProfilePropertiesCodec implements NetworkCodec<GameProfil
 
     @Override
     public @NonNull GameProfileProperties read(@NonNull ByteBuf buf) {
-        return GameProfileProperties.builder()
-                .uniqueId(NetworkUtil.readUniqueId(buf))
-                .username(NetworkUtil.readString(buf))
-                .signature(buf.readBoolean() ? NetworkUtil.readString(buf) : null)
-                .build();
+        return new GameProfileProperties(
+                NetworkUtil.readUniqueId(buf),
+                NetworkUtil.readString(buf),
+                buf.readBoolean() ? NetworkUtil.readString(buf) : null
+        );
     }
 
     @Override
