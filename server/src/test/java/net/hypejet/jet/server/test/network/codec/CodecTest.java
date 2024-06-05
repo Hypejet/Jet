@@ -3,7 +3,7 @@ package net.hypejet.jet.server.test.network.codec;
 import net.hypejet.jet.player.profile.properties.GameProfileProperties;
 import net.hypejet.jet.server.network.buffer.NetworkBuffer;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
-import net.hypejet.jet.server.network.codec.codecs.GameProfilePropertiesCodec;
+import net.hypejet.jet.server.network.protocol.codecs.GameProfilePropertiesCodec;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

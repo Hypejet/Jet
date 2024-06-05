@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.network.codec.codecs;
+package net.hypejet.jet.server.network.protocol.codecs;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.player.profile.properties.GameProfileProperties;

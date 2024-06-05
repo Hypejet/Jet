@@ -20,6 +20,8 @@ public final class ServerPacketIdentifiers {
     private static int currentConfigurationId = 0;
     private static int currentPlayId = 0;
 
+    private ServerPacketIdentifiers() {}
+
     /**
      * Gets a next available identifier for a {@linkplain ??? server status packet}.
      *

@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.handshake.ClientHandshakePacket;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -16,7 +18,16 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see ClientHandshakePacket
  * @see NetworkCodec
  */
-public final class HandshakePacketReader implements NetworkCodec<ClientHandshakePacket> {
+public final class HandshakePacketCodec extends ClientPacketCodec<ClientHandshakePacket> {
+    /**
+     * Constructs the {@linkplain HandshakePacketCodec handshake packet codec}.
+     *
+     * @since 1.0
+     */
+    public HandshakePacketCodec() {
+        super(ClientPacketIdentifiers.HANDSHAKE, ClientHandshakePacket.class);
+    }
+
     @Override
     public @NonNull ClientHandshakePacket read(@NonNull ByteBuf buf) {
         int protocolVersion = NetworkUtil.readVarInt(buf);

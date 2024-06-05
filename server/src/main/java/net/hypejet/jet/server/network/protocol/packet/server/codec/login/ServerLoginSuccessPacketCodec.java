@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.protocol.packet.server.codec.login;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.login.ServerLoginSuccessPacket;
-import net.hypejet.jet.server.network.codec.codecs.GameProfilePropertiesCodec;
+import net.hypejet.jet.server.network.protocol.codecs.GameProfilePropertiesCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.ServerPacketCodec;
 import net.hypejet.jet.server.util.NetworkUtil;

@@ -5,7 +5,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
-import net.hypejet.jet.server.network.protocol.packet.ServerPacketRegistry;
+import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketRegistry;
 import net.hypejet.jet.server.player.SocketPlayerConnection;
 import net.hypejet.jet.server.util.CompressionUtil;
 import net.hypejet.jet.server.util.NetworkUtil;

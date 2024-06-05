@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.network.protocol.packet;
+package net.hypejet.jet.server.network.protocol.packet.server;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;

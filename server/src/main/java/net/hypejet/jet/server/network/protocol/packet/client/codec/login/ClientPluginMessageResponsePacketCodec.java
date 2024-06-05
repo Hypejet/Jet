@@ -2,20 +2,30 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.login;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.login.ClientPluginMessageResponsePacket;
-import net.hypejet.jet.server.network.codec.NetworkCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain NetworkCodec network codec}, which reads and writes
+ * Represents a {@linkplain ClientPacketCodec client packet codec}, which reads and writes
  * a {@linkplain ClientPluginMessageResponsePacket plugin message response packet}.
  *
  * @since 1.0
  * @author Codestech
  * @see ClientPluginMessageResponsePacket
- * @see NetworkCodec
+ * @see ClientPacketCodec
  */
-public final class ClientPluginMessageResponsePacketReader implements NetworkCodec<ClientPluginMessageResponsePacket> {
+public final class ClientPluginMessageResponsePacketCodec extends ClientPacketCodec<ClientPluginMessageResponsePacket> {
+    /**
+     * Constructs a {@linkplain ClientPluginMessageResponsePacketCodec plugin message response packet codec}.
+     *
+     * @since 1.0
+     */
+    public ClientPluginMessageResponsePacketCodec() {
+        super(ClientPacketIdentifiers.LOGIN_PLUGIN_MESSAGE_RESPONSE, ClientPluginMessageResponsePacket.class);
+    }
+
     @Override
     public @NonNull ClientPluginMessageResponsePacket read(@NonNull ByteBuf buf) {
         return new ClientPluginMessageResponsePacket(

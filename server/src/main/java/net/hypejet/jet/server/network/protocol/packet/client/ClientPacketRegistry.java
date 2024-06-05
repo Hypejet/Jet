@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.network.protocol.packet;
+package net.hypejet.jet.server.network.protocol.packet.client;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.util.collection.IntObjectHashMap;
@@ -6,11 +6,13 @@ import io.netty.util.collection.IntObjectMap;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
-import net.hypejet.jet.server.network.protocol.packet.client.codec.handshake.HandshakePacketReader;
-import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientEncryptionResponsePacketReader;
-import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientLoginAcknowledgePacketReader;
-import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientLoginRequestPacketReader;
-import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientPluginMessageResponsePacketReader;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.handshake.HandshakePacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientCookieResponsePacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientEncryptionResponsePacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientLoginAcknowledgePacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientLoginRequestPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientPluginMessageResponsePacketCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -33,17 +35,13 @@ public final class ClientPacketRegistry {
     static {
         packetReaders = new EnumMap<>(ProtocolState.class);
 
-        IntObjectMap<NetworkCodec<? extends ClientPacket>> handshake = new IntObjectHashMap<>();
-        handshake.put(0, new HandshakePacketReader());
+        // Handshake
+        register(ProtocolState.HANDSHAKE, new HandshakePacketCodec());
 
-        IntObjectMap<NetworkCodec<? extends ClientPacket>> login = new IntObjectHashMap<>();
-        login.put(0, new ClientLoginRequestPacketReader());
-        login.put(1, new ClientEncryptionResponsePacketReader());
-        login.put(2, new ClientPluginMessageResponsePacketReader());
-        login.put(3, new ClientLoginAcknowledgePacketReader());
-
-        packetReaders.put(ProtocolState.HANDSHAKE, handshake);
-        packetReaders.put(ProtocolState.LOGIN, login);
+        // Login
+        register(ProtocolState.LOGIN, new ClientLoginRequestPacketCodec(), new ClientEncryptionResponsePacketCodec(),
+                new ClientPluginMessageResponsePacketCodec(), new ClientLoginAcknowledgePacketCodec(),
+                new ClientCookieResponsePacketCodec());
     }
 
     private ClientPacketRegistry() {}
@@ -81,5 +79,19 @@ public final class ClientPacketRegistry {
         IntObjectMap<NetworkCodec<? extends ClientPacket>> codecMap = packetReaders.get(state);
         if (codecMap == null) return false;
         return codecMap.containsKey(packetId);
+    }
+
+    /**
+     * Registers {@linkplain ClientPacketCodec client packet codecs} to the registry.
+     *
+     * @param state a protocol state of the packets that the codecs write
+     * @param codecs the codecs
+     * @since 1.0
+     */
+    private static void register(@NonNull ProtocolState state, @NonNull ClientPacketCodec<?> @NonNull ... codecs) {
+        IntObjectMap<NetworkCodec<? extends ClientPacket>> map = new IntObjectHashMap<>();
+        for (ClientPacketCodec<?> codec : codecs)
+            map.put(codec.getPacketId(), codec);
+        packetReaders.put(state, map);
     }
 }

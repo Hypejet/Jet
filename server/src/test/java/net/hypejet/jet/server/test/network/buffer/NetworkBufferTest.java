@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.hypejet.jet.player.profile.properties.GameProfileProperties;
 import net.hypejet.jet.server.network.buffer.NetworkBuffer;
-import net.hypejet.jet.server.network.codec.codecs.GameProfilePropertiesCodec;
+import net.hypejet.jet.server.network.protocol.codecs.GameProfilePropertiesCodec;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
