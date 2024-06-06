@@ -1,5 +1,6 @@
 package net.hypejet.jet;
 
+import net.hypejet.jet.configuration.ServerConfiguration;
 import net.hypejet.jet.event.node.EventNode;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -25,4 +26,19 @@ public interface MinecraftServer {
      * @since 1.0
      */
     int protocolVersion();
+
+    /**
+     * Gets a {@linkplain ServerConfiguration server configuration} of this server.
+     *
+     * @return the configuration
+     * @since 1.0
+     */
+    @NonNull ServerConfiguration configuration();
+
+    /**
+     * Shuts down the server.
+     *
+     * @since 1.0
+     */
+    void shutdown();
 }

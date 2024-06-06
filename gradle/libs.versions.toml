@@ -1,6 +1,11 @@
 [versions]
+# Fat jar compilation
+shadow = "8.1.7"
+
 checker-framework-plugin = "0.6.39"
 netty = "4.1.110.Final"
+
+# Minecraft text
 adventure = "4.17.0"
 
 # Logging
@@ -11,10 +16,15 @@ logback = "1.5.6"
 junit-jupiter = "5.10.2"
 junit-platform = "1.10.2"
 
+# Configuration
+configs = "5.0.1"
+
 [libraries]
 netty = { module = "io.netty:netty-all", version.ref = "netty" }
 
+# Minecraft text
 adventure = { module = "net.kyori:adventure-api", version.ref = "adventure" }
+adventure-minimessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure" }
 adventure-serializer-gson = { module = "net.kyori:adventure-text-serializer-gson", version.ref = "adventure" }
 
 # Logging
@@ -25,7 +35,18 @@ logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 junit-jupiter = { module =  "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
 junit-platform = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform" }
 
+# Configuration
+configs-snakeyaml = { module = "eu.okaeri:okaeri-configs-yaml-snakeyaml", version.ref = "configs" }
+configs-serdes-commonds = { module = "eu.okaeri:okaeri-configs-serdes-commons", version.ref = "configs" }
+
 [bundles]
+# Minecraft text
+adventure = ["adventure", "adventure-minimessage"]
+
+# Configuration
+configs = ["configs-snakeyaml", "configs-serdes-commonds"]
 
 [plugins]
+# Far jar compilation
+shadow = { id = "io.github.goooler.shadow", version.ref = "shadow" }
 checker-framework = { id = "org.checkerframework", version.ref = "checker-framework-plugin" }

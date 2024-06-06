@@ -77,7 +77,9 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
             switch (loginPacket) {
                 case ClientLoginAcknowledgeLoginPacket ignored ->
                         this.playerConnection.setProtocolState(ProtocolState.CONFIGURATION);
-                case ClientLoginRequestLoginPacket ignored -> this.playerConnection.setCompressionThreshold(256);
+                case ClientLoginRequestLoginPacket ignored -> this.playerConnection.setCompressionThreshold(
+                        this.server.configuration().compressionThreshold()
+                );
                 default -> {}
             }
 
