@@ -6,8 +6,8 @@ import net.hypejet.jet.event.events.packet.PacketSendEvent;
 import net.hypejet.jet.player.PlayerConnection;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
-import net.hypejet.jet.protocol.packet.server.login.ServerEnableCompressionPacket;
-import net.hypejet.jet.protocol.packet.server.login.ServerDisconnectPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerEnableCompressionLoginPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerDisconnectLoginPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -65,7 +65,7 @@ public final class SocketPlayerConnection implements PlayerConnection {
 
     @Override
     public void kick(@NonNull Component reason) {
-        this.sendPacket(new ServerDisconnectPacket(reason));
+        this.sendPacket(new ServerDisconnectLoginPacket(reason));
         this.close();
     }
 
@@ -109,7 +109,7 @@ public final class SocketPlayerConnection implements PlayerConnection {
      * @since 1.0
      */
     public void setCompressionThreshold(int compressionThreshold) {
-        this.sendPacket(new ServerEnableCompressionPacket(compressionThreshold));
+        this.sendPacket(new ServerEnableCompressionLoginPacket(compressionThreshold));
         this.compressionThreshold = compressionThreshold;
     }
 

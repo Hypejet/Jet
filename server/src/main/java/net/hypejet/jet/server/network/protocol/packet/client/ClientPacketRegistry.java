@@ -7,11 +7,11 @@ import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.handshake.HandshakePacketCodec;
-import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientCookieResponsePacketCodec;
-import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientEncryptionResponsePacketCodec;
-import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientLoginAcknowledgePacketCodec;
-import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientLoginRequestPacketCodec;
-import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientPluginMessageResponsePacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientCookieResponseLoginPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientEncryptionResponseLoginPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientLoginAcknowledgeLoginPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientLoginRequestLoginPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientPluginMessageResponseLoginPacketCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -34,13 +34,13 @@ public final class ClientPacketRegistry {
     static {
         packetCodecs = new EnumMap<>(ProtocolState.class);
 
-        // Handshake
+        // Handshake packets
         register(ProtocolState.HANDSHAKE, new HandshakePacketCodec());
 
-        // Login
-        register(ProtocolState.LOGIN, new ClientLoginRequestPacketCodec(), new ClientEncryptionResponsePacketCodec(),
-                new ClientPluginMessageResponsePacketCodec(), new ClientLoginAcknowledgePacketCodec(),
-                new ClientCookieResponsePacketCodec());
+        // Login packets
+        register(ProtocolState.LOGIN, new ClientLoginRequestLoginPacketCodec(),
+                new ClientEncryptionResponseLoginPacketCodec(), new ClientPluginMessageResponseLoginPacketCodec(),
+                new ClientLoginAcknowledgeLoginPacketCodec(), new ClientCookieResponseLoginPacketCodec());
     }
 
     private ClientPacketRegistry() {}

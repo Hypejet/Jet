@@ -8,8 +8,8 @@ import net.hypejet.jet.protocol.packet.client.ClientLoginPacket;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
 import net.hypejet.jet.event.events.packet.PacketReceiveEvent;
 import net.hypejet.jet.protocol.packet.client.handshake.ClientHandshakePacket;
-import net.hypejet.jet.protocol.packet.client.login.ClientLoginAcknowledgePacket;
-import net.hypejet.jet.protocol.packet.client.login.ClientLoginRequestPacket;
+import net.hypejet.jet.protocol.packet.client.login.ClientLoginAcknowledgeLoginPacket;
+import net.hypejet.jet.protocol.packet.client.login.ClientLoginRequestLoginPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.player.SocketPlayerConnection;
 import net.hypejet.jet.server.player.login.DefaultLoginHandler;
@@ -75,9 +75,9 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
 
         if (packet instanceof ClientLoginPacket loginPacket) {
             switch (loginPacket) {
-                case ClientLoginAcknowledgePacket ignored ->
+                case ClientLoginAcknowledgeLoginPacket ignored ->
                         this.playerConnection.setProtocolState(ProtocolState.CONFIGURATION);
-                case ClientLoginRequestPacket ignored -> this.playerConnection.setCompressionThreshold(256);
+                case ClientLoginRequestLoginPacket ignored -> this.playerConnection.setCompressionThreshold(256);
                 default -> {}
             }
 

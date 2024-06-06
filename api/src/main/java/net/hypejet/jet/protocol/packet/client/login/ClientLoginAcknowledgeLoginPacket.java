@@ -10,4 +10,4 @@ import net.hypejet.jet.protocol.packet.client.ClientLoginPacket;
  * @author Codestech
  * @see ClientLoginPacket
  */
-public record ClientLoginAcknowledgePacket() implements ClientLoginPacket {}
+public record ClientLoginAcknowledgeLoginPacket() implements ClientLoginPacket {}

@@ -1,7 +1,7 @@
 package net.hypejet.jet.protocol.packet.client.login;
 
 import net.hypejet.jet.protocol.packet.client.ClientLoginPacket;
-import net.hypejet.jet.protocol.packet.server.login.ServerEncryptionRequestPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerEncryptionRequestLoginPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -13,7 +13,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 1.0
  * @author Codestech
  * @see ClientLoginPacket
- * @see ServerEncryptionRequestPacket
+ * @see ServerEncryptionRequestLoginPacket
  */
-public record ClientEncryptionResponsePacket(byte @NonNull [] sharedSecret, byte @NonNull [] verifyToken)
+public record ClientEncryptionResponseLoginPacket(byte @NonNull [] sharedSecret, byte @NonNull [] verifyToken)
         implements ClientLoginPacket {}

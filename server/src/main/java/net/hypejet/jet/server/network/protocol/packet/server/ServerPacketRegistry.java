@@ -4,12 +4,12 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
-import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerCookieRequestPacketCodec;
-import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerDisconnectPacketCodec;
-import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerEnableCompressionPacketCodec;
-import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerEncryptionRequestPacketCodec;
-import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerLoginSuccessPacketCodec;
-import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerPluginMessageRequestPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerCookieRequestLoginPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerDisconnectLoginPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerEnableCompressionLoginPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerEncryptionRequestLoginPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerLoginSuccessLoginPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerPluginMessageRequestLoginPacketCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -33,9 +33,9 @@ public final class ServerPacketRegistry {
         packetCodecs = new HashMap<>();
 
         // Login packets
-        register(new ServerDisconnectPacketCodec(), new ServerEncryptionRequestPacketCodec(),
-                new ServerLoginSuccessPacketCodec(), new ServerEnableCompressionPacketCodec(),
-                new ServerPluginMessageRequestPacketCodec(), new ServerCookieRequestPacketCodec());
+        register(new ServerDisconnectLoginPacketCodec(), new ServerEncryptionRequestLoginPacketCodec(),
+                new ServerLoginSuccessLoginPacketCodec(), new ServerEnableCompressionLoginPacketCodec(),
+                new ServerPluginMessageRequestLoginPacketCodec(), new ServerCookieRequestLoginPacketCodec());
     }
 
     private ServerPacketRegistry() {}

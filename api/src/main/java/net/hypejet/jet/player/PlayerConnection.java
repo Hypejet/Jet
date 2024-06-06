@@ -3,7 +3,7 @@ package net.hypejet.jet.player;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
-import net.hypejet.jet.protocol.packet.server.login.ServerDisconnectPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerDisconnectLoginPacket;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -31,7 +31,7 @@ public interface PlayerConnection {
     void sendPacket(@NonNull ServerPacket packet);
 
     /**
-     * Sends a {@linkplain ServerDisconnectPacket disconnect packet} and closes the connection.
+     * Sends a {@linkplain ServerDisconnectLoginPacket disconnect packet} and closes the connection.
      *
      * @param reason a reason of the disconnection
      * @since 1.0

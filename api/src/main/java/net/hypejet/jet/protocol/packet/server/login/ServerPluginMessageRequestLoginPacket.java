@@ -14,5 +14,5 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @author Codestech
  * @see ServerLoginPacket
  */
-public record ServerPluginMessageRequestPacket(int messageId, @NonNull Key channel, byte @NonNull [] data)
+public record ServerPluginMessageRequestLoginPacket(int messageId, @NonNull Key channel, byte @NonNull [] data)
         implements ServerLoginPacket {}

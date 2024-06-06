@@ -13,4 +13,5 @@ import java.util.UUID;
  * @since 1.0
  * @author Codestech
  */
-public record ClientLoginRequestPacket(@NonNull String username, @NonNull UUID uniqueId) implements ClientLoginPacket {}
+public record ClientLoginRequestLoginPacket(@NonNull String username, @NonNull UUID uniqueId)
+        implements ClientLoginPacket {}

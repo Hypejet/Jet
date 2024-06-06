@@ -12,4 +12,4 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @author Codestech
  * @see ServerLoginPacket
  */
-public record ServerCookieRequestPacket(@NonNull Key identifier) implements ServerLoginPacket {}
+public record ServerCookieRequestLoginPacket(@NonNull Key identifier) implements ServerLoginPacket {}

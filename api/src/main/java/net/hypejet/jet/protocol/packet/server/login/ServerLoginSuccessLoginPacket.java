@@ -19,6 +19,6 @@ import java.util.UUID;
  * @author Codestech
  * @see ServerLoginPacket
  */
-public record ServerLoginSuccessPacket(@NonNull UUID uniqueId, @NonNull String username,
-                                       @NonNull Collection<GameProfileProperties> properties,
-                                       boolean strictErrorHandling) implements ServerLoginPacket {}
+public record ServerLoginSuccessLoginPacket(@NonNull UUID uniqueId, @NonNull String username,
+                                            @NonNull Collection<GameProfileProperties> properties,
+                                            boolean strictErrorHandling) implements ServerLoginPacket {}

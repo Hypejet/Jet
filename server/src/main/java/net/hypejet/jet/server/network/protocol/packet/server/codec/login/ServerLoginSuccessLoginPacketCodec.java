@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.network.protocol.packet.server.codec.login;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.protocol.packet.server.login.ServerLoginSuccessPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerLoginSuccessLoginPacket;
 import net.hypejet.jet.server.network.protocol.codecs.GameProfilePropertiesCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
@@ -10,26 +10,26 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Represents a {@linkplain PacketCodec server packet codec}, which reads and writes
- * a {@linkplain ServerLoginSuccessPacket login success packet}.
+ * a {@linkplain ServerLoginSuccessLoginPacket login success login packet}.
  *
  * @since 1.0
  * @author Codestech
- * @see ServerLoginSuccessPacket
+ * @see ServerLoginSuccessLoginPacket
  * @see PacketCodec
  */
-public final class ServerLoginSuccessPacketCodec extends PacketCodec<ServerLoginSuccessPacket> {
+public final class ServerLoginSuccessLoginPacketCodec extends PacketCodec<ServerLoginSuccessLoginPacket> {
     /**
-     * Constructs the {@linkplain ServerLoginSuccessPacketCodec login success packet codec}.
+     * Constructs the {@linkplain ServerLoginSuccessLoginPacketCodec login success packet codec}.
      *
      * @since 1.0
      */
-    public ServerLoginSuccessPacketCodec() {
-        super(ServerPacketIdentifiers.LOGIN_SUCCESS, ServerLoginSuccessPacket.class);
+    public ServerLoginSuccessLoginPacketCodec() {
+        super(ServerPacketIdentifiers.LOGIN_SUCCESS, ServerLoginSuccessLoginPacket.class);
     }
 
     @Override
-    public @NonNull ServerLoginSuccessPacket read(@NonNull ByteBuf buf) {
-        return new ServerLoginSuccessPacket(
+    public @NonNull ServerLoginSuccessLoginPacket read(@NonNull ByteBuf buf) {
+        return new ServerLoginSuccessLoginPacket(
                 NetworkUtil.readUniqueId(buf),
                 NetworkUtil.readString(buf),
                 NetworkUtil.readCollection(buf, GameProfilePropertiesCodec.instance()),
@@ -38,7 +38,7 @@ public final class ServerLoginSuccessPacketCodec extends PacketCodec<ServerLogin
     }
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerLoginSuccessPacket object) {
+    public void write(@NonNull ByteBuf buf, @NonNull ServerLoginSuccessLoginPacket object) {
         NetworkUtil.writeUniqueId(buf, object.uniqueId());
         NetworkUtil.writeString(buf, object.username());
         NetworkUtil.writeCollection(buf, GameProfilePropertiesCodec.instance(), object.properties());

@@ -10,4 +10,4 @@ import net.hypejet.jet.protocol.packet.server.ServerLoginPacket;
  * @author Codestech
  * @see ServerLoginPacket
  */
-public record ServerEnableCompressionPacket(int threshold) implements ServerLoginPacket {}
+public record ServerEnableCompressionLoginPacket(int threshold) implements ServerLoginPacket {}

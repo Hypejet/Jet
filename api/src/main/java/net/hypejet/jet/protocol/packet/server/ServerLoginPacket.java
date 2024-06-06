@@ -1,12 +1,12 @@
 package net.hypejet.jet.protocol.packet.server;
 
 import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.protocol.packet.server.login.ServerCookieRequestPacket;
-import net.hypejet.jet.protocol.packet.server.login.ServerDisconnectPacket;
-import net.hypejet.jet.protocol.packet.server.login.ServerEnableCompressionPacket;
-import net.hypejet.jet.protocol.packet.server.login.ServerEncryptionRequestPacket;
-import net.hypejet.jet.protocol.packet.server.login.ServerLoginSuccessPacket;
-import net.hypejet.jet.protocol.packet.server.login.ServerPluginMessageRequestPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerCookieRequestLoginPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerDisconnectLoginPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerEnableCompressionLoginPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerEncryptionRequestLoginPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerLoginSuccessLoginPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerPluginMessageRequestLoginPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -17,9 +17,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @author Codestech
  * @see ServerPacket
  */
-public sealed interface ServerLoginPacket extends ServerPacket permits ServerEnableCompressionPacket,
-        ServerCookieRequestPacket, ServerDisconnectPacket, ServerEncryptionRequestPacket,
-        ServerPluginMessageRequestPacket, ServerLoginSuccessPacket {
+public sealed interface ServerLoginPacket extends ServerPacket permits ServerEnableCompressionLoginPacket,
+        ServerCookieRequestLoginPacket, ServerDisconnectLoginPacket, ServerEncryptionRequestLoginPacket,
+        ServerPluginMessageRequestLoginPacket, ServerLoginSuccessLoginPacket {
     /**
      * {@inheritDoc}
      */

@@ -12,4 +12,4 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @author Codestech
  * @see ServerLoginPacket
  */
-public record ServerDisconnectPacket(@NonNull Component reason) implements ServerLoginPacket {}
+public record ServerDisconnectLoginPacket(@NonNull Component reason) implements ServerLoginPacket {}

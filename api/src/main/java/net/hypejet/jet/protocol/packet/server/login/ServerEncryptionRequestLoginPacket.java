@@ -16,6 +16,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @author Codestech
  * @see ServerLoginPacket
  */
-public record ServerEncryptionRequestPacket(@NonNull String serverId, byte @NonNull [] publicKey,
-                                            byte @NonNull [] verifyToken, boolean shouldAuthenticate)
+public record ServerEncryptionRequestLoginPacket(@NonNull String serverId, byte @NonNull [] publicKey,
+                                                 byte @NonNull [] verifyToken, boolean shouldAuthenticate)
         implements ServerLoginPacket {}
