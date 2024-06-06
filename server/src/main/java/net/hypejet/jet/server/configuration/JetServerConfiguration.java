@@ -6,10 +6,13 @@ import eu.okaeri.configs.annotation.Comments;
 import eu.okaeri.configs.annotation.CustomKey;
 import eu.okaeri.configs.annotation.Header;
 import eu.okaeri.configs.annotation.Headers;
-import eu.okaeri.configs.serdes.commons.SerdesCommons;
 import eu.okaeri.configs.yaml.snakeyaml.YamlSnakeYamlConfigurer;
 import net.hypejet.jet.configuration.ServerConfiguration;
+import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.network.transport.NettyTransportSelector;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -42,6 +45,9 @@ public final class JetServerConfiguration extends OkaeriConfig implements Server
             @Comment("AUTO will automatically select the \"best\" available transport")
     })
     private @MonotonicNonNull NettyTransportSelector transport = NettyTransportSelector.AUTO;
+
+    @Comment("A message used during disconnection when a player is trying to join with an unsupported version")
+    private @MonotonicNonNull Component unsupportedVersionMessage = createDefaultUnsupportedVersionMessage();
 
     private JetServerConfiguration() {}
 
@@ -89,6 +95,18 @@ public final class JetServerConfiguration extends OkaeriConfig implements Server
     }
 
     /**
+     * Gets a message used during disconnection when a player is trying to join with an unsupported version.
+     *
+     * @return the message
+     * @since 1.0
+     */
+    public @NonNull Component unsupportedVersionMessage() {
+        if (this.unsupportedVersionMessage == null)
+            this.unsupportedVersionMessage = createDefaultUnsupportedVersionMessage();
+        return this.unsupportedVersionMessage;
+    }
+
+    /**
      * Creates the {@linkplain JetServerConfiguration Jet server configuration}.
      *
      * @return the configuration
@@ -98,11 +116,16 @@ public final class JetServerConfiguration extends OkaeriConfig implements Server
         JetServerConfiguration configuration = new JetServerConfiguration();
 
         configuration.withBindFile(Path.of("server.yaml"));
-        configuration.withConfigurer(new YamlSnakeYamlConfigurer(), new SerdesCommons());
+        configuration.withConfigurer(new YamlSnakeYamlConfigurer(), new JetConfigurationSerdes());
         configuration.withRemoveOrphans(true);
         configuration.saveDefaults();
         configuration.load(true);
 
         return configuration;
+    }
+
+    private static @NonNull Component createDefaultUnsupportedVersionMessage() {
+        return Component.text("Unsupported version! Please use " + JetMinecraftServer.MINECRAFT_VERSION + ".",
+                NamedTextColor.DARK_RED, TextDecoration.BOLD);
     }
 }

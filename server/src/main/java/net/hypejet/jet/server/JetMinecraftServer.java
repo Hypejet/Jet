@@ -16,8 +16,10 @@ import org.slf4j.LoggerFactory;
  */
 public final class JetMinecraftServer implements MinecraftServer {
 
-    private static final Logger LOGGER  = LoggerFactory.getLogger(MinecraftServer.class);
     private static final int PROTOCOL_VERSION = 766;
+    public static final String MINECRAFT_VERSION = "1.20.6";
+
+    private static final Logger LOGGER  = LoggerFactory.getLogger(MinecraftServer.class);
 
     private final EventNode<Object> eventNode = EventNode.create();
     private final JetServerConfiguration configuration;
@@ -42,6 +44,11 @@ public final class JetMinecraftServer implements MinecraftServer {
     @Override
     public int protocolVersion() {
         return PROTOCOL_VERSION;
+    }
+
+    @Override
+    public @NonNull String minecraftVersion() {
+        return MINECRAFT_VERSION;
     }
 
     @Override

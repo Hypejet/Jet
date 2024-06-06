@@ -28,6 +28,17 @@ public interface MinecraftServer {
     int protocolVersion();
 
     /**
+     * Gets a Minecraft version name that this server supports.
+     * </p>
+     * If the {@linkplain #protocolVersion() protocol version} supports multiple Minecraft versions, the latest one
+     * will be returned.
+     *
+     * @return the Minecraft version name
+     * @since 1.0
+     */
+    @NonNull String minecraftVersion();
+
+    /**
      * Gets a {@linkplain ServerConfiguration server configuration} of this server.
      *
      * @return the configuration
