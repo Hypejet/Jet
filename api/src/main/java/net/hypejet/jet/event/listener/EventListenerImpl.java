@@ -24,7 +24,13 @@ record EventListenerImpl<E>(@NonNull Consumer<E> consumer, @NonNull Class<? exte
                             @Nullable Predicate<E> predicate, @NonNull EventPriority priority)
         implements EventListener<E> {
     @Override
-    public int compareTo(@NonNull EventListener<?> listener) {
-        return Integer.compare(this.priority().ordinal(), listener.priority().ordinal());
+    public void call(@NonNull E event) {
+        this.consumer.accept(event);
+    }
+
+    @Override
+    public boolean isEligible(@NonNull E event) {
+        if (this.predicate == null) return true;
+        return this.predicate.test(event);
     }
 }

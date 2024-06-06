@@ -6,11 +6,14 @@ import net.hypejet.jet.event.events.packet.PacketSendEvent;
 import net.hypejet.jet.player.PlayerConnection;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
-import net.hypejet.jet.protocol.packet.server.login.compression.ServerEnableCompressionPacket;
-import net.hypejet.jet.protocol.packet.server.login.disconnect.ServerDisconnectPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerEnableCompressionLoginPacket;
+import net.hypejet.jet.protocol.packet.server.login.ServerDisconnectLoginPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents an implementation of {@link PlayerConnection}, which is handled by netty's
@@ -21,8 +24,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class SocketPlayerConnection implements PlayerConnection {
 
-    private final SocketChannel channel;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SocketPlayerConnection.class);
 
+    private final SocketChannel channel;
     private final JetMinecraftServer server;
 
     private ProtocolState state = ProtocolState.HANDSHAKE;
@@ -46,17 +50,28 @@ public final class SocketPlayerConnection implements PlayerConnection {
     }
 
     @Override
-    public void sendPacket(@NonNull ServerPacket packet) {
+    public @Nullable ServerPacket sendPacket(@NonNull ServerPacket packet) {
         PacketSendEvent event = new PacketSendEvent(packet);
         this.server.eventNode().call(event);
-        if (!event.isCancelled()) this.channel.writeAndFlush(packet);
+
+        if (event.isCancelled()) return null;
+
+        packet = event.getPacket();
+        ProtocolState currentState = this.state;
+
+        if (packet.state() != currentState) {
+            LOGGER.error("Packet {} cannot be handled during {} protocol state", packet, currentState,
+                    new IllegalArgumentException(packet.toString()));
+            return null;
+        }
+
+        this.channel.writeAndFlush(packet, this.channel.voidPromise());
+        return packet;
     }
 
     @Override
     public void kick(@NonNull Component reason) {
-        this.sendPacket(ServerDisconnectPacket.builder()
-                .reason(reason)
-                .build());
+        this.sendPacket(new ServerDisconnectLoginPacket(reason));
         this.close();
     }
 
@@ -100,10 +115,9 @@ public final class SocketPlayerConnection implements PlayerConnection {
      * @since 1.0
      */
     public void setCompressionThreshold(int compressionThreshold) {
-        this.sendPacket(ServerEnableCompressionPacket.builder()
-                .threshold(compressionThreshold)
-                .build());
-        this.compressionThreshold = compressionThreshold;
+        ServerPacket finalPacket = this.sendPacket(new ServerEnableCompressionLoginPacket(compressionThreshold));
+        if (finalPacket instanceof ServerEnableCompressionLoginPacket packet)
+            this.compressionThreshold = packet.threshold();
     }
 
     /**

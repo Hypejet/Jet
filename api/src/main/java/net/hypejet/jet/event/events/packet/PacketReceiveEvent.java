@@ -35,7 +35,7 @@ public final class PacketReceiveEvent extends PacketEvent {
      * @since 1.0
      */
     @Override
-    public @NonNull ClientPacket packet() {
+    public @NonNull ClientPacket getPacket() {
         return this.packet;
     }
 

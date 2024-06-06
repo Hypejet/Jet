@@ -1,6 +1,5 @@
 package net.hypejet.jet.protocol.packet.client.handshake;
 
-import net.hypejet.jet.player.PlayerConnection;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -8,40 +7,20 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Represents a {@linkplain ClientPacket client packet} that initializes connection of a player.
  *
+ * @param protocolVersion a version of Minecraft protocol that the client uses
+ * @param serverAddress an address of a server that the client tries to connect to
+ * @param serverPort a port of a server that the client tries to connect to
+ * @param nextState a next {@linkplain ProtocolState protocol state} that the client will switch to
  * @since 1.0
  * @author Codestech
  */
-public non-sealed interface ClientHandshakePacket extends ClientPacket {
+public record ClientHandshakePacket(int protocolVersion, @NonNull String serverAddress, int serverPort,
+                                    @NonNull ProtocolState nextState) implements ClientPacket {
     /**
-     * Gets a version of the Minecraft protocol.
-     *
-     * @return the version
-     * @since 1.0
+     * {@inheritDoc}
      */
-    int protocolVersion();
-
-    /**
-     * Gets an address of a server that the client tries to connect to.
-     *
-     * @return the address
-     * @since 1.0
-     */
-    @NonNull String serverAddress();
-
-    /**
-     * Gets a port of a server that the client tries to connect to.
-     *
-     * @return the port
-     * @since 1.0
-     */
-    int serverPort();
-
-    /**
-     * Gets a next {@linkplain ProtocolState protocol state}, which a {@linkplain PlayerConnection player connection}
-     * will switch to.
-     *
-     * @return the protocol state
-     * @since 1.0
-     */
-    @NonNull ProtocolState nextState();
+    @Override
+    public @NonNull ProtocolState state() {
+        return ProtocolState.HANDSHAKE;
+    }
 }

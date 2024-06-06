@@ -8,11 +8,13 @@ import net.hypejet.jet.protocol.packet.client.ClientLoginPacket;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
 import net.hypejet.jet.event.events.packet.PacketReceiveEvent;
 import net.hypejet.jet.protocol.packet.client.handshake.ClientHandshakePacket;
-import net.hypejet.jet.protocol.packet.client.login.ClientLoginAcknowledgePacket;
-import net.hypejet.jet.protocol.packet.client.login.ClientLoginRequestPacket;
+import net.hypejet.jet.protocol.packet.client.login.ClientLoginAcknowledgeLoginPacket;
+import net.hypejet.jet.protocol.packet.client.login.ClientLoginRequestLoginPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.player.SocketPlayerConnection;
 import net.hypejet.jet.server.player.login.DefaultLoginHandler;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,15 +62,22 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
         if (event.isCancelled()) return;
 
         if (packet instanceof ClientHandshakePacket handshakePacket) {
-            this.playerConnection.setProtocolState(handshakePacket.nextState());
+            ProtocolState nextState = handshakePacket.nextState();
+            this.playerConnection.setProtocolState(nextState);
+
+            if (nextState == ProtocolState.LOGIN && handshakePacket.protocolVersion() != this.server.protocolVersion()) {
+                this.playerConnection.kick(Component.text("Unsupported protocol version", NamedTextColor.DARK_RED));
+                return;
+            }
+
             return;
         }
 
         if (packet instanceof ClientLoginPacket loginPacket) {
             switch (loginPacket) {
-                case ClientLoginAcknowledgePacket ignored ->
+                case ClientLoginAcknowledgeLoginPacket ignored ->
                         this.playerConnection.setProtocolState(ProtocolState.CONFIGURATION);
-                case ClientLoginRequestPacket ignored -> this.playerConnection.setCompressionThreshold(256);
+                case ClientLoginRequestLoginPacket ignored -> this.playerConnection.setCompressionThreshold(256);
                 default -> {}
             }
 

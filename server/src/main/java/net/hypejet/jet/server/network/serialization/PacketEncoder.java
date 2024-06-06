@@ -5,8 +5,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
-import net.hypejet.jet.server.network.buffer.NetworkBuffer;
-import net.hypejet.jet.server.network.protocol.ServerPacketRegistry;
+import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketRegistry;
 import net.hypejet.jet.server.player.SocketPlayerConnection;
 import net.hypejet.jet.server.util.CompressionUtil;
 import net.hypejet.jet.server.util.NetworkUtil;
@@ -43,9 +42,7 @@ public final class PacketEncoder extends MessageToByteEncoder<ServerPacket> {
 
         try {
             ByteBuf buf = Unpooled.buffer();
-
-            NetworkBuffer buffer = new NetworkBuffer(buf);
-            ServerPacketRegistry.write(buffer, msg, this.playerConnection.getProtocolState());
+            ServerPacketRegistry.write(buf, msg);
 
             int dataLength = buf.readableBytes();
             int compressionThreshold = this.playerConnection.compressionThreshold();
@@ -57,14 +54,13 @@ public final class PacketEncoder extends MessageToByteEncoder<ServerPacket> {
             }
 
             ByteBuf compressionBuf = Unpooled.buffer();
-            NetworkBuffer compressionBuffer = new NetworkBuffer(compressionBuf);
 
             if (compressionThreshold > dataLength) {
-                compressionBuffer.writeVarInt(0);
-                compressionBuffer.write(buffer);
+                NetworkUtil.writeVarInt(compressionBuf, 0);
+                compressionBuf.writeBytes(compressionBuf);
             } else {
-                compressionBuffer.writeVarInt(dataLength);
-                compressionBuffer.writeByteArray(CompressionUtil.compress(buf.array()), false);
+                NetworkUtil.writeVarInt(compressionBuf, dataLength);
+                compressionBuf.writeBytes(CompressionUtil.compress(buf.array()));
             }
 
             NetworkUtil.writeVarInt(out, compressionBuf.readableBytes());

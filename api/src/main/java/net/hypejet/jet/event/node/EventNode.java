@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  * @since 1.0
  * @author Codestech
  */
-public sealed interface EventNode<E> extends Comparable<EventNode<?>> permits EventNodeImpl {
+public interface EventNode<E> extends Comparable<EventNode<?>> {
     /**
      * Adds a {@linkplain EventNode event node} as a child of this node.
      *
@@ -125,6 +125,14 @@ public sealed interface EventNode<E> extends Comparable<EventNode<?>> permits Ev
      * @since 1.0
      */
     @NonNull Class<E> eventClass();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    default int compareTo(@NonNull EventNode<?> node) {
+        return Integer.compare(this.priority().ordinal(), node.priority().ordinal());
+    }
 
     /**
      * Creates an event node with a type of {@link Object} and a priority of {@linkplain EventPriority#NORMAL}.

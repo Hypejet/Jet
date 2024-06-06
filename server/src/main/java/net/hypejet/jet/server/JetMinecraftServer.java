@@ -12,10 +12,17 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class JetMinecraftServer implements MinecraftServer {
 
+    private static final int PROTOCOL_VERSION = 766;
+
     private final EventNode<Object> eventNode = EventNode.create();
 
     @Override
     public @NonNull EventNode<Object> eventNode() {
         return this.eventNode;
+    }
+
+    @Override
+    public int protocolVersion() {
+        return PROTOCOL_VERSION;
     }
 }

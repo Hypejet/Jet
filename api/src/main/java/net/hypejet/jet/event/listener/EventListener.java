@@ -15,14 +15,14 @@ import java.util.function.Predicate;
  * @author Codestech
  * @author Window5
  */
-public sealed interface EventListener<E> extends Comparable<EventListener<?>> permits EventListenerImpl {
+public interface EventListener<E> extends Comparable<EventListener<?>>, Consumer<E>, Predicate<E> {
     /**
-     * Gets a consumer, which consumes called events.
+     * Calls an {@linkplain E event}.
      *
-     * @return the consumer
+     * @param event the event
      * @since 1.0
      */
-    @NonNull Consumer<E> consumer();
+    void call(@NonNull E event);
 
     /**
      * Gets a type of event that this listener listens to.
@@ -38,21 +38,44 @@ public sealed interface EventListener<E> extends Comparable<EventListener<?>> pe
      * @return the priority
      * @since 1.0
      */
-    @NonNull EventPriority priority();
+    default @NonNull EventPriority priority() {
+        return EventPriority.NORMAL;
+    }
 
     /**
-     * Gets an optional predicate that checks whether an event is eligible to call this listener.
+     * Gets whether an event is eligible to call this listener.
      *
-     * @return the predicate, which may be null
+     * @param event the event
+     * @return true if the event is eligible to call this listener, false otherwise
      * @since 1.0
      */
-    @Nullable Predicate<E> predicate();
+    default boolean isEligible(@NonNull E event) {
+        return true;
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    int compareTo(@NonNull EventListener<?> listener);
+    default int compareTo(@NonNull EventListener<?> listener) {
+        return Integer.compare(this.priority().ordinal(), listener.priority().ordinal());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    default void accept(@NonNull E event) {
+        this.call(event);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    default boolean test(@NonNull E event) {
+        return this.isEligible(event);
+    }
 
     /**
      * Creates a new {@linkplain EventListener event listener} with a predicate, which always returns {@code true}
