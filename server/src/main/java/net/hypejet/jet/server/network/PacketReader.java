@@ -66,7 +66,7 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
             this.playerConnection.setProtocolState(nextState);
 
             if (nextState == ProtocolState.LOGIN && handshakePacket.protocolVersion() != this.server.protocolVersion()) {
-                this.playerConnection.kick(Component.text("Unsupported protocol version", NamedTextColor.DARK_RED));
+                this.playerConnection.kick(this.server.configuration().unsupportedVersionMessage());
                 return;
             }
 
@@ -77,7 +77,9 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
             switch (loginPacket) {
                 case ClientLoginAcknowledgeLoginPacket ignored ->
                         this.playerConnection.setProtocolState(ProtocolState.CONFIGURATION);
-                case ClientLoginRequestLoginPacket ignored -> this.playerConnection.setCompressionThreshold(256);
+                case ClientLoginRequestLoginPacket ignored -> this.playerConnection.setCompressionThreshold(
+                        this.server.configuration().compressionThreshold()
+                );
                 default -> {}
             }
 

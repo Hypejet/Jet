@@ -9,6 +9,7 @@ subprojects {
         mavenLocal()
         mavenCentral()
         maven("https://libraries.minecraft.net")
+        maven("https://storehouse.okaeri.eu/repository/maven-public/")
     }
 
     tasks {
