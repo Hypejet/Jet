@@ -29,7 +29,7 @@ public final class JetMinecraftServer implements MinecraftServer {
      *
      * @since 1.0
      */
-    public JetMinecraftServer() {
+    JetMinecraftServer() {
         this.configuration = JetServerConfiguration.create();
         this.networkManager = new NetworkManager(this);
     }
