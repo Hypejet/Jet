@@ -11,6 +11,7 @@ import net.hypejet.jet.protocol.packet.server.login.ServerDisconnectLoginPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,18 +50,23 @@ public final class SocketPlayerConnection implements PlayerConnection {
     }
 
     @Override
-    public void sendPacket(@NonNull ServerPacket packet) {
+    public @Nullable ServerPacket sendPacket(@NonNull ServerPacket packet) {
+        PacketSendEvent event = new PacketSendEvent(packet);
+        this.server.eventNode().call(event);
+
+        if (event.isCancelled()) return null;
+
+        packet = event.getPacket();
         ProtocolState currentState = this.state;
 
         if (packet.state() != currentState) {
             LOGGER.error("Packet {} cannot be handled during {} protocol state", packet, currentState,
                     new IllegalArgumentException(packet.toString()));
-            return;
+            return null;
         }
 
-        PacketSendEvent event = new PacketSendEvent(packet);
-        this.server.eventNode().call(event);
-        if (!event.isCancelled()) this.channel.writeAndFlush(packet, this.channel.voidPromise());
+        this.channel.writeAndFlush(packet, this.channel.voidPromise());
+        return packet;
     }
 
     @Override
@@ -109,8 +115,9 @@ public final class SocketPlayerConnection implements PlayerConnection {
      * @since 1.0
      */
     public void setCompressionThreshold(int compressionThreshold) {
-        this.sendPacket(new ServerEnableCompressionLoginPacket(compressionThreshold));
-        this.compressionThreshold = compressionThreshold;
+        ServerPacket finalPacket = this.sendPacket(new ServerEnableCompressionLoginPacket(compressionThreshold));
+        if (finalPacket instanceof ServerEnableCompressionLoginPacket packet)
+            this.compressionThreshold = packet.threshold();
     }
 
     /**

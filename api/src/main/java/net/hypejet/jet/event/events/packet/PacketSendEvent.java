@@ -16,7 +16,7 @@ import java.util.Objects;
  */
 public final class PacketSendEvent extends PacketEvent {
 
-    private final ServerPacket packet;
+    private ServerPacket packet;
 
     /**
      * Constructs a {@linkplain PacketSendEvent packet send event}.
@@ -35,8 +35,18 @@ public final class PacketSendEvent extends PacketEvent {
      * @since 1.0
      */
     @Override
-    public @NonNull ServerPacket packet() {
+    public @NonNull ServerPacket getPacket() {
         return this.packet;
+    }
+
+    /**
+     * Replaces the {@linkplain ServerPacket server packet}, which is being sent.
+     *
+     * @param packet the new packet
+     * @since 1.0
+     */
+    public void setPacket(@NonNull ServerPacket packet) {
+        this.packet = packet;
     }
 
     @Override

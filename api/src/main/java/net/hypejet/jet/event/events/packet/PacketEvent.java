@@ -13,10 +13,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public sealed abstract class PacketEvent extends CancellableEvent permits PacketReceiveEvent, PacketSendEvent {
     /**
-     * Gets the packet that was sent or received.
+     * Gets the {@linkplain Packet packet} that was sent or received.
      *
      * @return the packet
      * @since 1.0
      */
-    public abstract @NonNull Packet packet();
+    public abstract @NonNull Packet getPacket();
 }
