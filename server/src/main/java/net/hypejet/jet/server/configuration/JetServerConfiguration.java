@@ -29,7 +29,7 @@ import java.nio.file.Path;
 public final class JetServerConfiguration extends OkaeriConfig implements ServerConfiguration {
 
     @Comment("An address that the server should bind to")
-    private @MonotonicNonNull String address = "0.0.0.0";
+    private @MonotonicNonNull String address = defaultAddress();
 
     @Comment("A port that the server should bind to")
     private int port = 25565;
@@ -59,7 +59,7 @@ public final class JetServerConfiguration extends OkaeriConfig implements Server
      */
     public @NonNull String address() {
         if (this.address == null)
-            this.address = "0.0.0.0";
+            this.address = defaultAddress();
         return this.address;
     }
 
@@ -127,5 +127,9 @@ public final class JetServerConfiguration extends OkaeriConfig implements Server
     private static @NonNull Component createDefaultUnsupportedVersionMessage() {
         return Component.text("Unsupported version! Please use " + JetMinecraftServer.MINECRAFT_VERSION + ".",
                 NamedTextColor.DARK_RED, TextDecoration.BOLD);
+    }
+
+    private static @NonNull String defaultAddress() {
+        return "0.0.0.0";
     }
 }
