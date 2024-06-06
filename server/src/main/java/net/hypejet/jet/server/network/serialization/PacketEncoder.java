@@ -57,9 +57,9 @@ public final class PacketEncoder extends MessageToByteEncoder<ServerPacket> {
 
             if (compressionThreshold > dataLength) {
                 NetworkUtil.writeVarInt(compressionBuf, 0);
-                compressionBuf.writeBytes(buf);
+                compressionBuf.writeBytes(compressionBuf);
             } else {
-                NetworkUtil.writeVarInt(buf, dataLength);
+                NetworkUtil.writeVarInt(compressionBuf, dataLength);
                 compressionBuf.writeBytes(CompressionUtil.compress(buf.array()));
             }
 
