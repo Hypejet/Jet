@@ -87,7 +87,7 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
                             new ServerListPing.Version(this.server.minecraftVersion(), this.server.protocolVersion()),
                             null, // TODO: An actual list of players online,
                             this.server.configuration().serverListDescription(),
-                            null, // TODO: Add a support for server image,
+                            this.server.serverIcon(),
                             false, // TODO: An actual property
                             false, // TODO: An actual property
                             null
