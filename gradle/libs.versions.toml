@@ -41,7 +41,7 @@ configs-serdes-commonds = { module = "eu.okaeri:okaeri-configs-serdes-commons", 
 
 [bundles]
 # Minecraft text
-adventure = ["adventure", "adventure-minimessage"]
+adventure = ["adventure", "adventure-minimessage", "adventure-serializer-gson"]
 
 # Configuration
 configs = ["configs-snakeyaml", "configs-serdes-commonds"]

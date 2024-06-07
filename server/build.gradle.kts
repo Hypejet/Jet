@@ -8,7 +8,6 @@ dependencies {
     implementation(libs.netty)
     implementation(libs.logback)
     implementation(libs.bundles.configs)
-    implementation(libs.adventure.serializer.gson)
     implementation(project(":api"))
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.platform)
