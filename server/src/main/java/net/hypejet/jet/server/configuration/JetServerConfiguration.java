@@ -25,7 +25,7 @@ import java.nio.file.Path;
  * @since 1.0
  * @author Codestech
  */
-@Headers({@Header("A main configuration file for the Jet sever software"), @Header("")})
+@Headers({@Header("A main configuration file for the Jet sever software."), @Header("")})
 public final class JetServerConfiguration extends OkaeriConfig implements ServerConfiguration {
 
     @Comment("An address that the server should bind to.")

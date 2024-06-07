@@ -46,7 +46,7 @@ public final class ServerPingUtil {
                     return null;
                 }
 
-                if (image.getWidth() == SERVER_ICON_WIDTH || image.getHeight() == SERVER_ICON_HEIGHT) {
+                if (image.getWidth() == SERVER_ICON_WIDTH && image.getHeight() == SERVER_ICON_HEIGHT) {
                     favicon = ServerListPing.createFavicon(image);
                 } else {
                     logger.warn("The server icon is not an image with dimensions of {}x{}", SERVER_ICON_WIDTH,
