@@ -5,12 +5,15 @@
     <conversionRule conversionWord="highlight"
                     converterClass="net.hypejet.jet.server.logback.LogbackHighlightingMessage"/>
 
+    <conversionRule conversionWord="stacktraceHighlight"
+                    converterClass="ch.qos.logback.classic.pattern.ThrowableProxyConverter"/>
+
     <import class="ch.qos.logback.classic.encoder.PatternLayoutEncoder"/>
     <import class="ch.qos.logback.core.ConsoleAppender"/>
 
     <appender name="STDOUT" class="ConsoleAppender">
         <encoder class="PatternLayoutEncoder">
-            <pattern>%highlight([%d{HH:mm:ss} %level] [%logger{0}]: %msg%n)</pattern>
+            <pattern>%highlight([%d{HH:mm:ss} %level] [%logger{0}]: %msg%n%stacktraceHighlight{full})</pattern>
         </encoder>
     </appender>
 
