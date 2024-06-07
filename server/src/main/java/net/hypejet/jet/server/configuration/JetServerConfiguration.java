@@ -47,7 +47,12 @@ public final class JetServerConfiguration extends OkaeriConfig implements Server
     private @MonotonicNonNull NettyTransportSelector transport = NettyTransportSelector.AUTO;
 
     @Comment("A message used during disconnection when a player is trying to join with an unsupported version")
+    @CustomKey("unsupported-version-message")
     private @MonotonicNonNull Component unsupportedVersionMessage = createDefaultUnsupportedVersionMessage();
+
+    @Comment("A message used as a description of server list ping")
+    @CustomKey("server-list-description")
+    private @MonotonicNonNull Component serverListDescription = createDefaultServerListDescription();
 
     private JetServerConfiguration() {}
 
@@ -100,10 +105,18 @@ public final class JetServerConfiguration extends OkaeriConfig implements Server
      * @return the message
      * @since 1.0
      */
+    @Override
     public @NonNull Component unsupportedVersionMessage() {
         if (this.unsupportedVersionMessage == null)
             this.unsupportedVersionMessage = createDefaultUnsupportedVersionMessage();
         return this.unsupportedVersionMessage;
+    }
+
+    @Override
+    public @NonNull Component serverListDescription() {
+        if (this.serverListDescription == null)
+            this.serverListDescription = createDefaultServerListDescription();
+        return this.serverListDescription;
     }
 
     /**
@@ -127,6 +140,10 @@ public final class JetServerConfiguration extends OkaeriConfig implements Server
     private static @NonNull Component createDefaultUnsupportedVersionMessage() {
         return Component.text("Unsupported version! Please use " + JetMinecraftServer.MINECRAFT_VERSION + ".",
                 NamedTextColor.DARK_RED, TextDecoration.BOLD);
+    }
+
+    private static @NonNull Component createDefaultServerListDescription() {
+        return Component.text("A Jet server", NamedTextColor.DARK_PURPLE);
     }
 
     private static @NonNull String defaultAddress() {

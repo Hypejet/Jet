@@ -2,19 +2,23 @@ package net.hypejet.jet.server.network;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import net.hypejet.jet.ping.ServerListPing;
 import net.hypejet.jet.player.login.LoginHandler;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.ClientLoginPacket;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
 import net.hypejet.jet.event.events.packet.PacketReceiveEvent;
+import net.hypejet.jet.protocol.packet.client.ClientStatusPacket;
 import net.hypejet.jet.protocol.packet.client.handshake.ClientHandshakePacket;
 import net.hypejet.jet.protocol.packet.client.login.ClientLoginAcknowledgeLoginPacket;
 import net.hypejet.jet.protocol.packet.client.login.ClientLoginRequestLoginPacket;
+import net.hypejet.jet.protocol.packet.client.status.ClientPingRequestStatusPacket;
+import net.hypejet.jet.protocol.packet.client.status.ClientServerListRequestStatusPacket;
+import net.hypejet.jet.protocol.packet.server.status.ServerListResponseStatusPacket;
+import net.hypejet.jet.protocol.packet.server.status.ServerPingResponseStatusPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.player.SocketPlayerConnection;
 import net.hypejet.jet.server.player.login.DefaultLoginHandler;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +75,25 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
             }
 
             return;
+        }
+
+        if (packet instanceof ClientStatusPacket statusPacket) {
+            switch (statusPacket) {
+                case ClientPingRequestStatusPacket (long payload) ->
+                    this.playerConnection.sendPacket(new ServerPingResponseStatusPacket(payload));
+                case ClientServerListRequestStatusPacket () -> {
+                    ServerListPing ping = new ServerListPing(
+                            new ServerListPing.Version(this.server.minecraftVersion(), this.server.protocolVersion()),
+                            null, // TODO: An actual list of players online,
+                            this.server.configuration().serverListDescription(),
+                            null, // TODO: Add a support for server image,
+                            false, // TODO: An actual property
+                            false, // TODO: An actual property
+                            null
+                    );
+                    this.playerConnection.sendPacket(new ServerListResponseStatusPacket(ping));
+                }
+            }
         }
 
         if (packet instanceof ClientLoginPacket loginPacket) {
