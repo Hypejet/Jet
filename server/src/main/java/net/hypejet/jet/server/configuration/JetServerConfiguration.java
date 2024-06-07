@@ -28,31 +28,39 @@ import java.nio.file.Path;
 @Headers({@Header("A main configuration file for the Jet sever software"), @Header("")})
 public final class JetServerConfiguration extends OkaeriConfig implements ServerConfiguration {
 
-    @Comment("An address that the server should bind to")
+    @Comment("An address that the server should bind to.")
     private @MonotonicNonNull String address = defaultAddress();
 
-    @Comment("A port that the server should bind to")
+    @Comment("A port that the server should bind to.")
     private int port = 25565;
 
-    @Comment("A packet length, since which packets are compressed")
+    @Comment("A packet length, since which packets are compressed.")
     @CustomKey("compression-threshold")
     private int compressionThreshold = 256;
 
     @Comments({
-            @Comment("A transport, which should be used by netty"),
-            @Comment("Do not change if you do not know what it is"),
-            @Comment("Available options are NIO, EPOLL, KQUEUE and AUTO"),
-            @Comment("AUTO will automatically select the \"best\" available transport")
+            @Comment("A transport, which should be used by netty."),
+            @Comment("Do not change if you do not know what it is."),
+            @Comment("Available options are NIO, EPOLL, KQUEUE and AUTO."),
+            @Comment("AUTO will automatically select the \"best\" available transport.")
     })
     private @MonotonicNonNull NettyTransportSelector transport = NettyTransportSelector.AUTO;
 
-    @Comment("A message used during disconnection when a player is trying to join with an unsupported version")
+    @Comment("A message used during disconnection when a player is trying to join with an unsupported version.")
     @CustomKey("unsupported-version-message")
     private @MonotonicNonNull Component unsupportedVersionMessage = createDefaultUnsupportedVersionMessage();
 
-    @Comment("A message used as a description of server list ping")
+    @Comment("A message used as a description of server list ping.")
     @CustomKey("server-list-description")
     private @MonotonicNonNull Component serverListDescription = createDefaultServerListDescription();
+
+    @Comments({
+            @Comment("A max amount of the players, which can be on the server at once."),
+            @Comment("Note that this value by default is used only by for server list pinging,"),
+            @Comment("however, it might be used by other plugins for actually limiting the player count.")
+    })
+    @CustomKey("max-players")
+    private int maxPlayers = 100;
 
     private JetServerConfiguration() {}
 
@@ -112,11 +120,22 @@ public final class JetServerConfiguration extends OkaeriConfig implements Server
         return this.unsupportedVersionMessage;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public @NonNull Component serverListDescription() {
         if (this.serverListDescription == null)
             this.serverListDescription = createDefaultServerListDescription();
         return this.serverListDescription;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int maxPlayers() {
+        return this.maxPlayers;
     }
 
     /**

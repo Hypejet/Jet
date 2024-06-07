@@ -18,11 +18,14 @@ import net.hypejet.jet.protocol.packet.client.status.ClientServerListRequestStat
 import net.hypejet.jet.protocol.packet.server.status.ServerListResponseStatusPacket;
 import net.hypejet.jet.protocol.packet.server.status.ServerPingResponseStatusPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.player.SocketPlayerConnection;
 import net.hypejet.jet.server.player.login.DefaultLoginHandler;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * Represents a {@linkplain ChannelInboundHandlerAdapter channel inbound handler adapter}, which processes
@@ -83,10 +86,13 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
                 case ClientPingRequestStatusPacket (long payload) ->
                     this.playerConnection.sendPacket(new ServerPingResponseStatusPacket(payload));
                 case ClientServerListRequestStatusPacket () -> {
+                    JetServerConfiguration configuration = this.server.configuration();
+
                     ServerListPing ping = new ServerListPing(
                             new ServerListPing.Version(this.server.minecraftVersion(), this.server.protocolVersion()),
-                            null, // TODO: An actual list of players online,
-                            this.server.configuration().serverListDescription(),
+                            // TODO: An actual list of players online
+                            new ServerListPing.Players(configuration.maxPlayers(), 0, List.of()),
+                            configuration.serverListDescription(),
                             this.server.serverIcon(),
                             false, // TODO: An actual property
                             false, // TODO: An actual property
