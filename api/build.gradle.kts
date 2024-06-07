@@ -5,6 +5,7 @@ plugins {
 
 dependencies {
     api(libs.slf4j)
+    api(libs.gson)
     api(libs.bundles.adventure)
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.platform)

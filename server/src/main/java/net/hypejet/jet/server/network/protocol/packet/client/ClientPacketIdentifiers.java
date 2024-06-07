@@ -11,6 +11,9 @@ public final class ClientPacketIdentifiers {
 
     public static final int HANDSHAKE = 0;
 
+    public static final int STATUS_SERVER_LIST_REQUEST = nextStatusId();
+    public static final int STATUS_PING_REQUEST = nextStatusId();
+
     public static final int LOGIN_REQUEST = nextLoginId();
     public static final int LOGIN_ENCRYPTION_RESPONSE = nextLoginId();
     public static final int LOGIN_PLUGIN_MESSAGE_RESPONSE = nextLoginId();

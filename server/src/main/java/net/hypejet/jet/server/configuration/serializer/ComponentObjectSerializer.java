@@ -8,6 +8,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Represents a {@linkplain ObjectSerializer object serializer} allowing for serialization
  * of {@linkplain Component components}.
@@ -21,6 +24,8 @@ public final class ComponentObjectSerializer implements ObjectSerializer<Compone
 
     private static final MiniMessage SERIALIZER = MiniMessage.miniMessage();
 
+    private final Map<Component, String> componentStringCache = new HashMap<>(); // Fix gradient serialization
+
     @Override
     public boolean supports(@NonNull Class<? super Component> type) {
         return Component.class.isAssignableFrom(type);
@@ -28,11 +33,14 @@ public final class ComponentObjectSerializer implements ObjectSerializer<Compone
 
     @Override
     public void serialize(@NonNull Component object, @NonNull SerializationData data, @NonNull GenericsDeclaration generics) {
-        data.setValue(SERIALIZER.serialize(object));
+        data.setValue(this.componentStringCache.computeIfAbsent(object, SERIALIZER::serialize));
     }
 
     @Override
     public Component deserialize(@NonNull DeserializationData data, @NonNull GenericsDeclaration generics) {
-        return SERIALIZER.deserialize(data.getValue(String.class));
+        String value = data.getValue(String.class);
+        Component component = SERIALIZER.deserialize(value);
+        this.componentStringCache.putIfAbsent(component, value);
+        return component;
     }
 }

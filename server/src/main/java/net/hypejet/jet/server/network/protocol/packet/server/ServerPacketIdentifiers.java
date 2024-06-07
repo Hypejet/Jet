@@ -8,6 +8,9 @@ package net.hypejet.jet.server.network.protocol.packet.server;
  */
 public final class ServerPacketIdentifiers {
 
+    public static final int STATUS_SERVER_LIST_RESPONSE = nextStatusId();
+    public static final int STATUS_PING_RESPONSE = nextStatusId();
+
     public static final int LOGIN_DISCONNECT = nextLoginId();
     public static final int LOGIN_ENCRYPTION_REQUEST = nextLoginId();
     public static final int LOGIN_SUCCESS = nextLoginId();

@@ -11,4 +11,6 @@ module net.hypejet.jet {
     requires net.kyori.examination.api;
     requires org.checkerframework.checker.qual;
     requires org.slf4j;
+    requires java.desktop;
+    requires com.google.gson;
 }

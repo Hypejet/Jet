@@ -12,6 +12,8 @@ import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientE
 import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientLoginAcknowledgeLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientLoginRequestLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientPluginMessageResponseLoginPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.status.ClientPingRequestStatusPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.status.ClientServerListRequestStatusPacketCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -36,6 +38,10 @@ public final class ClientPacketRegistry {
 
         // Handshake packets
         register(ProtocolState.HANDSHAKE, new HandshakePacketCodec());
+
+        // Status packets
+        register(ProtocolState.STATUS,  new ClientServerListRequestStatusPacketCodec(),
+                new ClientPingRequestStatusPacketCodec());
 
         // Login packets
         register(ProtocolState.LOGIN, new ClientLoginRequestLoginPacketCodec(),

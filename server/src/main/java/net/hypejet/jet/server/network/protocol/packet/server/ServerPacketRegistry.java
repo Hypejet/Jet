@@ -10,6 +10,8 @@ import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerE
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerEncryptionRequestLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerLoginSuccessLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerPluginMessageRequestLoginPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.status.ServerListResponseStatusPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.status.ServerPingResponseStatusPacketCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -31,6 +33,9 @@ public final class ServerPacketRegistry {
 
     static {
         packetCodecs = new HashMap<>();
+
+        // Status packets
+        register(new ServerListResponseStatusPacketCodec(), new ServerPingResponseStatusPacketCodec());
 
         // Login packets
         register(new ServerDisconnectLoginPacketCodec(), new ServerEncryptionRequestLoginPacketCodec(),
