@@ -9,7 +9,6 @@ import com.google.gson.JsonSerializer;
 import net.hypejet.jet.ping.ServerListPing;
 import net.kyori.adventure.text.Component;
 
-import java.awt.image.BufferedImage;
 import java.lang.reflect.Type;
 import java.util.Map;
 
@@ -45,7 +44,7 @@ public final class ServerListPingSerializer implements JsonSerializer<ServerList
         Component description = src.description();
         if (description != null) object.add(DESCRIPTION_FIELD, context.serialize(description, Component.class));
 
-        BufferedImage favicon = src.favicon();
+        ServerListPing.Favicon favicon = src.favicon();
         if (favicon != null) object.add(FAVICON_FIELD, context.serialize(favicon));
 
         object.addProperty(ENFORCES_SECURE_CHAT_FIELD, src.enforcesSecureChat());
@@ -84,10 +83,10 @@ public final class ServerListPingSerializer implements JsonSerializer<ServerList
         }
 
         JsonElement faviconJson = object.remove(FAVICON_FIELD);
-        BufferedImage favicon = null;
+        ServerListPing.Favicon favicon = null;
 
         if (faviconJson != null) {
-            favicon = context.deserialize(faviconJson, BufferedImage.class);
+            favicon = context.deserialize(faviconJson, ServerListPing.Favicon.class);
         }
 
         boolean enforcesSecureChat = object.remove(ENFORCES_SECURE_CHAT_FIELD).getAsBoolean();

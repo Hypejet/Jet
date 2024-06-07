@@ -15,8 +15,6 @@ import net.hypejet.jet.server.util.NetworkUtil;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.awt.image.BufferedImage;
-
 /**
  * Represents a {@linkplain NetworkCodec network codec}, which reads and writes a {@linkplain ServerListPing server
  * list ping}.
@@ -32,7 +30,7 @@ public final class ServerListPingCodec implements NetworkCodec<ServerListPing> {
 
     private static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(Component.class, new ComponentSerializer())
-            .registerTypeAdapter(BufferedImage.class, new FaviconSerializer())
+            .registerTypeAdapter(ServerListPing.Favicon.class, new FaviconSerializer())
             .registerTypeAdapter(ServerListPing.PingPlayer.class, new PingPlayerSerializer())
             .registerTypeAdapter(ServerListPing.Players.class, new PlayersSerializer())
             .registerTypeAdapter(ServerListPing.class, new ServerListPingSerializer())

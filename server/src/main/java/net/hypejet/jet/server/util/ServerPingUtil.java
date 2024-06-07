@@ -1,5 +1,6 @@
 package net.hypejet.jet.server.util;
 
+import net.hypejet.jet.ping.ServerListPing;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
@@ -26,16 +27,15 @@ public final class ServerPingUtil {
     private ServerPingUtil() {}
 
     /**
-     * Loads an icon of the server, which is used by a {@linkplain net.hypejet.jet.ping.ServerListPing server list
-     * ping}.
+     * Loads a {@linkplain ServerListPing.Favicon server list ping favicon} of the server.
      *
      * @param logger a logger to log errors to
      * @return the icon
      * @since 1.0
      */
-    public static @Nullable BufferedImage loadServerIcon(@NonNull Logger logger) {
+    public static ServerListPing.@Nullable Favicon loadServerIcon(@NonNull Logger logger) {
         File serverIconFile = new File(SERVER_ICON_FILE_NAME);
-        BufferedImage serverIcon = null;
+        ServerListPing.Favicon favicon = null;
 
         if (serverIconFile.exists()) {
             try {
@@ -47,7 +47,7 @@ public final class ServerPingUtil {
                 }
 
                 if (image.getWidth() == SERVER_ICON_WIDTH || image.getHeight() == SERVER_ICON_HEIGHT) {
-                    serverIcon = image;
+                    favicon = ServerListPing.createFavicon(image);
                 } else {
                     logger.warn("The server icon is not an image with dimensions of {}x{}", SERVER_ICON_WIDTH,
                             SERVER_ICON_HEIGHT);
@@ -57,6 +57,6 @@ public final class ServerPingUtil {
             }
         }
 
-        return serverIcon;
+        return favicon;
     }
 }
