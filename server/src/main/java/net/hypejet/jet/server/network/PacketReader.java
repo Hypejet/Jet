@@ -2,6 +2,7 @@ package net.hypejet.jet.server.network;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import net.hypejet.jet.event.events.ping.ServerListPingEvent;
 import net.hypejet.jet.ping.ServerListPing;
 import net.hypejet.jet.player.login.LoginHandler;
 import net.hypejet.jet.protocol.ProtocolState;
@@ -91,6 +92,11 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
                             false, // TODO: An actual property
                             null
                     );
+
+                    ServerListPingEvent pingEvent = new ServerListPingEvent(this.playerConnection, ping);
+                    this.server.eventNode().call(pingEvent);
+                    ping = pingEvent.getPing();
+
                     this.playerConnection.sendPacket(new ServerListResponseStatusPacket(ping));
                 }
             }
