@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.network.protocol.codecs;
+package net.hypejet.jet.server.network.protocol.codecs.profile;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.player.profile.properties.GameProfileProperties;
@@ -7,8 +7,8 @@ import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain NetworkCodec network codec}, which writes or reads a {@linkplain GameProfileProperties game
- * profile properties}.
+ * Represents a {@linkplain NetworkCodec network codec}, which reads and writes a {@linkplain GameProfileProperties
+ * game profile properties}.
  *
  * @since 1.0
  * @author Codestech
@@ -44,7 +44,7 @@ public final class GameProfilePropertiesCodec implements NetworkCodec<GameProfil
     }
 
     /**
-     * Gets an instance of {@linkplain GameProfilePropertiesCodec game profile properties codec}.
+     * Gets an instance of the {@linkplain GameProfilePropertiesCodec game profile properties codec}.
      *
      * @return the instance
      * @since 1.0

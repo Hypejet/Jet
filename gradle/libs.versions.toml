@@ -19,6 +19,9 @@ junit-platform = "1.10.2"
 # Configuration
 configs = "5.0.1"
 
+# Json serialization
+gson = "2.11.0"
+
 [libraries]
 netty = { module = "io.netty:netty-all", version.ref = "netty" }
 
@@ -38,6 +41,9 @@ junit-platform = { module = "org.junit.platform:junit-platform-launcher", versio
 # Configuration
 configs-snakeyaml = { module = "eu.okaeri:okaeri-configs-yaml-snakeyaml", version.ref = "configs" }
 configs-serdes-commonds = { module = "eu.okaeri:okaeri-configs-serdes-commons", version.ref = "configs" }
+
+# Json serialization
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 
 [bundles]
 # Minecraft text

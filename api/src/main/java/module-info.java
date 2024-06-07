@@ -12,5 +12,5 @@ module net.hypejet.jet {
     requires org.checkerframework.checker.qual;
     requires org.slf4j;
     requires java.desktop;
-    requires gson;
+    requires com.google.gson;
 }

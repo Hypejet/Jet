@@ -11,4 +11,4 @@ import net.hypejet.jet.protocol.packet.client.ClientStatusPacket;
  * @author Codestech
  * @see ClientStatusPacket
  */
-public record ClientPingRequestStatusPacket(int payload) implements ClientStatusPacket {}
+public record ClientPingRequestStatusPacket(long payload) implements ClientStatusPacket {}

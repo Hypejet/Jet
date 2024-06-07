@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents something that writes and reads an object from a {@linkplain ByteBuf byte buf}.
+ * Represents something that reads and writes an {@linkplain T object} from a {@linkplain ByteBuf byte buf}.
  *
  * @param <T> a type of the object
  * @since 1.0

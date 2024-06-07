@@ -3,6 +3,7 @@ package net.hypejet.jet.ping;
 import com.google.gson.JsonObject;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.awt.image.BufferedImage;
 import java.util.Collection;
@@ -23,9 +24,9 @@ import java.util.UUID;
  * @author Codestech
  * @see net.hypejet.jet.protocol.packet.server.status.ServerListResponseStatusPacket
  */
-public record ServerListPing(@NonNull Version version, @NonNull Players players, @NonNull Component description,
-                             @NonNull BufferedImage favicon, boolean enforcesSecureChat, boolean previewsChat,
-                             @NonNull JsonObject customData) {
+public record ServerListPing(@NonNull Version version, @Nullable Players players, @Nullable Component description,
+                             @Nullable BufferedImage favicon, boolean enforcesSecureChat, boolean previewsChat,
+                             @Nullable JsonObject customData) {
     /**
      * Represents a version data of the server, which is displayed on a server list.
      *

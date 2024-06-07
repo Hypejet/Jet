@@ -10,4 +10,4 @@ import net.hypejet.jet.protocol.packet.server.ServerStatusPacket;
  * @since 1.0
  * @author Codestech
  */
-public record ServerPingResponseStatusPacket(int payload) implements ServerStatusPacket {}
+public record ServerPingResponseStatusPacket(long payload) implements ServerStatusPacket {}
