@@ -1,9 +1,8 @@
-package net.hypejet.jet.player;
+package net.hypejet.jet.protocol.connection;
 
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
-import net.hypejet.jet.protocol.packet.server.login.ServerDisconnectLoginPacket;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -36,12 +35,12 @@ public interface PlayerConnection {
     @Nullable ServerPacket sendPacket(@NonNull ServerPacket packet);
 
     /**
-     * Sends a {@linkplain ServerDisconnectLoginPacket disconnect packet} and closes the connection.
+     * Sends a disconnection packet and closes the connection.
      *
      * @param reason a reason of the disconnection
      * @since 1.0
      */
-    void kick(@NonNull Component reason);
+    void disconnect(@NonNull Component reason);
 
     /**
      * Gets a compression threshold of the connection, disabled if negative.

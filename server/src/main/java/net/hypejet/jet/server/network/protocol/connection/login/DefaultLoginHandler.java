@@ -1,7 +1,7 @@
-package net.hypejet.jet.server.player.login;
+package net.hypejet.jet.server.network.protocol.connection.login;
 
-import net.hypejet.jet.player.PlayerConnection;
-import net.hypejet.jet.player.login.LoginHandler;
+import net.hypejet.jet.protocol.connection.PlayerConnection;
+import net.hypejet.jet.protocol.connection.login.LoginHandler;
 import net.hypejet.jet.protocol.packet.client.ClientLoginPacket;
 import net.hypejet.jet.protocol.packet.client.login.ClientEncryptionResponseLoginPacket;
 import net.hypejet.jet.protocol.packet.client.login.ClientLoginRequestLoginPacket;

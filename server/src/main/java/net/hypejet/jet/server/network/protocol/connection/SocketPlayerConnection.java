@@ -1,11 +1,12 @@
-package net.hypejet.jet.server.player;
+package net.hypejet.jet.server.network.protocol.connection;
 
 import io.netty.channel.socket.SocketChannel;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.event.events.packet.PacketSendEvent;
-import net.hypejet.jet.player.PlayerConnection;
+import net.hypejet.jet.protocol.connection.PlayerConnection;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
+import net.hypejet.jet.protocol.packet.server.configuration.ServerDisconnectConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.login.ServerEnableCompressionLoginPacket;
 import net.hypejet.jet.protocol.packet.server.login.ServerDisconnectLoginPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
@@ -70,8 +71,18 @@ public final class SocketPlayerConnection implements PlayerConnection {
     }
 
     @Override
-    public void kick(@NonNull Component reason) {
-        this.sendPacket(new ServerDisconnectLoginPacket(reason));
+    public void disconnect(@NonNull Component reason) {
+        ServerPacket packet = switch (this.state) {
+            case LOGIN -> new ServerDisconnectLoginPacket(reason);
+            case CONFIGURATION -> new ServerDisconnectConfigurationPacket(reason);
+            case PLAY -> null; // TODO
+            default -> null;
+        };
+
+        if (packet != null) {
+            this.sendPacket(packet);
+        }
+
         this.close();
     }
 

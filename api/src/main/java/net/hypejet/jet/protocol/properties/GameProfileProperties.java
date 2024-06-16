@@ -1,4 +1,4 @@
-package net.hypejet.jet.player.profile.properties;
+package net.hypejet.jet.protocol.properties;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;

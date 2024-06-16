@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.network.protocol.codecs.profile;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.player.profile.properties.GameProfileProperties;
+import net.hypejet.jet.protocol.properties.GameProfileProperties;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;

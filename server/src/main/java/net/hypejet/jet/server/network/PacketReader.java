@@ -4,7 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import net.hypejet.jet.event.events.ping.ServerListPingEvent;
 import net.hypejet.jet.ping.ServerListPing;
-import net.hypejet.jet.player.login.LoginHandler;
+import net.hypejet.jet.protocol.connection.login.LoginHandler;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.ClientLoginPacket;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
@@ -19,8 +19,8 @@ import net.hypejet.jet.protocol.packet.server.status.ServerListResponseStatusPac
 import net.hypejet.jet.protocol.packet.server.status.ServerPingResponseStatusPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
-import net.hypejet.jet.server.player.SocketPlayerConnection;
-import net.hypejet.jet.server.player.login.DefaultLoginHandler;
+import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
+import net.hypejet.jet.server.network.protocol.connection.login.DefaultLoginHandler;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +74,7 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
             this.playerConnection.setProtocolState(nextState);
 
             if (nextState == ProtocolState.LOGIN && handshakePacket.protocolVersion() != this.server.protocolVersion()) {
-                this.playerConnection.kick(this.server.configuration().unsupportedVersionMessage());
+                this.playerConnection.disconnect(this.server.configuration().unsupportedVersionMessage());
                 return;
             }
 
