@@ -6,6 +6,7 @@ import io.netty.util.collection.IntObjectMap;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.configuration.ClientPluginMessageConfigurationPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.handshake.HandshakePacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientCookieResponseLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientEncryptionResponseLoginPacketCodec;
@@ -47,6 +48,9 @@ public final class ClientPacketRegistry {
         register(ProtocolState.LOGIN, new ClientLoginRequestLoginPacketCodec(),
                 new ClientEncryptionResponseLoginPacketCodec(), new ClientPluginMessageResponseLoginPacketCodec(),
                 new ClientLoginAcknowledgeLoginPacketCodec(), new ClientCookieResponseLoginPacketCodec());
+
+        // Configuration packets
+        register(ProtocolState.CONFIGURATION, new ClientPluginMessageConfigurationPacketCodec());
     }
 
     private ClientPacketRegistry() {}

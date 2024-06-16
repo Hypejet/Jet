@@ -21,6 +21,9 @@ public final class GameProfilePropertiesCodec implements NetworkCodec<GameProfil
 
     private GameProfilePropertiesCodec() {}
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public @NonNull GameProfileProperties read(@NonNull ByteBuf buf) {
         return new GameProfileProperties(
@@ -30,6 +33,9 @@ public final class GameProfilePropertiesCodec implements NetworkCodec<GameProfil
         );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull GameProfileProperties object) {
         NetworkUtil.writeUniqueId(buf, object.uniqueId());

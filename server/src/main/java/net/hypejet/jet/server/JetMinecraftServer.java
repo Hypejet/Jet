@@ -19,8 +19,8 @@ import org.slf4j.LoggerFactory;
  */
 public final class JetMinecraftServer implements MinecraftServer {
 
-    private static final int PROTOCOL_VERSION = 766;
-    public static final String MINECRAFT_VERSION = "1.20.6";
+    private static final int PROTOCOL_VERSION = 767;
+    public static final String MINECRAFT_VERSION = "1.21";
 
     private static final Logger LOGGER  = LoggerFactory.getLogger(MinecraftServer.class);
 

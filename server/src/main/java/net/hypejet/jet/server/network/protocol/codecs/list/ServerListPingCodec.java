@@ -39,11 +39,17 @@ public final class ServerListPingCodec implements NetworkCodec<ServerListPing> {
 
     private ServerListPingCodec() {}
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public @NonNull ServerListPing read(@NonNull ByteBuf buf) {
         return GSON.fromJson(NetworkUtil.readString(buf), ServerListPing.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerListPing object) {
         NetworkUtil.writeString(buf, GSON.toJson(object));

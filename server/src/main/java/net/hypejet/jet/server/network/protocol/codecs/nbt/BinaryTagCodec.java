@@ -36,6 +36,9 @@ public final class BinaryTagCodec implements NetworkCodec<BinaryTag> {
 
     private BinaryTagCodec() {}
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public @NonNull BinaryTag read(@NonNull ByteBuf buf) {
         try {
@@ -52,6 +55,9 @@ public final class BinaryTagCodec implements NetworkCodec<BinaryTag> {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull BinaryTag object) {
         try {

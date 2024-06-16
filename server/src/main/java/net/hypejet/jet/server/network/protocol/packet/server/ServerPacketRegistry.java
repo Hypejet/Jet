@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.configuration.ServerDisconnectConfigurationPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerCookieRequestLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerDisconnectLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerEnableCompressionLoginPacketCodec;
@@ -41,6 +42,9 @@ public final class ServerPacketRegistry {
         register(new ServerDisconnectLoginPacketCodec(), new ServerEncryptionRequestLoginPacketCodec(),
                 new ServerLoginSuccessLoginPacketCodec(), new ServerEnableCompressionLoginPacketCodec(),
                 new ServerPluginMessageRequestLoginPacketCodec(), new ServerCookieRequestLoginPacketCodec());
+
+        // Configuration packets
+        register(new ServerDisconnectConfigurationPacketCodec());
     }
 
     private ServerPacketRegistry() {}

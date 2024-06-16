@@ -20,6 +20,15 @@ public final class ClientPacketIdentifiers {
     public static final int LOGIN_ACKNOWLEDGE = nextLoginId();
     public static final int LOGIN_COOKIE_RESPONSE = nextLoginId();
 
+    public static final int CONFIGURATION_CLIENT_INFORMATION = nextConfigurationId();
+    public static final int CONFIGURATION_COOKIE_RESPONSE = nextConfigurationId();
+    public static final int CONFIGURATION_PLUGIN_MESSAGE = nextConfigurationId();
+    public static final int CONFIGURATION_ACKNOWLEDGE_FINISH_CONFIGURATION = nextConfigurationId();
+    public static final int CONFIGURATION_KEEP_ALIVE = nextConfigurationId();
+    public static final int CONFIGURATION_PONG = nextConfigurationId();
+    public static final int CONFIGURATION_RESOURCE_PACK_RESPONSE = nextConfigurationId();
+    public static final int CONFIGURATION_KNOWN_PACKS = nextConfigurationId();
+
     private static int currentStatusId = 0;
     private static int currentLoginId = 0;
     private static int currentConfigurationId = 0;
