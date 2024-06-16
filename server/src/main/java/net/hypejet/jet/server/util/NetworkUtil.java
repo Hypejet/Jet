@@ -1,13 +1,19 @@
 package net.hypejet.jet.server.util;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.ByteBufUtil;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.nbt.BinaryTagCodec;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.nbt.BinaryTag;
+import net.kyori.adventure.nbt.BinaryTagType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.kyori.adventure.text.serializer.nbt.NBTComponentSerializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -176,6 +182,32 @@ public final class NetworkUtil {
      */
     public static void writeJsonComponent(@NonNull ByteBuf buf, @NonNull Component value) {
         writeString(buf, GsonComponentSerializer.gson().serialize(value));
+    }
+
+    /**
+     * Reads a {@linkplain Component component} serialized to a {@linkplain BinaryTag binary tag} from
+     * a {@linkplain ByteBuf byte buf}.
+     *
+     * @param buf the byte buf
+     * @return the component
+     * @since 1.0
+     * @see BinaryTag
+     */
+    public static @NonNull Component readComponent(@NonNull ByteBuf buf) {
+        return NBTComponentSerializer.nbt().deserialize(BinaryTagCodec.instance().read(buf));
+    }
+
+    /**
+     * Writes a {@linkplain Component component} as a {@linkplain BinaryTag binary tag} to
+     * a {@linkplain ByteBuf byte buf}.
+     *
+     * @param buf the byte buf
+     * @param value the component
+     * @since 1.0
+     * @see BinaryTag
+     */
+    public static void writeComponent(@NonNull ByteBuf buf, @NonNull Component value) {
+        BinaryTagCodec.instance().write(buf, NBTComponentSerializer.nbt().serialize(value));
     }
 
     /**
