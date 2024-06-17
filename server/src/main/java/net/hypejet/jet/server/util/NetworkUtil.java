@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.IntFunction;
 
 /**
  * A utility used for serializing data allowed by Minecraft protocol, but unsupported by default

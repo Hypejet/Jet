@@ -1,7 +1,7 @@
 package net.hypejet.jet.event.node;
 
-import net.hypejet.jet.event.listener.EventListener;
 import net.hypejet.jet.event.annotation.Subscribe;
+import net.hypejet.jet.event.listener.EventListener;
 import net.hypejet.jet.event.priority.EventPriority;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.common.returnsreceiver.qual.This;

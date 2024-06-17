@@ -1,7 +1,7 @@
 package net.hypejet.jet.protocol.packet.server.login;
 
-import net.hypejet.jet.protocol.properties.GameProfileProperties;
 import net.hypejet.jet.protocol.packet.server.ServerLoginPacket;
+import net.hypejet.jet.protocol.properties.GameProfileProperties;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
