@@ -1,24 +1,24 @@
 package net.hypejet.jet.server.util;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.ByteBufUtil;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.nbt.BinaryTagCodec;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTag;
-import net.kyori.adventure.nbt.BinaryTagType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.nbt.NBTComponentSerializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.common.value.qual.IntRange;
+import org.jetbrains.annotations.Range;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.IntFunction;
 
 /**
  * A utility used for serializing data allowed by Minecraft protocol, but unsupported by default
@@ -136,10 +136,24 @@ public final class NetworkUtil {
      * @since 1.0
      */
     public static @NonNull String readString(@NonNull ByteBuf buf) {
+        return readString(buf, MAX_STRING_SIZE);
+    }
+
+    /**
+     * Reads a string from a {@link ByteBuf byte buf}.
+     *
+     * @param buf the byte buf
+     * @param maxLength a maximum length of the string
+     * @return the string
+     * @since 1.0
+     */
+    public static @NonNull String readString(@NonNull ByteBuf buf, @IntRange(to = MAX_STRING_SIZE) int maxLength) {
         int length = readVarInt(buf);
 
-        if (length < 0 || length > MAX_STRING_SIZE)
-            throw new IllegalArgumentException("Invalid length of a string - " + length);
+        if (length < 0 || length > maxLength) {
+            throw new IllegalArgumentException("Invalid length of a string - " + length + ". Maximum allowed length" +
+                    " is " + maxLength);
+        }
 
         if (!buf.isReadable(length))
             throw new IllegalArgumentException("A buffer does not contain at least " + length + " readable bytes");
@@ -159,6 +173,27 @@ public final class NetworkUtil {
      */
     public static void writeString(@NonNull ByteBuf buf, @NonNull String value) {
         writeVarInt(buf, ByteBufUtil.utf8Bytes(value));
+        buf.writeCharSequence(value, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Writes as string to a {@link ByteBuf byte buf}.
+     *
+     * @param buf the byte buf
+     * @param value the string
+     * @param maxLength a maximum length of the string
+     * @since 1.0
+     */
+    public static void writeString(@NonNull ByteBuf buf, @NonNull String value,
+                                   @Range(from = 0, to = MAX_STRING_SIZE) int maxLength) {
+        int length = ByteBufUtil.utf8Bytes(value);
+
+        if (length > maxLength) {
+            throw new IllegalArgumentException("A length of the string - " + length + " - is higher than the " +
+                    "maximum length allowed - " + maxLength);
+        }
+
+        writeVarInt(buf, length);
         buf.writeCharSequence(value, StandardCharsets.UTF_8);
     }
 

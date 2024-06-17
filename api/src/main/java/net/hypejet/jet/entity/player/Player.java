@@ -50,4 +50,20 @@ public interface Player extends Entity, Audience {
      * @see PlayerConnection#disconnect(Component)
      */
     void disconnect(@NotNull Component reason);
+
+    enum ChatMode {
+        ENABLED,
+        COMMANDS_ONLY,
+        HIDDEN
+    }
+
+    enum SkinPart {
+        CAPE,
+        JACKET,
+        LEFT_SLEEVE,
+        RIGHT_SLEEVE,
+        LEFT_PANTS,
+        RIGHT_PANTS,
+        HAT
+    }
 }

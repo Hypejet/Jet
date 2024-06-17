@@ -42,4 +42,9 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
      * @since 1.0
      */
     @NonNull UUID uniqueId();
+
+    enum Hand {
+        LEFT,
+        RIGHT
+    }
 }

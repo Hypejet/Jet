@@ -5,12 +5,19 @@ import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
+import net.hypejet.jet.protocol.packet.client.configuration.ClientAcknowledgeFinishConfigurationPacket;
+import net.hypejet.jet.protocol.packet.client.login.ClientLoginAcknowledgeLoginPacket;
+import net.hypejet.jet.server.network.protocol.packet.EmptyPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.configuration.ClientCookieResponseConfigurationPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.configuration.ClientInformationConfigurationPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.configuration.ClientKnownPacksConfigurationPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.configuration.ClientPluginMessageConfigurationPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.configuration.ClientPongConfigurationPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.configuration.ClientResourcePackResponseConfigurationPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.handshake.HandshakePacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientCookieResponseLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientEncryptionResponseLoginPacketCodec;
-import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientLoginAcknowledgeLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientLoginRequestLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientPluginMessageResponseLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.status.ClientPingRequestStatusPacketCodec;
@@ -47,10 +54,18 @@ public final class ClientPacketRegistry {
         // Login packets
         register(ProtocolState.LOGIN, new ClientLoginRequestLoginPacketCodec(),
                 new ClientEncryptionResponseLoginPacketCodec(), new ClientPluginMessageResponseLoginPacketCodec(),
-                new ClientLoginAcknowledgeLoginPacketCodec(), new ClientCookieResponseLoginPacketCodec());
+                new ClientCookieResponseLoginPacketCodec(),
+                new EmptyPacketCodec<>(ClientPacketIdentifiers.LOGIN_ACKNOWLEDGE,
+                        ClientLoginAcknowledgeLoginPacket.class, ClientLoginAcknowledgeLoginPacket::new));
 
         // Configuration packets
-        register(ProtocolState.CONFIGURATION, new ClientPluginMessageConfigurationPacketCodec());
+        register(ProtocolState.CONFIGURATION, new ClientPluginMessageConfigurationPacketCodec(),
+                new ClientInformationConfigurationPacketCodec(), new ClientCookieResponseConfigurationPacketCodec(),
+                new ClientPongConfigurationPacketCodec(), new ClientResourcePackResponseConfigurationPacketCodec(),
+                new ClientKnownPacksConfigurationPacketCodec(),
+                new EmptyPacketCodec<>(ClientPacketIdentifiers.CONFIGURATION_ACKNOWLEDGE_FINISH_CONFIGURATION,
+                        ClientAcknowledgeFinishConfigurationPacket.class,
+                        ClientAcknowledgeFinishConfigurationPacket::new));
     }
 
     private ClientPacketRegistry() {}

@@ -1,0 +1,31 @@
+package net.hypejet.jet.protocol.packet.client.configuration;
+
+import net.hypejet.jet.pack.DataPack;
+import net.hypejet.jet.protocol.packet.client.ClientConfigurationPacket;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Collection;
+import java.util.List;
+
+/**
+ * Represents a {@linkplain ClientConfigurationPacket client configuration packet}, which is sent by a client
+ * to inform server about data packs that are present on the client.
+ *
+ * @param dataPacks the data packs
+ * @since 1.0
+ * @author Codestech
+ * @see DataPack
+ * @see ClientConfigurationPacket
+ */
+public record ClientKnownPacksConfigurationPacket(@NonNull Collection<DataPack> dataPacks)
+        implements ClientConfigurationPacket {
+    /**
+     * Constructs the {@linkplain ClientKnownPacksConfigurationPacket known packs configuration packet}.
+     *
+     * @param dataPacks the data packs
+     * @since 1.0
+     */
+    public ClientKnownPacksConfigurationPacket {
+        dataPacks = List.copyOf(dataPacks);
+    }
+}
