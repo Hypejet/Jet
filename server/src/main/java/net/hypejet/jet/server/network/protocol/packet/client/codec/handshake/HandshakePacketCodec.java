@@ -3,7 +3,6 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.handshake;
 import io.netty.buffer.ByteBuf;
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
-import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.handshake.ClientHandshakePacket;
 import net.hypejet.jet.protocol.packet.client.handshake.ClientHandshakePacket.HandshakeIntent;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
