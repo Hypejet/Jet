@@ -11,6 +11,7 @@ import net.hypejet.jet.server.network.protocol.packet.EmptyPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.configuration.ClientCookieResponseConfigurationPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.configuration.ClientInformationConfigurationPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.configuration.ClientKeepAliveConfigurationPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.configuration.ClientKnownPacksConfigurationPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.configuration.ClientPluginMessageConfigurationPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.configuration.ClientPongConfigurationPacketCodec;
@@ -62,7 +63,7 @@ public final class ClientPacketRegistry {
         register(ProtocolState.CONFIGURATION, new ClientPluginMessageConfigurationPacketCodec(),
                 new ClientInformationConfigurationPacketCodec(), new ClientCookieResponseConfigurationPacketCodec(),
                 new ClientPongConfigurationPacketCodec(), new ClientResourcePackResponseConfigurationPacketCodec(),
-                new ClientKnownPacksConfigurationPacketCodec(),
+                new ClientKnownPacksConfigurationPacketCodec(), new ClientKeepAliveConfigurationPacketCodec(),
                 new EmptyPacketCodec<>(ClientPacketIdentifiers.CONFIGURATION_ACKNOWLEDGE_FINISH_CONFIGURATION,
                         ClientAcknowledgeFinishConfigurationPacket.class,
                         ClientAcknowledgeFinishConfigurationPacket::new));
