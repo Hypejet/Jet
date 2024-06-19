@@ -1,32 +1,31 @@
 package net.hypejet.jet.server.network.protocol.codecs.profile;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.protocol.properties.GameProfileProperties;
+import net.hypejet.jet.protocol.profile.GameProfile;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain NetworkCodec network codec}, which reads and writes a {@linkplain GameProfileProperties
- * game profile properties}.
+ * Represents a {@linkplain NetworkCodec network codec}, which reads and writes a {@linkplain GameProfile game profile}.
  *
  * @since 1.0
  * @author Codestech
- * @see GameProfileProperties
+ * @see GameProfile
  * @see NetworkCodec
  */
-public final class GameProfilePropertiesCodec implements NetworkCodec<GameProfileProperties> {
+public final class GameProfileCodec implements NetworkCodec<GameProfile> {
 
-    private static final GameProfilePropertiesCodec INSTANCE = new GameProfilePropertiesCodec();
+    private static final GameProfileCodec INSTANCE = new GameProfileCodec();
 
-    private GameProfilePropertiesCodec() {}
+    private GameProfileCodec() {}
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public @NonNull GameProfileProperties read(@NonNull ByteBuf buf) {
-        return new GameProfileProperties(
+    public @NonNull GameProfile read(@NonNull ByteBuf buf) {
+        return new GameProfile(
                 NetworkUtil.readUniqueId(buf),
                 NetworkUtil.readString(buf),
                 buf.readBoolean() ? NetworkUtil.readString(buf) : null
@@ -37,7 +36,7 @@ public final class GameProfilePropertiesCodec implements NetworkCodec<GameProfil
      * {@inheritDoc}
      */
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull GameProfileProperties object) {
+    public void write(@NonNull ByteBuf buf, @NonNull GameProfile object) {
         NetworkUtil.writeUniqueId(buf, object.uniqueId());
         NetworkUtil.writeString(buf, object.username());
 
@@ -50,12 +49,12 @@ public final class GameProfilePropertiesCodec implements NetworkCodec<GameProfil
     }
 
     /**
-     * Gets an instance of the {@linkplain GameProfilePropertiesCodec game profile properties codec}.
+     * Gets an instance of the {@linkplain GameProfileCodec game profile properties codec}.
      *
      * @return the instance
      * @since 1.0
      */
-    public static @NonNull GameProfilePropertiesCodec instance() {
+    public static @NonNull GameProfileCodec instance() {
         return INSTANCE;
     }
 }

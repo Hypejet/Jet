@@ -2,6 +2,7 @@ package net.hypejet.jet.server.network.protocol.connection;
 
 import io.netty.channel.socket.SocketChannel;
 import net.hypejet.jet.MinecraftServer;
+import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.packet.PacketSendEvent;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.connection.PlayerConnection;
@@ -10,6 +11,7 @@ import net.hypejet.jet.protocol.packet.server.configuration.ServerDisconnectConf
 import net.hypejet.jet.protocol.packet.server.login.ServerDisconnectLoginPacket;
 import net.hypejet.jet.protocol.packet.server.login.ServerEnableCompressionLoginPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.session.Session;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -30,8 +32,12 @@ public final class SocketPlayerConnection implements PlayerConnection {
     private final SocketChannel channel;
     private final JetMinecraftServer server;
 
+    private Session<?> session;
+
     private ProtocolState state = ProtocolState.HANDSHAKE;
     private int compressionThreshold = -1;
+
+    private Player player;
 
     /**
      * Constructs a {@link SocketPlayerConnection socket player connection}.
@@ -96,6 +102,11 @@ public final class SocketPlayerConnection implements PlayerConnection {
         return this.server;
     }
 
+    @Override
+    public @Nullable Player player() {
+        return this.player;
+    }
+
     /**
      * Closes the {@link PlayerConnection player connection}.
      *
@@ -139,5 +150,38 @@ public final class SocketPlayerConnection implements PlayerConnection {
      */
     public @NonNull SocketChannel getChannel() {
         return this.channel;
+    }
+
+    /**
+     * Gets a current {@linkplain Session session} of this connection.
+     *
+     * @return the session, {@code null} if the connection is not in any session
+     * @since 1.0
+     */
+    public @Nullable Session<?> getSession() {
+        return this.session;
+    }
+
+    /**
+     * Sets a current {@linkplain Session session} of this connection.
+     *
+     * @param session the session
+     * @since 1.0
+     */
+    public void setSession(@Nullable Session<?> session) {
+        this.session = session;
+    }
+
+    /**
+     * Initializes the {@linkplain Player player} on this connection.
+     *
+     * @param player the player
+     * @since 1.0
+     * @throws IllegalArgumentException if the player was already initialized
+     */
+    public void initializePlayer(@NonNull Player player) {
+        if (this.player != null)
+            throw new IllegalArgumentException("The player was already initialized");
+        this.player = player;
     }
 }

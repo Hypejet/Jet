@@ -1,6 +1,7 @@
 package net.hypejet.jet.protocol.connection;
 
 import net.hypejet.jet.MinecraftServer;
+import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
 import net.kyori.adventure.text.Component;
@@ -57,4 +58,12 @@ public interface PlayerConnection {
      * @since 1.0
      */
     @NonNull MinecraftServer server();
+
+    /**
+     * Gets a {@linkplain Player player}, which is using this connection.
+     *
+     * @return the player. {@code null} if not initialized yet
+     * @since 1.0
+     */
+    @Nullable Player player();
 }

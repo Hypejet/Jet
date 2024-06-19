@@ -2,9 +2,9 @@ package net.hypejet.jet.server.test.network.protocol.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.hypejet.jet.protocol.properties.GameProfileProperties;
+import net.hypejet.jet.protocol.profile.GameProfile;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.profile.GameProfilePropertiesCodec;
+import net.hypejet.jet.server.network.protocol.codecs.profile.GameProfileCodec;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,14 +21,12 @@ import java.util.UUID;
 public final class CodecTest {
     @Test
     public void testGameProfileCodec() {
-        GameProfileProperties properties = new GameProfileProperties(
-                UUID.randomUUID(), "some-username", "some-signature"
-        );
+        GameProfile profile = new GameProfile(UUID.randomUUID(), "some-username", "some-signature");
 
-        GameProfilePropertiesCodec codec = GameProfilePropertiesCodec.instance();
+        GameProfileCodec codec = GameProfileCodec.instance();
         ByteBuf buf = Unpooled.buffer();
 
-        codec.write(buf, properties);
-        Assertions.assertEquals(properties, codec.read(buf));
+        codec.write(buf, profile);
+        Assertions.assertEquals(profile, codec.read(buf));
     }
 }

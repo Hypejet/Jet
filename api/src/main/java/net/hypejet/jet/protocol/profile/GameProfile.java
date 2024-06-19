@@ -1,4 +1,4 @@
-package net.hypejet.jet.protocol.properties;
+package net.hypejet.jet.protocol.profile;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -14,4 +14,4 @@ import java.util.UUID;
  * @since 1.0
  * @author Codestech
  */
-public record GameProfileProperties(@NonNull UUID uniqueId, @NonNull String username, @Nullable String signature) {}
+public record GameProfile(@NonNull UUID uniqueId, @NonNull String username, @Nullable String signature) {}

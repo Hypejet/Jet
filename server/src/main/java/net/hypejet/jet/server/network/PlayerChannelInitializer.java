@@ -8,6 +8,7 @@ import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.serialization.PacketDecoder;
 import net.hypejet.jet.server.network.serialization.PacketEncoder;
+import net.hypejet.jet.server.session.Session;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,10 +44,17 @@ public final class PlayerChannelInitializer extends ChannelInitializer<SocketCha
     @Override
     protected void initChannel(SocketChannel ch) {
         SocketPlayerConnection playerConnection = new SocketPlayerConnection(ch, this.minecraftServer);
+
         ch.pipeline()
                 .addFirst(new PacketEncoder(playerConnection))
                 .addFirst(new PacketReader(playerConnection, this.minecraftServer))
                 .addFirst(new PacketDecoder(playerConnection));
+
+        ch.closeFuture().addListener(future -> {
+            Session<?> session = playerConnection.getSession();
+            if (session == null) return;
+            session.sessionHandler().onConnectionClose(future.cause());
+        });
     }
 
     @Override
