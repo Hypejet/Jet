@@ -3,21 +3,23 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.configuratio
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientKnownPacksConfigurationPacket;
 import net.hypejet.jet.server.network.protocol.codecs.pack.DataPackNetworkCodec;
-import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
+import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain PacketCodec packet codec}, which reads and writes
+ * Represents a {@linkplain ClientPacketCodec packet codec}, which reads and writes
  * a {@linkplain ClientKnownPacksConfigurationPacket known packs configuration packet}.
  *
  * @since 1.0
  * @author Codestech
  * @see ClientKnownPacksConfigurationPacket
- * @see PacketCodec
+ * @see ClientPacketCodec
  */
-public final class ClientKnownPacksConfigurationPacketCodec extends PacketCodec<ClientKnownPacksConfigurationPacket> {
+public final class ClientKnownPacksConfigurationPacketCodec
+        extends ClientPacketCodec<ClientKnownPacksConfigurationPacket> {
     /**
      * Constructs the {@linkplain ClientKnownPacksConfigurationPacketCodec known packs configuration packet codec}.
      *
@@ -37,5 +39,11 @@ public final class ClientKnownPacksConfigurationPacketCodec extends PacketCodec<
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ClientKnownPacksConfigurationPacket object) {
         NetworkUtil.writeCollection(buf, DataPackNetworkCodec.instance(), object.dataPacks());
+    }
+
+    @Override
+    public void handle(@NonNull ClientKnownPacksConfigurationPacket packet,
+                       @NonNull SocketPlayerConnection connection) {
+        // TODO
     }
 }

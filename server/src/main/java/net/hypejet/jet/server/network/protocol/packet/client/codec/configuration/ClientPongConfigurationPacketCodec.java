@@ -2,20 +2,22 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.configuratio
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientPongConfigurationPacket;
-import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
+import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain PacketCodec packet codec}, which reads and writes
+ * Represents a {@linkplain ClientPacketCodec client packet codec}, which reads and writes
  * a {@linkplain ClientPongConfigurationPacket pong configuration packet}.
  *
  * @since 1.0
  * @author Codestech
  * @see ClientPongConfigurationPacket
- * @see PacketCodec
+ * @see ClientPacketCodec
  */
-public final class ClientPongConfigurationPacketCodec extends PacketCodec<ClientPongConfigurationPacket> {
+public final class ClientPongConfigurationPacketCodec
+        extends ClientPacketCodec<ClientPongConfigurationPacket> {
     /**
      * Constructs a {@linkplain ClientPongConfigurationPacketCodec pong configuration packet codec}.
      *
@@ -33,5 +35,10 @@ public final class ClientPongConfigurationPacketCodec extends PacketCodec<Client
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ClientPongConfigurationPacket object) {
         buf.writeInt(object.pingIdentifier());
+    }
+
+    @Override
+    public void handle(@NonNull ClientPongConfigurationPacket packet, @NonNull SocketPlayerConnection connection) {
+        // TODO
     }
 }

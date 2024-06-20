@@ -8,24 +8,25 @@ import net.hypejet.jet.server.network.protocol.codecs.settings.ChatModeNetworkCo
 import net.hypejet.jet.server.network.protocol.codecs.settings.HandNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.settings.LocaleNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.settings.SkinPartCollectionNetworkCodec;
-import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
+import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
 import java.util.Locale;
 
 /**
- * Represents a {@linkplain PacketCodec packet codec}, which reads and writes
+ * Represents a {@linkplain ClientPacketCodec packet codec}, which reads and writes
  * a {@linkplain ClientInformationConfigurationPacket client information configuration packet}.
  *
  * @since 1.0
  * @author Codestech
  * @see ClientInformationConfigurationPacket
- * @see PacketCodec
+ * @see ClientPacketCodec
  */
 public final class ClientInformationConfigurationPacketCodec
-        extends PacketCodec<ClientInformationConfigurationPacket> {
+        extends ClientPacketCodec<ClientInformationConfigurationPacket> {
     /**
      * Constructs a {@linkplain ClientInformationConfigurationPacketCodec client information configuration packet
      * codec}.
@@ -64,5 +65,11 @@ public final class ClientInformationConfigurationPacketCodec
         HandNetworkCodec.instance().write(buf, object.mainHand());
         buf.writeBoolean(object.textFilteringEnabled());
         buf.writeBoolean(object.allowServerListings());
+    }
+
+    @Override
+    public void handle(@NonNull ClientInformationConfigurationPacket packet,
+                       @NonNull SocketPlayerConnection connection) {
+        // TODO
     }
 }

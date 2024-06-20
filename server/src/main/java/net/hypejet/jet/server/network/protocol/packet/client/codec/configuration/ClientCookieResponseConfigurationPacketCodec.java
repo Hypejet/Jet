@@ -2,22 +2,23 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.configuratio
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientCookieResponseConfigurationPacket;
-import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
+import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain PacketCodec packet codec}, which reads and writes
+ * Represents a {@linkplain ClientPacketCodec client packet codec}, which reads and writes
  * a {@linkplain ClientCookieResponseConfigurationPacket cookie response configuration packet}.
  *
  * @since 1.0
  * @author Codestech
  * @see ClientCookieResponseConfigurationPacket
- * @see PacketCodec
+ * @see ClientPacketCodec
  */
 public final class ClientCookieResponseConfigurationPacketCodec
-        extends PacketCodec<ClientCookieResponseConfigurationPacket> {
+        extends ClientPacketCodec<ClientCookieResponseConfigurationPacket> {
     /**
      * Constructs the {@linkplain ClientCookieResponseConfigurationPacketCodec cookie response configuration packet
      * codec}.
@@ -46,5 +47,11 @@ public final class ClientCookieResponseConfigurationPacketCodec
         if (data != null) {
             NetworkUtil.writeByteArray(buf, data);
         }
+    }
+
+    @Override
+    public void handle(@NonNull ClientCookieResponseConfigurationPacket packet,
+                       @NonNull SocketPlayerConnection connection) {
+        // TODO
     }
 }

@@ -5,8 +5,9 @@ import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientResourcePackResponseConfigurationPacket;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientResourcePackResponseConfigurationPacket.Result;
-import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
+import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -14,16 +15,16 @@ import java.util.EnumMap;
 import java.util.UUID;
 
 /**
- * Represents a {@linkplain PacketCodec packet codec}, which reads and writes
+ * Represents a {@linkplain ClientPacketCodec client packet codec}, which reads and writes
  * a {@linkplain ClientResourcePackResponseConfigurationPacket resource pack response configuration packet}.
  *
  * @since 1.0
  * @author Codestech
  * @see ClientResourcePackResponseConfigurationPacket
- * @see PacketCodec
+ * @see ClientPacketCodec
  */
 public final class ClientResourcePackResponseConfigurationPacketCodec
-        extends PacketCodec<ClientResourcePackResponseConfigurationPacket> {
+        extends ClientPacketCodec<ClientResourcePackResponseConfigurationPacket> {
 
     private static final IntObjectMap<Result> idToResultMap = new IntObjectHashMap<>();
     private static final EnumMap<Result, Integer> resultToIdMap = new EnumMap<>(Result.class);
@@ -69,5 +70,11 @@ public final class ClientResourcePackResponseConfigurationPacketCodec
     public void write(@NonNull ByteBuf buf, @NonNull ClientResourcePackResponseConfigurationPacket object) {
         NetworkUtil.writeUniqueId(buf, object.uniqueId());
         NetworkUtil.writeVarInt(buf, resultToIdMap.get(object.result()));
+    }
+
+    @Override
+    public void handle(@NonNull ClientResourcePackResponseConfigurationPacket packet,
+                       @NonNull SocketPlayerConnection connection) {
+        // TODO
     }
 }

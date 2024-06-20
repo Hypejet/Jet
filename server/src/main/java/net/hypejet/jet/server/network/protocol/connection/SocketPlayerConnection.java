@@ -98,7 +98,7 @@ public final class SocketPlayerConnection implements PlayerConnection {
     }
 
     @Override
-    public @NonNull MinecraftServer server() {
+    public @NonNull JetMinecraftServer server() {
         return this.server;
     }
 

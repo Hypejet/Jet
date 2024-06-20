@@ -2,22 +2,23 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.configuratio
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientPluginMessageConfigurationPacket;
-import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
+import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain PacketCodec packet codec}, which reads and writes
+ * Represents a {@linkplain ClientPacketCodec client packet codec}, which reads and writes
  * a {@linkplain ClientPluginMessageConfigurationPacket plugin message configuration packet}.
  *
  * @since 1.0
  * @author Codestech
  * @see ClientPluginMessageConfigurationPacket
- * @see PacketCodec
+ * @see ClientPacketCodec
  */
 public final class ClientPluginMessageConfigurationPacketCodec
-        extends PacketCodec<ClientPluginMessageConfigurationPacket> {
+        extends ClientPacketCodec<ClientPluginMessageConfigurationPacket> {
     /**
      * Constructs a {@linkplain ClientPluginMessageConfigurationPacketCodec plugin message configuration packet codec}.
      *
@@ -39,5 +40,11 @@ public final class ClientPluginMessageConfigurationPacketCodec
     public void write(@NonNull ByteBuf buf, @NonNull ClientPluginMessageConfigurationPacket object) {
         NetworkUtil.writeIdentifier(buf, object.identifier());
         buf.writeBytes(object.data());
+    }
+
+    @Override
+    public void handle(@NonNull ClientPluginMessageConfigurationPacket packet,
+                       @NonNull SocketPlayerConnection connection) {
+        // TODO
     }
 }

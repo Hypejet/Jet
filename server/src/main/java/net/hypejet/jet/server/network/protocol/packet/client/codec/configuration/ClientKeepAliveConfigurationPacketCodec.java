@@ -2,20 +2,22 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.configuratio
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientKeepAliveConfigurationPacket;
-import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
+import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain PacketCodec packet codec}, which reads and writes
+ * Represents a {@linkplain ClientPacketCodec client packet codec}, which reads and writes
  * a {@linkplain ClientKeepAliveConfigurationPacket keep alive configuration packet}.
  *
  * @since 1.0
  * @author Codestech
  * @see ClientKeepAliveConfigurationPacket
- * @see PacketCodec
+ * @see ClientPacketCodec
  */
-public final class ClientKeepAliveConfigurationPacketCodec extends PacketCodec<ClientKeepAliveConfigurationPacket> {
+public final class ClientKeepAliveConfigurationPacketCodec
+        extends ClientPacketCodec<ClientKeepAliveConfigurationPacket> {
     /**
      * Constructs the {@linkplain ClientKeepAliveConfigurationPacketCodec keep alive configuration packet codec}.
      *
@@ -33,5 +35,11 @@ public final class ClientKeepAliveConfigurationPacketCodec extends PacketCodec<C
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ClientKeepAliveConfigurationPacket object) {
         buf.writeLong(object.keepAliveIdentifier());
+    }
+
+    @Override
+    public void handle(@NonNull ClientKeepAliveConfigurationPacket packet,
+                       @NonNull SocketPlayerConnection connection) {
+        // TODO
     }
 }

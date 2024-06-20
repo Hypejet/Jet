@@ -2,21 +2,23 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.login;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.login.ClientCookieResponseLoginPacket;
-import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
+import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
+import net.hypejet.jet.server.session.JetLoginSession;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain PacketCodec packet codec}, which reads and writes
+ * Represents a {@linkplain ClientPacketCodec client packet codec}, which reads and writes
  * a {@linkplain ClientCookieResponseLoginPacket cookie response login packet}.
  *
  * @since 1.0
  * @author Codestech
  * @see ClientCookieResponseLoginPacket
- * @see PacketCodec
+ * @see ClientPacketCodec
  */
-public final class ClientCookieResponseLoginPacketCodec extends PacketCodec<ClientCookieResponseLoginPacket> {
+public final class ClientCookieResponseLoginPacketCodec extends ClientPacketCodec<ClientCookieResponseLoginPacket> {
     /**
      * Constructs the {@linkplain ClientCookieResponseLoginPacketCodec cookie response packet codec}.
      *
@@ -44,5 +46,11 @@ public final class ClientCookieResponseLoginPacketCodec extends PacketCodec<Clie
         if (data != null) {
             NetworkUtil.writeByteArray(buf, data);
         }
+    }
+
+    @Override
+    public void handle(@NonNull ClientCookieResponseLoginPacket packet, @NonNull SocketPlayerConnection connection) {
+        JetLoginSession session = JetLoginSession.asLoginSession(connection.getSession());
+        session.sessionHandler().onCookieResponse(packet, session);
     }
 }

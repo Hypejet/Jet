@@ -10,7 +10,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 1.0
  * @author Codestech
  */
-public interface Session<H extends SessionHandler<?, ?>> {
+public interface Session<H extends SessionHandler> {
     /**
      * Gets a {@linkplain SessionHandler session handler}, which handles this session.
      *

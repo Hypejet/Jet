@@ -1,6 +1,5 @@
 package net.hypejet.jet.session.handler;
 
-import net.hypejet.jet.protocol.packet.client.ClientLoginPacket;
 import net.hypejet.jet.protocol.packet.client.login.ClientCookieResponseLoginPacket;
 import net.hypejet.jet.protocol.packet.client.login.ClientEncryptionResponseLoginPacket;
 import net.hypejet.jet.protocol.packet.client.login.ClientLoginAcknowledgeLoginPacket;
@@ -18,7 +17,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see LoginSession
  * @see SessionHandler
  */
-public interface LoginSessionHandler extends SessionHandler<ClientLoginPacket, LoginSession> {
+public interface LoginSessionHandler extends SessionHandler {
     /**
      * Called when a {@linkplain ClientLoginRequestLoginPacket login request packet} is received.
      *
