@@ -109,7 +109,7 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
                     JetLoginSession session = new JetLoginSession(this.playerConnection, loginSessionHandler);
                     this.playerConnection.setSession(session);
 
-                    Thread.ofPlatform()
+                    Thread.ofVirtual()
                             .uncaughtExceptionHandler((thread, exception) ->
                                     handleLoginError(exception, this.playerConnection))
                             .start(() -> {
