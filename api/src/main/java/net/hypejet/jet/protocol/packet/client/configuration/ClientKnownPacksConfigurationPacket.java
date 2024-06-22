@@ -9,9 +9,9 @@ import java.util.List;
 
 /**
  * Represents a {@linkplain ClientConfigurationPacket client configuration packet}, which is sent by a client
- * to inform server about data packs that are present on the client.
+ * to inform server about data dataPacks that are present on the client.
  *
- * @param dataPacks the data packs
+ * @param dataPacks the data dataPacks
  * @since 1.0
  * @author Codestech
  * @see DataPack
@@ -20,9 +20,9 @@ import java.util.List;
 public record ClientKnownPacksConfigurationPacket(@NonNull Collection<DataPack> dataPacks)
         implements ClientConfigurationPacket {
     /**
-     * Constructs the {@linkplain ClientKnownPacksConfigurationPacket known packs configuration packet}.
+     * Constructs the {@linkplain ClientKnownPacksConfigurationPacket known dataPacks configuration packet}.
      *
-     * @param dataPacks the data packs
+     * @param dataPacks the data dataPacks
      * @since 1.0
      */
     public ClientKnownPacksConfigurationPacket {

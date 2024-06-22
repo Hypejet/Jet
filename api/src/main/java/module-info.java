@@ -13,4 +13,5 @@ module net.hypejet.jet {
     requires org.slf4j;
     requires java.desktop;
     requires com.google.gson;
+    requires net.kyori.adventure.nbt;
 }

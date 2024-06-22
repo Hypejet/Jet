@@ -11,7 +11,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Represents a {@linkplain ClientPacketCodec packet codec}, which reads and writes
- * a {@linkplain ClientKnownPacksConfigurationPacket known packs configuration packet}.
+ * a {@linkplain ClientKnownPacksConfigurationPacket known dataPacks configuration packet}.
  *
  * @since 1.0
  * @author Codestech
@@ -21,7 +21,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class ClientKnownPacksConfigurationPacketCodec
         extends ClientPacketCodec<ClientKnownPacksConfigurationPacket> {
     /**
-     * Constructs the {@linkplain ClientKnownPacksConfigurationPacketCodec known packs configuration packet codec}.
+     * Constructs the {@linkplain ClientKnownPacksConfigurationPacketCodec known dataPacks configuration packet codec}.
      *
      * @since 1.0
      */
