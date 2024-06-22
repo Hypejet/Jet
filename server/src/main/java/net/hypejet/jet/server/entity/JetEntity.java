@@ -37,16 +37,24 @@ public class JetEntity implements Entity {
      * @since 1.0
      */
     public JetEntity(@NonNull EntityType entityType, @NonNull UUID uniqueId) {
+        this(entityType, uniqueId, Pointers.builder()
+                .withStatic(Identity.UUID, uniqueId)
+                .build());
+    }
+
+    /**
+     * Constructs an {@linkplain JetEntity entity}.
+     *
+     * @param entityType a type of the entity
+     * @param uniqueId an unique identifier of the entity
+     * @param pointers a pointers of the entity
+     * @since 1.0
+     */
+    public JetEntity(@NonNull EntityType entityType, @NonNull UUID uniqueId, @NonNull Pointers pointers) {
         this.entityType = entityType;
         this.entityId = NEXT_ENTITY_ID.getAndIncrement();
-
         this.identity = Identity.identity(uniqueId);
-
-        Pointers.Builder pointersBuilder = Pointers.builder();
-        pointersBuilder.withStatic(Identity.UUID, uniqueId);
-        this.applyPointers(pointersBuilder);
-
-        this.pointers = pointersBuilder.build();
+        this.pointers = pointers;
     }
 
     @Override
@@ -84,12 +92,4 @@ public class JetEntity implements Entity {
         // TODO: Custom names
         return HoverEvent.showEntity(op.apply(HoverEvent.ShowEntity.showEntity(this.entityType, this.uniqueId())));
     }
-
-    /**
-     * Applies additional pointers of the entity to a {@linkplain Pointers.Builder pointers builder}.
-     *
-     * @param builder the builder
-     * @since 1.0
-     */
-    public void applyPointers(Pointers.@NonNull Builder builder) {}
 }

@@ -49,7 +49,10 @@ public final class JetPlayer extends JetEntity implements Player {
      * @since 1.0
      */
     public JetPlayer(@NonNull UUID uniqueId, @NonNull String username, @NonNull PlayerConnection connection) {
-        super(EntityType.PLAYER, uniqueId);
+        super(EntityType.PLAYER, uniqueId, Pointers.builder()
+                .withStatic(Identity.UUID, uniqueId)
+                .withStatic(Identity.NAME, username)
+                .build());
 
         this.username = username;
         this.connection = connection;
@@ -88,11 +91,6 @@ public final class JetPlayer extends JetEntity implements Player {
     @Override
     public @NonNull MinecraftServer server() {
         return this.connection.server();
-    }
-
-    @Override
-    public void applyPointers(Pointers.@NonNull Builder pointers) {
-        pointers.withStatic(Identity.NAME, this.username);
     }
 
     /**
