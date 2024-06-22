@@ -9,7 +9,6 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Locale;
@@ -31,7 +30,7 @@ public interface Player extends Entity, Audience {
      * @return the username
      * @since 1.0
      */
-    @NotNull String username();
+    @NonNull String username();
 
     /**
      * Gets a {@linkplain PlayerConnection player connection} of the player.
@@ -39,7 +38,7 @@ public interface Player extends Entity, Audience {
      * @return the player connection
      * @since 1.0-
      */
-    @NotNull PlayerConnection connection();
+    @NonNull PlayerConnection connection();
 
     /**
      * A shortcut for {@link PlayerConnection#sendPacket(ServerPacket)}, which is accessed by {@link #connection()}.
@@ -48,7 +47,7 @@ public interface Player extends Entity, Audience {
      * @since 1.0
      * @see PlayerConnection#sendPacket(ServerPacket)
      */
-    void sendPacket(@NotNull ServerPacket packet);
+    void sendPacket(@NonNull ServerPacket packet);
 
     /**
      * A shortcut for {@link PlayerConnection#disconnect(Component)}, which is accessed by {@link #connection()}.
@@ -57,7 +56,7 @@ public interface Player extends Entity, Audience {
      * @since 1.0
      * @see PlayerConnection#disconnect(Component)
      */
-    void disconnect(@NotNull Component reason);
+    void disconnect(@NonNull Component reason);
 
     /**
      * Gets a {@linkplain Settings settings} of the player.

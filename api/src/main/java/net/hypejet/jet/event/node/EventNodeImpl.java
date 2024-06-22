@@ -5,7 +5,6 @@ import net.hypejet.jet.event.listener.EventListener;
 import net.hypejet.jet.event.priority.EventPriority;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.common.returnsreceiver.qual.This;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +50,7 @@ final class EventNodeImpl<E> implements EventNode<E> {
     }
 
     @Override
-    public @NotNull EventNode<E> addChild(@NotNull EventNode<? extends E> node) {
+    public @NonNull EventNode<E> addChild(@NonNull EventNode<? extends E> node) {
         if (!this.eventClass.isAssignableFrom(node.eventClass())) {
             LOGGER.error("You cannot add a child to an event node, of which an event class is not assignable " +
                     "from an event class of the child", new IllegalArgumentException(node.toString()));
@@ -81,7 +80,7 @@ final class EventNodeImpl<E> implements EventNode<E> {
     }
 
     @Override
-    public @NotNull EventNode<E> addListener(@NotNull EventListener<? extends E> listener) {
+    public @NonNull EventNode<E> addListener(@NonNull EventListener<? extends E> listener) {
         if (!this.eventClass.isAssignableFrom(listener.eventClass())) {
             LOGGER.error("You cannot add a listener in an event node, of which an event class is not assignable " +
                     "from an event class of the listener", new IllegalArgumentException(listener.toString()));
@@ -106,7 +105,7 @@ final class EventNodeImpl<E> implements EventNode<E> {
     }
 
     @Override
-    public @NotNull EventNode<E> addListener(@NotNull Object listener) {
+    public @NonNull EventNode<E> addListener(@NonNull Object listener) {
         Class<?> listenerClass = listener.getClass();
         String listenerClassName = listenerClass.getSimpleName();
 
@@ -152,7 +151,7 @@ final class EventNodeImpl<E> implements EventNode<E> {
     }
 
     @Override
-    public @NotNull EventNode<E> call(@NotNull E event) {
+    public @NonNull EventNode<E> call(@NonNull E event) {
         if (!this.eventClass.isAssignableFrom(event.getClass())) {
             LOGGER.error("You cannot call an event in an event node, of which event class is not assignable from an " +
                     "event class of the event", new IllegalArgumentException(event.toString()));
@@ -181,7 +180,7 @@ final class EventNodeImpl<E> implements EventNode<E> {
     }
 
     @Override
-    public @NotNull EventPriority priority() {
+    public @NonNull EventPriority priority() {
         return this.priority;
     }
 

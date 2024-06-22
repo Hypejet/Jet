@@ -17,7 +17,6 @@ import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
@@ -57,22 +56,22 @@ public final class JetPlayer extends JetEntity implements Player {
     }
 
     @Override
-    public @NotNull String username() {
+    public @NonNull String username() {
         return this.username;
     }
 
     @Override
-    public @NotNull PlayerConnection connection() {
+    public @NonNull PlayerConnection connection() {
         return this.connection;
     }
 
     @Override
-    public void sendPacket(@NotNull ServerPacket packet) {
+    public void sendPacket(@NonNull ServerPacket packet) {
         this.connection.sendPacket(packet);
     }
 
     @Override
-    public void disconnect(@NotNull Component reason) {
+    public void disconnect(@NonNull Component reason) {
         this.connection.disconnect(reason);
     }
 
