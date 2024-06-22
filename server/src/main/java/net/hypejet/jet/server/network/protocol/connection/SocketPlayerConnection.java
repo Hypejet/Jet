@@ -2,7 +2,6 @@ package net.hypejet.jet.server.network.protocol.connection;
 
 import io.netty.channel.socket.SocketChannel;
 import net.hypejet.jet.MinecraftServer;
-import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.packet.PacketSendEvent;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.connection.PlayerConnection;
@@ -11,6 +10,7 @@ import net.hypejet.jet.protocol.packet.server.configuration.ServerDisconnectConf
 import net.hypejet.jet.protocol.packet.server.login.ServerDisconnectLoginPacket;
 import net.hypejet.jet.protocol.packet.server.login.ServerEnableCompressionLoginPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.session.Session;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -37,7 +37,7 @@ public final class SocketPlayerConnection implements PlayerConnection {
     private ProtocolState state = ProtocolState.HANDSHAKE;
     private int compressionThreshold = -1;
 
-    private Player player;
+    private JetPlayer player;
 
     /**
      * Constructs a {@link SocketPlayerConnection socket player connection}.
@@ -103,7 +103,7 @@ public final class SocketPlayerConnection implements PlayerConnection {
     }
 
     @Override
-    public @Nullable Player player() {
+    public @Nullable JetPlayer player() {
         return this.player;
     }
 
@@ -173,13 +173,13 @@ public final class SocketPlayerConnection implements PlayerConnection {
     }
 
     /**
-     * Initializes the {@linkplain Player player} on this connection.
+     * Initializes the {@linkplain JetPlayer player} on this connection.
      *
      * @param player the player
      * @since 1.0
      * @throws IllegalArgumentException if the player was already initialized
      */
-    public void initializePlayer(@NonNull Player player) {
+    public void initializePlayer(@NonNull JetPlayer player) {
         if (this.player != null)
             throw new IllegalArgumentException("The player was already initialized");
         this.player = player;

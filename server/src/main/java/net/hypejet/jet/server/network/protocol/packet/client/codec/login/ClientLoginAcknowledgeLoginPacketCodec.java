@@ -3,11 +3,15 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.login;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.login.ClientLoginAcknowledgeLoginPacket;
+import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
+import net.hypejet.jet.server.session.JetConfigurationSession;
 import net.hypejet.jet.server.session.JetLoginSession;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents a {@linkplain ClientPacketCodec client packet codec}, which reads and writes
@@ -47,6 +51,8 @@ public final class ClientLoginAcknowledgeLoginPacketCodec
         session.sessionHandler().onLoginAcknowledge(packet, session);
 
         connection.setProtocolState(ProtocolState.CONFIGURATION);
-        connection.setSession(null); // The login session has ended
+
+        JetPlayer player = Objects.requireNonNull(connection.player(), "Player cannot be null");
+        connection.setSession(new JetConfigurationSession(player));
     }
 }

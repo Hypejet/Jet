@@ -1,6 +1,5 @@
 package net.hypejet.jet.server.session;
 
-import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.login.PlayerLoginEvent;
 import net.hypejet.jet.protocol.connection.PlayerConnection;
 import net.hypejet.jet.protocol.packet.server.login.ServerLoginSuccessLoginPacket;
@@ -168,9 +167,8 @@ public final class JetLoginSession implements LoginSession, Session<LoginSession
                             throw new IllegalArgumentException("The unique identifier was not set");
                         }
 
-                        Player player = new JetPlayer(uniqueId, username, this.connection);
+                        JetPlayer player = new JetPlayer(uniqueId, username, this.connection);
                         this.connection.initializePlayer(player);
-
 
                         PlayerLoginEvent loginEvent = new PlayerLoginEvent(player);
                         this.connection.server().eventNode().call(loginEvent);
