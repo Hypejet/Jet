@@ -19,6 +19,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see ClientPacketCodec
  */
 public final class ClientLoginRequestLoginPacketCodec extends ClientPacketCodec<ClientLoginRequestLoginPacket> {
+
+    private static final int MAX_USERNAME_LENGTH = 16;
+
     /**
      * Constructs a {@linkplain ClientLoginRequestLoginPacketCodec login request packet codec}..
      *
@@ -30,12 +33,15 @@ public final class ClientLoginRequestLoginPacketCodec extends ClientPacketCodec<
 
     @Override
     public @NonNull ClientLoginRequestLoginPacket read(@NonNull ByteBuf buf) {
-        return new ClientLoginRequestLoginPacket(NetworkUtil.readString(buf), NetworkUtil.readUniqueId(buf));
+        return new ClientLoginRequestLoginPacket(
+                NetworkUtil.readString(buf, MAX_USERNAME_LENGTH),
+                NetworkUtil.readUniqueId(buf)
+        );
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ClientLoginRequestLoginPacket object) {
-        NetworkUtil.writeString(buf, object.username());
+        NetworkUtil.writeString(buf, object.username(), MAX_USERNAME_LENGTH);
         NetworkUtil.writeUniqueId(buf, object.uniqueId());
     }
 

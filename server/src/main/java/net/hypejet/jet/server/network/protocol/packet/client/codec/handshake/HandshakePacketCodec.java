@@ -25,6 +25,8 @@ import java.util.EnumMap;
  */
 public final class HandshakePacketCodec extends ClientPacketCodec<ClientHandshakePacket> {
 
+    private static final int MAX_ADDRESS_LENGTH = 255;
+
     private static final IntObjectMap<HandshakeIntent> idToIntentMap = new IntObjectHashMap<>();
     private static final EnumMap<HandshakeIntent, Integer> intentToIdMap = new EnumMap<>(HandshakeIntent.class);
 
@@ -47,7 +49,7 @@ public final class HandshakePacketCodec extends ClientPacketCodec<ClientHandshak
     @Override
     public @NonNull ClientHandshakePacket read(@NonNull ByteBuf buf) {
         int protocolVersion = NetworkUtil.readVarInt(buf);
-        String serverAddress = NetworkUtil.readString(buf);
+        String serverAddress = NetworkUtil.readString(buf, MAX_ADDRESS_LENGTH);
         int serverPort = buf.readUnsignedShort();
 
         int intentIdentifier = NetworkUtil.readVarInt(buf);
@@ -63,7 +65,7 @@ public final class HandshakePacketCodec extends ClientPacketCodec<ClientHandshak
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ClientHandshakePacket object) {
         NetworkUtil.writeVarInt(buf, object.protocolVersion());
-        NetworkUtil.writeString(buf, object.serverAddress());
+        NetworkUtil.writeString(buf, object.serverAddress(), MAX_ADDRESS_LENGTH);
         buf.writeShort(object.serverPort());
         NetworkUtil.writeVarInt(buf, intentToIdMap.get(object.intent()));
     }
