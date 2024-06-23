@@ -2,9 +2,12 @@ package net.hypejet.jet.server.session;
 
 import io.netty.util.collection.LongObjectHashMap;
 import io.netty.util.collection.LongObjectMap;
+import net.hypejet.jet.event.events.player.configuration.PlayerConfigurationStartEvent;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientKeepAliveConfigurationPacket;
+import net.hypejet.jet.protocol.packet.server.configuration.ServerFinishConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerKeepAliveConfigurationPacket;
 import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.util.thread.JetThreadFactory;
 import net.hypejet.jet.session.handler.SessionHandler;
 import net.kyori.adventure.text.Component;
@@ -20,6 +23,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -35,10 +39,10 @@ import java.util.concurrent.locks.ReentrantLock;
 public final class JetConfigurationSession implements Session<JetConfigurationSession>, SessionHandler {
 
     private static final int TIME_OUT_DURATION = 20;
-    private static final TimeUnit TIME_OUT_TIME_UNIT = TimeUnit.SECONDS;
+    private static final TimeUnit TIME_OUT_UNIT = TimeUnit.SECONDS;
 
     private static final int KEEP_ALIVE_INTERVAL = 10;
-    private static final TimeUnit KEEP_ALIVE_TIME_UNIT = TimeUnit.SECONDS;
+    private static final TimeUnit KEEP_ALIVE_UNIT = TimeUnit.SECONDS;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JetConfigurationSession.class);
 
@@ -49,6 +53,9 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
 
     private final JetPlayer player;
 
+    private final CountDownLatch acknowledgeLatch = new CountDownLatch(1);
+    private boolean finished;
+
     /**
      * Constructs the {@linkplain JetConfigurationSession configuration session}.
      *
@@ -57,13 +64,41 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
      */
     public JetConfigurationSession(@NonNull JetPlayer player) {
         this.player = player;
+
         this.keepAliveExecutor = Executors.newSingleThreadScheduledExecutor(JetThreadFactory.builder()
                 .name("Keep alive thread - " + player.username())
                 .threadType(JetThreadFactory.ThreadType.VIRTUAL)
                 .exceptionHandler((thread, throwable) -> this.handleThrowable(throwable))
                 .build());
-        this.keepAliveExecutor.scheduleAtFixedRate(this::requestKeepAlive, KEEP_ALIVE_INTERVAL, KEEP_ALIVE_INTERVAL,
-                KEEP_ALIVE_TIME_UNIT);
+        this.keepAliveExecutor.scheduleAtFixedRate(this::requestKeepAlive, 0, KEEP_ALIVE_INTERVAL, KEEP_ALIVE_UNIT);
+
+        Thread.ofVirtual()
+                .uncaughtExceptionHandler((thread, throwable) -> this.handleThrowable(throwable))
+                .start(() -> {
+                    SocketPlayerConnection connection = this.player.connection();
+
+                    connection.server().eventNode().call(new PlayerConfigurationStartEvent(this.player));
+                    this.keepAliveExecutor.shutdown();
+
+                    try {
+                        if (!this.keepAliveExecutor.awaitTermination(TIME_OUT_DURATION, TIME_OUT_UNIT)) {
+                            this.handleTimeOut();
+                        }
+                    } catch (InterruptedException exception) {
+                        throw new RuntimeException(exception);
+                    }
+
+                    this.finished = true;
+                    connection.sendPacket(new ServerFinishConfigurationPacket());
+
+                    try {
+                        if (!this.acknowledgeLatch.await(TIME_OUT_DURATION, TIME_OUT_UNIT)) {
+                            throw new TimeoutException("The configuration was not acknowledged on time");
+                        }
+                    } catch (InterruptedException | TimeoutException exception) {
+                        throw new RuntimeException(exception);
+                    }
+                });
     }
 
     @Override
@@ -90,6 +125,17 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
         } finally {
             this.keepAliveLock.unlock();
         }
+    }
+
+    /**
+     * Handles a client response for a configuration finish.
+     *
+     * @since 1.0
+     */
+    public void handleFinishAcknowledge() {
+        if (!this.finished)
+            throw new IllegalArgumentException("The configuration state was not finished");
+        this.acknowledgeLatch.countDown();
     }
 
     /**
@@ -127,7 +173,7 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
         this.player.sendPacket(new ServerKeepAliveConfigurationPacket(keepAliveId));
 
         try {
-            if (!latch.await(TIME_OUT_DURATION, TIME_OUT_TIME_UNIT)) {
+            if (!latch.await(TIME_OUT_DURATION, TIME_OUT_UNIT)) {
                 this.keepAliveExecutor.shutdownNow();
                 this.handleTimeOut();
             }

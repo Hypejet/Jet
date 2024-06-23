@@ -12,9 +12,9 @@ import net.hypejet.jet.event.events.player.PlayerResourcePackResponseEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.pack.DataPack;
 import net.hypejet.jet.pack.ResourcePackResult;
-import net.hypejet.jet.protocol.connection.PlayerConnection;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
 import net.hypejet.jet.server.entity.JetEntity;
+import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.pointer.Pointers;
@@ -42,7 +42,7 @@ public final class JetPlayer extends JetEntity implements Player {
     private static final Key BRAND_PLUGIN_MESSAGE_IDENTIFIER = Key.key("brand");
 
     private final String username;
-    private final PlayerConnection connection;
+    private final SocketPlayerConnection connection;
 
     private @MonotonicNonNull Settings settings;
     private @MonotonicNonNull String clientBrand;
@@ -57,7 +57,7 @@ public final class JetPlayer extends JetEntity implements Player {
      * @param connection a connection of the player
      * @since 1.0
      */
-    public JetPlayer(@NonNull UUID uniqueId, @NonNull String username, @NonNull PlayerConnection connection) {
+    public JetPlayer(@NonNull UUID uniqueId, @NonNull String username, @NonNull SocketPlayerConnection connection) {
         super(EntityType.PLAYER, uniqueId, Pointers.builder()
                 .withStatic(Identity.UUID, uniqueId)
                 .withStatic(Identity.NAME, username)
@@ -73,7 +73,7 @@ public final class JetPlayer extends JetEntity implements Player {
     }
 
     @Override
-    public @NonNull PlayerConnection connection() {
+    public @NonNull SocketPlayerConnection connection() {
         return this.connection;
     }
 

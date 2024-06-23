@@ -1,6 +1,7 @@
 package net.hypejet.jet.server.network.protocol.packet.client.codec.configuration;
 
 import io.netty.buffer.ByteBuf;
+import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientAcknowledgeFinishConfigurationPacket;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
@@ -44,6 +45,9 @@ public final class ClientAcknowledgeFinishConfigurationPacketCodec
     public void handle(@NonNull ClientAcknowledgeFinishConfigurationPacket packet,
                        @NonNull SocketPlayerConnection connection) {
         JetConfigurationSession session = JetConfigurationSession.asConfigurationSession(connection.getSession());
-        // TODO
+        session.handleFinishAcknowledge();
+
+        connection.setProtocolState(ProtocolState.PLAY);
+        connection.setSession(null); // The configuration state has finished
     }
 }
