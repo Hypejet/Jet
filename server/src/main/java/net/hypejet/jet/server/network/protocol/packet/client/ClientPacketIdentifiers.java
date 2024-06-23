@@ -37,7 +37,8 @@ public final class ClientPacketIdentifiers {
     private ClientPacketIdentifiers() {}
 
     /**
-     * Gets a next available identifier for a {@linkplain ??? client status packet}.
+     * Gets a next available identifier for a {@linkplain net.hypejet.jet.protocol.packet.client.ClientStatusPacket
+     * client status packet}.
      *
      * @return the identifier
      * @since 1.0
@@ -58,7 +59,8 @@ public final class ClientPacketIdentifiers {
     }
 
     /**
-     * Gets a next available identifier for a {@linkplain ??? client configuration packet}.
+     * Gets a next available identifier for
+     * a {@linkplain net.hypejet.jet.protocol.packet.client.ClientConfigurationPacket client configuration packet}.
      *
      * @return the identifier
      * @since 1.0

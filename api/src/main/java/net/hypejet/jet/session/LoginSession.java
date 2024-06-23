@@ -76,6 +76,7 @@ public interface LoginSession {
      * Finishes the session.
      *
      * @since 1.0
+     * @throws IllegalArgumentException if the session is already finished
      */
     void finish();
 }

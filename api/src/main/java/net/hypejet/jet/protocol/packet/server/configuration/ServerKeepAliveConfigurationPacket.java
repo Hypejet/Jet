@@ -11,4 +11,4 @@ import net.hypejet.jet.protocol.packet.server.ServerConfigurationPacket;
  * @author Codestech
  * @see ServerConfigurationPacket
  */
-public record ServerKeepAliveConfigurationPacket(int keepAliveIdentifier) implements ServerConfigurationPacket {}
+public record ServerKeepAliveConfigurationPacket(long keepAliveIdentifier) implements ServerConfigurationPacket {}

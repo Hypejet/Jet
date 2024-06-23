@@ -13,7 +13,7 @@ import java.util.UUID;
  * @param result a result of the load
  * @since 1.0
  * @author Codestech
- * @see ???
+ * @see net.hypejet.jet.protocol.packet.server.configuration.ServerAddResourcePackConfigurationPacket
  * @see Result
  * @see ClientConfigurationPacket
  */

@@ -4,8 +4,6 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.Packet;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.util.function.Supplier;
-
 /**
  * Represents a {@linkplain PacketCodec packet codec}, which does not process any packet data.
  *
@@ -16,24 +14,24 @@ import java.util.function.Supplier;
  */
 public final class EmptyPacketCodec<P extends Packet> extends PacketCodec<P> {
 
-    private final Supplier<P> packetSupplier;
+    private final P packet;
 
     /**
      * Constructs the {@linkplain EmptyPacketCodec empty packet codec}.
      *
      * @param packetId an identifier of the packet
      * @param packetClass a class of the packet
-     * @param packetSupplier a supplier providing an empty instance of the packet
+     * @param packet an instance of the packet, which is always returned in {@link #read(ByteBuf)}
      * @since 1.0
      */
-    public EmptyPacketCodec(int packetId, @NonNull Class<P> packetClass, @NonNull Supplier<P> packetSupplier) {
+    public EmptyPacketCodec(int packetId, @NonNull Class<P> packetClass, @NonNull P packet) {
         super(packetId, packetClass);
-        this.packetSupplier = packetSupplier;
+        this.packet = packet;
     }
 
     @Override
     public @NonNull P read(@NonNull ByteBuf buf) {
-        return this.packetSupplier.get();
+        return this.packet;
     }
 
     @Override

@@ -350,6 +350,35 @@ public final class NetworkUtil {
     }
 
     /**
+     * Reads a variable-length integer array from a {@linkplain ByteBuf byte buf}.
+     *
+     * @param buf the byte buf
+     * @return the integer array
+     * @since 1.0
+     */
+    public static int @NonNull [] readVarIntArray(@NonNull ByteBuf buf) {
+        int[] array = new int[readVarInt(buf)];
+        for (int index = 0; index < array.length; index++) {
+            array[index] = readVarInt(buf);
+        }
+        return array;
+    }
+
+    /**
+     * Writes a variable-length integer array to a {@linkplain ByteBuf byte buf}.
+     *
+     * @param buf the byte buf
+     * @param value the integer array
+     * @since 1.0
+     */
+    public static void writeVarIntArray(@NonNull ByteBuf buf, int @NonNull [] value) {
+        writeVarInt(buf, value.length);
+        for (int integer : value) {
+            writeVarInt(buf, integer);
+        }
+    }
+
+    /**
      * Reads all remaining bytes from a {@linkplain ByteBuf byte buf}.
      *
      * @param buf the byte buf

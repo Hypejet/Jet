@@ -39,7 +39,7 @@ public record ServerRegistryDataConfigurationPacket(@NonNull Key registry, @NonN
      *
      * @param identifier an identifier of the entry
      * @param data a data of the entry
-     * @see 1.0
+     * @since 1.0
      * @author Codestech
      * @see ServerRegistryDataConfigurationPacket
      */

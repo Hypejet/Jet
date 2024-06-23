@@ -44,7 +44,8 @@ public final class ServerPacketIdentifiers {
     private ServerPacketIdentifiers() {}
 
     /**
-     * Gets a next available identifier for a {@linkplain ??? server status packet}.
+     * Gets a next available identifier for a {@linkplain net.hypejet.jet.protocol.packet.server.ServerStatusPacket
+     * server status packet}.
      *
      * @return the identifier
      * @since 1.0
@@ -65,7 +66,8 @@ public final class ServerPacketIdentifiers {
     }
 
     /**
-     * Gets a next available identifier for a {@linkplain ??? server configuration packet}.
+     * Gets a next available identifier for
+     * a {@linkplain net.hypejet.jet.protocol.packet.server.ServerConfigurationPacket server configuration packet}.
      *
      * @return the identifier
      * @since 1.0
