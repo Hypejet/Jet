@@ -5,6 +5,7 @@ import net.hypejet.jet.protocol.packet.client.configuration.ClientAcknowledgeFin
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
+import net.hypejet.jet.server.session.JetConfigurationSession;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -42,6 +43,7 @@ public final class ClientAcknowledgeFinishConfigurationPacketCodec
     @Override
     public void handle(@NonNull ClientAcknowledgeFinishConfigurationPacket packet,
                        @NonNull SocketPlayerConnection connection) {
+        JetConfigurationSession session = JetConfigurationSession.asConfigurationSession(connection.getSession());
         // TODO
     }
 }
