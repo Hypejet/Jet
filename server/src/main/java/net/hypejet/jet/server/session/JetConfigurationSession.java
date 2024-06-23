@@ -191,6 +191,13 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
         this.player.disconnect(Component.text("Timed out"));
     }
 
+    @Override
+    public void onConnectionClose(@Nullable Throwable cause) {
+        if (!this.keepAliveExecutor.isShutdown()) {
+            this.keepAliveExecutor.shutdownNow();
+        }
+    }
+
     /**
      * Casts a {@linkplain Session session} to the {@linkplain JetConfigurationSession configuration session}
      * or throws an exception.
