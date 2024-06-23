@@ -2,10 +2,10 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.status;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.status.ClientPingRequestStatusPacket;
-import net.hypejet.jet.protocol.packet.server.status.ServerPingResponseStatusPacket;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
+import net.hypejet.jet.server.session.JetStatusSession;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -39,6 +39,7 @@ public final class ClientPingRequestStatusPacketCodec extends ClientPacketCodec<
 
     @Override
     public void handle(@NonNull ClientPingRequestStatusPacket packet, @NonNull SocketPlayerConnection connection) {
-        connection.sendPacket(new ServerPingResponseStatusPacket(packet.payload()));
+        JetStatusSession session = JetStatusSession.asLoginSession(connection.getSession());
+        session.handlePingRequest(packet);
     }
 }

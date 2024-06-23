@@ -11,12 +11,15 @@ import net.hypejet.jet.protocol.packet.server.login.ServerDisconnectLoginPacket;
 import net.hypejet.jet.protocol.packet.server.login.ServerEnableCompressionLoginPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.session.JetHandshakeSession;
 import net.hypejet.jet.server.session.Session;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 /**
  * Represents an implementation of {@link PlayerConnection}, which is handled by netty's
@@ -32,7 +35,7 @@ public final class SocketPlayerConnection implements PlayerConnection {
     private final SocketChannel channel;
     private final JetMinecraftServer server;
 
-    private Session<?> session;
+    private Session<?> session = new JetHandshakeSession(this);
 
     private ProtocolState state = ProtocolState.HANDSHAKE;
     private int compressionThreshold = -1;
@@ -108,12 +111,13 @@ public final class SocketPlayerConnection implements PlayerConnection {
     }
 
     /**
-     * Closes the {@link PlayerConnection player connection}.
+     * Closes the {@link PlayerConnection player connection}, nothing will.
      *
      * @since 1.0
      */
     public void close() {
         try {
+            if (!this.channel.isActive()) return; // The connection is already closed
             this.channel.close().sync();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -158,7 +162,7 @@ public final class SocketPlayerConnection implements PlayerConnection {
      * @return the session, {@code null} if the connection is not in any session
      * @since 1.0
      */
-    public @Nullable Session<?> getSession() {
+    public @NonNull Session<?> getSession() {
         return this.session;
     }
 
@@ -168,8 +172,8 @@ public final class SocketPlayerConnection implements PlayerConnection {
      * @param session the session
      * @since 1.0
      */
-    public void setSession(@Nullable Session<?> session) {
-        this.session = session;
+    public void setSession(@NonNull Session<?> session) {
+        this.session = Objects.requireNonNull(session, "The session must not be null");
     }
 
     /**

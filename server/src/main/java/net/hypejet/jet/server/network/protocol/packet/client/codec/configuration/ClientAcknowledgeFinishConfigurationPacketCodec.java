@@ -48,6 +48,6 @@ public final class ClientAcknowledgeFinishConfigurationPacketCodec
         session.handleFinishAcknowledge();
 
         connection.setProtocolState(ProtocolState.PLAY);
-        connection.setSession(null); // The configuration state has finished
+        // TODO: Switch to a play session
     }
 }

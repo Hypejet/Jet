@@ -106,6 +106,13 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
         return this;
     }
 
+    @Override
+    public void onConnectionClose(@Nullable Throwable cause) {
+        if (!this.keepAliveExecutor.isShutdown()) {
+            this.keepAliveExecutor.shutdownNow();
+        }
+    }
+
     /**
      * Handles a client response for a keep alive packet.
      *
@@ -188,14 +195,7 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
      * @since 1.0
      */
     private void handleTimeOut() {
-        this.player.disconnect(Component.text("Timed out"));
-    }
-
-    @Override
-    public void onConnectionClose(@Nullable Throwable cause) {
-        if (!this.keepAliveExecutor.isShutdown()) {
-            this.keepAliveExecutor.shutdownNow();
-        }
+        this.player.disconnect(Session.TIME_OUT_DISCONNECTION_MESSAGE);
     }
 
     /**
