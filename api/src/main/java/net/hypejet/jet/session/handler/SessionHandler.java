@@ -1,6 +1,5 @@
 package net.hypejet.jet.session.handler;
 
-import net.hypejet.jet.protocol.packet.client.ClientPacket;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**

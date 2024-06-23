@@ -1,7 +1,6 @@
 package net.hypejet.jet.server.session;
 
 import net.hypejet.jet.event.events.login.PlayerLoginEvent;
-import net.hypejet.jet.protocol.connection.PlayerConnection;
 import net.hypejet.jet.protocol.packet.server.login.ServerLoginSuccessLoginPacket;
 import net.hypejet.jet.protocol.profile.GameProfile;
 import net.hypejet.jet.server.entity.player.JetPlayer;

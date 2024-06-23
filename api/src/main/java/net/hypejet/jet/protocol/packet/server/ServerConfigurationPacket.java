@@ -1,10 +1,10 @@
 package net.hypejet.jet.protocol.packet.server;
 
 import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.protocol.packet.server.configuration.ServerCustomLinksConfigurationPacket;
-import net.hypejet.jet.protocol.packet.server.configuration.ServerCustomReportDetailsConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerAddResourcePackConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerCookieRequestConfigurationPacket;
+import net.hypejet.jet.protocol.packet.server.configuration.ServerCustomLinksConfigurationPacket;
+import net.hypejet.jet.protocol.packet.server.configuration.ServerCustomReportDetailsConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerDisconnectConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerFeatureFlagsConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerFinishConfigurationPacket;
