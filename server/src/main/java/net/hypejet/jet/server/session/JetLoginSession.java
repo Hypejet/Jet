@@ -64,6 +64,7 @@ public final class JetLoginSession implements LoginSession, Session<LoginSession
         this.sessionHandler = sessionHandler;
 
         Thread.ofVirtual()
+                .name("Login session")
                 .uncaughtExceptionHandler((thread, throwable) -> this.handleThrowable(throwable))
                 .start(() -> {
                     try {

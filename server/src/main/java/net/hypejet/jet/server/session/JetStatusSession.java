@@ -50,6 +50,7 @@ public final class JetStatusSession implements Session<JetStatusSession>, Sessio
         this.connection = connection;
 
         Thread.ofVirtual()
+                .name("Status session")
                 .uncaughtExceptionHandler((thread, throwable) -> this.handleThrowable(throwable))
                 .start(() -> {
                     try {
