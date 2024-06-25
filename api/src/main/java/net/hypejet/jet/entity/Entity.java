@@ -1,5 +1,6 @@
 package net.hypejet.jet.entity;
 
+import net.hypejet.jet.data.entity.type.EntityType;
 import net.kyori.adventure.identity.Identified;
 import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.pointer.Pointered;

@@ -4,7 +4,7 @@
  * @since 1.0
  * @author Codestech
  */
-// We use modules to allow classes extend and implement sealed interfaces from other packages
+// We use modules to allow classes implement sealed interfaces and extend java classes from other packages
 module net.hypejet.jet {
     requires net.kyori.adventure;
     requires net.kyori.adventure.key;
@@ -14,4 +14,5 @@ module net.hypejet.jet {
     requires java.desktop;
     requires com.google.gson;
     requires net.kyori.adventure.nbt;
+    requires net.hypejet.jet.data;
 }
