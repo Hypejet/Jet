@@ -2,8 +2,26 @@ package net.hypejet.jet.server.network.protocol.packet.server;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
+import net.hypejet.jet.protocol.packet.server.configuration.ServerFinishConfigurationPacket;
+import net.hypejet.jet.protocol.packet.server.configuration.ServerResetChatConfigurationPacket;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
+import net.hypejet.jet.server.network.protocol.packet.EmptyPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.configuration.ServerAddResourcePackConfigurationPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.configuration.ServerCookieRequestConfigurationPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.configuration.ServerCustomLinksConfigurationPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.configuration.ServerCustomReportDetailsConfigurationPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.configuration.ServerDisconnectConfigurationPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.configuration.ServerFeatureFlagsConfigurationPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.configuration.ServerKeepAliveConfigurationPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.configuration.ServerKnownPacksConfigurationPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.configuration.ServerPingConfigurationPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.configuration.ServerPluginMessageConfigurationPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.configuration.ServerRegistryDataConfigurationPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.configuration.ServerRemoveResourcePackConfigurationPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.configuration.ServerStoreCookieConfigurationPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.configuration.ServerTransferConfigurationPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.configuration.ServerUpdateTagsConfigurationPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerCookieRequestLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerDisconnectLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerEnableCompressionLoginPacketCodec;
@@ -41,6 +59,20 @@ public final class ServerPacketRegistry {
         register(new ServerDisconnectLoginPacketCodec(), new ServerEncryptionRequestLoginPacketCodec(),
                 new ServerLoginSuccessLoginPacketCodec(), new ServerEnableCompressionLoginPacketCodec(),
                 new ServerPluginMessageRequestLoginPacketCodec(), new ServerCookieRequestLoginPacketCodec());
+
+        // Configuration packets
+        register(new ServerAddResourcePackConfigurationPacketCodec(),
+                new ServerCookieRequestConfigurationPacketCodec(), new ServerCustomLinksConfigurationPacketCodec(),
+                new ServerCustomReportDetailsConfigurationPacketCodec(), new ServerDisconnectConfigurationPacketCodec(),
+                new ServerFeatureFlagsConfigurationPacketCodec(), new ServerKeepAliveConfigurationPacketCodec(),
+                new ServerKnownPacksConfigurationPacketCodec(), new ServerPingConfigurationPacketCodec(),
+                new ServerPluginMessageConfigurationPacketCodec(), new ServerRegistryDataConfigurationPacketCodec(),
+                new ServerRemoveResourcePackConfigurationPacketCodec(), new ServerStoreCookieConfigurationPacketCodec(),
+                new ServerTransferConfigurationPacketCodec(), new ServerUpdateTagsConfigurationPacketCodec(),
+                new EmptyPacketCodec<>(ServerPacketIdentifiers.CONFIGURATION_FINISH_CONFIGURATION,
+                        ServerFinishConfigurationPacket.class, new ServerFinishConfigurationPacket()),
+                new EmptyPacketCodec<>(ServerPacketIdentifiers.CONFIGURATION_RESET_CHAT,
+                        ServerResetChatConfigurationPacket.class, new ServerResetChatConfigurationPacket()));
     }
 
     private ServerPacketRegistry() {}

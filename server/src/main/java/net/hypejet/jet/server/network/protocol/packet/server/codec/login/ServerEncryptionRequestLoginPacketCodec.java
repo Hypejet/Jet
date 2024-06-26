@@ -17,6 +17,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see PacketCodec
  */
 public final class ServerEncryptionRequestLoginPacketCodec extends PacketCodec<ServerEncryptionRequestLoginPacket> {
+
+    private static final int MAX_SERVER_ID_LENGTH = 20;
+
     /**
      * Constructs the {@linkplain ServerEncryptionRequestLoginPacketCodec encryption request packet codec}.
      *
@@ -29,7 +32,7 @@ public final class ServerEncryptionRequestLoginPacketCodec extends PacketCodec<S
     @Override
     public @NonNull ServerEncryptionRequestLoginPacket read(@NonNull ByteBuf buf) {
         return new ServerEncryptionRequestLoginPacket(
-                NetworkUtil.readString(buf),
+                NetworkUtil.readString(buf, MAX_SERVER_ID_LENGTH),
                 NetworkUtil.readByteArray(buf),
                 NetworkUtil.readByteArray(buf),
                 buf.readBoolean()
@@ -38,7 +41,7 @@ public final class ServerEncryptionRequestLoginPacketCodec extends PacketCodec<S
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerEncryptionRequestLoginPacket object) {
-        NetworkUtil.writeString(buf, object.serverId());
+        NetworkUtil.writeString(buf, object.serverId(), MAX_SERVER_ID_LENGTH);
         NetworkUtil.writeByteArray(buf, object.publicKey());
         NetworkUtil.writeByteArray(buf, object.verifyToken());
         buf.writeBoolean(object.shouldAuthenticate());

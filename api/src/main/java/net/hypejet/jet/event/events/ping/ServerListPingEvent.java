@@ -1,7 +1,7 @@
 package net.hypejet.jet.event.events.ping;
 
 import net.hypejet.jet.ping.ServerListPing;
-import net.hypejet.jet.player.PlayerConnection;
+import net.hypejet.jet.protocol.connection.PlayerConnection;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Objects;

@@ -39,6 +39,14 @@ public interface MinecraftServer {
     @NonNull String minecraftVersion();
 
     /**
+     * Gets a brand name of the server.
+     *
+     * @return the brand name
+     * @since 1.0
+     */
+    @NonNull String brandName();
+
+    /**
      * Gets a {@linkplain ServerConfiguration server configuration} of this server.
      *
      * @return the configuration

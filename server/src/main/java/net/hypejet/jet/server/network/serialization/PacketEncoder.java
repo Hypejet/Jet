@@ -5,8 +5,8 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
+import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketRegistry;
-import net.hypejet.jet.server.player.SocketPlayerConnection;
 import net.hypejet.jet.server.util.CompressionUtil;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -50,6 +50,7 @@ public final class PacketEncoder extends MessageToByteEncoder<ServerPacket> {
             if (compressionThreshold < 0) {
                 NetworkUtil.writeVarInt(out, dataLength);
                 out.writeBytes(buf);
+                out.release();
                 return;
             }
 
@@ -63,8 +64,13 @@ public final class PacketEncoder extends MessageToByteEncoder<ServerPacket> {
                 compressionBuf.writeBytes(CompressionUtil.compress(buf.array()));
             }
 
+            buf.release();
+
             NetworkUtil.writeVarInt(out, compressionBuf.readableBytes());
             out.writeBytes(compressionBuf);
+
+            compressionBuf.release();
+            out.release();
         } catch (Throwable throwable) {
             this.playerConnection.close(); // Close the connection to avoid more issues
             LOGGER.error("An error occurred while encoding a packet", throwable);

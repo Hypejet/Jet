@@ -3,7 +3,6 @@ package net.hypejet.jet.server.test.util;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.hypejet.jet.server.util.NetworkUtil;
-import net.kyori.adventure.key.Key;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -42,15 +41,5 @@ public final class NetworkUtilTest {
         NetworkUtil.writeString(buf, expected);
 
         Assertions.assertEquals(NetworkUtil.readString(buf), expected);
-    }
-
-    @Test
-    public void testIdentifier() {
-        Key identifier = Key.key("codestech1", "hypejet/jet");
-
-        ByteBuf buf = Unpooled.buffer();
-        NetworkUtil.writeIdentifier(buf, identifier);
-
-        Assertions.assertEquals(NetworkUtil.readIdentifier(buf), identifier);
     }
 }

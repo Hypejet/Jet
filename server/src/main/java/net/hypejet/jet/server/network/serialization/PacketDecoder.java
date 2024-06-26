@@ -6,8 +6,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
+import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketRegistry;
-import net.hypejet.jet.server.player.SocketPlayerConnection;
 import net.hypejet.jet.server.util.CompressionUtil;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -52,25 +52,26 @@ public final class PacketDecoder extends ByteToMessageDecoder {
             return;
         }
 
-        ByteBuf framedInput = Unpooled.buffer(packetLength);
-        in.readBytes(framedInput, packetLength);
+        in = in.slice(0, packetLength);
 
         if (compressionThreshold < 0) {
-            out.add(this.readPacket(framedInput));
+            out.add(this.readPacket(in));
             return;
         }
 
-        int dataLength = NetworkUtil.readVarInt(framedInput);
+        int dataLength = NetworkUtil.readVarInt(in);
 
         if (dataLength == 0) {
-            out.add(this.readPacket(framedInput));
+            out.add(this.readPacket(in));
             return;
         }
 
-        byte[] compressed = NetworkUtil.readRemainingBytes(framedInput);
+        byte[] compressed = NetworkUtil.readRemainingBytes(in);
         ByteBuf uncompressedBuf = Unpooled.wrappedBuffer(CompressionUtil.decompress(compressed));
+        in.release();
 
         out.add(this.readPacket(uncompressedBuf));
+        uncompressedBuf.release();
     }
 
     @Override

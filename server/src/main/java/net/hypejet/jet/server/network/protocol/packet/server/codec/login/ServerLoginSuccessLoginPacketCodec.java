@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.protocol.packet.server.codec.login;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.login.ServerLoginSuccessLoginPacket;
-import net.hypejet.jet.server.network.protocol.codecs.profile.GameProfilePropertiesCodec;
+import net.hypejet.jet.server.network.protocol.codecs.profile.GameProfileCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
 import net.hypejet.jet.server.util.NetworkUtil;
@@ -32,7 +32,7 @@ public final class ServerLoginSuccessLoginPacketCodec extends PacketCodec<Server
         return new ServerLoginSuccessLoginPacket(
                 NetworkUtil.readUniqueId(buf),
                 NetworkUtil.readString(buf),
-                NetworkUtil.readCollection(buf, GameProfilePropertiesCodec.instance()),
+                NetworkUtil.readCollection(buf, GameProfileCodec.instance()),
                 buf.readBoolean()
         );
     }
@@ -41,7 +41,7 @@ public final class ServerLoginSuccessLoginPacketCodec extends PacketCodec<Server
     public void write(@NonNull ByteBuf buf, @NonNull ServerLoginSuccessLoginPacket object) {
         NetworkUtil.writeUniqueId(buf, object.uniqueId());
         NetworkUtil.writeString(buf, object.username());
-        NetworkUtil.writeCollection(buf, GameProfilePropertiesCodec.instance(), object.properties());
+        NetworkUtil.writeCollection(buf, GameProfileCodec.instance(), object.profiles());
         buf.writeBoolean(object.strictErrorHandling());
     }
 }
