@@ -4,6 +4,8 @@ import net.hypejet.jet.session.handler.SessionHandler;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Represents a Minecraft temporary session.
  *
@@ -18,6 +20,20 @@ public interface Session<H extends SessionHandler> {
      * @since 1.0
      */
     @NonNull Component TIME_OUT_DISCONNECTION_MESSAGE = Component.text("Timed out");
+
+    /**
+     * A common duration of waiting before timing out.
+     *
+     * @since 1.0
+     */
+    int TIME_OUT_DURATION = 20;
+
+    /**
+     * A common {@linkplain TimeUnit time unit} of waiting before timing out.
+     *
+     * @since 1.0
+     */
+    @NonNull TimeUnit TIME_OUT_UNIT = TimeUnit.SECONDS;
 
     /**
      * Gets a {@linkplain SessionHandler session handler}, which handles this session.

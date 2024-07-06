@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Represents a {@linkplain Session session} and a {@linkplain SessionHandler session handler}, which handles the
@@ -30,9 +29,6 @@ import java.util.concurrent.TimeUnit;
 public final class JetHandshakeSession implements Session<JetHandshakeSession>, SessionHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JetHandshakeSession.class);
-
-    private static final long TIME_OUT = 20;
-    private static final TimeUnit TIME_OUT_UNIT = TimeUnit.SECONDS;
 
     private final SocketPlayerConnection connection;
     private final CountDownLatch handshakeLatch = new CountDownLatch(1);
@@ -50,7 +46,7 @@ public final class JetHandshakeSession implements Session<JetHandshakeSession>, 
                 .uncaughtExceptionHandler((thread, throwable) -> this.handleThrowable(throwable))
                 .start(() -> {
                     try {
-                        if (!this.handshakeLatch.await(TIME_OUT, TIME_OUT_UNIT)) {
+                        if (!this.handshakeLatch.await(Session.TIME_OUT_DURATION, Session.TIME_OUT_UNIT)) {
                             this.connection.disconnect(Session.TIME_OUT_DISCONNECTION_MESSAGE);
                         }
                     } catch (InterruptedException exception) {

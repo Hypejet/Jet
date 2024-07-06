@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -35,9 +34,6 @@ public final class JetLoginSession implements LoginSession, Session<LoginSession
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JetLoginSession.class);
 
-    private static final long AWAIT_DURATION = 20;
-    private static final TimeUnit AWAIT_TIME_UNIT = TimeUnit.SECONDS;
-
     private final SocketPlayerConnection connection;
 
     private final ReentrantReadWriteLock usernameLock = new ReentrantReadWriteLock();
@@ -50,6 +46,7 @@ public final class JetLoginSession implements LoginSession, Session<LoginSession
 
     private @MonotonicNonNull String username;
     private @MonotonicNonNull UUID uniqueId;
+
     private Collection<GameProfile> gameProfiles = List.of();
 
     /**
@@ -68,7 +65,7 @@ public final class JetLoginSession implements LoginSession, Session<LoginSession
                 .uncaughtExceptionHandler((thread, throwable) -> this.handleThrowable(throwable))
                 .start(() -> {
                     try {
-                        if (!this.handlerLatch.await(AWAIT_DURATION, AWAIT_TIME_UNIT)) {
+                        if (!this.handlerLatch.await(Session.TIME_OUT_DURATION, Session.TIME_OUT_UNIT)) {
                             this.sessionHandler.onTimeOut(this, LoginSessionHandler.TimeOutType.HANDLER);
                             throw new RuntimeException(new TimeoutException("The login handler has timed out"));
                         }
@@ -98,7 +95,7 @@ public final class JetLoginSession implements LoginSession, Session<LoginSession
                                 uniqueId, username, this.gameProfiles(), true)
                         );
 
-                        if (!this.acknowledgeLatch.await(AWAIT_DURATION, AWAIT_TIME_UNIT)) {
+                        if (!this.acknowledgeLatch.await(Session.TIME_OUT_DURATION, Session.TIME_OUT_UNIT)) {
                             this.sessionHandler.onTimeOut(this, LoginSessionHandler.TimeOutType.ACKNOWLEDGE);
                             throw new TimeoutException("The login was not acknowledged on time");
                         }

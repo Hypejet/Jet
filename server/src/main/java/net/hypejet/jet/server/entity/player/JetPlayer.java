@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.entity.player;
 
 import net.hypejet.jet.MinecraftServer;
-import net.hypejet.jet.data.entity.type.VanillaEntityTypes;
+import net.hypejet.jet.data.entity.type.BuiltInEntityTypes;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.player.PlayerChangeClientBrandEvent;
 import net.hypejet.jet.event.events.player.PlayerChangeSettingsEvent;
@@ -58,7 +58,7 @@ public final class JetPlayer extends JetEntity implements Player {
      * @since 1.0
      */
     public JetPlayer(@NonNull UUID uniqueId, @NonNull String username, @NonNull SocketPlayerConnection connection) {
-        super(VanillaEntityTypes.PLAYER, uniqueId, Pointers.builder()
+        super(BuiltInEntityTypes.PLAYER, uniqueId, Pointers.builder()
                 .withStatic(Identity.UUID, uniqueId)
                 .withStatic(Identity.NAME, username)
                 .build());

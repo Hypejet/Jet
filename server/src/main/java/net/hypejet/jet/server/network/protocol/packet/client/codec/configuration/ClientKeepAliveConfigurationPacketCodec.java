@@ -42,6 +42,6 @@ public final class ClientKeepAliveConfigurationPacketCodec
     public void handle(@NonNull ClientKeepAliveConfigurationPacket packet,
                        @NonNull SocketPlayerConnection connection) {
         JetConfigurationSession session = JetConfigurationSession.asConfigurationSession(connection.getSession());
-        session.handleKeepAlive(packet);
+        session.keepAliveHandler().handleKeepAlive(packet.keepAliveIdentifier());
     }
 }
