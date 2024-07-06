@@ -50,7 +50,6 @@ public final class PacketEncoder extends MessageToByteEncoder<ServerPacket> {
             if (compressionThreshold < 0) {
                 NetworkUtil.writeVarInt(out, dataLength);
                 out.writeBytes(buf);
-                out.release();
                 return;
             }
 
@@ -64,13 +63,8 @@ public final class PacketEncoder extends MessageToByteEncoder<ServerPacket> {
                 compressionBuf.writeBytes(CompressionUtil.compress(buf.array()));
             }
 
-            buf.release();
-
             NetworkUtil.writeVarInt(out, compressionBuf.readableBytes());
             out.writeBytes(compressionBuf);
-
-            compressionBuf.release();
-            out.release();
         } catch (Throwable throwable) {
             this.playerConnection.close(); // Close the connection to avoid more issues
             LOGGER.error("An error occurred while encoding a packet", throwable);

@@ -52,26 +52,25 @@ public final class PacketDecoder extends ByteToMessageDecoder {
             return;
         }
 
-        in = in.slice(0, packetLength);
+        ByteBuf framedInput = Unpooled.buffer(packetLength);
+        in.readBytes(framedInput, packetLength);
 
         if (compressionThreshold < 0) {
-            out.add(this.readPacket(in));
+            out.add(this.readPacket(framedInput));
             return;
         }
 
-        int dataLength = NetworkUtil.readVarInt(in);
+        int dataLength = NetworkUtil.readVarInt(framedInput);
 
         if (dataLength == 0) {
-            out.add(this.readPacket(in));
+            out.add(this.readPacket(framedInput));
             return;
         }
 
-        byte[] compressed = NetworkUtil.readRemainingBytes(in);
+        byte[] compressed = NetworkUtil.readRemainingBytes(framedInput);
         ByteBuf uncompressedBuf = Unpooled.wrappedBuffer(CompressionUtil.decompress(compressed));
-        in.release();
 
         out.add(this.readPacket(uncompressedBuf));
-        uncompressedBuf.release();
     }
 
     @Override
