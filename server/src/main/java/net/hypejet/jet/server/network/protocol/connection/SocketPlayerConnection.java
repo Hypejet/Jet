@@ -171,10 +171,18 @@ public final class SocketPlayerConnection implements PlayerConnection {
      * Sets a compression threshold of this connection.
      *
      * @param compressionThreshold the compression threshold
+     * @throws IllegalStateException if the current protocol state of the player is
+     *                               not {@link ProtocolState#LOGIN}
      * @since 1.0
      */
     public void setCompressionThreshold(int compressionThreshold) {
+        if (this.getProtocolState() != ProtocolState.LOGIN) {
+            throw new IllegalStateException("You cannot set a compression threshold in protocol state other than" +
+                    "login");
+        }
+
         ServerPacket finalPacket = this.sendPacket(new ServerEnableCompressionLoginPacket(compressionThreshold));
+
         if (finalPacket instanceof ServerEnableCompressionLoginPacket packet) {
             compressionThreshold = packet.threshold();
             this.compressionThreshold = compressionThreshold;
