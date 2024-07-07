@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.network.protocol.packet.server.codec.login;
+package net.hypejet.jet.server.network.protocol.packet.server.codec.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.play.ServerDisconnectPlayPacket;

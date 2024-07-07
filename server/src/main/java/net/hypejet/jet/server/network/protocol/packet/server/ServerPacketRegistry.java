@@ -24,7 +24,7 @@ import net.hypejet.jet.server.network.protocol.packet.server.codec.configuration
 import net.hypejet.jet.server.network.protocol.packet.server.codec.configuration.ServerUpdateTagsConfigurationPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerCookieRequestLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerDisconnectLoginPacketCodec;
-import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerDisconnectPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerDisconnectPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerEnableCompressionLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerEncryptionRequestLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerLoginSuccessLoginPacketCodec;
