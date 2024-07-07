@@ -77,14 +77,14 @@ public final class KeepAliveHandler {
     }
 
     /**
-     * Gets whether an executor service of this keep alive handler is shut down.
+     * Gets whether an executor service of this keep alive handler is not shut down.
      *
-     * @return {@code true} if the executor service is shut down, false otherwise
+     * @return {@code true} if the executor service is not shut down, false otherwise
      * @since 1.0
      * @see ExecutorService#isShutdown()
      */
-    public boolean isShutdown() {
-        return this.keepAliveExecutor.isShutdown();
+    public boolean isAlive() {
+        return !this.keepAliveExecutor.isShutdown();
     }
 
     /**

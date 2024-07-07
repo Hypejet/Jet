@@ -83,7 +83,7 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
 
     @Override
     public void onConnectionClose(@Nullable Throwable cause) {
-        if (!this.keepAliveHandler.isShutdown()) {
+        if (this.keepAliveHandler.isAlive()) {
             this.keepAliveHandler.shutdownNow();
         }
     }
