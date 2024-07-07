@@ -1,8 +1,6 @@
 package net.hypejet.jet.server.network.protocol.codecs.link;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.util.collection.IntObjectHashMap;
-import io.netty.util.collection.IntObjectMap;
 import net.hypejet.jet.link.ServerLink;
 import net.hypejet.jet.link.label.BuiltinLabel;
 import net.hypejet.jet.link.label.ComponentLabel;
@@ -12,8 +10,6 @@ import net.hypejet.jet.server.network.protocol.codecs.enums.EnumVarIntCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.EnumMap;
 
 /**
  * Represents a {@linkplain NetworkCodec network codec}, which reads and writes a {@linkplain ServerLink server link}.

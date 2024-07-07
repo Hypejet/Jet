@@ -1,7 +1,6 @@
 package net.hypejet.jet.server.network.protocol.codecs.settings;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.Entity.Hand;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.entity.player.Player.ChatMode;
