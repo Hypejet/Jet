@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static net.hypejet.jet.server.network.netty.ChannelHandlers.PACKET_COMPRESSOR;
 import static net.hypejet.jet.server.network.netty.ChannelHandlers.PACKET_DECODER;
@@ -43,6 +44,9 @@ public final class SocketPlayerConnection implements PlayerConnection {
 
     private final SocketChannel channel;
     private final JetMinecraftServer server;
+
+    private final ReentrantReadWriteLock playerLock = new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock protocolStateLock = new ReentrantReadWriteLock();
 
     private Session<?> session = new JetHandshakeSession(this);
 
@@ -65,27 +69,37 @@ public final class SocketPlayerConnection implements PlayerConnection {
 
     @Override
     public @NonNull ProtocolState getProtocolState() {
-        return this.state;
+        this.protocolStateLock.readLock().lock();
+        try {
+            return this.state;
+        } finally {
+            this.protocolStateLock.readLock().unlock();
+        }
     }
 
     @Override
     public @Nullable ServerPacket sendPacket(@NonNull ServerPacket packet) {
-        PacketSendEvent event = new PacketSendEvent(packet);
-        this.server.eventNode().call(event);
+        this.protocolStateLock.readLock().lock();
+        try {
+            PacketSendEvent event = new PacketSendEvent(packet);
+            this.server.eventNode().call(event);
 
-        if (event.isCancelled()) return null;
+            if (event.isCancelled()) return null;
 
-        packet = event.getPacket();
-        ProtocolState currentState = this.state;
+            packet = event.getPacket();
+            ProtocolState currentState = this.state;
 
-        if (packet.state() != currentState) {
-            LOGGER.error("Packet {} cannot be handled during {} protocol state", packet, currentState,
-                    new IllegalArgumentException(packet.toString()));
-            return null;
+            if (packet.state() != currentState) {
+                LOGGER.error("Packet {} cannot be handled during {} protocol state", packet, currentState,
+                        new IllegalArgumentException(packet.toString()));
+                return null;
+            }
+
+            this.channel.writeAndFlush(packet, this.channel.voidPromise());
+            return packet;
+        } finally {
+            this.protocolStateLock.readLock().unlock();
         }
-
-        this.channel.writeAndFlush(packet, this.channel.voidPromise());
-        return packet;
     }
 
     @Override
@@ -116,7 +130,12 @@ public final class SocketPlayerConnection implements PlayerConnection {
 
     @Override
     public @Nullable JetPlayer player() {
-        return this.player;
+        try {
+            this.playerLock.readLock().lock();
+            return this.player;
+        } finally {
+            this.playerLock.readLock().unlock();
+        }
     }
 
     /**
@@ -140,7 +159,12 @@ public final class SocketPlayerConnection implements PlayerConnection {
      * @since 1.0
      */
     public void setProtocolState(@NonNull ProtocolState state) {
-        this.state = state;
+        this.protocolStateLock.writeLock().lock();
+        try {
+            this.state = state;
+        } finally {
+            this.protocolStateLock.writeLock().unlock();
+        }
     }
 
     /**
@@ -213,8 +237,13 @@ public final class SocketPlayerConnection implements PlayerConnection {
      * @throws IllegalArgumentException if the player was already initialized
      */
     public void initializePlayer(@NonNull JetPlayer player) {
-        if (this.player != null)
-            throw new IllegalArgumentException("The player was already initialized");
-        this.player = player;
+        this.playerLock.writeLock().lock();
+        try {
+            if (this.player != null)
+                throw new IllegalArgumentException("The player was already initialized");
+            this.player = player;
+        } finally {
+            this.playerLock.writeLock().unlock();
+        }
     }
 }
