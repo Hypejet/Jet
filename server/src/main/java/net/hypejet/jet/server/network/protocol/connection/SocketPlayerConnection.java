@@ -1,5 +1,7 @@
 package net.hypejet.jet.server.network.protocol.connection;
 
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.event.events.packet.PacketSendEvent;
@@ -11,6 +13,8 @@ import net.hypejet.jet.protocol.packet.server.login.ServerDisconnectLoginPacket;
 import net.hypejet.jet.protocol.packet.server.login.ServerEnableCompressionLoginPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.network.netty.decoder.PacketDecompressor;
+import net.hypejet.jet.server.network.netty.encoder.PacketCompressor;
 import net.hypejet.jet.server.session.JetHandshakeSession;
 import net.hypejet.jet.server.session.Session;
 import net.kyori.adventure.text.Component;
@@ -20,6 +24,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
+
+import static net.hypejet.jet.server.network.netty.ChannelHandlers.PACKET_COMPRESSOR;
+import static net.hypejet.jet.server.network.netty.ChannelHandlers.PACKET_DECODER;
+import static net.hypejet.jet.server.network.netty.ChannelHandlers.PACKET_DECOMPRESSOR;
+import static net.hypejet.jet.server.network.netty.ChannelHandlers.PACKET_ENCODER;
 
 /**
  * Represents an implementation of {@link PlayerConnection}, which is handled by netty's
@@ -142,8 +151,28 @@ public final class SocketPlayerConnection implements PlayerConnection {
      */
     public void setCompressionThreshold(int compressionThreshold) {
         ServerPacket finalPacket = this.sendPacket(new ServerEnableCompressionLoginPacket(compressionThreshold));
-        if (finalPacket instanceof ServerEnableCompressionLoginPacket packet)
-            this.compressionThreshold = packet.threshold();
+        if (finalPacket instanceof ServerEnableCompressionLoginPacket packet) {
+            compressionThreshold = packet.threshold();
+            this.compressionThreshold = compressionThreshold;
+
+            ChannelPipeline pipeline = this.channel.pipeline();
+
+            ChannelHandler packetDecompressor = pipeline.get(PACKET_DECOMPRESSOR);
+            ChannelHandler packetCompressor = pipeline.get(PACKET_COMPRESSOR);
+
+            if (compressionThreshold < 0) {
+                if (packetDecompressor != null)
+                    pipeline.remove(packetDecompressor);
+                if (packetCompressor != null)
+                    pipeline.remove(packetCompressor);
+                return;
+            }
+
+            if (packetDecompressor != null && packetCompressor != null) return;
+
+            pipeline.addBefore(PACKET_DECODER, PACKET_DECOMPRESSOR, new PacketDecompressor());
+            pipeline.addBefore(PACKET_ENCODER, PACKET_COMPRESSOR, new PacketCompressor(this));
+        }
     }
 
     /**

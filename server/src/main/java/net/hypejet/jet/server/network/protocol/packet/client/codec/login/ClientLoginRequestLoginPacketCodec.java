@@ -48,6 +48,11 @@ public final class ClientLoginRequestLoginPacketCodec extends ClientPacketCodec<
     @Override
     public void handle(@NonNull ClientLoginRequestLoginPacket packet, @NonNull SocketPlayerConnection connection) {
         JetLoginSession session = JetLoginSession.asLoginSession(connection.getSession());
+
+        connection.setCompressionThreshold(connection.server()
+                .configuration()
+                .compressionThreshold());
+
         session.sessionHandler().onLoginRequest(packet, session);
     }
 }

@@ -5,6 +5,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
+import net.hypejet.jet.server.network.netty.PlayerChannelInitializer;
 import net.hypejet.jet.server.network.transport.NettyTransportType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;

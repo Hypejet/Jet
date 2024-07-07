@@ -1,10 +1,9 @@
-package net.hypejet.jet.server.network;
+package net.hypejet.jet.server.network.netty;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import net.hypejet.jet.event.events.packet.PacketReceiveEvent;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
-import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketRegistry;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -24,18 +23,15 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(PacketReader.class);
 
     private final SocketPlayerConnection playerConnection;
-    private final JetMinecraftServer server;
 
     /**
      * Constructs a {@linkplain PacketReader packet reader}.
      *
      * @param playerConnection a player connection to read packets for
-     * @param server a server that provides the {@code connection}
      * @since 1.0
      */
-    public PacketReader(@NonNull SocketPlayerConnection playerConnection, @NonNull JetMinecraftServer server) {
+    public PacketReader(@NonNull SocketPlayerConnection playerConnection) {
         this.playerConnection = playerConnection;
-        this.server = server;
     }
 
     @Override
@@ -46,7 +42,7 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
             throw new IllegalStateException("A message received is not a client packet");
 
         PacketReceiveEvent event = new PacketReceiveEvent(packet);
-        this.server.eventNode().call(event);
+        this.playerConnection.server().eventNode().call(event);
         if (event.isCancelled()) return;
 
         ClientPacketRegistry.handle(packet, this.playerConnection);
