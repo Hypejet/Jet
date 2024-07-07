@@ -37,6 +37,7 @@ public final class ServerPacketIdentifiers {
     public static final int CONFIGURATION_SERVER_LINKS = nextConfigurationId();
 
     public static final int PLAY_KEEP_ALIVE = 0x26;
+    public static final int PLAY_DISCONNECT = 0x1D;
 
     private static int currentStatusId = 0;
     private static int currentLoginId = 0;

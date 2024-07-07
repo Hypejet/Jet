@@ -11,6 +11,7 @@ import net.hypejet.jet.protocol.packet.server.ServerPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerDisconnectConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.login.ServerDisconnectLoginPacket;
 import net.hypejet.jet.protocol.packet.server.login.ServerEnableCompressionLoginPacket;
+import net.hypejet.jet.protocol.packet.server.play.ServerDisconnectPlayPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.netty.decoder.PacketDecompressor;
@@ -107,7 +108,7 @@ public final class SocketPlayerConnection implements PlayerConnection {
         ServerPacket packet = switch (this.state) {
             case LOGIN -> new ServerDisconnectLoginPacket(reason);
             case CONFIGURATION -> new ServerDisconnectConfigurationPacket(reason);
-            case PLAY -> null; // TODO
+            case PLAY -> new ServerDisconnectPlayPacket(reason);
             default -> null;
         };
 
