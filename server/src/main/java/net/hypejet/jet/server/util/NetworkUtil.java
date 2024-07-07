@@ -3,10 +3,15 @@ package net.hypejet.jet.server.util;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.nbt.BinaryTagCodec;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.kyori.adventure.text.serializer.nbt.NBTComponentSerializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.common.value.qual.IntRange;
+import org.jetbrains.annotations.Range;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -130,10 +135,24 @@ public final class NetworkUtil {
      * @since 1.0
      */
     public static @NonNull String readString(@NonNull ByteBuf buf) {
+        return readString(buf, MAX_STRING_SIZE);
+    }
+
+    /**
+     * Reads a string from a {@link ByteBuf byte buf}.
+     *
+     * @param buf the byte buf
+     * @param maxLength a maximum length of the string
+     * @return the string
+     * @since 1.0
+     */
+    public static @NonNull String readString(@NonNull ByteBuf buf, @IntRange(to = MAX_STRING_SIZE) int maxLength) {
         int length = readVarInt(buf);
 
-        if (length < 0 || length > MAX_STRING_SIZE)
-            throw new IllegalArgumentException("Invalid length of a string - " + length);
+        if (length < 0 || length > maxLength) {
+            throw new IllegalArgumentException("Invalid length of a string - " + length + ". Maximum allowed length" +
+                    " is " + maxLength);
+        }
 
         if (!buf.isReadable(length))
             throw new IllegalArgumentException("A buffer does not contain at least " + length + " readable bytes");
@@ -157,6 +176,27 @@ public final class NetworkUtil {
     }
 
     /**
+     * Writes as string to a {@link ByteBuf byte buf}.
+     *
+     * @param buf the byte buf
+     * @param value the string
+     * @param maxLength a maximum length of the string
+     * @since 1.0
+     */
+    public static void writeString(@NonNull ByteBuf buf, @NonNull String value,
+                                   @Range(from = 0, to = MAX_STRING_SIZE) int maxLength) {
+        int length = ByteBufUtil.utf8Bytes(value);
+
+        if (length > maxLength) {
+            throw new IllegalArgumentException("A length of the string - " + length + " - is higher than the " +
+                    "maximum length allowed - " + maxLength);
+        }
+
+        writeVarInt(buf, length);
+        buf.writeCharSequence(value, StandardCharsets.UTF_8);
+    }
+
+    /**
      * Reads a {@linkplain Component component} serialized with json from a {@linkplain ByteBuf byte buf}.
      *
      * @param buf the byte buf
@@ -176,6 +216,32 @@ public final class NetworkUtil {
      */
     public static void writeJsonComponent(@NonNull ByteBuf buf, @NonNull Component value) {
         writeString(buf, GsonComponentSerializer.gson().serialize(value));
+    }
+
+    /**
+     * Reads a {@linkplain Component component} serialized to a {@linkplain BinaryTag binary tag} from
+     * a {@linkplain ByteBuf byte buf}.
+     *
+     * @param buf the byte buf
+     * @return the component
+     * @since 1.0
+     * @see BinaryTag
+     */
+    public static @NonNull Component readComponent(@NonNull ByteBuf buf) {
+        return NBTComponentSerializer.nbt().deserialize(BinaryTagCodec.instance().read(buf));
+    }
+
+    /**
+     * Writes a {@linkplain Component component} as a {@linkplain BinaryTag binary tag} to
+     * a {@linkplain ByteBuf byte buf}.
+     *
+     * @param buf the byte buf
+     * @param value the component
+     * @since 1.0
+     * @see BinaryTag
+     */
+    public static void writeComponent(@NonNull ByteBuf buf, @NonNull Component value) {
+        BinaryTagCodec.instance().write(buf, NBTComponentSerializer.nbt().serialize(value));
     }
 
     /**
@@ -281,6 +347,35 @@ public final class NetworkUtil {
     public static void writeByteArray(@NonNull ByteBuf buf, byte @NonNull [] value) {
         writeVarInt(buf, value.length);
         buf.writeBytes(value);
+    }
+
+    /**
+     * Reads a variable-length integer array from a {@linkplain ByteBuf byte buf}.
+     *
+     * @param buf the byte buf
+     * @return the integer array
+     * @since 1.0
+     */
+    public static int @NonNull [] readVarIntArray(@NonNull ByteBuf buf) {
+        int[] array = new int[readVarInt(buf)];
+        for (int index = 0; index < array.length; index++) {
+            array[index] = readVarInt(buf);
+        }
+        return array;
+    }
+
+    /**
+     * Writes a variable-length integer array to a {@linkplain ByteBuf byte buf}.
+     *
+     * @param buf the byte buf
+     * @param value the integer array
+     * @since 1.0
+     */
+    public static void writeVarIntArray(@NonNull ByteBuf buf, int @NonNull [] value) {
+        writeVarInt(buf, value.length);
+        for (int integer : value) {
+            writeVarInt(buf, integer);
+        }
     }
 
     /**

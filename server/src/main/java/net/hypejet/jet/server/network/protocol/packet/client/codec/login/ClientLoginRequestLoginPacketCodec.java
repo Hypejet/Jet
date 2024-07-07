@@ -2,21 +2,26 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.login;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.login.ClientLoginRequestLoginPacket;
-import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
+import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
+import net.hypejet.jet.server.session.JetLoginSession;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@link PacketCodec packet codec}, which reads and writes a {@link ClientLoginRequestLoginPacket login
+ * Represents a {@link ClientPacketCodec client packet codec}, which reads and writes a {@link ClientLoginRequestLoginPacket login
  * request login packet}.
  *
  * @since 1.0
  * @author Codestech
  * @see ClientLoginRequestLoginPacket
- * @see PacketCodec
+ * @see ClientPacketCodec
  */
-public final class ClientLoginRequestLoginPacketCodec extends PacketCodec<ClientLoginRequestLoginPacket> {
+public final class ClientLoginRequestLoginPacketCodec extends ClientPacketCodec<ClientLoginRequestLoginPacket> {
+
+    private static final int MAX_USERNAME_LENGTH = 16;
+
     /**
      * Constructs a {@linkplain ClientLoginRequestLoginPacketCodec login request packet codec}..
      *
@@ -28,12 +33,26 @@ public final class ClientLoginRequestLoginPacketCodec extends PacketCodec<Client
 
     @Override
     public @NonNull ClientLoginRequestLoginPacket read(@NonNull ByteBuf buf) {
-        return new ClientLoginRequestLoginPacket(NetworkUtil.readString(buf), NetworkUtil.readUniqueId(buf));
+        return new ClientLoginRequestLoginPacket(
+                NetworkUtil.readString(buf, MAX_USERNAME_LENGTH),
+                NetworkUtil.readUniqueId(buf)
+        );
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ClientLoginRequestLoginPacket object) {
-        NetworkUtil.writeString(buf, object.username());
+        NetworkUtil.writeString(buf, object.username(), MAX_USERNAME_LENGTH);
         NetworkUtil.writeUniqueId(buf, object.uniqueId());
+    }
+
+    @Override
+    public void handle(@NonNull ClientLoginRequestLoginPacket packet, @NonNull SocketPlayerConnection connection) {
+        JetLoginSession session = JetLoginSession.asLoginSession(connection.getSession());
+
+        connection.setCompressionThreshold(connection.server()
+                .configuration()
+                .compressionThreshold());
+
+        session.sessionHandler().onLoginRequest(packet, session);
     }
 }

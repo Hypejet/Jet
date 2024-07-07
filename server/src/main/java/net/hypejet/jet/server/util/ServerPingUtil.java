@@ -35,28 +35,26 @@ public final class ServerPingUtil {
      */
     public static ServerListPing.@Nullable Favicon loadServerIcon(@NonNull Logger logger) {
         File serverIconFile = new File(SERVER_ICON_FILE_NAME);
-        ServerListPing.Favicon favicon = null;
+        if (!serverIconFile.exists()) return null;
 
-        if (serverIconFile.exists()) {
-            try {
-                BufferedImage image = ImageIO.read(serverIconFile);
+        try {
+            BufferedImage image = ImageIO.read(serverIconFile);
 
-                if (image == null) {
-                    logger.error("The server icon could not be loaded properly");
-                    return null;
-                }
-
-                if (image.getWidth() == SERVER_ICON_WIDTH && image.getHeight() == SERVER_ICON_HEIGHT) {
-                    favicon = ServerListPing.createFavicon(image);
-                } else {
-                    logger.warn("The server icon is not an image with dimensions of {}x{}", SERVER_ICON_WIDTH,
-                            SERVER_ICON_HEIGHT);
-                }
-            } catch (IOException exception) {
-                logger.error("An error occurred while loading a server icon", exception);
+            if (image == null) {
+                logger.error("The server icon could not be loaded properly");
+                return null;
             }
+
+            if (image.getWidth() == SERVER_ICON_WIDTH && image.getHeight() == SERVER_ICON_HEIGHT) {
+                return ServerListPing.createFavicon(image);
+            } else {
+                logger.warn("The server icon is not an image with dimensions of {}x{}", SERVER_ICON_WIDTH,
+                        SERVER_ICON_HEIGHT);
+            }
+        } catch (IOException exception) {
+            logger.error("An error occurred while loading a server icon", exception);
         }
 
-        return favicon;
+        return null;
     }
 }

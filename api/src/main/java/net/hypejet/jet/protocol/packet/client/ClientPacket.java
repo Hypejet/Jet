@@ -9,5 +9,5 @@ import net.hypejet.jet.protocol.packet.client.handshake.ClientHandshakePacket;
  * @since 1.0
  * @author Codestech
  */
-public sealed interface ClientPacket extends Packet permits ClientLoginPacket, ClientStatusPacket,
-        ClientHandshakePacket {}
+public sealed interface ClientPacket extends Packet permits ClientConfigurationPacket, ClientLoginPacket,
+        ClientStatusPacket, ClientHandshakePacket {}
