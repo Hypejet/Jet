@@ -1,5 +1,6 @@
 package net.hypejet.jet.server.session;
 
+import net.hypejet.jet.protocol.packet.server.play.ServerKeepAlivePlayPacket;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.keepalive.KeepAliveHandler;
 import net.hypejet.jet.session.handler.SessionHandler;
@@ -37,9 +38,7 @@ public final class JetPlaySession implements Session<JetPlaySession>, SessionHan
      */
     public JetPlaySession(@NonNull JetPlayer player) {
         this.player = player;
-        this.keepAliveHandler = new KeepAliveHandler(player, this, keepAliveId -> {
-            throw new UnsupportedOperationException("Not implemented yet!"); // TODO
-        });
+        this.keepAliveHandler = new KeepAliveHandler(player, this, ServerKeepAlivePlayPacket::new);
     }
 
     @Override
@@ -60,6 +59,16 @@ public final class JetPlaySession implements Session<JetPlaySession>, SessionHan
         this.keepAliveHandler.shutdownNow();
         this.player.disconnect(Component.text("An error occurred during the play session", NamedTextColor.RED));
         LOGGER.error("An error occurred during the play session", e);
+    }
+
+    /**
+     * Gets a {@linkplain KeepAliveHandler keep alive handler} of this session.
+     *
+     * @return the keep alive handler
+     * @since 1.0
+     */
+    public @NonNull KeepAliveHandler keepAliveHandler() {
+        return this.keepAliveHandler;
     }
 
     /**

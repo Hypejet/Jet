@@ -36,6 +36,8 @@ public final class ServerPacketIdentifiers {
     public static final int CONFIGURATION_CUSTOM_REPORT_DETAILS = nextConfigurationId();
     public static final int CONFIGURATION_SERVER_LINKS = nextConfigurationId();
 
+    public static final int PLAY_KEEP_ALIVE = 0x26;
+
     private static int currentStatusId = 0;
     private static int currentLoginId = 0;
     private static int currentConfigurationId = 0;
@@ -77,7 +79,8 @@ public final class ServerPacketIdentifiers {
     }
 
     /**
-     * Gets a next available identifier for a {@linkplain ??? server play packet}.
+     * Gets a next available identifier for
+     * a {@linkplain net.hypejet.jet.protocol.packet.server.ServerPlayPacket server play packet}.
      *
      * @return the identifier
      * @since 1.0

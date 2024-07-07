@@ -29,6 +29,8 @@ public final class ClientPacketIdentifiers {
     public static final int CONFIGURATION_RESOURCE_PACK_RESPONSE = nextConfigurationId();
     public static final int CONFIGURATION_KNOWN_PACKS = nextConfigurationId();
 
+    public static final int PLAY_KEEP_ALIVE = 0x18;
+
     private static int currentStatusId = 0;
     private static int currentLoginId = 0;
     private static int currentConfigurationId = 0;
@@ -70,7 +72,8 @@ public final class ClientPacketIdentifiers {
     }
 
     /**
-     * Gets a next available identifier for a {@linkplain ??? client play packet}.
+     * Gets a next available identifier for
+     * a {@linkplain net.hypejet.jet.protocol.packet.client.ClientPlayPacket client play packet}.
      *
      * @return the identifier
      * @since 1.0

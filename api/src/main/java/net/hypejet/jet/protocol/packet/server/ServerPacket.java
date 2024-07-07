@@ -9,4 +9,4 @@ import net.hypejet.jet.protocol.packet.Packet;
  * @author Codestech
  */
 public sealed interface ServerPacket extends Packet permits ServerConfigurationPacket, ServerLoginPacket,
-        ServerStatusPacket {}
+        ServerPlayPacket, ServerStatusPacket {}
