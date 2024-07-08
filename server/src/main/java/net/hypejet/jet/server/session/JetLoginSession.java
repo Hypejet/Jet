@@ -21,7 +21,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Represents a server implementation of {@linkplain LoginSession login session}.
@@ -36,13 +36,12 @@ public final class JetLoginSession implements LoginSession, Session<LoginSession
 
     private final SocketPlayerConnection connection;
 
-    private final ReentrantReadWriteLock usernameLock = new ReentrantReadWriteLock();
-    private final ReentrantReadWriteLock uniqueIdLock = new ReentrantReadWriteLock();
-
     private final CountDownLatch handlerLatch = new CountDownLatch(1);
     private final CountDownLatch acknowledgeLatch = new CountDownLatch(1);
 
     private final LoginSessionHandler sessionHandler;
+
+    private final ReentrantLock finishLock = new ReentrantLock();
 
     private @MonotonicNonNull String username;
     private @MonotonicNonNull UUID uniqueId;
@@ -70,15 +69,10 @@ public final class JetLoginSession implements LoginSession, Session<LoginSession
                             throw new RuntimeException(new TimeoutException("The login handler has timed out"));
                         }
 
-                        String username = this.username();
-                        if (username == null) {
-                            throw new IllegalArgumentException("The username was not set");
-                        }
+                        String username = this.username;
+                        UUID uniqueId = this.uniqueId;
 
-                        UUID uniqueId = this.uniqueId();
-                        if (uniqueId == null) {
-                            throw new IllegalArgumentException("The unique identifier was not set");
-                        }
+                        Collection<GameProfile> gameProfiles = this.gameProfiles;
 
                         JetPlayer player = new JetPlayer(uniqueId, username, this.connection);
                         this.connection.initializePlayer(player);
@@ -92,7 +86,7 @@ public final class JetLoginSession implements LoginSession, Session<LoginSession
                         }
 
                         this.connection.sendPacket(new ServerLoginSuccessLoginPacket(
-                                uniqueId, username, this.gameProfiles(), true
+                                uniqueId, username, gameProfiles, true
                         ));
 
                         if (!this.acknowledgeLatch.await(Session.TIME_OUT_DURATION, Session.TIME_OUT_UNIT)) {
@@ -111,61 +105,26 @@ public final class JetLoginSession implements LoginSession, Session<LoginSession
     }
 
     @Override
-    public @Nullable String username() {
-        this.usernameLock.readLock().lock();
-        try {
-            return this.username;
-        } finally {
-            this.usernameLock.readLock().unlock();
-        }
-    }
+    public void finish(@NonNull String username, @NonNull UUID uniqueId,
+                       @NonNull Collection<GameProfile> gameProfiles) {
+        Objects.requireNonNull(username, "The username must not be null");
+        Objects.requireNonNull(uniqueId, "The unique identifier must not be null");
+        Objects.requireNonNull(gameProfiles, "The game profiles must not be null");
 
-    @Override
-    public void username(@NonNull String username) {
-        this.usernameLock.writeLock().lock();
+        this.finishLock.lock();
+
         try {
+            if (this.handlerLatch.getCount() == 0)
+                throw new IllegalArgumentException("The login session has been already finished");
+
             this.username = username;
-        } finally {
-            this.usernameLock.writeLock().unlock();
-        }
-    }
-
-    @Override
-    public @Nullable UUID uniqueId() {
-        this.uniqueIdLock.readLock().lock();
-        try {
-            return this.uniqueId;
-        } finally {
-            this.uniqueIdLock.readLock().unlock();
-        }
-    }
-
-    @Override
-    public void uniqueId(@NonNull UUID uniqueId) {
-        this.uniqueIdLock.writeLock().lock();
-        try {
             this.uniqueId = uniqueId;
+            this.gameProfiles = List.copyOf(gameProfiles);
+
+            this.handlerLatch.countDown();
         } finally {
-            this.uniqueIdLock.writeLock().unlock();
+            this.finishLock.unlock();
         }
-    }
-
-    @Override
-    public @NonNull Collection<GameProfile> gameProfiles() {
-        return this.gameProfiles;
-    }
-
-    @Override
-    public void gameProfiles(@NonNull Collection<GameProfile> gameProfiles) {
-        this.gameProfiles = List.copyOf(gameProfiles);
-    }
-
-    @Override
-    public void finish() {
-        if (this.handlerLatch.getCount() == 0) {
-            throw new IllegalArgumentException("The login session has been already finished");
-        }
-        this.handlerLatch.countDown();
     }
 
     @Override
