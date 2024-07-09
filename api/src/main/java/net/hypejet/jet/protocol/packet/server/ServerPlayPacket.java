@@ -15,7 +15,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @author Codestech
  * @see ServerPacket
  */
-public sealed interface ServerPlayPacket extends ServerPacket permits ServerDisconnectPlayPacket, ServerJoinGamePlayPacket, ServerKeepAlivePlayPacket, ServerPluginMessagePlayPacket {
+public sealed interface ServerPlayPacket extends ServerPacket permits ServerDisconnectPlayPacket,
+        ServerJoinGamePlayPacket, ServerKeepAlivePlayPacket, ServerPluginMessagePlayPacket {
     /**
      * {@inheritDoc}
      */

@@ -31,6 +31,10 @@ public final class ClientPacketIdentifiers {
 
     public static final int PLAY_PLUGIN_MESSAGE = 0x12;
     public static final int PLAY_KEEP_ALIVE = 0x18;
+    public static final int PLAY_POSITION = 0x1A;
+    public static final int PLAY_ROTATION_AND_POSITION = 0x1B;
+    public static final int PLAY_ROTATION = 0x1C;
+    public static final int PLAY_ACTION = 0x25;
 
     private static int currentStatusId = 0;
     private static int currentLoginId = 0;
