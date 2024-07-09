@@ -9,9 +9,9 @@ import net.hypejet.jet.server.network.protocol.codecs.position.BlockPositionNetw
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
 import net.hypejet.jet.server.util.NetworkUtil;
+import net.hypejet.jet.server.util.gamemode.GameModeUtil;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -29,13 +29,6 @@ public final class ServerJoinGamePlayPacketCodec extends PacketCodec<ServerJoinG
 
     private static final int MAX_VIEW_DISTANCE = 32;
     private static final int MIN_VIEW_DISTANCE = 2;
-
-    private static final byte NULL_GAME_MODE = -1;
-
-    private static final byte SURVIVAL_GAME_MODE = 0;
-    private static final byte CREATIVE_GAME_MODE = 1;
-    private static final byte ADVENTURE_GAME_MODE = 2;
-    private static final byte SPECTATOR_GAME_MODE = 3;
 
     /**
      * Constructs the {@linkplain ServerJoinGamePlayPacket join game play packet}.
@@ -70,8 +63,9 @@ public final class ServerJoinGamePlayPacketCodec extends PacketCodec<ServerJoinG
 
         long hashedSeed = buf.readLong();
 
-        Player.GameMode gameMode = Objects.requireNonNull(gameMode(buf.readByte()), "The game mode must not be null");
-        Player.GameMode previousGameMode = gameMode(buf.readByte());
+        Player.GameMode gameMode = Objects.requireNonNull(GameModeUtil.gameMode(buf.readByte()),
+                "The game mode must not be null");
+        Player.GameMode previousGameMode = GameModeUtil.gameMode(buf.readByte());
 
         boolean debug = buf.readBoolean();
         boolean flat = buf.readBoolean();
@@ -120,8 +114,8 @@ public final class ServerJoinGamePlayPacketCodec extends PacketCodec<ServerJoinG
 
         buf.writeLong(object.hashedSeed());
 
-        buf.writeByte(gameModeId(object.gameMode()));
-        buf.writeByte(gameModeId(object.previousGameMode()));
+        buf.writeByte(GameModeUtil.gameModeIdentifier(object.gameMode()));
+        buf.writeByte(GameModeUtil.gameModeIdentifier(object.previousGameMode()));
 
         buf.writeBoolean(object.debug());
         buf.writeBoolean(object.flat());
@@ -136,26 +130,5 @@ public final class ServerJoinGamePlayPacketCodec extends PacketCodec<ServerJoinG
 
         NetworkUtil.writeVarInt(buf, object.portalCooldown());
         buf.writeBoolean(object.enforcesSecureChat());
-    }
-
-    private static byte gameModeId(Player.@Nullable GameMode gameMode) {
-        return switch (gameMode) {
-            case SURVIVAL -> SURVIVAL_GAME_MODE;
-            case CREATIVE -> CREATIVE_GAME_MODE;
-            case ADVENTURE -> ADVENTURE_GAME_MODE;
-            case SPECTATOR -> SPECTATOR_GAME_MODE;
-            case null -> NULL_GAME_MODE;
-        };
-    }
-
-    private static Player.@Nullable GameMode gameMode(byte gameModeId) {
-        return switch (gameModeId) {
-            case SURVIVAL_GAME_MODE -> Player.GameMode.SURVIVAL;
-            case CREATIVE_GAME_MODE -> Player.GameMode.CREATIVE;
-            case ADVENTURE_GAME_MODE -> Player.GameMode.ADVENTURE;
-            case SPECTATOR_GAME_MODE -> Player.GameMode.SPECTATOR;
-            case NULL_GAME_MODE -> null;
-            default -> throw new IllegalArgumentException("Unknown game mode with identifier of: " + gameModeId);
-        };
     }
 }

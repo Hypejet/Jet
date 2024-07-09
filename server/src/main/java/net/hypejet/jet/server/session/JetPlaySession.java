@@ -1,11 +1,13 @@
 package net.hypejet.jet.server.session;
 
 import net.hypejet.jet.entity.player.Player;
+import net.hypejet.jet.protocol.packet.server.play.ServerGameEventPlayPacket;
 import net.hypejet.jet.protocol.packet.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.protocol.packet.server.play.ServerKeepAlivePlayPacket;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.keepalive.KeepAliveHandler;
 import net.hypejet.jet.session.handler.SessionHandler;
+import net.hypejet.jet.world.GameEvent;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -49,6 +51,8 @@ public final class JetPlaySession implements Session<JetPlaySession>, SessionHan
         player.sendPacket(new ServerJoinGamePlayPacket(player.entityId(), false, Collections.singleton(overworld),
                 20, 5, 5, false, true, false, 0, overworld, 0, Player.GameMode.SURVIVAL, null, false, true,
                 null, 2, false));
+
+        player.sendPacket(new ServerGameEventPlayPacket(GameEvent.waitForWorldChunks()));
     }
 
     @Override

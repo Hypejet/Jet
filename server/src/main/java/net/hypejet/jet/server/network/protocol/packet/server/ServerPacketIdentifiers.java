@@ -38,6 +38,7 @@ public final class ServerPacketIdentifiers {
 
     public static final int PLAY_PLUGIN_MESSAGE = 0x19;
     public static final int PLAY_DISCONNECT = 0x1D;
+    public static final int PLAY_GAME_EVENT = 0x22;
     public static final int PLAY_KEEP_ALIVE = 0x26;
     public static final int PLAY_JOIN_GAME = 0x2B;
 

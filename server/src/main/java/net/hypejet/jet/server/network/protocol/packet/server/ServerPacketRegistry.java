@@ -29,6 +29,7 @@ import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerE
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerEncryptionRequestLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerLoginSuccessLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerPluginMessageRequestLoginPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerGameEventPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerJoinGamePlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerKeepAlivePlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerPluginMessagePlayPacketCodec;
@@ -80,7 +81,8 @@ public final class ServerPacketRegistry {
 
         // Play packet
         register(new ServerKeepAlivePlayPacketCodec(), new ServerDisconnectPlayPacketCodec(),
-                new ServerJoinGamePlayPacketCodec(), new ServerPluginMessagePlayPacketCodec());
+                new ServerJoinGamePlayPacketCodec(), new ServerPluginMessagePlayPacketCodec(),
+                new ServerGameEventPlayPacketCodec());
     }
 
     private ServerPacketRegistry() {}
