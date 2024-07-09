@@ -2,6 +2,7 @@ package net.hypejet.jet.protocol.packet.server;
 
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.server.play.ServerDisconnectPlayPacket;
+import net.hypejet.jet.protocol.packet.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.protocol.packet.server.play.ServerKeepAlivePlayPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -14,7 +15,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see ServerPacket
  */
 public sealed interface ServerPlayPacket extends ServerPacket permits ServerDisconnectPlayPacket,
-        ServerKeepAlivePlayPacket {
+        ServerJoinGamePlayPacket, ServerKeepAlivePlayPacket {
     /**
      * {@inheritDoc}
      */

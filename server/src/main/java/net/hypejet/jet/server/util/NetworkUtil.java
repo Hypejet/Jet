@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.nbt.BinaryTagCodec;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -265,28 +264,6 @@ public final class NetworkUtil {
     public static void writeUniqueId(@NonNull ByteBuf buf, @NonNull UUID value) {
         buf.writeLong(value.getMostSignificantBits());
         buf.writeLong(value.getLeastSignificantBits());
-    }
-
-    /**
-     * Reads an identifier from a {@linkplain ByteBuf byte buf}.
-     *
-     * @param buf the byte buf
-     * @return the identifier
-     * @since 1.0
-     */
-    public static @NonNull Key readIdentifier(@NonNull ByteBuf buf) {
-        return Key.key(readString(buf));
-    }
-
-    /**
-     * Writes an identifier to a {@linkplain ByteBuf byte buf}.
-     *
-     * @param buf the byte buf
-     * @param value the identifier
-     * @since 1.0
-     */
-    public static void writeIdentifier(@NonNull ByteBuf buf, @NonNull Key value) {
-        writeString(buf, value.asString());
     }
 
     /**

@@ -26,6 +26,7 @@ public final class PacketDecompressor extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
+        if (!ctx.channel().isActive()) return; // The connection was closed
         int dataLength = NetworkUtil.readVarInt(in);
 
         if (dataLength == 0) {

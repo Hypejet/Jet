@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.configuratio
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientCookieResponseConfigurationPacket;
 import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.network.protocol.codecs.identifier.IdentifierNetworkCodec;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
@@ -35,14 +36,14 @@ public final class ClientCookieResponseConfigurationPacketCodec
     @Override
     public @NonNull ClientCookieResponseConfigurationPacket read(@NonNull ByteBuf buf) {
         return new ClientCookieResponseConfigurationPacket(
-                NetworkUtil.readIdentifier(buf),
+                IdentifierNetworkCodec.instance().read(buf),
                 buf.readBoolean() ? NetworkUtil.readByteArray(buf) : null
         );
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ClientCookieResponseConfigurationPacket object) {
-        NetworkUtil.writeIdentifier(buf, object.identifier());
+        IdentifierNetworkCodec.instance().write(buf, object.identifier());
 
         byte[] data = object.data();
         buf.writeBoolean(data != null);

@@ -57,6 +57,13 @@ public final class EnumVarIntCodec<E extends Enum<E>> implements NetworkCodec<E>
         NetworkUtil.writeVarInt(buf, enumEntryId);
     }
 
+    /**
+     * Creates a builder of the {@linkplain EnumVarIntCodec enum var-int codec}.
+     *
+     * @param <E> a type of the enum that the codec should encode and decode
+     * @return the builder
+     * @since 1.0
+     */
     public static <E extends Enum<E>> @NonNull Builder<E> builder(@NonNull Class<E> enumClass) {
         return new Builder<>(enumClass);
     }

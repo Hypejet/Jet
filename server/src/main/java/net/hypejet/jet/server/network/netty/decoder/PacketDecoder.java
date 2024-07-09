@@ -41,6 +41,7 @@ public final class PacketDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
+        if (!ctx.channel().isActive()) return; // The connection was closed
         int packetId = NetworkUtil.readVarInt(in);
 
         ProtocolState protocolState = this.connection.getProtocolState();

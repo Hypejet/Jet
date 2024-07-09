@@ -173,6 +173,39 @@ public interface Player extends Entity, Audience {
     }
 
     /**
+     * Represents a Minecraft game mode of a {@linkplain Player player}.
+     *
+     * @since 1.0
+     * @author Codestech
+     */
+    enum GameMode {
+        /**
+         * A survival game mode.
+         *
+         * @since 1.0
+         */
+        SURVIVAL,
+        /**
+         * A creative game mode.
+         *
+         * @since 1.0
+         */
+        CREATIVE,
+        /**
+         * An adventure game mode.
+         *
+         * @since 1.0
+         */
+        ADVENTURE,
+        /**
+         * A spectator game mode.
+         *
+         * @since 1.0
+         */
+        SPECTATOR
+    }
+
+    /**
      * Represents a settings of a {@linkplain Player player}.
      *
      * @param locale a locale of the player

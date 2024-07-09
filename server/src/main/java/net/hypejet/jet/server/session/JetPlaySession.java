@@ -1,9 +1,12 @@
 package net.hypejet.jet.server.session;
 
+import net.hypejet.jet.entity.player.Player;
+import net.hypejet.jet.protocol.packet.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.protocol.packet.server.play.ServerKeepAlivePlayPacket;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.keepalive.KeepAliveHandler;
 import net.hypejet.jet.session.handler.SessionHandler;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -11,6 +14,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.Objects;
 
 /**
@@ -39,6 +43,12 @@ public final class JetPlaySession implements Session<JetPlaySession>, SessionHan
     public JetPlaySession(@NonNull JetPlayer player) {
         this.player = player;
         this.keepAliveHandler = new KeepAliveHandler(player, this, ServerKeepAlivePlayPacket::new);
+
+        Key overworld = Key.key("overworld");
+
+        player.sendPacket(new ServerJoinGamePlayPacket(player.entityId(), false, Collections.singleton(overworld),
+                20, 5, 5, false, true, false, 0, overworld, 0, Player.GameMode.SURVIVAL, null, false, true,
+                null, 2, false));
     }
 
     @Override
