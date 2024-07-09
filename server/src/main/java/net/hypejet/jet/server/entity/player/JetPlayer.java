@@ -12,7 +12,10 @@ import net.hypejet.jet.event.events.player.PlayerResourcePackResponseEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.pack.DataPack;
 import net.hypejet.jet.pack.ResourcePackResult;
+import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
+import net.hypejet.jet.protocol.packet.server.configuration.ServerPluginMessageConfigurationPacket;
+import net.hypejet.jet.protocol.packet.server.play.ServerPluginMessagePlayPacket;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.kyori.adventure.identity.Identity;
@@ -107,8 +110,24 @@ public final class JetPlayer extends JetEntity implements Player {
         return this.connection.server();
     }
 
+    @Override
+    public void sendPluginMessage(@NonNull Key identifier, byte @NonNull [] data) {
+        Objects.requireNonNull(identifier, "The identifier must not be null");
+        Objects.requireNonNull(data, "The data must not be null");
+
+        ProtocolState protocolState = this.connection.getProtocolState();
+        ServerPacket packet = switch (protocolState) {
+            case CONFIGURATION -> new ServerPluginMessageConfigurationPacket(identifier, data);
+            case PLAY -> new ServerPluginMessagePlayPacket(identifier, data);
+            default -> throw new IllegalStateException("You cannot send a plugin message during "
+                    + protocolState + " protocol state");
+        };
+
+        this.sendPacket(packet);
+    }
+
     /**
-     * Updates {@linkplain Player.Settings settings} of the player.
+     * Updates {@linkplain Settings settings} of the player.
      *
      * @param settings the new settings
      * @since 1.0

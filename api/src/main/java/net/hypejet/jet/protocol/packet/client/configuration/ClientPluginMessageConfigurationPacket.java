@@ -5,8 +5,8 @@ import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain ClientConfigurationPacket client configuration packet}, when a client wants to send
- * a plugin message.
+ * Represents a {@linkplain ClientConfigurationPacket client configuration packet}, which is received when a client
+ * sends a plugin message.
  *
  * @param identifier an identifier of the plugin message
  * @param data a data of the plugin message

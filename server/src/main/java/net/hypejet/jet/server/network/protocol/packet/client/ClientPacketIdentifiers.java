@@ -29,6 +29,7 @@ public final class ClientPacketIdentifiers {
     public static final int CONFIGURATION_RESOURCE_PACK_RESPONSE = nextConfigurationId();
     public static final int CONFIGURATION_KNOWN_PACKS = nextConfigurationId();
 
+    public static final int PLAY_PLUGIN_MESSAGE = 0x12;
     public static final int PLAY_KEEP_ALIVE = 0x18;
 
     private static int currentStatusId = 0;

@@ -2,6 +2,7 @@ package net.hypejet.jet.protocol.packet.client;
 
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.play.ClientKeepAlivePlayPacket;
+import net.hypejet.jet.protocol.packet.client.play.ClientPluginMessagePlayPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -12,7 +13,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @author Codestech
  * @see ClientPacket
  */
-public sealed interface ClientPlayPacket extends ClientPacket permits ClientKeepAlivePlayPacket {
+public sealed interface ClientPlayPacket extends ClientPacket permits ClientKeepAlivePlayPacket,
+        ClientPluginMessagePlayPacket {
     /**
      * {@inheritDoc}
      */

@@ -22,6 +22,7 @@ import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientL
 import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientLoginRequestLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientPluginMessageResponseLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientKeepAlivePlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientPluginMessagePlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.status.ClientPingRequestStatusPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.status.ClientServerListRequestStatusPacketCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -68,7 +69,7 @@ public final class ClientPacketRegistry {
                 new ClientAcknowledgeFinishConfigurationPacketCodec());
 
         // Play packets
-        register(ProtocolState.PLAY, new ClientKeepAlivePlayPacketCodec());
+        register(ProtocolState.PLAY, new ClientKeepAlivePlayPacketCodec(), new ClientPluginMessagePlayPacketCodec());
     }
 
     private ClientPacketRegistry() {}
