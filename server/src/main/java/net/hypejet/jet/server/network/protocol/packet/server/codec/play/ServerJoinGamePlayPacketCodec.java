@@ -27,6 +27,9 @@ import java.util.Objects;
  */
 public final class ServerJoinGamePlayPacketCodec extends PacketCodec<ServerJoinGamePlayPacket> {
 
+    private static final int MAX_VIEW_DISTANCE = 32;
+    private static final int MIN_VIEW_DISTANCE = 2;
+
     private static final byte NULL_GAME_MODE = -1;
 
     private static final byte SURVIVAL_GAME_MODE = 0;
@@ -52,6 +55,10 @@ public final class ServerJoinGamePlayPacketCodec extends PacketCodec<ServerJoinG
 
         int maxPlayers = NetworkUtil.readVarInt(buf);
         int viewDistance = NetworkUtil.readVarInt(buf);
+
+        if (viewDistance < MIN_VIEW_DISTANCE || viewDistance > MAX_VIEW_DISTANCE)
+            throw new IllegalArgumentException("Invalid view distance: " + viewDistance);
+
         int simulationDistance = NetworkUtil.readVarInt(buf);
 
         boolean reducedDebugInfo = buf.readBoolean();
@@ -94,9 +101,14 @@ public final class ServerJoinGamePlayPacketCodec extends PacketCodec<ServerJoinG
         buf.writeBoolean(object.hardcore());
 
         NetworkUtil.writeCollection(buf, IdentifierNetworkCodec.instance(), object.dimensions());
-
         NetworkUtil.writeVarInt(buf, object.maxPlayers());
-        NetworkUtil.writeVarInt(buf, object.viewDistance());
+
+        int viewDistance = object.viewDistance();
+
+        if (viewDistance < MIN_VIEW_DISTANCE || viewDistance > MAX_VIEW_DISTANCE)
+            throw new IllegalArgumentException("Invalid view distance: " + viewDistance);
+
+        NetworkUtil.writeVarInt(buf, viewDistance);
         NetworkUtil.writeVarInt(buf, object.simulationDistance());
 
         buf.writeBoolean(object.reducedDebugInfo());
