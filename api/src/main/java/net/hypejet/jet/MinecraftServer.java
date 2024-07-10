@@ -1,8 +1,12 @@
 package net.hypejet.jet;
 
 import net.hypejet.jet.configuration.ServerConfiguration;
+import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.node.EventNode;
+import net.hypejet.jet.protocol.ProtocolState;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Collection;
 
 /**
  * Represents an interface for managing a Minecraft server.
@@ -60,4 +64,25 @@ public interface MinecraftServer {
      * @since 1.0
      */
     void shutdown();
+
+    /**
+     * Gets all players, which are connected to the server.
+     *
+     * <p>Note that all players are returned, even those, which are not in {@linkplain ProtocolState#PLAY play
+     * protocol state} yet.</p>
+     *
+     * @return the players
+     * @since 1.0
+     */
+    @NonNull Collection<Player> players();
+
+    /**
+     * Gets all players, which are connected to the server and are in a {@linkplain ProtocolState protocol state}
+     * specified.
+     *
+     * @param state the protocol state
+     * @return the players
+     * @since 1.0
+     */
+    @NonNull Collection<Player> players(@NonNull ProtocolState state);
 }

@@ -3,6 +3,7 @@ package net.hypejet.jet.server.session;
 import net.hypejet.jet.event.events.login.PlayerLoginEvent;
 import net.hypejet.jet.protocol.packet.server.login.ServerLoginSuccessLoginPacket;
 import net.hypejet.jet.protocol.profile.GameProfile;
+import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.session.LoginSession;
@@ -77,8 +78,11 @@ public final class JetLoginSession implements LoginSession, Session<LoginSession
                         JetPlayer player = new JetPlayer(uniqueId, username, this.connection);
                         this.connection.initializePlayer(player);
 
+                        JetMinecraftServer server = this.connection.server();
+                        server.registerPlayer(player);
+
                         PlayerLoginEvent loginEvent = new PlayerLoginEvent(player);
-                        this.connection.server().eventNode().call(loginEvent);
+                        server.eventNode().call(loginEvent);
 
                         if (loginEvent.getResult() instanceof PlayerLoginEvent.Result.Fail failResult) {
                             this.connection.disconnect(failResult.disconnectReason());
