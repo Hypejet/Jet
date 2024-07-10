@@ -24,6 +24,8 @@ import net.hypejet.jet.server.network.protocol.packet.server.codec.configuration
 import net.hypejet.jet.server.network.protocol.packet.server.codec.configuration.ServerUpdateTagsConfigurationPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerCookieRequestLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerDisconnectLoginPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerPlayerListHeaderAndFooterPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerActionBarPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerDisconnectPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerEnableCompressionLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerEncryptionRequestLoginPacketCodec;
@@ -33,6 +35,7 @@ import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerGa
 import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerJoinGamePlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerKeepAlivePlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerPluginMessagePlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerSystemMessagePlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.status.ServerListResponseStatusPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.status.ServerPingResponseStatusPacketCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
@@ -82,7 +85,8 @@ public final class ServerPacketRegistry {
         // Play packet
         register(new ServerKeepAlivePlayPacketCodec(), new ServerDisconnectPlayPacketCodec(),
                 new ServerJoinGamePlayPacketCodec(), new ServerPluginMessagePlayPacketCodec(),
-                new ServerGameEventPlayPacketCodec());
+                new ServerGameEventPlayPacketCodec(), new ServerSystemMessagePlayPacketCodec(),
+                new ServerActionBarPlayPacketCodec(), new ServerPlayerListHeaderAndFooterPlayPacketCodec());
     }
 
     private ServerPacketRegistry() {}

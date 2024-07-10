@@ -1,11 +1,14 @@
 package net.hypejet.jet.protocol.packet.server;
 
 import net.hypejet.jet.protocol.ProtocolState;
+import net.hypejet.jet.protocol.packet.server.play.ServerActionBarPlayPacket;
 import net.hypejet.jet.protocol.packet.server.play.ServerDisconnectPlayPacket;
 import net.hypejet.jet.protocol.packet.server.play.ServerGameEventPlayPacket;
 import net.hypejet.jet.protocol.packet.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.protocol.packet.server.play.ServerKeepAlivePlayPacket;
+import net.hypejet.jet.protocol.packet.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
 import net.hypejet.jet.protocol.packet.server.play.ServerPluginMessagePlayPacket;
+import net.hypejet.jet.protocol.packet.server.play.ServerSystemMessagePlayPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -16,7 +19,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @author Codestech
  * @see ServerPacket
  */
-public sealed interface ServerPlayPacket extends ServerPacket permits ServerDisconnectPlayPacket, ServerGameEventPlayPacket, ServerJoinGamePlayPacket, ServerKeepAlivePlayPacket, ServerPluginMessagePlayPacket {
+public sealed interface ServerPlayPacket extends ServerPacket permits ServerActionBarPlayPacket,
+        ServerDisconnectPlayPacket, ServerGameEventPlayPacket, ServerJoinGamePlayPacket, ServerKeepAlivePlayPacket,
+        ServerPlayerListHeaderAndFooterPlayPacket, ServerPluginMessagePlayPacket, ServerSystemMessagePlayPacket {
     /**
      * {@inheritDoc}
      */

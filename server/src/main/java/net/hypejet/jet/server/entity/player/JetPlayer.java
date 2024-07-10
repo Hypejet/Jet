@@ -17,10 +17,14 @@ import net.hypejet.jet.pack.ResourcePackResult;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerPluginMessageConfigurationPacket;
+import net.hypejet.jet.protocol.packet.server.play.ServerActionBarPlayPacket;
+import net.hypejet.jet.protocol.packet.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
 import net.hypejet.jet.protocol.packet.server.play.ServerPluginMessagePlayPacket;
+import net.hypejet.jet.protocol.packet.server.play.ServerSystemMessagePlayPacket;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.util.NetworkUtil;
+import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.pointer.Pointers;
@@ -28,6 +32,7 @@ import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -127,6 +132,25 @@ public final class JetPlayer extends JetEntity implements Player {
         };
 
         this.sendPacket(packet);
+    }
+
+    @Override
+    public void sendMessage(@NotNull Identity source, @NotNull Component message, @NotNull MessageType type) {
+        ServerPacket packet = switch (type) {
+            case CHAT -> throw new IllegalArgumentException("Non-system messages are not supported yet");
+            case SYSTEM -> new ServerSystemMessagePlayPacket(message, false);
+        };
+        this.sendPacket(packet);
+    }
+
+    @Override
+    public void sendActionBar(@NotNull Component message) {
+        this.sendPacket(new ServerActionBarPlayPacket(message));
+    }
+
+    @Override
+    public void sendPlayerListHeaderAndFooter(@NotNull Component header, @NotNull Component footer) {
+        this.sendPacket(new ServerPlayerListHeaderAndFooterPlayPacket(header, footer));
     }
 
     /**

@@ -41,6 +41,9 @@ public final class ServerPacketIdentifiers {
     public static final int PLAY_GAME_EVENT = 0x22;
     public static final int PLAY_KEEP_ALIVE = 0x26;
     public static final int PLAY_JOIN_GAME = 0x2B;
+    public static final int PLAY_ACTION_BAR = 0x4C;
+    public static final int PLAY_SYSTEM_MESSAGE = 0x6C;
+    public static final int PLAY_PLAYER_LIST_HEADER_AND_FOOTER = 0x6D;
 
     private static int currentStatusId = 0;
     private static int currentLoginId = 0;
