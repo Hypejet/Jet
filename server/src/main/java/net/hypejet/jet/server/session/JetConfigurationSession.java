@@ -340,6 +340,8 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
 
                     // End of the registry fuckery
 
+                    this.player.sendServerBrand(this.player.server().brandName());
+
                     this.finished = true;
                     connection.sendPacket(new ServerFinishConfigurationPacket());
 

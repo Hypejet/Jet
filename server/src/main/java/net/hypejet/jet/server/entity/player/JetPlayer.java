@@ -1,5 +1,7 @@
 package net.hypejet.jet.server.entity.player;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.data.entity.type.BuiltInEntityTypes;
 import net.hypejet.jet.entity.player.Player;
@@ -18,6 +20,7 @@ import net.hypejet.jet.protocol.packet.server.configuration.ServerPluginMessageC
 import net.hypejet.jet.protocol.packet.server.play.ServerPluginMessagePlayPacket;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
+import net.hypejet.jet.server.util.NetworkUtil;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.pointer.Pointers;
@@ -213,5 +216,21 @@ public final class JetPlayer extends JetEntity implements Player {
     public void handlePong(int pingIdentifier) {
         EventNode<Object> eventNode = this.server().eventNode();
         eventNode.call(new PlayerPongEvent(this, pingIdentifier));
+    }
+
+    /**
+     * Sends a plugin message to a client containing a server brand.
+     *
+     * @param brand the server brand
+     * @since 1.0
+     */
+    public void sendServerBrand(@NonNull String brand) {
+        ByteBuf buf = Unpooled.buffer();
+        NetworkUtil.writeString(buf, brand);
+
+        byte[] messageData = NetworkUtil.readRemainingBytes(buf);
+        this.sendPluginMessage(BRAND_PLUGIN_MESSAGE_IDENTIFIER, messageData);
+
+        buf.release();
     }
 }
