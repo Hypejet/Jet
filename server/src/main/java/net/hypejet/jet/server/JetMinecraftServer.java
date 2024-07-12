@@ -9,6 +9,8 @@ import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.NetworkManager;
 import net.hypejet.jet.server.util.ServerPingUtil;
+import net.hypejet.jet.server.world.JetWorldManager;
+import net.hypejet.jet.world.WorldManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
@@ -42,6 +44,8 @@ public final class JetMinecraftServer implements MinecraftServer {
 
     private final Set<JetPlayer> players = new HashSet<>();
     private final ReentrantReadWriteLock playersLock = new ReentrantReadWriteLock();
+
+    private final JetWorldManager worldManager = new JetWorldManager();
 
     /**
      * Constructs the {@linkplain JetMinecraftServer Jet Minecraft server}.
@@ -106,6 +110,11 @@ public final class JetMinecraftServer implements MinecraftServer {
         }
 
         return Set.copyOf(playersCopy);
+    }
+
+    @Override
+    public @NonNull WorldManager worldManager() {
+        return this.worldManager;
     }
 
     /**

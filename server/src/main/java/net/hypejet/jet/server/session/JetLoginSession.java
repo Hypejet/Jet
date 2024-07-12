@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.session;
 
-import net.hypejet.jet.event.events.login.PlayerLoginEvent;
+import net.hypejet.jet.event.events.player.login.PlayerLoginEvent;
 import net.hypejet.jet.protocol.packet.server.login.ServerLoginSuccessLoginPacket;
 import net.hypejet.jet.protocol.profile.GameProfile;
 import net.hypejet.jet.server.JetMinecraftServer;

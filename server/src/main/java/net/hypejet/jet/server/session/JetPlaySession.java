@@ -7,7 +7,7 @@ import net.hypejet.jet.protocol.packet.server.play.ServerKeepAlivePlayPacket;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.session.keepalive.KeepAliveHandler;
 import net.hypejet.jet.session.handler.SessionHandler;
-import net.hypejet.jet.world.GameEvent;
+import net.hypejet.jet.world.event.GameEvent;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

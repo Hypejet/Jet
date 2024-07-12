@@ -4,6 +4,7 @@ import net.hypejet.jet.configuration.ServerConfiguration;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.protocol.ProtocolState;
+import net.hypejet.jet.world.WorldManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -85,4 +86,12 @@ public interface MinecraftServer {
      * @since 1.0
      */
     @NonNull Collection<Player> players(@NonNull ProtocolState state);
+
+    /**
+     * Gets a {@linkplain WorldManager world manager} of the server.
+     *
+     * @return the world manager
+     * @since 1.0
+     */
+    @NonNull WorldManager worldManager();
 }

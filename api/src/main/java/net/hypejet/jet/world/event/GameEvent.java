@@ -1,4 +1,4 @@
-package net.hypejet.jet.world;
+package net.hypejet.jet.world.event;
 
 import net.hypejet.jet.entity.player.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;

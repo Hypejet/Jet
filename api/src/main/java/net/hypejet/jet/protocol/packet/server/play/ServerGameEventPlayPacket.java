@@ -1,7 +1,7 @@
 package net.hypejet.jet.protocol.packet.server.play;
 
 import net.hypejet.jet.protocol.packet.server.ServerPlayPacket;
-import net.hypejet.jet.world.GameEvent;
+import net.hypejet.jet.world.event.GameEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

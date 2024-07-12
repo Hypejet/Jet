@@ -1,4 +1,4 @@
-package net.hypejet.jet.event.events.login;
+package net.hypejet.jet.event.events.player.login;
 
 import net.hypejet.jet.entity.player.Player;
 import net.kyori.adventure.text.Component;
