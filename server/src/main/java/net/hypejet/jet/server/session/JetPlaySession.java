@@ -5,7 +5,7 @@ import net.hypejet.jet.protocol.packet.server.play.ServerGameEventPlayPacket;
 import net.hypejet.jet.protocol.packet.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.protocol.packet.server.play.ServerKeepAlivePlayPacket;
 import net.hypejet.jet.server.entity.player.JetPlayer;
-import net.hypejet.jet.server.keepalive.KeepAliveHandler;
+import net.hypejet.jet.server.session.keepalive.KeepAliveHandler;
 import net.hypejet.jet.session.handler.SessionHandler;
 import net.hypejet.jet.world.GameEvent;
 import net.kyori.adventure.key.Key;

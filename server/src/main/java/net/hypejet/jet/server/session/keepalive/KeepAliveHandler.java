@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.keepalive;
+package net.hypejet.jet.server.session.keepalive;
 
 import io.netty.util.collection.LongObjectHashMap;
 import io.netty.util.collection.LongObjectMap;

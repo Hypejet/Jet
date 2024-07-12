@@ -5,7 +5,7 @@ import net.hypejet.jet.protocol.packet.server.configuration.ServerFinishConfigur
 import net.hypejet.jet.protocol.packet.server.configuration.ServerKeepAliveConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerRegistryDataConfigurationPacket;
 import net.hypejet.jet.server.entity.player.JetPlayer;
-import net.hypejet.jet.server.keepalive.KeepAliveHandler;
+import net.hypejet.jet.server.session.keepalive.KeepAliveHandler;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.session.handler.SessionHandler;
 import net.kyori.adventure.key.Key;

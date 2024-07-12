@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.keepalive;
+package net.hypejet.jet.server.session.keepalive;
 
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
