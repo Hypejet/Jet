@@ -79,7 +79,8 @@ public final class JetLoginSession implements LoginSession, Session<LoginSession
                         this.connection.initializePlayer(player);
 
                         JetMinecraftServer server = this.connection.server();
-                        server.registerPlayer(player);
+
+                        if (this.connection.isClosed()) return;
 
                         PlayerLoginEvent loginEvent = new PlayerLoginEvent(player);
                         server.eventNode().call(loginEvent);
@@ -134,6 +135,19 @@ public final class JetLoginSession implements LoginSession, Session<LoginSession
     @Override
     public @NonNull LoginSessionHandler sessionHandler() {
         return this.sessionHandler;
+    }
+
+    @Override
+    public void onConnectionClose(@Nullable Throwable throwable) {
+        if (this.handlerLatch.getCount() > 0) {
+            this.handlerLatch.countDown();
+        }
+
+        if (this.acknowledgeLatch.getCount() > 0) {
+            this.acknowledgeLatch.countDown();
+        }
+
+        this.sessionHandler.onConnectionClose(throwable);
     }
 
     /**

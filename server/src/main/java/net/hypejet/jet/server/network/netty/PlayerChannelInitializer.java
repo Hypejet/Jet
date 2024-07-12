@@ -61,9 +61,7 @@ public final class PlayerChannelInitializer extends ChannelInitializer<SocketCha
                 .addAfter(PACKET_DECODER, PACKET_READER, new PacketReader(connection));
 
         ch.closeFuture().addListener(future -> {
-            connection.getSession()
-                    .sessionHandler()
-                    .onConnectionClose(future.cause());
+            connection.getSession().onConnectionClose(future.cause());
 
             JetPlayer player = connection.player();
             if (player != null)

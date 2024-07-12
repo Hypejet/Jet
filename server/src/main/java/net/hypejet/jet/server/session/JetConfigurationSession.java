@@ -58,6 +58,8 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
                 .start(() -> {
                     SocketPlayerConnection connection = this.player.connection();
 
+                    if (connection.isClosed()) return;
+
                     connection.server().eventNode().call(new PlayerConfigurationStartEvent(this.player));
                     this.keepAliveHandler.shutdown();
 
@@ -69,31 +71,29 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
 
                     // I just want to make the server joinable for now, don't hate me for what's below, OKKK???????
 
-                    CompoundBinaryTag binaryTag = CompoundBinaryTag.builder()
-                            .putBoolean("has_skylight", true)
-                            .putBoolean("has_ceiling", true)
-                            .putBoolean("ultrawarm", false)
-                            .putBoolean("natural", true)
-                            .putDouble("coordinate_scale", 1)
-                            .putBoolean("bed_works", true)
-                            .putBoolean("respawn_anchor_works", true)
-                            .putInt("min_y", -64)
-                            .putInt("height", 384)
-                            .putInt("logical_height", 384)
-                            .putString("infiniburn", "#minecraft:infiniburn_overworld")
-                            .putString("effects", "minecraft:overworld")
-                            .putFloat("ambient_light", 0)
-                            .putBoolean("piglin_safe", true)
-                            .putBoolean("has_raids", true)
-                            .putInt("monster_spawn_light_level", 0)
-                            .putInt("monster_spawn_block_light_limit", 0)
-                            .build();
-
                     connection.sendPacket(new ServerRegistryDataConfigurationPacket(
                             Key.key("dimension_type"),
                             List.of(new ServerRegistryDataConfigurationPacket.Entry(
                                     Key.key("overworld"),
-                                    binaryTag
+                                    CompoundBinaryTag.builder()
+                                            .putBoolean("has_skylight", true)
+                                            .putBoolean("has_ceiling", true)
+                                            .putBoolean("ultrawarm", false)
+                                            .putBoolean("natural", true)
+                                            .putDouble("coordinate_scale", 1)
+                                            .putBoolean("bed_works", true)
+                                            .putBoolean("respawn_anchor_works", true)
+                                            .putInt("min_y", -64)
+                                            .putInt("height", 384)
+                                            .putInt("logical_height", 384)
+                                            .putString("infiniburn", "#minecraft:infiniburn_overworld")
+                                            .putString("effects", "minecraft:overworld")
+                                            .putFloat("ambient_light", 0)
+                                            .putBoolean("piglin_safe", true)
+                                            .putBoolean("has_raids", true)
+                                            .putInt("monster_spawn_light_level", 0)
+                                            .putInt("monster_spawn_block_light_limit", 0)
+                                            .build()
                             ))
                     ));
 
@@ -364,13 +364,22 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
     public void onConnectionClose(@Nullable Throwable cause) {
         if (this.keepAliveHandler.isAlive()) {
             this.keepAliveHandler.shutdownNow();
+
+            try {
+                this.keepAliveHandler.awaitTermination();
+            } catch (InterruptedException exception) {
+                throw new RuntimeException(exception);
+            }
+        }
+
+        if (this.acknowledgeLatch.getCount() > 0) {
+            this.acknowledgeLatch.countDown();
         }
     }
 
     @Override
     public void uncaughtException(Thread t, Throwable e) {
         Objects.requireNonNull(e, "The throwable must not be null");
-        this.keepAliveHandler.shutdownNow();
         this.player.disconnect(Component.text("An error occurred during the configuration", NamedTextColor.RED));
         LOGGER.error("An error occurred during the configuration of a player", e);
     }

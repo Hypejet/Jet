@@ -98,14 +98,19 @@ public final class KeepAliveHandler {
     }
 
     /**
-     * Shuts down an executor service of this keep alive handler and tries to stop all running threads scheduled
-     * by it.
+     * Shuts down an executor service of this keep alive handler and completes all keep alive countdown latches.
      *
      * @since 1.0
-     * @see ExecutorService#shutdownNow()
      */
     public void shutdownNow() {
-        this.keepAliveExecutor.shutdownNow();
+        this.shutdown();
+        this.keepAliveLock.lock();
+
+        try {
+            this.keepAliveLatches.values().forEach(CountDownLatch::countDown);
+        } finally {
+            this.keepAliveLock.unlock();
+        }
     }
 
     /**

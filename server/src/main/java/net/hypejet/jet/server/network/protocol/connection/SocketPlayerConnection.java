@@ -80,7 +80,10 @@ public final class SocketPlayerConnection implements PlayerConnection {
 
     @Override
     public @Nullable ServerPacket sendPacket(@NonNull ServerPacket packet) {
+        if (this.isClosed()) return null;
+
         this.protocolStateLock.readLock().lock();
+
         try {
             PacketSendEvent event = new PacketSendEvent(packet);
             this.server.eventNode().call(event);
@@ -139,8 +142,13 @@ public final class SocketPlayerConnection implements PlayerConnection {
         }
     }
 
+    @Override
+    public boolean isClosed() {
+        return !this.channel.isActive();
+    }
+
     /**
-     * Closes the {@link PlayerConnection player connection}, nothing will.
+     * Closes the {@link PlayerConnection player connection}, nothing will happen if the connection is already closed.
      *
      * @since 1.0
      */

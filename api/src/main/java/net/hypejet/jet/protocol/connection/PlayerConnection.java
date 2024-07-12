@@ -30,7 +30,8 @@ public interface PlayerConnection {
      * send event}.
      *
      * @param packet the paket
-     * @return the final packet that was sent, null if the event was cancelled or something went wrong during sending
+     * @return the final packet that was sent, null if the event was cancelled, something went wrong during sending
+     *         or the connection has been closed
      * @since 1.0
      */
     @Nullable ServerPacket sendPacket(@NonNull ServerPacket packet);
@@ -66,4 +67,12 @@ public interface PlayerConnection {
      * @since 1.0
      */
     @Nullable Player player();
+
+    /**
+     * Gets whether the connection has been closed.
+     *
+     * @return {@code true} if the connection has been closed, {@code false} otherwise
+     * @since 1.0
+     */
+    boolean isClosed();
 }

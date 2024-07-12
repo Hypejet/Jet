@@ -62,8 +62,14 @@ public final class JetPlaySession implements Session<JetPlaySession>, SessionHan
 
     @Override
     public void onConnectionClose(@Nullable Throwable cause) {
-        if (this.keepAliveHandler.isAlive()) {
-            this.keepAliveHandler.shutdownNow();
+        if (!this.keepAliveHandler.isAlive()) return;
+
+        this.keepAliveHandler.shutdownNow();
+
+        try {
+            this.keepAliveHandler.awaitTermination();
+        } catch (InterruptedException exception) {
+            throw new RuntimeException(exception);
         }
     }
 

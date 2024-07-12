@@ -117,7 +117,9 @@ public final class JetMinecraftServer implements MinecraftServer {
     public void registerPlayer(@NonNull JetPlayer player) {
         this.playersLock.writeLock().lock();
         try {
-            this.players.add(player);
+            if (!player.connection().isClosed()) {
+                this.players.add(player);
+            }
         } finally {
             this.playersLock.writeLock().unlock();
         }
