@@ -1,6 +1,8 @@
 package net.hypejet.jet.protocol.packet.client;
 
 import net.hypejet.jet.protocol.ProtocolState;
+import net.hypejet.jet.protocol.packet.client.play.ClientAcknowledgeMessagePacket;
+import net.hypejet.jet.protocol.packet.client.play.ClientAcknowledgeMessagePlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientChangeDifficultyPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientConfirmTeleportationPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientKeepAlivePlayPacket;
@@ -20,10 +22,11 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @author Codestech
  * @see ClientPacket
  */
-public sealed interface ClientPlayPacket extends ClientPacket permits ClientActionPlayPacket,
-        ClientChangeDifficultyPlayPacket, ClientConfirmTeleportationPlayPacket, ClientKeepAlivePlayPacket,
-        ClientPluginMessagePlayPacket, ClientPositionPlayPacket, ClientQueryBlockEntityTagPacket,
-        ClientRotationAndPositionPlayPacket, ClientRotationPlayPacket {
+public sealed interface ClientPlayPacket extends ClientPacket permits ClientAcknowledgeMessagePacket,
+        ClientAcknowledgeMessagePlayPacket, ClientActionPlayPacket, ClientChangeDifficultyPlayPacket,
+        ClientConfirmTeleportationPlayPacket, ClientKeepAlivePlayPacket, ClientPluginMessagePlayPacket,
+        ClientPositionPlayPacket, ClientQueryBlockEntityTagPacket, ClientRotationAndPositionPlayPacket,
+        ClientRotationPlayPacket {
     /**
      * {@inheritDoc}
      */
