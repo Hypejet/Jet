@@ -3,6 +3,7 @@ package net.hypejet.jet.protocol.packet.client;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.play.ClientAcknowledgeMessagePlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientChangeDifficultyPlayPacket;
+import net.hypejet.jet.protocol.packet.client.play.ClientChatCommandPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientConfirmTeleportationPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientKeepAlivePlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientActionPlayPacket;
@@ -21,8 +22,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @author Codestech
  * @see ClientPacket
  */
-public sealed interface ClientPlayPacket extends ClientPacket permits
-        ClientAcknowledgeMessagePlayPacket, ClientActionPlayPacket, ClientChangeDifficultyPlayPacket,
+public sealed interface ClientPlayPacket extends ClientPacket permits ClientAcknowledgeMessagePlayPacket,
+        ClientActionPlayPacket, ClientChangeDifficultyPlayPacket, ClientChatCommandPlayPacket,
         ClientConfirmTeleportationPlayPacket, ClientKeepAlivePlayPacket, ClientPluginMessagePlayPacket,
         ClientPositionPlayPacket, ClientQueryBlockEntityTagPacket, ClientRotationAndPositionPlayPacket,
         ClientRotationPlayPacket {
