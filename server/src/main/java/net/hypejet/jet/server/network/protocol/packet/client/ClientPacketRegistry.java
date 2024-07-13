@@ -22,6 +22,7 @@ import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientL
 import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientLoginRequestLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientPluginMessageResponseLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientActionPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientChangeDifficultyPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientConfirmTeleportationPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientKeepAlivePlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientPluginMessagePlayPacketCodec;
@@ -78,7 +79,8 @@ public final class ClientPacketRegistry {
         register(ProtocolState.PLAY, new ClientKeepAlivePlayPacketCodec(), new ClientPluginMessagePlayPacketCodec(),
                 new ClientRotationAndPositionPlayPacketCodec(), new ClientPositionPlayPacketCodec(),
                 new ClientRotationPlayPacketCodec(), new ClientActionPlayPacketCodec(),
-                new ClientConfirmTeleportationPlayPacketCodec(), new ClientQueryBlockEntityTagPacketCodec());
+                new ClientConfirmTeleportationPlayPacketCodec(), new ClientQueryBlockEntityTagPacketCodec(),
+                new ClientChangeDifficultyPlayPacketCodec());
     }
 
     private ClientPacketRegistry() {}
