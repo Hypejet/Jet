@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.network.protocol.packet.client.codec.play;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.protocol.packet.client.play.ClientAcknowledgeMessagePacket;
+import net.hypejet.jet.protocol.packet.client.play.ClientAcknowledgeMessagePlayPacket;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
@@ -10,35 +10,36 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Represents a {@linkplain ClientPacketCodec client packet codec}, which reads and writes
- * a {@linkplain ClientAcknowledgeMessagePacket acknowledge message packet}.
+ * a {@linkplain ClientAcknowledgeMessagePlayPacket acknowledge message play packet}.
  *
  * @since 1.0
  * @author Codestech
- * @see ClientAcknowledgeMessagePacket
+ * @see ClientAcknowledgeMessagePlayPacket
  * @see ClientPacketCodec
  */
-public final class ClientAcknowledgeMessagePlayPacketCodec extends ClientPacketCodec<ClientAcknowledgeMessagePacket> {
+public final class ClientAcknowledgeMessagePlayPacketCodec extends ClientPacketCodec<ClientAcknowledgeMessagePlayPacket> {
     /**
      * Constructs the {@linkplain ClientAcknowledgeMessagePlayPacketCodec acknowledge message play packet codec}.
      *
      * @since 1.0
      */
     public ClientAcknowledgeMessagePlayPacketCodec() {
-        super(ClientPacketIdentifiers.PLAY_ACKNOWLEDGE_MESSAGE, ClientAcknowledgeMessagePacket.class);
+        super(ClientPacketIdentifiers.PLAY_ACKNOWLEDGE_MESSAGE, ClientAcknowledgeMessagePlayPacket.class);
     }
 
     @Override
-    public @NonNull ClientAcknowledgeMessagePacket read(@NonNull ByteBuf buf) {
-        return new ClientAcknowledgeMessagePacket(NetworkUtil.readVarInt(buf));
+    public @NonNull ClientAcknowledgeMessagePlayPacket read(@NonNull ByteBuf buf) {
+        return new ClientAcknowledgeMessagePlayPacket(NetworkUtil.readVarInt(buf));
     }
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ClientAcknowledgeMessagePacket object) {
+    public void write(@NonNull ByteBuf buf, @NonNull ClientAcknowledgeMessagePlayPacket object) {
         NetworkUtil.writeVarInt(buf, object.messageCount());
     }
 
     @Override
-    public void handle(@NonNull ClientAcknowledgeMessagePacket packet, @NonNull SocketPlayerConnection connection) {
+    public void handle(@NonNull ClientAcknowledgeMessagePlayPacket packet,
+                       @NonNull SocketPlayerConnection connection) {
         // TODO
     }
 }
