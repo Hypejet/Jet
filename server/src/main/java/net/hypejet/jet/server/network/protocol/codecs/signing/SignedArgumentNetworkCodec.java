@@ -1,0 +1,48 @@
+package net.hypejet.jet.server.network.protocol.codecs.signing;
+
+import io.netty.buffer.ByteBuf;
+import net.hypejet.jet.server.network.codec.NetworkCodec;
+import net.hypejet.jet.server.util.NetworkUtil;
+import net.hypejet.jet.signing.SignedArgument;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+/**
+ * Represents a {@linkplain NetworkCodec network codec}, which reads and writes a {@linkplain SignedArgument signed
+ * argument}.
+ *
+ * @since 1.0
+ * @author Codestech
+ * @see SignedArgument
+ * @see NetworkCodec
+ */
+public final class SignedArgumentNetworkCodec implements NetworkCodec<SignedArgument> {
+
+    private static final int MAX_ARGUMENT_NAME_LENGTH = 16;
+    private static final int ARGUMENT_SIGNATURE_LENGTH = 256;
+
+    private static final SignedArgumentNetworkCodec INSTANCE = new SignedArgumentNetworkCodec();
+
+    private SignedArgumentNetworkCodec() {}
+
+    @Override
+    public @NonNull SignedArgument read(@NonNull ByteBuf buf) {
+        return new SignedArgument(NetworkUtil.readString(buf, MAX_ARGUMENT_NAME_LENGTH),
+                NetworkUtil.readBytes(buf, ARGUMENT_SIGNATURE_LENGTH));
+    }
+
+    @Override
+    public void write(@NonNull ByteBuf buf, @NonNull SignedArgument object) {
+        NetworkUtil.writeString(buf, object.name());
+        buf.writeBytes(object.signature());
+    }
+
+    /**
+     * Gets an instance of the {@linkplain SignedArgumentNetworkCodec signed argument network codec}.
+     *
+     * @return the instance
+     * @since 1.0
+     */
+    public static @NonNull SignedArgumentNetworkCodec instance() {
+        return INSTANCE;
+    }
+}

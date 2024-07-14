@@ -363,7 +363,19 @@ public final class NetworkUtil {
      * @since 1.0
      */
     public static byte @NonNull [] readRemainingBytes(@NonNull ByteBuf buf) {
-        byte[] bytes = new byte[buf.readableBytes()];
+        return readBytes(buf, buf.readableBytes());
+    }
+
+    /**
+     * Reads bytes from a {@linkplain ByteBuf byte buf}.
+     *
+     * @param buf the byte buf
+     * @param length an amount of bytes to read
+     * @return the bytes
+     * @since 1.0
+     */
+    public static byte @NonNull [] readBytes(@NonNull ByteBuf buf, int length) {
+        byte[] bytes = new byte[length];
         buf.readBytes(bytes);
         return bytes;
     }

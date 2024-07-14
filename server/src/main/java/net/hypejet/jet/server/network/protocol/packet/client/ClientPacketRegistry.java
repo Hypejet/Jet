@@ -32,6 +32,7 @@ import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientPo
 import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientQueryBlockEntityTagPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientRotationAndPositionPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientRotationPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientSignedChatCommandPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.status.ClientPingRequestStatusPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.status.ClientServerListRequestStatusPacketCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -83,7 +84,7 @@ public final class ClientPacketRegistry {
                 new ClientRotationPlayPacketCodec(), new ClientActionPlayPacketCodec(),
                 new ClientConfirmTeleportationPlayPacketCodec(), new ClientQueryBlockEntityTagPacketCodec(),
                 new ClientChangeDifficultyPlayPacketCodec(), new ClientAcknowledgeMessagePlayPacketCodec(),
-                new ClientChatCommandPlayPacketCodec());
+                new ClientChatCommandPlayPacketCodec(), new ClientSignedChatCommandPlayPacketCodec());
     }
 
     private ClientPacketRegistry() {}

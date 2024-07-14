@@ -12,6 +12,7 @@ import net.hypejet.jet.protocol.packet.client.play.ClientQueryBlockEntityTagPack
 import net.hypejet.jet.protocol.packet.client.play.ClientRotationAndPositionPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientPluginMessagePlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientRotationPlayPacket;
+import net.hypejet.jet.protocol.packet.client.play.ClientSignedChatCommandPlayPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -22,11 +23,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @author Codestech
  * @see ClientPacket
  */
-public sealed interface ClientPlayPacket extends ClientPacket permits ClientAcknowledgeMessagePlayPacket,
-        ClientActionPlayPacket, ClientChangeDifficultyPlayPacket, ClientChatCommandPlayPacket,
-        ClientConfirmTeleportationPlayPacket, ClientKeepAlivePlayPacket, ClientPluginMessagePlayPacket,
-        ClientPositionPlayPacket, ClientQueryBlockEntityTagPacket, ClientRotationAndPositionPlayPacket,
-        ClientRotationPlayPacket {
+public sealed interface ClientPlayPacket extends ClientPacket permits ClientAcknowledgeMessagePlayPacket, ClientActionPlayPacket, ClientChangeDifficultyPlayPacket, ClientChatCommandPlayPacket, ClientConfirmTeleportationPlayPacket, ClientKeepAlivePlayPacket, ClientPluginMessagePlayPacket, ClientPositionPlayPacket, ClientQueryBlockEntityTagPacket, ClientRotationAndPositionPlayPacket, ClientRotationPlayPacket, ClientSignedChatCommandPlayPacket {
     /**
      * {@inheritDoc}
      */
