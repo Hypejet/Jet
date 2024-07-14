@@ -309,8 +309,28 @@ public final class NetworkUtil {
      * @since 1.0
      */
     public static byte @NonNull [] readByteArray(@NonNull ByteBuf buf) {
-        byte[] array = new byte[readVarInt(buf)];
+        return readByteArray(buf, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Reads a byte array from a {@linkplain ByteBuf byte buf}.
+     *
+     * @param buf the byte buf
+     * @param maxLength a max length of the array allowed
+     * @return the byte array
+     * @since 1.0
+     */
+    public static byte @NonNull [] readByteArray(@NonNull ByteBuf buf, int maxLength) {
+        int length = readVarInt(buf);
+
+        if (length > maxLength) {
+            throw new IllegalArgumentException("The array is longer than maximum allowed " +
+                    "(" + length + " > " + maxLength + ").");
+        }
+
+        byte[] array = new byte[length];
         buf.readBytes(array);
+
         return array;
     }
 
@@ -322,6 +342,18 @@ public final class NetworkUtil {
      * @since 1.0
      */
     public static void writeByteArray(@NonNull ByteBuf buf, byte @NonNull [] value) {
+        writeByteArray(buf, value, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Writes a byte array to a {@linkplain ByteBuf byte buf}.
+     *
+     * @param buf the byte buf
+     * @param value the byte array
+     * @param maxLength a max length of the array allowed
+     * @since 1.0
+     */
+    public static void writeByteArray(@NonNull ByteBuf buf, byte @NonNull [] value, int maxLength) {
         writeVarInt(buf, value.length);
         buf.writeBytes(value);
     }

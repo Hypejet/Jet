@@ -7,6 +7,7 @@ import net.hypejet.jet.protocol.packet.client.play.ClientChatCommandPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientConfirmTeleportationPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientKeepAlivePlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientActionPlayPacket;
+import net.hypejet.jet.protocol.packet.client.play.ClientChatSessionUpdatePlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientPositionPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientQueryBlockEntityTagPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientRotationAndPositionPlayPacket;
@@ -26,9 +27,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public sealed interface ClientPlayPacket extends ClientPacket permits ClientAcknowledgeMessagePlayPacket,
         ClientActionPlayPacket, ClientChangeDifficultyPlayPacket, ClientChatCommandPlayPacket,
-        ClientConfirmTeleportationPlayPacket, ClientKeepAlivePlayPacket, ClientPluginMessagePlayPacket,
-        ClientPositionPlayPacket, ClientQueryBlockEntityTagPacket, ClientRotationAndPositionPlayPacket,
-        ClientRotationPlayPacket, ClientSignedChatCommandPlayPacket, ClientSignedChatMessagePlayPacket {
+        ClientConfirmTeleportationPlayPacket, ClientKeepAlivePlayPacket, ClientChatSessionUpdatePlayPacket,
+        ClientPluginMessagePlayPacket, ClientPositionPlayPacket, ClientQueryBlockEntityTagPacket,
+        ClientRotationAndPositionPlayPacket, ClientRotationPlayPacket, ClientSignedChatCommandPlayPacket,
+        ClientSignedChatMessagePlayPacket {
     /**
      * {@inheritDoc}
      */

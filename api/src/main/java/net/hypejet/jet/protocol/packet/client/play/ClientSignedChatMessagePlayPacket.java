@@ -21,13 +21,28 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public record ClientSignedChatMessagePlayPacket(@NonNull String message, long timestamp, long salt,
                                                 byte @Nullable [] signature, @NonNull SeenMessages seenMessages)
         implements ClientPlayPacket {
-
+    /**
+     * Constructs the {@linkplain ClientSignedChatMessagePlayPacket signed chat message play packet}.
+     *
+     * @param message the message
+     * @param timestamp a timestamp that the chat message was sent at
+     * @param salt a salt used to verify the signature hash
+     * @param signature the signature, {@code null} if not present
+     * @param seenMessages last messages, which were sent by the client
+     * @since 1.0
+     */
     public ClientSignedChatMessagePlayPacket {
         if (signature != null) {
             signature = signature.clone();
         }
     }
 
+    /**
+     * Gets the signature, {@code null} if not present.
+     *
+     * @return the signature
+     * @since 1.0
+     */
     @Override
     public byte @Nullable [] signature() {
         byte[] signature = this.signature;
