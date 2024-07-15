@@ -76,7 +76,6 @@ public final class JetPlaySession implements Session<JetPlaySession>, SessionHan
     @Override
     public void uncaughtException(@NonNull Thread t, @NonNull Throwable e) {
         Objects.requireNonNull(e, "The throwable must not be null");
-        this.keepAliveHandler.shutdownNow();
         this.player.disconnect(Component.text("An error occurred during the play session", NamedTextColor.RED));
         LOGGER.error("An error occurred during the play session", e);
     }
