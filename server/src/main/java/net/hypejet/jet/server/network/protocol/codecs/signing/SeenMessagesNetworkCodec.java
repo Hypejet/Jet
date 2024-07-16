@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.protocol.codecs.signing;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.bitset.FixedBitSetNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.hypejet.jet.signing.SeenMessages;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -29,12 +30,12 @@ public final class SeenMessagesNetworkCodec implements NetworkCodec<SeenMessages
 
     @Override
     public @NonNull SeenMessages read(@NonNull ByteBuf buf) {
-        return new SeenMessages(NetworkUtil.readVarInt(buf), ACKNOWLEDGED_CODEC.read(buf));
+        return new SeenMessages(VarIntNetworkCodec.instance().read(buf), ACKNOWLEDGED_CODEC.read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull SeenMessages object) {
-        NetworkUtil.writeVarInt(buf, object.messageCount());
+        VarIntNetworkCodec.instance().write(buf, object.messageCount());
         ACKNOWLEDGED_CODEC.write(buf, object.acknowledged());
     }
 

@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.netty.encoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.util.CompressionUtil;
 import net.hypejet.jet.server.util.NetworkUtil;
@@ -42,10 +43,10 @@ public final class PacketCompressor extends MessageToByteEncoder<ByteBuf> {
             int dataLength = msg.readableBytes();
 
             if (compressionThreshold > dataLength) {
-                NetworkUtil.writeVarInt(out, 0);
+                VarIntNetworkCodec.instance().write(out, 0);
                 out.writeBytes(msg);
             } else {
-                NetworkUtil.writeVarInt(out, dataLength);
+                VarIntNetworkCodec.instance().write(out, dataLength);
                 out.writeBytes(CompressionUtil.compress(NetworkUtil.readRemainingBytes(msg)));
             }
         } catch (Throwable throwable) {

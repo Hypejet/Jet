@@ -63,5 +63,31 @@ public record ServerUpdateTagsConfigurationPacket(@NonNull Collection<TagRegistr
      * @see TagRegistry
      * @see ServerUpdateTagsConfigurationPacket
      */
-    public record Tag(@NonNull Key identifier, int @NonNull [] entries) {}
+    public record Tag(@NonNull Key identifier, int @NonNull [] entries) {
+        /**
+         * Constructs the {@linkplain Tag tag}.
+         *
+         * <p>The entries are copied to prevent modifications on the record.</p>
+         *
+         * @param identifier an identifier of the tag
+         * @param entries numeric IDs of data with type that this tag supports (block, items, etc.)
+         * @since 1.0
+         */
+        public Tag {
+            entries = entries.clone();
+        }
+
+        /**
+         * Gets numeric IDs of data with type that this tag supports (block, items, etc.).
+         *
+         * <p>The returned array is a copy to prevent modifications of the original array.</p>
+         *
+         * @return the identifiers
+         * @since 1.0
+         */
+        @Override
+        public int @NonNull [] entries() {
+            return this.entries.clone();
+        }
+    }
 }

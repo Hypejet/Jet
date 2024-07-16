@@ -2,10 +2,10 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.play.ClientConfirmTeleportationPlayPacket;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
-import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -30,12 +30,12 @@ public final class ClientConfirmTeleportationPlayPacketCodec
 
     @Override
     public @NonNull ClientConfirmTeleportationPlayPacket read(@NonNull ByteBuf buf) {
-        return new ClientConfirmTeleportationPlayPacket(NetworkUtil.readVarInt(buf));
+        return new ClientConfirmTeleportationPlayPacket(VarIntNetworkCodec.instance().read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ClientConfirmTeleportationPlayPacket object) {
-        NetworkUtil.writeVarInt(buf, object.teleportationId());
+        VarIntNetworkCodec.instance().write(buf, object.teleportationId());
     }
 
     @Override

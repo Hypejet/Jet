@@ -1,11 +1,12 @@
 package net.hypejet.jet.server.network.protocol.packet.server.codec.configuration;
 
 import io.netty.buffer.ByteBuf;
+import net.hypejet.jet.link.ServerLink;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerCustomLinksConfigurationPacket;
+import net.hypejet.jet.server.network.protocol.codecs.aggregate.CollectionNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.link.ServerLinkNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
-import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -19,6 +20,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class ServerCustomLinksConfigurationPacketCodec
         extends PacketCodec<ServerCustomLinksConfigurationPacket> {
+
+    private static final CollectionNetworkCodec<ServerLink> LINK_COLLECTION_CODEC = CollectionNetworkCodec
+            .create(ServerLinkNetworkCodec.instance());
+
     /**
      * Constructs the {@linkplain ServerCustomLinksConfigurationPacketCodec custom links configuration packet codec}.
      *
@@ -30,11 +35,11 @@ public final class ServerCustomLinksConfigurationPacketCodec
 
     @Override
     public @NonNull ServerCustomLinksConfigurationPacket read(@NonNull ByteBuf buf) {
-        return new ServerCustomLinksConfigurationPacket(NetworkUtil.readCollection(buf, ServerLinkNetworkCodec.instance()));
+        return new ServerCustomLinksConfigurationPacket(LINK_COLLECTION_CODEC.read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerCustomLinksConfigurationPacket object) {
-        NetworkUtil.writeCollection(buf, ServerLinkNetworkCodec.instance(), object.serverLinks());
+        LINK_COLLECTION_CODEC.write(buf, object.serverLinks());
     }
 }

@@ -1,7 +1,7 @@
 package net.hypejet.jet.session;
 
 import net.hypejet.jet.protocol.connection.PlayerConnection;
-import net.hypejet.jet.protocol.profile.GameProfile;
+import net.hypejet.jet.protocol.packet.server.login.ServerLoginSuccessLoginPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -28,9 +28,10 @@ public interface LoginSession {
      *
      * @param username a username that the player should have
      * @param uniqueId a unique identifier that the player should have
-     * @param gameProfiles game profiles that the player should have assigned
+     * @param properties a properties of the login
      * @since 1.0
      * @throws IllegalArgumentException if the session is already finished
      */
-    void finish(@NonNull String username, @NonNull UUID uniqueId, @NonNull Collection<GameProfile> gameProfiles);
+    void finish(@NonNull String username, @NonNull UUID uniqueId,
+                @NonNull Collection<ServerLoginSuccessLoginPacket.Property> properties);
 }

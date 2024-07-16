@@ -2,7 +2,6 @@ package net.hypejet.jet.server.session;
 
 import net.hypejet.jet.event.events.player.login.PlayerLoginEvent;
 import net.hypejet.jet.protocol.packet.server.login.ServerLoginSuccessLoginPacket;
-import net.hypejet.jet.protocol.profile.GameProfile;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
@@ -47,7 +46,7 @@ public final class JetLoginSession implements LoginSession, Session<LoginSession
     private @MonotonicNonNull String username;
     private @MonotonicNonNull UUID uniqueId;
 
-    private Collection<GameProfile> gameProfiles = List.of();
+    private Collection<ServerLoginSuccessLoginPacket.Property> properties = List.of();
 
     /**
      * Constructs the {@linkplain JetLoginSession login session}.
@@ -73,7 +72,7 @@ public final class JetLoginSession implements LoginSession, Session<LoginSession
                         String username = this.username;
                         UUID uniqueId = this.uniqueId;
 
-                        Collection<GameProfile> gameProfiles = this.gameProfiles;
+                        Collection<ServerLoginSuccessLoginPacket.Property> properties = this.properties;
 
                         JetPlayer player = new JetPlayer(uniqueId, username, this.connection);
                         this.connection.initializePlayer(player);
@@ -91,7 +90,7 @@ public final class JetLoginSession implements LoginSession, Session<LoginSession
                         }
 
                         this.connection.sendPacket(new ServerLoginSuccessLoginPacket(
-                                uniqueId, username, gameProfiles, true
+                                uniqueId, username, properties, true
                         ));
 
                         if (!this.acknowledgeLatch.await(Session.TIME_OUT_DURATION, Session.TIME_OUT_UNIT)) {
@@ -111,10 +110,10 @@ public final class JetLoginSession implements LoginSession, Session<LoginSession
 
     @Override
     public void finish(@NonNull String username, @NonNull UUID uniqueId,
-                       @NonNull Collection<GameProfile> gameProfiles) {
+                       @NonNull Collection<ServerLoginSuccessLoginPacket.Property> properties) {
         Objects.requireNonNull(username, "The username must not be null");
         Objects.requireNonNull(uniqueId, "The unique identifier must not be null");
-        Objects.requireNonNull(gameProfiles, "The game profiles must not be null");
+        Objects.requireNonNull(properties, "The properties must not be null");
 
         this.finishLock.lock();
 
@@ -124,7 +123,7 @@ public final class JetLoginSession implements LoginSession, Session<LoginSession
 
             this.username = username;
             this.uniqueId = uniqueId;
-            this.gameProfiles = List.copyOf(gameProfiles);
+            this.properties = List.copyOf(properties);
 
             this.handlerLatch.countDown();
         } finally {

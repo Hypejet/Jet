@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.netty.encoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import net.hypejet.jet.server.util.NetworkUtil;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +23,7 @@ public final class PacketLengthEncoder extends MessageToByteEncoder<ByteBuf> {
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) throws Exception {
         try {
-            NetworkUtil.writeVarInt(out, msg.readableBytes());
+            VarIntNetworkCodec.instance().write(out, msg.readableBytes());
             out.writeBytes(msg);
         } catch (Throwable throwable) {
             LOGGER.error("An error occurred while encoding a length of a packet", throwable);

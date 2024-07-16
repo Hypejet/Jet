@@ -4,10 +4,10 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.play.ClientActionPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientActionPlayPacket.Action;
 import net.hypejet.jet.server.network.protocol.codecs.enums.EnumVarIntCodec;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
-import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -24,7 +24,7 @@ public final class ClientActionPlayPacketCodec extends ClientPacketCodec<ClientA
     private static final int MIN_JUMP_BOOST = 0;
     private static final int MAX_JUMP_BOOST = 100;
 
-    private static final EnumVarIntCodec<Action> actionCodec = EnumVarIntCodec.builder(Action.class)
+    private static final EnumVarIntCodec<Action> ACTION_CODEC = EnumVarIntCodec.builder(Action.class)
             .add(Action.START_SNEAKING, 0)
             .add(Action.STOP_SNEAKING, 1)
             .add(Action.LEAVE_BED, 2)
@@ -47,9 +47,9 @@ public final class ClientActionPlayPacketCodec extends ClientPacketCodec<ClientA
 
     @Override
     public @NonNull ClientActionPlayPacket read(@NonNull ByteBuf buf) {
-        int entityId = NetworkUtil.readVarInt(buf);
-        Action action = actionCodec.read(buf);
-        int jumpBoost = NetworkUtil.readVarInt(buf);
+        int entityId = VarIntNetworkCodec.instance().read(buf);
+        Action action = ACTION_CODEC.read(buf);
+        int jumpBoost = VarIntNetworkCodec.instance().read(buf);
 
         if (jumpBoost > MAX_JUMP_BOOST || jumpBoost < MIN_JUMP_BOOST)
             throw new IllegalArgumentException("Invalid jump boost");
@@ -64,9 +64,9 @@ public final class ClientActionPlayPacketCodec extends ClientPacketCodec<ClientA
         if (jumpBoost > MAX_JUMP_BOOST || jumpBoost < MIN_JUMP_BOOST)
             throw new IllegalArgumentException("Invalid jump boost");
 
-        NetworkUtil.writeVarInt(buf, object.entityId());
-        actionCodec.write(buf, object.action());
-        NetworkUtil.writeVarInt(buf, jumpBoost);
+        VarIntNetworkCodec.instance().write(buf, object.entityId());
+        ACTION_CODEC.write(buf, object.action());
+        VarIntNetworkCodec.instance().write(buf, object.jumpBoost());
     }
 
     @Override

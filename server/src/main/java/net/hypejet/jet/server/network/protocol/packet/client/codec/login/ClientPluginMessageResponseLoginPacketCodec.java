@@ -2,6 +2,7 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.login;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.login.ClientPluginMessageResponseLoginPacket;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
@@ -32,7 +33,7 @@ public final class ClientPluginMessageResponseLoginPacketCodec
     @Override
     public @NonNull ClientPluginMessageResponseLoginPacket read(@NonNull ByteBuf buf) {
         return new ClientPluginMessageResponseLoginPacket(
-                NetworkUtil.readVarInt(buf),
+                VarIntNetworkCodec.instance().read(buf),
                 buf.readBoolean(),
                 NetworkUtil.readRemainingBytes(buf)
         );
@@ -40,7 +41,7 @@ public final class ClientPluginMessageResponseLoginPacketCodec
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ClientPluginMessageResponseLoginPacket object) {
-        NetworkUtil.writeVarInt(buf, object.messageId());
+        VarIntNetworkCodec.instance().write(buf, object.messageId());
         buf.writeBoolean(object.successful());
         buf.writeBytes(object.data());
     }

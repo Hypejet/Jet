@@ -2,7 +2,8 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.play.ClientQueryBlockEntityTagPacket;
-import net.hypejet.jet.server.network.protocol.codecs.position.BlockPositionNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.other.BlockPositionNetworkCodec;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
@@ -30,13 +31,13 @@ public final class ClientQueryBlockEntityTagPacketCodec extends ClientPacketCode
 
     @Override
     public @NonNull ClientQueryBlockEntityTagPacket read(@NonNull ByteBuf buf) {
-        return new ClientQueryBlockEntityTagPacket(NetworkUtil.readVarInt(buf),
+        return new ClientQueryBlockEntityTagPacket(VarIntNetworkCodec.instance().read(buf),
                 BlockPositionNetworkCodec.instance().read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ClientQueryBlockEntityTagPacket object) {
-        NetworkUtil.writeVarInt(buf, object.transactionId());
+        VarIntNetworkCodec.instance().write(buf, object.transactionId());
         BlockPositionNetworkCodec.instance().write(buf, object.blockPosition());
     }
 

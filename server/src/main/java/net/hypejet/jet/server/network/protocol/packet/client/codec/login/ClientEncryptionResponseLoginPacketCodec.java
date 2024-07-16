@@ -2,11 +2,11 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.login;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.login.ClientEncryptionResponseLoginPacket;
+import net.hypejet.jet.server.network.protocol.codecs.aggregate.arrays.ByteArrayNetworkCodec;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
 import net.hypejet.jet.server.session.JetLoginSession;
-import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -31,13 +31,14 @@ public final class ClientEncryptionResponseLoginPacketCodec
 
     @Override
     public @NonNull ClientEncryptionResponseLoginPacket read(@NonNull ByteBuf buf) {
-        return new ClientEncryptionResponseLoginPacket(NetworkUtil.readByteArray(buf), NetworkUtil.readByteArray(buf));
+        return new ClientEncryptionResponseLoginPacket(ByteArrayNetworkCodec.instance().read(buf),
+                ByteArrayNetworkCodec.instance().read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ClientEncryptionResponseLoginPacket object) {
-        NetworkUtil.writeByteArray(buf, object.sharedSecret());
-        NetworkUtil.writeByteArray(buf, object.verifyToken());
+        ByteArrayNetworkCodec.instance().write(buf, object.sharedSecret());
+        ByteArrayNetworkCodec.instance().write(buf, object.verifyToken());
     }
 
     @Override

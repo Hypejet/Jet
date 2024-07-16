@@ -3,7 +3,8 @@ package net.hypejet.jet.server.network.protocol.codecs.pack;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.pack.DataPack;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
-import net.hypejet.jet.server.util.NetworkUtil;
+import net.hypejet.jet.server.network.protocol.codecs.aggregate.CollectionNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -17,19 +18,21 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class DataPackNetworkCodec implements NetworkCodec<DataPack> {
 
     private static final DataPackNetworkCodec INSTANCE = new DataPackNetworkCodec();
+    private static final CollectionNetworkCodec<DataPack> COLLECTION_CODEC = CollectionNetworkCodec.create(INSTANCE);
 
     private DataPackNetworkCodec() {}
 
     @Override
     public @NonNull DataPack read(@NonNull ByteBuf buf) {
-        return new DataPack(NetworkUtil.readString(buf), NetworkUtil.readString(buf), NetworkUtil.readString(buf));
+        return new DataPack(StringNetworkCodec.instance().read(buf), StringNetworkCodec.instance().read(buf),
+                StringNetworkCodec.instance().read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull DataPack object) {
-        NetworkUtil.writeString(buf, object.namespace());
-        NetworkUtil.writeString(buf, object.identifier());
-        NetworkUtil.writeString(buf, object.version());
+        StringNetworkCodec.instance().write(buf, object.namespace());
+        StringNetworkCodec.instance().write(buf, object.identifier());
+        StringNetworkCodec.instance().write(buf, object.version());
     }
 
     /**
@@ -40,5 +43,16 @@ public final class DataPackNetworkCodec implements NetworkCodec<DataPack> {
      */
     public static @NonNull DataPackNetworkCodec instance() {
         return INSTANCE;
+    }
+
+    /**
+     * Gets an instance of a {@linkplain CollectionNetworkCodec collection network codec}, which reads and writes
+     * {@linkplain java.util.Collection collections} of {@linkplain DataPack data packs}.
+     *
+     * @return the instance
+     * @since 1.0
+     */
+    public static @NonNull CollectionNetworkCodec<DataPack> collectionCodec() {
+        return COLLECTION_CODEC;
     }
 }

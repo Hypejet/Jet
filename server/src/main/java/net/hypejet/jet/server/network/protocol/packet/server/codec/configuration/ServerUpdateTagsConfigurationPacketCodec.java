@@ -2,7 +2,9 @@ package net.hypejet.jet.server.network.protocol.packet.server.codec.configuratio
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerUpdateTagsConfigurationPacket;
-import net.hypejet.jet.server.network.protocol.codecs.tag.TagRegistryNetworkCodec;
+import net.hypejet.jet.protocol.packet.server.configuration.ServerUpdateTagsConfigurationPacket.TagRegistry;
+import net.hypejet.jet.server.network.protocol.codecs.aggregate.CollectionNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.registry.tag.TagRegistryNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
 import net.hypejet.jet.server.util.NetworkUtil;
@@ -18,6 +20,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see PacketCodec
  */
 public final class ServerUpdateTagsConfigurationPacketCodec extends PacketCodec<ServerUpdateTagsConfigurationPacket> {
+
+    private static final CollectionNetworkCodec<TagRegistry> TAG_REGISTRY_COLLECTION_CODEC = CollectionNetworkCodec
+            .create(TagRegistryNetworkCodec.instance());
+
     /**
      * Constructs the {@linkplain ServerUpdateTagsConfigurationPacketCodec update tags configuration packet codec}.
      *
@@ -29,13 +35,11 @@ public final class ServerUpdateTagsConfigurationPacketCodec extends PacketCodec<
 
     @Override
     public @NonNull ServerUpdateTagsConfigurationPacket read(@NonNull ByteBuf buf) {
-        return new ServerUpdateTagsConfigurationPacket(
-                NetworkUtil.readCollection(buf, TagRegistryNetworkCodec.instance())
-        );
+        return new ServerUpdateTagsConfigurationPacket(TAG_REGISTRY_COLLECTION_CODEC.read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerUpdateTagsConfigurationPacket object) {
-        NetworkUtil.writeCollection(buf, TagRegistryNetworkCodec.instance(), object.registries());
+        TAG_REGISTRY_COLLECTION_CODEC.write(buf, object.registries());
     }
 }

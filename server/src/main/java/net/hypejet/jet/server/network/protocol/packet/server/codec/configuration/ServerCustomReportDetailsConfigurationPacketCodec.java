@@ -2,10 +2,11 @@ package net.hypejet.jet.server.network.protocol.packet.server.codec.configuratio
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerCustomReportDetailsConfigurationPacket;
+import net.hypejet.jet.protocol.packet.server.configuration.ServerCustomReportDetailsConfigurationPacket.Details;
+import net.hypejet.jet.server.network.protocol.codecs.aggregate.CollectionNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.report.CustomReportDetailsNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
-import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -19,6 +20,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class ServerCustomReportDetailsConfigurationPacketCodec
         extends PacketCodec<ServerCustomReportDetailsConfigurationPacket> {
+
+    private static final CollectionNetworkCodec<Details> DETAILS_COLLECTION_CODEC = CollectionNetworkCodec
+            .create(CustomReportDetailsNetworkCodec.instance());
+
     /**
      * Constructs the {@linkplain ServerCustomReportDetailsConfigurationPacketCodec custom report details configuration
      * packet codec}.
@@ -32,13 +37,11 @@ public final class ServerCustomReportDetailsConfigurationPacketCodec
 
     @Override
     public @NonNull ServerCustomReportDetailsConfigurationPacket read(@NonNull ByteBuf buf) {
-        return new ServerCustomReportDetailsConfigurationPacket(
-                NetworkUtil.readCollection(buf, CustomReportDetailsNetworkCodec.instance())
-        );
+        return new ServerCustomReportDetailsConfigurationPacket(DETAILS_COLLECTION_CODEC.read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerCustomReportDetailsConfigurationPacket object) {
-        NetworkUtil.writeCollection(buf, CustomReportDetailsNetworkCodec.instance(), object.detailEntries());
+        DETAILS_COLLECTION_CODEC.write(buf, object.detailEntries());
     }
 }

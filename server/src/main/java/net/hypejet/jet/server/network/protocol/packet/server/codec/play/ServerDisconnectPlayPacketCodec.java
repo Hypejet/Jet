@@ -2,9 +2,9 @@ package net.hypejet.jet.server.network.protocol.packet.server.codec.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.play.ServerDisconnectPlayPacket;
+import net.hypejet.jet.server.network.protocol.codecs.component.ComponentNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
-import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -28,11 +28,11 @@ public final class ServerDisconnectPlayPacketCodec extends PacketCodec<ServerDis
 
     @Override
     public @NonNull ServerDisconnectPlayPacket read(@NonNull ByteBuf buf) {
-        return new ServerDisconnectPlayPacket(NetworkUtil.readComponent(buf));
+        return new ServerDisconnectPlayPacket(ComponentNetworkCodec.instance().read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerDisconnectPlayPacket object) {
-        NetworkUtil.writeComponent(buf, object.reason());
+        ComponentNetworkCodec.instance().write(buf, object.reason());
     }
 }

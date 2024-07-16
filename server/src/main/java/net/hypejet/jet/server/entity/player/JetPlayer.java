@@ -22,6 +22,7 @@ import net.hypejet.jet.protocol.packet.server.play.ServerPlayerListHeaderAndFoot
 import net.hypejet.jet.protocol.packet.server.play.ServerPluginMessagePlayPacket;
 import net.hypejet.jet.protocol.packet.server.play.ServerSystemMessagePlayPacket;
 import net.hypejet.jet.server.entity.JetEntity;
+import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.kyori.adventure.audience.MessageType;
@@ -250,7 +251,7 @@ public final class JetPlayer extends JetEntity implements Player {
      */
     public void sendServerBrand(@NonNull String brand) {
         ByteBuf buf = Unpooled.buffer();
-        NetworkUtil.writeString(buf, brand);
+        StringNetworkCodec.instance().write(buf, brand);
 
         byte[] messageData = NetworkUtil.readRemainingBytes(buf);
         this.sendPluginMessage(BRAND_PLUGIN_MESSAGE_IDENTIFIER, messageData);

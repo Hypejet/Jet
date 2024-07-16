@@ -2,6 +2,8 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.play.ClientChatSessionUpdatePlayPacket;
+import net.hypejet.jet.server.network.protocol.codecs.aggregate.arrays.ByteArrayNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.other.UUIDNetworkCodec;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
@@ -20,8 +22,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class ClientChatSessionUpdatePlayPacketCodec
         extends ClientPacketCodec<ClientChatSessionUpdatePlayPacket> {
 
-    private static final int MAX_PUBLIC_KEY_LENGTH = 512;
-    private static final int MAX_KEY_SIGNATURE_LENGTH = 4096;
+    private static final ByteArrayNetworkCodec PUBLIC_KEY_CODEC = ByteArrayNetworkCodec.create(512);
+    private static final ByteArrayNetworkCodec KEY_SIGNATURE_CODEC = ByteArrayNetworkCodec.create(4096);
 
     /**
      * Constructs the {@linkplain ClientChatSessionUpdatePlayPacket chat session update play packet}.
@@ -34,17 +36,16 @@ public final class ClientChatSessionUpdatePlayPacketCodec
 
     @Override
     public @NonNull ClientChatSessionUpdatePlayPacket read(@NonNull ByteBuf buf) {
-        return new ClientChatSessionUpdatePlayPacket(NetworkUtil.readUniqueId(buf), buf.readLong(),
-                NetworkUtil.readByteArray(buf, MAX_PUBLIC_KEY_LENGTH),
-                NetworkUtil.readByteArray(buf, MAX_KEY_SIGNATURE_LENGTH));
+        return new ClientChatSessionUpdatePlayPacket(UUIDNetworkCodec.instance().read(buf), buf.readLong(),
+                PUBLIC_KEY_CODEC.read(buf), KEY_SIGNATURE_CODEC.read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ClientChatSessionUpdatePlayPacket object) {
-        NetworkUtil.writeUniqueId(buf, object.sessionId());
+        UUIDNetworkCodec.instance().write(buf, object.sessionId());
         buf.writeLong(object.expiresAt());
-        NetworkUtil.writeByteArray(buf, object.publicKey(), MAX_PUBLIC_KEY_LENGTH);
-        NetworkUtil.writeByteArray(buf, object.keySignature(), MAX_KEY_SIGNATURE_LENGTH);
+        PUBLIC_KEY_CODEC.write(buf, object.publicKey());
+        KEY_SIGNATURE_CODEC.write(buf, object.keySignature());
     }
 
     @Override

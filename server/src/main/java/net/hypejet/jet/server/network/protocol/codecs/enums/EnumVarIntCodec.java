@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -36,7 +37,7 @@ public final class EnumVarIntCodec<E extends Enum<E>> implements NetworkCodec<E>
     public @NonNull E read(@NonNull ByteBuf buf) {
         Objects.requireNonNull(buf, "The byte buf must not be null");
 
-        int enumEntryId = NetworkUtil.readVarInt(buf);
+        int enumEntryId = VarIntNetworkCodec.instance().read(buf);
         E enumEntry = this.intToEnumMap.get(enumEntryId);
 
         if (enumEntry == null)
@@ -54,7 +55,7 @@ public final class EnumVarIntCodec<E extends Enum<E>> implements NetworkCodec<E>
         if (enumEntryId == null)
             throw new IllegalArgumentException("Could not find an identifier for an enum entry of: " + object);
 
-        NetworkUtil.writeVarInt(buf, enumEntryId);
+        VarIntNetworkCodec.instance().write(buf, enumEntryId);
     }
 
     /**

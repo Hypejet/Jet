@@ -3,11 +3,11 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.configuratio
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientCookieResponseConfigurationPacket;
 import net.hypejet.jet.server.entity.player.JetPlayer;
-import net.hypejet.jet.server.network.protocol.codecs.identifier.IdentifierNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.aggregate.arrays.ByteArrayNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.other.IdentifierNetworkCodec;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
-import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Objects;
@@ -37,7 +37,7 @@ public final class ClientCookieResponseConfigurationPacketCodec
     public @NonNull ClientCookieResponseConfigurationPacket read(@NonNull ByteBuf buf) {
         return new ClientCookieResponseConfigurationPacket(
                 IdentifierNetworkCodec.instance().read(buf),
-                buf.readBoolean() ? NetworkUtil.readByteArray(buf) : null
+                buf.readBoolean() ? ByteArrayNetworkCodec.instance().read(buf) : null
         );
     }
 
@@ -49,7 +49,7 @@ public final class ClientCookieResponseConfigurationPacketCodec
         buf.writeBoolean(data != null);
 
         if (data != null) {
-            NetworkUtil.writeByteArray(buf, data);
+            ByteArrayNetworkCodec.instance().write(buf, object.data());
         }
     }
 

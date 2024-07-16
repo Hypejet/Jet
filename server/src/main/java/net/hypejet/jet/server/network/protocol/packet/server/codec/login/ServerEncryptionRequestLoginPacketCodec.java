@@ -2,9 +2,10 @@ package net.hypejet.jet.server.network.protocol.packet.server.codec.login;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.login.ServerEncryptionRequestLoginPacket;
+import net.hypejet.jet.server.network.protocol.codecs.aggregate.arrays.ByteArrayNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
-import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -18,7 +19,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class ServerEncryptionRequestLoginPacketCodec extends PacketCodec<ServerEncryptionRequestLoginPacket> {
 
-    private static final int MAX_SERVER_ID_LENGTH = 20;
+    private static final StringNetworkCodec SERVER_ID_CODEC = StringNetworkCodec.create(20);
 
     /**
      * Constructs the {@linkplain ServerEncryptionRequestLoginPacketCodec encryption request packet codec}.
@@ -31,19 +32,16 @@ public final class ServerEncryptionRequestLoginPacketCodec extends PacketCodec<S
 
     @Override
     public @NonNull ServerEncryptionRequestLoginPacket read(@NonNull ByteBuf buf) {
-        return new ServerEncryptionRequestLoginPacket(
-                NetworkUtil.readString(buf, MAX_SERVER_ID_LENGTH),
-                NetworkUtil.readByteArray(buf),
-                NetworkUtil.readByteArray(buf),
-                buf.readBoolean()
-        );
+        return new ServerEncryptionRequestLoginPacket(SERVER_ID_CODEC.read(buf),
+                ByteArrayNetworkCodec.instance().read(buf), ByteArrayNetworkCodec.instance().read(buf),
+                buf.readBoolean());
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerEncryptionRequestLoginPacket object) {
-        NetworkUtil.writeString(buf, object.serverId(), MAX_SERVER_ID_LENGTH);
-        NetworkUtil.writeByteArray(buf, object.publicKey());
-        NetworkUtil.writeByteArray(buf, object.verifyToken());
+        SERVER_ID_CODEC.write(buf, object.serverId());
+        ByteArrayNetworkCodec.instance().write(buf, object.publicKey());
+        ByteArrayNetworkCodec.instance().write(buf, object.verifyToken());
         buf.writeBoolean(object.shouldAuthenticate());
     }
 }

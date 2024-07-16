@@ -2,9 +2,9 @@ package net.hypejet.jet.server.network.protocol.packet.server.codec.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.play.ServerActionBarPlayPacket;
+import net.hypejet.jet.server.network.protocol.codecs.component.ComponentNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
-import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -28,11 +28,11 @@ public final class ServerActionBarPlayPacketCodec extends PacketCodec<ServerActi
 
     @Override
     public @NonNull ServerActionBarPlayPacket read(@NonNull ByteBuf buf) {
-        return new ServerActionBarPlayPacket(NetworkUtil.readComponent(buf));
+        return new ServerActionBarPlayPacket(ComponentNetworkCodec.instance().read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerActionBarPlayPacket object) {
-        NetworkUtil.writeComponent(buf, object.text());
+        ComponentNetworkCodec.instance().write(buf, object.text());
     }
 }

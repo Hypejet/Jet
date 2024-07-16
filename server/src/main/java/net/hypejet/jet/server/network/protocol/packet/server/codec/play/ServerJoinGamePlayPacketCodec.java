@@ -4,11 +4,11 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.coordinate.BlockPosition;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.protocol.packet.server.play.ServerJoinGamePlayPacket;
-import net.hypejet.jet.server.network.protocol.codecs.identifier.IdentifierNetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.position.BlockPositionNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.other.IdentifierNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.other.BlockPositionNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
-import net.hypejet.jet.server.util.NetworkUtil;
 import net.hypejet.jet.server.util.gamemode.GameModeUtil;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -44,21 +44,21 @@ public final class ServerJoinGamePlayPacketCodec extends PacketCodec<ServerJoinG
         int entityId = buf.readInt();
         boolean hardcore = buf.readBoolean();
 
-        Collection<Key> dimensions = NetworkUtil.readCollection(buf, IdentifierNetworkCodec.instance());
+        Collection<Key> dimensions = IdentifierNetworkCodec.collectionCodec().read(buf);
 
-        int maxPlayers = NetworkUtil.readVarInt(buf);
-        int viewDistance = NetworkUtil.readVarInt(buf);
+        int maxPlayers = VarIntNetworkCodec.instance().read(buf);
+        int viewDistance = VarIntNetworkCodec.instance().read(buf);
 
         if (viewDistance < MIN_VIEW_DISTANCE || viewDistance > MAX_VIEW_DISTANCE)
             throw new IllegalArgumentException("Invalid view distance: " + viewDistance);
 
-        int simulationDistance = NetworkUtil.readVarInt(buf);
+        int simulationDistance = VarIntNetworkCodec.instance().read(buf);
 
         boolean reducedDebugInfo = buf.readBoolean();
         boolean enableRespawnScreen = buf.readBoolean();
         boolean limitedCrafting = buf.readBoolean();
 
-        int dimensionType = NetworkUtil.readVarInt(buf);
+        int dimensionType = VarIntNetworkCodec.instance().read(buf);
         Key dimensionName = IdentifierNetworkCodec.instance().read(buf);
 
         long hashedSeed = buf.readLong();
@@ -80,7 +80,7 @@ public final class ServerJoinGamePlayPacketCodec extends PacketCodec<ServerJoinG
             deathLocation = null;
         }
 
-        int portalCooldown = NetworkUtil.readVarInt(buf);
+        int portalCooldown = VarIntNetworkCodec.instance().read(buf);
         boolean enforcesSecureChat = buf.readBoolean();
 
         return new ServerJoinGamePlayPacket(entityId, hardcore, dimensions, maxPlayers, viewDistance,
@@ -94,22 +94,22 @@ public final class ServerJoinGamePlayPacketCodec extends PacketCodec<ServerJoinG
         buf.writeInt(object.entityId());
         buf.writeBoolean(object.hardcore());
 
-        NetworkUtil.writeCollection(buf, IdentifierNetworkCodec.instance(), object.dimensions());
-        NetworkUtil.writeVarInt(buf, object.maxPlayers());
+        IdentifierNetworkCodec.collectionCodec().write(buf, object.dimensions());
+        VarIntNetworkCodec.instance().write(buf, object.maxPlayers());
 
         int viewDistance = object.viewDistance();
 
         if (viewDistance < MIN_VIEW_DISTANCE || viewDistance > MAX_VIEW_DISTANCE)
             throw new IllegalArgumentException("Invalid view distance: " + viewDistance);
 
-        NetworkUtil.writeVarInt(buf, viewDistance);
-        NetworkUtil.writeVarInt(buf, object.simulationDistance());
+        VarIntNetworkCodec.instance().write(buf, object.viewDistance());
+        VarIntNetworkCodec.instance().write(buf, object.simulationDistance());
 
         buf.writeBoolean(object.reducedDebugInfo());
         buf.writeBoolean(object.enableRespawnScreen());
         buf.writeBoolean(object.limitedCrafting());
 
-        NetworkUtil.writeVarInt(buf, object.dimensionType());
+        VarIntNetworkCodec.instance().write(buf, object.dimensionType());
         IdentifierNetworkCodec.instance().write(buf, object.dimensionName());
 
         buf.writeLong(object.hashedSeed());
@@ -128,7 +128,7 @@ public final class ServerJoinGamePlayPacketCodec extends PacketCodec<ServerJoinG
             BlockPositionNetworkCodec.instance().write(buf, deathLocation.deathPosition());
         }
 
-        NetworkUtil.writeVarInt(buf, object.portalCooldown());
+        VarIntNetworkCodec.instance().write(buf, object.portalCooldown());
         buf.writeBoolean(object.enforcesSecureChat());
     }
 }

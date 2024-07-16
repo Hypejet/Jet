@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.protocol.packet.server.codec.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.play.ServerPluginMessagePlayPacket;
-import net.hypejet.jet.server.network.protocol.codecs.identifier.IdentifierNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.other.IdentifierNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
 import net.hypejet.jet.server.util.NetworkUtil;

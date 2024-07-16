@@ -5,6 +5,7 @@ import net.hypejet.jet.protocol.packet.server.ServerPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerFinishConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerResetChatConfigurationPacket;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.EmptyPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.configuration.ServerAddResourcePackConfigurationPacketCodec;
@@ -124,7 +125,7 @@ public final class ServerPacketRegistry {
      */
     private static <P extends ServerPacket> void write(@NonNull PacketCodec<P> codec, @NonNull ServerPacket packet,
                                                        @NonNull ByteBuf buf) {
-        NetworkUtil.writeVarInt(buf, codec.getPacketId());
+        VarIntNetworkCodec.instance().write(buf, codec.getPacketId());
         codec.write(buf, codec.getPacketClass().cast(packet));
     }
 

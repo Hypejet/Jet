@@ -1,9 +1,9 @@
-package net.hypejet.jet.server.network.protocol.codecs.tag;
+package net.hypejet.jet.server.network.protocol.codecs.registry.tag;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerUpdateTagsConfigurationPacket.TagRegistry;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.identifier.IdentifierNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.other.IdentifierNetworkCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -25,13 +25,13 @@ public final class TagRegistryNetworkCodec implements NetworkCodec<TagRegistry> 
     @Override
     public @NonNull TagRegistry read(@NonNull ByteBuf buf) {
         return new TagRegistry(IdentifierNetworkCodec.instance().read(buf),
-                NetworkUtil.readCollection(buf, TagNetworkCodec.instance()));
+                TagNetworkCodec.collectionCodec().read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull TagRegistry object) {
         IdentifierNetworkCodec.instance().write(buf, object.identifier());
-        NetworkUtil.writeCollection(buf, TagNetworkCodec.instance(), object.tags());
+        TagNetworkCodec.collectionCodec().write(buf, object.tags());
     }
 
     /**

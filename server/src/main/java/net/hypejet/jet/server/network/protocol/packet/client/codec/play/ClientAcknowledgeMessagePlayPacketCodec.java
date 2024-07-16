@@ -2,10 +2,10 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.play.ClientAcknowledgeMessagePlayPacket;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
-import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -29,12 +29,12 @@ public final class ClientAcknowledgeMessagePlayPacketCodec extends ClientPacketC
 
     @Override
     public @NonNull ClientAcknowledgeMessagePlayPacket read(@NonNull ByteBuf buf) {
-        return new ClientAcknowledgeMessagePlayPacket(NetworkUtil.readVarInt(buf));
+        return new ClientAcknowledgeMessagePlayPacket(VarIntNetworkCodec.instance().read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ClientAcknowledgeMessagePlayPacket object) {
-        NetworkUtil.writeVarInt(buf, object.messageCount());
+        VarIntNetworkCodec.instance().read(buf);
     }
 
     @Override

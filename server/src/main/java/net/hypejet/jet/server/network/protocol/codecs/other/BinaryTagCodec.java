@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.network.protocol.codecs.nbt;
+package net.hypejet.jet.server.network.protocol.codecs.other;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;

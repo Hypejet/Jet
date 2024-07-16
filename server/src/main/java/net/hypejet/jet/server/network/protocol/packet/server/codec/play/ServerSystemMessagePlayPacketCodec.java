@@ -2,9 +2,9 @@ package net.hypejet.jet.server.network.protocol.packet.server.codec.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.play.ServerSystemMessagePlayPacket;
+import net.hypejet.jet.server.network.protocol.codecs.component.ComponentNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
-import net.hypejet.jet.server.util.NetworkUtil;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -34,7 +34,7 @@ public final class ServerSystemMessagePlayPacketCodec extends PacketCodec<Server
     @Override
     public @NonNull ServerSystemMessagePlayPacket read(@NonNull ByteBuf buf) {
         int index = buf.readerIndex();
-        Component message = NetworkUtil.readComponent(buf);
+        Component message = ComponentNetworkCodec.instance().read(buf);
 
         if (buf.readerIndex() - index > MAX_MESSAGE_SIZE)
             throw new IllegalArgumentException("The message size is higher than allowed");
@@ -44,7 +44,7 @@ public final class ServerSystemMessagePlayPacketCodec extends PacketCodec<Server
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerSystemMessagePlayPacket object) {
-        NetworkUtil.writeComponent(buf, object.message());
+        ComponentNetworkCodec.instance().write(buf, object.message());
         if (buf.readableBytes() > MAX_MESSAGE_SIZE)
             throw new IllegalArgumentException("The message size is higher than allowed");
         buf.writeBoolean(object.overlay());

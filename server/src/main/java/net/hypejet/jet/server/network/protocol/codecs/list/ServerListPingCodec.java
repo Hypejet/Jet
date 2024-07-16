@@ -11,6 +11,7 @@ import net.hypejet.jet.server.network.protocol.codecs.list.json.PingPlayerSerial
 import net.hypejet.jet.server.network.protocol.codecs.list.json.PlayersSerializer;
 import net.hypejet.jet.server.network.protocol.codecs.list.json.ServerListPingSerializer;
 import net.hypejet.jet.server.network.protocol.codecs.list.json.VersionSerializer;
+import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -44,7 +45,7 @@ public final class ServerListPingCodec implements NetworkCodec<ServerListPing> {
      */
     @Override
     public @NonNull ServerListPing read(@NonNull ByteBuf buf) {
-        return GSON.fromJson(NetworkUtil.readString(buf), ServerListPing.class);
+        return GSON.fromJson(StringNetworkCodec.instance().read(buf), ServerListPing.class);
     }
 
     /**
@@ -52,7 +53,7 @@ public final class ServerListPingCodec implements NetworkCodec<ServerListPing> {
      */
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerListPing object) {
-        NetworkUtil.writeString(buf, GSON.toJson(object));
+        StringNetworkCodec.instance().write(buf, GSON.toJson(object));
     }
 
     /**

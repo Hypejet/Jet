@@ -2,11 +2,12 @@ package net.hypejet.jet.server.network.protocol.packet.server.codec.configuratio
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerRegistryDataConfigurationPacket;
-import net.hypejet.jet.server.network.protocol.codecs.identifier.IdentifierNetworkCodec;
+import net.hypejet.jet.protocol.packet.server.configuration.ServerRegistryDataConfigurationPacket.Entry;
+import net.hypejet.jet.server.network.protocol.codecs.aggregate.CollectionNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.other.IdentifierNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.registry.RegistryDataEntryNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
-import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -20,6 +21,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class ServerRegistryDataConfigurationPacketCodec
         extends PacketCodec<ServerRegistryDataConfigurationPacket> {
+
+    private static final CollectionNetworkCodec<Entry> REGISTRY_ENTRY_COLLECTION_CODEC = CollectionNetworkCodec
+            .create(RegistryDataEntryNetworkCodec.instance());
+
     /**
      * Constructs the {@linkplain ServerRegistryDataConfigurationPacketCodec registry data configuration packet codec}.
      *
@@ -32,12 +37,12 @@ public final class ServerRegistryDataConfigurationPacketCodec
     @Override
     public @NonNull ServerRegistryDataConfigurationPacket read(@NonNull ByteBuf buf) {
         return new ServerRegistryDataConfigurationPacket(IdentifierNetworkCodec.instance().read(buf),
-                NetworkUtil.readCollection(buf, RegistryDataEntryNetworkCodec.instance()));
+                REGISTRY_ENTRY_COLLECTION_CODEC.read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerRegistryDataConfigurationPacket object) {
         IdentifierNetworkCodec.instance().write(buf, object.registry());
-        NetworkUtil.writeCollection(buf, RegistryDataEntryNetworkCodec.instance(), object.entries());
+        REGISTRY_ENTRY_COLLECTION_CODEC.write(buf, object.entries());
     }
 }
