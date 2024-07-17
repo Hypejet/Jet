@@ -5,6 +5,7 @@ import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Arrays;
 import java.util.BitSet;
 
 /**
@@ -31,7 +32,7 @@ public final class FixedBitSetNetworkCodec implements NetworkCodec<BitSet> {
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull BitSet object) {
-        buf.writeBytes(object.toByteArray());
+        buf.writeBytes(Arrays.copyOf(object.toByteArray(), this.fixedByteSize));
     }
 
     /**

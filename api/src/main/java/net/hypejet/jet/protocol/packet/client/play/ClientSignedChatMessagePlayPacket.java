@@ -5,6 +5,9 @@ import net.hypejet.jet.signing.SeenMessages;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * Represents a {@linkplain ClientPlayPacket client play packet}, which is received when
  * a {@link net.hypejet.jet.entity.player.Player player} sends a chat message with a signature.
@@ -47,5 +50,30 @@ public record ClientSignedChatMessagePlayPacket(@NonNull String message, long ti
     public byte @Nullable [] signature() {
         byte[] signature = this.signature;
         return signature == null ? null : signature.clone();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    // Override, because records do not compare contents of arrays natively
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (!(object instanceof ClientSignedChatMessagePlayPacket that)) return false;
+        return this.salt == that.salt
+                && this.timestamp == that.timestamp
+                && Objects.equals(this.message, that.message)
+                && Objects.equals(this.seenMessages, that.seenMessages)
+                && Objects.deepEquals(this.signature, that.signature);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    // Override, because records do not compare contents of arrays natively
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.message, this.timestamp, this.salt, Arrays.hashCode(this.signature),
+                this.seenMessages);
     }
 }

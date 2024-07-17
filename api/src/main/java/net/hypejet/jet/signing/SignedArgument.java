@@ -2,6 +2,9 @@ package net.hypejet.jet.signing;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * Represents an argument of a Minecraft command, which was signed by a client.
  *
@@ -35,5 +38,25 @@ public record SignedArgument(@NonNull String name, byte @NonNull [] signature) {
     @Override
     public byte @NonNull [] signature() {
         return this.signature.clone();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    // Override, because records do not compare contents of arrays natively
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (!(object instanceof SignedArgument that)) return false;
+        return Objects.equals(this.name, that.name) && Objects.deepEquals(this.signature, that.signature);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    // Override, because records do not compare contents of arrays natively
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.name, Arrays.hashCode(this.signature));
     }
 }

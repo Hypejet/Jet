@@ -166,7 +166,7 @@ public final class ServerGameEventPlayPacketCodec extends PacketCodec<ServerGame
 
             case GameEvent.WinGame (boolean rollCredits) -> {
                 identifier = WIN_GAME;
-                value = rollCredits ? 0 : 1;
+                value = rollCredits ? 1 : 0;
             }
         }
 

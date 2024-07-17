@@ -4,8 +4,10 @@ import net.hypejet.jet.protocol.packet.server.ServerConfigurationPacket;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a {@linkplain ServerConfigurationPacket server configuration packet}, which updates tag registries on
@@ -88,6 +90,26 @@ public record ServerUpdateTagsConfigurationPacket(@NonNull Collection<TagRegistr
         @Override
         public int @NonNull [] entries() {
             return this.entries.clone();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        // Override, because records do not compare contents of arrays natively
+        @Override
+        public boolean equals(Object object) {
+            if (this == object) return true;
+            if (!(object instanceof Tag tag)) return false;
+            return Objects.equals(this.identifier, tag.identifier) && Objects.deepEquals(this.entries, tag.entries);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        // Override, because records do not compare contents of arrays natively
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.identifier, Arrays.hashCode(this.entries));
         }
     }
 }

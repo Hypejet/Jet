@@ -43,8 +43,8 @@ public final class CollectionNetworkCodec<T> extends AggregateNetworkCodec<Colle
     @Override
     protected @NonNull Collection<T> decodeElements(int length, @NonNull ByteBuf buf) {
         List<T> list = new ArrayList<>(length);
-        for (int index = 0; index < length; index++)
-            list.set(index, this.elementCodec.read(buf));
+        for (int i = 0; i < length; i++)
+            list.add(this.elementCodec.read(buf));
         return List.copyOf(list);
     }
 

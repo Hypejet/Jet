@@ -34,7 +34,7 @@ public final class ClientAcknowledgeMessagePlayPacketCodec extends ClientPacketC
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ClientAcknowledgeMessagePlayPacket object) {
-        VarIntNetworkCodec.instance().read(buf);
+        VarIntNetworkCodec.instance().write(buf, object.messageCount());
     }
 
     @Override

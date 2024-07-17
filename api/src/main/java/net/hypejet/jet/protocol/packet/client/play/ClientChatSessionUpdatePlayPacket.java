@@ -3,6 +3,8 @@ package net.hypejet.jet.protocol.packet.client.play;
 import net.hypejet.jet.protocol.packet.client.ClientPlayPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -60,5 +62,29 @@ public record ClientChatSessionUpdatePlayPacket(@NonNull UUID sessionId, long ex
     @Override
     public byte @NonNull [] keySignature() {
         return this.keySignature.clone();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    // Override, because records do not compare contents of arrays natively
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (!(object instanceof ClientChatSessionUpdatePlayPacket that)) return false;
+        return this.expiresAt == that.expiresAt
+                && Objects.equals(this.sessionId, that.sessionId)
+                && Objects.deepEquals(this.publicKey, that.publicKey)
+                && Objects.deepEquals(this.keySignature, that.keySignature);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    // Override, because records do not compare contents of arrays natively
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.sessionId, this.expiresAt, Arrays.hashCode(this.publicKey),
+                Arrays.hashCode(this.keySignature));
     }
 }
