@@ -6,7 +6,6 @@ import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.CollectionNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.arrays.VarIntArrayNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.IdentifierNetworkCodec;
-import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

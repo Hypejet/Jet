@@ -7,7 +7,6 @@ import net.hypejet.jet.server.network.protocol.codecs.aggregate.CollectionNetwor
 import net.hypejet.jet.server.network.protocol.codecs.registry.tag.TagRegistryNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
-import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

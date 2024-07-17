@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.bitset.FixedBitSetNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
-import net.hypejet.jet.server.util.NetworkUtil;
 import net.hypejet.jet.signing.SeenMessages;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

@@ -1,11 +1,9 @@
 package net.hypejet.jet.server.network.protocol.packet.client;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.configuration.ClientAcknowledgeFinishConfigurationPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.configuration.ClientCookieResponseConfigurationPacketCodec;

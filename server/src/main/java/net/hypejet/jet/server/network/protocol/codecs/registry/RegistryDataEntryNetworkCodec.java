@@ -3,8 +3,8 @@ package net.hypejet.jet.server.network.protocol.codecs.registry;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerRegistryDataConfigurationPacket.Entry;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.other.IdentifierNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.BinaryTagCodec;
+import net.hypejet.jet.server.network.protocol.codecs.other.IdentifierNetworkCodec;
 import net.kyori.adventure.nbt.BinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

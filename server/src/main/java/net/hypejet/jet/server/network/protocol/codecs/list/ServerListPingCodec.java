@@ -12,7 +12,6 @@ import net.hypejet.jet.server.network.protocol.codecs.list.json.PlayersSerialize
 import net.hypejet.jet.server.network.protocol.codecs.list.json.ServerListPingSerializer;
 import net.hypejet.jet.server.network.protocol.codecs.list.json.VersionSerializer;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
-import net.hypejet.jet.server.util.NetworkUtil;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

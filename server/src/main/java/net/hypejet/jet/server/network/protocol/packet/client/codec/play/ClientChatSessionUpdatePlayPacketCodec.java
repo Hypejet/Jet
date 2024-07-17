@@ -7,7 +7,6 @@ import net.hypejet.jet.server.network.protocol.codecs.other.UUIDNetworkCodec;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
-import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
