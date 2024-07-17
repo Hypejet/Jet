@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.pack.DataPack;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.CollectionNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.identifier.IdentifierNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -24,14 +25,12 @@ public final class DataPackNetworkCodec implements NetworkCodec<DataPack> {
 
     @Override
     public @NonNull DataPack read(@NonNull ByteBuf buf) {
-        return new DataPack(StringNetworkCodec.instance().read(buf), StringNetworkCodec.instance().read(buf),
-                StringNetworkCodec.instance().read(buf));
+        return new DataPack(IdentifierNetworkCodec.instance().read(buf), StringNetworkCodec.instance().read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull DataPack object) {
-        StringNetworkCodec.instance().write(buf, object.namespace());
-        StringNetworkCodec.instance().write(buf, object.identifier());
+        IdentifierNetworkCodec.instance().write(buf, object.key());
         StringNetworkCodec.instance().write(buf, object.version());
     }
 

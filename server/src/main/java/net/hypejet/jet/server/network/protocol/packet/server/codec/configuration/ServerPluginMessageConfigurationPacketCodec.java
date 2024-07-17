@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.protocol.packet.server.codec.configuratio
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerPluginMessageConfigurationPacket;
-import net.hypejet.jet.server.network.protocol.codecs.other.IdentifierNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.identifier.PackedIdentifierNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
 import net.hypejet.jet.server.util.NetworkUtil;
@@ -31,13 +31,13 @@ public final class ServerPluginMessageConfigurationPacketCodec
 
     @Override
     public @NonNull ServerPluginMessageConfigurationPacket read(@NonNull ByteBuf buf) {
-        return new ServerPluginMessageConfigurationPacket(IdentifierNetworkCodec.instance().read(buf),
+        return new ServerPluginMessageConfigurationPacket(PackedIdentifierNetworkCodec.instance().read(buf),
                 NetworkUtil.readRemainingBytes(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerPluginMessageConfigurationPacket object) {
-        IdentifierNetworkCodec.instance().write(buf, object.identifier());
+        PackedIdentifierNetworkCodec.instance().write(buf, object.identifier());
         buf.writeBytes(object.data());
     }
 }

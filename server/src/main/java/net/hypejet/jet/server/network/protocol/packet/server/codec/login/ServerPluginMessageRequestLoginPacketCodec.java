@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.protocol.packet.server.codec.login;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.login.ServerPluginMessageRequestLoginPacket;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.other.IdentifierNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.identifier.PackedIdentifierNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
 import net.hypejet.jet.server.util.NetworkUtil;
@@ -32,7 +32,7 @@ public final class ServerPluginMessageRequestLoginPacketCodec extends PacketCode
     public @NonNull ServerPluginMessageRequestLoginPacket read(@NonNull ByteBuf buf) {
         return new ServerPluginMessageRequestLoginPacket(
                 VarIntNetworkCodec.instance().read(buf),
-                IdentifierNetworkCodec.instance().read(buf),
+                PackedIdentifierNetworkCodec.instance().read(buf),
                 NetworkUtil.readRemainingBytes(buf)
         );
     }
@@ -40,7 +40,7 @@ public final class ServerPluginMessageRequestLoginPacketCodec extends PacketCode
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerPluginMessageRequestLoginPacket object) {
         VarIntNetworkCodec.instance().write(buf, object.messageId());
-        IdentifierNetworkCodec.instance().write(buf, object.channel());
+        PackedIdentifierNetworkCodec.instance().write(buf, object.channel());
         buf.writeBytes(object.data());
     }
 }

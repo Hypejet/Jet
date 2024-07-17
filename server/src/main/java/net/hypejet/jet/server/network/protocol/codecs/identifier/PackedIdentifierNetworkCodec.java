@@ -1,25 +1,28 @@
-package net.hypejet.jet.server.network.protocol.codecs.other;
+package net.hypejet.jet.server.network.protocol.codecs.identifier;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.CollectionNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain NetworkCodec network codec}, which reads and writes a {@linkplain Key identifier}.
+ * Represents a {@linkplain NetworkCodec network codec}, which reads and writes a {@linkplain Key identifier}
+ * from/to a single {@linkplain String string}.
  *
  * @since 1.0
  * @author Codestech
  * @see Key
+ * @see String
  * @see NetworkCodec
  */
-public final class IdentifierNetworkCodec implements NetworkCodec<Key> {
+public final class PackedIdentifierNetworkCodec implements NetworkCodec<Key> {
 
-    private static final IdentifierNetworkCodec INSTANCE = new IdentifierNetworkCodec();
+    private static final PackedIdentifierNetworkCodec INSTANCE = new PackedIdentifierNetworkCodec();
     private static final CollectionNetworkCodec<Key> COLLECTION_CODEC = CollectionNetworkCodec.create(INSTANCE);
 
-    private IdentifierNetworkCodec() {}
+    private PackedIdentifierNetworkCodec() {}
 
     @Override
     public @NonNull Key read(@NonNull ByteBuf buf) {
@@ -32,12 +35,12 @@ public final class IdentifierNetworkCodec implements NetworkCodec<Key> {
     }
 
     /**
-     * Gets an instance of the {@linkplain IdentifierNetworkCodec identifier network codec}.
+     * Gets an instance of the {@linkplain PackedIdentifierNetworkCodec identifier network codec}.
      *
      * @return the instance
      * @since 1.0
      */
-    public static @NonNull IdentifierNetworkCodec instance() {
+    public static @NonNull PackedIdentifierNetworkCodec instance() {
         return INSTANCE;
     }
 

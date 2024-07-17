@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.play;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.play.ClientPluginMessagePlayPacket;
 import net.hypejet.jet.server.entity.player.JetPlayer;
-import net.hypejet.jet.server.network.protocol.codecs.other.IdentifierNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.identifier.PackedIdentifierNetworkCodec;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
@@ -33,13 +33,13 @@ public final class ClientPluginMessagePlayPacketCodec extends ClientPacketCodec<
 
     @Override
     public @NonNull ClientPluginMessagePlayPacket read(@NonNull ByteBuf buf) {
-        return new ClientPluginMessagePlayPacket(IdentifierNetworkCodec.instance().read(buf),
+        return new ClientPluginMessagePlayPacket(PackedIdentifierNetworkCodec.instance().read(buf),
                 NetworkUtil.readRemainingBytes(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ClientPluginMessagePlayPacket object) {
-        IdentifierNetworkCodec.instance().write(buf, object.identifier());
+        PackedIdentifierNetworkCodec.instance().write(buf, object.identifier());
         buf.writeBytes(object.data());
     }
 

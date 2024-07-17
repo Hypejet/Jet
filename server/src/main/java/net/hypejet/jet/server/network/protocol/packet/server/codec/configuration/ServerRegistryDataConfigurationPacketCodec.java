@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerRegistryDataConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerRegistryDataConfigurationPacket.Entry;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.CollectionNetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.other.IdentifierNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.identifier.PackedIdentifierNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.registry.RegistryDataEntryNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
@@ -36,13 +36,13 @@ public final class ServerRegistryDataConfigurationPacketCodec
 
     @Override
     public @NonNull ServerRegistryDataConfigurationPacket read(@NonNull ByteBuf buf) {
-        return new ServerRegistryDataConfigurationPacket(IdentifierNetworkCodec.instance().read(buf),
+        return new ServerRegistryDataConfigurationPacket(PackedIdentifierNetworkCodec.instance().read(buf),
                 REGISTRY_ENTRY_COLLECTION_CODEC.read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerRegistryDataConfigurationPacket object) {
-        IdentifierNetworkCodec.instance().write(buf, object.registry());
+        PackedIdentifierNetworkCodec.instance().write(buf, object.registry());
         REGISTRY_ENTRY_COLLECTION_CODEC.write(buf, object.entries());
     }
 }

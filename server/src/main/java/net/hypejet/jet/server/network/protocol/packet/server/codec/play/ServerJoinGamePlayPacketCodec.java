@@ -6,7 +6,7 @@ import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.protocol.packet.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.BlockPositionNetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.other.IdentifierNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.identifier.PackedIdentifierNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
 import net.hypejet.jet.server.util.gamemode.GameModeUtil;
@@ -44,7 +44,7 @@ public final class ServerJoinGamePlayPacketCodec extends PacketCodec<ServerJoinG
         int entityId = buf.readInt();
         boolean hardcore = buf.readBoolean();
 
-        Collection<Key> dimensions = IdentifierNetworkCodec.collectionCodec().read(buf);
+        Collection<Key> dimensions = PackedIdentifierNetworkCodec.collectionCodec().read(buf);
 
         int maxPlayers = VarIntNetworkCodec.instance().read(buf);
         int viewDistance = VarIntNetworkCodec.instance().read(buf);
@@ -59,7 +59,7 @@ public final class ServerJoinGamePlayPacketCodec extends PacketCodec<ServerJoinG
         boolean limitedCrafting = buf.readBoolean();
 
         int dimensionType = VarIntNetworkCodec.instance().read(buf);
-        Key dimensionName = IdentifierNetworkCodec.instance().read(buf);
+        Key dimensionName = PackedIdentifierNetworkCodec.instance().read(buf);
 
         long hashedSeed = buf.readLong();
 
@@ -73,7 +73,7 @@ public final class ServerJoinGamePlayPacketCodec extends PacketCodec<ServerJoinG
         ServerJoinGamePlayPacket.DeathLocation deathLocation;
 
         if (buf.readBoolean()) {
-            Key deathDimensionName = IdentifierNetworkCodec.instance().read(buf);
+            Key deathDimensionName = PackedIdentifierNetworkCodec.instance().read(buf);
             BlockPosition blockPosition = BlockPositionNetworkCodec.instance().read(buf);
             deathLocation = new ServerJoinGamePlayPacket.DeathLocation(deathDimensionName, blockPosition);
         } else {
@@ -94,7 +94,7 @@ public final class ServerJoinGamePlayPacketCodec extends PacketCodec<ServerJoinG
         buf.writeInt(object.entityId());
         buf.writeBoolean(object.hardcore());
 
-        IdentifierNetworkCodec.collectionCodec().write(buf, object.dimensions());
+        PackedIdentifierNetworkCodec.collectionCodec().write(buf, object.dimensions());
         VarIntNetworkCodec.instance().write(buf, object.maxPlayers());
 
         int viewDistance = object.viewDistance();
@@ -110,7 +110,7 @@ public final class ServerJoinGamePlayPacketCodec extends PacketCodec<ServerJoinG
         buf.writeBoolean(object.limitedCrafting());
 
         VarIntNetworkCodec.instance().write(buf, object.dimensionType());
-        IdentifierNetworkCodec.instance().write(buf, object.dimensionName());
+        PackedIdentifierNetworkCodec.instance().write(buf, object.dimensionName());
 
         buf.writeLong(object.hashedSeed());
 
@@ -124,7 +124,7 @@ public final class ServerJoinGamePlayPacketCodec extends PacketCodec<ServerJoinG
         buf.writeBoolean(deathLocation != null);
 
         if (deathLocation != null) {
-            IdentifierNetworkCodec.instance().write(buf, deathLocation.deathDimensionName());
+            PackedIdentifierNetworkCodec.instance().write(buf, deathLocation.deathDimensionName());
             BlockPositionNetworkCodec.instance().write(buf, deathLocation.deathPosition());
         }
 

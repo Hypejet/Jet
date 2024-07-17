@@ -5,7 +5,7 @@ import net.hypejet.jet.protocol.packet.server.configuration.ServerUpdateTagsConf
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.CollectionNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.arrays.VarIntArrayNetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.other.IdentifierNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.identifier.PackedIdentifierNetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -25,12 +25,12 @@ public final class TagNetworkCodec implements NetworkCodec<Tag> {
 
     @Override
     public @NonNull Tag read(@NonNull ByteBuf buf) {
-        return new Tag(IdentifierNetworkCodec.instance().read(buf), VarIntArrayNetworkCodec.instance().read(buf));
+        return new Tag(PackedIdentifierNetworkCodec.instance().read(buf), VarIntArrayNetworkCodec.instance().read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull Tag object) {
-        IdentifierNetworkCodec.instance().write(buf, object.identifier());
+        PackedIdentifierNetworkCodec.instance().write(buf, object.identifier());
         VarIntArrayNetworkCodec.instance().write(buf, object.entries());
     }
 

@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.protocol.packet.server.codec.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.play.ServerPluginMessagePlayPacket;
-import net.hypejet.jet.server.network.protocol.codecs.other.IdentifierNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.identifier.PackedIdentifierNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
 import net.hypejet.jet.server.util.NetworkUtil;
@@ -29,13 +29,13 @@ public final class ServerPluginMessagePlayPacketCodec extends PacketCodec<Server
 
     @Override
     public @NonNull ServerPluginMessagePlayPacket read(@NonNull ByteBuf buf) {
-        return new ServerPluginMessagePlayPacket(IdentifierNetworkCodec.instance().read(buf),
+        return new ServerPluginMessagePlayPacket(PackedIdentifierNetworkCodec.instance().read(buf),
                 NetworkUtil.readRemainingBytes(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerPluginMessagePlayPacket object) {
-        IdentifierNetworkCodec.instance().write(buf, object.identifier());
+        PackedIdentifierNetworkCodec.instance().write(buf, object.identifier());
         buf.writeBytes(object.data());
     }
 }

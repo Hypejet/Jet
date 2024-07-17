@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.protocol.packet.server.codec.configuratio
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerCookieRequestConfigurationPacket;
-import net.hypejet.jet.server.network.protocol.codecs.other.IdentifierNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.identifier.PackedIdentifierNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -30,11 +30,11 @@ public final class ServerCookieRequestConfigurationPacketCodec
 
     @Override
     public @NonNull ServerCookieRequestConfigurationPacket read(@NonNull ByteBuf buf) {
-        return new ServerCookieRequestConfigurationPacket(IdentifierNetworkCodec.instance().read(buf));
+        return new ServerCookieRequestConfigurationPacket(PackedIdentifierNetworkCodec.instance().read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerCookieRequestConfigurationPacket object) {
-        IdentifierNetworkCodec.instance().write(buf, object.identifier());
+        PackedIdentifierNetworkCodec.instance().write(buf, object.identifier());
     }
 }
