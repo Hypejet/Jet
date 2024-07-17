@@ -67,7 +67,7 @@ public final class ClientConfigurationPacketsTest {
     @Test
     public void testKnownPacks() {
         ClientPacketTestUtil.testPacket(new ClientKnownPacksConfigurationPacket(Set.of(
-                new DataPack("minecraft", "core", "1.21"), new DataPack("custom", "data-pack", "2.3.4")
+                new DataPack(Key.key("core"), "1.21"), new DataPack(Key.key("custom", "data-pack"), "2.3.4")
         )));
     }
 

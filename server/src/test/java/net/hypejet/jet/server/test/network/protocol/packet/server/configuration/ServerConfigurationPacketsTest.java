@@ -97,7 +97,7 @@ public final class ServerConfigurationPacketsTest {
     @Test
     public void testKnownPacks() {
         ServerPacketTestUtil.testPacket(new ServerKnownPacksConfigurationPacket(Set.of(
-                new DataPack("minecraft", "core", "1.21"), new DataPack("some", "datapack", "ver-1.0")
+                new DataPack(Key.key("core"), "1.21"), new DataPack(Key.key("some", "datapack"), "ver-1.0")
         )));
     }
 
