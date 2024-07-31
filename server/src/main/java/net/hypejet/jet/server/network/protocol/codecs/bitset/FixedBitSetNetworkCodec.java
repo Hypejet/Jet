@@ -19,9 +19,11 @@ import java.util.BitSet;
  */
 public final class FixedBitSetNetworkCodec implements NetworkCodec<BitSet> {
 
+    private final int fixedSize;
     private final int fixedByteSize;
 
     private FixedBitSetNetworkCodec(int fixedSize) {
+        this.fixedSize = fixedSize;
         this.fixedByteSize = Math.ceilDiv(fixedSize, 8);
     }
 
@@ -32,6 +34,8 @@ public final class FixedBitSetNetworkCodec implements NetworkCodec<BitSet> {
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull BitSet object) {
+        if (object.length() > this.fixedSize)
+            throw new IllegalArgumentException("The size of the bitset should not be higher than: " + this.fixedSize);
         buf.writeBytes(Arrays.copyOf(object.toByteArray(), this.fixedByteSize));
     }
 

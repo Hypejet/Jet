@@ -46,6 +46,18 @@ public final class VarIntArrayNetworkCodec extends AggregateNetworkCodec<int[]> 
             integers[index] = VarIntNetworkCodec.instance().read(buf);
         return integers;
     }
+    /**
+     * Creates a new {@linkplain VarIntArrayNetworkCodec variable-length integer array network codec}.
+     *
+     * @return the instance or {@link #INSTANCE} if the max length is equal to {@link Integer#MAX_VALUE}
+     * @since 1.0
+     */
+    public static @NonNull VarIntArrayNetworkCodec create(int maxLength) {
+        if (maxLength == Integer.MAX_VALUE)
+            return INSTANCE;
+        return new VarIntArrayNetworkCodec(maxLength);
+    }
+
 
     /**
      * Gets an instance of the {@linkplain VarIntArrayNetworkCodec variable-length array network codec}, which handles
