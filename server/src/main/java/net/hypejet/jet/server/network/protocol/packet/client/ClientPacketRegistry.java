@@ -24,12 +24,15 @@ import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientAc
 import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientChangeDifficultyPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientChatCommandPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientChatSessionUpdatePlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientCommandSuggestionsRequestPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientConfirmTeleportationPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientInformationPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientKeepAlivePlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientOnGroundPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientPluginMessagePlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientPositionPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientQueryBlockEntityTagPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientRequestActionPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientRotationAndPositionPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientRotationPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientSignedChatCommandPlayPacketCodec;
@@ -87,7 +90,8 @@ public final class ClientPacketRegistry {
                 new ClientChangeDifficultyPlayPacketCodec(), new ClientAcknowledgeMessagePlayPacketCodec(),
                 new ClientChatCommandPlayPacketCodec(), new ClientSignedChatCommandPlayPacketCodec(),
                 new ClientSignedChatMessagePlayPacketCodec(), new ClientChatSessionUpdatePlayPacketCodec(),
-                new ClientOnGroundPlayPacketCodec());
+                new ClientOnGroundPlayPacketCodec(), new ClientRequestActionPlayPacketCodec(),
+                new ClientInformationPlayPacketCodec(), new ClientCommandSuggestionsRequestPlayPacketCodec());
     }
 
     private ClientPacketRegistry() {}

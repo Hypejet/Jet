@@ -38,7 +38,7 @@ public final class ClientPacketIdentifiers {
     public static final int PLAY_CHAT_MESSAGE = nextPlayId();
     public static final int PLAY_PLAYER_SESSION = nextPlayId();
     public static final int PLAY_CHUNK_BATCH_RECEIVED = nextPlayId();
-    public static final int PLAY_CLIENT_STATUS = nextPlayId();
+    public static final int PLAY_CLIENT_REQUEST_ACTION = nextPlayId();
     public static final int PLAY_CLIENT_INFORMATION = nextPlayId();
     public static final int PLAY_SUGGESTIONS_REQUEST = nextPlayId();
     public static final int PLAY_ACKNOWLEDGE_CONFIGURATION = nextPlayId();

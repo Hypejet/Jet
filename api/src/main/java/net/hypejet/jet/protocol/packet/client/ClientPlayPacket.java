@@ -6,8 +6,11 @@ import net.hypejet.jet.protocol.packet.client.play.ClientActionPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientChangeDifficultyPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientChatCommandPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientChatSessionUpdatePlayPacket;
+import net.hypejet.jet.protocol.packet.client.play.ClientCommandSuggestionsRequestPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientConfirmTeleportationPlayPacket;
+import net.hypejet.jet.protocol.packet.client.play.ClientInformationPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientKeepAlivePlayPacket;
+import net.hypejet.jet.protocol.packet.client.play.ClientRequestActionPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientOnGroundPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientPluginMessagePlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientPositionPlayPacket;
@@ -26,7 +29,13 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @author Codestech
  * @see ClientPacket
  */
-public sealed interface ClientPlayPacket extends ClientPacket permits ClientAcknowledgeMessagePlayPacket, ClientActionPlayPacket, ClientChangeDifficultyPlayPacket, ClientChatCommandPlayPacket, ClientChatSessionUpdatePlayPacket, ClientConfirmTeleportationPlayPacket, ClientKeepAlivePlayPacket, ClientOnGroundPlayPacket, ClientPluginMessagePlayPacket, ClientPositionPlayPacket, ClientQueryBlockEntityTagPacket, ClientRotationAndPositionPlayPacket, ClientRotationPlayPacket, ClientSignedChatCommandPlayPacket, ClientSignedChatMessagePlayPacket {
+public sealed interface ClientPlayPacket extends ClientPacket permits ClientAcknowledgeMessagePlayPacket,
+        ClientActionPlayPacket, ClientChangeDifficultyPlayPacket, ClientChatCommandPlayPacket,
+        ClientChatSessionUpdatePlayPacket, ClientCommandSuggestionsRequestPlayPacket,
+        ClientConfirmTeleportationPlayPacket, ClientInformationPlayPacket, ClientKeepAlivePlayPacket,
+        ClientOnGroundPlayPacket, ClientPluginMessagePlayPacket, ClientPositionPlayPacket,
+        ClientQueryBlockEntityTagPacket, ClientRequestActionPlayPacket, ClientRotationAndPositionPlayPacket,
+        ClientRotationPlayPacket, ClientSignedChatCommandPlayPacket, ClientSignedChatMessagePlayPacket {
     /**
      * {@inheritDoc}
      */
