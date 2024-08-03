@@ -58,7 +58,7 @@ public final class ClientPacketIdentifiers {
     public static final int PLAY_POSITION = nextPlayId();
     public static final int PLAY_ROTATION_AND_POSITION = nextPlayId();
     public static final int PLAY_ROTATION = nextPlayId();
-    public static final int PLAY_SET_ON_GROUND = nextPlayId();
+    public static final int PLAY_ON_GROUND = nextPlayId();
     public static final int PLAY_MOVE_VEHICLE = nextPlayId();
     public static final int PLAY_PADDLE_BOAT = nextPlayId();
     public static final int PLAY_PICK_ITEM = nextPlayId();

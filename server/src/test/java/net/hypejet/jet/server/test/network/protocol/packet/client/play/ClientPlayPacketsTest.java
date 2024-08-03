@@ -8,6 +8,7 @@ import net.hypejet.jet.protocol.packet.client.play.ClientChatCommandPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientChatSessionUpdatePlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientConfirmTeleportationPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientKeepAlivePlayPacket;
+import net.hypejet.jet.protocol.packet.client.play.ClientOnGroundPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientPluginMessagePlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientPositionPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientQueryBlockEntityTagPacket;
@@ -140,5 +141,10 @@ public final class ClientPlayPacketsTest {
     public void testChatSessionUpdate() {
         ClientPacketTestUtil.testPacket(new ClientChatSessionUpdatePlayPacket(UUID.randomUUID(),
                 System.currentTimeMillis(), new byte[] { 2, 4, 1, 8, 3, 74, 72 }, new byte[] { 1, 4, 7, 2, 6, 3, 2 }));
+    }
+
+    @Test
+    public void testOnGround() {
+        ClientPacketTestUtil.testPacket(new ClientOnGroundPlayPacket(true));
     }
 }
