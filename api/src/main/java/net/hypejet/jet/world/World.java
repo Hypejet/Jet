@@ -1,7 +1,11 @@
 package net.hypejet.jet.world;
 
+import net.hypejet.jet.coordinate.Coordinate;
 import net.hypejet.jet.entity.Entity;
+import net.hypejet.jet.world.chunk.Chunk;
+import net.hypejet.jet.world.chunk.ChunkPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -30,4 +34,33 @@ public interface World {
      * @return the entities
      */
     @NonNull Collection<Entity> entities();
+
+    /**
+     * Gets a chunk at a position specified.
+     *
+     * @param coordinate the position
+     * @return the chunk, {@code null} if there is no a chunk at the position specified
+     * @since 1.0
+     */
+    @Nullable Chunk chunkAt(@NonNull Coordinate<?> coordinate);
+
+    /**
+     * Gets a chunk at a position specified.
+     *
+     * @param chunkX a position of the chunk at an {@code X} axis
+     * @param chunkZ a position of the chunk at a {@code Z} axis
+     * @return the chunk, {@code null} if there is no a chunk at the position specified
+     * @since 1.0
+     */
+    @Nullable Chunk chunkAt(int chunkX, int chunkZ);
+
+
+    /**
+     * Gets a chunk at a position specified.
+     *
+     * @param position the position
+     * @return the chunk, {@code null} if there is no a chunk at the position specified
+     * @since 1.0
+     */
+    @Nullable Chunk chunkAt(@NonNull ChunkPosition position);
 }
