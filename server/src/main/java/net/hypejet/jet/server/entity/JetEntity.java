@@ -2,14 +2,21 @@ package net.hypejet.jet.server.entity;
 
 import net.hypejet.jet.data.entity.type.EntityType;
 import net.hypejet.jet.entity.Entity;
+import net.hypejet.jet.server.world.JetWorld;
+import net.hypejet.jet.world.World;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.pointer.Pointers;
 import net.kyori.adventure.text.event.HoverEvent;
+import org.checkerframework.checker.lock.qual.GuardedBy;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.UnaryOperator;
 
 /**
@@ -28,6 +35,9 @@ public class JetEntity implements Entity {
 
     private final Identity identity;
     private final Pointers pointers;
+
+    private final ReentrantReadWriteLock worldLock = new ReentrantReadWriteLock();
+    private @MonotonicNonNull @GuardedBy("worldLock") JetWorld world;
 
     /**
      * Constructs an {@linkplain JetEntity entity}.
@@ -70,6 +80,36 @@ public class JetEntity implements Entity {
     @Override
     public @NonNull UUID uniqueId() {
         return this.identity.uuid();
+    }
+
+    @Override
+    public @Nullable World getWorld() {
+        this.worldLock.readLock().lock();
+        try {
+            return this.world;
+        } finally {
+            this.worldLock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public void setWorld(@NonNull World world) {
+        Objects.requireNonNull(world, "The world must not be null");
+
+        if (!(world instanceof JetWorld jetWorld))
+            throw new IllegalArgumentException("The world is not a valid jet world");
+
+        this.worldLock.writeLock().lock();
+
+        try {
+            if (this.world != null)
+                this.world.removeEntity(this);
+
+            this.world = jetWorld;
+            jetWorld.addEntity(this);
+        } finally {
+            this.worldLock.writeLock().unlock();
+        }
     }
 
     @Override

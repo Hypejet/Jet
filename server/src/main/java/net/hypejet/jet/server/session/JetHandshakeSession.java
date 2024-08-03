@@ -97,6 +97,8 @@ public final class JetHandshakeSession implements Session<JetHandshakeSession>, 
                         return;
                     }
 
+                    if (this.connection.isClosed()) return;
+
                     LoginSessionInitializeEvent sessionEvent = new LoginSessionInitializeEvent(this.connection);
                     eventNode.call(sessionEvent);
 

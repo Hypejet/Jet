@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.util.CompressionUtil;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.slf4j.Logger;
@@ -26,7 +27,8 @@ public final class PacketDecompressor extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-        int dataLength = NetworkUtil.readVarInt(in);
+        if (!ctx.channel().isActive()) return; // The connection was closed
+        int dataLength = VarIntNetworkCodec.instance().read(in);
 
         if (dataLength == 0) {
             out.add(in.retainedSlice());

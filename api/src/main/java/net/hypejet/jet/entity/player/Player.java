@@ -7,6 +7,7 @@ import net.hypejet.jet.protocol.connection.PlayerConnection;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientInformationConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -93,6 +94,15 @@ public interface Player extends Entity, Audience {
     @NonNull MinecraftServer server();
 
     /**
+     * Sends a plugin message to the player.
+     *
+     * @param identifier an identifier of the plugin message
+     * @param data a data of the plugin message
+     * @since 1.0
+     */
+    void sendPluginMessage(@NonNull Key identifier, byte @NonNull [] data);
+
+    /**
      * Represents a Minecraft chat mode setting of a {@linkplain Player player}.
      *
      * @since 1.0
@@ -170,6 +180,39 @@ public interface Player extends Entity, Audience {
          * @since 1.0
          */
         HAT
+    }
+
+    /**
+     * Represents a Minecraft game mode of a {@linkplain Player player}.
+     *
+     * @since 1.0
+     * @author Codestech
+     */
+    enum GameMode {
+        /**
+         * A survival game mode.
+         *
+         * @since 1.0
+         */
+        SURVIVAL,
+        /**
+         * A creative game mode.
+         *
+         * @since 1.0
+         */
+        CREATIVE,
+        /**
+         * An adventure game mode.
+         *
+         * @since 1.0
+         */
+        ADVENTURE,
+        /**
+         * A spectator game mode.
+         *
+         * @since 1.0
+         */
+        SPECTATOR
     }
 
     /**

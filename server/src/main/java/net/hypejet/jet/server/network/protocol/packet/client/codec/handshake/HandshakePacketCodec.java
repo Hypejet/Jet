@@ -1,18 +1,16 @@
 package net.hypejet.jet.server.network.protocol.packet.client.codec.handshake;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.util.collection.IntObjectHashMap;
-import io.netty.util.collection.IntObjectMap;
 import net.hypejet.jet.protocol.packet.client.handshake.ClientHandshakePacket;
 import net.hypejet.jet.protocol.packet.client.handshake.ClientHandshakePacket.HandshakeIntent;
+import net.hypejet.jet.server.network.protocol.codecs.enums.EnumVarIntCodec;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
 import net.hypejet.jet.server.session.JetHandshakeSession;
-import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.EnumMap;
 
 /**
  * Represents a {@link ClientPacketCodec client packet codec}, which reads and writes a {@link ClientHandshakePacket
@@ -25,17 +23,14 @@ import java.util.EnumMap;
  */
 public final class HandshakePacketCodec extends ClientPacketCodec<ClientHandshakePacket> {
 
-    private static final int MAX_ADDRESS_LENGTH = 255;
+    private static final EnumVarIntCodec<HandshakeIntent> HANDSHAKE_INTENT_CODEC = EnumVarIntCodec
+            .builder(HandshakeIntent.class)
+            .add(HandshakeIntent.STATUS, 1)
+            .add(HandshakeIntent.LOGIN, 2)
+            .add(HandshakeIntent.TRANSFER, 3)
+            .build();
 
-    private static final IntObjectMap<HandshakeIntent> idToIntentMap = new IntObjectHashMap<>();
-    private static final EnumMap<HandshakeIntent, Integer> intentToIdMap = new EnumMap<>(HandshakeIntent.class);
-
-    static {
-        idToIntentMap.put(1, HandshakeIntent.STATUS);
-        idToIntentMap.put(2, HandshakeIntent.LOGIN);
-        idToIntentMap.put(3, HandshakeIntent.TRANSFER);
-        idToIntentMap.forEach((id, intent) -> intentToIdMap.put(intent, id));
-    }
+    private static final StringNetworkCodec ADDRESS_CODEC = StringNetworkCodec.create(255);
 
     /**
      * Constructs the {@linkplain HandshakePacketCodec handshake packet codec}.
@@ -48,26 +43,16 @@ public final class HandshakePacketCodec extends ClientPacketCodec<ClientHandshak
 
     @Override
     public @NonNull ClientHandshakePacket read(@NonNull ByteBuf buf) {
-        int protocolVersion = NetworkUtil.readVarInt(buf);
-        String serverAddress = NetworkUtil.readString(buf, MAX_ADDRESS_LENGTH);
-        int serverPort = buf.readUnsignedShort();
-
-        int intentIdentifier = NetworkUtil.readVarInt(buf);
-        HandshakeIntent intent = idToIntentMap.get(intentIdentifier);
-
-        if (intent == null) {
-            throw new IllegalArgumentException("Unknown handshake intent: "+ intentIdentifier);
-        }
-
-        return new ClientHandshakePacket(protocolVersion, serverAddress, serverPort, intent);
+        return new ClientHandshakePacket(VarIntNetworkCodec.instance().read(buf), ADDRESS_CODEC.read(buf),
+                buf.readUnsignedShort(), HANDSHAKE_INTENT_CODEC.read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ClientHandshakePacket object) {
-        NetworkUtil.writeVarInt(buf, object.protocolVersion());
-        NetworkUtil.writeString(buf, object.serverAddress(), MAX_ADDRESS_LENGTH);
+        VarIntNetworkCodec.instance().write(buf, object.protocolVersion());
+        ADDRESS_CODEC.write(buf, object.serverAddress());
         buf.writeShort(object.serverPort());
-        NetworkUtil.writeVarInt(buf, intentToIdMap.get(object.intent()));
+        HANDSHAKE_INTENT_CODEC.write(buf, object.intent());
     }
 
     @Override

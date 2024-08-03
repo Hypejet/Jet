@@ -4,10 +4,10 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.protocol.packet.client.ClientPacket;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketRegistry;
-import net.hypejet.jet.server.util.NetworkUtil;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,14 +41,15 @@ public final class PacketDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-        int packetId = NetworkUtil.readVarInt(in);
+        if (!ctx.channel().isActive()) return; // The connection was closed
+        int packetId = VarIntNetworkCodec.instance().read(in);
 
         ProtocolState protocolState = this.connection.getProtocolState();
-        ClientPacket packet = ClientPacketRegistry.read(packetId, protocolState, in);
+        ClientPacketCodec<?> codec = ClientPacketRegistry.codec(packetId, protocolState);
 
-        if (packet == null) throw packetReaderNotFound(packetId, protocolState);
+        if (codec == null) throw packetReaderNotFound(packetId, protocolState);
 
-        out.add(packet);
+        out.add(codec.read(in));
     }
 
     @Override

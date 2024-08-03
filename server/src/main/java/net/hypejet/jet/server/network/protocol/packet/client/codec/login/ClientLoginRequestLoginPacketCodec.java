@@ -2,11 +2,12 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.login;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.login.ClientLoginRequestLoginPacket;
+import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.other.UUIDNetworkCodec;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
 import net.hypejet.jet.server.session.JetLoginSession;
-import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -20,7 +21,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class ClientLoginRequestLoginPacketCodec extends ClientPacketCodec<ClientLoginRequestLoginPacket> {
 
-    private static final int MAX_USERNAME_LENGTH = 16;
+    private static final StringNetworkCodec USERNAME_CODEC = StringNetworkCodec.create(16);
 
     /**
      * Constructs a {@linkplain ClientLoginRequestLoginPacketCodec login request packet codec}..
@@ -33,16 +34,13 @@ public final class ClientLoginRequestLoginPacketCodec extends ClientPacketCodec<
 
     @Override
     public @NonNull ClientLoginRequestLoginPacket read(@NonNull ByteBuf buf) {
-        return new ClientLoginRequestLoginPacket(
-                NetworkUtil.readString(buf, MAX_USERNAME_LENGTH),
-                NetworkUtil.readUniqueId(buf)
-        );
+        return new ClientLoginRequestLoginPacket(USERNAME_CODEC.read(buf), UUIDNetworkCodec.instance().read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ClientLoginRequestLoginPacket object) {
-        NetworkUtil.writeString(buf, object.username(), MAX_USERNAME_LENGTH);
-        NetworkUtil.writeUniqueId(buf, object.uniqueId());
+        USERNAME_CODEC.write(buf, object.username());
+        UUIDNetworkCodec.instance().write(buf, object.uniqueId());
     }
 
     @Override

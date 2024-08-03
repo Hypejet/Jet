@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.protocol.codecs.settings;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
-import net.hypejet.jet.server.util.NetworkUtil;
+import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Locale;
@@ -17,24 +17,23 @@ import java.util.Locale;
  */
 public final class LocaleNetworkCodec implements NetworkCodec<Locale> {
 
-    private static final int MAX_LOCALE_LENGTH = 16;
-
-    private static final LocaleNetworkCodec INSTANCE = new LocaleNetworkCodec();
-
     private static final String LOCALE_TAG_DELIMITER = "-";
     private static final String MOJANG_LOCALE_TAG_DELIMITER = "_";
+
+    private static final StringNetworkCodec LOCALE_CODEC = StringNetworkCodec.create(16);
+    private static final LocaleNetworkCodec INSTANCE = new LocaleNetworkCodec();
 
     private LocaleNetworkCodec() {}
 
     @Override
     public @NonNull Locale read(@NonNull ByteBuf buf) {
-        return Locale.forLanguageTag(NetworkUtil.readString(buf, MAX_LOCALE_LENGTH)
+        return Locale.forLanguageTag(LOCALE_CODEC.read(buf)
                 .replace(MOJANG_LOCALE_TAG_DELIMITER, LOCALE_TAG_DELIMITER));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull Locale object) {
-        NetworkUtil.writeString(buf, object.toLanguageTag().replace(LOCALE_TAG_DELIMITER, MOJANG_LOCALE_TAG_DELIMITER));
+        LOCALE_CODEC.write(buf, object.toLanguageTag().replace(LOCALE_TAG_DELIMITER, MOJANG_LOCALE_TAG_DELIMITER));
     }
 
     /**

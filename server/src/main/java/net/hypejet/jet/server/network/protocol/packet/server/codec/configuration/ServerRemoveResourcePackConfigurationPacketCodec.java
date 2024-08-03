@@ -2,9 +2,9 @@ package net.hypejet.jet.server.network.protocol.packet.server.codec.configuratio
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerRemoveResourcePackConfigurationPacket;
+import net.hypejet.jet.server.network.protocol.codecs.other.UUIDNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
-import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.UUID;
@@ -34,7 +34,7 @@ public final class ServerRemoveResourcePackConfigurationPacketCodec
     @Override
     public @NonNull ServerRemoveResourcePackConfigurationPacket read(@NonNull ByteBuf buf) {
         return new ServerRemoveResourcePackConfigurationPacket(
-                buf.readBoolean() ? NetworkUtil.readUniqueId(buf) : null
+                buf.readBoolean() ? UUIDNetworkCodec.instance().read(buf) : null
         );
     }
 
@@ -44,7 +44,7 @@ public final class ServerRemoveResourcePackConfigurationPacketCodec
         buf.writeBoolean(uniqueId != null);
 
         if (uniqueId != null) {
-            NetworkUtil.writeUniqueId(buf, uniqueId);
+            UUIDNetworkCodec.instance().write(buf, uniqueId);
         }
     }
 }

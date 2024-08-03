@@ -6,6 +6,7 @@ import net.hypejet.jet.event.events.packet.PacketReceiveEvent;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketRegistry;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,12 +46,26 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
         this.playerConnection.server().eventNode().call(event);
         if (event.isCancelled()) return;
 
-        ClientPacketRegistry.handle(packet, this.playerConnection);
+        ClientPacketCodec<?> codec = ClientPacketRegistry.codec(packet.getClass());
+        if (codec == null) throw packetReaderNotFound(packet);
+
+        handlePacket(codec, packet, this.playerConnection); // Handle the packet with java generics
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         this.playerConnection.close(); // Close the connection to avoid more issues
         LOGGER.error("An error occurred while reading a packet", cause);
+    }
+
+    private static <P extends ClientPacket> void handlePacket(@NonNull ClientPacketCodec<P> codec,
+                                                              @NonNull ClientPacket packet,
+                                                              @NonNull SocketPlayerConnection connection) {
+        codec.handle(codec.getPacketClass().cast(packet), connection);
+    }
+
+    private static @NonNull IllegalArgumentException packetReaderNotFound(@NonNull ClientPacket packet) {
+        return new IllegalArgumentException("Could not find a client packet reader for packet: "
+                + packet.getClass().getSimpleName());
     }
 }

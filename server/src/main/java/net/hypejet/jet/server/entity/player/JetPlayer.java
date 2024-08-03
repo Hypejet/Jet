@@ -1,5 +1,7 @@
 package net.hypejet.jet.server.entity.player;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.data.entity.type.BuiltInEntityTypes;
 import net.hypejet.jet.entity.player.Player;
@@ -12,9 +14,18 @@ import net.hypejet.jet.event.events.player.PlayerResourcePackResponseEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.pack.DataPack;
 import net.hypejet.jet.pack.ResourcePackResult;
+import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
+import net.hypejet.jet.protocol.packet.server.configuration.ServerPluginMessageConfigurationPacket;
+import net.hypejet.jet.protocol.packet.server.play.ServerActionBarPlayPacket;
+import net.hypejet.jet.protocol.packet.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
+import net.hypejet.jet.protocol.packet.server.play.ServerPluginMessagePlayPacket;
+import net.hypejet.jet.protocol.packet.server.play.ServerSystemMessagePlayPacket;
 import net.hypejet.jet.server.entity.JetEntity;
+import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
+import net.hypejet.jet.server.util.NetworkUtil;
+import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.pointer.Pointers;
@@ -22,6 +33,7 @@ import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -107,8 +119,43 @@ public final class JetPlayer extends JetEntity implements Player {
         return this.connection.server();
     }
 
+    @Override
+    public void sendPluginMessage(@NonNull Key identifier, byte @NonNull [] data) {
+        Objects.requireNonNull(identifier, "The identifier must not be null");
+        Objects.requireNonNull(data, "The data must not be null");
+
+        ProtocolState protocolState = this.connection.getProtocolState();
+        ServerPacket packet = switch (protocolState) {
+            case CONFIGURATION -> new ServerPluginMessageConfigurationPacket(identifier, data);
+            case PLAY -> new ServerPluginMessagePlayPacket(identifier, data);
+            default -> throw new IllegalStateException("You cannot send a plugin message during "
+                    + protocolState + " protocol state");
+        };
+
+        this.sendPacket(packet);
+    }
+
+    @Override
+    public void sendMessage(@NotNull Identity source, @NotNull Component message, @NotNull MessageType type) {
+        ServerPacket packet = switch (type) {
+            case CHAT -> throw new IllegalArgumentException("Non-system messages are not supported yet");
+            case SYSTEM -> new ServerSystemMessagePlayPacket(message, false);
+        };
+        this.sendPacket(packet);
+    }
+
+    @Override
+    public void sendActionBar(@NotNull Component message) {
+        this.sendPacket(new ServerActionBarPlayPacket(message));
+    }
+
+    @Override
+    public void sendPlayerListHeaderAndFooter(@NotNull Component header, @NotNull Component footer) {
+        this.sendPacket(new ServerPlayerListHeaderAndFooterPlayPacket(header, footer));
+    }
+
     /**
-     * Updates {@linkplain Player.Settings settings} of the player.
+     * Updates {@linkplain Settings settings} of the player.
      *
      * @param settings the new settings
      * @since 1.0
@@ -194,5 +241,21 @@ public final class JetPlayer extends JetEntity implements Player {
     public void handlePong(int pingIdentifier) {
         EventNode<Object> eventNode = this.server().eventNode();
         eventNode.call(new PlayerPongEvent(this, pingIdentifier));
+    }
+
+    /**
+     * Sends a plugin message to a client containing a server brand.
+     *
+     * @param brand the server brand
+     * @since 1.0
+     */
+    public void sendServerBrand(@NonNull String brand) {
+        ByteBuf buf = Unpooled.buffer();
+        StringNetworkCodec.instance().write(buf, brand);
+
+        byte[] messageData = NetworkUtil.readRemainingBytes(buf);
+        this.sendPluginMessage(BRAND_PLUGIN_MESSAGE_IDENTIFIER, messageData);
+
+        buf.release();
     }
 }

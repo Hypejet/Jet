@@ -4,7 +4,10 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketRegistry;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,10 +27,18 @@ public final class PacketEncoder extends MessageToByteEncoder<ServerPacket> {
     @Override
     protected void encode(ChannelHandlerContext ctx, ServerPacket msg, ByteBuf out) throws Exception {
         try {
-            ServerPacketRegistry.write(out, msg);
+            PacketCodec<? extends ServerPacket> codec = ServerPacketRegistry.codec(msg.getClass());
+            if (codec == null) throw new IllegalArgumentException("Could not find a packet codec for: " + msg);
+            write(codec, out, msg); // Write the packet with java generics
         } catch (Throwable throwable) {
             LOGGER.error("An error occurred while encoding a packet", throwable);
             ctx.channel().close().sync();
         }
+    }
+
+    private static <P extends ServerPacket> void write(@NonNull PacketCodec<P> codec, @NonNull ByteBuf buf,
+                                                       @NonNull ServerPacket packet) {
+        VarIntNetworkCodec.instance().write(buf, codec.getPacketId());
+        codec.write(buf, codec.getPacketClass().cast(packet));
     }
 }

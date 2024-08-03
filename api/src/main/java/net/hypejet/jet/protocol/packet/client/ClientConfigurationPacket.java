@@ -24,6 +24,9 @@ public sealed interface ClientConfigurationPacket extends ClientPacket permits
         ClientInformationConfigurationPacket, ClientKeepAliveConfigurationPacket, ClientKnownPacksConfigurationPacket,
         ClientPluginMessageConfigurationPacket, ClientPongConfigurationPacket,
         ClientResourcePackResponseConfigurationPacket {
+    /**
+     * {@inheritDoc}
+     */
     @Override
     default @NonNull ProtocolState state() {
         return ProtocolState.CONFIGURATION;

@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.protocol.packet.server.codec.configuratio
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerStoreCookieConfigurationPacket;
-import net.hypejet.jet.server.network.protocol.codecs.identifier.IdentifierNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.identifier.PackedIdentifierNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
 import net.hypejet.jet.server.util.NetworkUtil;
@@ -34,7 +34,7 @@ public final class ServerStoreCookieConfigurationPacketCodec
 
     @Override
     public @NonNull ServerStoreCookieConfigurationPacket read(@NonNull ByteBuf buf) {
-        Key identifier = IdentifierNetworkCodec.instance().read(buf);
+        Key identifier = PackedIdentifierNetworkCodec.instance().read(buf);
         if (buf.readableBytes() > MAX_COOKIE_LENGTH) throw invalidCookieLengthException();
         return new ServerStoreCookieConfigurationPacket(identifier, NetworkUtil.readRemainingBytes(buf));
     }
@@ -46,7 +46,7 @@ public final class ServerStoreCookieConfigurationPacketCodec
 
         if (data.length > MAX_COOKIE_LENGTH) throw invalidCookieLengthException();
 
-        IdentifierNetworkCodec.instance().write(buf, identifier);
+        PackedIdentifierNetworkCodec.instance().write(buf, identifier);
         buf.writeBytes(data);
     }
 

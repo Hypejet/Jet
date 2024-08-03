@@ -2,7 +2,8 @@ package net.hypejet.jet.server.network.protocol.packet.server.codec.login;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.login.ServerPluginMessageRequestLoginPacket;
-import net.hypejet.jet.server.network.protocol.codecs.identifier.IdentifierNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.identifier.PackedIdentifierNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
 import net.hypejet.jet.server.util.NetworkUtil;
@@ -30,16 +31,16 @@ public final class ServerPluginMessageRequestLoginPacketCodec extends PacketCode
     @Override
     public @NonNull ServerPluginMessageRequestLoginPacket read(@NonNull ByteBuf buf) {
         return new ServerPluginMessageRequestLoginPacket(
-                NetworkUtil.readVarInt(buf),
-                IdentifierNetworkCodec.instance().read(buf),
+                VarIntNetworkCodec.instance().read(buf),
+                PackedIdentifierNetworkCodec.instance().read(buf),
                 NetworkUtil.readRemainingBytes(buf)
         );
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerPluginMessageRequestLoginPacket object) {
-        NetworkUtil.writeVarInt(buf, object.messageId());
-        IdentifierNetworkCodec.instance().write(buf, object.channel());
+        VarIntNetworkCodec.instance().write(buf, object.messageId());
+        PackedIdentifierNetworkCodec.instance().write(buf, object.channel());
         buf.writeBytes(object.data());
     }
 }

@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.netty.decoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import net.hypejet.jet.server.util.NetworkUtil;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +28,7 @@ public final class PacketLengthDecoder extends ByteToMessageDecoder {
         if (!ctx.channel().isActive()) return; // The connection was closed
 
         in.markReaderIndex();
-        int packetLength = NetworkUtil.readVarInt(in);
+        int packetLength = VarIntNetworkCodec.instance().read(in);
 
         if (packetLength > in.readableBytes()) {
             in.resetReaderIndex();

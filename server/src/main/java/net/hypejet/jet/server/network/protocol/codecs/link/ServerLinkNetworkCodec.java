@@ -6,8 +6,9 @@ import net.hypejet.jet.link.label.BuiltinLabel;
 import net.hypejet.jet.link.label.ComponentLabel;
 import net.hypejet.jet.link.label.ServerLinkLabel;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.component.ComponentNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.enums.EnumVarIntCodec;
-import net.hypejet.jet.server.util.NetworkUtil;
+import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -23,7 +24,8 @@ public final class ServerLinkNetworkCodec implements NetworkCodec<ServerLink> {
 
     private static final ServerLinkNetworkCodec INSTANCE = new ServerLinkNetworkCodec();
 
-    private static final EnumVarIntCodec<BuiltinLabel> builtInLabelCodec = EnumVarIntCodec.builder(BuiltinLabel.class)
+    private static final EnumVarIntCodec<BuiltinLabel> BUILT_IN_LABEL_CODEC = EnumVarIntCodec
+            .builder(BuiltinLabel.class)
             .add(BuiltinLabel.BUG_REPORT, 0)
             .add(BuiltinLabel.COMMUNITY_GUIDELINES, 1)
             .add(BuiltinLabel.SUPPORT, 2)
@@ -43,12 +45,12 @@ public final class ServerLinkNetworkCodec implements NetworkCodec<ServerLink> {
         ServerLinkLabel label;
 
         if (buf.readBoolean()) {
-            label = builtInLabelCodec.read(buf);
+            label = BUILT_IN_LABEL_CODEC.read(buf);
         } else {
-            label = new ComponentLabel(NetworkUtil.readComponent(buf));
+            label = new ComponentLabel(ComponentNetworkCodec.instance().read(buf));
         }
 
-        return new ServerLink(label, NetworkUtil.readString(buf));
+        return new ServerLink(label, StringNetworkCodec.instance().read(buf));
     }
 
     @Override
@@ -57,11 +59,11 @@ public final class ServerLinkNetworkCodec implements NetworkCodec<ServerLink> {
         buf.writeBoolean(label instanceof BuiltinLabel);
 
         switch (label) {
-            case BuiltinLabel builtinLabel -> builtInLabelCodec.write(buf, builtinLabel);
-            case ComponentLabel (Component component) -> NetworkUtil.writeComponent(buf, component);
+            case BuiltinLabel builtinLabel -> BUILT_IN_LABEL_CODEC.write(buf, builtinLabel);
+            case ComponentLabel (Component component) -> ComponentNetworkCodec.instance().write(buf, component);
         }
 
-        NetworkUtil.writeString(buf, object.url());
+        StringNetworkCodec.instance().write(buf, object.url());
     }
 
     /**

@@ -3,8 +3,8 @@ package net.hypejet.jet.server.network.protocol.codecs.registry;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerRegistryDataConfigurationPacket.Entry;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.identifier.IdentifierNetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.nbt.BinaryTagCodec;
+import net.hypejet.jet.server.network.protocol.codecs.other.BinaryTagCodec;
+import net.hypejet.jet.server.network.protocol.codecs.identifier.PackedIdentifierNetworkCodec;
 import net.kyori.adventure.nbt.BinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -26,14 +26,14 @@ public final class RegistryDataEntryNetworkCodec implements NetworkCodec<Entry> 
     @Override
     public @NonNull Entry read(@NonNull ByteBuf buf) {
         return new Entry(
-                IdentifierNetworkCodec.instance().read(buf),
+                PackedIdentifierNetworkCodec.instance().read(buf),
                 buf.readBoolean() ? BinaryTagCodec.instance().read(buf) : null
         );
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull Entry object) {
-        IdentifierNetworkCodec.instance().write(buf, object.identifier());
+        PackedIdentifierNetworkCodec.instance().write(buf, object.identifier());
 
         BinaryTag data = object.data();
         buf.writeBoolean(data != null);

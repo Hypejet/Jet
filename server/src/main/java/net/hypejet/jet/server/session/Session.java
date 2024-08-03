@@ -3,6 +3,7 @@ package net.hypejet.jet.server.session;
 import net.hypejet.jet.session.handler.SessionHandler;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
@@ -42,4 +43,12 @@ public interface Session<H extends SessionHandler> {
      * @since 1.0
      */
     @NonNull H sessionHandler();
+
+    /**
+     * Called when a connection is being closed.
+     *
+     * @param cause a cause of the closure, {@code null} if not present
+     * @since 1.0
+     */
+    void onConnectionClose(@Nullable Throwable cause);
 }

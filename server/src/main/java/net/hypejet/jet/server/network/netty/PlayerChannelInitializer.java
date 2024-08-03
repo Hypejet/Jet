@@ -5,6 +5,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import net.hypejet.jet.protocol.connection.PlayerConnection;
 import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.netty.decoder.PacketDecoder;
 import net.hypejet.jet.server.network.netty.decoder.PacketLengthDecoder;
 import net.hypejet.jet.server.network.netty.encoder.PacketEncoder;
@@ -59,9 +60,13 @@ public final class PlayerChannelInitializer extends ChannelInitializer<SocketCha
                 .addBefore(PACKET_ENCODER, PACKET_LENGTH_ENCODER, new PacketLengthEncoder())
                 .addAfter(PACKET_DECODER, PACKET_READER, new PacketReader(connection));
 
-        ch.closeFuture().addListener(future -> connection.getSession()
-                .sessionHandler()
-                .onConnectionClose(future.cause()));
+        ch.closeFuture().addListener(future -> {
+            connection.getSession().onConnectionClose(future.cause());
+
+            JetPlayer player = connection.player();
+            if (player != null)
+                connection.server().unregisterPlayer(player);
+        });
     }
 
     @Override

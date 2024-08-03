@@ -11,6 +11,7 @@ import net.hypejet.jet.protocol.packet.server.ServerPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerDisconnectConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.login.ServerDisconnectLoginPacket;
 import net.hypejet.jet.protocol.packet.server.login.ServerEnableCompressionLoginPacket;
+import net.hypejet.jet.protocol.packet.server.play.ServerDisconnectPlayPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.netty.decoder.PacketDecompressor;
@@ -79,7 +80,10 @@ public final class SocketPlayerConnection implements PlayerConnection {
 
     @Override
     public @Nullable ServerPacket sendPacket(@NonNull ServerPacket packet) {
+        if (this.isClosed()) return null;
+
         this.protocolStateLock.readLock().lock();
+
         try {
             PacketSendEvent event = new PacketSendEvent(packet);
             this.server.eventNode().call(event);
@@ -107,7 +111,7 @@ public final class SocketPlayerConnection implements PlayerConnection {
         ServerPacket packet = switch (this.state) {
             case LOGIN -> new ServerDisconnectLoginPacket(reason);
             case CONFIGURATION -> new ServerDisconnectConfigurationPacket(reason);
-            case PLAY -> null; // TODO
+            case PLAY -> new ServerDisconnectPlayPacket(reason);
             default -> null;
         };
 
@@ -138,8 +142,13 @@ public final class SocketPlayerConnection implements PlayerConnection {
         }
     }
 
+    @Override
+    public boolean isClosed() {
+        return !this.channel.isActive();
+    }
+
     /**
-     * Closes the {@link PlayerConnection player connection}, nothing will.
+     * Closes the {@link PlayerConnection player connection}, nothing will happen if the connection is already closed.
      *
      * @since 1.0
      */
@@ -171,10 +180,18 @@ public final class SocketPlayerConnection implements PlayerConnection {
      * Sets a compression threshold of this connection.
      *
      * @param compressionThreshold the compression threshold
+     * @throws IllegalStateException if the current protocol state of the player is
+     *                               not {@link ProtocolState#LOGIN}
      * @since 1.0
      */
     public void setCompressionThreshold(int compressionThreshold) {
+        if (this.getProtocolState() != ProtocolState.LOGIN) {
+            throw new IllegalStateException("You cannot set a compression threshold in protocol state other than" +
+                    "login");
+        }
+
         ServerPacket finalPacket = this.sendPacket(new ServerEnableCompressionLoginPacket(compressionThreshold));
+
         if (finalPacket instanceof ServerEnableCompressionLoginPacket packet) {
             compressionThreshold = packet.threshold();
             this.compressionThreshold = compressionThreshold;

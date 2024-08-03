@@ -1,11 +1,9 @@
 package net.hypejet.jet.server.network.protocol.packet.client;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.configuration.ClientAcknowledgeFinishConfigurationPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.configuration.ClientCookieResponseConfigurationPacketCodec;
@@ -21,6 +19,24 @@ import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientE
 import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientLoginAcknowledgeLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientLoginRequestLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.login.ClientPluginMessageResponseLoginPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientAcknowledgeMessagePlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientActionPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientChangeDifficultyPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientChatCommandPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientChatSessionUpdatePlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientCommandSuggestionsRequestPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientConfirmTeleportationPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientInformationPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientKeepAlivePlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientOnGroundPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientPluginMessagePlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientPositionPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientQueryBlockEntityTagPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientRequestActionPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientRotationAndPositionPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientRotationPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientSignedChatCommandPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.codec.play.ClientSignedChatMessagePlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.status.ClientPingRequestStatusPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.status.ClientServerListRequestStatusPacketCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -65,55 +81,46 @@ public final class ClientPacketRegistry {
                 new ClientPongConfigurationPacketCodec(), new ClientResourcePackResponseConfigurationPacketCodec(),
                 new ClientKnownPacksConfigurationPacketCodec(), new ClientKeepAliveConfigurationPacketCodec(),
                 new ClientAcknowledgeFinishConfigurationPacketCodec());
+
+        // Play packets
+        register(ProtocolState.PLAY, new ClientKeepAlivePlayPacketCodec(), new ClientPluginMessagePlayPacketCodec(),
+                new ClientRotationAndPositionPlayPacketCodec(), new ClientPositionPlayPacketCodec(),
+                new ClientRotationPlayPacketCodec(), new ClientActionPlayPacketCodec(),
+                new ClientConfirmTeleportationPlayPacketCodec(), new ClientQueryBlockEntityTagPacketCodec(),
+                new ClientChangeDifficultyPlayPacketCodec(), new ClientAcknowledgeMessagePlayPacketCodec(),
+                new ClientChatCommandPlayPacketCodec(), new ClientSignedChatCommandPlayPacketCodec(),
+                new ClientSignedChatMessagePlayPacketCodec(), new ClientChatSessionUpdatePlayPacketCodec(),
+                new ClientOnGroundPlayPacketCodec(), new ClientRequestActionPlayPacketCodec(),
+                new ClientInformationPlayPacketCodec(), new ClientCommandSuggestionsRequestPlayPacketCodec());
     }
 
     private ClientPacketRegistry() {}
 
     /**
-     * Gets a {@linkplain ClientPacketCodec client packet codec}, which can read a specific packet and reads it from
-     * a {@linkplain ByteBuf byte buf} using the codec. .
+     * Gets a {@linkplain ClientPacketCodec client packet codec} for a packet specified, which was registered in
+     * this registry.
      *
-     * @param packetId an id of the packet
-     * @param state a current state of the protocol
-     * @param buf the byte buf
-     * @return the packet, which may be null if the packet codec is not present
+     * @param packetClass a class of the packet
+     * @return the client packet codec, {@code null} if not present
      * @since 1.0
      */
-    public static @Nullable ClientPacket read(int packetId, @NonNull ProtocolState state, @NonNull ByteBuf buf) {
-        IntObjectMap<ClientPacketCodec<?>> codecMap = identityToCodecMap.get(state);
-        if (codecMap == null) return null;
-
-        ClientPacketCodec<?> codec = codecMap.get(packetId);
-        if (codec == null) return null;
-
-        return codec.read(buf);
+    public static @Nullable ClientPacketCodec<?> codec(@NonNull Class<? extends ClientPacket> packetClass) {
+        return classToCodecMap.get(packetClass);
     }
 
     /**
-     * Gets a {@linkplain ClientPacketCodec client packet codec}, which can handle a specific packet.
-     *
-     * @param packet the packet
-     * @param connection a player connection, from which the packet was received
-     * @since 1.0
-     */
-    public static void handle(@NonNull ClientPacket packet, @NonNull SocketPlayerConnection connection) {
-        ClientPacketCodec<?> codec = classToCodecMap.get(packet.getClass());
-        if (codec == null) return;
-        handle0(codec, packet, connection); // Handle the packet with generics
-    }
-
-    /**
-     * Gets whether the packet registry has a {@linkplain ClientPacketCodec client packet codec} for a specific packet.
+     * Gets a {@linkplain ClientPacketCodec client packet codec} for a packet specified, which was registered in
+     * this registry.
      *
      * @param packetId an identifier of the packet
-     * @param state a protocol state of the packet
-     * @return true if the packet registry has a client packet codec for a specific packet, false otherwise
+     * @param state a protocol state, during which the packet is handled
+     * @return the client packet codec, {@code null} if not present
      * @since 1.0
      */
-    public static boolean hasCodec(int packetId, @NonNull ProtocolState state) {
+    public static @Nullable ClientPacketCodec<?> codec(int packetId, @NonNull ProtocolState state) {
         IntObjectMap<ClientPacketCodec<?>> codecMap = identityToCodecMap.get(state);
-        if (codecMap == null) return false;
-        return codecMap.containsKey(packetId);
+        if (codecMap == null) return null;
+        return codecMap.get(packetId);
     }
 
     /**
@@ -130,21 +137,5 @@ public final class ClientPacketRegistry {
             classToCodecMap.put(codec.getPacketClass(), codec);
         }
         identityToCodecMap.put(state, map);
-    }
-
-    /**
-     * Handles a {@linkplain ClientPacket client packet} using a {@linkplain ClientPacketCodec client packet codec}
-     * specified using generics.
-     *
-     * @param codec the client packet codec
-     * @param packet the client packet
-     * @param connection a player connection, from which the packet was received
-     * @param <P> the type of the packet
-     * @since 1.0
-     */
-    private static <P extends ClientPacket> void handle0(@NonNull ClientPacketCodec<P> codec,
-                                                         @NonNull ClientPacket packet,
-                                                         @NonNull SocketPlayerConnection connection) {
-        codec.handle(codec.getPacketClass().cast(packet), connection);
     }
 }

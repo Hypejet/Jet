@@ -6,23 +6,23 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Represents a test for reading and writing {@linkplain net.hypejet.jet.protocol.packet.Packet packets} from
- * a {@link ClientPacketRegistry client packet registry}.
+ * Represents a test of getting
+ * {@linkplain net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec client packet codecs}
+ * from a {@link ClientPacketRegistry client packet registry}.
  *
  * @since 1.0
  * @author Codestech
+ * @see net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec
  * @see ClientPacketRegistry
  */
 public final class ClientPacketRegistryTest {
     @Test
     public void testValidPacket() {
-        Assertions.assertTrue(ClientPacketRegistry.hasCodec(0, ProtocolState.HANDSHAKE));
+        Assertions.assertNotNull(ClientPacketRegistry.codec(0, ProtocolState.HANDSHAKE));
     }
 
     @Test
     public void testInvalidPacket() {
-        Assertions.assertFalse(ClientPacketRegistry.hasCodec(1, ProtocolState.HANDSHAKE));
+        Assertions.assertNull(ClientPacketRegistry.codec(1, ProtocolState.HANDSHAKE));
     }
-
-    // TODO: Writing/Reading tests
 }

@@ -1,6 +1,5 @@
 package net.hypejet.jet.server.network.protocol.packet.server;
 
-import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerFinishConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerResetChatConfigurationPacket;
@@ -27,11 +26,22 @@ import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerD
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerEnableCompressionLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerEncryptionRequestLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerLoginSuccessLoginPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerPlayerListHeaderAndFooterPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerPluginMessageRequestLoginPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerActionBarPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerCenterChunkPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerChunkAndLightDataPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerDisconnectPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerGameEventPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerJoinGamePlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerKeepAlivePlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerPluginMessagePlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerSynchronizePositionPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerSystemMessagePlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.status.ServerListResponseStatusPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.status.ServerPingResponseStatusPacketCodec;
-import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -73,45 +83,29 @@ public final class ServerPacketRegistry {
                         ServerFinishConfigurationPacket.class, new ServerFinishConfigurationPacket()),
                 new EmptyPacketCodec<>(ServerPacketIdentifiers.CONFIGURATION_RESET_CHAT,
                         ServerResetChatConfigurationPacket.class, new ServerResetChatConfigurationPacket()));
+
+        // Play packet
+        register(new ServerKeepAlivePlayPacketCodec(), new ServerDisconnectPlayPacketCodec(),
+                new ServerJoinGamePlayPacketCodec(), new ServerPluginMessagePlayPacketCodec(),
+                new ServerGameEventPlayPacketCodec(), new ServerSystemMessagePlayPacketCodec(),
+                new ServerActionBarPlayPacketCodec(), new ServerPlayerListHeaderAndFooterPlayPacketCodec(),
+                new ServerChunkAndLightDataPlayPacketCodec(), new ServerSynchronizePositionPlayPacketCodec(),
+                new ServerCenterChunkPlayPacketCodec());
     }
 
     private ServerPacketRegistry() {}
 
     /**
-     * Finds a {@linkplain PacketCodec packet codec}, which can write a specific packet and writes it to
-     * a {@linkplain ByteBuf byte buf}.
+     * Gets a {@linkplain PacketCodec packet codec} for a packet specified, which was registered in this registry.
      *
-     * @param buf the byte buf
-     * @param packet the server packet
-     * @throws IllegalStateException if an eligible packet codec for the packet could not be found or the protocol
-     *                               state is not supported by protocol state of an eligible packet codec
+     * @param packetClass a class of the packet
+     * @return the packet codec, {@code null} if not present
      * @since 1.0
      */
-    public static void write(@NonNull ByteBuf buf, @NonNull ServerPacket packet) {
-        PacketCodec<? extends ServerPacket> codec = packetCodecs.get(packet.getClass());
-
-        if (codec == null) {
-            String packetName = packet.getClass().getSimpleName();
-            throw new IllegalStateException("Could not find an eligible server packet codec for " + packetName);
-        }
-
-        write(codec, packet, buf);
-    }
-
-    /**
-     * Writes a {@linkplain ServerPacket server packet} to a {@linkplain ByteBuf byte buf} using a specified
-     * {@linkplain PacketCodec packet codec}.
-     *
-     * @param codec the packet codec
-     * @param packet the server packet
-     * @param buf the byte buf
-     * @param <P> the type of the packet
-     * @since 1.0
-     */
-    private static <P extends ServerPacket> void write(@NonNull PacketCodec<P> codec, @NonNull ServerPacket packet,
-                                                       @NonNull ByteBuf buf) {
-        NetworkUtil.writeVarInt(buf, codec.getPacketId());
-        codec.write(buf, codec.getPacketClass().cast(packet));
+    public static @Nullable PacketCodec<? extends ServerPacket> codec(
+            @NonNull Class<? extends ServerPacket> packetClass
+    ) {
+        return packetCodecs.get(packetClass);
     }
 
     /**

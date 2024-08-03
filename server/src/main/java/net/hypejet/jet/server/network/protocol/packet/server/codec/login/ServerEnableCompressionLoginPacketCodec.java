@@ -2,9 +2,9 @@ package net.hypejet.jet.server.network.protocol.packet.server.codec.login;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.login.ServerEnableCompressionLoginPacket;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
-import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -28,11 +28,11 @@ public final class ServerEnableCompressionLoginPacketCodec extends PacketCodec<S
 
     @Override
     public @NonNull ServerEnableCompressionLoginPacket read(@NonNull ByteBuf buf) {
-        return new ServerEnableCompressionLoginPacket(NetworkUtil.readVarInt(buf));
+        return new ServerEnableCompressionLoginPacket(VarIntNetworkCodec.instance().read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerEnableCompressionLoginPacket object) {
-        NetworkUtil.writeVarInt(buf, object.threshold());
+        VarIntNetworkCodec.instance().write(buf, object.threshold());
     }
 }
