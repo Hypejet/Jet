@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketRegistry;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -37,6 +38,7 @@ public final class PacketEncoder extends MessageToByteEncoder<ServerPacket> {
 
     private static <P extends ServerPacket> void write(@NonNull PacketCodec<P> codec, @NonNull ByteBuf buf,
                                                        @NonNull ServerPacket packet) {
+        VarIntNetworkCodec.instance().write(buf, codec.getPacketId());
         codec.write(buf, codec.getPacketClass().cast(packet));
     }
 }

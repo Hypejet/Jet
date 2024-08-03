@@ -19,6 +19,6 @@ public final class SeenMessagesNetworkCodecTest {
     public void test() {
         BitSet set = new BitSet(20);
         set.set(0, 6);
-        NetworkCodecTestUtil.test(SeenMessagesNetworkCodec.instance(), new SeenMessages(set.size(), set));
+        NetworkCodecTestUtil.test(SeenMessagesNetworkCodec.instance(), new SeenMessages(set.length(), set));
     }
 }

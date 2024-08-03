@@ -29,11 +29,14 @@ import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerL
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerPlayerListHeaderAndFooterPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerPluginMessageRequestLoginPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerActionBarPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerCenterChunkPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerChunkAndLightDataPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerDisconnectPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerGameEventPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerJoinGamePlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerKeepAlivePlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerPluginMessagePlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerSynchronizePositionPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerSystemMessagePlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.status.ServerListResponseStatusPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.status.ServerPingResponseStatusPacketCodec;
@@ -85,7 +88,9 @@ public final class ServerPacketRegistry {
         register(new ServerKeepAlivePlayPacketCodec(), new ServerDisconnectPlayPacketCodec(),
                 new ServerJoinGamePlayPacketCodec(), new ServerPluginMessagePlayPacketCodec(),
                 new ServerGameEventPlayPacketCodec(), new ServerSystemMessagePlayPacketCodec(),
-                new ServerActionBarPlayPacketCodec(), new ServerPlayerListHeaderAndFooterPlayPacketCodec());
+                new ServerActionBarPlayPacketCodec(), new ServerPlayerListHeaderAndFooterPlayPacketCodec(),
+                new ServerChunkAndLightDataPlayPacketCodec(), new ServerSynchronizePositionPlayPacketCodec(),
+                new ServerCenterChunkPlayPacketCodec());
     }
 
     private ServerPacketRegistry() {}
