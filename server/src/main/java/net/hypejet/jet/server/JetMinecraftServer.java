@@ -5,12 +5,12 @@ import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.ping.ServerListPing;
 import net.hypejet.jet.protocol.ProtocolState;
+import net.hypejet.jet.server.command.JetCommandManager;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.NetworkManager;
 import net.hypejet.jet.server.util.ServerPingUtil;
 import net.hypejet.jet.server.world.JetWorldManager;
-import net.hypejet.jet.world.WorldManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
@@ -46,6 +46,7 @@ public final class JetMinecraftServer implements MinecraftServer {
     private final ReentrantReadWriteLock playersLock = new ReentrantReadWriteLock();
 
     private final JetWorldManager worldManager = new JetWorldManager();
+    private final JetCommandManager commandManager;
 
     /**
      * Constructs the {@linkplain JetMinecraftServer Jet Minecraft server}.
@@ -54,6 +55,7 @@ public final class JetMinecraftServer implements MinecraftServer {
      */
     JetMinecraftServer() {
         this.configuration = JetServerConfiguration.create();
+        this.commandManager = new JetCommandManager(this);
         this.networkManager = new NetworkManager(this);
         this.serverIcon = ServerPingUtil.loadServerIcon(LOGGER);
     }
@@ -113,8 +115,13 @@ public final class JetMinecraftServer implements MinecraftServer {
     }
 
     @Override
-    public @NonNull WorldManager worldManager() {
+    public @NonNull JetWorldManager worldManager() {
         return this.worldManager;
+    }
+
+    @Override
+    public @NonNull JetCommandManager commandManager() {
+        return this.commandManager;
     }
 
     /**

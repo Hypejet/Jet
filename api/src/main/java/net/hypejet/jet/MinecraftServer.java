@@ -1,5 +1,6 @@
 package net.hypejet.jet;
 
+import net.hypejet.jet.command.CommandManager;
 import net.hypejet.jet.configuration.ServerConfiguration;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.node.EventNode;
@@ -94,4 +95,12 @@ public interface MinecraftServer {
      * @since 1.0
      */
     @NonNull WorldManager worldManager();
+
+    /**
+     * Gets a {@linkplain CommandManager command manager} of the server.
+     *
+     * @return the command manager
+     * @since 1.0
+     */
+    @NonNull CommandManager commandManager();
 }

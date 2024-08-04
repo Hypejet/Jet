@@ -1,8 +1,6 @@
 package net.hypejet.jet.protocol.packet.client;
 
 import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.protocol.packet.client.status.ClientPingRequestStatusPacket;
-import net.hypejet.jet.protocol.packet.client.status.ClientServerListRequestStatusPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -13,8 +11,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @author Codestech
  * @see ClientPacket
  */
-public sealed interface ClientStatusPacket extends ClientPacket permits ClientPingRequestStatusPacket,
-        ClientServerListRequestStatusPacket {
+public interface ClientStatusPacket extends ClientPacket {
     /**
      * {@inheritDoc}
      */
