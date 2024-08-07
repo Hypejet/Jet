@@ -12,6 +12,7 @@ import net.hypejet.jet.event.command.CommandExecuteEvent;
 import net.hypejet.jet.event.command.CommandPreExecuteEvent;
 import net.hypejet.jet.event.command.CommandPreParseEvent;
 import net.hypejet.jet.event.node.EventNode;
+import net.hypejet.jet.protocol.packet.server.play.ServerDeclareCommandsPlayPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -39,6 +40,12 @@ public final class JetCommandManager implements CommandManager {
     private final CommandDispatcher<CommandSource> dispatcher = new CommandDispatcher<>();
     private final ReentrantReadWriteLock nodeLock = new ReentrantReadWriteLock();
 
+    /**
+     * Constructs the {@linkplain JetCommandManager command manager}.
+     *
+     * @param server a server, on which the commands should be managed
+     * @since 1.0
+     */
     public JetCommandManager(@NonNull JetMinecraftServer server) {
         this.server = server;
     }
@@ -136,6 +143,17 @@ public final class JetCommandManager implements CommandManager {
         } finally {
             this.nodeLock.readLock().unlock();
         }
+    }
+
+    /**
+     * Create a {@linkplain ServerDeclareCommandsPlayPacket declare commands play packet}
+     * using {@linkplain CommandNode command nodes} registered into this {@linkplain CommandManager command manager}.
+     *
+     * @return the packet
+     * @since 1.0
+     */
+    public @NonNull ServerDeclareCommandsPlayPacket createDeclarationPacket() {
+        return new ServerDeclareCommandsPlayPacket(CommandNodeAdapter.convert(this.dispatcher.getRoot()));
     }
 
     private static @NonNull IllegalArgumentException notLiteralException() {
