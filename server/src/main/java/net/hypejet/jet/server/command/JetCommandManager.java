@@ -2,7 +2,9 @@ package net.hypejet.jet.server.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.ParseResults;
+import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.hypejet.jet.command.CommandManager;
@@ -22,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -32,6 +35,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @see CommandManager
  */
 public final class JetCommandManager implements CommandManager {
+
+    public static final char COMMAND_PREFIX = '/';
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandManager.class);
 
@@ -143,6 +148,24 @@ public final class JetCommandManager implements CommandManager {
         } finally {
             this.nodeLock.readLock().unlock();
         }
+    }
+
+    public @NonNull CompletableFuture<Suggestions> suggest(@NonNull String input, @NonNull CommandSource source) {
+        StringReader reader = new StringReader(input);
+        if (reader.canRead() && reader.peek() == COMMAND_PREFIX)
+            reader.skip();
+
+        ParseResults<CommandSource> parseResults;
+
+        try {
+            parseResults = this.dispatcher.parse(reader, source);
+        } catch (Throwable throwable) {
+            // A throwable can be thrown during parsing while checking if a source can use a command node
+            LOGGER.error("An error occurred while parsing a command", throwable);
+            return CompletableFuture.failedFuture(throwable);
+        }
+
+        return this.dispatcher.getCompletionSuggestions(parseResults);
     }
 
     /**

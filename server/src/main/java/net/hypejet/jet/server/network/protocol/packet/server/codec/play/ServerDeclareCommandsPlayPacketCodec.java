@@ -98,7 +98,9 @@ public final class ServerDeclareCommandsPlayPacketCodec extends PacketCodec<Serv
                 }
 
                 argumentType = codec.read(buf);
-                suggestionsType = SUGGESTIONS_TYPE_CODEC.read(buf);
+
+                if (ByteUtil.isBitMaskEnabled(flags, HAS_SUGGESTIONS_TYPE))
+                    suggestionsType = SUGGESTIONS_TYPE_CODEC.read(buf);
             }
 
             rawNodes.add(new RawNode(flags, children, redirect, name, argumentType, suggestionsType));

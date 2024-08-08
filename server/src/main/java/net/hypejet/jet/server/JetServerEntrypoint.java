@@ -51,18 +51,27 @@ public final class JetServerEntrypoint {
                     ctx.getSource().sendMessage(Component.text("Hi!"));
                     return Command.SINGLE_SUCCESS;
                 })
+                .then(RequiredArgumentBuilder.<CommandSource, Integer>argument("int", IntegerArgumentType.integer())
+                        .executes(ctx -> {
+                            ctx.getSource().sendMessage(Component.text(ctx.getArgument("int", int.class)));
+                            return Command.SINGLE_SUCCESS;
+                        })
+                        .suggests((context, builder) -> {
+                            builder.suggest(1);
+                            return builder.buildFuture();
+                        })
+                        .then(RequiredArgumentBuilder.<CommandSource, Integer>argument("int1", IntegerArgumentType.integer())
+                                .executes(ctx -> {
+                                    ctx.getSource().sendMessage(Component.text(ctx.getArgument("int1", int.class)));
+                                    return Command.SINGLE_SUCCESS;
+                                })
+                                .suggests((context, builder) -> {
+                                    builder.suggest(2);
+                                    return builder.buildFuture();
+                                })
+                                .build())
+                        .build())
                 .build();
-
-        node1.addChild(RequiredArgumentBuilder.<CommandSource, Integer>argument("int", IntegerArgumentType.integer())
-                .executes(ctx -> {
-                    ctx.getSource().sendMessage(Component.text(ctx.getArgument("int", int.class)));
-                    return Command.SINGLE_SUCCESS;
-                })
-                .redirect(node1, ctx -> {
-                    ctx.getCommand().run(ctx);
-                    return ctx.getSource();
-                })
-                .build());
 
         JetCommandManager commandManager = server.commandManager();
         commandManager.register(node1);

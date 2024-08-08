@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.protocol.codecs.enums;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.identifier.IdentifierNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.identifier.PackedIdentifierNetworkCodec;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -32,7 +32,7 @@ public final class EnumIdentifierCodec<E extends Enum<E>> implements NetworkCode
 
     @Override
     public @NonNull E read(@NonNull ByteBuf buf) {
-        Key key = IdentifierNetworkCodec.instance().read(buf);
+        Key key = PackedIdentifierNetworkCodec.instance().read(buf);
         E enumEntry = this.identifierToEnumMap.get(key);
 
         if (enumEntry == null)
@@ -46,7 +46,7 @@ public final class EnumIdentifierCodec<E extends Enum<E>> implements NetworkCode
         Key key = this.enumToIdentifierMap.get(object);
         if (key == null)
             throw new IllegalArgumentException("Could not find a key for: " + object);
-        IdentifierNetworkCodec.instance().write(buf, key);
+        PackedIdentifierNetworkCodec.instance().write(buf, key);
     }
 
     /**

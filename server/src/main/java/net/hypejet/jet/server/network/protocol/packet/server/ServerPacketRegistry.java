@@ -31,6 +31,7 @@ import net.hypejet.jet.server.network.protocol.packet.server.codec.login.ServerP
 import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerActionBarPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerCenterChunkPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerChunkAndLightDataPlayPacketCodec;
+import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerCommandSuggestionsResponsePlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerDeclareCommandsPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerDisconnectPlayPacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.codec.play.ServerGameEventPlayPacketCodec;
@@ -91,7 +92,8 @@ public final class ServerPacketRegistry {
                 new ServerGameEventPlayPacketCodec(), new ServerSystemMessagePlayPacketCodec(),
                 new ServerActionBarPlayPacketCodec(), new ServerPlayerListHeaderAndFooterPlayPacketCodec(),
                 new ServerChunkAndLightDataPlayPacketCodec(), new ServerSynchronizePositionPlayPacketCodec(),
-                new ServerCenterChunkPlayPacketCodec(), new ServerDeclareCommandsPlayPacketCodec());
+                new ServerCenterChunkPlayPacketCodec(), new ServerDeclareCommandsPlayPacketCodec(),
+                new ServerCommandSuggestionsResponsePlayPacketCodec());
     }
 
     private ServerPacketRegistry() {}
