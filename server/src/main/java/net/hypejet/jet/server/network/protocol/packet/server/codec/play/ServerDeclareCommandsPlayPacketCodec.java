@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.play.ServerDeclareCommandsPlayPacket;
 import net.hypejet.jet.protocol.packet.server.play.ServerDeclareCommandsPlayPacket.ArgumentNode;
+import net.hypejet.jet.protocol.packet.server.play.ServerDeclareCommandsPlayPacket.ChildrenInitializer;
 import net.hypejet.jet.protocol.packet.server.play.ServerDeclareCommandsPlayPacket.LiteralNode;
 import net.hypejet.jet.protocol.packet.server.play.ServerDeclareCommandsPlayPacket.Node;
 import net.hypejet.jet.protocol.packet.server.play.ServerDeclareCommandsPlayPacket.RootNode;
@@ -44,7 +45,6 @@ public final class ServerDeclareCommandsPlayPacketCodec extends PacketCodec<Serv
 
     private static final int BEGINNING_NODE_INDEX = 0;
 
-    private static final byte ROOT_TYPE = 0x00;
     private static final byte LITERAL_TYPE = 0x01;
     private static final byte ARGUMENT_TYPE = 0x02;
 
@@ -148,41 +148,6 @@ public final class ServerDeclareCommandsPlayPacketCodec extends PacketCodec<Serv
         VarIntNetworkCodec.instance().write(buf, BEGINNING_NODE_INDEX);
     }
 
-    private static @NonNull Node deserializeNode(@NonNull List<RawNode> rawNodes, @NonNull List<Node> nodes,
-                                                 @NonNull RawNode rawNode) {
-        byte flags = rawNode.flags();
-        int[] childrenIds = rawNode.children();
-
-        boolean executable = ByteUtil.isBitMaskEnabled(flags, EXECUTABLE);
-
-        List<Node> children = new ArrayList<>(childrenIds.length);
-        for (int child : childrenIds)
-            children.add(deserializedNode(child, rawNodes, nodes));
-
-        Node redirect = null;
-
-        Integer redirectId = rawNode.redirect();
-        if (redirectId != null)
-            redirect = deserializedNode(rawNode.redirect(), rawNodes, nodes);
-
-        String name = rawNode.name();
-
-        if (ByteUtil.isBitMaskEnabled(flags, ROOT_TYPE))
-            return new RootNode(children, redirect, executable);
-
-        if (ByteUtil.isBitMaskEnabled(flags, LITERAL_TYPE))
-            return new LiteralNode(children, redirect, executable,
-                    Objects.requireNonNull(name, "The name must not be null"));
-
-        if (ByteUtil.isBitMaskEnabled(flags, ARGUMENT_TYPE))
-            return new ArgumentNode(children, redirect, executable,
-                    Objects.requireNonNull(name, "The name must not be null"),
-                    Objects.requireNonNull(rawNode.argumentType(), "The argument type must not be null"),
-                    rawNode.suggestionsType());
-
-        throw new IllegalArgumentException("Unknown command node type");
-    }
-
     private static void serializeNode(@NonNull Map<Node, Integer> identifiedNodes, @NonNull Node node,
                                       @NonNull ByteBuf buf) {
         byte flags = 0;
@@ -197,7 +162,7 @@ public final class ServerDeclareCommandsPlayPacketCodec extends PacketCodec<Serv
         }
 
         switch (node) {
-            case RootNode ignored -> flags |= ROOT_TYPE;
+            case RootNode ignored -> {}
             case LiteralNode ignored -> flags |= LITERAL_TYPE;
             case ArgumentNode argumentNode -> {
                 flags |= ARGUMENT_TYPE;
@@ -247,14 +212,48 @@ public final class ServerDeclareCommandsPlayPacketCodec extends PacketCodec<Serv
 
     private static @NonNull Node deserializedNode(int index, @NonNull List<RawNode> rawNodes,
                                                   @NonNull List<Node> nodes) {
-        Node deserializedNode = nodes.get(index);
-
-        if (deserializedNode == null) {
-            deserializedNode = deserializeNode(rawNodes, nodes, rawNodes.get(index));
-            nodes.set(index, deserializedNode);
+        if (nodes.size() > index) {
+            Node deserializedNode = nodes.get(index);
+            if (deserializedNode != null)
+                return deserializedNode;
         }
 
-        return deserializedNode;
+        RawNode rawNode = rawNodes.get(index);
+
+        byte flags = rawNode.flags();
+        boolean executable = ByteUtil.isBitMaskEnabled(flags, EXECUTABLE);
+
+        Node redirect = null;
+
+        Integer redirectId = rawNode.redirect();
+        if (redirectId != null)
+            redirect = deserializedNode(rawNode.redirect(), rawNodes, nodes);
+
+        String name = rawNode.name();
+
+        ChildrenInitializer childrenInitializer = node -> {
+            // Add the node to the list before children initialization to allow them referencing to it
+            nodes.add(index, node);
+
+            int[] childrenIds = rawNode.children();
+            List<Node> children = new ArrayList<>(childrenIds.length);
+
+            for (int child : childrenIds)
+                children.add(deserializedNode(child, rawNodes, nodes));
+            return children;
+        };
+
+        if (ByteUtil.isBitMaskEnabled(flags, LITERAL_TYPE))
+            return new LiteralNode(childrenInitializer, redirect, executable,
+                    Objects.requireNonNull(name, "The name must not be null"));
+
+        if (ByteUtil.isBitMaskEnabled(flags, ARGUMENT_TYPE))
+            return new ArgumentNode(childrenInitializer, redirect, executable,
+                    Objects.requireNonNull(name, "The name must not be null"),
+                    Objects.requireNonNull(rawNode.argumentType(), "The argument type must not be null"),
+                    rawNode.suggestionsType());
+
+        return new RootNode(childrenInitializer, redirect, executable);
     }
 
     private static <A extends ArgumentType<?>> void write(@NonNull ArgumentType<?> type, @NonNull ByteBuf buf,
