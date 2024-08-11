@@ -17,7 +17,8 @@ import java.util.Objects;
 public final class CommandPreParseEvent extends CancellableEvent implements CommandEvent {
 
     private final CommandSource source;
-    private final String input;
+
+    private String input;
 
     /**
      * Constructs the {@linkplain CommandPreParseEvent command pre-parse event}.
@@ -47,8 +48,18 @@ public final class CommandPreParseEvent extends CancellableEvent implements Comm
      * @return the command input
      * @since 1.0
      */
-    public @NonNull String input() {
+    public @NonNull String getInput() {
         return this.input;
+    }
+
+    /**
+     * Sets the command input.
+     *
+     * @param input the command input
+     * @since 1.0
+     */
+    public void setInput(@NonNull String input) {
+        this.input = input;
     }
 
     /**
