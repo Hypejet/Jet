@@ -38,7 +38,7 @@ public final class JetCommandManager implements CommandManager {
 
     public static final char COMMAND_PREFIX = '/';
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommandManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JetCommandManager.class);
 
     private final JetMinecraftServer server;
 

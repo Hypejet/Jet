@@ -34,7 +34,7 @@ public final class JetMinecraftServer implements MinecraftServer {
     private static final int PROTOCOL_VERSION = 767;
     public static final String MINECRAFT_VERSION = "1.21";
 
-    private static final Logger LOGGER  = LoggerFactory.getLogger(MinecraftServer.class);
+    private static final Logger LOGGER  = LoggerFactory.getLogger(JetMinecraftServer.class);
 
     private final EventNode<Object> eventNode = EventNode.create();
     private final JetServerConfiguration configuration;
