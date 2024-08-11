@@ -2,6 +2,7 @@ package net.hypejet.jet.server;
 
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.entity.player.Player;
+import net.hypejet.jet.event.events.server.ServerReadyEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.ping.ServerListPing;
 import net.hypejet.jet.plugin.PluginManager;
@@ -57,9 +58,10 @@ public final class JetMinecraftServer implements MinecraftServer {
      */
     JetMinecraftServer() {
         this.configuration = JetServerConfiguration.create();
+        this.serverIcon = ServerPingUtil.loadServerIcon(LOGGER);
         this.pluginManager = new JetPluginManager(this);
         this.networkManager = new NetworkManager(this);
-        this.serverIcon = ServerPingUtil.loadServerIcon(LOGGER);
+        this.eventNode.call(new ServerReadyEvent());
     }
 
     @Override
