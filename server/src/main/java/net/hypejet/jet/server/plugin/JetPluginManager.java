@@ -2,9 +2,13 @@ package net.hypejet.jet.server.plugin;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.plugin.PluginDependency;
 import net.hypejet.jet.plugin.PluginManager;
 import net.hypejet.jet.plugin.PluginMetadata;
+import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.plugin.json.PluginDependencyDeserializer;
 import net.hypejet.jet.server.plugin.json.PluginMetadataDeserializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -15,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
@@ -55,7 +58,9 @@ public final class JetPluginManager implements PluginManager {
      *
      * @since 1.0
      */
-    public JetPluginManager() {
+    public JetPluginManager(@NonNull JetMinecraftServer server) {
+        Injector injector = Guice.createInjector(binder -> binder.bind(MinecraftServer.class).toInstance(server));
+
         try {
             if (!Files.exists(PLUGIN_PATH))
                 Files.createDirectories(PLUGIN_PATH);
@@ -100,7 +105,7 @@ public final class JetPluginManager implements PluginManager {
                 if (plugins.containsKey(name)) continue;
 
                 try {
-                    plugins.put(name, load(entry.getValue(), pairs));
+                    load(entry.getValue(), pairs, plugins, injector);
                 } catch (Throwable throwable) {
                     entry.getValue().classLoader().close();
                     LOGGER.error("An error occurred while loading a plugin with name of \"{}\"", name, throwable);
@@ -138,8 +143,9 @@ public final class JetPluginManager implements PluginManager {
         }
     }
 
-    private static @NonNull JetPlugin load(@NonNull PluginPair pluginPair, @NonNull Map<String, PluginPair> pairs,
-                                           @NonNull String @NonNull ... dependants) {
+    private static void load(@NonNull PluginPair pluginPair, @NonNull Map<String, PluginPair> pairs,
+                             @NonNull Map<String, JetPlugin> plugins, @NonNull Injector injector,
+                             @NonNull String @NonNull ... dependants) {
         try {
             PluginMetadata pluginMetadata = pluginPair.metadata();
             URLClassLoader classLoader = pluginPair.classLoader();
@@ -158,7 +164,7 @@ public final class JetPluginManager implements PluginManager {
                 if (dependencyPluginPair != null) {
                     String[] newDependants = Arrays.copyOf(dependants, dependants.length + 1);
                     newDependants[dependants.length] = pluginName;
-                    load(dependencyPluginPair, pairs, newDependants);
+                    load(dependencyPluginPair, pairs, plugins, injector, newDependants);
                 }
 
                 if (dependency.required()) {
@@ -168,9 +174,7 @@ public final class JetPluginManager implements PluginManager {
             }
 
             Class<?> mainClass = Class.forName(pluginMetadata.mainClass(), true, classLoader);
-            Object instance = mainClass.getDeclaredConstructor().newInstance();
-
-            JetPlugin plugin = new JetPlugin(pluginMetadata, instance, classLoader);
+            JetPlugin plugin = new JetPlugin(pluginMetadata, injector.getInstance(mainClass), classLoader);
 
             StringBuilder builder = new StringBuilder();
 
@@ -190,9 +194,8 @@ public final class JetPluginManager implements PluginManager {
             }
 
             LOGGER.info(builder.toString());
-            return plugin;
-        } catch (ClassNotFoundException | InvocationTargetException | InstantiationException
-                 | IllegalAccessException | NoSuchMethodException exception) {
+            plugins.put(pluginName, plugin);
+        } catch (ClassNotFoundException exception) {
             throw new RuntimeException(exception);
         }
     }

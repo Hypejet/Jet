@@ -47,8 +47,8 @@ public final class JetMinecraftServer implements MinecraftServer {
     private final Set<JetPlayer> players = new HashSet<>();
     private final ReentrantReadWriteLock playersLock = new ReentrantReadWriteLock();
 
+    private final JetPluginManager pluginManager;
     private final JetWorldManager worldManager = new JetWorldManager();
-    private final JetPluginManager pluginManager = new JetPluginManager();
 
     /**
      * Constructs the {@linkplain JetMinecraftServer Jet Minecraft server}.
@@ -57,6 +57,7 @@ public final class JetMinecraftServer implements MinecraftServer {
      */
     JetMinecraftServer() {
         this.configuration = JetServerConfiguration.create();
+        this.pluginManager = new JetPluginManager(this);
         this.networkManager = new NetworkManager(this);
         this.serverIcon = ServerPingUtil.loadServerIcon(LOGGER);
     }
