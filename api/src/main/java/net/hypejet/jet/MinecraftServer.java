@@ -3,6 +3,7 @@ package net.hypejet.jet;
 import net.hypejet.jet.configuration.ServerConfiguration;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.node.EventNode;
+import net.hypejet.jet.plugin.PluginManager;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.world.WorldManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -94,4 +95,12 @@ public interface MinecraftServer {
      * @since 1.0
      */
     @NonNull WorldManager worldManager();
+
+    /**
+     * Gets a {@linkplain PluginManager plugin manager} of the server.
+     *
+     * @return the plugin manager
+     * @since 1.0
+     */
+    @NonNull PluginManager pluginManager();
 }

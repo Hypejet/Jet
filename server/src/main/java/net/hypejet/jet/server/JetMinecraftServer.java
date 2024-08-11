@@ -4,10 +4,12 @@ import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.ping.ServerListPing;
+import net.hypejet.jet.plugin.PluginManager;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.NetworkManager;
+import net.hypejet.jet.server.plugin.JetPluginManager;
 import net.hypejet.jet.server.util.ServerPingUtil;
 import net.hypejet.jet.server.world.JetWorldManager;
 import net.hypejet.jet.world.WorldManager;
@@ -46,6 +48,7 @@ public final class JetMinecraftServer implements MinecraftServer {
     private final ReentrantReadWriteLock playersLock = new ReentrantReadWriteLock();
 
     private final JetWorldManager worldManager = new JetWorldManager();
+    private final JetPluginManager pluginManager = new JetPluginManager();
 
     /**
      * Constructs the {@linkplain JetMinecraftServer Jet Minecraft server}.
@@ -115,6 +118,11 @@ public final class JetMinecraftServer implements MinecraftServer {
     @Override
     public @NonNull WorldManager worldManager() {
         return this.worldManager;
+    }
+
+    @Override
+    public @NonNull PluginManager pluginManager() {
+        return this.pluginManager;
     }
 
     /**
