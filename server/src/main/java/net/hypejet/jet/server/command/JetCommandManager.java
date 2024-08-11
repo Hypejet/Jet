@@ -116,6 +116,7 @@ public final class JetCommandManager implements CommandManager {
             eventNode.call(preParseEvent);
             if (preParseEvent.isCancelled()) return;
 
+            input = preParseEvent.getInput();
             ParseResults<CommandSource> parseResults;
 
             try {
