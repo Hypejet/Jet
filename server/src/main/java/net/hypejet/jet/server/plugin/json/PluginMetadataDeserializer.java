@@ -8,9 +8,12 @@ import com.google.gson.JsonObject;
 import net.hypejet.jet.plugin.PluginDependency;
 import net.hypejet.jet.plugin.PluginMetadata;
 import net.hypejet.jet.server.util.json.JsonUtil;
+import net.kyori.adventure.key.Key;
 
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -26,13 +29,22 @@ public final class PluginMetadataDeserializer implements JsonDeserializer<Plugin
 
     private static final String NAME = "name";
     private static final String VERSION = "version";
-    private static final String MAIN_CLASS = "main-class";
+    private static final String ENTRYPOINTS = "entrypoints";
     private static final String AUTHORS = "authors";
     private static final String DEPENDENCIES = "dependencies";
 
     @Override
     public PluginMetadata deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
         JsonObject object = json.getAsJsonObject();
+
+        JsonObject entrypointsObject = object.getAsJsonObject(ENTRYPOINTS);
+        Map<Key, String> entrypoints = new HashMap<>();
+
+        if (entrypointsObject != null) {
+            for (Map.Entry<String, JsonElement> entry : entrypointsObject.entrySet()) {
+                entrypoints.put(Key.key(entry.getKey()), entry.getValue().getAsString());
+            }
+        }
 
         Set<String> authors = new HashSet<>();
         JsonArray authorsArray = object.getAsJsonArray(AUTHORS);
@@ -44,11 +56,13 @@ public final class PluginMetadataDeserializer implements JsonDeserializer<Plugin
         Set<PluginDependency> dependencies = new HashSet<>();
         JsonArray dependenciesArray = object.getAsJsonArray(DEPENDENCIES);
 
-        if (dependenciesArray != null)
-            for (JsonElement element : dependenciesArray)
+        if (dependenciesArray != null) {
+            for (JsonElement element : dependenciesArray) {
                 dependencies.add(context.deserialize(element, PluginDependency.class));
+            }
+        }
 
         return new PluginMetadata(JsonUtil.getRequiredString(NAME, object), JsonUtil.getRequiredString(VERSION, object),
-                JsonUtil.getRequiredString(MAIN_CLASS, object), Set.copyOf(authors), Set.copyOf(dependencies));
+                Map.copyOf(entrypoints), Set.copyOf(authors), Set.copyOf(dependencies));
     }
 }

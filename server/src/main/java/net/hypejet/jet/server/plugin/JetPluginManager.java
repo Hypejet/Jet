@@ -13,6 +13,7 @@ import net.hypejet.jet.plugin.PluginMetadata;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.plugin.json.PluginDependencyDeserializer;
 import net.hypejet.jet.server.plugin.json.PluginMetadataDeserializer;
+import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
@@ -45,6 +46,8 @@ public final class JetPluginManager implements PluginManager {
 
     private static final String PLUGIN_JSON_FILE_NAME = "jet-plugin.json";
     private static final Path PLUGIN_PATH = Path.of("plugins");
+
+    private static final Key MAIN_ENTRYPOINT = Key.key("hypejet", "main");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JetPluginManager.class);
 
@@ -179,7 +182,13 @@ public final class JetPluginManager implements PluginManager {
                 }
             }
 
-            Class<?> mainClass = Class.forName(pluginMetadata.mainClass(), true, classLoader);
+            String mainEntrypoint = pluginMetadata.entrypoints().get(MAIN_ENTRYPOINT);
+            if (mainEntrypoint == null) {
+                throw new IllegalArgumentException("The \"" + MAIN_ENTRYPOINT
+                        + "\" entrypoint has been not specified");
+            }
+
+            Class<?> mainClass = Class.forName(mainEntrypoint, true, classLoader);
             JetPlugin plugin = new JetPlugin(pluginMetadata, injector.getInstance(mainClass), classLoader);
 
             this.server.eventNode().call(new PluginLoadEvent(plugin));
