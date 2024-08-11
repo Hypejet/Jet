@@ -81,10 +81,8 @@ public final class JetPluginManager implements PluginManager {
                                     + PLUGIN_JSON_FILE_NAME + "\" file");
                         }
 
-                        pluginMetadata = PLUGIN_METADATA_GSON.fromJson(
-                                new InputStreamReader(stream),
-                                PluginMetadata.class
-                        );
+                        pluginMetadata = PLUGIN_METADATA_GSON.fromJson(new InputStreamReader(stream),
+                                PluginMetadata.class);
                     } catch (Throwable throwable) {
                         classLoader.close();
                         throw new RuntimeException("An error occurred while creating a plugin with file of \""
@@ -193,8 +191,8 @@ public final class JetPluginManager implements PluginManager {
 
             LOGGER.info(builder.toString());
             return plugin;
-        } catch (ClassNotFoundException | InvocationTargetException | InstantiationException | IllegalAccessException |
-                 NoSuchMethodException exception) {
+        } catch (ClassNotFoundException | InvocationTargetException | InstantiationException
+                 | IllegalAccessException | NoSuchMethodException exception) {
             throw new RuntimeException(exception);
         }
     }
