@@ -25,9 +25,9 @@ public interface PlayerConnection {
 
     /**
      * Sends a {@linkplain ServerPacket client-bound packet} to a client.
-     * </p>
-     * Note that the packet may be changed in a {@linkplain net.hypejet.jet.event.events.packet.PacketSendEvent packet
-     * send event}.
+     *
+     * <p>Note that the packet may be changed in a {@linkplain net.hypejet.jet.event.events.packet.PacketSendEvent packet
+     * send event}.</p>
      *
      * @param packet the paket
      * @return the final packet that was sent, null if the event was cancelled, something went wrong during sending

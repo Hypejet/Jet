@@ -90,6 +90,7 @@ public final class JetMinecraftServer implements MinecraftServer {
     public void shutdown() {
         LOGGER.info("Shutting down the server...");
         this.networkManager.shutdown();
+        this.pluginManager.shutdown();
         LOGGER.info("Successfully shut down the server");
     }
 

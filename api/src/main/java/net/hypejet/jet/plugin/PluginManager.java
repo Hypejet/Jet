@@ -28,5 +28,5 @@ public interface PluginManager {
      * @return the collection
      * @since 1.0
      */
-    @NonNull Collection<Plugin> plugins();
+    @NonNull Collection<? extends Plugin> plugins();
 }

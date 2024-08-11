@@ -35,9 +35,9 @@ public interface MinecraftServer {
 
     /**
      * Gets a Minecraft version name that this server supports.
-     * </p>
-     * If the {@linkplain #protocolVersion() protocol version} supports multiple Minecraft versions, the latest one
-     * will be returned.
+     *
+     * <p>If the {@linkplain #protocolVersion() protocol version} supports multiple Minecraft versions, the latest one
+     * will be returned.</p>
      *
      * @return the Minecraft version name
      * @since 1.0
