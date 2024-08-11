@@ -80,7 +80,9 @@ public final class JetPluginManager implements PluginManager {
                     Path path = pathIterator.next();
                     if (!Files.isRegularFile(path)) continue; // Might be a plugin data directory
 
-                    URLClassLoader classLoader = new URLClassLoader(new URL[] { path.toUri().toURL() },
+                    String fileName = path.getFileName().toString();
+
+                    URLClassLoader classLoader = new URLClassLoader(fileName, new URL[] { path.toUri().toURL() },
                             this.getClass().getClassLoader());
                     PluginMetadata pluginMetadata;
 
@@ -92,13 +94,12 @@ public final class JetPluginManager implements PluginManager {
 
                         pluginMetadata = PLUGIN_METADATA_GSON.fromJson(new InputStreamReader(stream),
                                 PluginMetadata.class);
+                        pairs.put(pluginMetadata.name(), new PluginPair(pluginMetadata, classLoader));
                     } catch (Throwable throwable) {
                         classLoader.close();
-                        throw new RuntimeException("An error occurred while creating a plugin with file of \""
-                                + path.getFileName().toString() + "\"", throwable);
+                        LOGGER.error("An error occurred while creating a plugin with file name of \"{}\"", fileName,
+                                throwable);
                     }
-
-                    pairs.put(pluginMetadata.name(), new PluginPair(pluginMetadata, classLoader));
                 }
             }
 
