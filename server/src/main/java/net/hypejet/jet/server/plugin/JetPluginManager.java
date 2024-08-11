@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import net.hypejet.jet.MinecraftServer;
+import net.hypejet.jet.event.events.plugin.PluginLoadEvent;
+import net.hypejet.jet.event.events.plugin.PluginUnloadEvent;
 import net.hypejet.jet.plugin.PluginDependency;
 import net.hypejet.jet.plugin.PluginManager;
 import net.hypejet.jet.plugin.PluginMetadata;
@@ -51,6 +53,7 @@ public final class JetPluginManager implements PluginManager {
             .registerTypeAdapter(PluginMetadata.class, new PluginMetadataDeserializer())
             .create();
 
+    private final JetMinecraftServer server;
     private final Map<String, JetPlugin> plugins;
 
     /**
@@ -59,6 +62,7 @@ public final class JetPluginManager implements PluginManager {
      * @since 1.0
      */
     public JetPluginManager(@NonNull JetMinecraftServer server) {
+        this.server = server;
         Injector injector = Guice.createInjector(binder -> binder.bind(MinecraftServer.class).toInstance(server));
 
         try {
@@ -105,7 +109,7 @@ public final class JetPluginManager implements PluginManager {
                 if (plugins.containsKey(name)) continue;
 
                 try {
-                    load(entry.getValue(), pairs, plugins, injector);
+                    this.load(entry.getValue(), pairs, plugins, injector);
                 } catch (Throwable throwable) {
                     entry.getValue().classLoader().close();
                     LOGGER.error("An error occurred while loading a plugin with name of \"{}\"", name, throwable);
@@ -137,15 +141,16 @@ public final class JetPluginManager implements PluginManager {
         for (JetPlugin plugin : this.plugins()) {
             try {
                 plugin.classLoader().close();
+                this.server.eventNode().call(new PluginUnloadEvent(plugin));
             } catch (IOException exception) {
                 throw new RuntimeException(exception);
             }
         }
     }
 
-    private static void load(@NonNull PluginPair pluginPair, @NonNull Map<String, PluginPair> pairs,
-                             @NonNull Map<String, JetPlugin> plugins, @NonNull Injector injector,
-                             @NonNull String @NonNull ... dependants) {
+    private void load(@NonNull PluginPair pluginPair, @NonNull Map<String, PluginPair> pairs,
+                      @NonNull Map<String, JetPlugin> plugins, @NonNull Injector injector,
+                      @NonNull String @NonNull ... dependants) {
         try {
             PluginMetadata pluginMetadata = pluginPair.metadata();
             URLClassLoader classLoader = pluginPair.classLoader();
@@ -164,7 +169,7 @@ public final class JetPluginManager implements PluginManager {
                 if (dependencyPluginPair != null) {
                     String[] newDependants = Arrays.copyOf(dependants, dependants.length + 1);
                     newDependants[dependants.length] = pluginName;
-                    load(dependencyPluginPair, pairs, plugins, injector, newDependants);
+                    this.load(dependencyPluginPair, pairs, plugins, injector, newDependants);
                 }
 
                 if (dependency.required()) {
@@ -175,6 +180,8 @@ public final class JetPluginManager implements PluginManager {
 
             Class<?> mainClass = Class.forName(pluginMetadata.mainClass(), true, classLoader);
             JetPlugin plugin = new JetPlugin(pluginMetadata, injector.getInstance(mainClass), classLoader);
+
+            this.server.eventNode().call(new PluginLoadEvent(plugin));
 
             StringBuilder builder = new StringBuilder();
 

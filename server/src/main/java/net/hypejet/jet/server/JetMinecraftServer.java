@@ -3,6 +3,7 @@ package net.hypejet.jet.server;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.server.ServerReadyEvent;
+import net.hypejet.jet.event.events.server.ServerShutdownEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.ping.ServerListPing;
 import net.hypejet.jet.plugin.PluginManager;
@@ -92,6 +93,7 @@ public final class JetMinecraftServer implements MinecraftServer {
     @Override
     public void shutdown() {
         LOGGER.info("Shutting down the server...");
+        this.eventNode.addListener(new ServerShutdownEvent());
         this.networkManager.shutdown();
         this.pluginManager.shutdown();
         LOGGER.info("Successfully shut down the server");
