@@ -26,24 +26,27 @@ public final class ServerStatusPacketsTest {
 
     @Test
     public void testServerListResponse() {
-        ServerPacketTestUtil.testPacket(new ServerListResponseStatusPacket(new ServerListPing(
-                new ServerListPing.Version("1.21", 766),
-                new ServerListPing.Players(20, 3, List.of(
-                        new ServerListPing.PingPlayer("DummyPlayer", UUID.randomUUID()),
-                        new ServerListPing.PingPlayer("AnotherPlayer", UUID.randomUUID())
-                )),
-                Component.text()
-                        .append(Component.text("Hi!", NamedTextColor.RED))
-                        .appendNewline()
-                        .append(Component.text("Hello world!", NamedTextColor.GREEN, TextDecoration.BOLD))
-                        .build(),
-                new ServerListPing.Favicon(TEST_FAVICON),
-                true, true, null
-        )));
+        ServerPacketTestUtil.testPacket(ServerListResponseStatusPacket.class, new ServerListResponseStatusPacket(
+                new ServerListPing(
+                        new ServerListPing.Version("1.21", 766),
+                        new ServerListPing.Players(20, 3, List.of(
+                                new ServerListPing.PingPlayer("DummyPlayer", UUID.randomUUID()),
+                                new ServerListPing.PingPlayer("AnotherPlayer", UUID.randomUUID())
+                        )),
+                        Component.text()
+                                .append(Component.text("Hi!", NamedTextColor.RED))
+                                .appendNewline()
+                                .append(Component.text("Hello world!", NamedTextColor.GREEN, TextDecoration.BOLD))
+                                .build(),
+                        new ServerListPing.Favicon(TEST_FAVICON),
+                        true, true, null
+                )
+        ));
     }
 
     @Test
     public void testPingResponse() {
-        ServerPacketTestUtil.testPacket(new ServerPingResponseStatusPacket(325254733));
+        ServerPacketTestUtil.testPacket(ServerPingResponseStatusPacket.class,
+                new ServerPingResponseStatusPacket(325254733));
     }
 }

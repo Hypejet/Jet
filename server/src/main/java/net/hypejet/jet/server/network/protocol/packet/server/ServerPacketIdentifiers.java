@@ -36,6 +36,8 @@ public final class ServerPacketIdentifiers {
     public static final int CONFIGURATION_CUSTOM_REPORT_DETAILS = nextConfigurationId();
     public static final int CONFIGURATION_SERVER_LINKS = nextConfigurationId();
 
+    public static final int PLAY_SUGGESTIONS_RESPONSE = 0x10;
+    public static final int PLAY_DECLARE_COMMANDS = 0x11;
     public static final int PLAY_PLUGIN_MESSAGE = 0x19;
     public static final int PLAY_DISCONNECT = 0x1D;
     public static final int PLAY_GAME_EVENT = 0x22;

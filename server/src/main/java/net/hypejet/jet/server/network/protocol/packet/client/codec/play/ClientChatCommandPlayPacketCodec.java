@@ -2,11 +2,14 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.play.ClientChatCommandPlayPacket;
+import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents a {@linkplain ClientPacketCodec client packet codec}, which reads and writes
@@ -39,6 +42,7 @@ public final class ClientChatCommandPlayPacketCodec extends ClientPacketCodec<Cl
 
     @Override
     public void handle(@NonNull ClientChatCommandPlayPacket packet, @NonNull SocketPlayerConnection connection) {
-        // TODO
+        JetPlayer player = Objects.requireNonNull(connection.player(), "The player must not be null");
+        connection.server().commandManager().execute(packet.commandString(), player);
     }
 }

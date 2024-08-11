@@ -1,8 +1,6 @@
 package net.hypejet.jet.protocol.packet;
 
 import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.protocol.packet.client.ClientPacket;
-import net.hypejet.jet.protocol.packet.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -12,7 +10,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @author Window5
  * @author Codestech
  */
-public sealed interface Packet permits ClientPacket, ServerPacket {
+public interface Packet {
     /**
      * Gets a {@linkplain ProtocolState protocol state}, during which this packet can be handled.
      *
