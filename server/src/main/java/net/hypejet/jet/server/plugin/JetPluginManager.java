@@ -251,11 +251,11 @@ public final class JetPluginManager implements PluginManager {
         int[] parsedVersion = VersioningUtil.parseVersion(versionString);
         int[] parsedRequiredVersion = VersioningUtil.parseVersion(requiredVersion.name());
 
-        int minLength = Math.min(parsedVersion.length, parsedRequiredVersion.length);
+        int maxLength = Math.max(parsedVersion.length, parsedRequiredVersion.length);
 
-        for (int index = 0; index < minLength; index++) {
-            int digit = parsedVersion[index];
-            int requiredDigit = parsedRequiredVersion[index];
+        for (int index = 0; index < maxLength; index++) {
+            int digit = parsedVersion.length > index ? parsedVersion[index] : 0;
+            int requiredDigit = parsedRequiredVersion.length > index ? parsedRequiredVersion[index] : 0;
 
             boolean compatible = digit == requiredDigit
                     || (requiredVersion.backwardsCompatible() && digit < requiredDigit)
