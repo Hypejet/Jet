@@ -4,6 +4,7 @@ import net.hypejet.jet.command.CommandManager;
 import net.hypejet.jet.configuration.ServerConfiguration;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.node.EventNode;
+import net.hypejet.jet.plugin.PluginManager;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.world.WorldManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -35,9 +36,9 @@ public interface MinecraftServer {
 
     /**
      * Gets a Minecraft version name that this server supports.
-     * </p>
-     * If the {@linkplain #protocolVersion() protocol version} supports multiple Minecraft versions, the latest one
-     * will be returned.
+     *
+     * <p>If the {@linkplain #protocolVersion() protocol version} supports multiple Minecraft versions, the latest one
+     * will be returned.</p>
      *
      * @return the Minecraft version name
      * @since 1.0
@@ -103,4 +104,12 @@ public interface MinecraftServer {
      * @since 1.0
      */
     @NonNull CommandManager commandManager();
+
+    /**
+     * Gets a {@linkplain PluginManager plugin manager} of the server.
+     *
+     * @return the plugin manager
+     * @since 1.0
+     */
+    @NonNull PluginManager pluginManager();
 }

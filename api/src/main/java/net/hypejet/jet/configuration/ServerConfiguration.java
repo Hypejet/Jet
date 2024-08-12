@@ -37,8 +37,8 @@ public interface ServerConfiguration {
 
     /**
      * Gets a max amount of players, which can be on the server at once.
-     * </p>
-     * Note that this value by default is used only by for server list pinging.
+     *
+     * <p>Note that this value by default is used only by for server list pinging.</p>
      *
      * @return the amount
      * @since 1.0

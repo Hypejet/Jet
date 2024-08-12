@@ -20,48 +20,48 @@ import net.hypejet.jet.event.annotation.Subscribe;
 public enum EventPriority {
     /**
      * Represents an {@linkplain EventPriority event priority}.
-     * </p>
-     * Listeners of this type are called first.
+     *
+     * <p>Listeners of this type are called first.</p>
      *
      * @since 1.0
      */
     FIRST,
     /**
      * Represents an {@linkplain EventPriority event priority}.
-     * </p>
-     * Listeners of this type are called second.
+     *
+     * <p>Listeners of this type are called second.</p>
      *
      * @since 1.0
      */
     EARLY,
     /**
      * Represents an {@linkplain EventPriority event priority}.
-     * </p>
-     * Listeners of this type are called third.
+     *
+     * <p>Listeners of this type are called third.</p>
      *
      * @since 1.0
      */
     NORMAL,
     /**
      * Represents an {@linkplain EventPriority event priority}.
-     * </p>
-     * Listeners of this type are called fourth.
+     *
+     * <p>Listeners of this type are called fourth.</p>
      *
      * @since 1.0
      */
     SERVER,
     /**
      * Represents an {@linkplain EventPriority event priority}.
-     * </p>
-     * Listeners of this type are called fifth.
+     *
+     * <p>Listeners of this type are called fifth.</p>
      *
      * @since 1.0
      */
     LATE,
     /**
      * Represents an {@linkplain EventPriority event priority}.
-     * </p>
-     * Listeners of this type are called last.
+     *
+     * <p>Listeners of this type are called last.</p>
      *
      * @since 1.0
      */

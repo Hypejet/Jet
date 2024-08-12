@@ -2,13 +2,17 @@ package net.hypejet.jet.server;
 
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.entity.player.Player;
+import net.hypejet.jet.event.events.server.ServerReadyEvent;
+import net.hypejet.jet.event.events.server.ServerShutdownEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.ping.ServerListPing;
+import net.hypejet.jet.plugin.PluginManager;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.server.command.JetCommandManager;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.NetworkManager;
+import net.hypejet.jet.server.plugin.JetPluginManager;
 import net.hypejet.jet.server.util.ServerPingUtil;
 import net.hypejet.jet.server.world.JetWorldManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -45,6 +49,7 @@ public final class JetMinecraftServer implements MinecraftServer {
     private final Set<JetPlayer> players = new HashSet<>();
     private final ReentrantReadWriteLock playersLock = new ReentrantReadWriteLock();
 
+    private final JetPluginManager pluginManager;
     private final JetWorldManager worldManager = new JetWorldManager();
     private final JetCommandManager commandManager;
 
@@ -55,9 +60,11 @@ public final class JetMinecraftServer implements MinecraftServer {
      */
     JetMinecraftServer() {
         this.configuration = JetServerConfiguration.create();
-        this.commandManager = new JetCommandManager(this);
-        this.networkManager = new NetworkManager(this);
         this.serverIcon = ServerPingUtil.loadServerIcon(LOGGER);
+        this.commandManager = new JetCommandManager(this);
+        this.pluginManager = new JetPluginManager(this);
+        this.networkManager = new NetworkManager(this);
+        this.eventNode.call(new ServerReadyEvent());
     }
 
     @Override
@@ -88,7 +95,9 @@ public final class JetMinecraftServer implements MinecraftServer {
     @Override
     public void shutdown() {
         LOGGER.info("Shutting down the server...");
+        this.eventNode.addListener(new ServerShutdownEvent());
         this.networkManager.shutdown();
+        this.pluginManager.shutdown();
         LOGGER.info("Successfully shut down the server");
     }
 
@@ -122,6 +131,11 @@ public final class JetMinecraftServer implements MinecraftServer {
     @Override
     public @NonNull JetCommandManager commandManager() {
         return this.commandManager;
+    }
+
+    @Override
+    public @NonNull PluginManager pluginManager() {
+        return this.pluginManager;
     }
 
     /**
