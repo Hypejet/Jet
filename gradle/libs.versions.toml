@@ -63,9 +63,6 @@ brigadier = { module = "com.mojang:brigadier", version.ref = "brigadier" }
 guice = { module = "com.google.inject:guice", version.ref = "guice" }
 
 [bundles]
-# Minecraft text
-adventure = ["adventure", "adventure-minimessage", "adventure-serializer-gson", "adventure-serializer-nbt"]
-
 # Configuration
 configs = ["configs-snakeyaml", "configs-serdes-commonds"]
 
