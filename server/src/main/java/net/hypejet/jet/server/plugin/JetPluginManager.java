@@ -7,6 +7,7 @@ import com.google.inject.Injector;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.event.events.plugin.PluginLoadEvent;
 import net.hypejet.jet.event.events.plugin.PluginUnloadEvent;
+import net.hypejet.jet.plugin.Plugin;
 import net.hypejet.jet.plugin.metadata.PluginDependency;
 import net.hypejet.jet.plugin.PluginManager;
 import net.hypejet.jet.plugin.metadata.PluginMetadata;
@@ -62,7 +63,9 @@ public final class JetPluginManager implements PluginManager {
             .create();
 
     private final JetMinecraftServer server;
-    private final Map<String, JetPlugin> plugins;
+
+    private final Map<String, JetPlugin> nameToPluginMap;
+    private final Map<Object, JetPlugin> instanceToPluginMap;
 
     /**
      * Constructs the {@linkplain JetPluginManager plugin manager}.
@@ -125,7 +128,11 @@ public final class JetPluginManager implements PluginManager {
                 }
             }
 
-            this.plugins = Map.copyOf(plugins);
+            this.nameToPluginMap = Map.copyOf(plugins);
+
+            Map<Object, JetPlugin> instanceToPluginMap = new HashMap<>();
+            plugins.values().forEach(plugin -> instanceToPluginMap.put(plugin.instance(), plugin));
+            this.instanceToPluginMap = Map.copyOf(instanceToPluginMap);
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
@@ -133,12 +140,22 @@ public final class JetPluginManager implements PluginManager {
 
     @Override
     public @Nullable JetPlugin getPlugin(@NonNull String name) {
-        return this.plugins.get(Objects.requireNonNull(name, "The name must not be null"));
+        return this.nameToPluginMap.get(Objects.requireNonNull(name, "The name must not be null"));
+    }
+
+    @Override
+    public @Nullable Plugin getPlugin(@NonNull Object object) {
+        return this.instanceToPluginMap.get(Objects.requireNonNull(object, "The instance must not be null"));
+    }
+
+    @Override
+    public boolean isLoaded(@NonNull String name) {
+        return this.nameToPluginMap.containsKey(name);
     }
 
     @Override
     public @NonNull Collection<JetPlugin> plugins() {
-        return Set.copyOf(this.plugins.values());
+        return Set.copyOf(this.nameToPluginMap.values());
     }
 
     /**
