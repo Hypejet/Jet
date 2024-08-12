@@ -280,8 +280,10 @@ public final class JetPluginManager implements PluginManager {
         int maxLength = Math.max(parsedVersion.length, parsedRequiredVersion.length);
 
         for (int index = 0; index < maxLength; index++) {
-            int digit = parsedVersion.length > index ? parsedVersion[index] : 0;
             int requiredDigit = parsedRequiredVersion.length > index ? parsedRequiredVersion[index] : 0;
+            if (VersioningUtil.isWildcardDigit(requiredDigit)) continue;
+
+            int digit = parsedVersion.length > index ? parsedVersion[index] : 0;
 
             boolean compatible = digit == requiredDigit
                     || (requiredVersion.backwardsCompatible() && digit < requiredDigit)
