@@ -1,14 +1,6 @@
 package net.hypejet.jet.protocol.packet.client;
 
 import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.protocol.packet.client.configuration.ClientAcknowledgeFinishConfigurationPacket;
-import net.hypejet.jet.protocol.packet.client.configuration.ClientCookieResponseConfigurationPacket;
-import net.hypejet.jet.protocol.packet.client.configuration.ClientInformationConfigurationPacket;
-import net.hypejet.jet.protocol.packet.client.configuration.ClientKeepAliveConfigurationPacket;
-import net.hypejet.jet.protocol.packet.client.configuration.ClientKnownPacksConfigurationPacket;
-import net.hypejet.jet.protocol.packet.client.configuration.ClientPluginMessageConfigurationPacket;
-import net.hypejet.jet.protocol.packet.client.configuration.ClientPongConfigurationPacket;
-import net.hypejet.jet.protocol.packet.client.configuration.ClientResourcePackResponseConfigurationPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -19,11 +11,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @author Codestech
  * @see ClientPacket
  */
-public sealed interface ClientConfigurationPacket extends ClientPacket permits
-        ClientAcknowledgeFinishConfigurationPacket, ClientCookieResponseConfigurationPacket,
-        ClientInformationConfigurationPacket, ClientKeepAliveConfigurationPacket, ClientKnownPacksConfigurationPacket,
-        ClientPluginMessageConfigurationPacket, ClientPongConfigurationPacket,
-        ClientResourcePackResponseConfigurationPacket {
+public interface ClientConfigurationPacket extends ClientPacket {
     /**
      * {@inheritDoc}
      */

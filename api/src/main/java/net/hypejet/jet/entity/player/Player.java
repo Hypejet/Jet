@@ -1,12 +1,12 @@
 package net.hypejet.jet.entity.player;
 
 import net.hypejet.jet.MinecraftServer;
+import net.hypejet.jet.command.CommandSource;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.pack.DataPack;
 import net.hypejet.jet.protocol.connection.PlayerConnection;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientInformationConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -23,9 +23,9 @@ import java.util.Set;
  * @author Codestech
  * @see Entity
  * @see PlayerConnection
- * @see Audience
+ * @see CommandSource
  */
-public interface Player extends Entity, Audience {
+public interface Player extends Entity, CommandSource {
     /**
      * Gets a username of the player.
      *

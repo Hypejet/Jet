@@ -111,6 +111,7 @@ public final class JetPlaySession implements Session<JetPlaySession>, SessionHan
         }
 
         player.sendPacket(new ServerSynchronizePositionPlayPacket(new Position(8.5, 16, 8.5, 0f, 0f), Set.of(), 0));
+        player.sendPacket(player.connection().server().commandManager().createDeclarationPacket());
     }
 
     @Override

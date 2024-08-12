@@ -1,11 +1,6 @@
 package net.hypejet.jet.protocol.packet.client;
 
 import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.protocol.packet.client.login.ClientCookieResponseLoginPacket;
-import net.hypejet.jet.protocol.packet.client.login.ClientEncryptionResponseLoginPacket;
-import net.hypejet.jet.protocol.packet.client.login.ClientLoginAcknowledgeLoginPacket;
-import net.hypejet.jet.protocol.packet.client.login.ClientLoginRequestLoginPacket;
-import net.hypejet.jet.protocol.packet.client.login.ClientPluginMessageResponseLoginPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -16,9 +11,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @author Codestech
  * @see ClientPacket
  */
-public sealed interface ClientLoginPacket extends ClientPacket permits ClientCookieResponseLoginPacket,
-        ClientEncryptionResponseLoginPacket, ClientLoginAcknowledgeLoginPacket, ClientLoginRequestLoginPacket,
-        ClientPluginMessageResponseLoginPacket {
+public interface ClientLoginPacket extends ClientPacket {
     /**
      * {@inheritDoc}
      */

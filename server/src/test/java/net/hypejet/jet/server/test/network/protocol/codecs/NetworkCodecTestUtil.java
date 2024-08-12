@@ -61,7 +61,7 @@ public final class NetworkCodecTestUtil {
         Throwable throwable = null;
 
         try {
-            NetworkCodecTestUtil.test(codec, value, equalsFunction);
+            test(codec, value, equalsFunction);
         } catch (Throwable thrownThrowable) {
             throwable = thrownThrowable;
         }
