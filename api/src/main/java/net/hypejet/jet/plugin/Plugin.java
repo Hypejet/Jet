@@ -1,5 +1,6 @@
 package net.hypejet.jet.plugin;
 
+import net.hypejet.jet.plugin.metadata.PluginMetadata;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

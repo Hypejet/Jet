@@ -1,10 +1,12 @@
-package net.hypejet.jet.plugin;
+package net.hypejet.jet.plugin.metadata;
 
+import net.hypejet.jet.plugin.Plugin;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -31,8 +33,10 @@ public record PluginMetadata(@NonNull String name, @NonNull String version, @Non
      * @since 1.0
      */
     public PluginMetadata {
-        entrypoints = Map.copyOf(entrypoints);
-        authors = Set.copyOf(authors);
-        dependencies = Set.copyOf(dependencies);
+        Objects.requireNonNull(name, "The name must not be null");
+        Objects.requireNonNull(version, "The version must not be null");
+        entrypoints = Map.copyOf(Objects.requireNonNull(entrypoints, "The entrypoints must not be null"));
+        authors = Set.copyOf(Objects.requireNonNull(authors, "The authors must not be null"));
+        dependencies = Set.copyOf(Objects.requireNonNull(dependencies, "The dependencies must not be null"));
     }
 }

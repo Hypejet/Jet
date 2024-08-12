@@ -7,12 +7,15 @@ import com.google.inject.Injector;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.event.events.plugin.PluginLoadEvent;
 import net.hypejet.jet.event.events.plugin.PluginUnloadEvent;
-import net.hypejet.jet.plugin.PluginDependency;
+import net.hypejet.jet.plugin.metadata.PluginDependency;
 import net.hypejet.jet.plugin.PluginManager;
-import net.hypejet.jet.plugin.PluginMetadata;
+import net.hypejet.jet.plugin.metadata.PluginMetadata;
+import net.hypejet.jet.plugin.metadata.PluginVersion;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.plugin.json.PluginDependencyDeserializer;
 import net.hypejet.jet.server.plugin.json.PluginMetadataDeserializer;
+import net.hypejet.jet.server.plugin.json.PluginVersionDeserializer;
+import net.hypejet.jet.server.util.version.VersioningUtil;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -31,6 +34,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Stream;
@@ -44,7 +48,7 @@ import java.util.stream.Stream;
  */
 public final class JetPluginManager implements PluginManager {
 
-    private static final String PLUGIN_JSON_FILE_NAME = "jet-plugin.json";
+    private static final String METADATA_FILE_NAME = "jet-plugin-metadata.json";
     private static final Path PLUGIN_PATH = Path.of("plugins");
 
     private static final Key MAIN_ENTRYPOINT = Key.key("hypejet", "main");
@@ -52,6 +56,7 @@ public final class JetPluginManager implements PluginManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(JetPluginManager.class);
 
     private static final Gson PLUGIN_METADATA_GSON = new GsonBuilder()
+            .registerTypeAdapter(PluginVersion.class, new PluginVersionDeserializer())
             .registerTypeAdapter(PluginDependency.class, new PluginDependencyDeserializer())
             .registerTypeAdapter(PluginMetadata.class, new PluginMetadataDeserializer())
             .create();
@@ -65,7 +70,7 @@ public final class JetPluginManager implements PluginManager {
      * @since 1.0
      */
     public JetPluginManager(@NonNull JetMinecraftServer server) {
-        this.server = server;
+        this.server = Objects.requireNonNull(server, "The server must not be null");
         Injector injector = Guice.createInjector(binder -> binder.bind(MinecraftServer.class).toInstance(server));
 
         try {
@@ -89,10 +94,10 @@ public final class JetPluginManager implements PluginManager {
                             this.getClass().getClassLoader());
                     PluginMetadata pluginMetadata;
 
-                    try (InputStream stream = classLoader.getResourceAsStream(PLUGIN_JSON_FILE_NAME)) {
+                    try (InputStream stream = classLoader.getResourceAsStream(METADATA_FILE_NAME)) {
                         if (stream == null) {
                             throw new IllegalArgumentException("The plugin does not contain a \""
-                                    + PLUGIN_JSON_FILE_NAME + "\" file");
+                                    + METADATA_FILE_NAME + "\" file");
                         }
 
                         pluginMetadata = PLUGIN_METADATA_GSON.fromJson(new InputStreamReader(stream),
@@ -128,7 +133,7 @@ public final class JetPluginManager implements PluginManager {
 
     @Override
     public @Nullable JetPlugin getPlugin(@NonNull String name) {
-        return this.plugins.get(name);
+        return this.plugins.get(Objects.requireNonNull(name, "The name must not be null"));
     }
 
     @Override
@@ -171,21 +176,39 @@ public final class JetPluginManager implements PluginManager {
                 PluginPair dependencyPluginPair = pairs.get(dependencyPluginName);
 
                 if (dependencyPluginPair != null) {
+                    String dependencyVersion = dependencyPluginPair.metadata().version();
+
+                    if (!isCompatible(dependencyVersion, dependency)) {
+                        if (!dependency.required()) continue;
+                        throw new IllegalArgumentException(String.format(
+                                "Version \"%s\" of dependency \"%s\" is incompatible",
+                                dependencyVersion,
+                                dependencyPluginName
+                        ));
+                    }
+
+                    if (plugins.containsKey(dependencyPluginName))
+                        continue;
+
                     String[] newDependants = Arrays.copyOf(dependants, dependants.length + 1);
                     newDependants[dependants.length] = pluginName;
                     this.load(dependencyPluginPair, pairs, plugins, injector, newDependants);
+                    continue;
                 }
 
-                if (dependency.required()) {
-                    throw new IllegalArgumentException("Plugin with name of \"" + pluginName + "\" requires a plugin"
-                            + " with name of \"" + dependencyPluginName + "\"");
-                }
+                throw new IllegalArgumentException(String.format(
+                        "Plugin \"%s\" requires a dependency with name of \"%s\"",
+                        pluginName,
+                        dependencyPluginName
+                ));
             }
 
             String mainEntrypoint = pluginMetadata.entrypoints().get(MAIN_ENTRYPOINT);
             if (mainEntrypoint == null) {
-                throw new IllegalArgumentException("The \"" + MAIN_ENTRYPOINT
-                        + "\" entrypoint has been not specified");
+                throw new IllegalArgumentException(String.format(
+                        "The \"%s\" entrypoint has been not specified",
+                        MAIN_ENTRYPOINT
+                ));
             }
 
             Class<?> mainClass = Class.forName(mainEntrypoint, true, classLoader);
@@ -215,6 +238,34 @@ public final class JetPluginManager implements PluginManager {
         } catch (ClassNotFoundException exception) {
             throw new RuntimeException(exception);
         }
+    }
+
+    private static boolean isCompatible(@NonNull String versionString, @NonNull PluginDependency dependency) {
+        for (PluginVersion version : dependency.versionsSupported())
+            if (isVersionCompatible(versionString, version))
+                return true;
+        return false;
+    }
+
+    private static boolean isVersionCompatible(@NonNull String versionString, @NonNull PluginVersion requiredVersion) {
+        int[] parsedVersion = VersioningUtil.parseVersion(versionString);
+        int[] parsedRequiredVersion = VersioningUtil.parseVersion(requiredVersion.name());
+
+        int minLength = Math.min(parsedVersion.length, parsedRequiredVersion.length);
+
+        for (int index = 0; index < minLength; index++) {
+            int digit = parsedVersion[index];
+            int requiredDigit = parsedRequiredVersion[index];
+
+            boolean compatible = digit == requiredDigit
+                    || (requiredVersion.backwardsCompatible() && digit < requiredDigit)
+                    || (requiredVersion.forwardCompatible() && digit > requiredDigit);
+
+            if (!compatible)
+                return false;
+        }
+
+        return true;
     }
 
     /**

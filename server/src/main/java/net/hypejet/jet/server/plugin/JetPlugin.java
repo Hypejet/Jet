@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.plugin;
 
 import net.hypejet.jet.plugin.Plugin;
-import net.hypejet.jet.plugin.PluginMetadata;
+import net.hypejet.jet.plugin.metadata.PluginMetadata;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.net.URLClassLoader;

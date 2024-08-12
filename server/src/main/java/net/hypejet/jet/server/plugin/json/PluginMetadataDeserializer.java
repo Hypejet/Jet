@@ -5,8 +5,8 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.hypejet.jet.plugin.PluginDependency;
-import net.hypejet.jet.plugin.PluginMetadata;
+import net.hypejet.jet.plugin.metadata.PluginDependency;
+import net.hypejet.jet.plugin.metadata.PluginMetadata;
 import net.hypejet.jet.server.util.json.JsonUtil;
 import net.kyori.adventure.key.Key;
 
@@ -62,7 +62,8 @@ public final class PluginMetadataDeserializer implements JsonDeserializer<Plugin
             }
         }
 
-        return new PluginMetadata(JsonUtil.getRequiredString(NAME, object), JsonUtil.getRequiredString(VERSION, object),
-                Map.copyOf(entrypoints), Set.copyOf(authors), Set.copyOf(dependencies));
+        return new PluginMetadata(JsonUtil.getRequiredString(NAME, object),
+                JsonUtil.getRequiredString(VERSION, object), Map.copyOf(entrypoints),
+                Set.copyOf(authors), Set.copyOf(dependencies));
     }
 }
