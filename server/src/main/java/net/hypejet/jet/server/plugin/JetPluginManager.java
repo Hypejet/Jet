@@ -105,7 +105,16 @@ public final class JetPluginManager implements PluginManager {
 
                         pluginMetadata = PLUGIN_METADATA_GSON.fromJson(new InputStreamReader(stream),
                                 PluginMetadata.class);
-                        pairs.put(pluginMetadata.name(), new PluginPair(pluginMetadata, classLoader));
+
+                        String pluginName = pluginMetadata.name();
+                        if (pairs.containsKey(pluginName)) {
+                            throw new IllegalArgumentException(String.format(
+                                    "Plugin with name of \"%s\" has been already registered",
+                                    pluginName
+                            ));
+                        }
+
+                        pairs.put(pluginName, new PluginPair(pluginMetadata, classLoader));
                     } catch (Throwable throwable) {
                         classLoader.close();
                         LOGGER.error("An error occurred while creating a plugin with file name of \"{}\"", fileName,
