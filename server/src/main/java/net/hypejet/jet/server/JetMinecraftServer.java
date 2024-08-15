@@ -8,11 +8,13 @@ import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.ping.ServerListPing;
 import net.hypejet.jet.plugin.PluginManager;
 import net.hypejet.jet.protocol.ProtocolState;
+import net.hypejet.jet.registry.RegistryManager;
 import net.hypejet.jet.server.command.JetCommandManager;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.NetworkManager;
 import net.hypejet.jet.server.plugin.JetPluginManager;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.ServerPingUtil;
 import net.hypejet.jet.server.world.JetWorldManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -49,9 +51,11 @@ public final class JetMinecraftServer implements MinecraftServer {
     private final Set<JetPlayer> players = new HashSet<>();
     private final ReentrantReadWriteLock playersLock = new ReentrantReadWriteLock();
 
-    private final JetPluginManager pluginManager;
     private final JetWorldManager worldManager = new JetWorldManager();
+
+    private final JetPluginManager pluginManager;
     private final JetCommandManager commandManager;
+    private final JetRegistryManager registryManager;
 
     /**
      * Constructs the {@linkplain JetMinecraftServer Jet Minecraft server}.
@@ -63,6 +67,7 @@ public final class JetMinecraftServer implements MinecraftServer {
         this.serverIcon = ServerPingUtil.loadServerIcon(LOGGER);
         this.commandManager = new JetCommandManager(this);
         this.pluginManager = new JetPluginManager(this);
+        this.registryManager = new JetRegistryManager(this);
         this.networkManager = new NetworkManager(this);
         this.eventNode.call(new ServerReadyEvent());
     }
@@ -136,6 +141,11 @@ public final class JetMinecraftServer implements MinecraftServer {
     @Override
     public @NonNull PluginManager pluginManager() {
         return this.pluginManager;
+    }
+
+    @Override
+    public @NonNull RegistryManager registryManager() {
+        return this.registryManager;
     }
 
     /**

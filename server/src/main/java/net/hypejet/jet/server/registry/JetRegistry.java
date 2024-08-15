@@ -2,8 +2,13 @@ package net.hypejet.jet.server.registry;
 
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
+import net.hypejet.jet.MinecraftServer;
+import net.hypejet.jet.event.events.registry.RegistryInitializeEvent;
+import net.hypejet.jet.protocol.packet.server.configuration.ServerRegistryDataConfigurationPacket;
+import net.hypejet.jet.protocol.packet.server.configuration.ServerRegistryDataConfigurationPacket.Entry;
 import net.hypejet.jet.registry.Registry;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.nbt.BinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
@@ -16,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Represents an implementation of {@linkplain Registry registry}.
@@ -36,25 +42,31 @@ public final class JetRegistry<E> implements Registry<E> {
     private final Map<E, Key> entryToIdentifierMap;
     private final Map<E, Integer> entryToNumericIdentifierMap;
 
+    private final ServerRegistryDataConfigurationPacket packet;
+
     /**
      * Constructs the {@linkplain JetRegistry registry}.
      *
-     * @param registryIdentifier an identifier of the registry
+     * @param identifier an identifier of the registry
      * @param entryClass a class of entries of the registry
-     * @param entryMap a map of identifiers and their entries
+     * @param server a server, on which the registry is registered
      * @since 1.0
      */
-    public JetRegistry(@NonNull Key registryIdentifier, @NonNull Class<E> entryClass, @NonNull Map<Key, E> entryMap) {
-        Objects.requireNonNull(registryIdentifier, "The registry identifier must not be null");
-        Objects.requireNonNull(entryMap, "The entry map must not be null");
+    public JetRegistry(@NonNull Key identifier, @NonNull Class<E> entryClass, @NonNull MinecraftServer server,
+                       @NonNull Function<E, BinaryTag> binaryTagCodec) {
+        Objects.requireNonNull(identifier, "The registry identifier must not be null");
+        Objects.requireNonNull(identifier, "The entry map must not be null");
 
-        this.registryIdentifier = registryIdentifier;
+        this.registryIdentifier = identifier;
         this.entryClass = Objects.requireNonNull(entryClass, "The entry class must not be null");
-        this.identifierToEntryMap = Map.copyOf(entryMap);
 
-        int numericIdentifier = 0;
+        RegistryInitializeEvent<E> initializeEvent = new RegistryInitializeEvent<>(identifier, entryClass);
+        server.eventNode().call(initializeEvent);
+        this.identifierToEntryMap = Map.copyOf(initializeEvent.entryMap());
+
+        int currentNumericIdentifier = 0;
         for (E value : this.identifierToEntryMap.values())
-            this.numericIdentifierToEntryMap.put(numericIdentifier++, value);
+            this.numericIdentifierToEntryMap.put(currentNumericIdentifier++, value);
 
         Map<E, Key> entryToIdentifierMap = new HashMap<>();
         this.identifierToEntryMap.forEach((key, entry) -> entryToIdentifierMap.put(entry, key));
@@ -63,6 +75,15 @@ public final class JetRegistry<E> implements Registry<E> {
         Map<E, Integer> entryToNumericIdentifierMap = new HashMap<>();
         this.numericIdentifierToEntryMap.forEach((key, entry) -> entryToNumericIdentifierMap.put(entry, key));
         this.entryToNumericIdentifierMap = Map.copyOf(entryToNumericIdentifierMap);
+
+        List<Entry> entries = new ArrayList<>();
+        for (Map.Entry<Key, E> mapEntry : this.identifierToEntryMap.entrySet()) {
+            E entry = mapEntry.getValue();
+            int numericIdentifier = this.entryToNumericIdentifierMap.get(entry);
+            entries.add(numericIdentifier, new Entry(mapEntry.getKey(), binaryTagCodec.apply(entry)));
+        }
+
+        this.packet = new ServerRegistryDataConfigurationPacket(this.registryIdentifier, entries);
     }
 
     @Override
@@ -71,8 +92,13 @@ public final class JetRegistry<E> implements Registry<E> {
     }
 
     @Override
+    public @NonNull Class<E> entryClass() {
+        return this.entryClass;
+    }
+
+    @Override
     public @Nullable E get(@NonNull Key identifier) {
-        Objects.requireNonNull(identifier, "The identifier must not be null")
+        Objects.requireNonNull(identifier, "The identifier must not be null");
         return this.identifierToEntryMap.get(identifier);
     }
 
@@ -113,5 +139,15 @@ public final class JetRegistry<E> implements Registry<E> {
         List<E> sortedEntries = new ArrayList<>(this.numericIdentifierToEntryMap.values());
         sortedEntries.sort(Comparator.comparingInt(this::numericIdentifierOf));
         return List.copyOf(sortedEntries);
+    }
+
+    /**
+     * Gets a {@linkplain ServerRegistryDataConfigurationPacket registry data configuration packet}.
+     *
+     * @return the packet
+     * @since 1.0
+     */
+    public @NonNull ServerRegistryDataConfigurationPacket getPacket() {
+        return this.packet;
     }
 }
