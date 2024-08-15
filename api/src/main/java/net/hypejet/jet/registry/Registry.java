@@ -14,7 +14,7 @@ import java.util.List;
  * @since 1.0
  * @author Codestech
  */
-public interface Registry<E> {
+public interface Registry<E extends Entry> {
     /**
      * Gets an {@linkplain Key identifier} of this {@linkplain Registry registry}.
      *

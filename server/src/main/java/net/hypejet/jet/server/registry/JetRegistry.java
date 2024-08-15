@@ -5,7 +5,7 @@ import io.netty.util.collection.IntObjectMap;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.event.events.registry.RegistryInitializeEvent;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerRegistryDataConfigurationPacket;
-import net.hypejet.jet.protocol.packet.server.configuration.ServerRegistryDataConfigurationPacket.Entry;
+import net.hypejet.jet.registry.Entry;
 import net.hypejet.jet.registry.Registry;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTag;
@@ -31,7 +31,7 @@ import java.util.function.Function;
  * @author Codesetech
  * @see Registry
  */
-public final class JetRegistry<E> implements Registry<E> {
+public final class JetRegistry<E extends Entry> implements Registry<E> {
 
     private final Key registryIdentifier;
     private final Class<E> entryClass;
@@ -76,11 +76,11 @@ public final class JetRegistry<E> implements Registry<E> {
         this.numericIdentifierToEntryMap.forEach((key, entry) -> entryToNumericIdentifierMap.put(entry, key));
         this.entryToNumericIdentifierMap = Map.copyOf(entryToNumericIdentifierMap);
 
-        List<Entry> entries = new ArrayList<>();
+        List<ServerRegistryDataConfigurationPacket.Entry> entries = new ArrayList<>();
         for (Map.Entry<Key, E> mapEntry : this.identifierToEntryMap.entrySet()) {
             E entry = mapEntry.getValue();
             int numericIdentifier = this.entryToNumericIdentifierMap.get(entry);
-            entries.add(numericIdentifier, new Entry(mapEntry.getKey(), binaryTagCodec.apply(entry)));
+            entries.add(numericIdentifier, new ServerRegistryDataConfigurationPacket.Entry(mapEntry.getKey(), binaryTagCodec.apply(entry)));
         }
 
         this.packet = new ServerRegistryDataConfigurationPacket(this.registryIdentifier, entries);

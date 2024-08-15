@@ -1,5 +1,6 @@
 package net.hypejet.jet.event.events.registry;
 
+import net.hypejet.jet.registry.Entry;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -14,7 +15,7 @@ import java.util.Objects;
  * @since 1.0
  * @author Codestech
  */
-public final class RegistryInitializeEvent<E> {
+public final class RegistryInitializeEvent<E extends Entry> {
 
     private final Key identifier;
     private final Class<E> entryClass;
@@ -66,23 +67,26 @@ public final class RegistryInitializeEvent<E> {
     /**
      * Registers an {@linkplain E entry} to be added to the registry.
      *
-     * @param identifier an identifier of the entry
      * @param entry the entry
-     * @throws IllegalArgumentException if the entry has been already registered or the {@link #entryClass} is not
-     *                                  assignable from a class of the entry specified
+     * @throws IllegalArgumentException if an entry with the same identifier has been already registered or
+     *                                  the {@link #entryClass} is not assignable from a class of the entry specified
      * @since 1.0
      */
-    public void register(@NonNull Key identifier, @NonNull E entry) {
+    public void register(@NonNull E entry) {
+        Key identifier = entry.key();
+
         if (this.entryMap.containsKey(identifier))
             throw new IllegalArgumentException(String.format(
                     "An entry with identifier %s has been already registered",
                     identifier
             ));
-        if (this.entryClass.isAssignableFrom(entry.getClass()))
+
+        if (!this.entryClass.isAssignableFrom(entry.getClass()))
             throw new IllegalArgumentException(String.format(
                     "The entry specified is not a valid entry of \"%s\"",
                     this.entryClass.getSimpleName()
             ));
+
         this.entryMap.put(identifier, entry);
     }
 
