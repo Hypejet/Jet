@@ -4,8 +4,10 @@ import net.hypejet.jet.event.events.player.configuration.PlayerConfigurationStar
 import net.hypejet.jet.protocol.packet.server.configuration.ServerFinishConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerKeepAliveConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerRegistryDataConfigurationPacket;
+import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
+import net.hypejet.jet.server.registry.JetRegistry;
 import net.hypejet.jet.server.session.keepalive.KeepAliveHandler;
 import net.hypejet.jet.session.handler.SessionHandler;
 import net.kyori.adventure.key.Key;
@@ -57,10 +59,11 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
                 .uncaughtExceptionHandler(this)
                 .start(() -> {
                     SocketPlayerConnection connection = this.player.connection();
-
                     if (connection.isClosed()) return;
 
-                    connection.server().eventNode().call(new PlayerConfigurationStartEvent(this.player));
+                    JetMinecraftServer server = connection.server();
+
+                    server.eventNode().call(new PlayerConfigurationStartEvent(this.player));
                     this.keepAliveHandler.shutdown();
 
                     try {
@@ -69,278 +72,10 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
                         throw new RuntimeException(exception);
                     }
 
-                    // I just want to make the server joinable for now, don't hate me for what's below, OKKK???????
+                    for (JetRegistry<?> registry : server.registryManager().getRegistries().values())
+                        this.player.sendPacket(registry.getPacket());
 
-                    connection.sendPacket(new ServerRegistryDataConfigurationPacket(
-                            Key.key("dimension_type"),
-                            List.of(new ServerRegistryDataConfigurationPacket.Entry(
-                                    Key.key("overworld"),
-                                    CompoundBinaryTag.builder()
-                                            .putBoolean("has_skylight", true)
-                                            .putBoolean("has_ceiling", true)
-                                            .putBoolean("ultrawarm", false)
-                                            .putBoolean("natural", true)
-                                            .putDouble("coordinate_scale", 1)
-                                            .putBoolean("bed_works", true)
-                                            .putBoolean("respawn_anchor_works", true)
-                                            .putInt("min_y", -64)
-                                            .putInt("height", 384)
-                                            .putInt("logical_height", 384)
-                                            .putString("infiniburn", "#minecraft:infiniburn_overworld")
-                                            .putString("effects", "minecraft:overworld")
-                                            .putFloat("ambient_light", 0)
-                                            .putBoolean("piglin_safe", true)
-                                            .putBoolean("has_raids", true)
-                                            .putInt("monster_spawn_light_level", 0)
-                                            .putInt("monster_spawn_block_light_limit", 0)
-                                            .build()
-                            ))
-                    ));
-
-                    connection.sendPacket(new ServerRegistryDataConfigurationPacket(
-                            Key.key("wolf_variant"),
-                            List.of(new ServerRegistryDataConfigurationPacket.Entry(
-                                    Key.key("striped"),
-                                    CompoundBinaryTag.builder()
-                                            .putString("wild_texture", "minecraft:entity/wolf/wolf_striped")
-                                            .putString("tame_texture", "minecraft:entity/wolf/wolf_striped_tame")
-                                            .putString("angry_texture", "minecraft:entity/wolf/wolf_striped_angry")
-                                            .putString("biomes", "#minecraft:is_badlands")
-                                            .build()
-                            ))
-                    ));
-
-                    connection.sendPacket(new ServerRegistryDataConfigurationPacket(
-                            Key.key("painting_variant"),
-                            List.of(new ServerRegistryDataConfigurationPacket.Entry(
-                                    Key.key("alban"),
-                                    CompoundBinaryTag.builder()
-                                            .putString("asset_id", "minecraft:alban")
-                                            .putInt("width", 1)
-                                            .putInt("height", 1)
-                                            .build()
-                            ))
-                    ));
-
-                    connection.sendPacket(new ServerRegistryDataConfigurationPacket(
-                            Key.key("damage_type"),
-                            List.of(
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("in_fire"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    ),
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("campfire"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    ),
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("lightning_bolt"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    ),
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("on_fire"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    ),
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("lava"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    ),
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("hot_floor"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    ),
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("in_wall"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    ),
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("cramming"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    ),
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("drown"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    ),
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("starve"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    ),
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("cactus"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    ),
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("fall"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    ),
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("fly_into_wall"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    ),
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("out_of_world"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    ),
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("generic"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    ),
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("magic"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    ),
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("wither"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    ),
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("dragon_breath"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    ),
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("dry_out"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    ),
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("sweet_berry_bush"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    ),
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("freeze"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    ),
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("stalagmite"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    ),
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("outside_border"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    ),
-                                    new ServerRegistryDataConfigurationPacket.Entry(
-                                            Key.key("generic_kill"),
-                                            CompoundBinaryTag.builder()
-                                                    .putString("message_id", "death.attack.onFire")
-                                                    .putString("scaling", "never")
-                                                    .putFloat("exhaustion", 0)
-                                                    .build()
-                                    )
-                            )
-                    ));
-
-                    connection.sendPacket(new ServerRegistryDataConfigurationPacket(
-                            Key.key("worldgen/biome"),
-                            List.of(new ServerRegistryDataConfigurationPacket.Entry(
-                                    Key.key("plains"),
-                                    CompoundBinaryTag.builder()
-                                            .putBoolean("has_precipitation", false)
-                                            .putFloat("temperature", 2f)
-                                            .putFloat("downfall", 1f)
-                                            .put("effects", CompoundBinaryTag.builder()
-                                                    .putInt("fog_color", 8364543)
-                                                    .putInt("water_color", 8364543)
-                                                    .putInt("water_fog_color", 8364543)
-                                                    .putInt("sky_color", 8364543)
-                                                    .build())
-                                            .build()
-                            ))
-                    ));
-
-                    // End of the registry fuckery
-
-                    this.player.sendServerBrand(this.player.server().brandName());
+                    this.player.sendServerBrand(server.brandName());
 
                     this.finished = true;
                     connection.sendPacket(new ServerFinishConfigurationPacket());

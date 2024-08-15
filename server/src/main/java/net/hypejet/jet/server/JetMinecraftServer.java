@@ -139,12 +139,12 @@ public final class JetMinecraftServer implements MinecraftServer {
     }
 
     @Override
-    public @NonNull PluginManager pluginManager() {
+    public @NonNull JetPluginManager pluginManager() {
         return this.pluginManager;
     }
 
     @Override
-    public @NonNull RegistryManager registryManager() {
+    public @NonNull JetRegistryManager registryManager() {
         return this.registryManager;
     }
 
