@@ -1,8 +1,10 @@
 package net.hypejet.jet.server.registry;
 
 import net.hypejet.jet.MinecraftServer;
+import net.hypejet.jet.biome.Biome;
 import net.hypejet.jet.registry.RegistryManager;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -25,7 +27,9 @@ public final class JetRegistryManager implements RegistryManager {
      * @since 1.0
      */
     public JetRegistryManager(@NonNull MinecraftServer server) {
-        this.registries = Map.of();
+        JetRegistry<Biome> registry = new JetRegistry<>(Key.key("worldgen/biome"), Biome.class, server,
+                entry -> CompoundBinaryTag.empty());
+        this.registries = Map.of(registry.registryIdentifier(), registry);
     }
 
     @Override

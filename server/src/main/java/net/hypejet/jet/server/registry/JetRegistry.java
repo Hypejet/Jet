@@ -80,7 +80,8 @@ public final class JetRegistry<E extends Entry> implements Registry<E> {
         for (Map.Entry<Key, E> mapEntry : this.identifierToEntryMap.entrySet()) {
             E entry = mapEntry.getValue();
             int numericIdentifier = this.entryToNumericIdentifierMap.get(entry);
-            entries.add(numericIdentifier, new ServerRegistryDataConfigurationPacket.Entry(mapEntry.getKey(), binaryTagCodec.apply(entry)));
+            entries.add(numericIdentifier, new ServerRegistryDataConfigurationPacket.Entry(mapEntry.getKey(),
+                    binaryTagCodec.apply(entry)));
         }
 
         this.packet = new ServerRegistryDataConfigurationPacket(this.registryIdentifier, entries);
