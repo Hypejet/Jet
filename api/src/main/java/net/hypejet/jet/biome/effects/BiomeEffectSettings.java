@@ -1,11 +1,11 @@
 package net.hypejet.jet.biome.effects;
 
+import net.hypejet.jet.biome.effects.modifier.GrassColorModifier;
 import net.hypejet.jet.biome.effects.music.BiomeMusic;
 import net.hypejet.jet.biome.effects.particle.BiomeParticleSettings;
 import net.hypejet.jet.biome.effects.sound.BiomeAdditionalSound;
 import net.hypejet.jet.biome.effects.sound.BiomeAmbientSound;
 import net.hypejet.jet.biome.effects.sound.BiomeMoodSound;
-import net.hypejet.jet.biome.effects.modifier.GrassColorModifier;
 import net.hypejet.jet.color.Color;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;

@@ -5,7 +5,6 @@ import net.hypejet.jet.biome.Biome;
 import net.hypejet.jet.registry.RegistryManager;
 import net.hypejet.jet.server.registry.codecs.biome.BiomeBinaryTagCodec;
 import net.kyori.adventure.key.Key;
-import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
