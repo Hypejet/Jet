@@ -1,5 +1,6 @@
 package net.hypejet.jet.registry;
 
+import net.hypejet.jet.pack.DataPack;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -14,7 +15,7 @@ import java.util.List;
  * @since 1.0
  * @author Codestech
  */
-public interface Registry<E extends Entry> {
+public interface Registry<E> {
     /**
      * Gets an {@linkplain Key identifier} of this {@linkplain Registry registry}.
      *
@@ -93,4 +94,12 @@ public interface Registry<E extends Entry> {
      * @since 1.0
      */
     @NonNull List<E> sortedEntries();
+
+    /**
+     * Gets a {@linkplain DataPack data-pack}, which supports the registry entry specified natively.
+     *
+     * @param entry the entry
+     * @return the data-pack, {@code null} if no data-packs
+     */
+    @Nullable DataPack datapack(@NonNull E entry);
 }

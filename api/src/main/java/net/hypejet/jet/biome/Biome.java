@@ -2,32 +2,26 @@ package net.hypejet.jet.biome;
 
 import net.hypejet.jet.biome.effects.BiomeEffectSettings;
 import net.hypejet.jet.biome.temperature.TemperatureModifier;
-import net.hypejet.jet.registry.Entry;
-import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Objects;
 
 /**
- * Represents a {@linkplain Entry registry entry} of a Minecraft biome.
+ * Represents a Minecraft biome.
  *
- * @param key an identifier of the biome
  * @param hasPrecipitation whether the biome has precipitation
  * @param temperature a temperature of the biome
  * @param temperatureModifier a modifier of temperature of the biome, {@code null} if none
  * @param effects effects of the biome
  * @since 1.0
  * @author Codestech
- * @see Entry
  */
-public record Biome(@NonNull Key key, boolean hasPrecipitation, float temperature,
-                    @Nullable TemperatureModifier temperatureModifier, float downfall,
-                    @NonNull BiomeEffectSettings effects) implements Entry {
+public record Biome(boolean hasPrecipitation, float temperature, @Nullable TemperatureModifier temperatureModifier,
+                    float downfall, @NonNull BiomeEffectSettings effects) {
     /**
      * Constructs the {@linkplain Biome biome}.
      *
-     * @param key an identifier of the biome
      * @param hasPrecipitation whether the biome has precipitation
      * @param temperature a temperature of the biome
      * @param temperatureModifier a modifier of temperature of the biome, {@code null} if none
@@ -35,7 +29,6 @@ public record Biome(@NonNull Key key, boolean hasPrecipitation, float temperatur
      * @since 1.0
      */
     public Biome {
-        Objects.requireNonNull(key, "The biome identifier must not be null");
         Objects.requireNonNull(effects, "The biome effects must not be null");
     }
 
@@ -58,8 +51,6 @@ public record Biome(@NonNull Key key, boolean hasPrecipitation, float temperatur
      */
     public static final class Builder {
 
-        private Key key;
-
         private boolean hasPrecipitation;
 
         private float temperature;
@@ -69,18 +60,6 @@ public record Biome(@NonNull Key key, boolean hasPrecipitation, float temperatur
         private BiomeEffectSettings effectSettings;
 
         private Builder() {}
-
-        /**
-         * Sets an {@linkplain Key identifier} that the {@linkplain Biome biome} should have.
-         *
-         * @param key the identifier
-         * @return this builder
-         * @since 1.0
-         */
-        public @NonNull Builder key(@NonNull Key key) {
-            this.key = Objects.requireNonNull(key, "The key must not be null");
-            return this;
-        }
 
         /**
          * Sets whether the {@linkplain Biome biome} should have precipitation.
@@ -150,10 +129,10 @@ public record Biome(@NonNull Key key, boolean hasPrecipitation, float temperatur
          * @since 1.0
          */
         public @NonNull Biome build() {
-            return new Biome(Objects.requireNonNull(this.key, "The biome identifier was not specified"),
+            return new Biome(
                     this.hasPrecipitation, this.temperature, this.temperatureModifier, this.downfall,
-                    Objects.requireNonNull(this.effectSettings,
-                            "The biome effect settings were not specified"));
+                    Objects.requireNonNull(this.effectSettings, "The biome effect settings were not specified")
+            );
         }
     }
 }

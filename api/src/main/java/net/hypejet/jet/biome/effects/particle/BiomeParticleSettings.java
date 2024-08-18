@@ -1,6 +1,6 @@
 package net.hypejet.jet.biome.effects.particle;
 
-import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.kyori.adventure.nbt.BinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -16,7 +16,7 @@ import java.util.Objects;
  * @author Codestech
  * @see net.hypejet.jet.biome.Biome
  */
-public record BiomeParticleSettings(@NonNull String name, @Nullable CompoundBinaryTag data, float probability) {
+public record BiomeParticleSettings(@NonNull String name, @Nullable BinaryTag data, float probability) {
     /**
      * Constructs the {@linkplain BiomeParticleSettings biome particle settings}.
      *
