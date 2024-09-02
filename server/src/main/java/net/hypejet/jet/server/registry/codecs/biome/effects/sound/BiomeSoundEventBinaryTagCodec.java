@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.registry.codecs.biome.effects.sound;
 
-import net.hypejet.jet.registry.registries.biome.effects.sound.BiomeSoundEvent;
+import net.hypejet.jet.data.model.registry.registries.biome.effects.sound.BiomeSoundEvent;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.identifier.PackedIdentifierBinaryTagCodec;
 import net.kyori.adventure.key.Key;

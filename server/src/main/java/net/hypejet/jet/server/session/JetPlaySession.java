@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.session;
 
-import net.hypejet.jet.coordinate.Position;
+import net.hypejet.jet.data.model.coordinate.Position;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.protocol.packet.server.play.ServerCenterChunkPlayPacket;
 import net.hypejet.jet.protocol.packet.server.play.ServerChunkAndLightDataPlayPacket;

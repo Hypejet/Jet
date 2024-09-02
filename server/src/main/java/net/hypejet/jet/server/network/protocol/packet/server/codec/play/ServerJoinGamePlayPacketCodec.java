@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.network.protocol.packet.server.codec.play;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.coordinate.BlockPosition;
+import net.hypejet.jet.data.model.coordinate.BlockPosition;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.protocol.packet.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.server.network.protocol.codecs.identifier.PackedIdentifierNetworkCodec;

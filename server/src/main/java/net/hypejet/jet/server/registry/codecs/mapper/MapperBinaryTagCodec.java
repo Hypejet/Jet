@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.registry.codecs.mapper;
 
-import net.hypejet.jet.data.json.util.mapper.Mapper;
+import net.hypejet.jet.data.codecs.util.mapper.Mapper;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.StringBinaryTag;
