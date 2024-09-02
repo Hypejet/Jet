@@ -1,17 +1,17 @@
 package net.hypejet.jet.server.registry.codecs.biome.effects;
 
-import net.hypejet.jet.biome.effects.BiomeEffectSettings;
-import net.hypejet.jet.biome.effects.modifier.GrassColorModifier;
+import net.hypejet.jet.data.json.util.mapper.Mapper;
+import net.hypejet.jet.registry.registries.biome.effects.BiomeEffectSettings;
+import net.hypejet.jet.registry.registries.biome.effects.modifier.GrassColorModifier;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.ColorBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.biome.effects.music.BiomeMusicBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.biome.effects.particle.BiomeParticleSettingsBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.biome.effects.sound.BiomeAdditionalSoundBinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.biome.effects.sound.BiomeAmbientSoundBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.biome.effects.sound.BiomeSoundEventBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.biome.effects.sound.BiomeMoodSoundBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.mapper.MapperBinaryTagCodec;
 import net.hypejet.jet.server.util.BinaryTagUtil;
-import net.hypejet.jet.server.util.mapper.Mapper;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -47,8 +47,7 @@ public final class BiomeEffectSettingsBinaryTagCodec implements BinaryTagCodec<B
     private static final String MUSIC = "music";
 
     private static final BinaryTagCodec<GrassColorModifier> GRASS_COLOR_MODIFIER_CODEC = MapperBinaryTagCodec
-            .stringCodec(Mapper
-                    .builder(GrassColorModifier.class, String.class)
+            .stringCodec(Mapper.builder(GrassColorModifier.class, String.class)
                     .register(GrassColorModifier.NONE, "none")
                     .register(GrassColorModifier.DARK_FOREST, "dark_forest")
                     .register(GrassColorModifier.SWAMP, "swamp")
@@ -86,7 +85,7 @@ public final class BiomeEffectSettingsBinaryTagCodec implements BinaryTagCodec<B
                 .grassColorOverride(BinaryTagUtil.read(GRASS_COLOR, compound, colorCodec))
                 .grassColorModifier(BinaryTagUtil.read(GRASS_COLOR_MODIFIER, compound, GRASS_COLOR_MODIFIER_CODEC))
                 .particleSettings(BinaryTagUtil.read(PARTICLE, compound, BiomeParticleSettingsBinaryTagCodec.instance()))
-                .ambientSound(BinaryTagUtil.read(AMBIENT_SOUND, compound, BiomeAmbientSoundBinaryTagCodec.instance()))
+                .ambientSound(BinaryTagUtil.read(AMBIENT_SOUND, compound, BiomeSoundEventBinaryTagCodec.instance()))
                 .moodSound(BinaryTagUtil.read(MOOD_SOUND, compound, BiomeMoodSoundBinaryTagCodec.instance()))
                 .additionalSound(BinaryTagUtil.read(ADDITIONS_SOUND, compound,
                         BiomeAdditionalSoundBinaryTagCodec.instance()))
@@ -110,7 +109,7 @@ public final class BiomeEffectSettingsBinaryTagCodec implements BinaryTagCodec<B
 
         BinaryTagUtil.write(PARTICLE, object.particleSettings(), builder, BiomeParticleSettingsBinaryTagCodec.instance());
 
-        BinaryTagUtil.write(AMBIENT_SOUND, object.ambientSound(), builder, BiomeAmbientSoundBinaryTagCodec.instance());
+        BinaryTagUtil.write(AMBIENT_SOUND, object.ambientSound(), builder, BiomeSoundEventBinaryTagCodec.instance());
         BinaryTagUtil.write(MOOD_SOUND, object.moodSound(), builder, BiomeMoodSoundBinaryTagCodec.instance());
         BinaryTagUtil.write(ADDITIONS_SOUND, object.additionalSound(), builder,
                 BiomeAdditionalSoundBinaryTagCodec.instance());

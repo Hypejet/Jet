@@ -1,11 +1,11 @@
 package net.hypejet.jet.server.registry.codecs.biome;
 
-import net.hypejet.jet.biome.Biome;
-import net.hypejet.jet.biome.temperature.TemperatureModifier;
+import net.hypejet.jet.data.json.util.mapper.Mapper;
+import net.hypejet.jet.registry.registries.biome.Biome;
+import net.hypejet.jet.registry.registries.biome.temperature.BiomeTemperatureModifier;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.biome.effects.BiomeEffectSettingsBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.mapper.MapperBinaryTagCodec;
-import net.hypejet.jet.server.util.mapper.Mapper;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -28,10 +28,10 @@ public final class BiomeBinaryTagCodec implements BinaryTagCodec<Biome> {
     private static final String DOWNFALL = "downfall";
     private static final String EFFECTS = "effects";
 
-    private static final BinaryTagCodec<TemperatureModifier> TEMPERATURE_MODIFIER_CODEC = MapperBinaryTagCodec
-            .stringCodec(Mapper.builder(TemperatureModifier.class, String.class)
-                    .register(TemperatureModifier.NONE, "none")
-                    .register(TemperatureModifier.FROZEN, "frozen")
+    private static final BinaryTagCodec<BiomeTemperatureModifier> TEMPERATURE_MODIFIER_CODEC = MapperBinaryTagCodec
+            .stringCodec(Mapper.builder(BiomeTemperatureModifier.class, String.class)
+                    .register(BiomeTemperatureModifier.NONE, "none")
+                    .register(BiomeTemperatureModifier.FROZEN, "frozen")
                     .build());
 
     private BiomeBinaryTagCodec() {}
@@ -41,7 +41,7 @@ public final class BiomeBinaryTagCodec implements BinaryTagCodec<Biome> {
         if (!(tag instanceof CompoundBinaryTag compound))
             throw new IllegalArgumentException("The binary tag is not a compound");
 
-        TemperatureModifier temperatureModifier = null;
+        BiomeTemperatureModifier temperatureModifier = null;
 
         BinaryTag binaryTemperatureModifier = compound.get(TEMPERATURE_MODIFIER);
         if (binaryTemperatureModifier != null)
@@ -66,7 +66,7 @@ public final class BiomeBinaryTagCodec implements BinaryTagCodec<Biome> {
                 .putBoolean(HAS_PRECIPITATION, object.hasPrecipitation())
                 .putFloat(TEMPERATURE, object.temperature());
 
-        TemperatureModifier temperatureModifier = object.temperatureModifier();
+        BiomeTemperatureModifier temperatureModifier = object.temperatureModifier();
         if (temperatureModifier != null)
             builder.put(TEMPERATURE_MODIFIER, TEMPERATURE_MODIFIER_CODEC.write(temperatureModifier));
 

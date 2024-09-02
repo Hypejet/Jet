@@ -1,8 +1,7 @@
 package net.hypejet.jet.server.registry.codecs.biome.effects.sound;
 
-import net.hypejet.jet.biome.effects.sound.BiomeAdditionalSound;
+import net.hypejet.jet.registry.registries.biome.effects.sound.BiomeAdditionalSound;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.identifier.PackedIdentifierBinaryTagCodec;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -34,14 +33,14 @@ public final class BiomeAdditionalSoundBinaryTagCodec implements BinaryTagCodec<
         if (binarySound == null)
             throw new IllegalArgumentException("The sound was not specified");
 
-        return new BiomeAdditionalSound(PackedIdentifierBinaryTagCodec.instance().read(binarySound),
+        return new BiomeAdditionalSound(BiomeSoundEventBinaryTagCodec.instance().read(binarySound),
                 compound.getDouble(TICK_CHANCE));
     }
 
     @Override
     public @NonNull BinaryTag write(@NonNull BiomeAdditionalSound object) {
         return CompoundBinaryTag.builder()
-                .put(SOUND, PackedIdentifierBinaryTagCodec.instance().write(object.key()))
+                .put(SOUND, BiomeSoundEventBinaryTagCodec.instance().write(object.event()))
                 .putDouble(TICK_CHANCE, object.tickChance())
                 .build();
     }

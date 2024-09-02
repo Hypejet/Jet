@@ -24,12 +24,12 @@ public final class ColorBinaryTagCodec implements BinaryTagCodec<Color> {
     public @NonNull Color read(@NonNull BinaryTag tag) {
         if (!(tag instanceof IntBinaryTag binaryTag))
             throw new IllegalArgumentException("The binary tag is not an integer binary tag");
-        return Color.fromHex(binaryTag.value());
+        return new Color(binaryTag.value());
     }
 
     @Override
     public @NonNull BinaryTag write(@NonNull Color object) {
-        return IntBinaryTag.intBinaryTag(object.toHex());
+        return IntBinaryTag.intBinaryTag(object.value());
     }
 
     /**

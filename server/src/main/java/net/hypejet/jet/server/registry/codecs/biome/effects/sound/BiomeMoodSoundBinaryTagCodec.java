@@ -1,8 +1,7 @@
 package net.hypejet.jet.server.registry.codecs.biome.effects.sound;
 
-import net.hypejet.jet.biome.effects.sound.BiomeMoodSound;
+import net.hypejet.jet.registry.registries.biome.effects.sound.BiomeMoodSound;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.identifier.PackedIdentifierBinaryTagCodec;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -36,14 +35,14 @@ public final class BiomeMoodSoundBinaryTagCodec implements BinaryTagCodec<BiomeM
         if (binarySound == null)
             throw new IllegalArgumentException("The sound was not specified");
 
-        return new BiomeMoodSound(PackedIdentifierBinaryTagCodec.instance().read(binarySound),
+        return new BiomeMoodSound(BiomeSoundEventBinaryTagCodec.instance().read(binarySound),
                 compound.getInt(TICK_DELAY), compound.getInt(BLOCK_SEARCH_EXTENT), compound.getDouble(OFFSET));
     }
 
     @Override
     public @NonNull BinaryTag write(@NonNull BiomeMoodSound object) {
         return CompoundBinaryTag.builder()
-                .put(SOUND, PackedIdentifierBinaryTagCodec.instance().write(object.key()))
+                .put(SOUND, BiomeSoundEventBinaryTagCodec.instance().write(object.event()))
                 .putInt(TICK_DELAY, object.tickDelay())
                 .putInt(BLOCK_SEARCH_EXTENT, object.blockSearchExtent())
                 .putDouble(OFFSET, object.offset())

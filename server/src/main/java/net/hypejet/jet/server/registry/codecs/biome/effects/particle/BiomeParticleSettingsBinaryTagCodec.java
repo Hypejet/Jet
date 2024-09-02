@@ -1,7 +1,8 @@
 package net.hypejet.jet.server.registry.codecs.biome.effects.particle;
 
-import net.hypejet.jet.biome.effects.particle.BiomeParticleSettings;
+import net.hypejet.jet.registry.registries.biome.effects.particle.BiomeParticleSettings;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.identifier.PackedIdentifierBinaryTagCodec;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -35,16 +36,22 @@ public final class BiomeParticleSettingsBinaryTagCodec implements BinaryTagCodec
         CompoundBinaryTag binaryOptions = compound.getCompound(OPTIONS);
         float probability = compound.getFloat(PROBABILITY);
 
-        String name = binaryOptions.getString(OPTIONS_TYPE);
-        BinaryTag data = binaryOptions.get(OPTIONS_VALUE);
+        BinaryTag typeTag = binaryOptions.get(OPTIONS_TYPE);
+        if (typeTag == null) {
+            throw new IllegalArgumentException(String.format(
+                    "Could not find a a binary tag with name of \"%s\" in the options binary tag",
+                    OPTIONS_TYPE
+            ));
+        }
 
-        return new BiomeParticleSettings(name, data, probability);
+        BinaryTag data = binaryOptions.get(OPTIONS_VALUE);
+        return new BiomeParticleSettings(PackedIdentifierBinaryTagCodec.instance().read(typeTag), data, probability);
     }
 
     @Override
     public @NonNull BinaryTag write(@NonNull BiomeParticleSettings object) {
         CompoundBinaryTag.Builder binaryOptions = CompoundBinaryTag.builder()
-                .putString(OPTIONS_TYPE, object.name());
+                .put(OPTIONS_TYPE, PackedIdentifierBinaryTagCodec.instance().write(object.key()));
 
         BinaryTag data = object.data();
         if (data != null)

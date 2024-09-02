@@ -3,7 +3,6 @@ package net.hypejet.jet.server.entity.player;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.hypejet.jet.MinecraftServer;
-import net.hypejet.jet.data.entity.type.BuiltInEntityTypes;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.player.PlayerChangeClientBrandEvent;
 import net.hypejet.jet.event.events.player.PlayerChangeSettingsEvent;
@@ -51,6 +50,7 @@ import java.util.UUID;
  */
 public final class JetPlayer extends JetEntity implements Player {
 
+    private static final Key ENTITY_TYPE = Key.key("player");
     private static final Key BRAND_PLUGIN_MESSAGE_IDENTIFIER = Key.key("brand");
 
     private final String username;
@@ -70,7 +70,7 @@ public final class JetPlayer extends JetEntity implements Player {
      * @since 1.0
      */
     public JetPlayer(@NonNull UUID uniqueId, @NonNull String username, @NonNull SocketPlayerConnection connection) {
-        super(BuiltInEntityTypes.PLAYER, uniqueId, Pointers.builder()
+        super(ENTITY_TYPE, uniqueId, Pointers.builder()
                 .withStatic(Identity.UUID, uniqueId)
                 .withStatic(Identity.NAME, username)
                 .build());

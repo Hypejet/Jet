@@ -6,7 +6,9 @@ import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.event.events.registry.RegistryInitializeEvent;
 import net.hypejet.jet.pack.DataPack;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerRegistryDataConfigurationPacket;
+import net.hypejet.jet.protocol.packet.server.configuration.ServerRegistryDataConfigurationPacket.Entry;
 import net.hypejet.jet.registry.Registry;
+import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -17,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -55,7 +58,7 @@ public final class JetRegistry<E> implements Registry<E> {
      * @since 1.0
      */
     public JetRegistry(@NonNull Key identifier, @NonNull Class<E> entryClass, @NonNull MinecraftServer server,
-                       @NonNull BinaryTagCodec<E> binaryTagCodec) {
+                       @NonNull BinaryTagCodec<E> binaryTagCodec, @NonNull Collection<RegistryEntry<E>> builtInEntries) {
         Objects.requireNonNull(identifier, "The registry identifier must not be null");
         Objects.requireNonNull(identifier, "The entry map must not be null");
 
@@ -64,29 +67,31 @@ public final class JetRegistry<E> implements Registry<E> {
 
         RegistryInitializeEvent<E> initializeEvent = new RegistryInitializeEvent<>(identifier, entryClass);
         server.eventNode().call(initializeEvent);
-        this.identifierToEntryMap = Map.copyOf(initializeEvent.entryMap());
 
-        int currentNumericIdentifier = 0;
+        Map<Key, E> entryMap = new HashMap<>(initializeEvent.entryMap());
+        for (RegistryEntry<E> entry : builtInEntries)
+            entryMap.put(entry.key(), entry.value());
+        this.identifierToEntryMap = Map.copyOf(entryMap);
+
+        List<E> entries = new ArrayList<>();
+        for (Map.Entry<Key, E> mapEntry : this.identifierToEntryMap.entrySet())
+            entries.add(mapEntry.getValue());
+
         for (E value : this.identifierToEntryMap.values())
-            this.numericIdentifierToEntryMap.put(currentNumericIdentifier++, value);
+            this.numericIdentifierToEntryMap.put(entries.indexOf(value), value);
 
-        Map<E, Key> entryToIdentifierMap = new HashMap<>();
+        Map<E, Key> entryToIdentifierMap = new IdentityHashMap<>();
         this.identifierToEntryMap.forEach((key, entry) -> entryToIdentifierMap.put(entry, key));
-        this.entryToIdentifierMap = Map.copyOf(entryToIdentifierMap);
+        this.entryToIdentifierMap = entryToIdentifierMap;
 
-        Map<E, Integer> entryToNumericIdentifierMap = new HashMap<>();
-        this.numericIdentifierToEntryMap.forEach((key, entry) -> entryToNumericIdentifierMap.put(entry, key));
-        this.entryToNumericIdentifierMap = Map.copyOf(entryToNumericIdentifierMap);
+        Map<E, Integer> entryToNumericIdentifierMap = new IdentityHashMap<>();
+        this.numericIdentifierToEntryMap.forEach((id, entry) -> entryToNumericIdentifierMap.put(entry, id));
+        this.entryToNumericIdentifierMap = entryToNumericIdentifierMap;
 
-        List<ServerRegistryDataConfigurationPacket.Entry> entries = new ArrayList<>();
-        for (Map.Entry<Key, E> mapEntry : this.identifierToEntryMap.entrySet()) {
-            E entry = mapEntry.getValue();
-            entries.add(this.entryToNumericIdentifierMap.get(entry), new ServerRegistryDataConfigurationPacket.Entry(
-                    mapEntry.getKey(), binaryTagCodec.write(entry)
-            ));
-        }
-
-        this.packet = new ServerRegistryDataConfigurationPacket(this.registryIdentifier, entries);
+        List<Entry> packetEntries = new ArrayList<>();
+        for (E entry : entries)
+            packetEntries.add(new Entry(this.entryToIdentifierMap.get(entry), binaryTagCodec.write(entry)));
+        this.packet = new ServerRegistryDataConfigurationPacket(this.registryIdentifier, List.copyOf(packetEntries));
     }
 
     @Override

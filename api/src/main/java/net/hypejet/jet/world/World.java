@@ -11,12 +11,12 @@ import java.util.Collection;
 import java.util.UUID;
 
 /**
- * Represents a container of Minecraft {@linkplain net.hypejet.jet.data.block.Block blocks}
+ * Represents a container of Minecraft {@linkplain ??? blocks}
  * and {@linkplain net.hypejet.jet.entity.Entity entities}.
  *
  * @since 1.0
  * @author Codestech
- * @see net.hypejet.jet.data.block.Block
+ * @see ???
  * @see net.hypejet.jet.entity.Entity
  */
 public interface World {

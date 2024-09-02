@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.registry.codecs.mapper;
 
+import net.hypejet.jet.data.json.util.mapper.Mapper;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
-import net.hypejet.jet.server.util.mapper.Mapper;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.StringBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
