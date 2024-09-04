@@ -3,11 +3,15 @@ package net.hypejet.jet.server.registry;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.data.codecs.JetDataJson;
 import net.hypejet.jet.data.generated.Biomes;
+import net.hypejet.jet.data.generated.DimensionTypes;
 import net.hypejet.jet.data.model.registry.RegistryEntry;
 import net.hypejet.jet.data.model.registry.registries.biome.Biome;
 import net.hypejet.jet.data.model.registry.registries.biome.BiomeRegistryEntry;
+import net.hypejet.jet.data.model.registry.registries.dimension.DimensionType;
+import net.hypejet.jet.data.model.registry.registries.dimension.DimensionTypeRegistryEntry;
 import net.hypejet.jet.registry.RegistryManager;
 import net.hypejet.jet.server.registry.codecs.biome.BiomeBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.dimension.DimensionTypeBinaryTagCodec;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -39,7 +43,10 @@ public final class JetRegistryManager implements RegistryManager {
         Set<JetRegistry<?>> registrySet = Set.of(
                 new JetRegistry<>(Key.key("worldgen/biome"),
                         Biome.class, server, BiomeBinaryTagCodec.instance(),
-                        getEntries(BiomeRegistryEntry.class, Biomes.SPEC_JSON_FILE_NAME))
+                        getEntries(BiomeRegistryEntry.class, Biomes.SPEC_JSON_FILE_NAME)),
+                new JetRegistry<>(Key.key("dimension_type"),
+                        DimensionType.class, server, DimensionTypeBinaryTagCodec.instance(),
+                        getEntries(DimensionTypeRegistryEntry.class, DimensionTypes.SPEC_JSON_FILE_NAME))
         );
 
         Map<Key, JetRegistry<?>> registries = new HashMap<>();
