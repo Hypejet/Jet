@@ -2,11 +2,14 @@ package net.hypejet.jet.server.registry;
 
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.data.codecs.JetDataJson;
+import net.hypejet.jet.data.generated.ArmorTrimMaterials;
 import net.hypejet.jet.data.generated.BannerPatterns;
 import net.hypejet.jet.data.generated.Biomes;
 import net.hypejet.jet.data.generated.DimensionTypes;
 import net.hypejet.jet.data.generated.PaintingVariants;
 import net.hypejet.jet.data.model.registry.RegistryEntry;
+import net.hypejet.jet.data.model.registry.registries.armor.material.ArmorTrimMaterial;
+import net.hypejet.jet.data.model.registry.registries.armor.material.ArmorTrimMaterialRegistryEntry;
 import net.hypejet.jet.data.model.registry.registries.banner.BannerPattern;
 import net.hypejet.jet.data.model.registry.registries.banner.BannerPatternRegistryEntry;
 import net.hypejet.jet.data.model.registry.registries.biome.Biome;
@@ -16,6 +19,7 @@ import net.hypejet.jet.data.model.registry.registries.dimension.DimensionTypeReg
 import net.hypejet.jet.data.model.registry.registries.painting.PaintingVariant;
 import net.hypejet.jet.data.model.registry.registries.painting.PaintingVariantRegistryEntry;
 import net.hypejet.jet.registry.RegistryManager;
+import net.hypejet.jet.server.registry.codecs.registry.armor.material.ArmorTrimMaterialBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.registry.banner.BannerPatternBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.registry.biome.BiomeBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.registry.dimension.DimensionTypeBinaryTagCodec;
@@ -60,7 +64,10 @@ public final class JetRegistryManager implements RegistryManager {
                         getEntries(PaintingVariantRegistryEntry.class, PaintingVariants.SPEC_JSON_FILE_NAME)),
                 new JetRegistry<>(Key.key("banner_pattern"),
                         BannerPattern.class, server, BannerPatternBinaryTagCodec.instance(),
-                        getEntries(BannerPatternRegistryEntry.class, BannerPatterns.SPEC_JSON_FILE_NAME))
+                        getEntries(BannerPatternRegistryEntry.class, BannerPatterns.SPEC_JSON_FILE_NAME)),
+                new JetRegistry<>(Key.key("trim_material"),
+                        ArmorTrimMaterial.class, server, ArmorTrimMaterialBinaryTagCodec.instance(),
+                        getEntries(ArmorTrimMaterialRegistryEntry.class, ArmorTrimMaterials.SPEC_JSON_FILE_NAME))
         );
 
         Map<Key, JetRegistry<?>> registries = new HashMap<>();

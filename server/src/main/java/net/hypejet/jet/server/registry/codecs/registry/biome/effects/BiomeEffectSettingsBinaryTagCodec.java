@@ -81,15 +81,15 @@ public final class BiomeEffectSettingsBinaryTagCodec implements BinaryTagCodec<B
                 .waterColor(colorCodec.read(binaryWaterColor))
                 .waterFogColor(colorCodec.read(binaryWaterFogColor))
                 .skyColor(colorCodec.read(binarySkyColor))
-                .foliageColorOverride(BinaryTagUtil.read(FOLIAGE_COLOR, compound, colorCodec))
-                .grassColorOverride(BinaryTagUtil.read(GRASS_COLOR, compound, colorCodec))
-                .grassColorModifier(BinaryTagUtil.read(GRASS_COLOR_MODIFIER, compound, GRASS_COLOR_MODIFIER_CODEC))
-                .particleSettings(BinaryTagUtil.read(PARTICLE, compound, BiomeParticleSettingsBinaryTagCodec.instance()))
-                .ambientSound(BinaryTagUtil.read(AMBIENT_SOUND, compound, BiomeSoundEventBinaryTagCodec.instance()))
-                .moodSound(BinaryTagUtil.read(MOOD_SOUND, compound, BiomeMoodSoundBinaryTagCodec.instance()))
-                .additionalSound(BinaryTagUtil.read(ADDITIONS_SOUND, compound,
+                .foliageColorOverride(BinaryTagUtil.readOptional(FOLIAGE_COLOR, compound, colorCodec))
+                .grassColorOverride(BinaryTagUtil.readOptional(GRASS_COLOR, compound, colorCodec))
+                .grassColorModifier(BinaryTagUtil.readOptional(GRASS_COLOR_MODIFIER, compound, GRASS_COLOR_MODIFIER_CODEC))
+                .particleSettings(BinaryTagUtil.readOptional(PARTICLE, compound, BiomeParticleSettingsBinaryTagCodec.instance()))
+                .ambientSound(BinaryTagUtil.readOptional(AMBIENT_SOUND, compound, BiomeSoundEventBinaryTagCodec.instance()))
+                .moodSound(BinaryTagUtil.readOptional(MOOD_SOUND, compound, BiomeMoodSoundBinaryTagCodec.instance()))
+                .additionalSound(BinaryTagUtil.readOptional(ADDITIONS_SOUND, compound,
                         BiomeAdditionalSoundBinaryTagCodec.instance()))
-                .biomeMusic(BinaryTagUtil.read(MUSIC, compound, BiomeMusicBinaryTagCodec.instance()))
+                .biomeMusic(BinaryTagUtil.readOptional(MUSIC, compound, BiomeMusicBinaryTagCodec.instance()))
                 .build();
     }
 
@@ -103,18 +103,18 @@ public final class BiomeEffectSettingsBinaryTagCodec implements BinaryTagCodec<B
                 .put(WATER_FOG_COLOR, colorCodec.write(object.waterFogColor()))
                 .put(SKY_COLOR, colorCodec.write(object.skyColor()));
 
-        BinaryTagUtil.write(FOLIAGE_COLOR, object.foliageColorOverride(), builder, colorCodec);
-        BinaryTagUtil.write(GRASS_COLOR, object.grassColorOverride(), builder, colorCodec);
-        BinaryTagUtil.write(GRASS_COLOR_MODIFIER, object.grassColorModifier(), builder, GRASS_COLOR_MODIFIER_CODEC);
+        BinaryTagUtil.writeOptional(FOLIAGE_COLOR, object.foliageColorOverride(), builder, colorCodec);
+        BinaryTagUtil.writeOptional(GRASS_COLOR, object.grassColorOverride(), builder, colorCodec);
+        BinaryTagUtil.writeOptional(GRASS_COLOR_MODIFIER, object.grassColorModifier(), builder, GRASS_COLOR_MODIFIER_CODEC);
 
-        BinaryTagUtil.write(PARTICLE, object.particleSettings(), builder, BiomeParticleSettingsBinaryTagCodec.instance());
+        BinaryTagUtil.writeOptional(PARTICLE, object.particleSettings(), builder, BiomeParticleSettingsBinaryTagCodec.instance());
 
-        BinaryTagUtil.write(AMBIENT_SOUND, object.ambientSound(), builder, BiomeSoundEventBinaryTagCodec.instance());
-        BinaryTagUtil.write(MOOD_SOUND, object.moodSound(), builder, BiomeMoodSoundBinaryTagCodec.instance());
-        BinaryTagUtil.write(ADDITIONS_SOUND, object.additionalSound(), builder,
+        BinaryTagUtil.writeOptional(AMBIENT_SOUND, object.ambientSound(), builder, BiomeSoundEventBinaryTagCodec.instance());
+        BinaryTagUtil.writeOptional(MOOD_SOUND, object.moodSound(), builder, BiomeMoodSoundBinaryTagCodec.instance());
+        BinaryTagUtil.writeOptional(ADDITIONS_SOUND, object.additionalSound(), builder,
                 BiomeAdditionalSoundBinaryTagCodec.instance());
 
-        BinaryTagUtil.write(MUSIC, object.music(), builder, BiomeMusicBinaryTagCodec.instance());
+        BinaryTagUtil.writeOptional(MUSIC, object.music(), builder, BiomeMusicBinaryTagCodec.instance());
 
         return builder.build();
     }

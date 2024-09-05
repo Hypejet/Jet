@@ -33,7 +33,7 @@ public final class PaintingVariantBinaryTagCodec implements BinaryTagCodec<Paint
         if (!(tag instanceof CompoundBinaryTag compound))
             throw new IllegalArgumentException("The binary tag specified is not a compound binary tag");
 
-        Key asset = BinaryTagUtil.read(ASSET_FIELD, compound, PackedIdentifierBinaryTagCodec.instance());
+        Key asset = BinaryTagUtil.readOptional(ASSET_FIELD, compound, PackedIdentifierBinaryTagCodec.instance());
         if (asset == null)
             throw new IllegalArgumentException("The asset field was not specified");
 

@@ -58,9 +58,9 @@ public final class DimensionTypeBinaryTagCodec implements BinaryTagCodec<Dimensi
         if (fixedTimeBinaryTag instanceof NumberBinaryTag fixedTimeIntBinaryTag)
             builder.fixedTime(fixedTimeIntBinaryTag.longValue());
 
-        Key infiniburn = BinaryTagUtil.read(INFINIBURN, compound, TagIdentifierBinaryTagCodec.instance());
-        Key effects = BinaryTagUtil.read(EFFECTS, compound, PackedIdentifierBinaryTagCodec.instance());
-        IntegerProvider monsterSpawnLightLevel = BinaryTagUtil.read(MONSTER_SPAWN_LIGHT_LEVEL, compound,
+        Key infiniburn = BinaryTagUtil.readOptional(INFINIBURN, compound, TagIdentifierBinaryTagCodec.instance());
+        Key effects = BinaryTagUtil.readOptional(EFFECTS, compound, PackedIdentifierBinaryTagCodec.instance());
+        IntegerProvider monsterSpawnLightLevel = BinaryTagUtil.readOptional(MONSTER_SPAWN_LIGHT_LEVEL, compound,
                 IntegerProviderBinaryTagCodec.instance());
 
         if (infiniburn == null)

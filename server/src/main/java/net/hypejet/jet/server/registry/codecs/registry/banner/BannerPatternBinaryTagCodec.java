@@ -32,7 +32,7 @@ public final class BannerPatternBinaryTagCodec implements BinaryTagCodec<BannerP
         if (!(tag instanceof CompoundBinaryTag compound))
             throw new IllegalArgumentException("The binary tag specified is not a compound binary tag");
 
-        Key assetId = BinaryTagUtil.read(ASSET_ID_FIELD, compound, PackedIdentifierBinaryTagCodec.instance());
+        Key assetId = BinaryTagUtil.readOptional(ASSET_ID_FIELD, compound, PackedIdentifierBinaryTagCodec.instance());
         if (assetId == null)
             throw new IllegalArgumentException("The asset id field was not specified");
 
