@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.registry.codecs.painting;
+package net.hypejet.jet.server.registry.codecs.registry.painting;
 
 import net.hypejet.jet.data.model.registry.registries.painting.PaintingVariant;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;

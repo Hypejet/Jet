@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.registry.codecs.banner;
+package net.hypejet.jet.server.registry.codecs.registry.banner;
 
 import net.hypejet.jet.data.model.registry.registries.banner.BannerPattern;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;

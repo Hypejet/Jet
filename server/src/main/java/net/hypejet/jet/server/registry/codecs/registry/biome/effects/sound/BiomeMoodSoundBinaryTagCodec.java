@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.registry.codecs.biome.effects.sound;
+package net.hypejet.jet.server.registry.codecs.registry.biome.effects.sound;
 
 import net.hypejet.jet.data.model.registry.registries.biome.effects.sound.BiomeMoodSound;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;

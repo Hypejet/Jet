@@ -1,10 +1,10 @@
-package net.hypejet.jet.server.registry.codecs.biome;
+package net.hypejet.jet.server.registry.codecs.registry.biome;
 
 import net.hypejet.jet.data.codecs.util.mapper.Mapper;
 import net.hypejet.jet.data.model.registry.registries.biome.Biome;
 import net.hypejet.jet.data.model.registry.registries.biome.temperature.BiomeTemperatureModifier;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.biome.effects.BiomeEffectSettingsBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.registry.biome.effects.BiomeEffectSettingsBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.mapper.MapperBinaryTagCodec;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;

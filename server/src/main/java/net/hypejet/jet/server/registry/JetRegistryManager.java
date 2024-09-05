@@ -16,10 +16,10 @@ import net.hypejet.jet.data.model.registry.registries.dimension.DimensionTypeReg
 import net.hypejet.jet.data.model.registry.registries.painting.PaintingVariant;
 import net.hypejet.jet.data.model.registry.registries.painting.PaintingVariantRegistryEntry;
 import net.hypejet.jet.registry.RegistryManager;
-import net.hypejet.jet.server.registry.codecs.banner.BannerPatternBinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.biome.BiomeBinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.dimension.DimensionTypeBinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.painting.PaintingVariantBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.registry.banner.BannerPatternBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.registry.biome.BiomeBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.registry.dimension.DimensionTypeBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.registry.painting.PaintingVariantBinaryTagCodec;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;

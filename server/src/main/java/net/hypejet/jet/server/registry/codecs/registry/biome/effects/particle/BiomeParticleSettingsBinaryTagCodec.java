@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.registry.codecs.biome.effects.particle;
+package net.hypejet.jet.server.registry.codecs.registry.biome.effects.particle;
 
 import net.hypejet.jet.data.model.registry.registries.biome.effects.particle.BiomeParticleSettings;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;

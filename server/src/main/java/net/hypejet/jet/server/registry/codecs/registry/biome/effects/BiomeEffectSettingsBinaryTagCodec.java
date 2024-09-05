@@ -1,15 +1,15 @@
-package net.hypejet.jet.server.registry.codecs.biome.effects;
+package net.hypejet.jet.server.registry.codecs.registry.biome.effects;
 
 import net.hypejet.jet.data.codecs.util.mapper.Mapper;
 import net.hypejet.jet.data.model.registry.registries.biome.effects.BiomeEffectSettings;
 import net.hypejet.jet.data.model.registry.registries.biome.effects.modifier.GrassColorModifier;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.ColorBinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.biome.effects.music.BiomeMusicBinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.biome.effects.particle.BiomeParticleSettingsBinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.biome.effects.sound.BiomeAdditionalSoundBinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.biome.effects.sound.BiomeMoodSoundBinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.biome.effects.sound.BiomeSoundEventBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.registry.biome.effects.music.BiomeMusicBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.registry.biome.effects.particle.BiomeParticleSettingsBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.registry.biome.effects.sound.BiomeAdditionalSoundBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.registry.biome.effects.sound.BiomeMoodSoundBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.registry.biome.effects.sound.BiomeSoundEventBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.mapper.MapperBinaryTagCodec;
 import net.hypejet.jet.server.util.BinaryTagUtil;
 import net.kyori.adventure.nbt.BinaryTag;
