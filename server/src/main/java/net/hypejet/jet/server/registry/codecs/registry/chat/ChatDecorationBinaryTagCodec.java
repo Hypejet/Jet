@@ -32,13 +32,12 @@ public final class ChatDecorationBinaryTagCodec implements BinaryTagCodec<ChatDe
     private static final String STYLE_FIELD = "style";
     private static final String PARAMETERS_FIELD = "parameters";
 
-    private static final BinaryTagCodec<ChatDecorationParameter> PARAMETER_CODEC = MapperBinaryTagCodec.codec(
+    private static final BinaryTagCodec<ChatDecorationParameter> PARAMETER_CODEC = MapperBinaryTagCodec.stringCodec(
             Mapper.builder(ChatDecorationParameter.class, String.class)
                     .register(ChatDecorationParameter.SENDER, "sender")
                     .register(ChatDecorationParameter.TARGET, "target")
                     .register(ChatDecorationParameter.CONTENT, "content")
-                    .build(),
-            StringBinaryTag.class, StringBinaryTag::value, StringBinaryTag::stringBinaryTag
+                    .build()
     );
 
     private static final ChatDecorationBinaryTagCodec INSTANCE = new ChatDecorationBinaryTagCodec();
