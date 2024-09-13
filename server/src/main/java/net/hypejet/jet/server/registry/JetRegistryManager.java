@@ -2,12 +2,7 @@ package net.hypejet.jet.server.registry;
 
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.data.codecs.JetDataJson;
-import net.hypejet.jet.data.generated.ArmorTrimMaterials;
-import net.hypejet.jet.data.generated.ArmorTrimPatterns;
-import net.hypejet.jet.data.generated.BannerPatterns;
-import net.hypejet.jet.data.generated.Biomes;
-import net.hypejet.jet.data.generated.DimensionTypes;
-import net.hypejet.jet.data.generated.PaintingVariants;
+import net.hypejet.jet.data.generated.*;
 import net.hypejet.jet.data.model.registry.RegistryEntry;
 import net.hypejet.jet.data.model.registry.registries.armor.material.ArmorTrimMaterial;
 import net.hypejet.jet.data.model.registry.registries.armor.material.ArmorTrimMaterialRegistryEntry;
@@ -17,6 +12,8 @@ import net.hypejet.jet.data.model.registry.registries.banner.BannerPattern;
 import net.hypejet.jet.data.model.registry.registries.banner.BannerPatternRegistryEntry;
 import net.hypejet.jet.data.model.registry.registries.biome.Biome;
 import net.hypejet.jet.data.model.registry.registries.biome.BiomeRegistryEntry;
+import net.hypejet.jet.data.model.registry.registries.chat.ChatType;
+import net.hypejet.jet.data.model.registry.registries.chat.ChatTypeRegistryEntry;
 import net.hypejet.jet.data.model.registry.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.registry.registries.dimension.DimensionTypeRegistryEntry;
 import net.hypejet.jet.data.model.registry.registries.painting.PaintingVariant;
@@ -26,6 +23,7 @@ import net.hypejet.jet.server.registry.codecs.registry.armor.material.ArmorTrimM
 import net.hypejet.jet.server.registry.codecs.registry.armor.pattern.ArmorTrimPatternBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.registry.banner.BannerPatternBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.registry.biome.BiomeBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.registry.chat.ChatTypeBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.registry.dimension.DimensionTypeBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.registry.painting.PaintingVariantBinaryTagCodec;
 import net.kyori.adventure.key.Key;
@@ -74,7 +72,10 @@ public final class JetRegistryManager implements RegistryManager {
                         getEntries(ArmorTrimMaterialRegistryEntry.class, ArmorTrimMaterials.SPEC_JSON_FILE_NAME)),
                 new JetRegistry<>(Key.key("trim_pattern"),
                         ArmorTrimPattern.class, server, ArmorTrimPatternBinaryTagCodec.instance(),
-                        getEntries(ArmorTrimPatternRegistryEntry.class, ArmorTrimPatterns.SPEC_JSON_FILE_NAME))
+                        getEntries(ArmorTrimPatternRegistryEntry.class, ArmorTrimPatterns.SPEC_JSON_FILE_NAME)),
+                new JetRegistry<>(Key.key("chat_type"),
+                        ChatType.class, server, ChatTypeBinaryTagCodec.instance(),
+                        getEntries(ChatTypeRegistryEntry.class, ChatTypes.SPEC_JSON_FILE_NAME))
         );
 
         Map<Key, JetRegistry<?>> registries = new HashMap<>();
