@@ -1,8 +1,6 @@
 package net.hypejet.jet.server.network.protocol.codecs.chunk;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.data.biome.Biome;
-import net.hypejet.jet.data.block.Block;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.arrays.LongArrayNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.arrays.VarIntArrayNetworkCodec;
