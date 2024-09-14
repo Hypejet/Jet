@@ -22,7 +22,7 @@ public final class PaintingVariantBinaryTagCodec implements BinaryTagCodec<Paint
 
     private static final PaintingVariantBinaryTagCodec INSTANCE = new PaintingVariantBinaryTagCodec();
 
-    private static final String ASSET_FIELD = "asset";
+    private static final String ASSET_ID_FIELD = "asset_id";
     private static final String HEIGHT_FIELD = "height";
     private static final String WIDTH_FIELD = "width";
 
@@ -33,7 +33,7 @@ public final class PaintingVariantBinaryTagCodec implements BinaryTagCodec<Paint
         if (!(tag instanceof CompoundBinaryTag compound))
             throw new IllegalArgumentException("The binary tag specified is not a compound binary tag");
 
-        Key asset = BinaryTagUtil.readOptional(ASSET_FIELD, compound, PackedIdentifierBinaryTagCodec.instance());
+        Key asset = BinaryTagUtil.readOptional(ASSET_ID_FIELD, compound, PackedIdentifierBinaryTagCodec.instance());
         if (asset == null)
             throw new IllegalArgumentException("The asset field was not specified");
 
@@ -43,7 +43,7 @@ public final class PaintingVariantBinaryTagCodec implements BinaryTagCodec<Paint
     @Override
     public @NonNull BinaryTag write(@NonNull PaintingVariant object) {
         return CompoundBinaryTag.builder()
-                .put(ASSET_FIELD, PackedIdentifierBinaryTagCodec.instance().write(object.asset()))
+                .put(ASSET_ID_FIELD, PackedIdentifierBinaryTagCodec.instance().write(object.asset()))
                 .putInt(HEIGHT_FIELD, object.height())
                 .putInt(WIDTH_FIELD, object.width())
                 .build();
