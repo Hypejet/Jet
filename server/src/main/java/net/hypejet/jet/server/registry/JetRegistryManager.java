@@ -20,6 +20,8 @@ import net.hypejet.jet.data.model.registry.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.registry.registries.dimension.DimensionTypeRegistryEntry;
 import net.hypejet.jet.data.model.registry.registries.painting.PaintingVariant;
 import net.hypejet.jet.data.model.registry.registries.painting.PaintingVariantRegistryEntry;
+import net.hypejet.jet.data.model.registry.registries.wolf.WolfVariant;
+import net.hypejet.jet.data.model.registry.registries.wolf.WolfVariantRegistryEntry;
 import net.hypejet.jet.registry.RegistryManager;
 import net.hypejet.jet.server.registry.codecs.registry.armor.material.ArmorTrimMaterialBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.registry.armor.pattern.ArmorTrimPatternBinaryTagCodec;
@@ -29,6 +31,7 @@ import net.hypejet.jet.server.registry.codecs.registry.chat.ChatTypeBinaryTagCod
 import net.hypejet.jet.server.registry.codecs.registry.damage.DamageTypeBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.registry.dimension.DimensionTypeBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.registry.painting.PaintingVariantBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.registry.wolf.WolfVariantBinaryTagCodec;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -57,8 +60,7 @@ public final class JetRegistryManager implements RegistryManager {
      * @since 1.0
      */
     public JetRegistryManager(@NonNull MinecraftServer server) {
-        Set<JetRegistry<?>> registrySet;
-        registrySet = Set.of(
+        Set<JetRegistry<?>> registrySet = Set.of(
                 new JetRegistry<>(Key.key("worldgen/biome"),
                         Biome.class, server, BiomeBinaryTagCodec.instance(),
                         getEntries(BiomeRegistryEntry.class, Biomes.SPEC_JSON_FILE_NAME)),
@@ -82,7 +84,10 @@ public final class JetRegistryManager implements RegistryManager {
                         getEntries(ChatTypeRegistryEntry.class, ChatTypes.SPEC_JSON_FILE_NAME)),
                 new JetRegistry<>(Key.key("damage_type"),
                         DamageType.class, server, DamageTypeBinaryTagCodec.instance(),
-                        getEntries(DamageTypeRegistryEntry.class, DamageTypes.SPEC_JSON_FILE_NAME))
+                        getEntries(DamageTypeRegistryEntry.class, DamageTypes.SPEC_JSON_FILE_NAME)),
+                new JetRegistry<>(Key.key("wolf_variant"),
+                        WolfVariant.class, server, WolfVariantBinaryTagCodec.instance(),
+                        getEntries(WolfVariantRegistryEntry.class, WolfVariants.SPEC_JSON_FILE_NAME))
         );
 
         Map<Key, JetRegistry<?>> registries = new HashMap<>();

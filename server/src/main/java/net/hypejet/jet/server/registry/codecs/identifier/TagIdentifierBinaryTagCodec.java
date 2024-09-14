@@ -17,6 +17,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class TagIdentifierBinaryTagCodec implements BinaryTagCodec<Key> {
 
+    public static final char HASH_CHAR = '#';
+    public static final String HASH_STRING = String.valueOf(HASH_CHAR);
+
     private static final TagIdentifierBinaryTagCodec INSTANCE = new TagIdentifierBinaryTagCodec();
 
     private TagIdentifierBinaryTagCodec() {}
@@ -25,12 +28,12 @@ public final class TagIdentifierBinaryTagCodec implements BinaryTagCodec<Key> {
     public @NonNull Key read(@NonNull BinaryTag tag) {
         if (!(tag instanceof StringBinaryTag stringTag))
             throw new IllegalArgumentException("The binary tag specified must be a string binary tag");
-        return Key.key(stringTag.value());
+        return Key.key(stringTag.value().replaceFirst(HASH_STRING, ""));
     }
 
     @Override
     public @NonNull BinaryTag write(@NonNull Key object) {
-        return StringBinaryTag.stringBinaryTag(object.asString());
+        return StringBinaryTag.stringBinaryTag(HASH_CHAR + object.asString());
     }
 
     /**
