@@ -67,7 +67,7 @@ public final class ArmorTrimMaterialBinaryTagCodec implements BinaryTagCodec<Arm
         }
 
         return CompoundBinaryTag.builder()
-                .put(ASSET_NAME_FIELD, PackedIdentifierBinaryTagCodec.instance().write(object.asset()))
+                .putString(ASSET_NAME_FIELD, object.asset().value())
                 .put(INGREDIENT_FIELD, PackedIdentifierBinaryTagCodec.instance().write(object.ingredient()))
                 .putFloat(ITEM_MODEL_INDEX_FIELD, object.itemModelIndex())
                 .put(OVERRIDE_ARMOR_MATERIALS_FIELD, overrideArmorMaterialsBuilder.build())
