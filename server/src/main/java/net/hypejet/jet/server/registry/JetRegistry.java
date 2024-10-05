@@ -1,11 +1,12 @@
 package net.hypejet.jet.server.registry;
 
-import net.hypejet.jet.MinecraftServer;
+import net.hypejet.jet.data.model.pack.DataPack;
 import net.hypejet.jet.data.model.registry.RegistryEntryData;
 import net.hypejet.jet.data.model.utils.NullabilityUtil;
 import net.hypejet.jet.event.events.registry.RegistryInitializeEvent;
 import net.hypejet.jet.registry.Registry;
 import net.hypejet.jet.registry.RegistryEntry;
+import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -17,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Represents an implementation of {@linkplain Registry registry}.
@@ -50,7 +52,7 @@ public final class JetRegistry<V> implements Registry<V> {
      * @since 1.0
      */
     public JetRegistry(@NonNull Key identifier, @NonNull Class<V> entryValueClass,
-                       @NonNull MinecraftServer server, @NonNull BinaryTagCodec<V> binaryTagCodec,
+                       @NonNull JetMinecraftServer server, @NonNull BinaryTagCodec<V> binaryTagCodec,
                        @NonNull Collection<RegistryEntryData<V>> builtInEntryData) {
         NullabilityUtil.requireNonNull(server, "server");
         NullabilityUtil.requireNonNull(builtInEntryData, "built-in entry data");
@@ -63,17 +65,21 @@ public final class JetRegistry<V> implements Registry<V> {
         server.eventNode().call(initializeEvent);
         
         Map<Key, JetRegistryEntry<V>> keyToRegistryEntryMap = new HashMap<>();
-
         for (Map.Entry<Key, V> entry : initializeEvent.entryMap().entrySet()) {
             Key key = entry.getKey();
             V value = entry.getValue();
             keyToRegistryEntryMap.put(entry.getKey(), new JetRegistryEntry<>(key, value, null));
         }
 
+        Set<DataPack> enabledDataPacks = server.configuration().enabledPacks();
         for (RegistryEntryData<V> entry : builtInEntryData) {
             Key key = entry.key();
             V value = entry.value();
-            keyToRegistryEntryMap.put(entry.key(), new JetRegistryEntry<>(key, value, entry.knownPack()));
+
+            DataPack dataPack = entry.knownPack();
+            if (!enabledDataPacks.contains(dataPack)) continue;
+
+            keyToRegistryEntryMap.put(entry.key(), new JetRegistryEntry<>(key, value, dataPack));
         }
 
         this.keyToRegistryEntryMap = Map.copyOf(keyToRegistryEntryMap);
