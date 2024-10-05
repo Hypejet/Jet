@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
  * @author Codestech
  * @see RegistryDataEntryNetworkCodec
  */
-public final class RegistryDataEntryNetworkCodecTest {
+public final class MinecraftRegistryDataEntryNetworkCodecTest {
     @Test
     public void test() {
         NetworkCodecTestUtil.test(

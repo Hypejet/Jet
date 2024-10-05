@@ -13,9 +13,9 @@ import java.util.List;
  * @since 1.0
  * @author Codestech
  */
-public interface Registry<V> {
+public interface MinecraftRegistry<V> {
     /**
-     * Gets an {@linkplain Key identifier} of this {@linkplain Registry registry}.
+     * Gets an {@linkplain Key identifier} of this {@linkplain MinecraftRegistry registry}.
      *
      * @return the identifier
      * @since 1.0
@@ -23,7 +23,7 @@ public interface Registry<V> {
     @NonNull Key registryIdentifier();
 
     /**
-     * Gets a {@linkplain Class class} of values of entries of this {@linkplain Registry registry}.
+     * Gets a {@linkplain Class class} of values of entries of this {@linkplain MinecraftRegistry registry}.
      *
      * @return the class
      * @since 1.0
@@ -49,7 +49,7 @@ public interface Registry<V> {
     @Nullable RegistryEntry<V> get(int numericIdentifier);
 
     /**
-     * Gets whether a registry entry specified was registered in this {@linkplain Registry registry}.
+     * Gets whether a registry entry specified was registered in this {@linkplain MinecraftRegistry registry}.
      *
      * @param entry the registry entry
      * @return {@code true} if the registry entry was registered in this registry, {@code false} otherwise
@@ -58,7 +58,7 @@ public interface Registry<V> {
     boolean isRegistered(@NonNull RegistryEntry<V> entry);
 
     /**
-     * Gets a {@linkplain Key key} of a registry entry registered in this {@linkplain Registry registry}.
+     * Gets a {@linkplain Key key} of a registry entry registered in this {@linkplain MinecraftRegistry registry}.
      *
      * @param entry the registry entry
      * @return the identifier
@@ -67,7 +67,7 @@ public interface Registry<V> {
     @NonNull Key keyOf(@NonNull RegistryEntry<V> entry);
 
     /**
-     * Gets a numeric identifier of a registry entry registered in this {@link Registry registry}.
+     * Gets a numeric identifier of a registry entry registered in this {@link MinecraftRegistry registry}.
      *
      * @param entry the registry entry
      * @return a numeric identifier of the registry entry
@@ -76,7 +76,7 @@ public interface Registry<V> {
     int identifierOf(@NonNull RegistryEntry<V> entry);
 
     /**
-     * Gets a {@linkplain List list} of all entries registered in this {@linkplain Registry registry}.
+     * Gets a {@linkplain List list} of all entries registered in this {@linkplain MinecraftRegistry registry}.
      *
      * <p>The entries are sorted by their numeric identifier.</p>
      *

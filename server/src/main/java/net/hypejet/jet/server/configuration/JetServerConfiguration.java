@@ -8,6 +8,7 @@ import eu.okaeri.configs.annotation.Header;
 import eu.okaeri.configs.annotation.Headers;
 import eu.okaeri.configs.yaml.snakeyaml.YamlSnakeYamlConfigurer;
 import net.hypejet.jet.configuration.ServerConfiguration;
+import net.hypejet.jet.data.generated.server.DataPacks;
 import net.hypejet.jet.data.model.pack.DataPack;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.network.transport.NettyTransportSelector;
@@ -19,6 +20,7 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -68,10 +70,10 @@ public final class JetServerConfiguration extends OkaeriConfig implements Server
     @Comments({
             @Comment("Data packs that should be enabled on the server."),
             @Comment("The data packs add additional functionality on the server and client"),
-            @Comment("Make sure that you put real Minecraft values here. Otherwise clients will not be able to join.")
+            @Comment("Make sure that you put actual Minecraft pack keys here.")
     })
     @CustomKey("enabled-packs")
-    private @MonotonicNonNull Set<DataPack> enabledPacks = createDefaultEnabledPacks();
+    private @MonotonicNonNull Set<Key> enabledPacks = createDefaultEnabledPacks();
 
     private JetServerConfiguration() {}
 
@@ -111,15 +113,22 @@ public final class JetServerConfiguration extends OkaeriConfig implements Server
     }
 
     /**
-     * Gets a {@linkplain Set collection} of {@linkplain DataPack data packs} that should be enabled
+     * Gets a {@linkplain Set set} of {@linkplain Key keys} of {@linkplain DataPack data packs} that should be enabled
      * on the server.
      *
-     * @return the data pack set
+     * @return the set
      * @since 1.0
      */
-    public @NonNull Set<DataPack> enabledPacks() {
-        if (this.enabledPacks == null || this.enabledPacks.isEmpty())
+    public @NonNull Set<Key> enabledPacks() {
+        if (this.enabledPacks == null)
             this.enabledPacks = createDefaultEnabledPacks();
+
+        if (!this.enabledPacks.contains(DataPacks.CORE)) {
+            Set<Key> enabledPacks = new HashSet<>(this.enabledPacks);
+            enabledPacks.add(DataPacks.CORE);
+            this.enabledPacks = Set.copyOf(enabledPacks);
+        }
+
         return Set.copyOf(this.enabledPacks);
     }
 
@@ -193,7 +202,7 @@ public final class JetServerConfiguration extends OkaeriConfig implements Server
         return "0.0.0.0";
     }
 
-    private static @NonNull Set<DataPack> createDefaultEnabledPacks() {
-        return Set.of(new DataPack(Key.key("core"), "1.21.1"));
+    private static @NonNull Set<Key> createDefaultEnabledPacks() {
+        return Set.of(DataPacks.CORE);
     }
 }

@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
  * @see net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec
  * @see ClientPacketRegistry
  */
-public final class ClientPacketRegistryTest {
+public final class ClientPacketMinecraftRegistryTest {
     @Test
     public void testValidPacket() {
         Assertions.assertNotNull(ClientPacketRegistry.codec(0, ProtocolState.HANDSHAKE));

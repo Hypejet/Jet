@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
  * @author Codestech
  * @see ArgumentCodecRegistry
  */
-public final class ArgumentCodecRegistryTest {
+public final class ArgumentCodecMinecraftRegistryTest {
     @Test
     public void testByClass() {
         Assertions.assertNotNull(ArgumentCodecRegistry.codec(StringArgumentType.class));
