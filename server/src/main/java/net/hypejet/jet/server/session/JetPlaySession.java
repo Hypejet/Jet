@@ -61,8 +61,10 @@ public final class JetPlaySession implements Session<JetPlaySession>, SessionHan
 
         Key overworld = Key.key("overworld");
 
-        player.sendPacket(new ServerJoinGamePlayPacket(player.entityId(), false, Collections.singleton(overworld),
-                20, 5, 5, false, true, false, 0, overworld, 0, Player.GameMode.SURVIVAL, null, false, true,
+        player.sendPacket(new ServerJoinGamePlayPacket(player.entityId(), false,
+                Collections.singleton(overworld), 20, 5, 5,
+                false, true, false, 0, overworld,
+                0, Player.GameMode.SURVIVAL, null, false, true,
                 null, 2, false));
 
         player.sendPacket(new ServerGameEventPlayPacket(GameEvent.waitForWorldChunks()));

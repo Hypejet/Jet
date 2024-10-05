@@ -1,6 +1,6 @@
 package net.hypejet.jet.protocol.packet.client.configuration;
 
-import net.hypejet.jet.pack.DataPack;
+import net.hypejet.jet.data.model.pack.DataPack;
 import net.hypejet.jet.protocol.packet.client.ClientConfigurationPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

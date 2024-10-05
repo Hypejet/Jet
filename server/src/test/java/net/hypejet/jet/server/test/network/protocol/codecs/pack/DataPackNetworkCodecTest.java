@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.test.network.protocol.codecs.pack;
 
-import net.hypejet.jet.pack.DataPack;
+import net.hypejet.jet.data.model.pack.DataPack;
 import net.hypejet.jet.server.network.protocol.codecs.pack.DataPackNetworkCodec;
 import net.hypejet.jet.server.test.network.protocol.codecs.NetworkCodecTestUtil;
 import net.kyori.adventure.key.Key;

@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.test.network.protocol.packet.server.play;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.hypejet.jet.coordinate.BlockPosition;
-import net.hypejet.jet.coordinate.Position;
+import net.hypejet.jet.data.model.coordinate.BlockPosition;
+import net.hypejet.jet.data.model.coordinate.Position;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.protocol.packet.server.play.ServerActionBarPlayPacket;
 import net.hypejet.jet.protocol.packet.server.play.ServerCenterChunkPlayPacket;

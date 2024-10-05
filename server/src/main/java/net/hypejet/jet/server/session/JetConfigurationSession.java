@@ -1,14 +1,20 @@
 package net.hypejet.jet.server.session;
 
+import net.hypejet.jet.data.model.pack.DataPack;
 import net.hypejet.jet.event.events.player.configuration.PlayerConfigurationStartEvent;
+import net.hypejet.jet.protocol.packet.client.configuration.ClientKnownPacksConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerFinishConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerKeepAliveConfigurationPacket;
+import net.hypejet.jet.protocol.packet.server.configuration.ServerKnownPacksConfigurationPacket;
+import net.hypejet.jet.protocol.packet.server.configuration.ServerRegistryDataConfigurationPacket;
+import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.player.JetPlayer;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.registry.JetRegistry;
 import net.hypejet.jet.server.session.keepalive.KeepAliveHandler;
 import net.hypejet.jet.session.handler.SessionHandler;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -16,6 +22,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeoutException;
@@ -39,6 +48,10 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
     private final KeepAliveHandler keepAliveHandler;
 
     private final CountDownLatch acknowledgeLatch = new CountDownLatch(1);
+    private final CountDownLatch registryConfigurationLatch = new CountDownLatch(1);
+
+    private final Collection<DataPack> requestedDataPacks;
+
     private boolean finished;
 
     /**
@@ -51,14 +64,12 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
         this.player = player;
         this.keepAliveHandler = new KeepAliveHandler(player, this, ServerKeepAliveConfigurationPacket::new);
 
+        JetMinecraftServer server = player.server();
+        this.requestedDataPacks = server.configuration().enabledPacks();
+
         Thread.ofVirtual()
                 .uncaughtExceptionHandler(this)
                 .start(() -> {
-                    SocketPlayerConnection connection = this.player.connection();
-                    if (connection.isClosed()) return;
-
-                    JetMinecraftServer server = connection.server();
-
                     server.eventNode().call(new PlayerConfigurationStartEvent(this.player));
                     this.keepAliveHandler.shutdown();
 
@@ -68,13 +79,18 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
                         throw new RuntimeException(exception);
                     }
 
-                    for (JetRegistry<?> registry : server.registryManager().getRegistries().values())
-                        this.player.sendPacket(registry.getPacket());
+                    this.player.sendPacket(new ServerKnownPacksConfigurationPacket(this.requestedDataPacks));
+
+                    try {
+                        this.registryConfigurationLatch.await();
+                    } catch (InterruptedException exception) {
+                        throw new RuntimeException(exception);
+                    }
 
                     this.player.sendServerBrand(server.brandName());
 
                     this.finished = true;
-                    connection.sendPacket(new ServerFinishConfigurationPacket());
+                    player.sendPacket(new ServerFinishConfigurationPacket());
 
                     try {
                         if (!this.acknowledgeLatch.await(TIME_OUT_DURATION, TIME_OUT_UNIT)) {
@@ -127,6 +143,21 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
     }
 
     /**
+     * Handles a client response for a {@linkplain ServerKnownPacksConfigurationPacket known packs packet}.
+     *
+     * @param packet the packet that the client respond with
+     * @since 1.0
+     */
+    public void handleKnownPacks(@NonNull ClientKnownPacksConfigurationPacket packet) {
+        if (this.registryConfigurationLatch.getCount() <= 0)
+            throw new IllegalArgumentException("The known packs response has been already received");
+
+        for (JetRegistry<?> registry : this.player.server().registryManager().getRegistries().values())
+            sendRegistry(registry, packet.dataPacks());
+        this.registryConfigurationLatch.countDown();
+    }
+
+    /**
      * Gets a {@linkplain KeepAliveHandler keep alive handler} of this session.
      *
      * @return the keep alive handler
@@ -134,6 +165,27 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
      */
     public @NonNull KeepAliveHandler keepAliveHandler() {
         return this.keepAliveHandler;
+    }
+
+    private <V> void sendRegistry(@NonNull JetRegistry<V> registry, @NonNull Collection<DataPack> dataPackResponse) {
+        Key registryIdentifier = registry.registryIdentifier();
+        List<ServerRegistryDataConfigurationPacket.Entry> entries = new ArrayList<>();
+
+        for (RegistryEntry<V> entry : registry.entries()) {
+            Key identifier = entry.key();
+            DataPack dataPack = entry.dataPack();
+
+            BinaryTag serializedEntry;
+
+            if (dataPack == null || !dataPackResponse.contains(dataPack))
+                serializedEntry = registry.binaryTagCodec().write(entry.value());
+            else
+                serializedEntry = null; // The client already knows the value of the entry
+
+            entries.add(new ServerRegistryDataConfigurationPacket.Entry(identifier, serializedEntry));
+        }
+
+        this.player.sendPacket(new ServerRegistryDataConfigurationPacket(registryIdentifier, List.copyOf(entries)));
     }
 
     /**

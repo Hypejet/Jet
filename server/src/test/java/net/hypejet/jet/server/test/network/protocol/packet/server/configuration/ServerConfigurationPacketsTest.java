@@ -1,9 +1,9 @@
 package net.hypejet.jet.server.test.network.protocol.packet.server.configuration;
 
+import net.hypejet.jet.data.model.pack.DataPack;
 import net.hypejet.jet.link.ServerLink;
 import net.hypejet.jet.link.label.BuiltinLabel;
 import net.hypejet.jet.link.label.ComponentLabel;
-import net.hypejet.jet.pack.DataPack;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerAddResourcePackConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerCookieRequestConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerCustomLinksConfigurationPacket;

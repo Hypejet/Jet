@@ -2,8 +2,8 @@ package net.hypejet.jet.entity.player;
 
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.command.CommandSource;
+import net.hypejet.jet.data.model.pack.DataPack;
 import net.hypejet.jet.entity.Entity;
-import net.hypejet.jet.pack.DataPack;
 import net.hypejet.jet.protocol.connection.PlayerConnection;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientInformationConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
@@ -75,15 +75,6 @@ public interface Player extends Entity, CommandSource {
      * @since 1.0
      */
     @Nullable String clientBrand();
-
-    /**
-     * Gets a collection of {@linkplain DataPack data packs} that are present on the client.
-     *
-     * @return the collection, empty if the client has no data packs present or the data packs were not loaded yet
-     * @since 1.0
-     * @see DataPack
-     */
-    @NonNull Collection<DataPack> knownDataPacks();
 
     /**
      * Gets a {@linkplain MinecraftServer Minecraft server} that the player is connected to.

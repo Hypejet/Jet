@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.network.protocol.codecs.pack;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.pack.DataPack;
+import net.hypejet.jet.data.model.pack.DataPack;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.CollectionNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.identifier.IdentifierNetworkCodec;
