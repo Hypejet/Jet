@@ -8,9 +8,9 @@ import eu.okaeri.configs.annotation.Header;
 import eu.okaeri.configs.annotation.Headers;
 import eu.okaeri.configs.yaml.snakeyaml.YamlSnakeYamlConfigurer;
 import net.hypejet.jet.configuration.ServerConfiguration;
-import net.hypejet.jet.data.generated.server.DataPacks;
-import net.hypejet.jet.data.model.pack.DataPack;
-import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.data.generated.server.FeaturePacks;
+import net.hypejet.jet.data.generated.server.MinecraftVersionInfo;
+import net.hypejet.jet.data.model.server.pack.FeaturePack;
 import net.hypejet.jet.server.network.transport.NettyTransportSelector;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -68,12 +68,13 @@ public final class JetServerConfiguration extends OkaeriConfig implements Server
     private int maxPlayers = 100;
 
     @Comments({
-            @Comment("Data packs that should be enabled on the server."),
-            @Comment("The data packs add additional functionality on the server and client"),
-            @Comment("Make sure that you put actual Minecraft pack keys here.")
+            @Comment("Feature packs that should be enabled on the server."),
+            @Comment,
+            @Comment("The feature packs add additional functionality on the server and client"),
+            @Comment("Make sure that you put actual Minecraft feature pack keys here.")
     })
     @CustomKey("enabled-packs")
-    private @MonotonicNonNull Set<Key> enabledPacks = createDefaultEnabledPacks();
+    private @MonotonicNonNull Set<Key> enabledFeaturePacks = createDefaultEnabledFeaturePacks();
 
     private JetServerConfiguration() {}
 
@@ -113,23 +114,23 @@ public final class JetServerConfiguration extends OkaeriConfig implements Server
     }
 
     /**
-     * Gets a {@linkplain Set set} of {@linkplain Key keys} of {@linkplain DataPack data packs} that should be enabled
-     * on the server.
+     * Gets a {@linkplain Set set} of {@linkplain Key keys} of {@linkplain FeaturePack feature packs} that should
+     * be enabled on the server.
      *
      * @return the set
      * @since 1.0
      */
-    public @NonNull Set<Key> enabledPacks() {
-        if (this.enabledPacks == null)
-            this.enabledPacks = createDefaultEnabledPacks();
+    public @NonNull Set<Key> enabledFeaturePacks() {
+        if (this.enabledFeaturePacks == null)
+            this.enabledFeaturePacks = createDefaultEnabledFeaturePacks();
 
-        if (!this.enabledPacks.contains(DataPacks.CORE)) {
-            Set<Key> enabledPacks = new HashSet<>(this.enabledPacks);
-            enabledPacks.add(DataPacks.CORE);
-            this.enabledPacks = Set.copyOf(enabledPacks);
+        if (!this.enabledFeaturePacks.contains(FeaturePacks.CORE)) {
+            Set<Key> enabledPacks = new HashSet<>(this.enabledFeaturePacks);
+            enabledPacks.add(FeaturePacks.CORE);
+            this.enabledFeaturePacks = Set.copyOf(enabledPacks);
         }
 
-        return Set.copyOf(this.enabledPacks);
+        return Set.copyOf(this.enabledFeaturePacks);
     }
 
     /**
@@ -190,7 +191,7 @@ public final class JetServerConfiguration extends OkaeriConfig implements Server
     }
 
     private static @NonNull Component createDefaultUnsupportedVersionMessage() {
-        return Component.text("Unsupported version! Please use " + JetMinecraftServer.MINECRAFT_VERSION + ".",
+        return Component.text("Unsupported version! Please use " + MinecraftVersionInfo.VERSION_NAME + ".",
                 NamedTextColor.DARK_RED, TextDecoration.BOLD);
     }
 
@@ -202,7 +203,7 @@ public final class JetServerConfiguration extends OkaeriConfig implements Server
         return "0.0.0.0";
     }
 
-    private static @NonNull Set<Key> createDefaultEnabledPacks() {
-        return Set.of(DataPacks.CORE);
+    private static @NonNull Set<Key> createDefaultEnabledFeaturePacks() {
+        return Set.of(FeaturePacks.CORE);
     }
 }

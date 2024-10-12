@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.registry.codecs.registry.dimension;
 
-import net.hypejet.jet.data.model.number.IntegerProvider;
-import net.hypejet.jet.data.model.registry.registries.dimension.DimensionType;
+import net.hypejet.jet.data.model.api.number.IntegerProvider;
+import net.hypejet.jet.data.model.api.registry.registries.dimension.DimensionType;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.identifier.PackedIdentifierBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.identifier.TagIdentifierBinaryTagCodec;

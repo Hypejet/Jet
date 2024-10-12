@@ -1,6 +1,6 @@
 package net.hypejet.jet.world;
 
-import net.hypejet.jet.data.model.coordinate.Coordinate;
+import net.hypejet.jet.data.model.api.coordinate.Coordinate;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.world.chunk.Chunk;
 import net.hypejet.jet.world.chunk.ChunkPosition;

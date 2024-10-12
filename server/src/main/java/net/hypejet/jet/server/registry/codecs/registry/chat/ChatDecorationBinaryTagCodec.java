@@ -1,8 +1,8 @@
 package net.hypejet.jet.server.registry.codecs.registry.chat;
 
 import net.hypejet.jet.data.codecs.util.mapper.Mapper;
-import net.hypejet.jet.data.model.registry.registries.chat.decoration.ChatDecoration;
-import net.hypejet.jet.data.model.registry.registries.chat.decoration.ChatDecorationParameter;
+import net.hypejet.jet.data.model.api.registry.registries.chat.decoration.ChatDecoration;
+import net.hypejet.jet.data.model.api.registry.registries.chat.decoration.ChatDecorationParameter;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.mapper.MapperBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.registry.component.StyleBinaryTagCodec;
@@ -10,7 +10,6 @@ import net.hypejet.jet.server.util.BinaryTagUtil;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.ListBinaryTag;
-import net.kyori.adventure.nbt.StringBinaryTag;
 import net.kyori.adventure.text.format.Style;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

@@ -1,9 +1,9 @@
 package net.hypejet.jet.server.registry;
 
-import net.hypejet.jet.data.model.pack.DataPack;
-import net.hypejet.jet.data.model.pack.info.PackInfo;
-import net.hypejet.jet.data.model.registry.DataRegistryEntry;
-import net.hypejet.jet.data.model.utils.NullabilityUtil;
+import net.hypejet.jet.data.model.api.pack.PackInfo;
+import net.hypejet.jet.data.model.api.registry.DataRegistryEntry;
+import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.data.model.server.pack.FeaturePack;
 import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.kyori.adventure.key.Key;
@@ -37,11 +37,12 @@ public class JetRegistry<V> {
      * @param entryValueClass a class of values of entries of the registry
      * @param server a server, on which the registry is registered
      * @param entries a collection of registry entries, which should be put into the registry
-     * @param enabledDataPacks data packs, which are enabled on the server
+     * @param enabledFeaturePacks feature packs, which are enabled on the server
      * @since 1.0
      */
     public JetRegistry(@NonNull Class<V> entryValueClass, @NonNull JetMinecraftServer server,
-                       @NonNull Collection<DataRegistryEntry<V>> entries, @NonNull Set<DataPack> enabledDataPacks) {
+                       @NonNull Collection<DataRegistryEntry<V>> entries,
+                       @NonNull Set<FeaturePack> enabledFeaturePacks) {
         NullabilityUtil.requireNonNull(server, "server");
         NullabilityUtil.requireNonNull(entries, "entries");
 
@@ -49,16 +50,16 @@ public class JetRegistry<V> {
 
         Map<Key, JetRegistryEntry<V>> keyToRegistryEntryMap = new HashMap<>();
 
-        Set<PackInfo> enabledDataPackInfos = new HashSet<>();
-        for (DataPack enabledDataPack : enabledDataPacks)
-            enabledDataPackInfos.add(enabledDataPack.info());
+        Set<PackInfo> enabledFeaturePackInfos = new HashSet<>();
+        for (FeaturePack enabledDataPack : enabledFeaturePacks)
+            enabledFeaturePackInfos.add(enabledDataPack.info());
 
         for (DataRegistryEntry<V> entry : entries) {
             Key key = entry.key();
             V value = entry.value();
 
             PackInfo knownPackInfo = entry.knownPackInfo();
-            if (knownPackInfo != null && !enabledDataPackInfos.contains(knownPackInfo)) continue;
+            if (knownPackInfo != null && !enabledFeaturePackInfos.contains(knownPackInfo)) continue;
 
             keyToRegistryEntryMap.put(entry.key(), new JetRegistryEntry<>(key, value, knownPackInfo));
         }

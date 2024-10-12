@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.registry.codecs.registry.armor.pattern;
 
-import net.hypejet.jet.data.model.registry.registries.armor.pattern.ArmorTrimPattern;
+import net.hypejet.jet.data.model.api.registry.registries.armor.pattern.ArmorTrimPattern;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.identifier.PackedIdentifierBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.registry.component.ComponentBinaryTagCodec;

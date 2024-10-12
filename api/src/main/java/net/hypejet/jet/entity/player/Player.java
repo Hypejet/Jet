@@ -2,7 +2,6 @@ package net.hypejet.jet.entity.player;
 
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.command.CommandSource;
-import net.hypejet.jet.data.model.pack.DataPack;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.protocol.connection.PlayerConnection;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientInformationConfigurationPacket;

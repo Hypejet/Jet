@@ -10,28 +10,28 @@ import net.hypejet.jet.data.generated.api.DamageTypes;
 import net.hypejet.jet.data.generated.api.DimensionTypes;
 import net.hypejet.jet.data.generated.api.PaintingVariants;
 import net.hypejet.jet.data.generated.api.WolfVariants;
-import net.hypejet.jet.data.generated.server.DataPacks;
-import net.hypejet.jet.data.model.pack.DataPack;
-import net.hypejet.jet.data.model.registry.DataRegistryEntry;
-import net.hypejet.jet.data.model.registry.registries.armor.material.ArmorTrimMaterial;
-import net.hypejet.jet.data.model.registry.registries.armor.material.ArmorTrimMaterialDataRegistryEntry;
-import net.hypejet.jet.data.model.registry.registries.armor.pattern.ArmorTrimPattern;
-import net.hypejet.jet.data.model.registry.registries.armor.pattern.ArmorTrimPatternDataRegistryEntry;
-import net.hypejet.jet.data.model.registry.registries.banner.BannerPattern;
-import net.hypejet.jet.data.model.registry.registries.banner.BannerPatternDataRegistryEntry;
-import net.hypejet.jet.data.model.registry.registries.biome.Biome;
-import net.hypejet.jet.data.model.registry.registries.biome.BiomeDataRegistryEntry;
-import net.hypejet.jet.data.model.registry.registries.chat.ChatType;
-import net.hypejet.jet.data.model.registry.registries.chat.ChatTypeDataRegistryEntry;
-import net.hypejet.jet.data.model.registry.registries.damage.DamageType;
-import net.hypejet.jet.data.model.registry.registries.damage.DamageTypeDataRegistryEntry;
-import net.hypejet.jet.data.model.registry.registries.datapack.DataPackDataRegistryEntry;
-import net.hypejet.jet.data.model.registry.registries.dimension.DimensionType;
-import net.hypejet.jet.data.model.registry.registries.dimension.DimensionTypeDataRegistryEntry;
-import net.hypejet.jet.data.model.registry.registries.painting.PaintingVariant;
-import net.hypejet.jet.data.model.registry.registries.painting.PaintingVariantDataRegistryEntry;
-import net.hypejet.jet.data.model.registry.registries.wolf.WolfVariant;
-import net.hypejet.jet.data.model.registry.registries.wolf.WolfVariantDataRegistryEntry;
+import net.hypejet.jet.data.generated.server.FeaturePacks;
+import net.hypejet.jet.data.model.api.registry.DataRegistryEntry;
+import net.hypejet.jet.data.model.api.registry.registries.armor.material.ArmorTrimMaterial;
+import net.hypejet.jet.data.model.api.registry.registries.armor.material.ArmorTrimMaterialDataRegistryEntry;
+import net.hypejet.jet.data.model.api.registry.registries.armor.pattern.ArmorTrimPattern;
+import net.hypejet.jet.data.model.api.registry.registries.armor.pattern.ArmorTrimPatternDataRegistryEntry;
+import net.hypejet.jet.data.model.api.registry.registries.banner.BannerPattern;
+import net.hypejet.jet.data.model.api.registry.registries.banner.BannerPatternDataRegistryEntry;
+import net.hypejet.jet.data.model.api.registry.registries.biome.Biome;
+import net.hypejet.jet.data.model.api.registry.registries.biome.BiomeDataRegistryEntry;
+import net.hypejet.jet.data.model.api.registry.registries.chat.ChatType;
+import net.hypejet.jet.data.model.api.registry.registries.chat.ChatTypeDataRegistryEntry;
+import net.hypejet.jet.data.model.api.registry.registries.damage.DamageType;
+import net.hypejet.jet.data.model.api.registry.registries.damage.DamageTypeDataRegistryEntry;
+import net.hypejet.jet.data.model.api.registry.registries.dimension.DimensionType;
+import net.hypejet.jet.data.model.api.registry.registries.dimension.DimensionTypeDataRegistryEntry;
+import net.hypejet.jet.data.model.api.registry.registries.painting.PaintingVariant;
+import net.hypejet.jet.data.model.api.registry.registries.painting.PaintingVariantDataRegistryEntry;
+import net.hypejet.jet.data.model.api.registry.registries.wolf.WolfVariant;
+import net.hypejet.jet.data.model.api.registry.registries.wolf.WolfVariantDataRegistryEntry;
+import net.hypejet.jet.data.model.server.pack.FeaturePack;
+import net.hypejet.jet.data.model.server.registry.registries.pack.FeaturePackRegistryEntry;
 import net.hypejet.jet.registry.RegistryManager;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.registry.codecs.registry.armor.material.ArmorTrimMaterialBinaryTagCodec;
@@ -66,7 +66,7 @@ import java.util.Set;
 public final class JetRegistryManager implements RegistryManager {
 
     private final Map<Key, JetSerializableMinecraftRegistry<?>> registries;
-    private final Set<DataPack> enabledDataPacks;
+    private final Set<FeaturePack> enabledFeaturePacks;
 
     /**
      * Constructs the {@linkplain JetRegistryManager registry manager}.
@@ -75,70 +75,70 @@ public final class JetRegistryManager implements RegistryManager {
      * @since 1.0
      */
     public JetRegistryManager(@NonNull JetMinecraftServer server) {
-        Set<DataRegistryEntry<DataPack>> dataPackEntries = getEntries(
-                DataPackDataRegistryEntry.class,
-                DataPacks.SPEC_JSON_FILE_NAME
+        Set<DataRegistryEntry<FeaturePack>> dataPackEntries = getEntries(
+                FeaturePackRegistryEntry.class,
+                FeaturePacks.RESOURCE_FILE_NAME
         );
 
         Logger logger = LoggerFactory.getLogger(JetRegistryManager.class);
-        Set<DataPack> enabledDataPacks = new HashSet<>();
+        Set<FeaturePack> enabledFeaturePacks = new HashSet<>();
 
-        for (Key packKey : server.configuration().enabledPacks()) {
-            DataRegistryEntry<DataPack> entry = null;
+        for (Key packKey : server.configuration().enabledFeaturePacks()) {
+            DataRegistryEntry<FeaturePack> entry = null;
 
-            for (DataRegistryEntry<DataPack> dataPackEntry : dataPackEntries) {
-                if (!dataPackEntry.key().equals(packKey)) continue;
-                entry = dataPackEntry;
+            for (DataRegistryEntry<FeaturePack> featurePackEntry : dataPackEntries) {
+                if (!featurePackEntry.key().equals(packKey)) continue;
+                entry = featurePackEntry;
             }
 
             if (entry == null) {
-                logger.warn("Could not find a data pack with key of \"{}\", skipping...", packKey);
+                logger.warn("Could not find a feature pack with key of \"{}\", skipping...", packKey);
                 continue;
             }
 
-            enabledDataPacks.add(entry.value());
-            logger.info("Enabled data pack with key of \"{}\"", packKey);
+            enabledFeaturePacks.add(entry.value());
+            logger.info("Enabled feature pack with key of \"{}\"", packKey);
         }
 
-        this.enabledDataPacks = Set.copyOf(enabledDataPacks);
+        this.enabledFeaturePacks = Set.copyOf(enabledFeaturePacks);
 
         Set<JetSerializableMinecraftRegistry<?>> registrySet = Set.of(
                 new JetSerializableMinecraftRegistry<>(Key.key("worldgen/biome"),
                         Biome.class, server, BiomeBinaryTagCodec.instance(),
-                        getEntries(BiomeDataRegistryEntry.class, Biomes.SPEC_JSON_FILE_NAME),
-                        this.enabledDataPacks),
+                        getEntries(BiomeDataRegistryEntry.class, Biomes.RESOURCE_FILE_NAME),
+                        this.enabledFeaturePacks),
                 new JetSerializableMinecraftRegistry<>(Key.key("dimension_type"),
                         DimensionType.class, server, DimensionTypeBinaryTagCodec.instance(),
-                        getEntries(DimensionTypeDataRegistryEntry.class, DimensionTypes.SPEC_JSON_FILE_NAME),
-                        this.enabledDataPacks),
+                        getEntries(DimensionTypeDataRegistryEntry.class, DimensionTypes.RESOURCE_FILE_NAME),
+                        this.enabledFeaturePacks),
                 new JetSerializableMinecraftRegistry<>(Key.key("painting_variant"),
                         PaintingVariant.class, server, PaintingVariantBinaryTagCodec.instance(),
-                        getEntries(PaintingVariantDataRegistryEntry.class, PaintingVariants.SPEC_JSON_FILE_NAME),
-                        this.enabledDataPacks),
+                        getEntries(PaintingVariantDataRegistryEntry.class, PaintingVariants.RESOURCE_FILE_NAME),
+                        this.enabledFeaturePacks),
                 new JetSerializableMinecraftRegistry<>(Key.key("banner_pattern"),
                         BannerPattern.class, server, BannerPatternBinaryTagCodec.instance(),
-                        getEntries(BannerPatternDataRegistryEntry.class, BannerPatterns.SPEC_JSON_FILE_NAME),
-                        this.enabledDataPacks),
+                        getEntries(BannerPatternDataRegistryEntry.class, BannerPatterns.RESOURCE_FILE_NAME),
+                        this.enabledFeaturePacks),
                 new JetSerializableMinecraftRegistry<>(Key.key("trim_material"),
                         ArmorTrimMaterial.class, server, ArmorTrimMaterialBinaryTagCodec.instance(),
-                        getEntries(ArmorTrimMaterialDataRegistryEntry.class, ArmorTrimMaterials.SPEC_JSON_FILE_NAME),
-                        this.enabledDataPacks),
+                        getEntries(ArmorTrimMaterialDataRegistryEntry.class, ArmorTrimMaterials.RESOURCE_FILE_NAME),
+                        this.enabledFeaturePacks),
                 new JetSerializableMinecraftRegistry<>(Key.key("trim_pattern"),
                         ArmorTrimPattern.class, server, ArmorTrimPatternBinaryTagCodec.instance(),
-                        getEntries(ArmorTrimPatternDataRegistryEntry.class, ArmorTrimPatterns.SPEC_JSON_FILE_NAME),
-                        this.enabledDataPacks),
+                        getEntries(ArmorTrimPatternDataRegistryEntry.class, ArmorTrimPatterns.RESOURCE_FILE_NAME),
+                        this.enabledFeaturePacks),
                 new JetSerializableMinecraftRegistry<>(Key.key("chat_type"),
                         ChatType.class, server, ChatTypeBinaryTagCodec.instance(),
-                        getEntries(ChatTypeDataRegistryEntry.class, ChatTypes.SPEC_JSON_FILE_NAME),
-                        this.enabledDataPacks),
+                        getEntries(ChatTypeDataRegistryEntry.class, ChatTypes.RESOURCE_FILE_NAME),
+                        this.enabledFeaturePacks),
                 new JetSerializableMinecraftRegistry<>(Key.key("damage_type"),
                         DamageType.class, server, DamageTypeBinaryTagCodec.instance(),
-                        getEntries(DamageTypeDataRegistryEntry.class, DamageTypes.SPEC_JSON_FILE_NAME),
-                        this.enabledDataPacks),
+                        getEntries(DamageTypeDataRegistryEntry.class, DamageTypes.RESOURCE_FILE_NAME),
+                        this.enabledFeaturePacks),
                 new JetSerializableMinecraftRegistry<>(Key.key("wolf_variant"),
                         WolfVariant.class, server, WolfVariantBinaryTagCodec.instance(),
-                        getEntries(WolfVariantDataRegistryEntry.class, WolfVariants.SPEC_JSON_FILE_NAME),
-                        this.enabledDataPacks)
+                        getEntries(WolfVariantDataRegistryEntry.class, WolfVariants.RESOURCE_FILE_NAME),
+                        this.enabledFeaturePacks)
         );
 
         Map<Key, JetSerializableMinecraftRegistry<?>> registries = new HashMap<>();
@@ -157,13 +157,13 @@ public final class JetRegistryManager implements RegistryManager {
     }
 
     /**
-     * Gets a {@linkplain Set set} of enabled {@linkplain DataPack data packs}.
+     * Gets a {@linkplain Set set} of enabled {@linkplain FeaturePack feature packs}.
      *
      * @return the set
      * @since 1.0
      */
-    public @NonNull Set<DataPack> enabledDataPacks() {
-        return this.enabledDataPacks;
+    public @NonNull Set<FeaturePack> enabledDataPacks() {
+        return this.enabledFeaturePacks;
     }
 
     private static <E> Set<DataRegistryEntry<E>> getEntries(@NonNull Class<? extends DataRegistryEntry<E>> entryClass,

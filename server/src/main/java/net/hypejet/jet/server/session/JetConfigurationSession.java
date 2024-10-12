@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.session;
 
-import net.hypejet.jet.data.model.pack.DataPack;
-import net.hypejet.jet.data.model.pack.info.PackInfo;
+import net.hypejet.jet.data.model.api.pack.PackInfo;
+import net.hypejet.jet.data.model.server.pack.FeaturePack;
 import net.hypejet.jet.event.events.player.configuration.PlayerConfigurationStartEvent;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientKnownPacksConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerFeatureFlagsConfigurationPacket;
@@ -67,7 +67,7 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
         this.keepAliveHandler = new KeepAliveHandler(player, this, ServerKeepAliveConfigurationPacket::new);
 
         JetMinecraftServer server = player.server();
-        Set<DataPack> dataPacks = server.registryManager().enabledDataPacks();
+        Set<FeaturePack> featurePacks = server.registryManager().enabledDataPacks();
 
         Thread.ofVirtual()
                 .uncaughtExceptionHandler(this)
@@ -82,12 +82,12 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
                     }
 
                     Set<Key> featureFlags = new HashSet<>();
-                    for (DataPack dataPack : dataPacks)
-                        featureFlags.addAll(dataPack.requiredFeatureFlags());
+                    for (FeaturePack featurePack : featurePacks)
+                        featureFlags.addAll(featurePack.requiredFeatureFlags());
                     this.player.sendPacket(new ServerFeatureFlagsConfigurationPacket(Set.copyOf(featureFlags)));
 
                     Set<PackInfo> packInfos = new HashSet<>();
-                    dataPacks.forEach(dataPack -> packInfos.add(dataPack.info()));
+                    featurePacks.forEach(dataPack -> packInfos.add(dataPack.info()));
                     this.player.sendPacket(new ServerKnownPacksConfigurationPacket(Set.copyOf(packInfos)));
 
                     try {
@@ -164,7 +164,7 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
         this.player.server().registryManager()
                 .getRegistries()
                 .values()
-                .forEach(registry -> sendRegistry(registry, packet.dataPacks()));
+                .forEach(registry -> sendRegistry(registry, packet.featurePacks()));
         this.registryConfigurationLatch.countDown();
     }
 

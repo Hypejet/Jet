@@ -1,6 +1,7 @@
 package net.hypejet.jet.server;
 
 import net.hypejet.jet.MinecraftServer;
+import net.hypejet.jet.data.generated.server.MinecraftVersionInfo;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.server.ServerReadyEvent;
 import net.hypejet.jet.event.events.server.ServerShutdownEvent;
@@ -34,10 +35,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public final class JetMinecraftServer implements MinecraftServer {
 
     private static final String BRAND_NAME = "Jet";
-
-    private static final int PROTOCOL_VERSION = 767;
-    public static final String MINECRAFT_VERSION = "1.21";
-
     private static final Logger LOGGER  = LoggerFactory.getLogger(JetMinecraftServer.class);
 
     private final EventNode<Object> eventNode = EventNode.create();
@@ -77,12 +74,12 @@ public final class JetMinecraftServer implements MinecraftServer {
 
     @Override
     public int protocolVersion() {
-        return PROTOCOL_VERSION;
+        return MinecraftVersionInfo.PROTOCOL_VERSION;
     }
 
     @Override
     public @NonNull String minecraftVersion() {
-        return MINECRAFT_VERSION;
+        return MinecraftVersionInfo.VERSION_NAME;
     }
 
     @Override

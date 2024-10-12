@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.registry.codecs.registry.banner;
 
-import net.hypejet.jet.data.model.registry.registries.banner.BannerPattern;
+import net.hypejet.jet.data.model.api.registry.registries.banner.BannerPattern;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.identifier.PackedIdentifierBinaryTagCodec;
 import net.hypejet.jet.server.util.BinaryTagUtil;

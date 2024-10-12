@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.registry.codecs.registry.chat;
 
-import net.hypejet.jet.data.model.registry.registries.chat.ChatType;
+import net.hypejet.jet.data.model.api.registry.registries.chat.ChatType;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
 import net.hypejet.jet.server.util.BinaryTagUtil;
 import net.kyori.adventure.nbt.BinaryTag;

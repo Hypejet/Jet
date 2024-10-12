@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.network.protocol.codecs.pack;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.data.model.pack.info.PackInfo;
+import net.hypejet.jet.data.model.api.pack.PackInfo;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.CollectionNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.identifier.IdentifierNetworkCodec;
@@ -35,7 +35,7 @@ public final class PackInfoNetworkCodec implements NetworkCodec<PackInfo> {
     }
 
     /**
-     * Gets an instance of the {@linkplain PackInfoNetworkCodec data pack network codec}.
+     * Gets an instance of the {@linkplain PackInfoNetworkCodec pack info network codec}.
      *
      * @return the instance
      * @since 1.0
@@ -46,7 +46,7 @@ public final class PackInfoNetworkCodec implements NetworkCodec<PackInfo> {
 
     /**
      * Gets an instance of a {@linkplain CollectionNetworkCodec collection network codec}, which reads and writes
-     * {@linkplain java.util.Collection collections} of {@linkplain PackInfo data packs}.
+     * {@linkplain java.util.Collection collections} of {@linkplain PackInfo pack infos}.
      *
      * @return the instance
      * @since 1.0

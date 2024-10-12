@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.registry.codecs.number;
 
-import net.hypejet.jet.data.model.number.IntegerProvider;
+import net.hypejet.jet.data.model.api.number.IntegerProvider;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;

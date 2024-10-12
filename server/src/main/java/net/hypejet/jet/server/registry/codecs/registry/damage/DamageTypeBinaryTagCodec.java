@@ -1,10 +1,10 @@
 package net.hypejet.jet.server.registry.codecs.registry.damage;
 
 import net.hypejet.jet.data.codecs.util.mapper.Mapper;
-import net.hypejet.jet.data.model.registry.registries.damage.DamageEffectType;
-import net.hypejet.jet.data.model.registry.registries.damage.DamageScalingType;
-import net.hypejet.jet.data.model.registry.registries.damage.DamageType;
-import net.hypejet.jet.data.model.registry.registries.damage.DeathMessageType;
+import net.hypejet.jet.data.model.api.registry.registries.damage.DamageEffectType;
+import net.hypejet.jet.data.model.api.registry.registries.damage.DamageScalingType;
+import net.hypejet.jet.data.model.api.registry.registries.damage.DamageType;
+import net.hypejet.jet.data.model.api.registry.registries.damage.DeathMessageType;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.mapper.MapperBinaryTagCodec;
 import net.hypejet.jet.server.util.BinaryTagUtil;

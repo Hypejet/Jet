@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.registry.codecs;
 
-import net.hypejet.jet.data.model.color.Color;
+import net.hypejet.jet.data.model.api.color.Color;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.IntBinaryTag;

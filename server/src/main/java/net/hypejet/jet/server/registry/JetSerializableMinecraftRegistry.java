@@ -1,8 +1,8 @@
 package net.hypejet.jet.server.registry;
 
-import net.hypejet.jet.data.model.pack.DataPack;
-import net.hypejet.jet.data.model.registry.DataRegistryEntry;
-import net.hypejet.jet.data.model.utils.NullabilityUtil;
+import net.hypejet.jet.data.model.api.registry.DataRegistryEntry;
+import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.data.model.server.pack.FeaturePack;
 import net.hypejet.jet.event.events.registry.RegistryInitializeEvent;
 import net.hypejet.jet.registry.MinecraftRegistry;
 import net.hypejet.jet.registry.RegistryEntry;
@@ -47,17 +47,17 @@ public final class JetSerializableMinecraftRegistry<V> extends JetRegistry<V> im
      * @param server a server, on which the registry is registered
      * @param binaryTagCodec a binary tag codec, which reads and writes the registry entry
      * @param builtInEntries a collection of registry entry data, which should be enabled by default
-     * @param enabledDataPacks data packs, which are enabled on the server
+     * @param enabledFeaturePacks feature packs, which are enabled on the server
      * @since 1.0
      */
     public JetSerializableMinecraftRegistry(@NonNull Key identifier, @NonNull Class<V> entryValueClass,
                                             @NonNull JetMinecraftServer server,
                                             @NonNull BinaryTagCodec<V> binaryTagCodec,
                                             @NonNull Collection<DataRegistryEntry<V>> builtInEntries,
-                                            @NonNull Set<DataPack> enabledDataPacks) {
+                                            @NonNull Set<FeaturePack> enabledFeaturePacks) {
         super(entryValueClass, server,
                 prepareValues(identifier, entryValueClass, server, builtInEntries),
-                enabledDataPacks);
+                enabledFeaturePacks);
 
         this.registryIdentifier = identifier;
         this.binaryTagCodec = NullabilityUtil.requireNonNull(binaryTagCodec, "binary tag codec");

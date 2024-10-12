@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.network.protocol.codecs.other;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.data.model.coordinate.Position;
+import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

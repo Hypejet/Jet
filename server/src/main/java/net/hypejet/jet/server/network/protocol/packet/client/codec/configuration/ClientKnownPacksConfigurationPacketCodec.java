@@ -36,7 +36,7 @@ public final class ClientKnownPacksConfigurationPacketCodec
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ClientKnownPacksConfigurationPacket object) {
-        PackInfoNetworkCodec.collectionCodec().write(buf, object.dataPacks());
+        PackInfoNetworkCodec.collectionCodec().write(buf, object.featurePacks());
     }
 
     @Override

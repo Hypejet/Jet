@@ -1,6 +1,6 @@
 package net.hypejet.jet.registry;
 
-import net.hypejet.jet.data.model.pack.info.PackInfo;
+import net.hypejet.jet.data.model.api.pack.PackInfo;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -33,9 +33,9 @@ public interface RegistryEntry<V> extends Keyed {
     @NonNull V value();
 
     /**
-     * Gets an information of a data pack, which enables this entry.
+     * Gets an information of a feature pack, which enables this entry.
      *
-     * @return the data pack, {@code null} if no data packs enable the entry
+     * @return the feature pack, {@code null} if no feature packs enable the entry
      * @since 1.0
      */
     @Nullable PackInfo knownPackInfo();

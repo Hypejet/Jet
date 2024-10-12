@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.registry.codecs.registry.wolf;
 
-import net.hypejet.jet.data.model.registry.registries.wolf.WolfVariant;
+import net.hypejet.jet.data.model.api.registry.registries.wolf.WolfVariant;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.identifier.PackedIdentifierBinaryTagCodec;
 import net.hypejet.jet.server.util.BinaryTagUtil;

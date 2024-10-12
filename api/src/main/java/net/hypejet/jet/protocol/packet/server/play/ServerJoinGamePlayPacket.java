@@ -1,6 +1,6 @@
 package net.hypejet.jet.protocol.packet.server.play;
 
-import net.hypejet.jet.data.model.coordinate.BlockPosition;
+import net.hypejet.jet.data.model.api.coordinate.BlockPosition;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.protocol.packet.server.ServerPlayPacket;
 import net.kyori.adventure.key.Key;

@@ -1,6 +1,6 @@
 package net.hypejet.jet.protocol.packet.server.play;
 
-import net.hypejet.jet.data.model.coordinate.Position;
+import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.protocol.packet.server.ServerPlayPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
