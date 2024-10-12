@@ -206,6 +206,33 @@ public interface Player extends Entity, CommandSource {
     }
 
     /**
+     * Represents a particle settings of a {@linkplain Player player}.
+     *
+     * @since 1.0
+     * @author Codestech
+     */
+    enum ParticleStatus {
+        /**
+         * A particle status indicating that all particles should be shown.
+         *
+         * @since 1.0
+         */
+        ALL,
+        /**
+         * A particle status indicating that decreased amount of particles should be shown.
+         *
+         * @since 1.0
+         */
+        DECREASED,
+        /**
+         * A particle status indicating that minimal amount of particles should be shown.
+         *
+         * @since 1.0
+         */
+        MINIMAL
+    }
+
+    /**
      * Represents a settings of a {@linkplain Player player}.
      *
      * @param locale a locale of the player
@@ -216,11 +243,13 @@ public interface Player extends Entity, CommandSource {
      * @param mainHand a main hand of the player
      * @param textFilteringEnabled whether the text filtering on signs and written books is enabled
      * @param allowServerListings whether the player should be listed on players lists
+     * @param particleStatus a particle settings of the player
      * @since 1.0
      */
     record Settings(@NonNull Locale locale, byte viewDistance, Player.@NonNull ChatMode chatMode,
                     boolean chatColorsEnabled, @NonNull Collection<Player.SkinPart> enabledSkinParts,
-                    Entity.@NonNull Hand mainHand, boolean textFilteringEnabled, boolean allowServerListings) {
+                    Entity.@NonNull Hand mainHand, boolean textFilteringEnabled, boolean allowServerListings,
+                    @NonNull ParticleStatus particleStatus) {
         /**
          * Constructs the {@linkplain ClientInformationConfigurationPacket information configuration packet}.
          *
@@ -232,6 +261,7 @@ public interface Player extends Entity, CommandSource {
          * @param mainHand a main hand of the player
          * @param textFilteringEnabled whether the text filtering on signs and written books is enabled
          * @param allowServerListings whether the player should be listed on players lists
+         * @param particleStatus a particle settings of the player
          * @since 1.0
          */
         public Settings {

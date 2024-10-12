@@ -45,8 +45,7 @@ public final class ServerLoginPacketsTest {
                 UUID.randomUUID(),
                 "A-Player",
                 List.of(new ServerLoginSuccessLoginPacket.Property("a-key", "a-value", null),
-                        new ServerLoginSuccessLoginPacket.Property("some-key", "the-value", "a-signature")),
-                true
+                        new ServerLoginSuccessLoginPacket.Property("some-key", "the-value", "a-signature"))
         ));
     }
 
