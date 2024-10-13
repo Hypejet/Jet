@@ -31,6 +31,7 @@ public final class ClientPacketIdentifiers {
 
     public static final int PLAY_CONFIRM_TELEPORTATION = nextPlayId();
     public static final int PLAY_QUERY_BLOCK_ENTITY_TAG = nextPlayId();
+    public static final int PLAY_BUNDLE_ITEM_SELECTED = nextPlayId();
     public static final int PLAY_CHANGE_DIFFICULTY = nextPlayId();
     public static final int PLAY_ACKNOWLEDGE_MESSAGE = nextPlayId();
     public static final int PLAY_CHAT_COMMAND = nextPlayId();
@@ -39,6 +40,7 @@ public final class ClientPacketIdentifiers {
     public static final int PLAY_PLAYER_SESSION = nextPlayId();
     public static final int PLAY_CHUNK_BATCH_RECEIVED = nextPlayId();
     public static final int PLAY_CLIENT_REQUEST_ACTION = nextPlayId();
+    public static final int PLAY_CLIENT_END_TICK = nextPlayId();
     public static final int PLAY_CLIENT_INFORMATION = nextPlayId();
     public static final int PLAY_SUGGESTIONS_REQUEST = nextPlayId();
     public static final int PLAY_ACKNOWLEDGE_CONFIGURATION = nextPlayId();

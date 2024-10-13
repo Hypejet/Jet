@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.play;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.play.ClientQueryBlockEntityTagPacket;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.other.BlockPositionNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.coordinate.BlockPositionNetworkCodec;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;

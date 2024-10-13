@@ -6,7 +6,7 @@ import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.protocol.packet.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.server.network.protocol.codecs.identifier.PackedIdentifierNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.other.BlockPositionNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.coordinate.BlockPositionNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
 import net.hypejet.jet.server.util.gamemode.GameModeUtil;
@@ -81,12 +81,13 @@ public final class ServerJoinGamePlayPacketCodec extends PacketCodec<ServerJoinG
         }
 
         int portalCooldown = VarIntNetworkCodec.instance().read(buf);
+        int seaLevel = VarIntNetworkCodec.instance().read(buf);
         boolean enforcesSecureChat = buf.readBoolean();
 
         return new ServerJoinGamePlayPacket(entityId, hardcore, dimensions, maxPlayers, viewDistance,
                 simulationDistance, reducedDebugInfo, enableRespawnScreen, limitedCrafting, dimensionType,
                 dimensionName, hashedSeed, gameMode, previousGameMode, debug, flat, deathLocation,
-                portalCooldown, enforcesSecureChat);
+                portalCooldown, seaLevel, enforcesSecureChat);
     }
 
     @Override
@@ -129,6 +130,7 @@ public final class ServerJoinGamePlayPacketCodec extends PacketCodec<ServerJoinG
         }
 
         VarIntNetworkCodec.instance().write(buf, object.portalCooldown());
+        VarIntNetworkCodec.instance().write(buf, object.seaLevel());
         buf.writeBoolean(object.enforcesSecureChat());
     }
 }

@@ -35,7 +35,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public final class JetMinecraftServer implements MinecraftServer {
 
     private static final String BRAND_NAME = "Jet";
-    private static final Logger LOGGER  = LoggerFactory.getLogger(JetMinecraftServer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JetMinecraftServer.class);
 
     private final EventNode<Object> eventNode = EventNode.create();
     private final JetServerConfiguration configuration;

@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.network.protocol.codecs.other;
+package net.hypejet.jet.server.network.protocol.codecs.coordinate;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.data.model.api.coordinate.BlockPosition;

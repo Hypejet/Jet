@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.session;
 
-import net.hypejet.jet.data.model.api.coordinate.Position;
+import net.hypejet.jet.data.model.api.coordinate.Vector;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.protocol.packet.server.play.ServerCenterChunkPlayPacket;
 import net.hypejet.jet.protocol.packet.server.play.ServerChunkAndLightDataPlayPacket;
@@ -65,7 +65,7 @@ public final class JetPlaySession implements Session<JetPlaySession>, SessionHan
                 Collections.singleton(overworld), 20, 5, 5,
                 false, true, false, 0, overworld,
                 0, Player.GameMode.SURVIVAL, null, false, true,
-                null, 2, false));
+                null, 2, 0, false));
 
         player.sendPacket(new ServerGameEventPlayPacket(GameEvent.waitForWorldChunks()));
         player.sendPacket(new ServerCenterChunkPlayPacket(0, 0));
@@ -112,7 +112,8 @@ public final class JetPlaySession implements Session<JetPlaySession>, SessionHan
             }
         }
 
-        player.sendPacket(new ServerSynchronizePositionPlayPacket(new Position(8.5, 16, 8.5, 0f, 0f), Set.of(), 0));
+        player.sendPacket(new ServerSynchronizePositionPlayPacket(0, new Vector(8.5, 16, 8.5),
+                new Vector(0, 0, 0), 0, 0, Set.of()));
         player.sendPacket(player.connection().server().commandManager().createDeclarationPacket());
     }
 

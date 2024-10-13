@@ -4,8 +4,8 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.play.ServerSynchronizePositionPlayPacket;
 import net.hypejet.jet.protocol.packet.server.play.ServerSynchronizePositionPlayPacket.RelativeFlag;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.coordinate.VectorNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.other.PositionNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -39,18 +39,20 @@ public final class ServerSynchronizePositionPlayPacketCodec extends PacketCodec<
 
     @Override
     public @NonNull ServerSynchronizePositionPlayPacket read(@NonNull ByteBuf buf) {
-        return new ServerSynchronizePositionPlayPacket(
-                PositionNetworkCodec.instance().read(buf),
-                FLAG_CODEC.read(buf),
-                VarIntNetworkCodec.instance().read(buf)
+        return new ServerSynchronizePositionPlayPacket(VarIntNetworkCodec.instance().read(buf),
+                VectorNetworkCodec.instance().read(buf), VectorNetworkCodec.instance().read(buf),
+                buf.readFloat(), buf.readFloat(), FLAG_CODEC.read(buf)
         );
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerSynchronizePositionPlayPacket object) {
-        PositionNetworkCodec.instance().write(buf, object.position());
-        FLAG_CODEC.write(buf, object.relativeFlags());
         VarIntNetworkCodec.instance().write(buf, object.teleportId());
+        VectorNetworkCodec.instance().write(buf, object.position());
+        VectorNetworkCodec.instance().write(buf, object.deltaMovement());
+        buf.writeFloat(object.yaw());
+        buf.writeFloat(object.pitch());
+        FLAG_CODEC.write(buf, object.relativeFlags());
     }
 
     /**
@@ -68,16 +70,20 @@ public final class ServerSynchronizePositionPlayPacketCodec extends PacketCodec<
         private static final EnumMap<RelativeFlag, Integer> FLAG_IDS = new EnumMap<>(RelativeFlag.class);
 
         static {
-            FLAG_IDS.put(RelativeFlag.RELATIVE_X, 0x01);
-            FLAG_IDS.put(RelativeFlag.RELATIVE_Y, 0x02);
-            FLAG_IDS.put(RelativeFlag.RELATIVE_Z, 0x04);
-            FLAG_IDS.put(RelativeFlag.RELATIVE_YAW, 0x08);
-            FLAG_IDS.put(RelativeFlag.RELATIVE_PITCH, 0x10);
+            FLAG_IDS.put(RelativeFlag.RELATIVE_X, 0);
+            FLAG_IDS.put(RelativeFlag.RELATIVE_Y, 1);
+            FLAG_IDS.put(RelativeFlag.RELATIVE_Z, 2);
+            FLAG_IDS.put(RelativeFlag.RELATIVE_YAW, 3);
+            FLAG_IDS.put(RelativeFlag.RELATIVE_PITCH, 4);
+            FLAG_IDS.put(RelativeFlag.RELATIVE_DELTA_X, 5);
+            FLAG_IDS.put(RelativeFlag.RELATIVE_DELTA_Y, 6);
+            FLAG_IDS.put(RelativeFlag.RELATIVE_DELTA_Z, 7);
+            FLAG_IDS.put(RelativeFlag.ROTATE_DELTA, 8);
         }
 
         @Override
         public @NonNull Collection<RelativeFlag> read(@NonNull ByteBuf buf) {
-            byte value = buf.readByte();
+            int value = buf.readInt();
             Set<RelativeFlag> flags = new HashSet<>();
 
             for (RelativeFlag flag : RelativeFlag.values()) {
@@ -94,7 +100,7 @@ public final class ServerSynchronizePositionPlayPacketCodec extends PacketCodec<
             byte value = 0;
             for (RelativeFlag flag : object)
                 value |= FLAG_IDS.get(flag);
-            buf.writeByte(value);
+            buf.writeInt(value);
         }
     }
 }
