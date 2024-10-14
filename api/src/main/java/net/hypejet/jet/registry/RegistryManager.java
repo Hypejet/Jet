@@ -15,9 +15,9 @@ import java.util.Map;
  */
 public interface RegistryManager {
     /**
-     * Gets a {@linkplain MinecraftRegistry Minecraft registry} with an identifier specified.
+     * Gets a {@linkplain MinecraftRegistry Minecraft registry} with a {@linkplain Key key} specified.
      *
-     * @param identifier the identifier
+     * @param identifier the key
      * @return the registry
      * @since 1.0
      */

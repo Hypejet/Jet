@@ -10,7 +10,7 @@ import eu.okaeri.configs.yaml.snakeyaml.YamlSnakeYamlConfigurer;
 import net.hypejet.jet.configuration.ServerConfiguration;
 import net.hypejet.jet.data.generated.server.FeaturePacks;
 import net.hypejet.jet.data.generated.server.MinecraftVersionInfo;
-import net.hypejet.jet.data.model.server.pack.FeaturePack;
+import net.hypejet.jet.data.model.server.registry.registries.pack.FeaturePack;
 import net.hypejet.jet.server.network.transport.NettyTransportSelector;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;

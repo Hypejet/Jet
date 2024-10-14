@@ -14,7 +14,7 @@ import net.hypejet.jet.protocol.packet.server.configuration.ServerUpdateTagsConf
 import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.player.JetPlayer;
-import net.hypejet.jet.server.registry.JetRegistryEntry;
+import net.hypejet.jet.server.registry.JetMinecraftRegistry;
 import net.hypejet.jet.server.registry.JetSerializableMinecraftRegistry;
 import net.hypejet.jet.server.session.keepalive.KeepAliveHandler;
 import net.hypejet.jet.session.handler.SessionHandler;
@@ -29,10 +29,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -166,15 +164,19 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
         if (this.registryConfigurationLatch.getCount() <= 0)
             throw new IllegalArgumentException("The known packs response has been already received");
 
-        Collection<JetSerializableMinecraftRegistry<?>> registries = this.player.server()
+        Collection<JetMinecraftRegistry<?>> registries = this.player.server()
                 .registryManager()
                 .getRegistries()
                 .values();
-        registries.forEach(registry -> sendRegistry(registry, packet.featurePacks()));
+
+        for (JetMinecraftRegistry<?> registry : registries) {
+            if (!(registry instanceof JetSerializableMinecraftRegistry<?> serializableRegistry)) continue;
+            sendRegistry(serializableRegistry, packet.featurePacks());
+        }
 
         Collection<TagRegistry> tagRegistries = new HashSet<>();
-        for (JetSerializableMinecraftRegistry<?> registry : registries)
-            tagRegistries.add(createTagRegistry(registry));
+        for (JetMinecraftRegistry<?> registry : registries)
+            tagRegistries.add(registry.createTagRegistry());
         this.player.sendPacket(new ServerUpdateTagsConfigurationPacket(Set.copyOf(tagRegistries)));
 
         this.registryConfigurationLatch.countDown();
@@ -192,7 +194,7 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
 
     private <V> void sendRegistry(@NonNull JetSerializableMinecraftRegistry<V> registry,
                                   @NonNull Collection<PackInfo> dataPackResponse) {
-        Key registryIdentifier = registry.registryIdentifier();
+        Key registryKey = registry.registryKey();
         List<ServerRegistryDataConfigurationPacket.Entry> entries = new ArrayList<>();
 
         for (RegistryEntry<V> entry : registry.entries()) {
@@ -200,7 +202,6 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
             PackInfo knownPackInfo = entry.knownPackInfo();
 
             BinaryTag serializedEntry;
-
             if (knownPackInfo == null || !dataPackResponse.contains(knownPackInfo))
                 serializedEntry = registry.binaryTagCodec().write(entry.value());
             else
@@ -209,7 +210,7 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
             entries.add(new ServerRegistryDataConfigurationPacket.Entry(identifier, serializedEntry));
         }
 
-        this.player.sendPacket(new ServerRegistryDataConfigurationPacket(registryIdentifier, List.copyOf(entries)));
+        this.player.sendPacket(new ServerRegistryDataConfigurationPacket(registryKey, List.copyOf(entries)));
     }
 
     /**
@@ -224,24 +225,5 @@ public final class JetConfigurationSession implements Session<JetConfigurationSe
     public static @NonNull JetConfigurationSession asConfigurationSession(@Nullable Session<?> session) {
         if (session instanceof JetConfigurationSession configurationSession) return configurationSession;
         throw new IllegalStateException("The session is not a configuration session");
-    }
-
-
-    private static <V> @NonNull TagRegistry createTagRegistry(@NonNull JetSerializableMinecraftRegistry<V> registry) {
-        Collection<ServerUpdateTagsConfigurationPacket.Tag> tags = new HashSet<>();
-
-        Map<Key, List<Integer>> tagMap = new HashMap<>();
-        for (JetRegistryEntry<V> entry : registry.entries())
-            for (Key key : registry.tagsFor(entry))
-                tagMap.computeIfAbsent(key, tagKey -> new ArrayList<>()).add(registry.identifierOf(entry));
-
-        tagMap.forEach((key, identifiers) -> {
-            int[] identifierArray = new int[identifiers.size()];
-            for (int index = 0; index < identifiers.size(); index++)
-                identifierArray[index] = identifiers.get(index);
-            tags.add(new ServerUpdateTagsConfigurationPacket.Tag(key, identifierArray));
-        });
-
-        return new TagRegistry(registry.registryIdentifier(), Set.copyOf(tags));
     }
 }

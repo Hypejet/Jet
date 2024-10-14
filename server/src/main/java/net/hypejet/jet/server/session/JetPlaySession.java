@@ -81,7 +81,7 @@ public final class JetPlaySession implements Session<JetPlaySession>, SessionHan
                 blocks = new SingleValuedPalette(0);
             } else {
                 blockCount = 16 * 16 * 16;
-                blocks = new SingleValuedPalette(1);
+                blocks = new SingleValuedPalette(27153);
             }
 
             sections.add(new ChunkSection(blockCount, blocks, new SingleValuedPalette(0)));

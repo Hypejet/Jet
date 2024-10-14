@@ -10,6 +10,7 @@ import net.hypejet.jet.data.generated.api.DamageTypes;
 import net.hypejet.jet.data.generated.api.DimensionTypes;
 import net.hypejet.jet.data.generated.api.PaintingVariants;
 import net.hypejet.jet.data.generated.api.WolfVariants;
+import net.hypejet.jet.data.generated.server.Blocks;
 import net.hypejet.jet.data.generated.server.FeaturePacks;
 import net.hypejet.jet.data.model.api.registry.DataRegistryEntry;
 import net.hypejet.jet.data.model.api.registry.registries.armor.material.ArmorTrimMaterial;
@@ -21,6 +22,7 @@ import net.hypejet.jet.data.model.api.registry.registries.damage.DamageType;
 import net.hypejet.jet.data.model.api.registry.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.registry.registries.painting.PaintingVariant;
 import net.hypejet.jet.data.model.api.registry.registries.wolf.WolfVariant;
+import net.hypejet.jet.data.model.server.registry.registries.block.Block;
 import net.hypejet.jet.data.model.server.registry.registries.pack.FeaturePack;
 import net.hypejet.jet.registry.RegistryManager;
 import net.hypejet.jet.server.JetMinecraftServer;
@@ -54,7 +56,7 @@ import java.util.Set;
  */
 public final class JetRegistryManager implements RegistryManager {
 
-    private final Map<Key, JetSerializableMinecraftRegistry<?>> registries;
+    private final Map<Key, JetMinecraftRegistry<?>> registries;
     private final Set<FeaturePack> enabledFeaturePacks;
 
     /**
@@ -64,9 +66,8 @@ public final class JetRegistryManager implements RegistryManager {
      * @since 1.0
      */
     public JetRegistryManager(@NonNull JetMinecraftServer server) {
-        List<DataRegistryEntry<?>> dataPackEntries = JetSerializableMinecraftRegistry.entries(
-                JetDataJson.createPlainGson(), FeaturePacks.RESOURCE_FILE_NAME
-        );
+        List<DataRegistryEntry<?>> dataPackEntries = JetMinecraftRegistry.entries(JetDataJson.createPlainGson(),
+                FeaturePacks.RESOURCE_FILE_NAME);
 
         Logger logger = LoggerFactory.getLogger(JetRegistryManager.class);
         Set<FeaturePack> enabledFeaturePacks = new HashSet<>();
@@ -94,22 +95,31 @@ public final class JetRegistryManager implements RegistryManager {
 
         this.enabledFeaturePacks = Set.copyOf(enabledFeaturePacks);
 
-        Set<JetSerializableMinecraftRegistry<?>> registrySet = Set.of(
-                JetSerializableMinecraftRegistry.create(Key.key("worldgen/biome"),
-                        Biome.class, server, BiomeBinaryTagCodec.instance(),
-                        this.enabledFeaturePacks, JetDataJson.createBiomesGson(), Biomes.RESOURCE_FILE_NAME),
-                JetSerializableMinecraftRegistry.create(Key.key("dimension_type"),
-                        DimensionType.class, server, DimensionTypeBinaryTagCodec.instance(),
-                        this.enabledFeaturePacks, JetDataJson.createDimensionTypesGson(),
-                        DimensionTypes.RESOURCE_FILE_NAME),
+        Set<JetMinecraftRegistry<?>> registrySet = Set.of(
+                JetMinecraftRegistry.create(Key.key("block"), Block.class, server, this.enabledFeaturePacks,
+                        JetDataJson.createBlocksGson(), Blocks.RESOURCE_FILE_NAME), // TODO: Filter blocks based on required feature flags
+                JetSerializableMinecraftRegistry.create(Key.key("dimension_type"), DimensionType.class, server,
+                        DimensionTypeBinaryTagCodec.instance(), this.enabledFeaturePacks,
+                        JetDataJson.createDimensionTypesGson(), DimensionTypes.RESOURCE_FILE_NAME),
+                JetSerializableMinecraftRegistry.create(Key.key("chat_type"),
+                        ChatType.class, server, ChatTypeBinaryTagCodec.instance(), this.enabledFeaturePacks,
+                        JetDataJson.createChatTypesGson(), ChatTypes.RESOURCE_FILE_NAME),
+                JetSerializableMinecraftRegistry.create(Key.key("damage_type"),
+                        DamageType.class, server, DamageTypeBinaryTagCodec.instance(), this.enabledFeaturePacks,
+                        JetDataJson.createDamageTypesGson(), DamageTypes.RESOURCE_FILE_NAME),
+                JetSerializableMinecraftRegistry.create(Key.key("banner_pattern"),
+                        BannerPattern.class, server, BannerPatternBinaryTagCodec.instance(), this.enabledFeaturePacks,
+                        JetDataJson.createBannerPatternsGson(), BannerPatterns.RESOURCE_FILE_NAME),
+                JetSerializableMinecraftRegistry.create(Key.key("wolf_variant"),
+                        WolfVariant.class, server, WolfVariantBinaryTagCodec.instance(), this.enabledFeaturePacks,
+                        JetDataJson.createWolfVariantsGson(), WolfVariants.RESOURCE_FILE_NAME),
+                JetSerializableMinecraftRegistry.create(Key.key("worldgen/biome"), Biome.class, server,
+                        BiomeBinaryTagCodec.instance(), this.enabledFeaturePacks, JetDataJson.createBiomesGson(),
+                        Biomes.RESOURCE_FILE_NAME),
                 JetSerializableMinecraftRegistry.create(Key.key("painting_variant"),
                         PaintingVariant.class, server, PaintingVariantBinaryTagCodec.instance(),
                         this.enabledFeaturePacks, JetDataJson.createPaintingVariantsGson(),
                         PaintingVariants.RESOURCE_FILE_NAME),
-                JetSerializableMinecraftRegistry.create(Key.key("banner_pattern"),
-                        BannerPattern.class, server, BannerPatternBinaryTagCodec.instance(),
-                        this.enabledFeaturePacks, JetDataJson.createBannerPatternsGson(),
-                        BannerPatterns.RESOURCE_FILE_NAME),
                 JetSerializableMinecraftRegistry.create(Key.key("trim_material"),
                         ArmorTrimMaterial.class, server, ArmorTrimMaterialBinaryTagCodec.instance(),
                         this.enabledFeaturePacks, JetDataJson.createTrimMaterialsGson(),
@@ -117,33 +127,21 @@ public final class JetRegistryManager implements RegistryManager {
                 JetSerializableMinecraftRegistry.create(Key.key("trim_pattern"),
                         ArmorTrimPattern.class, server, ArmorTrimPatternBinaryTagCodec.instance(),
                         this.enabledFeaturePacks, JetDataJson.createTrimPatternsGson(),
-                        ArmorTrimPatterns.RESOURCE_FILE_NAME),
-                JetSerializableMinecraftRegistry.create(Key.key("chat_type"),
-                        ChatType.class, server, ChatTypeBinaryTagCodec.instance(),
-                        this.enabledFeaturePacks, JetDataJson.createChatTypesGson(),
-                        ChatTypes.RESOURCE_FILE_NAME),
-                JetSerializableMinecraftRegistry.create(Key.key("damage_type"),
-                        DamageType.class, server, DamageTypeBinaryTagCodec.instance(),
-                        this.enabledFeaturePacks, JetDataJson.createDamageTypesGson(),
-                        DamageTypes.RESOURCE_FILE_NAME),
-                JetSerializableMinecraftRegistry.create(Key.key("wolf_variant"),
-                        WolfVariant.class, server, WolfVariantBinaryTagCodec.instance(),
-                        this.enabledFeaturePacks, JetDataJson.createWolfVariantsGson(),
-                        WolfVariants.RESOURCE_FILE_NAME)
+                        ArmorTrimPatterns.RESOURCE_FILE_NAME)
         );
 
-        Map<Key, JetSerializableMinecraftRegistry<?>> registries = new HashMap<>();
-        registrySet.forEach(registry -> registries.put(registry.registryIdentifier(), registry));
+        Map<Key, JetMinecraftRegistry<?>> registries = new HashMap<>();
+        registrySet.forEach(registry -> registries.put(registry.registryKey(), registry));
         this.registries = Map.copyOf(registries);
     }
 
     @Override
-    public @Nullable JetSerializableMinecraftRegistry<?> getRegistry(@NonNull Key identifier) {
-        return this.registries.get(identifier);
+    public @Nullable JetMinecraftRegistry<?> getRegistry(@NonNull Key key) {
+        return this.registries.get(key);
     }
 
     @Override
-    public @NonNull Map<Key, JetSerializableMinecraftRegistry<?>> getRegistries() {
+    public @NonNull Map<Key, JetMinecraftRegistry<?>> getRegistries() {
         return Map.copyOf(this.registries);
     }
 

@@ -4,6 +4,7 @@ import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -15,12 +16,12 @@ import java.util.List;
  */
 public interface MinecraftRegistry<V> {
     /**
-     * Gets an {@linkplain Key identifier} of this {@linkplain MinecraftRegistry registry}.
+     * Gets a {@linkplain Key key} of this {@linkplain MinecraftRegistry registry}.
      *
-     * @return the identifier
+     * @return the key
      * @since 1.0
      */
-    @NonNull Key registryIdentifier();
+    @NonNull Key registryKey();
 
     /**
      * Gets a {@linkplain Class class} of values of entries of this {@linkplain MinecraftRegistry registry}.
@@ -84,4 +85,24 @@ public interface MinecraftRegistry<V> {
      * @since 1.0
      */
     @NonNull List<? extends RegistryEntry<V>> entries();
+
+    /**
+     * Gets whether a {@linkplain RegistryEntry registry entry} specified has a tag specified attached.
+     *
+     * @param entry the registry entry
+     * @param tag the tag
+     * @return {@code true} if the registry entry specified has a tag specified attached, {@code false} otherwise
+     * @since 1.0
+     */
+    boolean hasTag(@NonNull RegistryEntry<V> entry, @NonNull Key tag);
+
+    /**
+     * Gets a {@linkplain Collection collection} of tags attached to a {@linkplain RegistryEntry registry entry}
+     * specified.
+     *
+     * @param entry the registry entry
+     * @return the collection
+     * @since 1.0
+     */
+    @NonNull Collection<Key> tagsFor(@NonNull RegistryEntry<V> entry);
 }
