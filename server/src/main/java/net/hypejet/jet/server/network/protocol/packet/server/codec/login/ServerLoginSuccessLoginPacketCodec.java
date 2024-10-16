@@ -38,7 +38,7 @@ public final class ServerLoginSuccessLoginPacketCodec extends PacketCodec<Server
     @Override
     public @NonNull ServerLoginSuccessLoginPacket read(@NonNull ByteBuf buf) {
         return new ServerLoginSuccessLoginPacket(UUIDNetworkCodec.instance().read(buf), USERNAME_CODEC.read(buf),
-                PROPERTIES_CODEC.read(buf), buf.readBoolean());
+                PROPERTIES_CODEC.read(buf));
     }
 
     @Override
@@ -46,7 +46,6 @@ public final class ServerLoginSuccessLoginPacketCodec extends PacketCodec<Server
         UUIDNetworkCodec.instance().write(buf, object.uniqueId());
         USERNAME_CODEC.write(buf, object.username());
         PROPERTIES_CODEC.write(buf, object.properties());
-        buf.writeBoolean(object.strictErrorHandling());
     }
 
     private static final class PropertyCodec implements NetworkCodec<Property> {

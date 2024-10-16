@@ -48,8 +48,15 @@ public final class PacketDecoder extends ByteToMessageDecoder {
         ClientPacketCodec<?> codec = ClientPacketRegistry.codec(packetId, protocolState);
 
         if (codec == null) throw packetReaderNotFound(packetId, protocolState);
-
         out.add(codec.read(in));
+
+        int readableBytes = in.readableBytes();
+        if (readableBytes > 0) {
+            throw new IllegalStateException(String.format(
+                    "Packet with identifier of %s has been not fully read. (%s > 0)",
+                    packetId, readableBytes
+            ));
+        }
     }
 
     @Override

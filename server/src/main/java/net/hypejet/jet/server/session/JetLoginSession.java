@@ -89,9 +89,7 @@ public final class JetLoginSession implements LoginSession, Session<LoginSession
                             return;
                         }
 
-                        this.connection.sendPacket(new ServerLoginSuccessLoginPacket(
-                                uniqueId, username, properties, true
-                        ));
+                        this.connection.sendPacket(new ServerLoginSuccessLoginPacket(uniqueId, username, properties));
 
                         if (!this.acknowledgeLatch.await(Session.TIME_OUT_DURATION, Session.TIME_OUT_UNIT)) {
                             this.sessionHandler.onTimeOut(this, LoginSessionHandler.TimeOutType.ACKNOWLEDGE);

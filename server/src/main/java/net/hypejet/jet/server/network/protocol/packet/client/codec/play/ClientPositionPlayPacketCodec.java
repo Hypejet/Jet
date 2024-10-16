@@ -2,6 +2,7 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.play.ClientPositionPlayPacket;
+import net.hypejet.jet.server.network.protocol.codecs.position.PositionFlagsCodec;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
@@ -28,7 +29,8 @@ public final class ClientPositionPlayPacketCodec extends ClientPacketCodec<Clien
 
     @Override
     public @NonNull ClientPositionPlayPacket read(@NonNull ByteBuf buf) {
-        return new ClientPositionPlayPacket(buf.readDouble(), buf.readDouble(), buf.readDouble(), buf.readBoolean());
+        return new ClientPositionPlayPacket(buf.readDouble(), buf.readDouble(), buf.readDouble(),
+                PositionFlagsCodec.instance().read(buf));
     }
 
     @Override
@@ -36,7 +38,7 @@ public final class ClientPositionPlayPacketCodec extends ClientPacketCodec<Clien
         buf.writeDouble(object.x());
         buf.writeDouble(object.feetY());
         buf.writeDouble(object.z());
-        buf.writeBoolean(object.onGround());
+        PositionFlagsCodec.instance().write(buf, object.flags());
     }
 
     @Override

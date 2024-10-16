@@ -1,8 +1,8 @@
 package net.hypejet.jet.server.test.network.protocol.packet.client.configuration;
 
+import net.hypejet.jet.data.model.pack.DataPack;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.player.Player;
-import net.hypejet.jet.pack.DataPack;
 import net.hypejet.jet.pack.ResourcePackResult;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientAcknowledgeFinishConfigurationPacket;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientCookieResponseConfigurationPacket;

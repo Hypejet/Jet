@@ -2,8 +2,6 @@ package net.hypejet.jet.server.entity.player;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.hypejet.jet.MinecraftServer;
-import net.hypejet.jet.data.entity.type.BuiltInEntityTypes;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.player.PlayerChangeClientBrandEvent;
 import net.hypejet.jet.event.events.player.PlayerChangeSettingsEvent;
@@ -12,7 +10,6 @@ import net.hypejet.jet.event.events.player.PlayerPluginMessageEvent;
 import net.hypejet.jet.event.events.player.PlayerPongEvent;
 import net.hypejet.jet.event.events.player.PlayerResourcePackResponseEvent;
 import net.hypejet.jet.event.node.EventNode;
-import net.hypejet.jet.pack.DataPack;
 import net.hypejet.jet.pack.ResourcePackResult;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
@@ -21,6 +18,7 @@ import net.hypejet.jet.protocol.packet.server.play.ServerActionBarPlayPacket;
 import net.hypejet.jet.protocol.packet.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
 import net.hypejet.jet.protocol.packet.server.play.ServerPluginMessagePlayPacket;
 import net.hypejet.jet.protocol.packet.server.play.ServerSystemMessagePlayPacket;
+import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
@@ -36,8 +34,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -51,6 +47,7 @@ import java.util.UUID;
  */
 public final class JetPlayer extends JetEntity implements Player {
 
+    private static final Key ENTITY_TYPE = Key.key("player");
     private static final Key BRAND_PLUGIN_MESSAGE_IDENTIFIER = Key.key("brand");
 
     private final String username;
@@ -58,8 +55,6 @@ public final class JetPlayer extends JetEntity implements Player {
 
     private @MonotonicNonNull Settings settings;
     private @MonotonicNonNull String clientBrand;
-
-    private Collection<DataPack> knownPacks = Collections.emptySet();
 
     /**
      * Constructs a {@linkplain JetPlayer player}.
@@ -70,7 +65,7 @@ public final class JetPlayer extends JetEntity implements Player {
      * @since 1.0
      */
     public JetPlayer(@NonNull UUID uniqueId, @NonNull String username, @NonNull SocketPlayerConnection connection) {
-        super(BuiltInEntityTypes.PLAYER, uniqueId, Pointers.builder()
+        super(ENTITY_TYPE, uniqueId, Pointers.builder()
                 .withStatic(Identity.UUID, uniqueId)
                 .withStatic(Identity.NAME, username)
                 .build());
@@ -110,12 +105,7 @@ public final class JetPlayer extends JetEntity implements Player {
     }
 
     @Override
-    public @NonNull Collection<DataPack> knownDataPacks() {
-        return this.knownPacks;
-    }
-
-    @Override
-    public @NonNull MinecraftServer server() {
+    public @NonNull JetMinecraftServer server() {
         return this.connection.server();
     }
 
@@ -168,18 +158,6 @@ public final class JetPlayer extends JetEntity implements Player {
         if (event.isCancelled()) return;
 
         this.settings = settings;
-    }
-
-    /**
-     * Updates known {@linkplain DataPack data packs} of the player.
-     *
-     * @param knownPacks the data packs
-     * @since 1.0
-     * @see DataPack
-     */
-    public void knownDataPacks(@NonNull Collection<DataPack> knownPacks) {
-        Objects.requireNonNull(knownPacks, "The known packs must not be null");
-        this.knownPacks = knownPacks;
     }
 
     /**

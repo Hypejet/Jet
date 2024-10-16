@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.world;
 
-import net.hypejet.jet.coordinate.Coordinate;
+import net.hypejet.jet.data.model.api.coordinate.Coordinate;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.world.chunk.JetChunk;

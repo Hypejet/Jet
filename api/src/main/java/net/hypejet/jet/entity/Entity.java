@@ -1,8 +1,8 @@
 package net.hypejet.jet.entity;
 
-import net.hypejet.jet.data.entity.type.EntityType;
 import net.hypejet.jet.world.World;
 import net.kyori.adventure.identity.Identified;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.pointer.Pointered;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -22,13 +22,12 @@ import java.util.UUID;
  */
 public interface Entity extends Identified, Pointered, HoverEventSource<HoverEvent.ShowEntity>, Keyed {
     /**
-     * Gets a type of the entity.
+     * Gets an identifier of type of the entity.
      *
-     * @return the type
+     * @return the identifier
      * @since 1.0
-     * @see EntityType
      */
-    @NonNull EntityType entityType();
+    @NonNull Key entityType();
 
     /**
      * Gets an identifier of the entity.

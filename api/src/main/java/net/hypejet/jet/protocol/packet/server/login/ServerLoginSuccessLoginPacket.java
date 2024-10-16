@@ -15,13 +15,12 @@ import java.util.UUID;
  * @param uniqueId a unique identifier of a player that is logged in
  * @param username a username of a player that is logged in
  * @param properties a collection of {@linkplain Property properties} of the login
- * @param strictErrorHandling whether a player logging in should disconnect if this packet is incorrect
  * @since 1.0
  * @author Codestech
  * @see ServerLoginPacket
  */
 public record ServerLoginSuccessLoginPacket(@NonNull UUID uniqueId, @NonNull String username,
-                                            @NonNull Collection<Property> properties, boolean strictErrorHandling)
+                                            @NonNull Collection<Property> properties)
         implements ServerLoginPacket {
     /**
      * Constructs a {@linkplain ServerLoginSuccessLoginPacket login success packet}.
@@ -29,7 +28,6 @@ public record ServerLoginSuccessLoginPacket(@NonNull UUID uniqueId, @NonNull Str
      * @param uniqueId a unique identifier of a player that is logged in
      * @param username a username of a player that is logged in
      * @param properties a collection of {@linkplain Property properties} of the login
-     * @param strictErrorHandling whether a player logging in should disconnect if this packet is incorrect
      * @since 1.0
      */
     public ServerLoginSuccessLoginPacket {

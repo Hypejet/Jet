@@ -16,7 +16,7 @@ import java.util.Set;
  * @author Codestech
  * @see TagRegistryNetworkCodec
  */
-public final class TagRegistryNetworkCodecTest {
+public final class TagMinecraftRegistryNetworkCodecTest {
     @Test
     public void test() {
         NetworkCodecTestUtil.test(

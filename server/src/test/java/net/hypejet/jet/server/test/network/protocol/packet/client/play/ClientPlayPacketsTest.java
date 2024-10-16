@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.test.network.protocol.packet.client.play;
 
-import net.hypejet.jet.coordinate.BlockPosition;
+import net.hypejet.jet.data.model.coordinate.BlockPosition;
 import net.hypejet.jet.protocol.packet.client.play.ClientAcknowledgeMessagePlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientActionPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientChangeDifficultyPlayPacket;

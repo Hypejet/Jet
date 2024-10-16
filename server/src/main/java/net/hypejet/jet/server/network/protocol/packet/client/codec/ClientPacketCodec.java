@@ -17,7 +17,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public abstract class ClientPacketCodec<P extends ClientPacket> extends PacketCodec<P> {
     /**
-     * Constructs the {@linkplain ClientPacketCodec client paket codec}.
+     * Constructs the {@linkplain ClientPacketCodec client packet codec}.
      *
      * @param packetId an identifier of the packet that this codec serializes
      * @param packetClass a {@linkplain Class class} of the packet that this codec serializes

@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.protocol.packet.server.codec.configuratio
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerKnownPacksConfigurationPacket;
-import net.hypejet.jet.server.network.protocol.codecs.pack.DataPackNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.pack.PackInfoNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
 import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketIdentifiers;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -23,11 +23,11 @@ public final class ServerKnownPacksConfigurationPacketCodec extends PacketCodec<
 
     @Override
     public @NonNull ServerKnownPacksConfigurationPacket read(@NonNull ByteBuf buf) {
-        return new ServerKnownPacksConfigurationPacket(DataPackNetworkCodec.collectionCodec().read(buf));
+        return new ServerKnownPacksConfigurationPacket(PackInfoNetworkCodec.collectionCodec().read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerKnownPacksConfigurationPacket object) {
-        DataPackNetworkCodec.collectionCodec().write(buf, object.dataPacks());
+        PackInfoNetworkCodec.collectionCodec().write(buf, object.featurePacks());
     }
 }

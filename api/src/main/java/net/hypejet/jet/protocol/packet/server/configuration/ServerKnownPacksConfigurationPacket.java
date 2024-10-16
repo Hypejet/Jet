@@ -1,29 +1,29 @@
 package net.hypejet.jet.protocol.packet.server.configuration;
 
-import net.hypejet.jet.pack.DataPack;
+import net.hypejet.jet.data.model.api.pack.PackInfo;
 import net.hypejet.jet.protocol.packet.server.ServerConfigurationPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Represents a {@linkplain ServerConfigurationPacket server configuration packet} informing a client, which data
- * dataPacks are present on the server.
+ * feature packs are present on the server.
  *
- * @param dataPacks the data packs
+ * @param featurePacks the pack information collection of the feature packs
  * @since 1.0
  * @author Codestech
  */
-public record ServerKnownPacksConfigurationPacket(@NonNull Collection<DataPack> dataPacks)
+public record ServerKnownPacksConfigurationPacket(@NonNull Collection<PackInfo> featurePacks)
         implements ServerConfigurationPacket {
     /**
-     * Constructs the {@linkplain ServerKnownPacksConfigurationPacket known packs configuration packet}.
+     * Constructs the {@linkplain ServerKnownPacksConfigurationPacket known feature packs configuration packet}.
      *
-     * @param dataPacks the data packs
+     * @param featurePacks the feature packs
      * @since 1.0
      */
     public ServerKnownPacksConfigurationPacket {
-        dataPacks = List.copyOf(dataPacks);
+        featurePacks = Set.copyOf(featurePacks);
     }
 }

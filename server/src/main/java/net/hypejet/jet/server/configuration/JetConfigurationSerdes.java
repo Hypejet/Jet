@@ -4,6 +4,7 @@ import eu.okaeri.configs.serdes.OkaeriSerdesPack;
 import eu.okaeri.configs.serdes.SerdesRegistry;
 import eu.okaeri.configs.serdes.commons.SerdesCommons;
 import net.hypejet.jet.server.configuration.serializer.ComponentObjectSerializer;
+import net.hypejet.jet.server.configuration.serializer.KeySerializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -32,5 +33,6 @@ public final class JetConfigurationSerdes implements OkaeriSerdesPack {
     public void register(@NonNull SerdesRegistry registry) {
         registry.register(new SerdesCommons());
         registry.register(new ComponentObjectSerializer());
+        registry.register(new KeySerializer());
     }
 }
