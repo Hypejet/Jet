@@ -41,4 +41,6 @@ You can contribute to Jet easily by creating pull requests, without any other ne
 To not waste your time, make sure to join our [Discord server](https://discord.com/invite/kS4CuPvYD2) and ask if your contribution would be merged or not. You can also make that via an issue, however it may take longer to get a response.
 
 ## License
-All Jet components (except of API) are licensed under a GPL 3.0 license. However, the API is licensed under a MIT license to allow plugins to be done like their authors want.
+All Jet components (except of API) are licensed under an AGPL 3.0 license.
+
+License of the API however is a MIT license, allowing plugins freedom of licensing or even being close-sourced. 
