@@ -1,18 +1,18 @@
-package net.hypejet.jet.acquisition;
+package net.hypejet.jet.acquisition.collection;
 
+import net.hypejet.jet.acquisition.Acquisition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
 import java.util.function.Predicate;
 
 /**
- * Represents an acquisition, which manages {@linkplain Collection a collection} allowing to make changes to it.
+ * Represents an acquisition, which allows making changes to {@linkplain Collection a collection}.
  *
  * @param <V> a type of value of the collection
  * @since 1.0
  * @author Codestech
  * @see Collection
- * @see MutableAcquisition
  */
 public interface MutableCollectionAcquisition<V, C extends Collection<V>> extends Acquisition<C> {
     /**
@@ -21,6 +21,7 @@ public interface MutableCollectionAcquisition<V, C extends Collection<V>> extend
      * @param value the value
      * @return {@code true} if the change was made, {@code false} otherwise
      * @since 1.0
+     * @see Collection#add(Object)
      */
     boolean add(@NonNull V value);
 
@@ -30,6 +31,7 @@ public interface MutableCollectionAcquisition<V, C extends Collection<V>> extend
      * @param value the value
      * @return {@code true} if the change was made, {@code false} otherwise
      * @since 1.0
+     * @see Collection#remove(Object)
      */
     boolean remove(@NonNull V value);
 
@@ -39,8 +41,9 @@ public interface MutableCollectionAcquisition<V, C extends Collection<V>> extend
      * @param collection the other collection
      * @return {@code true} if the change was made, {@code false} otherwise
      * @since 1.0
+     * @see Collection#addAll(Collection)
      */
-    boolean addAll(@NonNull Collection<V> collection);
+    boolean addAll(@NonNull Collection<? extends V> collection);
 
     /**
      * Removes all values from the collection, which are present in another collection.
@@ -48,8 +51,9 @@ public interface MutableCollectionAcquisition<V, C extends Collection<V>> extend
      * @param collection the other collection
      * @return {@code true} if the change was made, {@code false} otherwise
      * @since 1.0
+     * @see Collection#removeAll(Collection)
      */
-    boolean removeAll(@NonNull Collection<V> collection);
+    boolean removeAll(@NonNull Collection<? extends V> collection);
 
     /**
      * Removes all values from the collection, which satisfy a predicate.
@@ -57,6 +61,15 @@ public interface MutableCollectionAcquisition<V, C extends Collection<V>> extend
      * @param predicate the predicate
      * @return {@code true} if the change was made, {@code false} otherwise
      * @since 1.0
+     * @see Collection#removeIf(Predicate)
      */
     boolean removeIf(@NonNull Predicate<V> predicate);
+
+    /**
+     * Removes all values from the collection.
+     *
+     * @since 1.0
+     * @see Collection#clear()
+     */
+    void clear();
 }

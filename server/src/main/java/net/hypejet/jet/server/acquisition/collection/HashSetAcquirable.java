@@ -10,31 +10,31 @@ import java.util.Set;
 
 /**
  * Represents an implementation of {@linkplain AbstractCollectionAcquirable an abstract collection acquirable},
- * which holds {@linkplain Set a set}.
+ * which holds {@linkplain Set a set} using {@linkplain HashSet a hash set} implementation.
  *
  * @param <V> a type of value of the set
  * @since 1.0
  * @author Codestech
  * @see AbstractCollectionAcquirable
  */
-public final class SetAcquirable<V> extends AbstractCollectionAcquirable<V, Set<V>> {
+public final class HashSetAcquirable<V> extends AbstractCollectionAcquirable<V, Set<V>> {
     /**
-     * Constructs the {@linkplain SetAcquirable set acquirable} without default values.
+     * Constructs the {@linkplain HashSetAcquirable set acquirable} without default values.
      *
      * @since 1.0
      */
-    public SetAcquirable() {
+    public HashSetAcquirable() {
         this(null);
     }
 
     /**
-     * Constructs the {@linkplain SetAcquirable set acquirable}.
+     * Constructs the {@linkplain HashSetAcquirable set acquirable}.
      *
      * @param defaultValuesCollection a collection that contains default values, which should be added to
      *                                the collection, {@code null} if none
      * @since 1.0
      */
-    public SetAcquirable(@Nullable Collection<V> defaultValuesCollection) {
+    public HashSetAcquirable(@Nullable Collection<V> defaultValuesCollection) {
         super(defaultValuesCollection);
     }
 

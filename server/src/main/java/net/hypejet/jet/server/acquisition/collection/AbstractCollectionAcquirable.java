@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.acquisition.collection;
 
 import net.hypejet.jet.acquisition.Acquisition;
-import net.hypejet.jet.acquisition.MutableCollectionAcquisition;
+import net.hypejet.jet.acquisition.collection.MutableCollectionAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.acquisition.AbstractAcquirable;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -137,14 +137,14 @@ abstract class AbstractCollectionAcquirable<V, C extends Collection<V>> extends 
         }
 
         @Override
-        public boolean addAll(@NonNull Collection<V> collection) {
+        public boolean addAll(@NonNull Collection<? extends V> collection) {
             this.runChecks();
             NullabilityUtil.requireNonNull(collection, "collection");
             return this.acquirable.collection.addAll(collection);
         }
 
         @Override
-        public boolean removeAll(@NonNull Collection<V> collection) {
+        public boolean removeAll(@NonNull Collection<? extends V> collection) {
             this.runChecks();
             NullabilityUtil.requireNonNull(collection, "collection");
             return this.acquirable.collection.removeAll(collection);
@@ -155,6 +155,12 @@ abstract class AbstractCollectionAcquirable<V, C extends Collection<V>> extends 
             this.runChecks();
             NullabilityUtil.requireNonNull(predicate, "predicate");
             return this.acquirable.collection.removeIf(predicate);
+        }
+
+        @Override
+        public void clear() {
+            this.runChecks();
+            this.acquirable.collection.clear();
         }
     }
 
