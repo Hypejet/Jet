@@ -30,7 +30,8 @@ public interface LoginSession {
      * @param uniqueId a unique identifier that the player should have
      * @param properties a properties of the login
      * @since 1.0
-     * @throws IllegalArgumentException if the session is already finished
+     * @throws IllegalArgumentException if the session is already finished or the caller thread is not an event loop
+     *                                  thread, a thread that handler methods are called in
      */
     void finish(@NonNull String username, @NonNull UUID uniqueId,
                 @NonNull Collection<ServerLoginSuccessLoginPacket.Property> properties);

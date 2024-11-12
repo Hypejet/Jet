@@ -15,6 +15,8 @@ public interface MutableAcquisition<V> extends Acquisition<V> {
      *
      * @param value the value
      * @since 1.0
+     * @throws IllegalStateException if the acquisition has been already unlocked
+     * @throws IllegalArgumentException if the caller thread does not own the acquisition
      */
     void set(@NonNull V value);
 }

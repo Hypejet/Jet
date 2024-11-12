@@ -4,9 +4,9 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.play.ClientChatSessionUpdatePlayPacket;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.arrays.ByteArrayNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.UUIDNetworkCodec;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
+import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -48,7 +48,7 @@ public final class ClientChatSessionUpdatePlayPacketCodec
     }
 
     @Override
-    public void handle(@NonNull ClientChatSessionUpdatePlayPacket packet, @NonNull SocketPlayerConnection connection) {
+    public void handle(@NonNull ClientChatSessionUpdatePlayPacket packet, @NonNull SessionTask sessionTask) {
         // TODO
     }
 }

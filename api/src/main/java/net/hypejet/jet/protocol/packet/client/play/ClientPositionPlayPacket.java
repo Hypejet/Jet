@@ -1,8 +1,8 @@
 package net.hypejet.jet.protocol.packet.client.play;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.protocol.position.PositionFlag;
 import net.hypejet.jet.protocol.packet.client.ClientPlayPacket;
+import net.hypejet.jet.protocol.position.PositionFlag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;

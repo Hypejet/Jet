@@ -6,10 +6,10 @@ import net.hypejet.jet.protocol.packet.client.handshake.ClientHandshakePacket.Ha
 import net.hypejet.jet.server.network.protocol.codecs.enums.EnumVarIntCodec;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
-import net.hypejet.jet.server.session.JetHandshakeSession;
+import net.hypejet.jet.server.network.session.task.HandshakeTask;
+import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -56,11 +56,9 @@ public final class HandshakePacketCodec extends ClientPacketCodec<ClientHandshak
     }
 
     @Override
-    public void handle(@NonNull ClientHandshakePacket packet, @NonNull SocketPlayerConnection connection) {
-        if (!(connection.getSession() instanceof JetHandshakeSession session)) {
-            throw new IllegalStateException("Received a handshake packet while the current session is not " +
-                    "a handshake session");
-        }
-        session.handleHandshakePacket(packet);
+    public void handle(@NonNull ClientHandshakePacket packet, @NonNull SessionTask sessionTask) {
+        if (!(sessionTask instanceof HandshakeTask handshakeTask))
+            throw new IllegalArgumentException("The current session task must be a handshaking task");
+        handshakeTask.handleHandshakePacket(packet);
     }
 }

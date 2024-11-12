@@ -3,9 +3,9 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.play;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.play.ClientAcknowledgeMessagePlayPacket;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
+import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -39,7 +39,7 @@ public final class ClientAcknowledgeMessagePlayPacketCodec extends ClientPacketC
 
     @Override
     public void handle(@NonNull ClientAcknowledgeMessagePlayPacket packet,
-                       @NonNull SocketPlayerConnection connection) {
+                       @NonNull SessionTask sessionTask) {
         // TODO
     }
 }

@@ -3,10 +3,10 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.configuratio
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientKnownPacksConfigurationPacket;
 import net.hypejet.jet.server.network.protocol.codecs.pack.PackInfoNetworkCodec;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
-import net.hypejet.jet.server.session.JetConfigurationSession;
+import net.hypejet.jet.server.network.session.task.ConfigurationTask;
+import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -40,9 +40,9 @@ public final class ClientKnownPacksConfigurationPacketCodec
     }
 
     @Override
-    public void handle(@NonNull ClientKnownPacksConfigurationPacket packet,
-                       @NonNull SocketPlayerConnection connection) {
-        JetConfigurationSession session = JetConfigurationSession.asConfigurationSession(connection.getSession());
-        session.handleKnownPacks(packet);
+    public void handle(@NonNull ClientKnownPacksConfigurationPacket packet, @NonNull SessionTask sessionTask) {
+        if (!(sessionTask instanceof ConfigurationTask configurationTask))
+            throw new IllegalArgumentException("The session task is must be a configuration task");
+        configurationTask.handleKnownPacks(packet);
     }
 }

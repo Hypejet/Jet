@@ -3,9 +3,9 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.play;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.play.ClientConfirmTeleportationPlayPacket;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
+import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -40,7 +40,7 @@ public final class ClientConfirmTeleportationPlayPacketCodec
 
     @Override
     public void handle(@NonNull ClientConfirmTeleportationPlayPacket packet,
-                       @NonNull SocketPlayerConnection connection) {
+                       @NonNull SessionTask sessionTask) {
         // TODO
     }
 }

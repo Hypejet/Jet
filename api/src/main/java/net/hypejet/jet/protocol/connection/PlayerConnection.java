@@ -1,6 +1,7 @@
 package net.hypejet.jet.protocol.connection;
 
 import net.hypejet.jet.MinecraftServer;
+import net.hypejet.jet.acquisition.Acquisition;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.server.ServerPacket;
@@ -16,12 +17,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public interface PlayerConnection {
     /**
-     * Gets a protocol state of the connection.
+     * Creates {@linkplain Acquisition an acquisition} of {@linkplain ProtocolState a protocol state} of
+     * the connection.
      *
-     * @return the protocol state
+     * @return the acquisition
      * @since 1.0
      */
-    @NonNull ProtocolState getProtocolState();
+    @NonNull Acquisition<ProtocolState> protocolState();
 
     /**
      * Sends a {@linkplain ServerPacket client-bound packet} to a client.
@@ -59,6 +61,16 @@ public interface PlayerConnection {
      * @since 1.0
      */
     @NonNull MinecraftServer server();
+
+    /**
+     * Gets a {@linkplain Player player}, which is using this connection, throws an exception if it has not been
+     * initialized yet.
+     *
+     * @return the player
+     * @throws IllegalStateException if the player has not been initialized yet
+     * @since 1.0
+     */
+    @NonNull Player playerOrThrow();
 
     /**
      * Gets a {@linkplain Player player}, which is using this connection.

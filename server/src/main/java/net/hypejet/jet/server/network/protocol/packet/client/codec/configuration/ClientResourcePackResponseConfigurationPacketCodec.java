@@ -3,15 +3,13 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.configuratio
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.pack.ResourcePackResult;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientResourcePackResponseConfigurationPacket;
-import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.protocol.codecs.enums.EnumVarIntCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.UUIDNetworkCodec;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
+import net.hypejet.jet.server.network.session.task.ConfigurationTask;
+import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.Objects;
 
 /**
  * Represents a {@linkplain ClientPacketCodec client packet codec}, which reads and writes
@@ -61,8 +59,9 @@ public final class ClientResourcePackResponseConfigurationPacketCodec
 
     @Override
     public void handle(@NonNull ClientResourcePackResponseConfigurationPacket packet,
-                       @NonNull SocketPlayerConnection connection) {
-        JetPlayer player = Objects.requireNonNull(connection.player(), "Player cannot be null");
-        player.handleResourcePackResponse(packet.uniqueId(), packet.result());
+                       @NonNull SessionTask sessionTask) {
+        if (!(sessionTask instanceof ConfigurationTask configurationTask))
+            throw new IllegalArgumentException("The session task must be a configuration task");
+        configurationTask.player().handleResourcePackResponse(packet.uniqueId(), packet.result());
     }
 }

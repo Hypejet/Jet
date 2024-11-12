@@ -2,11 +2,11 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.play.ClientQueryBlockEntityTagPacket;
-import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.coordinate.BlockPositionNetworkCodec;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
+import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -41,7 +41,7 @@ public final class ClientQueryBlockEntityTagPacketCodec extends ClientPacketCode
     }
 
     @Override
-    public void handle(@NonNull ClientQueryBlockEntityTagPacket packet, @NonNull SocketPlayerConnection connection) {
+    public void handle(@NonNull ClientQueryBlockEntityTagPacket packet, @NonNull SessionTask sessionTask) {
         // TODO
     }
 }

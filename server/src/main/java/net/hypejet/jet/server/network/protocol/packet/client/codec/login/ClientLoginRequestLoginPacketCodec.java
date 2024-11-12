@@ -2,12 +2,13 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.login;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.login.ClientLoginRequestLoginPacket;
+import net.hypejet.jet.server.network.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.UUIDNetworkCodec;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
-import net.hypejet.jet.server.session.JetLoginSession;
+import net.hypejet.jet.server.network.session.task.LoginTask;
+import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -44,13 +45,15 @@ public final class ClientLoginRequestLoginPacketCodec extends ClientPacketCodec<
     }
 
     @Override
-    public void handle(@NonNull ClientLoginRequestLoginPacket packet, @NonNull SocketPlayerConnection connection) {
-        JetLoginSession session = JetLoginSession.asLoginSession(connection.getSession());
+    public void handle(@NonNull ClientLoginRequestLoginPacket packet, @NonNull SessionTask sessionTask) {
+        if (!(sessionTask instanceof LoginTask loginTask))
+            throw new IllegalArgumentException("The current session task must be a login task");
 
+        SocketPlayerConnection connection = loginTask.connection();
         connection.setCompressionThreshold(connection.server()
                 .configuration()
                 .compressionThreshold());
 
-        session.sessionHandler().onLoginRequest(packet, session);
+        loginTask.handlePacket(packet);
     }
 }

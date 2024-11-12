@@ -1,17 +1,12 @@
 package net.hypejet.jet.server.network.protocol.packet.client.codec.configuration;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientAcknowledgeFinishConfigurationPacket;
-import net.hypejet.jet.server.entity.player.JetPlayer;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
-import net.hypejet.jet.server.session.JetConfigurationSession;
-import net.hypejet.jet.server.session.JetPlaySession;
+import net.hypejet.jet.server.network.session.task.ConfigurationTask;
+import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.Objects;
 
 /**
  * Represents a {@linkplain ClientPacketCodec client packet codec}, which reads and writes
@@ -46,14 +41,9 @@ public final class ClientAcknowledgeFinishConfigurationPacketCodec
     }
 
     @Override
-    public void handle(@NonNull ClientAcknowledgeFinishConfigurationPacket packet,
-                       @NonNull SocketPlayerConnection connection) {
-        JetConfigurationSession session = JetConfigurationSession.asConfigurationSession(connection.getSession());
-        session.handleFinishAcknowledge();
-
-        connection.setProtocolState(ProtocolState.PLAY);
-
-        JetPlayer player = Objects.requireNonNull(connection.player(), "The player must not be null");
-        connection.setSession(new JetPlaySession(player));
+    public void handle(@NonNull ClientAcknowledgeFinishConfigurationPacket packet, @NonNull SessionTask sessionTask) {
+        if (!(sessionTask instanceof ConfigurationTask configurationTask))
+            throw new IllegalArgumentException("The session task is must be a configuration task");
+        configurationTask.handleFinishAcknowledge();
     }
 }

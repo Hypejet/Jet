@@ -1,8 +1,8 @@
 package net.hypejet.jet.server.network.protocol.packet.client.codec;
 
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.PacketCodec;
+import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -31,8 +31,8 @@ public abstract class ClientPacketCodec<P extends ClientPacket> extends PacketCo
      * Handles a {@linkplain P packet}.
      *
      * @param packet the packet
-     * @param connection a connection, from which the packet was received
+     * @param sessionTask a session task, during which the packet is handled
      * @since 1.0
      */
-    public abstract void handle(@NonNull P packet, @NonNull SocketPlayerConnection connection);
+    public abstract void handle(@NonNull P packet, @NonNull SessionTask sessionTask);
 }

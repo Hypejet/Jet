@@ -2,10 +2,10 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.status;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.status.ClientServerListRequestStatusPacket;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
-import net.hypejet.jet.server.session.JetStatusSession;
+import net.hypejet.jet.server.network.session.task.SessionTask;
+import net.hypejet.jet.server.network.session.task.StatusSessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -39,8 +39,9 @@ public final class ClientServerListRequestStatusPacketCodec
     }
 
     @Override
-    public void handle(@NonNull ClientServerListRequestStatusPacket packet, @NonNull SocketPlayerConnection connection) {
-        JetStatusSession session = JetStatusSession.asLoginSession(connection.getSession());
-        session.handleStatusRequest();
+    public void handle(@NonNull ClientServerListRequestStatusPacket packet, @NonNull SessionTask sessionTask) {
+        if (!(sessionTask instanceof StatusSessionTask task))
+            throw new IllegalArgumentException("The current session task must be a status session task");
+        task.handleServerListRequest();
     }
 }

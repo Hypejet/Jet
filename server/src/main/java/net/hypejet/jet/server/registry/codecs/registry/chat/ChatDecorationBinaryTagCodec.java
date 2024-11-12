@@ -1,8 +1,8 @@
 package net.hypejet.jet.server.registry.codecs.registry.chat;
 
 import net.hypejet.jet.data.codecs.util.mapper.Mapper;
-import net.hypejet.jet.data.model.api.registry.registries.chat.decoration.ChatDecoration;
-import net.hypejet.jet.data.model.api.registry.registries.chat.decoration.ChatDecorationParameter;
+import net.hypejet.jet.data.model.api.registries.chat.decoration.ChatDecoration;
+import net.hypejet.jet.data.model.api.registries.chat.decoration.ChatDecorationParameter;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.mapper.MapperBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.registry.component.StyleBinaryTagCodec;

@@ -1,17 +1,12 @@
 package net.hypejet.jet.server.network.protocol.packet.client.codec.login;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.protocol.packet.client.login.ClientLoginAcknowledgeLoginPacket;
-import net.hypejet.jet.server.entity.player.JetPlayer;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
-import net.hypejet.jet.server.session.JetConfigurationSession;
-import net.hypejet.jet.server.session.JetLoginSession;
+import net.hypejet.jet.server.network.session.task.LoginTask;
+import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.Objects;
 
 /**
  * Represents a {@linkplain ClientPacketCodec client packet codec}, which reads and writes
@@ -44,15 +39,10 @@ public final class ClientLoginAcknowledgeLoginPacketCodec
     }
 
     @Override
-    public void handle(@NonNull ClientLoginAcknowledgeLoginPacket packet, @NonNull SocketPlayerConnection connection) {
-        JetLoginSession session = JetLoginSession.asLoginSession(connection.getSession());
-
-        session.releaseAcknowledgeLatch();
-        session.sessionHandler().onLoginAcknowledge(packet, session);
-
-        connection.setProtocolState(ProtocolState.CONFIGURATION);
-
-        JetPlayer player = Objects.requireNonNull(connection.player(), "Player cannot be null");
-        connection.setSession(new JetConfigurationSession(player));
+    public void handle(@NonNull ClientLoginAcknowledgeLoginPacket packet, @NonNull SessionTask sessionTask) {
+        if (!(sessionTask instanceof LoginTask loginTask))
+            throw new IllegalArgumentException("The current session task is not a login task");
+        // TODO: Call an event?
+        loginTask.acknowledgeFinishLogin();
     }
 }

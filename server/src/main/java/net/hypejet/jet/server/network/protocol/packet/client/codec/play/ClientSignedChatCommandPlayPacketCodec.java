@@ -6,9 +6,9 @@ import net.hypejet.jet.server.network.protocol.codecs.aggregate.CollectionNetwor
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.signing.SeenMessagesNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.signing.SignedArgumentNetworkCodec;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
+import net.hypejet.jet.server.network.session.task.SessionTask;
 import net.hypejet.jet.signing.SignedArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -54,7 +54,7 @@ public final class ClientSignedChatCommandPlayPacketCodec
     }
 
     @Override
-    public void handle(@NonNull ClientSignedChatCommandPlayPacket packet, @NonNull SocketPlayerConnection connection) {
+    public void handle(@NonNull ClientSignedChatCommandPlayPacket packet, @NonNull SessionTask sessionTask) {
         // TODO
     }
 }

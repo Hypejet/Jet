@@ -4,12 +4,11 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.play.ClientChatCommandPlayPacket;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
+import net.hypejet.jet.server.network.session.task.PlayTask;
+import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.Objects;
 
 /**
  * Represents a {@linkplain ClientPacketCodec client packet codec}, which reads and writes
@@ -41,8 +40,10 @@ public final class ClientChatCommandPlayPacketCodec extends ClientPacketCodec<Cl
     }
 
     @Override
-    public void handle(@NonNull ClientChatCommandPlayPacket packet, @NonNull SocketPlayerConnection connection) {
-        JetPlayer player = Objects.requireNonNull(connection.player(), "The player must not be null");
-        connection.server().commandManager().execute(packet.commandString(), player);
+    public void handle(@NonNull ClientChatCommandPlayPacket packet, @NonNull SessionTask sessionTask) {
+        if (!(sessionTask instanceof PlayTask playTask))
+            throw new IllegalArgumentException("The session task must be a play task");
+        JetPlayer player = playTask.player();
+        player.server().commandManager().execute(packet.commandString(), player);
     }
 }

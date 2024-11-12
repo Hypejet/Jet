@@ -3,9 +3,9 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.play;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.play.ClientPositionPlayPacket;
 import net.hypejet.jet.server.network.protocol.codecs.position.PositionFlagsCodec;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
+import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -42,7 +42,7 @@ public final class ClientPositionPlayPacketCodec extends ClientPacketCodec<Clien
     }
 
     @Override
-    public void handle(@NonNull ClientPositionPlayPacket packet, @NonNull SocketPlayerConnection connection) {
+    public void handle(@NonNull ClientPositionPlayPacket packet, @NonNull SessionTask sessionTask) {
         // TODO
     }
 }

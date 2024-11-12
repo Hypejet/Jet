@@ -4,13 +4,11 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import net.hypejet.jet.protocol.ProtocolState;
+import net.hypejet.jet.server.network.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketRegistry;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -24,8 +22,6 @@ import java.util.List;
  * @see ByteToMessageDecoder
  */
 public final class PacketDecoder extends ByteToMessageDecoder {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(PacketDecoder.class);
 
     private final SocketPlayerConnection connection;
 
@@ -41,28 +37,30 @@ public final class PacketDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-        if (!ctx.channel().isActive()) return; // The connection was closed
-        int packetId = VarIntNetworkCodec.instance().read(in);
+        this.connection.consumeSession(session -> {
+            if (!ctx.channel().isActive()) return; // The connection has been closed
 
-        ProtocolState protocolState = this.connection.getProtocolState();
-        ClientPacketCodec<?> codec = ClientPacketRegistry.codec(packetId, protocolState);
+            ProtocolState protocolState = session.protocolState();
+            int packetId = VarIntNetworkCodec.instance().read(in);
 
-        if (codec == null) throw packetReaderNotFound(packetId, protocolState);
-        out.add(codec.read(in));
+            ClientPacketCodec<?> codec = ClientPacketRegistry.codec(packetId, protocolState);
+            if (codec == null) throw packetReaderNotFound(packetId, protocolState);
 
-        int readableBytes = in.readableBytes();
-        if (readableBytes > 0) {
-            throw new IllegalStateException(String.format(
-                    "Packet with identifier of %s has been not fully read. (%s > 0)",
-                    packetId, readableBytes
-            ));
-        }
+            out.add(codec.read(in));
+
+            int readableBytes = in.readableBytes();
+            if (readableBytes > 0) {
+                throw new IllegalStateException(String.format(
+                        "Packet with identifier of %s has been not fully read. (%s > 0)",
+                        packetId, readableBytes
+                ));
+            }
+        });
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        LOGGER.error("An error occurred while decoding a packet", cause);
-        ctx.channel().close().sync();
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        this.connection.uncaughtException(Thread.currentThread(), cause);
     }
 
     private static @NonNull RuntimeException packetReaderNotFound(int packetId, @NonNull ProtocolState protocolState) {

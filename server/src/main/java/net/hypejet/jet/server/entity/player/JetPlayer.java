@@ -20,8 +20,8 @@ import net.hypejet.jet.protocol.packet.server.play.ServerPluginMessagePlayPacket
 import net.hypejet.jet.protocol.packet.server.play.ServerSystemMessagePlayPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
+import net.hypejet.jet.server.network.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
@@ -111,18 +111,20 @@ public final class JetPlayer extends JetEntity implements Player {
 
     @Override
     public void sendPluginMessage(@NonNull Key identifier, byte @NonNull [] data) {
-        Objects.requireNonNull(identifier, "The identifier must not be null");
-        Objects.requireNonNull(data, "The data must not be null");
+        this.connection.consumeSession(session -> {
+            Objects.requireNonNull(identifier, "The identifier must not be null");
+            Objects.requireNonNull(data, "The data must not be null");
 
-        ProtocolState protocolState = this.connection.getProtocolState();
-        ServerPacket packet = switch (protocolState) {
-            case CONFIGURATION -> new ServerPluginMessageConfigurationPacket(identifier, data);
-            case PLAY -> new ServerPluginMessagePlayPacket(identifier, data);
-            default -> throw new IllegalStateException("You cannot send a plugin message during "
-                    + protocolState + " protocol state");
-        };
+            ProtocolState protocolState = session.protocolState();
+            ServerPacket packet = switch (protocolState) {
+                case CONFIGURATION -> new ServerPluginMessageConfigurationPacket(identifier, data);
+                case PLAY -> new ServerPluginMessagePlayPacket(identifier, data);
+                default -> throw new IllegalStateException("You cannot send a plugin message during "
+                        + protocolState + " protocol state");
+            };
 
-        this.sendPacket(packet);
+            this.sendPacket(packet);
+        });
     }
 
     @Override

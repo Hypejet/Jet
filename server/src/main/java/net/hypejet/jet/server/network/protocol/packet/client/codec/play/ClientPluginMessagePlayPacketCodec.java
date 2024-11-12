@@ -2,15 +2,13 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.play.ClientPluginMessagePlayPacket;
-import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.protocol.codecs.identifier.PackedIdentifierNetworkCodec;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
+import net.hypejet.jet.server.network.session.task.PlayTask;
+import net.hypejet.jet.server.network.session.task.SessionTask;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.Objects;
 
 /**
  * Represents a {@linkplain ClientPacketCodec client packet codec}, which reads and writes
@@ -44,9 +42,9 @@ public final class ClientPluginMessagePlayPacketCodec extends ClientPacketCodec<
     }
 
     @Override
-    public void handle(@NonNull ClientPluginMessagePlayPacket packet,
-                       @NonNull SocketPlayerConnection connection) {
-        JetPlayer player = Objects.requireNonNull(connection.player(), "Player cannot be null");
-        player.handlePluginMessage(packet.identifier(), packet.data());
+    public void handle(@NonNull ClientPluginMessagePlayPacket packet, @NonNull SessionTask sessionTask) {
+        if (!(sessionTask instanceof PlayTask playTask))
+            throw new IllegalArgumentException("The session task must be a play task");
+        playTask.player().handlePluginMessage(packet.identifier(), packet.data());
     }
 }

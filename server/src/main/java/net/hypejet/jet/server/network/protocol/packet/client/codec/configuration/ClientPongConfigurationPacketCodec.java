@@ -2,13 +2,11 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.configuratio
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientPongConfigurationPacket;
-import net.hypejet.jet.server.entity.player.JetPlayer;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
+import net.hypejet.jet.server.network.session.task.ConfigurationTask;
+import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.Objects;
 
 /**
  * Represents a {@linkplain ClientPacketCodec client packet codec}, which reads and writes
@@ -41,8 +39,9 @@ public final class ClientPongConfigurationPacketCodec
     }
 
     @Override
-    public void handle(@NonNull ClientPongConfigurationPacket packet, @NonNull SocketPlayerConnection connection) {
-        JetPlayer player = Objects.requireNonNull(connection.player(), "The player must not be null");
-        player.handlePong(packet.pingIdentifier());
+    public void handle(@NonNull ClientPongConfigurationPacket packet, @NonNull SessionTask sessionTask) {
+        if (!(sessionTask instanceof ConfigurationTask configurationTask))
+            throw new IllegalArgumentException("The session task must be a configuration task");
+        configurationTask.player().handlePong(packet.pingIdentifier());
     }
 }

@@ -1,9 +1,9 @@
 package net.hypejet.jet.server.registry;
 
 import com.google.gson.Gson;
-import net.hypejet.jet.data.model.api.registry.DataRegistryEntry;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.data.model.server.registry.registries.pack.FeaturePack;
+import net.hypejet.jet.data.model.server.registry.registries.registry.DataRegistryEntry;
 import net.hypejet.jet.event.events.registry.RegistryInitializeEvent;
 import net.hypejet.jet.registry.MinecraftRegistry;
 import net.hypejet.jet.server.JetMinecraftServer;

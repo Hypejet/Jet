@@ -5,9 +5,9 @@ import net.hypejet.jet.protocol.packet.client.play.ClientActionPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientActionPlayPacket.Action;
 import net.hypejet.jet.server.network.protocol.codecs.enums.EnumVarIntCodec;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
+import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -70,7 +70,7 @@ public final class ClientActionPlayPacketCodec extends ClientPacketCodec<ClientA
     }
 
     @Override
-    public void handle(@NonNull ClientActionPlayPacket packet, @NonNull SocketPlayerConnection connection) {
+    public void handle(@NonNull ClientActionPlayPacket packet, @NonNull SessionTask sessionTask) {
         // TODO
     }
 }

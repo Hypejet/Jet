@@ -2,9 +2,9 @@ package net.hypejet.jet.server.network.protocol.packet.client.codec.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.play.ClientEndTickPlayPacket;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketIdentifiers;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
+import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -37,7 +37,7 @@ public final class ClientEndTickPlayPacketCodec extends ClientPacketCodec<Client
     }
 
     @Override
-    public void handle(@NonNull ClientEndTickPlayPacket packet, @NonNull SocketPlayerConnection connection) {
+    public void handle(@NonNull ClientEndTickPlayPacket packet, @NonNull SessionTask sessionTask) {
         // TODO
     }
 }
