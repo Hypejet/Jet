@@ -122,7 +122,7 @@ public final class LoginTask implements SessionTask.EventLoopTask, SessionTask.V
         this.acknowledgeFuture.cancel(false);
 
         if (this.sessionAcquisition != null)
-            this.sessionAcquisition.unlockIfNotUnlocked();
+            this.sessionAcquisition.close();
     }
 
     @Override
@@ -155,11 +155,9 @@ public final class LoginTask implements SessionTask.EventLoopTask, SessionTask.V
         if (sessionAcquisition == null)
             throw new IllegalArgumentException("The session acquirable has been not acquired");
 
-        try {
+        try (sessionAcquisition) {
             sessionAcquisition.set(new Session(ProtocolState.CONFIGURATION, this.connection,
                     new ConfigurationTask(this.connection.playerOrThrow(), this.sessionAcquirableValue)));
-        } finally {
-            sessionAcquisition.unlock();
         }
     }
 
@@ -189,7 +187,7 @@ public final class LoginTask implements SessionTask.EventLoopTask, SessionTask.V
                     player.uniqueId(), player.username(), Set.of()
             ));
         } catch (Throwable throwable) {
-            sessionAcquisition.unlock();
+            sessionAcquisition.close();
             throw throwable; // Re-throw the throwable, since it has been not completely handled
         }
     }

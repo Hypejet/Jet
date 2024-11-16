@@ -1,7 +1,9 @@
 package net.hypejet.jet.server.network.session.task;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.protocol.packet.server.configuration.ServerUpdateTagsConfigurationPacket;
 import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.registry.session.RegistryTagsUpdater;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -14,7 +16,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @author Codestech
  * @see SessionTask
  */
-public final class PlayTask implements SessionTask.EventLoopTask {
+public final class PlayTask implements SessionTask.EventLoopTask, RegistryTagsUpdater {
 
     private final JetPlayer player;
 
@@ -46,5 +48,10 @@ public final class PlayTask implements SessionTask.EventLoopTask {
      */
     public @NonNull JetPlayer player() {
         return this.player;
+    }
+
+    @Override
+    public void synchronizeTags(ServerUpdateTagsConfigurationPacket.@NonNull TagRegistry tagRegistry) {
+        // TODO
     }
 }

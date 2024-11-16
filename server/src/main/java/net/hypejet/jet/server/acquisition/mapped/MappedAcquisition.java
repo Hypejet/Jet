@@ -38,13 +38,8 @@ public record MappedAcquisition<O, M>(@NonNull Acquisition<O> originalAcquisitio
     }
 
     @Override
-    public void unlock() {
-        this.originalAcquisition.unlock();
-    }
-
-    @Override
-    public void unlockIfNotUnlocked() {
-        this.originalAcquisition.unlockIfNotUnlocked();
+    public void close() {
+        this.originalAcquisition.close();
     }
 
     @Override

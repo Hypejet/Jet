@@ -2,6 +2,8 @@ package net.hypejet.jet.server.entity.player;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import net.hypejet.jet.acquisition.Acquisition;
+import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.player.PlayerChangeClientBrandEvent;
 import net.hypejet.jet.event.events.player.PlayerChangeSettingsEvent;
@@ -22,6 +24,7 @@ import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.network.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
+import net.hypejet.jet.server.network.session.Session;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
@@ -111,11 +114,13 @@ public final class JetPlayer extends JetEntity implements Player {
 
     @Override
     public void sendPluginMessage(@NonNull Key identifier, byte @NonNull [] data) {
-        this.connection.consumeSession(session -> {
-            Objects.requireNonNull(identifier, "The identifier must not be null");
-            Objects.requireNonNull(data, "The data must not be null");
+        NullabilityUtil.requireNonNull(identifier, "identifier");
+        NullabilityUtil.requireNonNull(data, "data");
 
-            ProtocolState protocolState = session.protocolState();
+        try (Acquisition<Session> sessionAcquisition = this.connection.createOrReuseSessionAcquisition()) {
+            ProtocolState protocolState = sessionAcquisition.get().protocolState();
+
+            // TODO: This can be replaced by an interface that can be implemented by a session task
             ServerPacket packet = switch (protocolState) {
                 case CONFIGURATION -> new ServerPluginMessageConfigurationPacket(identifier, data);
                 case PLAY -> new ServerPluginMessagePlayPacket(identifier, data);
@@ -124,7 +129,7 @@ public final class JetPlayer extends JetEntity implements Player {
             };
 
             this.sendPacket(packet);
-        });
+        }
     }
 
     @Override

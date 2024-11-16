@@ -14,24 +14,14 @@ import java.util.Set;
  * @author Codestech
  * @see JetRegistryEntry
  */
-public record JetTagSpecification(@NonNull Collection<Key> tags) {
+public record Tags(@NonNull Collection<Key> tags) {
     /**
-     * Constructs the {@linkplain JetTagSpecification tag specification}.
+     * Constructs the {@linkplain Tags tags}.
      *
      * @param tags a collection of the tags
      * @since 1.0
      */
-    public JetTagSpecification {
+    public Tags {
         tags = Set.copyOf(tags);
-    }
-
-    /**
-     * Gets whether a tag has been attached to the {@linkplain JetRegistryEntry registry entry}.
-     *
-     * @param key a key of the tag
-     * @return {@code true} if the tag has been attached to the registry entry, {@code false} otherwise
-     */
-    public boolean hasTag(@NonNull Key key) {
-        return this.tags.contains(key);
     }
 }

@@ -1,5 +1,6 @@
 package net.hypejet.jet.server.network.session.task;
 
+import net.hypejet.jet.acquisition.Acquisition;
 import net.hypejet.jet.acquisition.MutableAcquisition;
 import net.hypejet.jet.data.model.api.pack.PackInfo;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
@@ -13,6 +14,7 @@ import net.hypejet.jet.protocol.packet.server.configuration.ServerKeepAliveConfi
 import net.hypejet.jet.protocol.packet.server.configuration.ServerKnownPacksConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerRegistryDataConfigurationPacket;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerUpdateTagsConfigurationPacket;
+import net.hypejet.jet.protocol.packet.server.configuration.ServerUpdateTagsConfigurationPacket.TagRegistry;
 import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.acquisition.value.AcquirableValue;
@@ -23,6 +25,7 @@ import net.hypejet.jet.server.network.session.keepalive.KeepAliveHandler;
 import net.hypejet.jet.server.network.session.keepalive.KeepAliveResponseHandler;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
 import net.hypejet.jet.server.registry.JetSerializableMinecraftRegistry;
+import net.hypejet.jet.server.registry.session.RegistryTagsUpdater;
 import net.hypejet.jet.server.util.unit.Unit;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTag;
@@ -48,12 +51,14 @@ import java.util.concurrent.TimeoutException;
  * @author Codestech
  * @see SessionTask
  */
-public final class ConfigurationTask implements SessionTask.VirtualThreadTask, KeepAliveResponseHandler {
+public final class ConfigurationTask implements SessionTask.VirtualThreadTask, KeepAliveResponseHandler,
+        RegistryTagsUpdater {
 
     private static final long TIME_OUT_DURATION = 20;
     private static final TimeUnit TIME_OUT_UNIT = TimeUnit.SECONDS;
 
     private final AcquirableValue<Session> sessionAcquirableValue;
+    private final AcquirableValue<Boolean> tagsSentValue = new AcquirableValue<>(false);
 
     private final JetPlayer player;
     private final KeepAliveHandler keepAliveHandler;
@@ -109,10 +114,22 @@ public final class ConfigurationTask implements SessionTask.VirtualThreadTask, K
                 sendRegistry(this.player, serializableRegistry, packet.featurePacks());
             }
 
-            Collection<ServerUpdateTagsConfigurationPacket.TagRegistry> tagRegistries = new HashSet<>();
-            for (JetMinecraftRegistry<?> registry : registries)
-                tagRegistries.add(registry.createTagRegistry());
-            this.player.sendPacket(new ServerUpdateTagsConfigurationPacket(Set.copyOf(tagRegistries)));
+            try (MutableAcquisition<Boolean> tagsSentAcquisition = this.tagsSentValue.acquireMutable()) {
+                Collection<Acquisition<TagRegistry>> tagRegistryAcquisitions = new HashSet<>();
+                try {
+                    for (JetMinecraftRegistry<?> registry : registries)
+                        tagRegistryAcquisitions.add(registry.createTagRegistry());
+
+                    Collection<TagRegistry> tagRegistries = new HashSet<>();
+                    for (Acquisition<TagRegistry> tagRegistryAcquisition : tagRegistryAcquisitions)
+                        tagRegistries.add(tagRegistryAcquisition.get());
+
+                    this.player.sendPacket(new ServerUpdateTagsConfigurationPacket(Set.copyOf(tagRegistries)));
+                    tagsSentAcquisition.set(true);
+                } finally {
+                    tagRegistryAcquisitions.forEach(Acquisition::close);
+                }
+            }
 
             if (!this.keepAliveHandler.stopAndAwaitTermination(TIME_OUT_DURATION, TIME_OUT_UNIT)) {
                 this.player.connection().close(); // The keep alive handler has timed out
@@ -140,7 +157,7 @@ public final class ConfigurationTask implements SessionTask.VirtualThreadTask, K
         this.acknowledgeFuture.cancel(false);
 
         if (this.sessionAcquisition != null)
-            this.sessionAcquisition.unlockIfNotUnlocked();
+            this.sessionAcquisition.close();
     }
 
     @Override
@@ -177,10 +194,8 @@ public final class ConfigurationTask implements SessionTask.VirtualThreadTask, K
         if (sessionAcquisition == null)
             throw new IllegalArgumentException("The session acquirable has been not acquired");
 
-        try {
+        try (sessionAcquisition) {
             sessionAcquisition.set(new Session(ProtocolState.PLAY, connection, new PlayTask(this.player)));
-        } finally {
-            sessionAcquisition.unlock();
         }
     }
 
@@ -194,6 +209,16 @@ public final class ConfigurationTask implements SessionTask.VirtualThreadTask, K
         return this.player;
     }
 
+    @Override
+    public void synchronizeTags(@NonNull TagRegistry tagRegistry) {
+        try (Acquisition<Boolean> tagsSentAcquisition = this.tagsSentValue.acquire()) {
+            /* If the tags have been not already sent we do not need to send them, because they are already going to
+               be sent, and they should be up-to-date thanks to the acquisition. */
+            if (!tagsSentAcquisition.get()) return;
+            this.player.sendPacket(new ServerUpdateTagsConfigurationPacket(Set.of(tagRegistry)));
+        }
+    }
+
     private void finishSession() {
         this.player.connection().ensureInEventLoop();
         MutableAcquisition<Session> sessionAcquisition = this.sessionAcquirableValue.acquireMutable();
@@ -201,7 +226,7 @@ public final class ConfigurationTask implements SessionTask.VirtualThreadTask, K
             this.sessionAcquisition = sessionAcquisition;
             this.player.sendPacket(new ServerFinishConfigurationPacket());
         } catch (Throwable throwable) {
-            sessionAcquisition.unlock();
+            sessionAcquisition.close();
             throw throwable; // Re-throw the throwable, since it has been not completely handled
         }
     }

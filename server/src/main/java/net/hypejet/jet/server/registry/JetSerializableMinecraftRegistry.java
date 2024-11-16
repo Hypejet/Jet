@@ -34,10 +34,9 @@ public final class JetSerializableMinecraftRegistry<V> extends JetMinecraftRegis
     private JetSerializableMinecraftRegistry(
             @NonNull Key registryKey, @NonNull Class<V> entryValueClass, @NonNull JetMinecraftServer server,
             @NonNull BinaryTagCodec<V> binaryTagCodec, @NonNull Set<FeaturePack> enabledFeaturePacks,
-            @NonNull List<JetRegistryEntry<V>> entries,
-            @NonNull Map<JetRegistryEntry<V>, JetTagSpecification> entryToTagSpecificationMap
+            @NonNull List<JetRegistryEntry<V>> entries, @NonNull Map<JetRegistryEntry<V>, Tags> entryToTagsMap
     ) {
-        super(registryKey, entryValueClass, server, entries, enabledFeaturePacks, entryToTagSpecificationMap);
+        super(registryKey, entryValueClass, server, entries, enabledFeaturePacks, entryToTagsMap);
         this.binaryTagCodec = NullabilityUtil.requireNonNull(binaryTagCodec, "binary tag codec");
     }
 
@@ -72,7 +71,7 @@ public final class JetSerializableMinecraftRegistry<V> extends JetMinecraftRegis
             @NonNull Gson gson, @NonNull String resourceFileName
     ) {
         List<JetRegistryEntry<V>> entries = new ArrayList<>();
-        Map<JetRegistryEntry<V>, JetTagSpecification> entryToTagSpecificationMap = new HashMap<>();
+        Map<JetRegistryEntry<V>, Tags> entryToTagsMap = new HashMap<>();
 
         for (DataRegistryEntry<?> dataEntry : JetMinecraftRegistry.entries(gson, resourceFileName)) {
             if (!entryValueClass.isAssignableFrom(dataEntry.value().getClass()))
@@ -81,14 +80,14 @@ public final class JetSerializableMinecraftRegistry<V> extends JetMinecraftRegis
             JetRegistryEntry<V> registryEntry = new JetRegistryEntry<>(dataEntry.key(),
                     entryValueClass.cast(dataEntry.value()), dataEntry.knownPackInfo());
 
-            JetTagSpecification specification = null;
-            Collection<Key> tags = dataEntry.tags();
+            Tags tags = null;
+            Collection<Key> tagCollection = dataEntry.tags();
 
-            if (tags != null)
-                specification = new JetTagSpecification(tags);
+            if (tagCollection != null)
+                tags = new Tags(tagCollection);
 
             entries.add(registryEntry);
-            entryToTagSpecificationMap.put(registryEntry, specification);
+            entryToTagsMap.put(registryEntry, tags);
         }
 
         RegistryInitializeEvent<V> initializeEvent = new RegistryInitializeEvent<>(registryKey, entryValueClass);
@@ -99,6 +98,6 @@ public final class JetSerializableMinecraftRegistry<V> extends JetMinecraftRegis
         ));
 
         return new JetSerializableMinecraftRegistry<>(registryKey, entryValueClass, server, binaryTagCodec,
-                enabledFeaturePacks, List.copyOf(entries), Map.copyOf(entryToTagSpecificationMap));
+                enabledFeaturePacks, List.copyOf(entries), Map.copyOf(entryToTagsMap));
     }
 }

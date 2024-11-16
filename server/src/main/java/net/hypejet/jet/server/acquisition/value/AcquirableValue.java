@@ -42,32 +42,14 @@ public class AcquirableValue<V> extends AbstractAcquirable<V> {
     }
 
     /**
-     * Creates {@linkplain Acquisition an immutable acquisition} of a value held by
-     * this {@linkplain AcquirableValue acquirable value}.
-     *
-     * @return the immutable acquisition
-     * @since 1.0
-     * @throws IllegalStateException if the thread has already created an acquisition
-     */
-    @Override
-    public final @NonNull Acquisition<V> acquire() {
-        Acquisition<V> acquisition = this.findAcquisition();
-        if (acquisition == null) return new ImmutableAcquisitionImpl<>(this);
-        throw new IllegalArgumentException("Current thread has already created an acquisition");
-    }
-
-    /**
      * Creates {@linkplain MutableAcquisition a mutable acquisition} of a value held by
      * this {@linkplain AcquirableValue acquirable value}.
      *
      * @return the immutable acquisition
      * @since 1.0
-     * @throws IllegalStateException if the thread has already created an acquisition
      */
     public final @NonNull MutableAcquisition<V> acquireMutable() {
-        Acquisition<V> acquisition = this.findAcquisition();
-        if (acquisition == null) return new MutableAcquisitionImpl<>(this);
-        throw new IllegalArgumentException("Current thread has already created an acquisition");
+        return new MutableAcquisitionImpl<>(this);
     }
 
     /**
@@ -87,6 +69,11 @@ public class AcquirableValue<V> extends AbstractAcquirable<V> {
      * @since 1.0
      */
     protected void onPostSet(@NonNull V value, @NonNull V previousValue) {}
+
+    @Override
+    protected final @NonNull Acquisition<V> createAcquisition() {
+        return new ImmutableAcquisitionImpl<>(this);
+    }
 
     /**
      * Represents a function that initializes a value of {@linkplain AcquirableValue an acquirable value} giving access

@@ -3,11 +3,13 @@ package net.hypejet.jet.server.network.netty.decoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import net.hypejet.jet.acquisition.Acquisition;
 import net.hypejet.jet.protocol.ProtocolState;
 import net.hypejet.jet.server.network.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketRegistry;
 import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
+import net.hypejet.jet.server.network.session.Session;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
@@ -37,10 +39,9 @@ public final class PacketDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-        this.connection.consumeSession(session -> {
-            if (!ctx.channel().isActive()) return; // The connection has been closed
-
-            ProtocolState protocolState = session.protocolState();
+        if (!ctx.channel().isActive()) return; // The connection has been closed
+        try (Acquisition<Session> sessionAcquisition = this.connection.createOrReuseSessionAcquisition()) {
+            ProtocolState protocolState = sessionAcquisition.get().protocolState();
             int packetId = VarIntNetworkCodec.instance().read(in);
 
             ClientPacketCodec<?> codec = ClientPacketRegistry.codec(packetId, protocolState);
@@ -55,7 +56,7 @@ public final class PacketDecoder extends ByteToMessageDecoder {
                         packetId, readableBytes
                 ));
             }
-        });
+        }
     }
 
     @Override

@@ -16,6 +16,7 @@ import net.hypejet.jet.protocol.packet.server.login.ServerDisconnectLoginPacket;
 import net.hypejet.jet.protocol.packet.server.login.ServerEnableCompressionLoginPacket;
 import net.hypejet.jet.protocol.packet.server.play.ServerDisconnectPlayPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.acquisition.AbstractAcquirable;
 import net.hypejet.jet.server.acquisition.mapped.MappedAcquisition;
 import net.hypejet.jet.server.acquisition.value.AcquirableValue;
 import net.hypejet.jet.server.entity.player.JetPlayer;
@@ -32,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.Consumer;
 
 import static net.hypejet.jet.server.network.netty.ChannelHandlers.PACKET_COMPRESSOR;
 import static net.hypejet.jet.server.network.netty.ChannelHandlers.PACKET_DECODER;
@@ -89,13 +89,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
         if (this.isClosed()) return null;
 
         // Acquire the session to avoid race conditions of packets and protocol states
-        Acquisition<Session> sessionAcquisition = this.sessionAcquirableValue.findAcquisition();
-        boolean shouldAcquireAndUnlock = sessionAcquisition == null;
-
-        if (shouldAcquireAndUnlock)
-            sessionAcquisition = this.sessionAcquirableValue.acquire();
-
-        try {
+        try (Acquisition<Session> sessionAcquisition = this.sessionAcquirableValue.acquire()) {
             PacketSendEvent event = new PacketSendEvent(packet);
             this.server.eventNode().call(event);
 
@@ -112,15 +106,14 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
 
             this.channel.writeAndFlush(packet, this.channel.voidPromise());
             return packet;
-        } finally {
-            if (shouldAcquireAndUnlock) sessionAcquisition.unlock();
         }
     }
 
     @Override
     public void disconnect(@NonNull Component reason) {
-        this.consumeSession(session -> {
-            ServerPacket packet = switch (session.protocolState()) {
+        try (Acquisition<Session> sessionAcquisition = this.sessionAcquirableValue.acquire()) {
+            // TODO: This can be replaced by an interface or even by a common packet
+            ServerPacket packet = switch (sessionAcquisition.get().protocolState()) {
                 case LOGIN -> new ServerDisconnectLoginPacket(reason);
                 case CONFIGURATION -> new ServerDisconnectConfigurationPacket(reason);
                 case PLAY -> new ServerDisconnectPlayPacket(reason);
@@ -130,7 +123,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
             if (packet != null)
                 this.sendPacket(packet);
             this.close();
-        });
+        }
     }
 
     @Override
@@ -179,7 +172,10 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     @Override
     public void handleDisconnection() {
         this.ensureInEventLoop();
-        this.consumeSession(Session::handleDisconnection);
+
+        try (Acquisition<Session> sessionAcquisition = this.createOrReuseSessionAcquisition()) {
+            sessionAcquisition.get().handleDisconnection();
+        }
 
         if (this.player != null)
             this.server.unregisterPlayer(this.player);
@@ -208,10 +204,11 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
      * @since 1.0
      */
     public void setCompressionThreshold(int compressionThreshold) {
-        this.consumeSession(session -> {
-            if (session.protocolState() != ProtocolState.LOGIN) {
-                throw new IllegalStateException("You cannot set a compression threshold in protocol state other" +
-                        " than login");
+        try (Acquisition<Session> sessionAcquisition = this.createOrReuseSessionAcquisition()) {
+            // TODO: This can be replaced with an interface
+            if (sessionAcquisition.get().protocolState() != ProtocolState.LOGIN) {
+                throw new IllegalStateException("You cannot set a compression threshold in" +
+                        " protocol state other than login");
             }
 
             ServerPacket packet = this.sendPacket(new ServerEnableCompressionLoginPacket(compressionThreshold));
@@ -236,18 +233,18 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
                 pipeline.addBefore(PACKET_DECODER, PACKET_DECOMPRESSOR, new PacketDecompressor(this));
                 pipeline.addBefore(PACKET_ENCODER, PACKET_COMPRESSOR, new PacketCompressor(this));
             }
-        });
+        }
     }
 
     /**
-     * Consumes the {@linkplain Session session}.
+     * Creates {@linkplain Acquisition an acquisition} of the session or uses a reused one if the caller thread already
+     * created an acquisition. See {@link AbstractAcquirable#acquire()} for more information.
      *
-     * @param consumer a consumer to consume the session with
-     * @since 1.0
-     * @see AcquirableValue#consume(Consumer)
+     * @return the acquisition
+     * @see AbstractAcquirable#acquire()
      */
-    public void consumeSession(@NonNull Consumer<Session> consumer) {
-        this.sessionAcquirableValue.consume(consumer);
+    public @NonNull Acquisition<Session> createOrReuseSessionAcquisition() {
+        return this.sessionAcquirableValue.acquire();
     }
 
     /**

@@ -131,13 +131,10 @@ public final class JetMinecraftServer implements MinecraftServer {
      * @since 1.0
      */
     public void registerPlayer(@NonNull JetPlayer player) {
-        MutableCollectionAcquisition<JetPlayer, Set<JetPlayer>> acquisition = this.playersAcquirable.acquireMutable();
-        try {
+        try (MutableCollectionAcquisition<JetPlayer, ?> acquisition = this.playersAcquirable.acquireMutable()) {
             if (!player.connection().isClosed()) { // TODO: Check whether this check is actually needed
                 acquisition.add(player);
             }
-        } finally {
-            acquisition.unlock();
         }
     }
 
@@ -148,11 +145,8 @@ public final class JetMinecraftServer implements MinecraftServer {
      * @since 1.0
      */
     public void unregisterPlayer(@NonNull JetPlayer player) {
-        MutableCollectionAcquisition<JetPlayer, Set<JetPlayer>> acquisition = this.playersAcquirable.acquireMutable();
-        try {
+        try (MutableCollectionAcquisition<JetPlayer, ?> acquisition = this.playersAcquirable.acquireMutable()) {
             acquisition.remove(player);
-        } finally {
-            acquisition.unlock();
         }
     }
 

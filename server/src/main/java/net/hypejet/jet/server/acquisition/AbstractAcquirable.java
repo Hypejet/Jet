@@ -4,13 +4,11 @@ import net.hypejet.jet.acquisition.Acquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.acquisition.value.AcquirableValue;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Consumer;
 
 /**
  * Represents something that protects a value that is guarded by a {@linkplain Lock lock} that requires to be acquired
@@ -26,66 +24,57 @@ public abstract class AbstractAcquirable<V> {
     private final ReentrantLock acquisitionsLock = new ReentrantLock();
 
     /**
-     * Consumes a value from this acquirable.
+     * Creates {@linkplain Acquisition an immutable acquisition} of a value held by
+     * this {@linkplain AcquirableValue acquirable}.
+     * </p>
+     * If the caller thread already owns the acquisition a special implementation of an acquisition is used, which
+     * reuses it and does nothing when {@link Acquisition#close()} is called. If the acquisition needs to be
+     * unlocked the already existing acquisition needs to be used to do that.
      *
-     * <p>If current thread already created an acquisition then it is being used, however this method will not
-     * unlock it. It will be unlocked only if the acquisition was created specifically for the consumption.</p>
-     *
-     * @param consumer the consumer that should consume the value
+     * @return the immutable acquisition
      * @since 1.0
      */
-    public final void consume(@NonNull Consumer<V> consumer) {
-        NullabilityUtil.requireNonNull(consumer, "consumer");
-
-        Acquisition<V> acquisition = this.findAcquisition();
-        boolean shouldAcquireAndUnlock = acquisition == null;
-
-        if (shouldAcquireAndUnlock)
-            acquisition = this.acquire();
-
+    public final @NonNull Acquisition<V> acquire() {
+        Acquisition<V> acquisition;
         try {
-            consumer.accept(acquisition.get());
+            this.acquisitionsLock.lock();
+            acquisition = this.acquisitions.get(Thread.currentThread());
         } finally {
-            if (shouldAcquireAndUnlock)
-                acquisition.unlock();
+            this.acquisitionsLock.unlock();
         }
+
+        /* We can safely call use the acquisition from the map outside the lock, because it is attached
+           to the caller thread anyway. */
+        if (acquisition == null) acquisition = this.createAcquisition();
+        else acquisition = new ReusedAcquisition<>(acquisition);
+
+        return acquisition;
     }
 
     /**
-     * Finds {@linkplain Acquisition an acquisition} (owned by the calling thread) of the value.
+     * Creates {@linkplain Acquisition an immutable acquisition} specific to this acquirable implementation.
      *
      * @return the acquisition
      * @since 1.0
      */
-    public final @Nullable Acquisition<V> findAcquisition() {
-        try {
-            this.acquisitionsLock.lock();
-            return this.acquisitions.get(Thread.currentThread());
-        } finally {
-            this.acquisitionsLock.unlock();
-        }
-    }
-
-    /**
-     * Creates {@linkplain Acquisition an immutable acquisition} of a value held by
-     * this {@linkplain AcquirableValue acquirable}.
-     *
-     * @return the immutable acquisition
-     * @since 1.0
-     * @throws IllegalStateException if the thread has already created an acquisition
-     */
-    public abstract @NonNull Acquisition<V> acquire();
+    protected abstract @NonNull Acquisition<V> createAcquisition();
 
     /**
      * Registers an acquisition.
      *
      * @param acquisition the acquisition
      * @since 1.0
+     * @throws IllegalArgumentException if an acquisition for current thread has been already registered
      */
     private void registerAcquisition(@NonNull AbstractAcquisition<V> acquisition) {
         try {
             this.acquisitionsLock.lock();
-            this.acquisitions.put(acquisition.owner, acquisition);
+
+            Thread owner = acquisition.owner;
+            if (this.acquisitions.containsKey(owner))
+                throw new IllegalArgumentException("An acquisition for current thread has been already registered");
+
+            this.acquisitions.put(owner, acquisition);
         } finally {
             this.acquisitionsLock.unlock();
         }
@@ -135,22 +124,19 @@ public abstract class AbstractAcquirable<V> {
             this.owner = Thread.currentThread();
             this.lock = NullabilityUtil.requireNonNull(lock, "lock");
 
-            this.lock.lock();
             acquirable.registerAcquisition(this);
+            this.lock.lock();
         }
 
         @Override
-        public final void unlock() {
+        public final void close() {
             this.runChecks();
+
+            if (this.unlocked) return;
             this.unlocked = true;
+
             this.acquirable.unregisterAcquisition(this);
             this.lock.unlock();
-        }
-
-        @Override
-        public final void unlockIfNotUnlocked() {
-            if (!this.isUnlocked())
-                this.unlock();
         }
 
         @Override
@@ -179,6 +165,42 @@ public abstract class AbstractAcquirable<V> {
         protected final void checkCallerThread() {
             if (Thread.currentThread() != this.owner)
                 throw new IllegalArgumentException("The caller thread does not own the acquisition");
+        }
+    }
+
+    /**
+     * Represents {@linkplain Acquisition an acquisition}, which reuses another acquisition, which was already created
+     * for a thread, which requested the acquisition to be created.
+     *
+     * @param acquisition the reused acquisition
+     * @param <V> a type of value of the reused acquisition
+     * @since 1.0
+     * @see Acquisition
+     */
+    private record ReusedAcquisition<V>(@NonNull Acquisition<V> acquisition) implements Acquisition<V> {
+        /**
+         * Constructs the {@linkplain ReusedAcquisition reused acquisition}.
+         *
+         * @param acquisition the reused acquisition
+         * @since 1.0
+         */
+        private ReusedAcquisition {
+            NullabilityUtil.requireNonNull(acquisition, "acquisition");
+        }
+
+        @Override
+        public @NonNull V get() {
+            return this.acquisition.get();
+        }
+
+        @Override
+        public void close() {
+            // NOOP
+        }
+
+        @Override
+        public boolean isUnlocked() {
+            return this.acquisition.isUnlocked();
         }
     }
 }

@@ -1,11 +1,13 @@
 package net.hypejet.jet.registry;
 
+import net.hypejet.jet.acquisition.Acquisition;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.UnaryOperator;
 
 /**
  * Represents a Minecraft registry.
@@ -87,22 +89,34 @@ public interface MinecraftRegistry<V> {
     @NonNull List<? extends RegistryEntry<V>> entries();
 
     /**
-     * Gets whether a {@linkplain RegistryEntry registry entry} specified has a tag specified attached.
+     * Creates an acquisition defining whether a {@linkplain RegistryEntry registry entry} specified
+     * has a tag specified attached.
      *
      * @param entry the registry entry
      * @param tag the tag
-     * @return {@code true} if the registry entry specified has a tag specified attached, {@code false} otherwise
+     * @return the acquisition with a value of {@code true} if the registry entry specified has
+     *         a tag specified attached, {@code false} otherwise
      * @since 1.0
      */
-    boolean hasTag(@NonNull RegistryEntry<V> entry, @NonNull Key tag);
+    @NonNull Acquisition<Boolean> hasTag(@NonNull RegistryEntry<V> entry, @NonNull Key tag);
 
     /**
-     * Gets a {@linkplain Collection collection} of tags attached to a {@linkplain RegistryEntry registry entry}
-     * specified.
+     * Creates {@linkplain Acquisition an acquisition} of a {@linkplain Collection collection} of tags attached
+     * to a {@linkplain RegistryEntry registry entry} specified.
      *
      * @param entry the registry entry
      * @return the collection
      * @since 1.0
      */
-    @NonNull Collection<Key> tagsFor(@NonNull RegistryEntry<V> entry);
+    @NonNull Acquisition<Collection<Key>> tagsFor(@NonNull RegistryEntry<V> entry);
+
+    /**
+     * Updates tags for {@linkplain RegistryEntry a registry entry} specified.
+     *
+     * @param entry the registry entry
+     * @param tagUnaryOperator a unary operator to update the tags with, the provided collection is a collection of
+     *                         current tags, the returned collection is a collection of new tags
+     * @since 1.0
+     */
+    void updateTags(@NonNull RegistryEntry<V> entry, @NonNull UnaryOperator<Collection<Key>> tagUnaryOperator);
 }

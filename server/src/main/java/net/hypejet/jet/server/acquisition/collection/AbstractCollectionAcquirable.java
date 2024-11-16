@@ -63,11 +63,6 @@ abstract class AbstractCollectionAcquirable<V, C extends Collection<V>> extends 
      */
     protected abstract @NonNull C createImmutableView(@NonNull C mutableCollection);
 
-    @Override
-    public final @NonNull Acquisition<C> acquire() {
-        return new ImmutableCollectionAcquisitionImpl<>(this);
-    }
-
     /**
      * Creates {@linkplain MutableCollectionAcquisition a mutable collection acquisition} of the collection.
      *
@@ -76,6 +71,11 @@ abstract class AbstractCollectionAcquirable<V, C extends Collection<V>> extends 
      */
     public final @NonNull MutableCollectionAcquisition<V, C> acquireMutable() {
         return new MutableCollectionAcquisitionImpl<>(this);
+    }
+
+    @Override
+    protected final @NonNull Acquisition<C> createAcquisition() {
+        return new ImmutableCollectionAcquisitionImpl<>(this);
     }
 
     /**

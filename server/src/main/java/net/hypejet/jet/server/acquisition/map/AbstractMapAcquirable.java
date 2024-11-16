@@ -46,7 +46,7 @@ abstract class AbstractMapAcquirable<K, V, M extends Map<K, V>> extends Abstract
     }
 
     @Override
-    public @NonNull Acquisition<M> acquire() {
+    protected final @NonNull Acquisition<M> createAcquisition() {
         return new ImmutableMapAcquisition<>(this);
     }
 

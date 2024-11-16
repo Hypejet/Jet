@@ -71,7 +71,7 @@ public final class HandshakeTask implements SessionTask.VirtualThreadTask {
     public void handleDisconnection() {
         this.handshakeFuture.cancel(false);
         if (this.sessionAcquisition != null)
-            this.sessionAcquisition.unlockIfNotUnlocked();
+            this.sessionAcquisition.close();
     }
 
     /**
@@ -96,7 +96,7 @@ public final class HandshakeTask implements SessionTask.VirtualThreadTask {
         } catch (Throwable throwable) {
             throw new RuntimeException(throwable);
         } finally {
-            this.sessionAcquisition.unlock();
+            this.sessionAcquisition.close();
         }
     }
 }
