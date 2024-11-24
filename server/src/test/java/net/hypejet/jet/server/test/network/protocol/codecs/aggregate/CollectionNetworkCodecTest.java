@@ -1,6 +1,5 @@
 package net.hypejet.jet.server.test.network.protocol.codecs.aggregate;
 
-import net.hypejet.jet.server.network.protocol.codecs.aggregate.CollectionNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.hypejet.jet.server.test.network.protocol.codecs.NetworkCodecTestUtil;
 import org.junit.jupiter.api.Test;

@@ -2,14 +2,18 @@ package net.hypejet.jet.server.network.protocol.codecs.pack;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.data.model.api.pack.PackInfo;
+import net.hypejet.jet.server.network.codec.CombinedNetworkCodec;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.aggregate.CollectionNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.aggregate.collection.CollectionNetworkReader;
+import net.hypejet.jet.server.network.protocol.codecs.aggregate.collection.CollectionNetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.identifier.IdentifierNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Collection;
+
 /**
- * Represents a {@linkplain NetworkCodec network codec}, which reads and writes a {@linkplain PackInfo pack info}.
+ * Represents {@linkplain NetworkCodec a network codec}, which reads and writes {@linkplain PackInfo a pack info}.
  *
  * @since 1.0
  * @author Codestech
@@ -18,8 +22,23 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class PackInfoNetworkCodec implements NetworkCodec<PackInfo> {
 
-    private static final PackInfoNetworkCodec INSTANCE = new PackInfoNetworkCodec();
-    private static final CollectionNetworkCodec<PackInfo> COLLECTION_CODEC = CollectionNetworkCodec.create(INSTANCE);
+    /**
+     * An instance of {@linkplain PackInfoNetworkCodec a pack info network writer}.
+     *
+     * @since 1.0
+     */
+    public static final PackInfoNetworkCodec INSTANCE = new PackInfoNetworkCodec();
+
+    /**
+     * An instance of {@linkplain NetworkCodec a network codec}, which reads and writes elements with type
+     * of {@linkplain Collection collections} of {@linkplain PackInfo a pack info}
+     * using {@linkplain PackInfoNetworkCodec a pack info network codec}.
+     *
+     * @since 1.0
+     */
+    public static final NetworkCodec<Collection<PackInfo>> COLLECTION_CODEC = new CombinedNetworkCodec<>(
+            new CollectionNetworkReader<>(INSTANCE), new CollectionNetworkWriter<>(INSTANCE)
+    );
 
     private PackInfoNetworkCodec() {}
 
@@ -32,26 +51,5 @@ public final class PackInfoNetworkCodec implements NetworkCodec<PackInfo> {
     public void write(@NonNull ByteBuf buf, @NonNull PackInfo object) {
         IdentifierNetworkCodec.instance().write(buf, object.key());
         StringNetworkCodec.instance().write(buf, object.version());
-    }
-
-    /**
-     * Gets an instance of the {@linkplain PackInfoNetworkCodec pack info network codec}.
-     *
-     * @return the instance
-     * @since 1.0
-     */
-    public static @NonNull PackInfoNetworkCodec instance() {
-        return INSTANCE;
-    }
-
-    /**
-     * Gets an instance of a {@linkplain CollectionNetworkCodec collection network codec}, which reads and writes
-     * {@linkplain java.util.Collection collections} of {@linkplain PackInfo pack infos}.
-     *
-     * @return the instance
-     * @since 1.0
-     */
-    public static @NonNull CollectionNetworkCodec<PackInfo> collectionCodec() {
-        return COLLECTION_CODEC;
     }
 }

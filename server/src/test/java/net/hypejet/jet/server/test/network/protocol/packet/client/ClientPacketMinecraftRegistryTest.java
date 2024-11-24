@@ -7,12 +7,12 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Represents a test of getting
- * {@linkplain net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec client packet codecs}
+ * {@linkplain net.hypejet.jet.server.network.protocol.packet.client.handler.ClientPacketCodec client packet codecs}
  * from a {@link ClientPacketRegistry client packet registry}.
  *
  * @since 1.0
  * @author Codestech
- * @see net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec
+ * @see net.hypejet.jet.server.network.protocol.packet.client.handler.ClientPacketCodec
  * @see ClientPacketRegistry
  */
 public final class ClientPacketMinecraftRegistryTest {

@@ -1,0 +1,44 @@
+package net.hypejet.jet.server.network.codec;
+
+import io.netty.buffer.ByteBuf;
+import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+/**
+ * Represents {@linkplain NetworkCodec a network codec}, which uses {@linkplain NetworkReader a network reader}
+ * and {@linkplain NetworkWriter a network writer} specified for reading and writing.
+ *
+ * @param <T> a type of the object that the codec should read and write
+ * @since 1.0
+ * @author Codestech
+ * @see NetworkReader
+ * @see NetworkWriter
+ * @see NetworkCodec
+ */
+public final class CombinedNetworkCodec<T> implements NetworkCodec<T> {
+
+    private final NetworkReader<T> reader;
+    private final NetworkWriter<T> writer;
+
+    /**
+     * Constructs the {@linkplain CombinedNetworkCodec combined network codec}.
+     *
+     * @param reader the network reader
+     * @param writer the network writer
+     * @since 1.0
+     */
+    public CombinedNetworkCodec(@NonNull NetworkReader<T> reader, @NonNull NetworkWriter<T> writer) {
+        this.reader = NullabilityUtil.requireNonNull(reader, "reader");
+        this.writer = NullabilityUtil.requireNonNull(writer, "writer");
+    }
+
+    @Override
+    public @NonNull T read(@NonNull ByteBuf buf) {
+        return this.reader.read(buf);
+    }
+
+    @Override
+    public void write(@NonNull ByteBuf buf, @NonNull T object) {
+        this.writer.write(buf, object);
+    }
+}

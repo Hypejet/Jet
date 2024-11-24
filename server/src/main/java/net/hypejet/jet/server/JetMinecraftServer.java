@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-import java.util.Set;
 
 /**
  * Represents an implementation of {@linkplain MinecraftServer Minecraft server}.

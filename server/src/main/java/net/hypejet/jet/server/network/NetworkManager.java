@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
+import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.network.netty.PlayerChannelInitializer;
@@ -29,10 +30,12 @@ public final class NetworkManager {
     /**
      * Constructs the {@linkplain NetworkManager network manager}.
      *
-     * @param server the server accepting connections
+     * @param server the server that should accept connections
      * @since 1.0
      */
     public NetworkManager(@NonNull JetMinecraftServer server) {
+        NullabilityUtil.requireNonNull(server, "server");
+
         JetServerConfiguration configuration = server.configuration();
         NettyTransportType transport = configuration.transportSelector().getTransportType();
 

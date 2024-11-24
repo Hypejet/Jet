@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.hypejet.jet.protocol.packet.client.ClientPacket;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketRegistry;
-import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.Assertions;
 

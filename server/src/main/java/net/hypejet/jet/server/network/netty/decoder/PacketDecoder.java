@@ -4,12 +4,14 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import net.hypejet.jet.acquisition.Acquisition;
+import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.protocol.ProtocolState;
+import net.hypejet.jet.protocol.packet.client.ClientPacket;
 import net.hypejet.jet.server.network.connection.SocketPlayerConnection;
+import net.hypejet.jet.server.network.netty.reader.UnhandledPacket;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketHandler;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketRegistry;
-import net.hypejet.jet.server.network.protocol.packet.client.codec.ClientPacketCodec;
-import net.hypejet.jet.server.network.session.Session;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
@@ -26,28 +28,29 @@ import java.util.List;
 public final class PacketDecoder extends ByteToMessageDecoder {
 
     private final SocketPlayerConnection connection;
+    private final ClientPacketRegistry packetRegistry;
 
     /**
      * Constructs the {@linkplain PacketDecoder packet decoder}.
      *
      * @param connection a connection that the decoding should be handled for
+     * @param packetRegistry a client packet registry that should be used for finding client packet handlers
      * @since 1.0
      */
-    public PacketDecoder(@NonNull SocketPlayerConnection connection) {
-        this.connection = connection;
+    public PacketDecoder(@NonNull SocketPlayerConnection connection, @NonNull ClientPacketRegistry packetRegistry) {
+        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
+        this.packetRegistry = NullabilityUtil.requireNonNull(packetRegistry, "packet registry");
     }
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-        if (!ctx.channel().isActive()) return; // The connection has been closed
-        try (Acquisition<Session> sessionAcquisition = this.connection.createOrReuseSessionAcquisition()) {
-            ProtocolState protocolState = sessionAcquisition.get().protocolState();
+        try (Acquisition<ProtocolState> protocolStateAcquisition = this.connection.protocolState()) {
+            ProtocolState protocolState = protocolStateAcquisition.get();
             int packetId = VarIntNetworkCodec.instance().read(in);
 
-            ClientPacketCodec<?> codec = ClientPacketRegistry.codec(packetId, protocolState);
-            if (codec == null) throw packetReaderNotFound(packetId, protocolState);
-
-            out.add(codec.read(in));
+            ClientPacketHandler<?> handler = this.packetRegistry.handlerFor(packetId, protocolState);
+            if (handler == null) throw throwPacketHandlerNotFound(packetId, protocolState);
+            UnhandledPacket<?> unhandledPacket = readPacket(in, handler); // Read the packet with generics
 
             int readableBytes = in.readableBytes();
             if (readableBytes > 0) {
@@ -56,6 +59,8 @@ public final class PacketDecoder extends ByteToMessageDecoder {
                         packetId, readableBytes
                 ));
             }
+
+            out.add(unhandledPacket);
         }
     }
 
@@ -64,8 +69,17 @@ public final class PacketDecoder extends ByteToMessageDecoder {
         this.connection.uncaughtException(Thread.currentThread(), cause);
     }
 
-    private static @NonNull RuntimeException packetReaderNotFound(int packetId, @NonNull ProtocolState protocolState) {
-        return new IllegalStateException("Could not find a reader of a packet with id of "
-                + packetId + " in protocol state " + protocolState);
+    private static @NonNull RuntimeException throwPacketHandlerNotFound(int packetId,
+                                                                        @NonNull ProtocolState protocolState) {
+        return new IllegalStateException(String.format(
+                "Could not find a reader of a packet with id of \"%s\" in protocol state \"%s\"",
+                packetId, protocolState
+        ));
+    }
+
+    private static <P extends ClientPacket> @NonNull UnhandledPacket<P> readPacket(
+            @NonNull ByteBuf buf,  @NonNull ClientPacketHandler<P> handler
+    ) {
+        return new UnhandledPacket<>(handler.read(buf), handler);
     }
 }
