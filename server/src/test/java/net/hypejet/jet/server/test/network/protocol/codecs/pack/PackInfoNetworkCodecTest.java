@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.test.network.protocol.codecs.pack;
 
-import net.hypejet.jet.data.model.pack.info.PackInfo;
+import net.hypejet.jet.data.model.api.pack.PackInfo;
 import net.hypejet.jet.server.network.protocol.codecs.pack.PackInfoNetworkCodec;
 import net.hypejet.jet.server.test.network.protocol.codecs.NetworkCodecTestUtil;
 import net.kyori.adventure.key.Key;
@@ -16,6 +16,6 @@ import org.junit.jupiter.api.Test;
 public final class PackInfoNetworkCodecTest {
     @Test
     public void test() {
-        NetworkCodecTestUtil.test(PackInfoNetworkCodec.instance(), new PackInfo(Key.key("hypejet", "datapack"), "v1"));
+        NetworkCodecTestUtil.test(PackInfoNetworkCodec.INSTANCE, new PackInfo(Key.key("hypejet", "datapack"), "v1"));
     }
 }

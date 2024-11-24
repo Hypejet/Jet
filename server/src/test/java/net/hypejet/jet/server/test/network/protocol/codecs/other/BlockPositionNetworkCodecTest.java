@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.test.network.protocol.codecs.other;
 
-import net.hypejet.jet.data.model.coordinate.BlockPosition;
+import net.hypejet.jet.data.model.api.coordinate.BlockPosition;
 import net.hypejet.jet.server.network.protocol.codecs.coordinate.BlockPositionNetworkCodec;
 import net.hypejet.jet.server.test.network.protocol.codecs.NetworkCodecTestUtil;
 import org.junit.jupiter.api.Test;

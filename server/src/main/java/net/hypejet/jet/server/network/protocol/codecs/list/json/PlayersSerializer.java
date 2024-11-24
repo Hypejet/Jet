@@ -1,8 +1,6 @@
 package net.hypejet.jet.server.network.protocol.codecs.list.json;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
@@ -10,22 +8,17 @@ import com.google.gson.JsonSerializer;
 import net.hypejet.jet.ping.ServerListPing;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * Represents a {@linkplain JsonSerializer json serializer} and a {@linkplain JsonDeserializer json deserializer},
- * which serializes and deserializes {@linkplain ServerListPing.Players players} to a {@linkplain JsonElement json
- * element}.
+ * Represents {@linkplain JsonSerializer a json serializer}, which serializes {@linkplain ServerListPing.Players server
+ * list ping players} to {@linkplain JsonElement s json element}.
  *
  * @since 1.0
  * @author Codestech
  * @see ServerListPing.Players
  * @see JsonSerializer
- * @see JsonDeserializer
  */
-public final class PlayersSerializer implements JsonSerializer<ServerListPing.Players>,
-        JsonDeserializer<ServerListPing.Players> {
+public final class PlayersSerializer implements JsonSerializer<ServerListPing.Players> {
 
     private static final String MAX_FIELD = "max";
     private static final String ONLINE_FIELD = "online";
@@ -46,23 +39,5 @@ public final class PlayersSerializer implements JsonSerializer<ServerListPing.Pl
 
         playersJson.add(SAMPLE_FIELD, sampleJson);
         return playersJson;
-    }
-
-    @Override
-    public ServerListPing.Players deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
-        JsonObject object = json.getAsJsonObject();
-
-        List<JsonElement> sampleJson = object.get(SAMPLE_FIELD).getAsJsonArray().asList();
-        List<ServerListPing.PingPlayer> sample = new ArrayList<>();
-
-        for (JsonElement element : sampleJson) {
-            sample.add(context.deserialize(element, ServerListPing.PingPlayer.class));
-        }
-
-        return new ServerListPing.Players(
-                object.get(MAX_FIELD).getAsInt(),
-                object.get(ONLINE_FIELD).getAsInt(),
-                sample
-        );
     }
 }

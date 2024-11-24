@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 public final class PackedKeyNetworkCodecTest {
     @Test
     public void test() {
-        NetworkCodecTestUtil.test(PackedKeyNetworkCodec.instance(), Key.key("identifier", "first"));
-        NetworkCodecTestUtil.test(PackedKeyNetworkCodec.instance(), Key.key("a-minecraft-identifier"));
+        NetworkCodecTestUtil.test(PackedKeyNetworkCodec.INSTANCE, Key.key("identifier", "first"));
+        NetworkCodecTestUtil.test(PackedKeyNetworkCodec.INSTANCE, Key.key("a-minecraft-identifier"));
     }
 }

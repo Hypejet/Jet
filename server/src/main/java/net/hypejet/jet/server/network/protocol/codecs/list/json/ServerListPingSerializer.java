@@ -1,7 +1,5 @@
 package net.hypejet.jet.server.network.protocol.codecs.list.json;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
@@ -13,18 +11,15 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
- * Represents a {@linkplain JsonSerializer json serializer} and a {@linkplain JsonDeserializer json deserializer},
- * which serializes and deserializes a {@linkplain ServerListPing server list ping} to a {@linkplain JsonElement json
- * element}.
+ * Represents {@linkplain JsonSerializer a json serializer}, which serializes a {@linkplain ServerListPing server list
+ * ping} to {@linkplain JsonElement a json element}.
  *
  * @since 1.0
  * @author Codestech
  * @see ServerListPing
  * @see JsonSerializer
- * @see JsonDeserializer
  */
-public final class ServerListPingSerializer implements JsonSerializer<ServerListPing>,
-        JsonDeserializer<ServerListPing> {
+public final class ServerListPingSerializer implements JsonSerializer<ServerListPing>{
 
     private static final String VERSION_FIELD = "version";
     private static final String PLAYERS_FIELD = "players";
@@ -60,38 +55,5 @@ public final class ServerListPingSerializer implements JsonSerializer<ServerList
         }
 
         return object;
-    }
-
-    @Override
-    public ServerListPing deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
-        JsonObject object = json.getAsJsonObject();
-
-        ServerListPing.Version version = context.deserialize(object.remove(VERSION_FIELD), ServerListPing.Version.class);
-
-        JsonElement playersJson = object.remove(PLAYERS_FIELD);
-        ServerListPing.Players players = null;
-
-        if (playersJson != null) {
-            players = context.deserialize(playersJson, ServerListPing.Players.class);
-        }
-
-        JsonElement descriptionJson = object.remove(DESCRIPTION_FIELD);
-        Component description = null;
-
-        if (descriptionJson != null) {
-            description = context.deserialize(descriptionJson, Component.class);
-        }
-
-        JsonElement faviconJson = object.remove(FAVICON_FIELD);
-        ServerListPing.Favicon favicon = null;
-
-        if (faviconJson != null) {
-            favicon = context.deserialize(faviconJson, ServerListPing.Favicon.class);
-        }
-
-        boolean enforcesSecureChat = object.remove(ENFORCES_SECURE_CHAT_FIELD).getAsBoolean();
-        boolean previewsChat = object.remove(PREVIEWS_CHAT_FIELD).getAsBoolean();
-
-        return new ServerListPing(version, players, description, favicon, enforcesSecureChat, previewsChat, object);
     }
 }
