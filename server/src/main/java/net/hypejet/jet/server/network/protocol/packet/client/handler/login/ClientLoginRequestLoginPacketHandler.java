@@ -20,12 +20,12 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see ClientPacketHandler
  */
 public final class ClientLoginRequestLoginPacketHandler implements ClientPacketHandler<ClientLoginRequestLoginPacket> {
-
-    private static final StringNetworkCodec USERNAME_CODEC = StringNetworkCodec.create(16);
-
     @Override
     public @NonNull ClientLoginRequestLoginPacket read(@NonNull ByteBuf buf) {
-        return new ClientLoginRequestLoginPacket(USERNAME_CODEC.read(buf), UUIDNetworkCodec.instance().read(buf));
+        return new ClientLoginRequestLoginPacket(
+                StringNetworkCodec.MAX_16_INSTANCE.read(buf),
+                UUIDNetworkCodec.INSTANCE.read(buf)
+        );
     }
 
     @Override

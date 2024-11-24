@@ -9,8 +9,8 @@ import net.hypejet.jet.ping.ServerListPing;
 import java.lang.reflect.Type;
 
 /**
- * Represents {@linkplain JsonSerializer a json serializer}, which serializes a {@linkplain ServerListPing.PingPlayer
- * server list ping player} to {@linkplain JsonElement a json element}.
+ * Represents {@linkplain JsonSerializer a json serializer}, which serializes {@linkplain ServerListPing.PingPlayer
+ * a server list ping player} to {@linkplain JsonElement a json element}.
  *
  * @since 1.0
  * @author Codestech

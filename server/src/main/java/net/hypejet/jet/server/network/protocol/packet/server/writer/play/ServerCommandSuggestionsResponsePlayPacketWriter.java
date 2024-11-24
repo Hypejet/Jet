@@ -5,7 +5,7 @@ import net.hypejet.jet.protocol.packet.server.play.ServerCommandSuggestionsRespo
 import net.hypejet.jet.protocol.packet.server.play.ServerCommandSuggestionsResponsePlayPacket.Suggestion;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.collection.CollectionNetworkWriter;
-import net.hypejet.jet.server.network.protocol.codecs.component.ComponentNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.component.ComponentNetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
@@ -28,9 +28,9 @@ public final class ServerCommandSuggestionsResponsePlayPacketWriter
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerCommandSuggestionsResponsePlayPacket object) {
-        VarIntNetworkCodec.instance().write(buf, object.transactionId());
-        VarIntNetworkCodec.instance().write(buf, object.start());
-        VarIntNetworkCodec.instance().write(buf, object.length());
+        VarIntNetworkCodec.INSTANCE.write(buf, object.transactionId());
+        VarIntNetworkCodec.INSTANCE.write(buf, object.start());
+        VarIntNetworkCodec.INSTANCE.write(buf, object.length());
         SUGGESTIONS_WRITER.write(buf, object.suggestions());
     }
 
@@ -45,8 +45,8 @@ public final class ServerCommandSuggestionsResponsePlayPacketWriter
     private static final class SuggestionWriter implements NetworkWriter<Suggestion> {
         @Override
         public void write(@NonNull ByteBuf buf, @NonNull Suggestion object) {
-            StringNetworkCodec.instance().write(buf, object.text());
-            NetworkUtil.writeOptional(object.tooltip(), ComponentNetworkCodec.instance(), buf);
+            StringNetworkCodec.INSTANCE.write(buf, object.text());
+            NetworkUtil.writeOptional(object.tooltip(), ComponentNetworkWriter.INSTANCE, buf);
         }
     }
 }

@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.protocol.packet.client.handler.configurat
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.pack.ResourcePackResult;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientResourcePackResponseConfigurationPacket;
-import net.hypejet.jet.server.network.protocol.codecs.enums.EnumVarIntCodec;
+import net.hypejet.jet.server.network.protocol.codecs.enums.EnumVarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.UUIDNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketHandler;
 import net.hypejet.jet.server.network.session.task.ConfigurationTask;
@@ -22,7 +22,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class ClientResourcePackResponseConfigurationPacketHandler
         implements ClientPacketHandler<ClientResourcePackResponseConfigurationPacket> {
 
-    private static final EnumVarIntCodec<ResourcePackResult> RESULT_CODEC = EnumVarIntCodec
+    private static final EnumVarIntNetworkCodec<ResourcePackResult> RESULT_CODEC = EnumVarIntNetworkCodec
             .builder(ResourcePackResult.class)
             .add(ResourcePackResult.SUCCESS, 0)
             .add(ResourcePackResult.DECLINED, 1)
@@ -37,7 +37,7 @@ public final class ClientResourcePackResponseConfigurationPacketHandler
     @Override
     public @NonNull ClientResourcePackResponseConfigurationPacket read(@NonNull ByteBuf buf) {
         return new ClientResourcePackResponseConfigurationPacket(
-                UUIDNetworkCodec.instance().read(buf),
+                UUIDNetworkCodec.INSTANCE.read(buf),
                 RESULT_CODEC.read(buf)
         );
     }

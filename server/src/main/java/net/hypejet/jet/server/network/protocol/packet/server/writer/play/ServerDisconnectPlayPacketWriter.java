@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.protocol.packet.server.writer.play;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.play.ServerDisconnectPlayPacket;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
-import net.hypejet.jet.server.network.protocol.codecs.component.ComponentNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.component.ComponentNetworkWriter;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -18,6 +18,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class ServerDisconnectPlayPacketWriter implements NetworkWriter<ServerDisconnectPlayPacket> {
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerDisconnectPlayPacket object) {
-        ComponentNetworkCodec.instance().write(buf, object.reason());
+        ComponentNetworkWriter.INSTANCE.write(buf, object.reason());
     }
 }

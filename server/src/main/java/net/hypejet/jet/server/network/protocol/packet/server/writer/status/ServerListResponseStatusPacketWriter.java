@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.protocol.packet.server.writer.status;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.status.ServerListResponseStatusPacket;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
-import net.hypejet.jet.server.network.protocol.codecs.list.ServerListPingWriter;
+import net.hypejet.jet.server.network.protocol.codecs.list.ServerListPingNetworkWriter;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -18,6 +18,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class ServerListResponseStatusPacketWriter implements NetworkWriter<ServerListResponseStatusPacket> {
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerListResponseStatusPacket object) {
-        ServerListPingWriter.INSTANCE.write(buf, object.ping());
+        ServerListPingNetworkWriter.INSTANCE.write(buf, object.ping());
     }
 }

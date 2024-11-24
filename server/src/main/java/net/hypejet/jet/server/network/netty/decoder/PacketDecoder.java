@@ -46,7 +46,7 @@ public final class PacketDecoder extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         try (Acquisition<ProtocolState> protocolStateAcquisition = this.connection.protocolState()) {
             ProtocolState protocolState = protocolStateAcquisition.get();
-            int packetId = VarIntNetworkCodec.instance().read(in);
+            int packetId = VarIntNetworkCodec.INSTANCE.read(in);
 
             ClientPacketHandler<?> handler = this.packetRegistry.handlerFor(packetId, protocolState);
             if (handler == null) throw throwPacketHandlerNotFound(packetId, protocolState);

@@ -12,7 +12,7 @@ import net.hypejet.jet.server.command.argument.ArgumentCodec;
 import net.hypejet.jet.server.command.argument.ArgumentCodecRegistry;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.array.varint.VarIntArrayNetworkWriter;
-import net.hypejet.jet.server.network.protocol.codecs.enums.EnumIdentifierCodec;
+import net.hypejet.jet.server.network.protocol.codecs.enums.EnumKeyNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.kyori.adventure.key.Key;
@@ -47,7 +47,7 @@ public final class ServerDeclareCommandsPlayPacketWriter implements NetworkWrite
     private static final byte HAS_REDIRECT = 0x08;
     private static final byte HAS_SUGGESTIONS_TYPE = 0x10;
 
-    private static final EnumIdentifierCodec<SuggestionsType> SUGGESTIONS_TYPE_CODEC = EnumIdentifierCodec
+    private static final EnumKeyNetworkCodec<SuggestionsType> SUGGESTIONS_TYPE_CODEC = EnumKeyNetworkCodec
             .builder(SuggestionsType.class)
             .add(SuggestionsType.ASK_SERVER, Key.key("ask_server"))
             .add(SuggestionsType.ALL_RECIPES, Key.key("all_recipes"))
@@ -77,11 +77,11 @@ public final class ServerDeclareCommandsPlayPacketWriter implements NetworkWrite
             if (redirect != null) nodeQueue.add(redirect);
         }
 
-        VarIntNetworkCodec.instance().write(buf, identifiedNodes.size());
+        VarIntNetworkCodec.INSTANCE.write(buf, identifiedNodes.size());
         for (Node node : order)
             serializeNode(identifiedNodes, node, buf);
 
-        VarIntNetworkCodec.instance().write(buf, BEGINNING_NODE_INDEX);
+        VarIntNetworkCodec.INSTANCE.write(buf, BEGINNING_NODE_INDEX);
     }
 
     private static void serializeNode(@NonNull Map<Node, Integer> identifiedNodes, @NonNull Node node,
@@ -120,12 +120,12 @@ public final class ServerDeclareCommandsPlayPacketWriter implements NetworkWrite
 
         VarIntArrayNetworkWriter.INSTANCE.write(buf, identifiers);
         if (redirect != null)
-            VarIntNetworkCodec.instance().write(buf, identifiedNodes.get(redirect));
+            VarIntNetworkCodec.INSTANCE.write(buf, identifiedNodes.get(redirect));
 
         switch (node) {
-            case LiteralNode literalNode -> StringNetworkCodec.instance().write(buf, literalNode.name());
+            case LiteralNode literalNode -> StringNetworkCodec.INSTANCE.write(buf, literalNode.name());
             case ArgumentNode argumentNode -> {
-                StringNetworkCodec.instance().write(buf, argumentNode.name());
+                StringNetworkCodec.INSTANCE.write(buf, argumentNode.name());
 
                 ArgumentType<?> argumentType = argumentNode.argumentType();
                 Class<?> argumentTypeClass = argumentType.getClass();
@@ -136,7 +136,7 @@ public final class ServerDeclareCommandsPlayPacketWriter implements NetworkWrite
                             + argumentTypeClass.getSimpleName());
                 }
 
-                VarIntNetworkCodec.instance().write(buf, codec.getParserId());
+                VarIntNetworkCodec.INSTANCE.write(buf, codec.getParserId());
                 write(argumentType, buf, codec);
 
                 SuggestionsType suggestionsType = argumentNode.suggestionsType();

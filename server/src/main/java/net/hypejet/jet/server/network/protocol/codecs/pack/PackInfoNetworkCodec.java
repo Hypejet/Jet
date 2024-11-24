@@ -6,7 +6,7 @@ import net.hypejet.jet.server.network.codec.CombinedNetworkCodec;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.collection.CollectionNetworkReader;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.collection.CollectionNetworkWriter;
-import net.hypejet.jet.server.network.protocol.codecs.identifier.IdentifierNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.key.KeyNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -44,12 +44,12 @@ public final class PackInfoNetworkCodec implements NetworkCodec<PackInfo> {
 
     @Override
     public @NonNull PackInfo read(@NonNull ByteBuf buf) {
-        return new PackInfo(IdentifierNetworkCodec.instance().read(buf), StringNetworkCodec.instance().read(buf));
+        return new PackInfo(KeyNetworkCodec.INSTANCE.read(buf), StringNetworkCodec.INSTANCE.read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull PackInfo object) {
-        IdentifierNetworkCodec.instance().write(buf, object.key());
-        StringNetworkCodec.instance().write(buf, object.version());
+        KeyNetworkCodec.INSTANCE.write(buf, object.key());
+        StringNetworkCodec.INSTANCE.write(buf, object.version());
     }
 }

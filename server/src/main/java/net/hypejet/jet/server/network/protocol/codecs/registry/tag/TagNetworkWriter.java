@@ -5,11 +5,11 @@ import net.hypejet.jet.protocol.packet.server.configuration.ServerUpdateTagsConf
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.array.varint.VarIntArrayNetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.collection.CollectionNetworkWriter;
-import net.hypejet.jet.server.network.protocol.codecs.identifier.PackedKeyNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.key.PackedKeyNetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents {@linkplain NetworkWriter a network writer}, which reads {@linkplain Tag a tag}.
+ * Represents {@linkplain NetworkWriter a network writer}, which writes {@linkplain Tag a tag}.
  *
  * @since 1.0
  * @author Codestech

@@ -39,10 +39,10 @@ public final class PacketCompressor extends MessageToByteEncoder<ByteBuf> {
             int dataLength = msg.readableBytes();
 
             if (compressionThreshold > dataLength) {
-                VarIntNetworkCodec.instance().write(out, 0);
+                VarIntNetworkCodec.INSTANCE.write(out, 0);
                 out.writeBytes(msg);
             } else {
-                VarIntNetworkCodec.instance().write(out, dataLength);
+                VarIntNetworkCodec.INSTANCE.write(out, dataLength);
                 out.writeBytes(CompressionUtil.compress(NetworkUtil.readRemainingBytes(msg)));
             }
         } catch (Throwable throwable) {

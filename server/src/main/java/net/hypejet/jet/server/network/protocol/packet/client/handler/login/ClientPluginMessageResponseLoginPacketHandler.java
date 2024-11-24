@@ -23,7 +23,7 @@ public final class ClientPluginMessageResponseLoginPacketHandler
     @Override
     public @NonNull ClientPluginMessageResponseLoginPacket read(@NonNull ByteBuf buf) {
         return new ClientPluginMessageResponseLoginPacket(
-                VarIntNetworkCodec.instance().read(buf),
+                VarIntNetworkCodec.INSTANCE.read(buf),
                 buf.readBoolean(),
                 NetworkUtil.readRemainingBytes(buf)
         );

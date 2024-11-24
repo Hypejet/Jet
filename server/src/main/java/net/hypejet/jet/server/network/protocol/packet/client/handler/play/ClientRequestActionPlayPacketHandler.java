@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.protocol.packet.client.handler.play;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.play.ClientRequestActionPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientRequestActionPlayPacket.Action;
-import net.hypejet.jet.server.network.protocol.codecs.enums.EnumVarIntCodec;
+import net.hypejet.jet.server.network.protocol.codecs.enums.EnumVarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketHandler;
 import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -19,7 +19,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class ClientRequestActionPlayPacketHandler implements ClientPacketHandler<ClientRequestActionPlayPacket> {
 
-    private static final EnumVarIntCodec<Action> ACTION_CODEC = EnumVarIntCodec.builder(Action.class)
+    private static final EnumVarIntNetworkCodec<Action> ACTION_CODEC = EnumVarIntNetworkCodec.builder(Action.class)
             .add(Action.PERFORM_RESPAWN, 0)
             .add(Action.REQUEST_STATS, 1)
             .build();

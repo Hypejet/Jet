@@ -30,9 +30,9 @@ public final class ServerSynchronizePositionPlayPacketWriter
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerSynchronizePositionPlayPacket object) {
-        VarIntNetworkCodec.instance().write(buf, object.teleportId());
-        VectorNetworkCodec.instance().write(buf, object.position());
-        VectorNetworkCodec.instance().write(buf, object.deltaMovement());
+        VarIntNetworkCodec.INSTANCE.write(buf, object.teleportId());
+        VectorNetworkCodec.INSTANCE.write(buf, object.position());
+        VectorNetworkCodec.INSTANCE.write(buf, object.deltaMovement());
         buf.writeFloat(object.yaw());
         buf.writeFloat(object.pitch());
         FLAG_CODEC.write(buf, object.relativeFlags());

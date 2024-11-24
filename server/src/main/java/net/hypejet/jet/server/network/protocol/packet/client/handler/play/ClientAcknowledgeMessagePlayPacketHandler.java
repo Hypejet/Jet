@@ -20,7 +20,7 @@ public final class ClientAcknowledgeMessagePlayPacketHandler
         implements ClientPacketHandler<ClientAcknowledgeMessagePlayPacket> {
     @Override
     public @NonNull ClientAcknowledgeMessagePlayPacket read(@NonNull ByteBuf buf) {
-        return new ClientAcknowledgeMessagePlayPacket(VarIntNetworkCodec.instance().read(buf));
+        return new ClientAcknowledgeMessagePlayPacket(VarIntNetworkCodec.INSTANCE.read(buf));
     }
 
     @Override

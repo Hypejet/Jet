@@ -5,7 +5,7 @@ import net.hypejet.jet.protocol.packet.server.configuration.ServerUpdateTagsConf
 import net.hypejet.jet.protocol.packet.server.configuration.ServerUpdateTagsConfigurationPacket.TagRegistry;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.collection.CollectionNetworkWriter;
-import net.hypejet.jet.server.network.protocol.codecs.identifier.PackedKeyNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.key.PackedKeyNetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

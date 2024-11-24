@@ -1,8 +1,8 @@
-package net.hypejet.jet.server.network.protocol.codecs.position;
+package net.hypejet.jet.server.network.protocol.codecs.coordinate;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.position.PositionFlag;
-import net.hypejet.jet.server.network.codec.NetworkCodec;
+import net.hypejet.jet.server.network.codec.NetworkReader;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -11,26 +11,32 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Represents a {@linkplain NetworkCodec network codec}, which reads and writes a {@linkplain Collection collection}
+ * Represents {@linkplain NetworkReader a network reader}, which reads {@linkplain Collection a collection}
  * of {@linkplain PositionFlag position flags}.
  *
  * @since 1.0
  * @author Codestech
  * @see PositionFlag
  * @see Collection
- * @see NetworkCodec
+ * @see NetworkReader
  */
-public final class PositionFlagsCodec implements NetworkCodec<Collection<PositionFlag>> {
+public final class PositionFlagsReader implements NetworkReader<Collection<PositionFlag>> {
 
-    private static final PositionFlagsCodec INSTANCE = new PositionFlagsCodec();
     private static final EnumMap<PositionFlag, Integer> FLAG_IDS = new EnumMap<>(PositionFlag.class);
+
+    /**
+     * An instance of {@linkplain PositionFlagsReader a position flags reader}.
+     *
+     * @since 1.0
+     */
+    public static final PositionFlagsReader INSTANCE = new PositionFlagsReader();
 
     static {
         FLAG_IDS.put(PositionFlag.ON_GROUND, 1);
         FLAG_IDS.put(PositionFlag.HORIZONTAL_COLLISION, 2);
     }
 
-    private PositionFlagsCodec() {}
+    private PositionFlagsReader() {}
 
     @Override
     public @NonNull Collection<PositionFlag> read(@NonNull ByteBuf buf) {
@@ -44,23 +50,5 @@ public final class PositionFlagsCodec implements NetworkCodec<Collection<Positio
         }
 
         return Set.copyOf(flags);
-    }
-
-    @Override
-    public void write(@NonNull ByteBuf buf, @NonNull Collection<PositionFlag> object) {
-        short value = 0;
-        for (PositionFlag flag : object)
-            value |= FLAG_IDS.get(flag);
-        buf.writeByte(value);
-    }
-
-    /**
-     * Gets an instance of the {@linkplain PositionFlagsCodec position flags codec}.
-     *
-     * @return the instance
-     * @since 1.0
-     */
-    public static @NonNull PositionFlagsCodec instance() {
-        return INSTANCE;
     }
 }

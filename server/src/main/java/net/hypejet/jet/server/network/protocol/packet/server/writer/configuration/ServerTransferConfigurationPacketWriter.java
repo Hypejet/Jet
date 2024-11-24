@@ -19,7 +19,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class ServerTransferConfigurationPacketWriter implements NetworkWriter<ServerTransferConfigurationPacket> {
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerTransferConfigurationPacket object) {
-        StringNetworkCodec.instance().write(buf, object.host());
-        VarIntNetworkCodec.instance().write(buf, object.port());
+        StringNetworkCodec.INSTANCE.write(buf, object.host());
+        VarIntNetworkCodec.INSTANCE.write(buf, object.port());
     }
 }

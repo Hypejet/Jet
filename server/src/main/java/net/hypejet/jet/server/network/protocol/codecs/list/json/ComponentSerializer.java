@@ -9,7 +9,7 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import java.lang.reflect.Type;
 
 /**
- * Represents {@linkplain JsonSerializer a json serializer}, which serializes {@linkplain Component component} to
+ * Represents {@linkplain JsonSerializer a json serializer}, which serializes {@linkplain Component a component} to
  * {@linkplain JsonElement a json element}.
  *
  * @since 1.0

@@ -41,6 +41,6 @@ public final class VarIntArrayNetworkWriter extends AggregateNetworkWriter<int[]
     @Override
     protected void encodeElements(int @NonNull [] aggregate, @NonNull ByteBuf buf) {
         for (int element : aggregate)
-            VarIntNetworkCodec.instance().write(buf, element);
+            VarIntNetworkCodec.INSTANCE.write(buf, element);
     }
 }

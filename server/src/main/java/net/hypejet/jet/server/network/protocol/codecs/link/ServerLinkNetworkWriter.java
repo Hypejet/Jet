@@ -7,8 +7,8 @@ import net.hypejet.jet.link.label.ComponentLabel;
 import net.hypejet.jet.link.label.ServerLinkLabel;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.collection.CollectionNetworkWriter;
-import net.hypejet.jet.server.network.protocol.codecs.component.ComponentNetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.enums.EnumVarIntCodec;
+import net.hypejet.jet.server.network.protocol.codecs.component.ComponentNetworkWriter;
+import net.hypejet.jet.server.network.protocol.codecs.enums.EnumVarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -23,7 +23,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class ServerLinkNetworkWriter implements NetworkWriter<ServerLink> {
 
-    private static final EnumVarIntCodec<BuiltinLabel> BUILT_IN_LABEL_CODEC = EnumVarIntCodec
+    private static final EnumVarIntNetworkCodec<BuiltinLabel> BUILT_IN_LABEL_CODEC = EnumVarIntNetworkCodec
             .builder(BuiltinLabel.class)
             .add(BuiltinLabel.BUG_REPORT, 0)
             .add(BuiltinLabel.COMMUNITY_GUIDELINES, 1)
@@ -62,9 +62,9 @@ public final class ServerLinkNetworkWriter implements NetworkWriter<ServerLink> 
 
         switch (label) {
             case BuiltinLabel builtinLabel -> BUILT_IN_LABEL_CODEC.write(buf, builtinLabel);
-            case ComponentLabel (Component component) -> ComponentNetworkCodec.instance().write(buf, component);
+            case ComponentLabel (Component component) -> ComponentNetworkWriter.INSTANCE.write(buf, component);
         }
 
-        StringNetworkCodec.instance().write(buf, object.url());
+        StringNetworkCodec.INSTANCE.write(buf, object.url());
     }
 }

@@ -19,6 +19,6 @@ public final class ServerEnableCompressionLoginPacketWriter
         implements NetworkWriter<ServerEnableCompressionLoginPacket> {
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerEnableCompressionLoginPacket object) {
-        VarIntNetworkCodec.instance().write(buf, object.threshold());
+        VarIntNetworkCodec.INSTANCE.write(buf, object.threshold());
     }
 }

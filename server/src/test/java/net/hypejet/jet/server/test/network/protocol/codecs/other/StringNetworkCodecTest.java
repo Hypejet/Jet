@@ -5,7 +5,7 @@ import net.hypejet.jet.server.test.network.protocol.codecs.NetworkCodecTestUtil;
 import org.junit.jupiter.api.Test;
 
 /**
- * Represents a test of reading and writing of a {@linkplain StringNetworkCodec string network codec}.
+ * Represents a test of reading and writing of {@linkplain StringNetworkCodec a string network codec}.
  *
  * @since 1.0
  * @author Codestech
@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test;
 public final class StringNetworkCodecTest {
     @Test
     public void testUnlimited() {
-        NetworkCodecTestUtil.test(StringNetworkCodec.instance(), "some-string");
-        NetworkCodecTestUtil.test(StringNetworkCodec.instance(), "another-string");
+        NetworkCodecTestUtil.test(StringNetworkCodec.INSTANCE, "some-string");
+        NetworkCodecTestUtil.test(StringNetworkCodec.INSTANCE, "another-string");
     }
 
     @Test
     public void testLimited() {
-        StringNetworkCodec codec = StringNetworkCodec.create(16);
+        StringNetworkCodec codec = StringNetworkCodec.MAX_16_INSTANCE;
         NetworkCodecTestUtil.test(codec, "a-valid-string");
         NetworkCodecTestUtil.testInvalid(codec, "an-invalid-string");
     }

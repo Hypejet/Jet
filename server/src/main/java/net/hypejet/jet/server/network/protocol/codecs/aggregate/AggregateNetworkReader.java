@@ -29,7 +29,7 @@ public abstract class AggregateNetworkReader<A> implements NetworkReader<A> {
 
     @Override
     public @NonNull A read(@NonNull ByteBuf buf) {
-        int length = VarIntNetworkCodec.instance().read(buf);
+        int length = VarIntNetworkCodec.INSTANCE.read(buf);
         if (length > this.maxLength)
             throw tooLongAggregateException(length, this.maxLength);
         return this.decodeElements(length, buf);

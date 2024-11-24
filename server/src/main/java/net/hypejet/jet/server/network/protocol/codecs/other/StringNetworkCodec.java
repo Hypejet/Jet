@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 /**
- * Represents a {@linkplain NetworkCodec network codec}, which reads and writes a {@linkplain String string}.
+ * Represents {@linkplain NetworkCodec a network codec}, which reads and writes a {@linkplain String string}.
  *
  * @since 1.0
  * @author Codestech
@@ -22,8 +22,21 @@ public final class StringNetworkCodec implements NetworkCodec<String> {
 
     private static final short MAX_STRING_SIZE = 32767;
 
-    private static final StringNetworkCodec MAX_SIZE_INSTANCE = new StringNetworkCodec(MAX_STRING_SIZE);
-    private static final StringNetworkCodec MAX_16_INSTANCE = new StringNetworkCodec(16);
+    /**
+     * An instance of {@linkplain StringNetworkCodec a string network codec}, which
+     * supports string sizes up to {@linkplain #MAX_STRING_SIZE a maximum allowed string size}.
+     *
+     * @since 1.0
+     */
+    public static final StringNetworkCodec INSTANCE = new StringNetworkCodec(MAX_STRING_SIZE);
+
+    /**
+     * An instance of {@linkplain StringNetworkCodec a string network codec}, which supports string
+     * sizes up to {@code 16}.
+     *
+     * @since 1.0
+     */
+    public static final StringNetworkCodec MAX_16_INSTANCE = new StringNetworkCodec(16);
 
     private final int maxStringSize;
 
@@ -33,7 +46,7 @@ public final class StringNetworkCodec implements NetworkCodec<String> {
 
     @Override
     public @NonNull String read(@NonNull ByteBuf buf) {
-        int length = VarIntNetworkCodec.instance().read(buf);
+        int length = VarIntNetworkCodec.INSTANCE.read(buf);
 
         if (length < 0 || length > this.maxStringSize)
             throw invalidLengthException(length);
@@ -57,20 +70,20 @@ public final class StringNetworkCodec implements NetworkCodec<String> {
         if (length < 0 || length > this.maxStringSize)
             throw invalidLengthException(length);
 
-        VarIntNetworkCodec.instance().write(buf, length);
+        VarIntNetworkCodec.INSTANCE.write(buf, length);
         buf.writeCharSequence(object, StandardCharsets.UTF_8);
     }
 
     private static @NonNull IllegalArgumentException invalidLengthException(int length) {
-        return new IllegalArgumentException("Invalid length of a string - " + length + ".");
+        return new IllegalArgumentException(String.format("Invalid length of a string - %s.", length));
     }
 
     /**
      * Creates a {@linkplain StringNetworkCodec string network codec}.
      *
-     * @param maxStringSize a maximum length of string allowed by the codec, the maximum is {@link #MAX_STRING_SIZE},
-     *                      when it is the maximum, the {@link #MAX_SIZE_INSTANCE} is returned,
-     *                      when it is {@code 16}, the {@link #MAX_16_INSTANCE} is returned
+     * @param maxStringSize a maximum length of string allowed by the codec, the {@link #INSTANCE}
+     *                      or {@link #MAX_16_INSTANCE} may be returned if the max string size specified is the same
+     *                      as in them
      * @return the string network codec
      * @since 1.0
      */
@@ -78,20 +91,9 @@ public final class StringNetworkCodec implements NetworkCodec<String> {
         if (maxStringSize > MAX_STRING_SIZE)
             throw new IllegalArgumentException("The maximum string size is: " + MAX_STRING_SIZE);
         if (maxStringSize == MAX_STRING_SIZE)
-            return MAX_SIZE_INSTANCE;
+            return INSTANCE;
         if (maxStringSize == 16)
             return MAX_16_INSTANCE;
         return new StringNetworkCodec(maxStringSize);
-    }
-
-    /**
-     * Gets an instance of the {@linkplain StringNetworkCodec string network codec}, whose max length
-     * is {@link #MAX_STRING_SIZE}.
-     *
-     * @return the instance
-     * @since 1.0
-     */
-    public static @NonNull StringNetworkCodec instance() {
-        return MAX_SIZE_INSTANCE;
     }
 }

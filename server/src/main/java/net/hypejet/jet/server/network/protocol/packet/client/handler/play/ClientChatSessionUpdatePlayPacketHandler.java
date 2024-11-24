@@ -26,7 +26,7 @@ public final class ClientChatSessionUpdatePlayPacketHandler
     @Override
     public @NonNull ClientChatSessionUpdatePlayPacket read(@NonNull ByteBuf buf) {
         return new ClientChatSessionUpdatePlayPacket(
-                UUIDNetworkCodec.instance().read(buf), buf.readLong(),
+                UUIDNetworkCodec.INSTANCE.read(buf), buf.readLong(),
                 PUBLIC_KEY_READER.read(buf), KEY_SIGNATURE_READER.read(buf)
         );
     }

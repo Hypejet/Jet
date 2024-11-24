@@ -7,7 +7,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.Objects;
 
 /**
- * Represents a {@linkplain NetworkCodec network codec}, which reads and writes a variable-length long.
+ * Represents {@linkplain NetworkCodec a network codec}, which reads and writes a variable-length long.
  *
  * @since 1.0
  * @author Codestech
@@ -18,7 +18,12 @@ public final class VarLongNetworkCodec implements NetworkCodec<Long> {
     private static final byte SEGMENT_BITS = 0x7F;
     private static final int CONTINUE_BIT = 0x80;
 
-    private static final VarLongNetworkCodec INSTANCE = new VarLongNetworkCodec();
+    /**
+     * An instance of {@linkplain VarLongNetworkCodec a variable-length long network codec}.
+     *
+     * @since 1.0
+     */
+    public static final VarLongNetworkCodec INSTANCE = new VarLongNetworkCodec();
 
     private VarLongNetworkCodec() {}
 
@@ -56,15 +61,5 @@ public final class VarLongNetworkCodec implements NetworkCodec<Long> {
             buf.writeByte((int) ((value & SEGMENT_BITS) | CONTINUE_BIT));
             value >>>= 7;
         }
-    }
-
-    /**
-     * Gets an instance of the {@linkplain VarLongNetworkCodec variable-length long network codec}.
-     *
-     * @return the instance
-     * @since 1.0
-     */
-    public static @NonNull VarLongNetworkCodec instance() {
-        return INSTANCE;
     }
 }

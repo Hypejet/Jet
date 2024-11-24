@@ -236,7 +236,7 @@ public final class JetPlayer extends JetEntity implements Player {
      */
     public void sendServerBrand(@NonNull String brand) {
         ByteBuf buf = Unpooled.buffer();
-        StringNetworkCodec.instance().write(buf, brand);
+        StringNetworkCodec.INSTANCE.write(buf, brand);
 
         byte[] messageData = NetworkUtil.readRemainingBytes(buf);
         this.sendPluginMessage(BRAND_PLUGIN_MESSAGE_IDENTIFIER, messageData);

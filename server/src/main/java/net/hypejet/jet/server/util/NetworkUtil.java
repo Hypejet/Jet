@@ -1,7 +1,8 @@
 package net.hypejet.jet.server.util;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.server.network.codec.NetworkCodec;
+import net.hypejet.jet.server.network.codec.NetworkReader;
+import net.hypejet.jet.server.network.codec.NetworkWriter;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -44,29 +45,29 @@ public final class NetworkUtil {
     /**
      * Reads an optional value from a {@linkplain ByteBuf byte buf}.
      *
-     * @param codec a codec, which reads the value
+     * @param reader a network reader, which should read the value
      * @param buf the byte buf
      * @return the value, {@code null} if not present
      * @param <T> a type of the value
      * @since 1.0
      */
-    public static <T> @Nullable T readOptional(@NonNull NetworkCodec<T> codec, @NonNull ByteBuf buf) {
+    public static <T> @Nullable T readOptional(@NonNull NetworkReader<T> reader, @NonNull ByteBuf buf) {
         if (!buf.readBoolean()) return null;
-        return codec.read(buf);
+        return reader.read(buf);
     }
 
     /**
      * Writes an optional value to a {@linkplain ByteBuf byte buf}.
      *
      * @param value the value, {@code null} if not present
-     * @param codec a codec, which writes the value
+     * @param writer a network writer, which should write the value
      * @param buf the byte buf
      * @param <T> a type of the value
      * @since 1.0
      */
-    public static <T> void writeOptional(@Nullable T value, @NonNull NetworkCodec<T> codec, @NonNull ByteBuf buf) {
+    public static <T> void writeOptional(@Nullable T value, @NonNull NetworkWriter<T> writer, @NonNull ByteBuf buf) {
         boolean present = value != null;
         buf.writeBoolean(present);
-        if (present) codec.write(buf, value);
+        if (present) writer.write(buf, value);
     }
 }

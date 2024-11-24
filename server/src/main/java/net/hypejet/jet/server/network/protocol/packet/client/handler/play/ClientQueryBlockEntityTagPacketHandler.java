@@ -22,8 +22,8 @@ public final class ClientQueryBlockEntityTagPacketHandler
     @Override
     public @NonNull ClientQueryBlockEntityTagPacket read(@NonNull ByteBuf buf) {
         return new ClientQueryBlockEntityTagPacket(
-                VarIntNetworkCodec.instance().read(buf),
-                BlockPositionNetworkCodec.instance().read(buf)
+                VarIntNetworkCodec.INSTANCE.read(buf),
+                BlockPositionNetworkCodec.INSTANCE.read(buf)
         );
     }
 

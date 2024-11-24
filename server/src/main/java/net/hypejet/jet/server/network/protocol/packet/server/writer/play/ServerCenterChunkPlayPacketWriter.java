@@ -18,7 +18,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class ServerCenterChunkPlayPacketWriter implements NetworkWriter<ServerCenterChunkPlayPacket> {
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerCenterChunkPlayPacket object) {
-        VarIntNetworkCodec.instance().write(buf, object.chunkX());
-        VarIntNetworkCodec.instance().write(buf, object.chunkZ());
+        VarIntNetworkCodec.INSTANCE.write(buf, object.chunkX());
+        VarIntNetworkCodec.INSTANCE.write(buf, object.chunkZ());
     }
 }

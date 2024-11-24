@@ -37,7 +37,7 @@ public final class VarIntArrayNetworkReader extends AggregateNetworkReader<int[]
     protected int @NonNull [] decodeElements(int length, @NonNull ByteBuf buf) {
         int[] integers = new int[length];
         for (int index = 0; index < length; index++)
-            integers[index] = VarIntNetworkCodec.instance().read(buf);
+            integers[index] = VarIntNetworkCodec.INSTANCE.read(buf);
         return integers;
     }
 }

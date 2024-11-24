@@ -20,7 +20,7 @@ public final class ClientConfirmTeleportationPlayPacketHandler
         implements ClientPacketHandler<ClientConfirmTeleportationPlayPacket> {
     @Override
     public @NonNull ClientConfirmTeleportationPlayPacket read(@NonNull ByteBuf buf) {
-        return new ClientConfirmTeleportationPlayPacket(VarIntNetworkCodec.instance().read(buf));
+        return new ClientConfirmTeleportationPlayPacket(VarIntNetworkCodec.INSTANCE.read(buf));
     }
 
     @Override

@@ -6,7 +6,7 @@ import net.hypejet.jet.server.network.codec.NetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain NetworkCodec network codec}, which reads and writes a {@linkplain Vector vector}.
+ * Represents {@linkplain NetworkCodec a network codec}, which reads and writes {@linkplain Vector a vector}.
  *
  * @since 1.0
  * @author Codestech
@@ -15,7 +15,12 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class VectorNetworkCodec implements NetworkCodec<Vector> {
 
-    private static final VectorNetworkCodec INSTANCE = new VectorNetworkCodec();
+    /**
+     * An instance of {@linkplain VectorNetworkCodec a vector network codec}.
+     *
+     * @since 1.0
+     */
+    public static final VectorNetworkCodec INSTANCE = new VectorNetworkCodec();
 
     private VectorNetworkCodec() {}
 
@@ -29,15 +34,5 @@ public final class VectorNetworkCodec implements NetworkCodec<Vector> {
         buf.writeDouble(object.x());
         buf.writeDouble(object.y());
         buf.writeDouble(object.z());
-    }
-
-    /**
-     * Gets an instance of the {@linkplain VectorNetworkCodec vector network codec}.
-     *
-     * @return the instance
-     * @since 1.0
-     */
-    public static @NonNull VectorNetworkCodec instance() {
-        return INSTANCE;
     }
 }

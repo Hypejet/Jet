@@ -37,7 +37,7 @@ public final class ClientCommandSuggestionsRequestPlayPacketHandler
     @Override
     public @NonNull ClientCommandSuggestionsRequestPlayPacket read(@NonNull ByteBuf buf) {
         return new ClientCommandSuggestionsRequestPlayPacket(
-                VarIntNetworkCodec.instance().read(buf),
+                VarIntNetworkCodec.INSTANCE.read(buf),
                 TEXT_CODEC.read(buf)
         );
     }

@@ -20,14 +20,13 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class ServerLoginSuccessLoginPacketWriter implements NetworkWriter<ServerLoginSuccessLoginPacket> {
 
-    private static final StringNetworkCodec USERNAME_CODEC = StringNetworkCodec.create(16);
     private static final CollectionNetworkWriter<Property> PROPERTIES_CODEC =
             new CollectionNetworkWriter<>(new PropertyWriter()); // TODO
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerLoginSuccessLoginPacket object) {
-        UUIDNetworkCodec.instance().write(buf, object.uniqueId());
-        USERNAME_CODEC.write(buf, object.username());
+        UUIDNetworkCodec.INSTANCE.write(buf, object.uniqueId());
+        StringNetworkCodec.MAX_16_INSTANCE.write(buf, object.username());
         PROPERTIES_CODEC.write(buf, object.properties());
     }
 
@@ -41,14 +40,14 @@ public final class ServerLoginSuccessLoginPacketWriter implements NetworkWriter<
     private static final class PropertyWriter implements NetworkWriter<Property> {
         @Override
         public void write(@NonNull ByteBuf buf, @NonNull Property object) {
-            StringNetworkCodec.instance().write(buf, object.key());
-            StringNetworkCodec.instance().write(buf, object.value());
+            StringNetworkCodec.INSTANCE.write(buf, object.key());
+            StringNetworkCodec.INSTANCE.write(buf, object.value());
 
             String signature = object.signature();
             buf.writeBoolean(signature != null);
 
             if (signature != null) {
-                StringNetworkCodec.instance().write(buf, signature);
+                StringNetworkCodec.INSTANCE.write(buf, signature);
             }
         }
     }

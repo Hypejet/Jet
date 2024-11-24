@@ -5,7 +5,7 @@ import net.hypejet.jet.server.test.network.protocol.codecs.NetworkCodecTestUtil;
 import org.junit.jupiter.api.Test;
 
 /**
- * Represents a test of reading and writing of a {@linkplain VarLongNetworkCodec variable-length long network codec}.
+ * Represents a test of reading and writing of {@linkplain VarLongNetworkCodec a variable-length long network codec}.
  *
  * @since 1.0
  * @author Codestech
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 public final class VarLongNetworkCodecTest {
     @Test
     public void test() {
-        NetworkCodecTestUtil.test(VarLongNetworkCodec.instance(), 235L);
-        NetworkCodecTestUtil.test(VarLongNetworkCodec.instance(), Long.MAX_VALUE);
+        NetworkCodecTestUtil.test(VarLongNetworkCodec.INSTANCE, 235L);
+        NetworkCodecTestUtil.test(VarLongNetworkCodec.INSTANCE, Long.MAX_VALUE);
     }
 }

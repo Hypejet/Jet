@@ -8,10 +8,10 @@ import net.hypejet.jet.server.network.protocol.codecs.aggregate.array.bytes.Byte
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.array.object.ObjectArrayNetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.bitset.BitSetNetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.collection.CollectionNetworkWriter;
-import net.hypejet.jet.server.network.protocol.codecs.chunk.BlockEntityNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.chunk.BlockEntityNetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.chunk.ChunkSectionNetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.other.BinaryTagCodec;
+import net.hypejet.jet.server.network.protocol.codecs.other.BinaryTagNetworkWriter;
 import net.hypejet.jet.world.chunk.BlockEntity;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -25,10 +25,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class ServerChunkAndLightDataPlayPacketWriter implements NetworkWriter<ServerChunkAndLightDataPlayPacket> {
 
-    private static final int MAX_SECTION_DATA_LENGTH = 2_097_152; // 2 MiB
-
     private static final CollectionNetworkWriter<BlockEntity> BLOCK_ENTITIES_WRITER =
-            new CollectionNetworkWriter<>(BlockEntityNetworkCodec.instance());
+            new CollectionNetworkWriter<>(BlockEntityNetworkWriter.INSTANCE);
+
     private static final ObjectArrayNetworkWriter<byte[]> ARRAY_OF_BYTE_ARRAY_WRITER =
             new ObjectArrayNetworkWriter<>(ByteArrayNetworkWriter.INSTANCE);
 
@@ -36,13 +35,13 @@ public final class ServerChunkAndLightDataPlayPacketWriter implements NetworkWri
     public void write(@NonNull ByteBuf buf, @NonNull ServerChunkAndLightDataPlayPacket object) {
         buf.writeInt(object.chunkX());
         buf.writeInt(object.chunkZ());
-        BinaryTagCodec.instance().write(buf, object.heightmaps());
+        BinaryTagNetworkWriter.INSTANCE.write(buf, object.heightmaps());
 
         ByteBuf sectionsBuf = Unpooled.buffer();
 
         try {
             object.sections().forEach(section -> ChunkSectionNetworkWriter.INSTANCE.write(sectionsBuf, section));
-            VarIntNetworkCodec.instance().write(buf, sectionsBuf.readableBytes());
+            VarIntNetworkCodec.INSTANCE.write(buf, sectionsBuf.readableBytes());
             buf.writeBytes(sectionsBuf);
         } finally {
             sectionsBuf.release();

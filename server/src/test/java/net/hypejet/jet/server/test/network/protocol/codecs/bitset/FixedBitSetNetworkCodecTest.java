@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.BitSet;
 
 /**
- * Represents a test of reading and writing of {@linkplain FixedBitSetNetworkCodec fixed bitset network codec}.
+ * Represents a test of reading and writing of {@linkplain FixedBitSetNetworkCodec a fixed bitset network codec}.
  *
  * @since 1.0
  * @author Codestech
@@ -16,7 +16,7 @@ import java.util.BitSet;
 public final class FixedBitSetNetworkCodecTest {
     @Test
     public void test() {
-        FixedBitSetNetworkCodec codec = FixedBitSetNetworkCodec.codec(20);
+        FixedBitSetNetworkCodec codec = new FixedBitSetNetworkCodec(20);
 
         BitSet validBitSet = new BitSet(20);
         validBitSet.set(0);

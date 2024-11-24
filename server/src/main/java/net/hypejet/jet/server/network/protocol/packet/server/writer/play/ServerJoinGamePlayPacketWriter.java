@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.coordinate.BlockPositionNetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.identifier.PackedKeyNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.key.PackedKeyNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.util.gamemode.GameModeUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -29,21 +29,21 @@ public final class ServerJoinGamePlayPacketWriter implements NetworkWriter<Serve
         buf.writeBoolean(object.hardcore());
 
         PackedKeyNetworkCodec.COLLECTION_CODEC.write(buf, object.dimensions());
-        VarIntNetworkCodec.instance().write(buf, object.maxPlayers());
+        VarIntNetworkCodec.INSTANCE.write(buf, object.maxPlayers());
 
         int viewDistance = object.viewDistance();
 
         if (viewDistance < MIN_VIEW_DISTANCE || viewDistance > MAX_VIEW_DISTANCE)
             throw new IllegalArgumentException("Invalid view distance: " + viewDistance);
 
-        VarIntNetworkCodec.instance().write(buf, object.viewDistance());
-        VarIntNetworkCodec.instance().write(buf, object.simulationDistance());
+        VarIntNetworkCodec.INSTANCE.write(buf, object.viewDistance());
+        VarIntNetworkCodec.INSTANCE.write(buf, object.simulationDistance());
 
         buf.writeBoolean(object.reducedDebugInfo());
         buf.writeBoolean(object.enableRespawnScreen());
         buf.writeBoolean(object.limitedCrafting());
 
-        VarIntNetworkCodec.instance().write(buf, object.dimensionType());
+        VarIntNetworkCodec.INSTANCE.write(buf, object.dimensionType());
         PackedKeyNetworkCodec.INSTANCE.write(buf, object.dimensionName());
 
         buf.writeLong(object.hashedSeed());
@@ -59,11 +59,11 @@ public final class ServerJoinGamePlayPacketWriter implements NetworkWriter<Serve
 
         if (deathLocation != null) {
             PackedKeyNetworkCodec.INSTANCE.write(buf, deathLocation.deathDimensionName());
-            BlockPositionNetworkCodec.instance().write(buf, deathLocation.deathPosition());
+            BlockPositionNetworkCodec.INSTANCE.write(buf, deathLocation.deathPosition());
         }
 
-        VarIntNetworkCodec.instance().write(buf, object.portalCooldown());
-        VarIntNetworkCodec.instance().write(buf, object.seaLevel());
+        VarIntNetworkCodec.INSTANCE.write(buf, object.portalCooldown());
+        VarIntNetworkCodec.INSTANCE.write(buf, object.seaLevel());
         buf.writeBoolean(object.enforcesSecureChat());
     }
 }

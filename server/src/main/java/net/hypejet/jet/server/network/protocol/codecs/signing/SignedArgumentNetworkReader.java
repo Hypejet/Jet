@@ -19,7 +19,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class SignedArgumentNetworkReader implements NetworkReader<SignedArgument> {
 
     private static final int ARGUMENT_SIGNATURE_LENGTH = 256;
-    private static final StringNetworkCodec ARGUMENT_NAME_CODEC = StringNetworkCodec.create(16);
 
     /**
      * An instance of {@linkplain SignedArgumentNetworkReader a signed argument network reader}.
@@ -29,7 +28,7 @@ public final class SignedArgumentNetworkReader implements NetworkReader<SignedAr
     public static final SignedArgumentNetworkReader INSTANCE = new SignedArgumentNetworkReader();
 
     /**
-     * An instance of {@linkplain CollectionNetworkReader a collection network reader}, which writes elements
+     * An instance of {@linkplain CollectionNetworkReader a collection network reader}, which reads elements
      * with a type of {@linkplain SignedArgument signed argument}.
      */
     public static final CollectionNetworkReader<SignedArgument> COLLECTION_READER =
@@ -40,7 +39,7 @@ public final class SignedArgumentNetworkReader implements NetworkReader<SignedAr
     @Override
     public @NonNull SignedArgument read(@NonNull ByteBuf buf) {
         return new SignedArgument(
-                ARGUMENT_NAME_CODEC.read(buf),
+                StringNetworkCodec.MAX_16_INSTANCE.read(buf),
                 NetworkUtil.readBytes(buf, ARGUMENT_SIGNATURE_LENGTH)
         );
     }

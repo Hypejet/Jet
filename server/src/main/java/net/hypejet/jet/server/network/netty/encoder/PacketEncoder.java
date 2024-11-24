@@ -59,7 +59,7 @@ public final class PacketEncoder extends MessageToByteEncoder<ServerPacket> {
 
     private static <P extends ServerPacket> void write(@NonNull RegistryPacketSpecification<P> specification,
                                                        @NonNull ByteBuf buf, @NonNull ServerPacket packet) {
-        VarIntNetworkCodec.instance().write(buf, specification.packetIdentifier());
+        VarIntNetworkCodec.INSTANCE.write(buf, specification.packetIdentifier());
         specification.packetWriter().write(buf, specification.packetClass().cast(packet));
     }
 }

@@ -25,7 +25,7 @@ public final class ServerRemoveResourcePackConfigurationPacketWriter
         buf.writeBoolean(uniqueId != null);
 
         if (uniqueId != null) {
-            UUIDNetworkCodec.instance().write(buf, uniqueId);
+            UUIDNetworkCodec.INSTANCE.write(buf, uniqueId);
         }
     }
 }

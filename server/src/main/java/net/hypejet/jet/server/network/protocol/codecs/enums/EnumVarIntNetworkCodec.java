@@ -1,39 +1,41 @@
 package net.hypejet.jet.server.network.protocol.codecs.enums;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.util.collection.ByteObjectHashMap;
-import io.netty.util.collection.ByteObjectMap;
+import io.netty.util.collection.IntObjectHashMap;
+import io.netty.util.collection.IntObjectMap;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.EnumMap;
 import java.util.Objects;
 
 /**
- * Represents a {@linkplain NetworkCodec network codec}, which reads an enum from a byte and write it to the byte.
+ * Represents {@linkplain NetworkCodec a network codec}, which reads/write an enum from/to a variable-length integer.
  *
  * @param <E> a type of the enum
  * @since 1.0
  * @author Codestech
  * @see Builder
+ * @see VarIntNetworkCodec
  */
-public final class EnumByteCodec<E extends Enum<E>> implements NetworkCodec<E> {
+public final class EnumVarIntNetworkCodec<E extends Enum<E>> implements NetworkCodec<E> {
 
-    private final EnumMap<E, Byte> enumToByteMap;
-    private final ByteObjectMap<E> byteToEnumMap;
+    private final EnumMap<E, Integer> enumToIntMap;
+    private final IntObjectMap<E> intToEnumMap;
 
-    private EnumByteCodec(@NonNull Class<E> enumClass, @NonNull ByteObjectMap<E> entries) {
-        this.enumToByteMap = new EnumMap<>(enumClass);
-        this.byteToEnumMap = entries;
-        entries.forEach((key, value) -> this.enumToByteMap.put(value, key));
+    private EnumVarIntNetworkCodec(@NonNull Class<E> enumClass, @NonNull IntObjectMap<E> entries) {
+        this.enumToIntMap = new EnumMap<>(enumClass);
+        this.intToEnumMap = entries;
+        entries.forEach((key, value) -> this.enumToIntMap.put(value, key));
     }
 
     @Override
     public @NonNull E read(@NonNull ByteBuf buf) {
         Objects.requireNonNull(buf, "The byte buf must not be null");
 
-        byte enumEntryId = buf.readByte();
-        E enumEntry = this.byteToEnumMap.get(enumEntryId);
+        int enumEntryId = VarIntNetworkCodec.INSTANCE.read(buf);
+        E enumEntry = this.intToEnumMap.get(enumEntryId);
 
         if (enumEntry == null)
             throw new IllegalArgumentException("Could not find an enum entry with identifier of: " + enumEntryId);
@@ -46,15 +48,15 @@ public final class EnumByteCodec<E extends Enum<E>> implements NetworkCodec<E> {
         Objects.requireNonNull(buf, "The byte buf must not be null");
         Objects.requireNonNull(object, "The object must not be null");
 
-        Byte enumEntryId = this.enumToByteMap.get(object);
+        Integer enumEntryId = this.enumToIntMap.get(object);
         if (enumEntryId == null)
             throw new IllegalArgumentException("Could not find an identifier for an enum entry of: " + object);
 
-        buf.writeByte(enumEntryId);
+        VarIntNetworkCodec.INSTANCE.write(buf, enumEntryId);
     }
 
     /**
-     * Creates a builder of the {@linkplain EnumByteCodec enum byte codec}.
+     * Creates a builder of the {@linkplain EnumVarIntNetworkCodec enum var-int network codec}.
      *
      * @param <E> a type of the enum that the codec should encode and decode
      * @return the builder
@@ -65,43 +67,44 @@ public final class EnumByteCodec<E extends Enum<E>> implements NetworkCodec<E> {
     }
 
     /**
-     * Represents a builder of the {@linkplain EnumByteCodec enum byte codec}.
+     * Represents a builder of the {@linkplain EnumVarIntNetworkCodec enum variable-length integer network codec}.
      *
      * @param <E> a type of the enum that the codec should encode and decode
      * @since 1.0
      * @author Codestech
-     * @see EnumByteCodec
+     * @see EnumVarIntNetworkCodec
      */
     public static class Builder<E extends Enum<E>> {
 
         private final Class<E> enumClass;
-        private final ByteObjectMap<E> map = new ByteObjectHashMap<>();
+        private final IntObjectMap<E> map = new IntObjectHashMap<>();
 
         private Builder(@NonNull Class<E> enumClass) {
             this.enumClass = enumClass;
         }
 
         /**
-         * Adds an enum entry and byte representation of it.
+         * Adds an enum entry and integer representation of it.
          *
          * @param entry the enum entry
-         * @param value the byte representation of the enum entry
+         * @param integer the integer representation the enum entry
          * @return this builder
          * @since 1.0
          */
-        public @NonNull Builder<E> add(@NonNull E entry, byte value) {
-            this.map.put(value, entry);
+        public @NonNull Builder<E> add(@NonNull E entry, int integer) {
+            this.map.put(integer, entry);
             return this;
         }
 
         /**
-         * Builds the {@linkplain EnumByteCodec enum byte codec}.
+         * Builds {@linkplain EnumVarIntNetworkCodec an enum variable-length integer network codec} using
+         * values registered in this builder.
          *
          * @return the codec
          * @since 1.0
          */
-        public @NonNull EnumByteCodec<E> build() {
-            return new EnumByteCodec<>(this.enumClass, this.map);
+        public @NonNull EnumVarIntNetworkCodec<E> build() {
+            return new EnumVarIntNetworkCodec<>(this.enumClass, this.map);
         }
     }
 }

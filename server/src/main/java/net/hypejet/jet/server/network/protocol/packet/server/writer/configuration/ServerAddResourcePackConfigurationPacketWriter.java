@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.protocol.packet.server.writer.configurati
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerAddResourcePackConfigurationPacket;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
-import net.hypejet.jet.server.network.protocol.codecs.component.ComponentNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.component.ComponentNetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.UUIDNetworkCodec;
 import net.kyori.adventure.text.Component;
@@ -25,8 +25,8 @@ public final class ServerAddResourcePackConfigurationPacketWriter
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerAddResourcePackConfigurationPacket object) {
-        UUIDNetworkCodec.instance().write(buf, object.uniqueId());
-        StringNetworkCodec.instance().write(buf, object.url());
+        UUIDNetworkCodec.INSTANCE.write(buf, object.uniqueId());
+        StringNetworkCodec.INSTANCE.write(buf, object.url());
 
         HASH_CODEC.write(buf, object.hash());
         buf.writeBoolean(object.forced());
@@ -35,7 +35,7 @@ public final class ServerAddResourcePackConfigurationPacketWriter
         buf.writeBoolean(prompt != null);
 
         if (prompt != null) {
-            ComponentNetworkCodec.instance().write(buf, object.prompt());
+            ComponentNetworkWriter.INSTANCE.write(buf, object.prompt());
         }
     }
 }

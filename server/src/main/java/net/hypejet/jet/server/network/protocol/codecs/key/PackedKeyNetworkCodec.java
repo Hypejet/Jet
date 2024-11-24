@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.network.protocol.codecs.identifier;
+package net.hypejet.jet.server.network.protocol.codecs.key;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.CombinedNetworkCodec;
@@ -12,7 +12,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.Collection;
 
 /**
- * Represents a {@linkplain NetworkCodec network codec}, which reads and writes a {@linkplain Key key}
+ * Represents {@linkplain NetworkCodec a network codec}, which reads and writes {@linkplain Key a key}
  * from/to a single {@linkplain String string}.
  *
  * @since 1.0
@@ -45,11 +45,11 @@ public final class PackedKeyNetworkCodec implements NetworkCodec<Key> {
 
     @Override
     public @NonNull Key read(@NonNull ByteBuf buf) {
-        return Key.key(StringNetworkCodec.instance().read(buf));
+        return Key.key(StringNetworkCodec.INSTANCE.read(buf));
     }
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull Key object) {
-        StringNetworkCodec.instance().write(buf, object.asString());
+        StringNetworkCodec.INSTANCE.write(buf, object.asString());
     }
 }

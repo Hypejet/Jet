@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.protocol.packet.client.handler.configurat
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientInformationConfigurationPacket;
-import net.hypejet.jet.server.network.protocol.codecs.settings.PlayerSettingsCodec;
+import net.hypejet.jet.server.network.protocol.codecs.settings.PlayerSettingsReader;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketHandler;
 import net.hypejet.jet.server.network.session.task.ConfigurationTask;
 import net.hypejet.jet.server.network.session.task.SessionTask;
@@ -21,7 +21,7 @@ public final class ClientInformationConfigurationPacketHandler
         implements ClientPacketHandler<ClientInformationConfigurationPacket> {
     @Override
     public @NonNull ClientInformationConfigurationPacket read(@NonNull ByteBuf buf) {
-        return new ClientInformationConfigurationPacket(PlayerSettingsCodec.instance().read(buf));
+        return new ClientInformationConfigurationPacket(PlayerSettingsReader.INSTANCE.read(buf));
     }
 
     @Override

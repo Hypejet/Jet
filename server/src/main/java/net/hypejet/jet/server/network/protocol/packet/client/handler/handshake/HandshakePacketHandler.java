@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.protocol.packet.client.handler.handshake;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.handshake.ClientHandshakePacket;
 import net.hypejet.jet.protocol.packet.client.handshake.ClientHandshakePacket.HandshakeIntent;
-import net.hypejet.jet.server.network.protocol.codecs.enums.EnumVarIntCodec;
+import net.hypejet.jet.server.network.protocol.codecs.enums.EnumVarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketHandler;
@@ -22,7 +22,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class HandshakePacketHandler implements ClientPacketHandler<ClientHandshakePacket> {
 
-    private static final EnumVarIntCodec<HandshakeIntent> HANDSHAKE_INTENT_CODEC = EnumVarIntCodec
+    private static final EnumVarIntNetworkCodec<HandshakeIntent> HANDSHAKE_INTENT_CODEC = EnumVarIntNetworkCodec
             .builder(HandshakeIntent.class)
             .add(HandshakeIntent.STATUS, 1)
             .add(HandshakeIntent.LOGIN, 2)
@@ -33,7 +33,7 @@ public final class HandshakePacketHandler implements ClientPacketHandler<ClientH
 
     @Override
     public @NonNull ClientHandshakePacket read(@NonNull ByteBuf buf) {
-        return new ClientHandshakePacket(VarIntNetworkCodec.instance().read(buf), ADDRESS_CODEC.read(buf),
+        return new ClientHandshakePacket(VarIntNetworkCodec.INSTANCE.read(buf), ADDRESS_CODEC.read(buf),
                 buf.readUnsignedShort(), HANDSHAKE_INTENT_CODEC.read(buf));
     }
 

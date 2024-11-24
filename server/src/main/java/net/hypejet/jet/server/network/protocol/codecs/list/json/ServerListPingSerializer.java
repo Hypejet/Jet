@@ -11,7 +11,7 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
- * Represents {@linkplain JsonSerializer a json serializer}, which serializes a {@linkplain ServerListPing server list
+ * Represents {@linkplain JsonSerializer a json serializer}, which serializes {@linkplain ServerListPing a server list
  * ping} to {@linkplain JsonElement a json element}.
  *
  * @since 1.0

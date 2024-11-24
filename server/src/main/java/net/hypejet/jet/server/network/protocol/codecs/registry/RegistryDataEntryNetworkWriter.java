@@ -4,8 +4,8 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerRegistryDataConfigurationPacket.Entry;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.collection.CollectionNetworkWriter;
-import net.hypejet.jet.server.network.protocol.codecs.identifier.PackedKeyNetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.other.BinaryTagCodec;
+import net.hypejet.jet.server.network.protocol.codecs.key.PackedKeyNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.other.BinaryTagNetworkWriter;
 import net.kyori.adventure.nbt.BinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -44,7 +44,7 @@ public final class RegistryDataEntryNetworkWriter implements NetworkWriter<Entry
         buf.writeBoolean(data != null);
 
         if (data != null) {
-            BinaryTagCodec.instance().write(buf, data);
+            BinaryTagNetworkWriter.INSTANCE.write(buf, data);
         }
     }
 }

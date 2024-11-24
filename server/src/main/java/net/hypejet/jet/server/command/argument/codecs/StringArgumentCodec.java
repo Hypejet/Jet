@@ -4,7 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType.StringType;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.command.argument.ArgumentCodec;
-import net.hypejet.jet.server.network.protocol.codecs.enums.EnumVarIntCodec;
+import net.hypejet.jet.server.network.protocol.codecs.enums.EnumVarIntNetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -18,7 +18,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class StringArgumentCodec extends ArgumentCodec<StringArgumentType> {
 
-    private static final EnumVarIntCodec<StringType> STRING_TYPE_CODEC = EnumVarIntCodec.builder(StringType.class)
+    private static final EnumVarIntNetworkCodec<StringType> STRING_TYPE_CODEC = EnumVarIntNetworkCodec.builder(StringType.class)
             .add(StringType.SINGLE_WORD, 0)
             .add(StringType.QUOTABLE_PHRASE, 1)
             .add(StringType.GREEDY_PHRASE, 2)

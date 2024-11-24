@@ -34,7 +34,7 @@ public abstract class AggregateNetworkWriter<A> implements NetworkWriter<A> {
         if (length > this.maxLength)
             throw tooLongAggregateException(length, this.maxLength);
 
-        VarIntNetworkCodec.instance().write(buf, length);
+        VarIntNetworkCodec.INSTANCE.write(buf, length);
         this.encodeElements(object, buf);
     }
 

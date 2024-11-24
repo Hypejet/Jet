@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.protocol.packet.client.handler.play;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.play.ClientSignedChatCommandPlayPacket;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.signing.SeenMessagesNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.signing.SeenMessagesNetworkReader;
 import net.hypejet.jet.server.network.protocol.codecs.signing.SignedArgumentNetworkReader;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketHandler;
 import net.hypejet.jet.server.network.session.task.SessionTask;
@@ -23,10 +23,10 @@ public final class ClientSignedChatCommandPlayPacketHandler
     @Override
     public @NonNull ClientSignedChatCommandPlayPacket read(@NonNull ByteBuf buf) {
         return new ClientSignedChatCommandPlayPacket(
-                StringNetworkCodec.instance().read(buf),
+                StringNetworkCodec.INSTANCE.read(buf),
                 buf.readLong(), buf.readLong(),
                 SignedArgumentNetworkReader.COLLECTION_READER.read(buf),
-                SeenMessagesNetworkCodec.instance().read(buf)
+                SeenMessagesNetworkReader.INSTANCE.read(buf)
         );
     }
 

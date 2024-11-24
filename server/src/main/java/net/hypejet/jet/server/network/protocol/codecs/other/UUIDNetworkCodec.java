@@ -7,7 +7,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.UUID;
 
 /**
- * Represents a {@linkplain NetworkCodec network codec}, which reads and writes a {@linkplain UUID unique identifier}.
+ * Represents {@linkplain NetworkCodec a network codec}, which reads and writes {@linkplain UUID a unique identifier}.
  *
  * @since 1.0
  * @author Codestech
@@ -16,7 +16,12 @@ import java.util.UUID;
  */
 public final class UUIDNetworkCodec implements NetworkCodec<UUID> {
 
-    private static final UUIDNetworkCodec INSTANCE = new UUIDNetworkCodec();
+    /**
+     * An instance of {@linkplain UUIDNetworkCodec a unique identifier network codec}.
+     *
+     * @since 1.0
+     */
+    public static final UUIDNetworkCodec INSTANCE = new UUIDNetworkCodec();
 
     private UUIDNetworkCodec() {}
 
@@ -29,15 +34,5 @@ public final class UUIDNetworkCodec implements NetworkCodec<UUID> {
     public void write(@NonNull ByteBuf buf, @NonNull UUID object) {
         buf.writeLong(object.getMostSignificantBits());
         buf.writeLong(object.getLeastSignificantBits());
-    }
-
-    /**
-     * Gets an instance of the {@linkplain UUIDNetworkCodec unique identifier network codec}.
-     *
-     * @return the instance
-     * @since 1.0
-     */
-    public static @NonNull UUIDNetworkCodec instance() {
-        return INSTANCE;
     }
 }

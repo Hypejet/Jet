@@ -6,7 +6,7 @@ import net.hypejet.jet.server.network.codec.NetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain NetworkCodec network codec}, which reads and writes a {@linkplain Position position}.
+ * Represents {@linkplain NetworkCodec a network codec}, which reads and writes {@linkplain Position a position}.
  *
  * @since 1.0
  * @author Codestech
@@ -15,7 +15,12 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class PositionNetworkCodec implements NetworkCodec<Position> {
 
-    private static final PositionNetworkCodec INSTANCE = new PositionNetworkCodec();
+    /**
+     * An instance of {@linkplain PositionNetworkCodec a position network codec}.
+     *
+     * @since 1.0
+     */
+    public static final PositionNetworkCodec INSTANCE = new PositionNetworkCodec();
 
     private PositionNetworkCodec() {}
 
@@ -31,15 +36,5 @@ public final class PositionNetworkCodec implements NetworkCodec<Position> {
         buf.writeDouble(object.z());
         buf.writeFloat(object.yaw());
         buf.writeFloat(object.pitch());
-    }
-
-    /**
-     * Gets an instance of the {@linkplain PositionNetworkCodec position network codec}.
-     *
-     * @return the instance
-     * @since 1.0
-     */
-    public static @NonNull PositionNetworkCodec instance() {
-        return INSTANCE;
     }
 }

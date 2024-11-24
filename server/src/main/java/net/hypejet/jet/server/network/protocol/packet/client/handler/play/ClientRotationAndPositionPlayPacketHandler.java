@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.protocol.packet.client.handler.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.play.ClientRotationAndPositionPlayPacket;
-import net.hypejet.jet.server.network.protocol.codecs.position.PositionFlagsCodec;
+import net.hypejet.jet.server.network.protocol.codecs.coordinate.PositionFlagsReader;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketHandler;
 import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -22,7 +22,7 @@ public final class ClientRotationAndPositionPlayPacketHandler
     public @NonNull ClientRotationAndPositionPlayPacket read(@NonNull ByteBuf buf) {
         return new ClientRotationAndPositionPlayPacket(
                 buf.readDouble(), buf.readDouble(), buf.readDouble(),
-                buf.readFloat(), buf.readFloat(), PositionFlagsCodec.instance().read(buf)
+                buf.readFloat(), buf.readFloat(), PositionFlagsReader.INSTANCE.read(buf)
         );
     }
 

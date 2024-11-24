@@ -9,8 +9,8 @@ import java.util.Arrays;
 import java.util.BitSet;
 
 /**
- * Represents a {@linkplain NetworkCodec network codec}, which reads and writes a {@linkplain BitSet bitset} with
- * a fixed length.
+ * Represents {@linkplain NetworkCodec a network codec}, which reads and writes {@linkplain BitSet a bitset} using
+ * a length specified during creation of the codec.
  *
  * @since 1.0
  * @author Codestech
@@ -22,7 +22,13 @@ public final class FixedBitSetNetworkCodec implements NetworkCodec<BitSet> {
     private final int fixedSize;
     private final int fixedByteSize;
 
-    private FixedBitSetNetworkCodec(int fixedSize) {
+    /**
+     * Creates {@linkplain FixedBitSetNetworkCodec a fixed bitset network codec}.
+     *
+     * @param fixedSize the length
+     * @since 1.0
+     */
+    public FixedBitSetNetworkCodec(int fixedSize) {
         this.fixedSize = fixedSize;
         this.fixedByteSize = Math.ceilDiv(fixedSize, 8);
     }
@@ -34,19 +40,11 @@ public final class FixedBitSetNetworkCodec implements NetworkCodec<BitSet> {
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull BitSet object) {
-        if (object.length() > this.fixedSize)
-            throw new IllegalArgumentException("The size of the bitset should not be higher than: " + this.fixedSize);
+        if (object.length() > this.fixedSize) {
+            throw new IllegalArgumentException(String.format(
+                    "The size of the bitset should not be higher than %s", this.fixedSize
+            ));
+        }
         buf.writeBytes(Arrays.copyOf(object.toByteArray(), this.fixedByteSize));
-    }
-
-    /**
-     * Creates a {@linkplain FixedBitSetNetworkCodec fixed bitset network codec}.
-     *
-     * @param fixedSize a fixed size of the bitset
-     * @return the network codec
-     * @since 1.0
-     */
-    public static @NonNull FixedBitSetNetworkCodec codec(int fixedSize) {
-        return new FixedBitSetNetworkCodec(fixedSize);
     }
 }

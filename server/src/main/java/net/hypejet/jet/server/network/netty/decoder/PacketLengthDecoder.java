@@ -38,7 +38,7 @@ public final class PacketLengthDecoder extends ByteToMessageDecoder {
         if (!ctx.channel().isActive()) return; // The connection was closed
 
         in.markReaderIndex();
-        int packetLength = VarIntNetworkCodec.instance().read(in);
+        int packetLength = VarIntNetworkCodec.INSTANCE.read(in);
 
         if (packetLength > in.readableBytes()) {
             in.resetReaderIndex();

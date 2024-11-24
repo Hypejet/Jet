@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.UUID;
 
 /**
- * Represents a test of reading and writing of a {@linkplain UUIDNetworkCodec unique identifier network codec}.
+ * Represents a test of reading and writing of {@linkplain UUIDNetworkCodec a unique identifier network codec}.
  *
  * @since 1.0
  * @author Codestech
@@ -16,6 +16,6 @@ import java.util.UUID;
 public final class UUIDNetworkCodecTest {
     @Test
     public void test() {
-        NetworkCodecTestUtil.test(UUIDNetworkCodec.instance(), UUID.randomUUID());
+        NetworkCodecTestUtil.test(UUIDNetworkCodec.INSTANCE, UUID.randomUUID());
     }
 }

@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.protocol.packet.server.writer.configurati
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerDisconnectConfigurationPacket;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
-import net.hypejet.jet.server.network.protocol.codecs.component.ComponentNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.component.ComponentNetworkWriter;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -19,6 +19,6 @@ public final class ServerDisconnectConfigurationPacketWriter
         implements NetworkWriter<ServerDisconnectConfigurationPacket> {
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerDisconnectConfigurationPacket object) {
-        ComponentNetworkCodec.instance().write(buf, object.reason());
+        ComponentNetworkWriter.INSTANCE.write(buf, object.reason());
     }
 }

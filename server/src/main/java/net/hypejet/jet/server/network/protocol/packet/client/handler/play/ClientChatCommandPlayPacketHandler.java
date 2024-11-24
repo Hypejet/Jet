@@ -21,7 +21,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class ClientChatCommandPlayPacketHandler implements ClientPacketHandler<ClientChatCommandPlayPacket> {
     @Override
     public @NonNull ClientChatCommandPlayPacket read(@NonNull ByteBuf buf) {
-        return new ClientChatCommandPlayPacket(StringNetworkCodec.instance().read(buf));
+        return new ClientChatCommandPlayPacket(StringNetworkCodec.INSTANCE.read(buf));
     }
 
     @Override

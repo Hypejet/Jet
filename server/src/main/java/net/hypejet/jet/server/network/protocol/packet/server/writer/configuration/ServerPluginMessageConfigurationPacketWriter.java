@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.protocol.packet.server.writer.configurati
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerPluginMessageConfigurationPacket;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
-import net.hypejet.jet.server.network.protocol.codecs.identifier.PackedKeyNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.key.PackedKeyNetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

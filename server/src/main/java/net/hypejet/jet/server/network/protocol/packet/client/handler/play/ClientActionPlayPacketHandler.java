@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.protocol.packet.client.handler.play;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.play.ClientActionPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientActionPlayPacket.Action;
-import net.hypejet.jet.server.network.protocol.codecs.enums.EnumVarIntCodec;
+import net.hypejet.jet.server.network.protocol.codecs.enums.EnumVarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketHandler;
 import net.hypejet.jet.server.network.session.task.SessionTask;
@@ -23,7 +23,7 @@ public final class ClientActionPlayPacketHandler implements ClientPacketHandler<
     private static final int MIN_JUMP_BOOST = 0;
     private static final int MAX_JUMP_BOOST = 100;
 
-    private static final EnumVarIntCodec<Action> ACTION_CODEC = EnumVarIntCodec.builder(Action.class)
+    private static final EnumVarIntNetworkCodec<Action> ACTION_CODEC = EnumVarIntNetworkCodec.builder(Action.class)
             .add(Action.START_SNEAKING, 0)
             .add(Action.STOP_SNEAKING, 1)
             .add(Action.LEAVE_BED, 2)
@@ -37,9 +37,9 @@ public final class ClientActionPlayPacketHandler implements ClientPacketHandler<
 
     @Override
     public @NonNull ClientActionPlayPacket read(@NonNull ByteBuf buf) {
-        int entityId = VarIntNetworkCodec.instance().read(buf);
+        int entityId = VarIntNetworkCodec.INSTANCE.read(buf);
         Action action = ACTION_CODEC.read(buf);
-        int jumpBoost = VarIntNetworkCodec.instance().read(buf);
+        int jumpBoost = VarIntNetworkCodec.INSTANCE.read(buf);
 
         if (jumpBoost > MAX_JUMP_BOOST || jumpBoost < MIN_JUMP_BOOST)
             throw new IllegalArgumentException("Invalid jump boost");

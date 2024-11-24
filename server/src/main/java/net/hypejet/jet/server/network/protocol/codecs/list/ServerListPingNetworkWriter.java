@@ -23,7 +23,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see ServerListPing
  * @see NetworkWriter
  */
-public final class ServerListPingWriter implements NetworkWriter<ServerListPing> {
+public final class ServerListPingNetworkWriter implements NetworkWriter<ServerListPing> {
 
     private static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(Component.class, new ComponentSerializer())
@@ -35,16 +35,16 @@ public final class ServerListPingWriter implements NetworkWriter<ServerListPing>
             .create();
 
     /**
-     * An instance of {@linkplain ServerListPingWriter a server list ping codec}.
+     * An instance of {@linkplain ServerListPingNetworkWriter a server list ping codec}.
      *
      * @since 1.0
      */
-    public static final ServerListPingWriter INSTANCE = new ServerListPingWriter();
+    public static final ServerListPingNetworkWriter INSTANCE = new ServerListPingNetworkWriter();
 
-    private ServerListPingWriter() {}
+    private ServerListPingNetworkWriter() {}
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerListPing object) {
-        StringNetworkCodec.instance().write(buf, GSON.toJson(object));
+        StringNetworkCodec.INSTANCE.write(buf, GSON.toJson(object));
     }
 }

@@ -68,7 +68,7 @@ public final class PaletteNetworkWriter implements NetworkWriter<Palette> {
 
         switch (object) {
             case IndirectPalette indirect -> VarIntArrayNetworkWriter.INSTANCE.write(buf, indirect.data());
-            case SingleValuedPalette (int value) -> VarIntNetworkCodec.instance().write(buf, value);
+            case SingleValuedPalette (int value) -> VarIntNetworkCodec.INSTANCE.write(buf, value);
             default -> {}
         }
 
