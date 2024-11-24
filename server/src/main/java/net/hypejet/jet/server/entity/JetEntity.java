@@ -1,6 +1,5 @@
 package net.hypejet.jet.server.entity;
 
-import net.hypejet.jet.data.entity.type.EntityType;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.world.World;
@@ -30,7 +29,7 @@ public class JetEntity implements Entity {
 
     private static final AtomicInteger NEXT_ENTITY_ID = new AtomicInteger();
 
-    private final EntityType entityType;
+    private final Key entityType;
     private final int entityId;
 
     private final Identity identity;
@@ -42,11 +41,11 @@ public class JetEntity implements Entity {
     /**
      * Constructs an {@linkplain JetEntity entity}.
      *
-     * @param entityType a type of the entity
+     * @param entityType an identifier of a type of the entity
      * @param uniqueId an unique identifier of the entity
      * @since 1.0
      */
-    public JetEntity(@NonNull EntityType entityType, @NonNull UUID uniqueId) {
+    public JetEntity(@NonNull Key entityType, @NonNull UUID uniqueId) {
         this(entityType, uniqueId, Pointers.builder()
                 .withStatic(Identity.UUID, uniqueId)
                 .build());
@@ -55,12 +54,12 @@ public class JetEntity implements Entity {
     /**
      * Constructs an {@linkplain JetEntity entity}.
      *
-     * @param entityType a type of the entity
+     * @param entityType an identifier of a type of the entity
      * @param uniqueId an unique identifier of the entity
      * @param pointers a pointers of the entity
      * @since 1.0
      */
-    public JetEntity(@NonNull EntityType entityType, @NonNull UUID uniqueId, @NonNull Pointers pointers) {
+    public JetEntity(@NonNull Key entityType, @NonNull UUID uniqueId, @NonNull Pointers pointers) {
         this.entityType = entityType;
         this.entityId = NEXT_ENTITY_ID.getAndIncrement();
         this.identity = Identity.identity(uniqueId);
@@ -68,7 +67,7 @@ public class JetEntity implements Entity {
     }
 
     @Override
-    public @NonNull EntityType entityType() {
+    public @NonNull Key entityType() {
         return this.entityType;
     }
 

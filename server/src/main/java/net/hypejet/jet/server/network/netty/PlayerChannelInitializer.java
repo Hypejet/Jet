@@ -3,14 +3,17 @@ package net.hypejet.jet.server.network.netty;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
+import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.protocol.connection.PlayerConnection;
 import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.network.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.netty.decoder.PacketDecoder;
 import net.hypejet.jet.server.network.netty.decoder.PacketLengthDecoder;
 import net.hypejet.jet.server.network.netty.encoder.PacketEncoder;
 import net.hypejet.jet.server.network.netty.encoder.PacketLengthEncoder;
-import net.hypejet.jet.server.network.protocol.connection.SocketPlayerConnection;
+import net.hypejet.jet.server.network.netty.reader.PacketReader;
+import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketRegistry;
+import net.hypejet.jet.server.network.protocol.packet.server.ServerPacketRegistry;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,36 +40,31 @@ public final class PlayerChannelInitializer extends ChannelInitializer<SocketCha
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PlayerChannelInitializer.class);
 
-    private final JetMinecraftServer minecraftServer;
+    private final JetMinecraftServer server;
+
+    private final ClientPacketRegistry clientPacketRegistry = new ClientPacketRegistry();
+    private final ServerPacketRegistry serverPacketRegistry = new ServerPacketRegistry();
 
     /**
      * Constructs a {@link PlayerChannelInitializer player channel initializer}.
      *
-     * @param minecraftServer a {@linkplain JetMinecraftServer minecraft server}, which provides player connections
+     * @param server a {@linkplain JetMinecraftServer minecraft server}, which provides player connections
      * @since 1.0
      */
-    public PlayerChannelInitializer(@NonNull JetMinecraftServer minecraftServer) {
-        this.minecraftServer = minecraftServer;
+    public PlayerChannelInitializer(@NonNull JetMinecraftServer server) {
+        this.server = NullabilityUtil.requireNonNull(server, "server");
     }
 
     @Override
-    protected void initChannel(SocketChannel ch) {
-        SocketPlayerConnection connection = new SocketPlayerConnection(ch, this.minecraftServer);
-
+    protected void initChannel(@NonNull SocketChannel ch) {
+        SocketPlayerConnection connection = new SocketPlayerConnection(ch, this.server);
         ch.pipeline()
-                .addFirst(PACKET_ENCODER, new PacketEncoder())
-                .addFirst(PACKET_DECODER, new PacketDecoder(connection))
-                .addBefore(PACKET_DECODER, PACKET_LENGTH_DECODER, new PacketLengthDecoder())
-                .addBefore(PACKET_ENCODER, PACKET_LENGTH_ENCODER, new PacketLengthEncoder())
+                .addFirst(PACKET_ENCODER, new PacketEncoder(connection, this.serverPacketRegistry))
+                .addFirst(PACKET_DECODER, new PacketDecoder(connection, this.clientPacketRegistry))
+                .addBefore(PACKET_DECODER, PACKET_LENGTH_DECODER, new PacketLengthDecoder(connection))
+                .addBefore(PACKET_ENCODER, PACKET_LENGTH_ENCODER, new PacketLengthEncoder(connection))
                 .addAfter(PACKET_DECODER, PACKET_READER, new PacketReader(connection));
-
-        ch.closeFuture().addListener(future -> {
-            connection.getSession().onConnectionClose(future.cause());
-
-            JetPlayer player = connection.player();
-            if (player != null)
-                connection.server().unregisterPlayer(player);
-        });
+        ch.closeFuture().addListener(future -> connection.handleDisconnection());
     }
 
     @Override

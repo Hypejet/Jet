@@ -4,11 +4,11 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import net.hypejet.jet.server.network.connection.SocketPlayerConnection;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.util.CompressionUtil;
 import net.hypejet.jet.server.util.NetworkUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 
@@ -23,7 +23,17 @@ import java.util.List;
  */
 public final class PacketDecompressor extends ByteToMessageDecoder {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PacketDecompressor.class);
+    private final SocketPlayerConnection connection;
+
+    /**
+     * Constructs the {@linkplain PacketDecompressor packet decompressor}.
+     *
+     * @param connection a connection that the decompression should be handled for
+     * @since 1.0
+     */
+    public PacketDecompressor(@NonNull SocketPlayerConnection connection) {
+        this.connection = connection;
+    }
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
@@ -42,8 +52,7 @@ public final class PacketDecompressor extends ByteToMessageDecoder {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        LOGGER.error("An error occurred while decompressing a packet", cause);
-        ctx.channel().close().sync();
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        this.connection.uncaughtException(Thread.currentThread(), cause);
     }
 }

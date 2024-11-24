@@ -5,10 +5,11 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":api"))
     implementation(libs.netty)
     implementation(libs.logback)
     implementation(libs.bundles.configs)
-    implementation(project(":api"))
+    implementation(libs.bundles.jetDataServer)
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.platform)
 }

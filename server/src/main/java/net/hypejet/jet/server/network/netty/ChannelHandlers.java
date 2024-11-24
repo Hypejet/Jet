@@ -1,5 +1,7 @@
 package net.hypejet.jet.server.network.netty;
 
+import net.hypejet.jet.server.network.netty.reader.PacketReader;
+
 /**
  * Represents a holder of names of {@linkplain io.netty.channel.ChannelHandler channel handlers} managing
  * Minecraft packet flow.

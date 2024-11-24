@@ -1,6 +1,6 @@
 package net.hypejet.jet.protocol.packet.server.play;
 
-import net.hypejet.jet.coordinate.BlockPosition;
+import net.hypejet.jet.data.model.api.coordinate.BlockPosition;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.protocol.packet.server.ServerPlayPacket;
 import net.kyori.adventure.key.Key;
@@ -32,6 +32,7 @@ import java.util.Set;
  * @param flat whether the world is a super-flat world
  * @param deathLocation a death location of the player, {@code null} if the player did not die
  * @param portalCooldown a number of ticks until the player can use portal again
+ * @param seaLevel a sea level of the world
  * @param enforcesSecureChat whether the server enforces the player to use secure chat
  * @since 1.0
  * @author Codestech
@@ -43,7 +44,8 @@ public record ServerJoinGamePlayPacket(int entityId, boolean hardcore, @NonNull 
                                        int dimensionType, @NonNull Key dimensionName, long hashedSeed,
                                        Player.@NonNull GameMode gameMode, Player.@Nullable GameMode previousGameMode,
                                        boolean debug, boolean flat, @Nullable DeathLocation deathLocation,
-                                       int portalCooldown, boolean enforcesSecureChat) implements ServerPlayPacket {
+                                       int portalCooldown, int seaLevel, boolean enforcesSecureChat)
+        implements ServerPlayPacket {
     /**
      * Constructs the {@linkplain ServerJoinGamePlayPacket join game play packet}.
      *
@@ -66,6 +68,7 @@ public record ServerJoinGamePlayPacket(int entityId, boolean hardcore, @NonNull 
      * @param flat whether the world is a super-flat world
      * @param deathLocation a death location of the player, {@code null} if the player did not die
      * @param portalCooldown a number of ticks until the player can use portal again
+     * @param seaLevel a sea level of the world
      * @param enforcesSecureChat whether the server enforces the player to use secure chat
      * @since 1.0
      */

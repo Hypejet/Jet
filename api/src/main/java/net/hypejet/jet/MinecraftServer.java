@@ -1,11 +1,13 @@
 package net.hypejet.jet;
 
+import net.hypejet.jet.acquisition.Acquisition;
 import net.hypejet.jet.command.CommandManager;
 import net.hypejet.jet.configuration.ServerConfiguration;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.plugin.PluginManager;
 import net.hypejet.jet.protocol.ProtocolState;
+import net.hypejet.jet.registry.RegistryManager;
 import net.hypejet.jet.world.WorldManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -69,25 +71,15 @@ public interface MinecraftServer {
     void shutdown();
 
     /**
-     * Gets all players, which are connected to the server.
+     * Creates {@linkplain Acquisition an acquisition} of all players, which are connected to the server.
      *
      * <p>Note that all players are returned, even those, which are not in {@linkplain ProtocolState#PLAY play
      * protocol state} yet.</p>
      *
-     * @return the players
+     * @return the acquisition
      * @since 1.0
      */
-    @NonNull Collection<Player> players();
-
-    /**
-     * Gets all players, which are connected to the server and are in a {@linkplain ProtocolState protocol state}
-     * specified.
-     *
-     * @param state the protocol state
-     * @return the players
-     * @since 1.0
-     */
-    @NonNull Collection<Player> players(@NonNull ProtocolState state);
+    @NonNull Acquisition<? extends Collection<? extends Player>> players();
 
     /**
      * Gets a {@linkplain WorldManager world manager} of the server.
@@ -112,4 +104,12 @@ public interface MinecraftServer {
      * @since 1.0
      */
     @NonNull PluginManager pluginManager();
+
+    /**
+     * Gets a {@linkplain RegistryManager registry manager} of the server.
+     *
+     * @return the registry manager
+     * @since 1.0
+     */
+    @NonNull RegistryManager registryManager();
 }
