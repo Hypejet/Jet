@@ -78,7 +78,8 @@ public final class ServerDeclareCommandsPlayPacketWriter implements NetworkWrite
             nodeQueue.addAll(node.children());
 
             Node redirect = node.redirect();
-            if (redirect != null) nodeQueue.add(redirect);
+            if (redirect != null)
+                nodeQueue.add(redirect);
         }
 
         VarIntNetworkCodec.INSTANCE.write(buf, identifiedNodes.size());
@@ -136,8 +137,10 @@ public final class ServerDeclareCommandsPlayPacketWriter implements NetworkWrite
                 ArgumentCodec<?> codec = ArgumentCodecRegistry.codec(argumentTypeClass);
 
                 if (codec == null) {
-                    throw new IllegalArgumentException("Could not find a codec for argument type: "
-                            + argumentTypeClass.getSimpleName());
+                    throw new IllegalArgumentException(String.format(
+                            "Could not find a codec for argument type with class name of %s",
+                            argumentTypeClass.getSimpleName()
+                    ));
                 }
 
                 VarIntNetworkCodec.INSTANCE.write(buf, codec.getParserId());

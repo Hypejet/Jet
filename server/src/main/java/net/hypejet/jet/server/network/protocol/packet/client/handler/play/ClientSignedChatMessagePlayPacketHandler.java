@@ -7,6 +7,7 @@ import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.game.signing.SeenMessagesNetworkReader;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketHandler;
 import net.hypejet.jet.server.network.session.task.SessionTask;
+import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -28,7 +29,7 @@ public final class ClientSignedChatMessagePlayPacketHandler
     public @NonNull ClientSignedChatMessagePlayPacket read(@NonNull ByteBuf buf) {
         return new ClientSignedChatMessagePlayPacket(
                 MESSAGE_CODEC.read(buf), buf.readLong(),
-                buf.readLong(), buf.readBoolean() ? SIGNATURE_READER.read(buf) : null,
+                buf.readLong(), NetworkUtil.readOptional(SIGNATURE_READER, buf),
                 SeenMessagesNetworkReader.INSTANCE.read(buf)
         );
     }

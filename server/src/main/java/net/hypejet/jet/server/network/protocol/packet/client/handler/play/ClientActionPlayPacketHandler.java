@@ -43,8 +43,8 @@ public final class ClientActionPlayPacketHandler implements ClientPacketHandler<
     public @NonNull ClientActionPlayPacket read(@NonNull ByteBuf buf) {
         int entityId = VarIntNetworkCodec.INSTANCE.read(buf);
         Action action = ACTION_CODEC.read(buf);
-        int jumpBoost = VarIntNetworkCodec.INSTANCE.read(buf);
 
+        int jumpBoost = VarIntNetworkCodec.INSTANCE.read(buf);
         if (jumpBoost > MAX_JUMP_BOOST || jumpBoost < MIN_JUMP_BOOST)
             throw new IllegalArgumentException("Invalid jump boost");
 

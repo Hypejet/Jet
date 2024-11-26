@@ -7,7 +7,7 @@ import net.hypejet.jet.server.network.protocol.codecs.game.component.ComponentNe
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents {@linkplain NetworkWriter network writer}, which writes
+ * Represents {@linkplain NetworkWriter a network writer}, which writes
  * {@linkplain ServerSystemMessagePlayPacket a system message play packet}.
  *
  * @since 1.0

@@ -60,9 +60,8 @@ public final class ClientCommandSuggestionsRequestPlayPacketHandler
                 Component convertedTooltip = null;
 
                 if (tooltip != null) {
-                    convertedTooltip = tooltip instanceof ComponentTooltip componentTooltip
-                            ? componentTooltip.component()
-                            : Component.text(tooltip.getString());
+                    convertedTooltip = tooltip instanceof ComponentTooltip(Component component)
+                            ? component : Component.text(tooltip.getString());
                 }
 
                 suggestionList.add(new Suggestion(suggestion.getText(), convertedTooltip));

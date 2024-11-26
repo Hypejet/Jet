@@ -10,7 +10,7 @@ import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents {@linkplain ClientPacketHandler client packet handler}, which reads and handles
+ * Represents {@linkplain ClientPacketHandler a client packet handler}, which reads and handles
  * {@linkplain ClientPluginMessageResponseLoginPacket a plugin message response packet}.
  *
  * @since 1.0

@@ -11,7 +11,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Represents {@linkplain ClientPacketHandler a client packet handler}, which reads and handles
- * a {@linkplain ClientPluginMessageConfigurationPacket plugin message configuration packet}.
+ * {@linkplain ClientPluginMessageConfigurationPacket a plugin message configuration packet}.
  *
  * @since 1.0
  * @author Codestech

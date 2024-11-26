@@ -7,7 +7,7 @@ import net.hypejet.jet.server.network.protocol.codecs.game.ping.ServerListPingNe
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents {@linkplain NetworkWriter network writer}, which writes
+ * Represents {@linkplain NetworkWriter a network writer}, which writes
  * {@linkplain ServerListResponseStatusPacket a server list response status packet}.
  * 
  * @since 1.0

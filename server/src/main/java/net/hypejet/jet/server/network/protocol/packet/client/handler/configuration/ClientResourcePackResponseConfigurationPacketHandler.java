@@ -13,7 +13,7 @@ import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain ClientPacketHandler client packet handler}, which reads and handles
+ * Represents {@linkplain ClientPacketHandler a client packet handler}, which reads and handles
  * {@linkplain ClientResourcePackResponseConfigurationPacket a resource pack response configuration packet}.
  *
  * @since 1.0

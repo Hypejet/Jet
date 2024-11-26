@@ -4,9 +4,8 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerRemoveResourcePackConfigurationPacket;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.other.UUIDNetworkCodec;
+import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.UUID;
 
 /**
  * Represents {@linkplain NetworkWriter a network writer}, which writes
@@ -21,11 +20,6 @@ public final class ServerRemoveResourcePackConfigurationPacketWriter
         implements NetworkWriter<ServerRemoveResourcePackConfigurationPacket> {
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerRemoveResourcePackConfigurationPacket object) {
-        UUID uniqueId = object.uniqueId();
-        buf.writeBoolean(uniqueId != null);
-
-        if (uniqueId != null) {
-            UUIDNetworkCodec.INSTANCE.write(buf, uniqueId);
-        }
+        NetworkUtil.writeOptional(object.uniqueId(), UUIDNetworkCodec.INSTANCE, buf);
     }
 }

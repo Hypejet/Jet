@@ -7,6 +7,7 @@ import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.collection.CollectionNetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.UUIDNetworkCodec;
+import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -42,13 +43,7 @@ public final class ServerLoginSuccessLoginPacketWriter implements NetworkWriter<
         public void write(@NonNull ByteBuf buf, @NonNull Property object) {
             StringNetworkCodec.INSTANCE.write(buf, object.key());
             StringNetworkCodec.INSTANCE.write(buf, object.value());
-
-            String signature = object.signature();
-            buf.writeBoolean(signature != null);
-
-            if (signature != null) {
-                StringNetworkCodec.INSTANCE.write(buf, signature);
-            }
+            NetworkUtil.writeOptional(object.signature(), StringNetworkCodec.INSTANCE, buf);
         }
     }
 }

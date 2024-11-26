@@ -8,7 +8,6 @@ import net.hypejet.jet.server.util.gamemode.GameModeUtil;
 import net.hypejet.jet.world.event.GameEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-
 /**
  * Represents {@linkplain NetworkWriter a network writer}, which writes
  * {@linkplain ServerGameEventPlayPacket a game event play packet}.
@@ -106,11 +105,5 @@ public final class ServerGameEventPlayPacketWriter implements NetworkWriter<Serv
 
         buf.writeByte(identifier);
         buf.writeFloat(value);
-    }
-
-    private static boolean booleanFromFloat(float value) {
-        if (value == 1) return true;
-        if (value == 0) return false;
-        throw new IllegalArgumentException(value + " cannot be represented as a boolean");
     }
 }

@@ -6,7 +6,7 @@ import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.game.component.ComponentNetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.UUIDNetworkCodec;
-import net.kyori.adventure.text.Component;
+import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -27,15 +27,8 @@ public final class ServerAddResourcePackConfigurationPacketWriter
     public void write(@NonNull ByteBuf buf, @NonNull ServerAddResourcePackConfigurationPacket object) {
         UUIDNetworkCodec.INSTANCE.write(buf, object.uniqueId());
         StringNetworkCodec.INSTANCE.write(buf, object.url());
-
         HASH_CODEC.write(buf, object.hash());
         buf.writeBoolean(object.forced());
-
-        Component prompt = object.prompt();
-        buf.writeBoolean(prompt != null);
-
-        if (prompt != null) {
-            ComponentNetworkWriter.INSTANCE.write(buf, object.prompt());
-        }
+        NetworkUtil.writeOptional(object.prompt(), ComponentNetworkWriter.INSTANCE, buf);
     }
 }
