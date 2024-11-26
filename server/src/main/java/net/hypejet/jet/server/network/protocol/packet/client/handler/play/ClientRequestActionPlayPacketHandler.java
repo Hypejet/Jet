@@ -1,9 +1,11 @@
 package net.hypejet.jet.server.network.protocol.packet.client.handler.play;
 
 import io.netty.buffer.ByteBuf;
+import net.hypejet.jet.data.codecs.util.mapper.Mapper;
 import net.hypejet.jet.protocol.packet.client.play.ClientRequestActionPlayPacket;
 import net.hypejet.jet.protocol.packet.client.play.ClientRequestActionPlayPacket.Action;
-import net.hypejet.jet.server.network.protocol.codecs.enums.EnumVarIntNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.mapper.MapperNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketHandler;
 import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -19,10 +21,13 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class ClientRequestActionPlayPacketHandler implements ClientPacketHandler<ClientRequestActionPlayPacket> {
 
-    private static final EnumVarIntNetworkCodec<Action> ACTION_CODEC = EnumVarIntNetworkCodec.builder(Action.class)
-            .add(Action.PERFORM_RESPAWN, 0)
-            .add(Action.REQUEST_STATS, 1)
-            .build();
+    private static final MapperNetworkCodec<Action, Integer> ACTION_CODEC = new MapperNetworkCodec<>(
+            Mapper.builder(Action.class, int.class)
+                    .register(Action.PERFORM_RESPAWN, 0)
+                    .register(Action.REQUEST_STATS, 1)
+                    .build(),
+            VarIntNetworkCodec.INSTANCE
+    );
 
     @Override
     public @NonNull ClientRequestActionPlayPacket read(@NonNull ByteBuf buf) {

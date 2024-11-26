@@ -5,7 +5,7 @@ import net.hypejet.jet.protocol.packet.server.play.ServerCommandSuggestionsRespo
 import net.hypejet.jet.protocol.packet.server.play.ServerCommandSuggestionsResponsePlayPacket.Suggestion;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.collection.CollectionNetworkWriter;
-import net.hypejet.jet.server.network.protocol.codecs.component.ComponentNetworkWriter;
+import net.hypejet.jet.server.network.protocol.codecs.game.component.ComponentNetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.hypejet.jet.server.util.NetworkUtil;

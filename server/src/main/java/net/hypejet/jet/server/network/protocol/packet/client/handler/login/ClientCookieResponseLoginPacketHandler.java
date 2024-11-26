@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.protocol.packet.client.handler.login;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.login.ClientCookieResponseLoginPacket;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.array.bytes.ByteArrayNetworkReader;
-import net.hypejet.jet.server.network.protocol.codecs.key.PackedKeyNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.game.key.PackedKeyNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketHandler;
 import net.hypejet.jet.server.network.session.task.LoginTask;
 import net.hypejet.jet.server.network.session.task.SessionTask;

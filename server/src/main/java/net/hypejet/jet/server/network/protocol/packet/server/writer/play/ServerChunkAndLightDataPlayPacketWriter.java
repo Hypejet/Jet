@@ -8,10 +8,10 @@ import net.hypejet.jet.server.network.protocol.codecs.aggregate.array.bytes.Byte
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.array.object.ObjectArrayNetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.bitset.BitSetNetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.collection.CollectionNetworkWriter;
-import net.hypejet.jet.server.network.protocol.codecs.chunk.BlockEntityNetworkWriter;
-import net.hypejet.jet.server.network.protocol.codecs.chunk.ChunkSectionNetworkWriter;
+import net.hypejet.jet.server.network.protocol.codecs.game.world.chunk.BlockEntityNetworkWriter;
+import net.hypejet.jet.server.network.protocol.codecs.game.world.chunk.ChunkSectionNetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.other.BinaryTagNetworkWriter;
+import net.hypejet.jet.server.network.protocol.codecs.game.miscellaneous.BinaryTagNetworkWriter;
 import net.hypejet.jet.world.chunk.BlockEntity;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

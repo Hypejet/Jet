@@ -8,7 +8,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.common.value.qual.IntRange;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
 /**
  * Represents {@linkplain NetworkCodec a network codec}, which reads and writes a {@linkplain String string}.
@@ -52,7 +51,10 @@ public final class StringNetworkCodec implements NetworkCodec<String> {
             throw invalidLengthException(length);
 
         if (!buf.isReadable(length)) {
-            throw new IllegalArgumentException("A buffer does not contain at least " + length + " readable bytes");
+            throw new IllegalArgumentException(String.format(
+                    "A buffer does not contain at least %s readable bytes",
+                    length
+            ));
         }
 
         String string = buf.toString(buf.readerIndex(), length, StandardCharsets.UTF_8);
@@ -63,8 +65,6 @@ public final class StringNetworkCodec implements NetworkCodec<String> {
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull String object) {
-        Objects.requireNonNull(object, "The object must not be null");
-
         int length = ByteBufUtil.utf8Bytes(object);
 
         if (length < 0 || length > this.maxStringSize)
@@ -89,7 +89,7 @@ public final class StringNetworkCodec implements NetworkCodec<String> {
      */
     public static @NonNull StringNetworkCodec create(@IntRange(from = 0, to = MAX_STRING_SIZE) int maxStringSize) {
         if (maxStringSize > MAX_STRING_SIZE)
-            throw new IllegalArgumentException("The maximum string size is: " + MAX_STRING_SIZE);
+            throw new IllegalArgumentException(String.format("The maximum string size is %s", MAX_STRING_SIZE));
         if (maxStringSize == MAX_STRING_SIZE)
             return INSTANCE;
         if (maxStringSize == 16)

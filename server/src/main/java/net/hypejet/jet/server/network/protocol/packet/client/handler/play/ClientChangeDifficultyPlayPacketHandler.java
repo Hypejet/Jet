@@ -1,8 +1,10 @@
 package net.hypejet.jet.server.network.protocol.packet.client.handler.play;
 
 import io.netty.buffer.ByteBuf;
+import net.hypejet.jet.data.codecs.util.mapper.Mapper;
 import net.hypejet.jet.protocol.packet.client.play.ClientChangeDifficultyPlayPacket;
-import net.hypejet.jet.server.network.protocol.codecs.enums.EnumByteNetworkCodec;
+import net.hypejet.jet.server.network.codec.CombinedNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.mapper.MapperNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketHandler;
 import net.hypejet.jet.server.network.session.task.SessionTask;
 import net.hypejet.jet.world.difficulty.Difficulty;
@@ -20,12 +22,16 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class ClientChangeDifficultyPlayPacketHandler
         implements ClientPacketHandler<ClientChangeDifficultyPlayPacket> {
 
-    private static final EnumByteNetworkCodec<Difficulty> DIFFICULTY_CODEC = EnumByteNetworkCodec.builder(Difficulty.class)
-            .add(Difficulty.PEACEFUL, (byte) 0)
-            .add(Difficulty.EASY, (byte) 1)
-            .add(Difficulty.NORMAL, (byte) 2)
-            .add(Difficulty.HARD, (byte) 3)
-            .build();
+    private static final MapperNetworkCodec<Difficulty, Byte> DIFFICULTY_CODEC = new MapperNetworkCodec<>(
+            Mapper.builder(Difficulty.class, byte.class)
+                    .register(Difficulty.PEACEFUL, (byte) 0)
+                    .register(Difficulty.EASY, (byte) 1)
+                    .register(Difficulty.NORMAL, (byte) 2)
+                    .register(Difficulty.HARD, (byte) 3)
+                    .build(),
+            // TODO
+            new CombinedNetworkCodec<>(ByteBuf::readByte, (buf, object) -> buf.writeByte(object))
+    );
 
     @Override
     public @NonNull ClientChangeDifficultyPlayPacket read(@NonNull ByteBuf buf) {

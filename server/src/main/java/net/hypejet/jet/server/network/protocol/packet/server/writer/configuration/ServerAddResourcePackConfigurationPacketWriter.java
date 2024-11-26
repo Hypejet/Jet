@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.protocol.packet.server.writer.configurati
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.configuration.ServerAddResourcePackConfigurationPacket;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
-import net.hypejet.jet.server.network.protocol.codecs.component.ComponentNetworkWriter;
+import net.hypejet.jet.server.network.protocol.codecs.game.component.ComponentNetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.UUIDNetworkCodec;
 import net.kyori.adventure.text.Component;

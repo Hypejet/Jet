@@ -1,9 +1,11 @@
 package net.hypejet.jet.server.network.protocol.packet.client.handler.configuration;
 
 import io.netty.buffer.ByteBuf;
+import net.hypejet.jet.data.codecs.util.mapper.Mapper;
 import net.hypejet.jet.pack.ResourcePackResult;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientResourcePackResponseConfigurationPacket;
-import net.hypejet.jet.server.network.protocol.codecs.enums.EnumVarIntNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.mapper.MapperNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.UUIDNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketHandler;
 import net.hypejet.jet.server.network.session.task.ConfigurationTask;
@@ -22,17 +24,19 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class ClientResourcePackResponseConfigurationPacketHandler
         implements ClientPacketHandler<ClientResourcePackResponseConfigurationPacket> {
 
-    private static final EnumVarIntNetworkCodec<ResourcePackResult> RESULT_CODEC = EnumVarIntNetworkCodec
-            .builder(ResourcePackResult.class)
-            .add(ResourcePackResult.SUCCESS, 0)
-            .add(ResourcePackResult.DECLINED, 1)
-            .add(ResourcePackResult.FAILED_TO_DOWNLOAD, 2)
-            .add(ResourcePackResult.ACCEPTED, 3)
-            .add(ResourcePackResult.DOWNLOADED, 4)
-            .add(ResourcePackResult.INVALID_URL, 5)
-            .add(ResourcePackResult.FAILED_TO_RELOAD, 6)
-            .add(ResourcePackResult.DISCARDED, 7)
-            .build();
+    private static final MapperNetworkCodec<ResourcePackResult, Integer> RESULT_CODEC = new MapperNetworkCodec<>(
+            Mapper.builder(ResourcePackResult.class, int.class)
+                    .register(ResourcePackResult.SUCCESS, 0)
+                    .register(ResourcePackResult.DECLINED, 1)
+                    .register(ResourcePackResult.FAILED_TO_DOWNLOAD, 2)
+                    .register(ResourcePackResult.ACCEPTED, 3)
+                    .register(ResourcePackResult.DOWNLOADED, 4)
+                    .register(ResourcePackResult.INVALID_URL, 5)
+                    .register(ResourcePackResult.FAILED_TO_RELOAD, 6)
+                    .register(ResourcePackResult.DISCARDED, 7)
+                    .build(),
+            VarIntNetworkCodec.INSTANCE
+    );
 
     @Override
     public @NonNull ClientResourcePackResponseConfigurationPacket read(@NonNull ByteBuf buf) {

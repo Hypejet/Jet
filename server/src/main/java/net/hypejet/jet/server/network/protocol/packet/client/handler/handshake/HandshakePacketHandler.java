@@ -1,9 +1,10 @@
 package net.hypejet.jet.server.network.protocol.packet.client.handler.handshake;
 
 import io.netty.buffer.ByteBuf;
+import net.hypejet.jet.data.codecs.util.mapper.Mapper;
 import net.hypejet.jet.protocol.packet.client.handshake.ClientHandshakePacket;
 import net.hypejet.jet.protocol.packet.client.handshake.ClientHandshakePacket.HandshakeIntent;
-import net.hypejet.jet.server.network.protocol.codecs.enums.EnumVarIntNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.mapper.MapperNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketHandler;
@@ -22,19 +23,23 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class HandshakePacketHandler implements ClientPacketHandler<ClientHandshakePacket> {
 
-    private static final EnumVarIntNetworkCodec<HandshakeIntent> HANDSHAKE_INTENT_CODEC = EnumVarIntNetworkCodec
-            .builder(HandshakeIntent.class)
-            .add(HandshakeIntent.STATUS, 1)
-            .add(HandshakeIntent.LOGIN, 2)
-            .add(HandshakeIntent.TRANSFER, 3)
-            .build();
+    private static final MapperNetworkCodec<HandshakeIntent, Integer> INTENT_CODEC = new MapperNetworkCodec<>(
+            Mapper.builder(HandshakeIntent.class, int.class)
+                    .register(HandshakeIntent.STATUS, 1)
+                    .register(HandshakeIntent.LOGIN, 2)
+                    .register(HandshakeIntent.TRANSFER, 3)
+                    .build(),
+            VarIntNetworkCodec.INSTANCE
+    );
 
     private static final StringNetworkCodec ADDRESS_CODEC = StringNetworkCodec.create(255);
 
     @Override
     public @NonNull ClientHandshakePacket read(@NonNull ByteBuf buf) {
-        return new ClientHandshakePacket(VarIntNetworkCodec.INSTANCE.read(buf), ADDRESS_CODEC.read(buf),
-                buf.readUnsignedShort(), HANDSHAKE_INTENT_CODEC.read(buf));
+        return new ClientHandshakePacket(
+                VarIntNetworkCodec.INSTANCE.read(buf), ADDRESS_CODEC.read(buf),
+                buf.readUnsignedShort(), INTENT_CODEC.read(buf)
+        );
     }
 
     @Override

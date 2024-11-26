@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.protocol.packet.client.handler.configurat
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.configuration.ClientKnownPacksConfigurationPacket;
-import net.hypejet.jet.server.network.protocol.codecs.pack.PackInfoNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.game.pack.PackInfoNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketHandler;
 import net.hypejet.jet.server.network.session.task.ConfigurationTask;
 import net.hypejet.jet.server.network.session.task.SessionTask;

@@ -4,8 +4,6 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.util.Objects;
-
 /**
  * Represents {@linkplain NetworkCodec a network codec}, which reads and writes a variable-length integer.
  *
@@ -44,8 +42,10 @@ public final class VarIntNetworkCodec implements NetworkCodec<Integer> {
             position += 7;
 
             if (position >= MAX_LENGTH) {
-                throw new IllegalArgumentException("Variable-length integer is bigger than maximum allowed " +
-                        "(" + position + " >= " + MAX_LENGTH + ")");
+                throw new IllegalArgumentException(String.format(
+                        "Variable-length integer is bigger than maximum allowed (%s >= %s)",
+                        position, MAX_LENGTH
+                ));
             }
         }
 
@@ -54,9 +54,7 @@ public final class VarIntNetworkCodec implements NetworkCodec<Integer> {
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull Integer object) {
-        Objects.requireNonNull(object, "The integer must not be null");
         int value = object;
-
         while (true) {
             if ((value & ~SEGMENT_BITS) == 0) {
                 buf.writeByte(value);

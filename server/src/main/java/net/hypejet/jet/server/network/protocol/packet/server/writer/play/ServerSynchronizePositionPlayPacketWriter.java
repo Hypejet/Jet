@@ -5,7 +5,7 @@ import net.hypejet.jet.protocol.packet.server.play.ServerSynchronizePositionPlay
 import net.hypejet.jet.protocol.packet.server.play.ServerSynchronizePositionPlayPacket.RelativeFlag;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
-import net.hypejet.jet.server.network.protocol.codecs.coordinate.VectorNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.game.world.coordinate.VectorNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

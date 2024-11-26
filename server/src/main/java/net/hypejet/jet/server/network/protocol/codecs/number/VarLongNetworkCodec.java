@@ -4,8 +4,6 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.util.Objects;
-
 /**
  * Represents {@linkplain NetworkCodec a network codec}, which reads and writes a variable-length long.
  *
@@ -49,9 +47,7 @@ public final class VarLongNetworkCodec implements NetworkCodec<Long> {
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull Long object) {
-        Objects.requireNonNull(object, "The object must not be null");
         long value = object;
-
         while (true) {
             if ((value & ~((long) SEGMENT_BITS)) == 0) {
                 buf.writeByte((int) value);

@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.protocol.packet.server.writer.status;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.server.status.ServerListResponseStatusPacket;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
-import net.hypejet.jet.server.network.protocol.codecs.list.ServerListPingNetworkWriter;
+import net.hypejet.jet.server.network.protocol.codecs.game.ping.ServerListPingNetworkWriter;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

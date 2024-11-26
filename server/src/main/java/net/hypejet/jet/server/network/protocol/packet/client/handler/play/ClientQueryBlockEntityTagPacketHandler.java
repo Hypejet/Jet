@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.protocol.packet.client.handler.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.play.ClientQueryBlockEntityTagPacket;
-import net.hypejet.jet.server.network.protocol.codecs.coordinate.BlockPositionNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.game.world.coordinate.BlockPositionNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketHandler;
 import net.hypejet.jet.server.network.session.task.SessionTask;

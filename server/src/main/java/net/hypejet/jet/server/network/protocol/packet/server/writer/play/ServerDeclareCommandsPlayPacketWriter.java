@@ -2,6 +2,7 @@ package net.hypejet.jet.server.network.protocol.packet.server.writer.play;
 
 import com.mojang.brigadier.arguments.ArgumentType;
 import io.netty.buffer.ByteBuf;
+import net.hypejet.jet.data.codecs.util.mapper.Mapper;
 import net.hypejet.jet.protocol.packet.server.play.ServerDeclareCommandsPlayPacket;
 import net.hypejet.jet.protocol.packet.server.play.ServerDeclareCommandsPlayPacket.ArgumentNode;
 import net.hypejet.jet.protocol.packet.server.play.ServerDeclareCommandsPlayPacket.LiteralNode;
@@ -12,7 +13,8 @@ import net.hypejet.jet.server.command.argument.ArgumentCodec;
 import net.hypejet.jet.server.command.argument.ArgumentCodecRegistry;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.array.varint.VarIntArrayNetworkWriter;
-import net.hypejet.jet.server.network.protocol.codecs.enums.EnumKeyNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.game.key.PackedKeyNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.mapper.MapperNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
 import net.kyori.adventure.key.Key;
@@ -47,13 +49,15 @@ public final class ServerDeclareCommandsPlayPacketWriter implements NetworkWrite
     private static final byte HAS_REDIRECT = 0x08;
     private static final byte HAS_SUGGESTIONS_TYPE = 0x10;
 
-    private static final EnumKeyNetworkCodec<SuggestionsType> SUGGESTIONS_TYPE_CODEC = EnumKeyNetworkCodec
-            .builder(SuggestionsType.class)
-            .add(SuggestionsType.ASK_SERVER, Key.key("ask_server"))
-            .add(SuggestionsType.ALL_RECIPES, Key.key("all_recipes"))
-            .add(SuggestionsType.AVAILABLE_SOUNDS, Key.key("available_sounds"))
-            .add(SuggestionsType.SUMMONABLE_ENTITIES, Key.key("summonable_entities"))
-            .build();
+    private static final MapperNetworkCodec<SuggestionsType, Key> SUGGESTIONS_TYPE_CODEC = new MapperNetworkCodec<>(
+            Mapper.builder(SuggestionsType.class, Key.class)
+                    .register(SuggestionsType.ASK_SERVER, Key.key("ask_server"))
+                    .register(SuggestionsType.ALL_RECIPES, Key.key("all_recipes"))
+                    .register(SuggestionsType.AVAILABLE_SOUNDS, Key.key("available_sounds"))
+                    .register(SuggestionsType.SUMMONABLE_ENTITIES, Key.key("summonable_entities"))
+                    .build(),
+            PackedKeyNetworkCodec.INSTANCE
+    );
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerDeclareCommandsPlayPacket object) {

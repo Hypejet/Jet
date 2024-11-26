@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.protocol.packet.client.play.ClientSignedChatMessagePlayPacket;
 import net.hypejet.jet.server.network.protocol.codecs.aggregate.array.bytes.ByteArrayNetworkReader;
 import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.signing.SeenMessagesNetworkReader;
+import net.hypejet.jet.server.network.protocol.codecs.game.signing.SeenMessagesNetworkReader;
 import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketHandler;
 import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;

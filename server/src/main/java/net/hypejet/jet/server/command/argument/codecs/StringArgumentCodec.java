@@ -3,8 +3,10 @@ package net.hypejet.jet.server.command.argument.codecs;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType.StringType;
 import io.netty.buffer.ByteBuf;
+import net.hypejet.jet.data.codecs.util.mapper.Mapper;
 import net.hypejet.jet.server.command.argument.ArgumentCodec;
-import net.hypejet.jet.server.network.protocol.codecs.enums.EnumVarIntNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.mapper.MapperNetworkCodec;
+import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -18,11 +20,14 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class StringArgumentCodec extends ArgumentCodec<StringArgumentType> {
 
-    private static final EnumVarIntNetworkCodec<StringType> STRING_TYPE_CODEC = EnumVarIntNetworkCodec.builder(StringType.class)
-            .add(StringType.SINGLE_WORD, 0)
-            .add(StringType.QUOTABLE_PHRASE, 1)
-            .add(StringType.GREEDY_PHRASE, 2)
-            .build();
+    private static final MapperNetworkCodec<StringType, Integer> STRING_TYPE_CODEC = new MapperNetworkCodec<>(
+            Mapper.builder(StringType.class, Integer.class)
+                    .register(StringType.SINGLE_WORD, 0)
+                    .register(StringType.QUOTABLE_PHRASE, 1)
+                    .register(StringType.GREEDY_PHRASE, 2)
+                    .build(),
+            VarIntNetworkCodec.INSTANCE
+    );
 
     /**
      * Constructs the {@linkplain StringArgumentCodec string argument codec}.
