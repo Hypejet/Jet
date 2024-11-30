@@ -3,6 +3,7 @@ package net.hypejet.jet.network;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.acquisition.Acquisition;
 import net.hypejet.jet.entity.player.Player;
+import net.hypejet.jet.network.packet.Packet;
 import net.hypejet.jet.network.packet.server.ServerPacket;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -33,11 +34,10 @@ public interface PlayerConnection {
      * {@linkplain net.hypejet.jet.event.events.packet.PacketSendEvent a packet send event}.</p>
      *
      * @param packet the packet
-     * @return a completable future, which is completed when the packet has been sent successfully and contains a final
-     *         packet that was sent or {@code null} if the event was cancelled or the connection has been closed
+     * @return a completable future, which contains the result of the operation
      * @since 1.0
      */
-    @NonNull CompletableFuture<@Nullable ServerPacket> sendPacket(@NonNull ServerPacket packet);
+    @NonNull CompletableFuture<PacketSendResult> sendPacket(@NonNull ServerPacket packet);
 
     /**
      * Sends a disconnection packet and closes the connection.
@@ -80,4 +80,66 @@ public interface PlayerConnection {
      * @since 1.0
      */
     boolean isClosed();
+
+    /**
+     * Represents a result of sending {@linkplain ServerPacket a server packet}.
+     *
+     * @since 1.0
+     * @see ServerPacket
+     */
+    sealed interface PacketSendResult {
+        /**
+         * Represents {@linkplain PacketSendResult a packet send result}, which represents a success.
+         *
+         * @param finalPacket the final packet that was sent
+         * @since 1.0
+         * @see PacketSendResult
+         */
+        record Success(@NonNull ServerPacket finalPacket) implements PacketSendResult {}
+
+        /**
+         * Represents {@linkplain PacketSendResult a packet send result}, which represents a cancellation
+         * of the packet sending, which could have been caused by a packet event cancellation or an internal reason.
+         *
+         * @since 1.0
+         * @see PacketSendResult
+         */
+        final class Cancellation implements PacketSendResult {
+            private static final Cancellation INSTANCE = new Cancellation();
+            private Cancellation() {}
+        }
+
+        /**
+         * Represents {@linkplain PacketSendResult a packet send result}, which represents a network error, which has
+         * been already handled.
+         *
+         * @since 1.0
+         * @see PacketSendResult
+         */
+        final class NetworkError implements PacketSendResult {
+            private static final NetworkError INSTANCE = new NetworkError();
+            private NetworkError() {}
+        }
+
+
+        /**
+         * Gets an instance of {@linkplain Cancellation a cancellation}.
+         *
+         * @return the instance
+         * @since 1.0
+         */
+        static @NonNull Cancellation cancellation() {
+            return Cancellation.INSTANCE;
+        }
+
+        /**
+         * Gets an instance of {@linkplain NetworkError a network error}.
+         *
+         * @return the instance
+         * @since 1.0
+         */
+        static @NonNull NetworkError networkError() {
+            return NetworkError.INSTANCE;
+        }
+    }
 }

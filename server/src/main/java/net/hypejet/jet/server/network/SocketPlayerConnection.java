@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -105,23 +104,27 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     }
 
     @Override
-    public @NonNull CompletableFuture<@Nullable ServerPacket> sendPacket(@NonNull ServerPacket packet) {
+    public @NonNull CompletableFuture<PacketSendResult> sendPacket(@NonNull ServerPacket packet) {
         if (this.isClosed())
-            return CompletableFuture.completedFuture(null);
+            return CompletableFuture.completedFuture(PacketSendResult.cancellation());
 
         PacketSendEvent event = new PacketSendEvent(packet);
         this.server.eventNode().call(event);
 
         if (event.isCancelled())
-            return CompletableFuture.completedFuture(null);
+            return CompletableFuture.completedFuture(PacketSendResult.cancellation());
         ServerPacket finalPacket = event.getPacket(); // Java requires this to access the packet from a lambda function
 
-        CompletableFuture<ServerPacket> packetFuture = new CompletableFuture<>();
-        this.channel.writeAndFlush(packet).addListener(future -> {
-            switch (future.state()) {
-                case SUCCESS -> packetFuture.complete(finalPacket);
-                case FAILED -> packetFuture.completeExceptionally(future.exceptionNow());
-                case CANCELLED -> packetFuture.cancel(false);
+        CompletableFuture<PacketSendResult> packetFuture = new CompletableFuture<>();
+        this.channel.writeAndFlush(finalPacket).addListener(future -> {
+            Future.State futureState = future.state();
+            switch (futureState) {
+                case SUCCESS -> packetFuture.complete(new PacketSendResult.Success(finalPacket));
+                case FAILED -> packetFuture.complete(PacketSendResult.networkError());
+                case CANCELLED -> packetFuture.complete(PacketSendResult.cancellation());
+                default -> packetFuture.completeExceptionally(new IllegalArgumentException(
+                        String.format("The future is in an unexpected state of %s", futureState.name())
+                ));
             }
         });
 
@@ -209,6 +212,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
      * @since 1.0
      */
     public void setCompressionThreshold(int compressionThreshold) {
+        this.ensureInEventLoop(); // The handler updating requires to be executed in an event loop
         try (Acquisition<Session> sessionAcquisition = this.createOrReuseSessionAcquisition()) {
             // TODO: This can be replaced with an interface
             if (sessionAcquisition.get().protocolState() != ProtocolState.LOGIN) {
@@ -216,19 +220,25 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
                         " protocol state other than login");
             }
 
-            ServerPacket packet = this.sendPacket(new ServerEnableCompressionLoginPacket(compressionThreshold)).get();
-            if (!(packet instanceof ServerEnableCompressionLoginPacket(int threshold)))
-                return;
+            ServerEnableCompressionLoginPacket packet = new ServerEnableCompressionLoginPacket(compressionThreshold);
+            if (!(this.sendPacket(packet).get() instanceof PacketSendResult.Success(ServerPacket finalPacket))) return;
+
+            if (!(finalPacket instanceof ServerEnableCompressionLoginPacket compressionPacket)) return;
+            packet = compressionPacket;
+            compressionThreshold = packet.compressionThreshold();
 
             try (MutableAcquisition<Integer> thresholdAcquisition = this.compressionThreshold.acquireMutable()) {
                 /* Handlers need to be updated after the compression threshold
                    is set, because that field is going to be used. */
-                thresholdAcquisition.set(threshold);
+                thresholdAcquisition.set(compressionThreshold);
                 this.updateHandlers();
             }
-        } catch (ExecutionException | InterruptedException exception) {
-            // TODO: Find out if it is necessary
-            this.uncaughtException(Thread.currentThread(), exception);
+        } catch (Throwable throwable) {
+            Thread currentThread = Thread.currentThread();
+            this.uncaughtException(currentThread, throwable);
+
+            if (throwable instanceof InterruptedException)
+                currentThread.interrupt(); // Restore the interrupted status
         }
     }
 
