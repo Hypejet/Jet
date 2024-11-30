@@ -11,7 +11,9 @@ import java.util.function.Function;
 /**
  * Represents an acquisition, which allows making changes to {@linkplain Map a map}.
  *
- * @param <V> a type of value of the collection
+ * @param <K> a type of key of the map
+ * @param <V> a type of value of the map
+ * @param <M> a type of the map
  * @since 1.0
  * @author Codestech
  * @see Map

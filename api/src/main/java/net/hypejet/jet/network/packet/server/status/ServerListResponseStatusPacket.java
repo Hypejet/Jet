@@ -1,0 +1,26 @@
+package net.hypejet.jet.network.packet.server.status;
+
+import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.network.packet.server.ServerPacket;
+import net.hypejet.jet.ping.ServerListPing;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+/**
+ * Represents {@linkplain ServerPacket a server packet}, which sends a server list response data requested by a client.
+ *
+ * @param ping the response data
+ * @since 1.0
+ * @author Codestech
+ * @see ServerPacket
+ */
+public record ServerListResponseStatusPacket(@NonNull ServerListPing ping) implements ServerPacket {
+    /**
+     * Constructs the {@linkplain ServerListResponseStatusPacket server list response status packet}.
+     *
+     * @param ping the response data
+     * @since 1.0
+     */
+    public ServerListResponseStatusPacket {
+        NullabilityUtil.requireNonNull(ping, "ping");
+    }
+}

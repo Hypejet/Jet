@@ -10,6 +10,7 @@ import java.util.function.Predicate;
  * Represents an acquisition, which allows making changes to {@linkplain Collection a collection}.
  *
  * @param <V> a type of value of the collection
+ * @param <C> a type of the collection
  * @since 1.0
  * @author Codestech
  * @see Collection

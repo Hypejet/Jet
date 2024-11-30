@@ -5,8 +5,8 @@ import com.mojang.brigadier.arguments.StringArgumentType.StringType;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.data.codecs.util.mapper.Mapper;
 import net.hypejet.jet.server.command.argument.ArgumentCodec;
-import net.hypejet.jet.server.network.protocol.codecs.mapper.MapperNetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.network.codec.mapper.MapperNetworkCodec;
+import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

@@ -2,7 +2,7 @@ package net.hypejet.jet.server.registry.codecs.registry.banner;
 
 import net.hypejet.jet.data.model.api.registries.banner.BannerPattern;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.identifier.PackedIdentifierBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.identifier.PackedKeyBinaryTagCodec;
 import net.hypejet.jet.server.util.BinaryTagUtil;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTag;
@@ -32,7 +32,7 @@ public final class BannerPatternBinaryTagCodec implements BinaryTagCodec<BannerP
         if (!(tag instanceof CompoundBinaryTag compound))
             throw new IllegalArgumentException("The binary tag specified is not a compound binary tag");
 
-        Key assetId = BinaryTagUtil.readOptional(ASSET_ID_FIELD, compound, PackedIdentifierBinaryTagCodec.instance());
+        Key assetId = BinaryTagUtil.readOptional(ASSET_ID_FIELD, compound, PackedKeyBinaryTagCodec.instance());
         if (assetId == null)
             throw new IllegalArgumentException("The asset id field was not specified");
 
@@ -42,7 +42,7 @@ public final class BannerPatternBinaryTagCodec implements BinaryTagCodec<BannerP
     @Override
     public @NonNull BinaryTag write(@NonNull BannerPattern object) {
         return CompoundBinaryTag.builder()
-                .put(ASSET_ID_FIELD, PackedIdentifierBinaryTagCodec.instance().write(object.asset()))
+                .put(ASSET_ID_FIELD, PackedKeyBinaryTagCodec.instance().write(object.asset()))
                 .putString(TRANSLATION_KEY_FIELD, object.translationKey())
                 .build();
     }

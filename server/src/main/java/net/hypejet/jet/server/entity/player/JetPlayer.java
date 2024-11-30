@@ -5,25 +5,20 @@ import io.netty.buffer.Unpooled;
 import net.hypejet.jet.acquisition.Acquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.player.Player;
-import net.hypejet.jet.event.events.player.PlayerChangeClientBrandEvent;
 import net.hypejet.jet.event.events.player.PlayerChangeSettingsEvent;
-import net.hypejet.jet.event.events.player.PlayerCookieResponseEvent;
-import net.hypejet.jet.event.events.player.PlayerPluginMessageEvent;
 import net.hypejet.jet.event.events.player.PlayerPongEvent;
 import net.hypejet.jet.event.events.player.PlayerResourcePackResponseEvent;
 import net.hypejet.jet.event.node.EventNode;
-import net.hypejet.jet.pack.ResourcePackResult;
-import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.protocol.packet.server.ServerPacket;
-import net.hypejet.jet.protocol.packet.server.configuration.ServerPluginMessageConfigurationPacket;
-import net.hypejet.jet.protocol.packet.server.play.ServerActionBarPlayPacket;
-import net.hypejet.jet.protocol.packet.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
-import net.hypejet.jet.protocol.packet.server.play.ServerPluginMessagePlayPacket;
-import net.hypejet.jet.protocol.packet.server.play.ServerSystemMessagePlayPacket;
+import net.hypejet.jet.network.packet.server.common.ServerPluginMessagePacket;
+import net.hypejet.jet.pack.ResourcePackState;
+import net.hypejet.jet.network.packet.server.ServerPacket;
+import net.hypejet.jet.network.packet.server.play.ServerActionBarPlayPacket;
+import net.hypejet.jet.network.packet.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
+import net.hypejet.jet.network.packet.server.play.ServerSystemMessagePlayPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
-import net.hypejet.jet.server.network.connection.SocketPlayerConnection;
-import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
+import net.hypejet.jet.server.network.SocketPlayerConnection;
+import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.session.Session;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.kyori.adventure.audience.MessageType;
@@ -36,7 +31,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -56,13 +50,13 @@ public final class JetPlayer extends JetEntity implements Player {
     private final String username;
     private final SocketPlayerConnection connection;
 
-    private @MonotonicNonNull Settings settings;
-    private @MonotonicNonNull String clientBrand;
+    private @MonotonicNonNull Settings settings; // TODO: Thread safety
+    private @MonotonicNonNull String clientBrand; // TODO: Thread safety
 
     /**
      * Constructs a {@linkplain JetPlayer player}.
      *
-     * @param uniqueId an unique identifier of the player
+     * @param uniqueId a unique identifier of the player
      * @param username a username of the player
      * @param connection a connection of the player
      * @since 1.0
@@ -117,18 +111,9 @@ public final class JetPlayer extends JetEntity implements Player {
         NullabilityUtil.requireNonNull(identifier, "identifier");
         NullabilityUtil.requireNonNull(data, "data");
 
-        try (Acquisition<Session> sessionAcquisition = this.connection.createOrReuseSessionAcquisition()) {
-            ProtocolState protocolState = sessionAcquisition.get().protocolState();
-
-            // TODO: This can be replaced by an interface that can be implemented by a session task
-            ServerPacket packet = switch (protocolState) {
-                case CONFIGURATION -> new ServerPluginMessageConfigurationPacket(identifier, data);
-                case PLAY -> new ServerPluginMessagePlayPacket(identifier, data);
-                default -> throw new IllegalStateException("You cannot send a plugin message during "
-                        + protocolState + " protocol state");
-            };
-
-            this.sendPacket(packet);
+        try (Acquisition<Session> ignoredAcquisition = this.connection.createOrReuseSessionAcquisition()) {
+            // TODO: Do checks? Check whether the acquisition is actually necessary?
+            this.sendPacket(new ServerPluginMessagePacket(identifier, data));
         }
     }
 
@@ -168,67 +153,6 @@ public final class JetPlayer extends JetEntity implements Player {
     }
 
     /**
-     * Handles a plugin message sent by the player.
-     *
-     * @param identifier an identifier of the plugin message
-     * @param data a data of the plugin message
-     * @since 1.0
-     */
-    public void handlePluginMessage(@NonNull Key identifier, byte @NonNull [] data) {
-        Objects.requireNonNull(identifier, "The identifier must not be null");
-        Objects.requireNonNull(data, "The data must not be null");
-
-        EventNode<Object> eventNode = this.server().eventNode();
-        eventNode.call(new PlayerPluginMessageEvent(this, identifier, data));
-
-        if (identifier.equals(BRAND_PLUGIN_MESSAGE_IDENTIFIER)) {
-            String clientBrand = new String(data, StandardCharsets.UTF_8);
-            eventNode.call(new PlayerChangeClientBrandEvent(this, clientBrand));
-            this.clientBrand = clientBrand;
-        }
-    }
-
-    /**
-     * Handles a cookie response sent by the player.
-     *
-     * @param identifier an identifier of the cookie
-     * @param data a data of the cookie
-     * @since 1.0
-     */
-    public void handleCookieResponse(@NonNull Key identifier, byte @Nullable [] data) {
-        Objects.requireNonNull(identifier, "The identifier must not be null");
-
-        EventNode<Object> eventNode = this.server().eventNode();
-        eventNode.call(new PlayerCookieResponseEvent(this, identifier, data));
-    }
-
-    /**
-     * Handles a resource pack response.
-     *
-     * @param uniqueId an unique identifier of the resource pack
-     * @param result a result of the resource pack
-     * @since 1.0
-     */
-    public void handleResourcePackResponse(@NonNull UUID uniqueId, @NonNull ResourcePackResult result) {
-        Objects.requireNonNull(uniqueId, "The unique identifier must not be null");
-        Objects.requireNonNull(result, "The result must not be null");
-
-        EventNode<Object> eventNode = this.server().eventNode();
-        eventNode.call(new PlayerResourcePackResponseEvent(this, uniqueId, result));
-    }
-
-    /**
-     * Handles a response for a ping packet.
-     *
-     * @param pingIdentifier an identifier of the ping
-     * @since 1.0
-     */
-    public void handlePong(int pingIdentifier) {
-        EventNode<Object> eventNode = this.server().eventNode();
-        eventNode.call(new PlayerPongEvent(this, pingIdentifier));
-    }
-
-    /**
      * Sends a plugin message to a client containing a server brand.
      *
      * @param brand the server brand
@@ -242,5 +166,15 @@ public final class JetPlayer extends JetEntity implements Player {
         this.sendPluginMessage(BRAND_PLUGIN_MESSAGE_IDENTIFIER, messageData);
 
         buf.release();
+    }
+
+    /**
+     * Sets a brand name of the client.
+     *
+     * @param clientBrand the brand name
+     * @since 1.0
+     */
+    public void setClientBrand(@NonNull String clientBrand) {
+        this.clientBrand = NullabilityUtil.requireNonNull(clientBrand, "client brand");
     }
 }

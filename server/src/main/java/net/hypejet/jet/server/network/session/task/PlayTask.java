@@ -1,22 +1,21 @@
 package net.hypejet.jet.server.network.session.task;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.protocol.packet.server.configuration.ServerUpdateTagsConfigurationPacket;
 import net.hypejet.jet.server.entity.player.JetPlayer;
-import net.hypejet.jet.server.registry.session.RegistryTagsUpdater;
+import net.hypejet.jet.server.registry.session.RegistryTagUpdateFunction;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Represents {@linkplain SessionTask a session task}, which handles
- * {@linkplain net.hypejet.jet.protocol.ProtocolState#PLAY a play protocol state}.
+ * {@linkplain net.hypejet.jet.network.ProtocolState#PLAY a play protocol state}.
  *
  * @since 1.0
  * @author Codestech
  * @see SessionTask
  */
-public final class PlayTask implements SessionTask.EventLoopTask, RegistryTagsUpdater {
+public final class PlayTask implements SessionTask.EventLoopTask, RegistryTagUpdateFunction {
 
     private final JetPlayer player;
 
@@ -51,7 +50,7 @@ public final class PlayTask implements SessionTask.EventLoopTask, RegistryTagsUp
     }
 
     @Override
-    public void synchronizeTags(ServerUpdateTagsConfigurationPacket.@NonNull TagRegistry tagRegistry) {
-        // TODO
+    public void updateTags(@NonNull Runnable tagUpdateTask) {
+        tagUpdateTask.run();
     }
 }

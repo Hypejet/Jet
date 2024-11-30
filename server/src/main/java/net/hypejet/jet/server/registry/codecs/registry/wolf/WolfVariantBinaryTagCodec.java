@@ -2,7 +2,7 @@ package net.hypejet.jet.server.registry.codecs.registry.wolf;
 
 import net.hypejet.jet.data.model.api.registries.wolf.WolfVariant;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.identifier.PackedIdentifierBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.identifier.PackedKeyBinaryTagCodec;
 import net.hypejet.jet.server.util.BinaryTagUtil;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
@@ -33,7 +33,7 @@ public final class WolfVariantBinaryTagCodec implements BinaryTagCodec<WolfVaria
         if (!(tag instanceof CompoundBinaryTag compound))
             throw new IllegalArgumentException("The binary tag specified must be a compound binary tag");
 
-        PackedIdentifierBinaryTagCodec identifierCodec = PackedIdentifierBinaryTagCodec.instance();
+        PackedKeyBinaryTagCodec identifierCodec = PackedKeyBinaryTagCodec.instance();
         return new WolfVariant(BinaryTagUtil.read(WILD_TEXTURE_FIELD, compound, identifierCodec),
                 BinaryTagUtil.read(TAME_TEXTURE_FIELD, compound, identifierCodec),
                 BinaryTagUtil.read(ANGRY_TEXTURE_FIELD, compound, identifierCodec),
@@ -43,9 +43,9 @@ public final class WolfVariantBinaryTagCodec implements BinaryTagCodec<WolfVaria
     @Override
     public @NonNull BinaryTag write(@NonNull WolfVariant object) {
         return CompoundBinaryTag.builder()
-                .put(WILD_TEXTURE_FIELD, PackedIdentifierBinaryTagCodec.instance().write(object.wildTexture()))
-                .put(TAME_TEXTURE_FIELD, PackedIdentifierBinaryTagCodec.instance().write(object.tameTexture()))
-                .put(ANGRY_TEXTURE_FIELD, PackedIdentifierBinaryTagCodec.instance().write(object.angryTexture()))
+                .put(WILD_TEXTURE_FIELD, PackedKeyBinaryTagCodec.instance().write(object.wildTexture()))
+                .put(TAME_TEXTURE_FIELD, PackedKeyBinaryTagCodec.instance().write(object.tameTexture()))
+                .put(ANGRY_TEXTURE_FIELD, PackedKeyBinaryTagCodec.instance().write(object.angryTexture()))
                 .put(BIOMES_FIELD, WolfBiomesBinaryTagCodec.instance().write(object.biomes()))
                 .build();
     }

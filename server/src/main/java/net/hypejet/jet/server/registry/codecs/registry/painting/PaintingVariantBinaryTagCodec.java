@@ -2,7 +2,7 @@ package net.hypejet.jet.server.registry.codecs.registry.painting;
 
 import net.hypejet.jet.data.model.api.registries.painting.PaintingVariant;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.identifier.PackedIdentifierBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.identifier.PackedKeyBinaryTagCodec;
 import net.hypejet.jet.server.util.BinaryTagUtil;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTag;
@@ -33,7 +33,7 @@ public final class PaintingVariantBinaryTagCodec implements BinaryTagCodec<Paint
         if (!(tag instanceof CompoundBinaryTag compound))
             throw new IllegalArgumentException("The binary tag specified is not a compound binary tag");
 
-        Key asset = BinaryTagUtil.readOptional(ASSET_ID_FIELD, compound, PackedIdentifierBinaryTagCodec.instance());
+        Key asset = BinaryTagUtil.readOptional(ASSET_ID_FIELD, compound, PackedKeyBinaryTagCodec.instance());
         if (asset == null)
             throw new IllegalArgumentException("The asset field was not specified");
 
@@ -43,7 +43,7 @@ public final class PaintingVariantBinaryTagCodec implements BinaryTagCodec<Paint
     @Override
     public @NonNull BinaryTag write(@NonNull PaintingVariant object) {
         return CompoundBinaryTag.builder()
-                .put(ASSET_ID_FIELD, PackedIdentifierBinaryTagCodec.instance().write(object.asset()))
+                .put(ASSET_ID_FIELD, PackedKeyBinaryTagCodec.instance().write(object.asset()))
                 .putInt(HEIGHT_FIELD, object.height())
                 .putInt(WIDTH_FIELD, object.width())
                 .build();

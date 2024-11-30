@@ -14,7 +14,7 @@ import net.hypejet.jet.event.command.CommandExecutionFailureEvent;
 import net.hypejet.jet.event.command.CommandPreExecuteEvent;
 import net.hypejet.jet.event.command.CommandPreParseEvent;
 import net.hypejet.jet.event.node.EventNode;
-import net.hypejet.jet.protocol.packet.server.play.ServerDeclareCommandsPlayPacket;
+import net.hypejet.jet.network.packet.server.play.ServerDeclareCommandsPlayPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;

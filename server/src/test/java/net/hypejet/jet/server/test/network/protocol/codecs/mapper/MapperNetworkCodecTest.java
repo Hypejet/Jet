@@ -1,8 +1,8 @@
 package net.hypejet.jet.server.test.network.protocol.codecs.mapper;
 
 import net.hypejet.jet.data.codecs.util.mapper.Mapper;
-import net.hypejet.jet.server.network.protocol.codecs.mapper.MapperNetworkCodec;
-import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.network.codec.mapper.MapperNetworkCodec;
+import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.test.network.protocol.codecs.NetworkCodecTestUtil;
 import org.junit.jupiter.api.Test;
 

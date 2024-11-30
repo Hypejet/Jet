@@ -3,7 +3,7 @@ package net.hypejet.jet.server.registry.codecs.registry.dimension;
 import net.hypejet.jet.data.model.api.number.IntegerProvider;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.identifier.PackedIdentifierBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.identifier.PackedKeyBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.identifier.TagIdentifierBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.number.IntegerProviderBinaryTagCodec;
 import net.hypejet.jet.server.util.BinaryTagUtil;
@@ -59,7 +59,7 @@ public final class DimensionTypeBinaryTagCodec implements BinaryTagCodec<Dimensi
             builder.fixedTime(fixedTimeIntBinaryTag.longValue());
 
         Key infiniburn = BinaryTagUtil.readOptional(INFINIBURN, compound, TagIdentifierBinaryTagCodec.instance());
-        Key effects = BinaryTagUtil.readOptional(EFFECTS, compound, PackedIdentifierBinaryTagCodec.instance());
+        Key effects = BinaryTagUtil.readOptional(EFFECTS, compound, PackedKeyBinaryTagCodec.instance());
         IntegerProvider monsterSpawnLightLevel = BinaryTagUtil.readOptional(MONSTER_SPAWN_LIGHT_LEVEL, compound,
                 IntegerProviderBinaryTagCodec.instance());
 
@@ -109,7 +109,7 @@ public final class DimensionTypeBinaryTagCodec implements BinaryTagCodec<Dimensi
                 .putInt(HEIGHT, object.height())
                 .putInt(LOGICAL_HEIGHT, object.localHeight())
                 .put(INFINIBURN, TagIdentifierBinaryTagCodec.instance().write(object.infiniburn()))
-                .put(EFFECTS, PackedIdentifierBinaryTagCodec.instance().write(object.effects()))
+                .put(EFFECTS, PackedKeyBinaryTagCodec.instance().write(object.effects()))
                 .putFloat(AMBIENT_LIGHT, object.ambientLight())
                 .putBoolean(PIGLIN_SAFE, object.piglinSafe())
                 .putBoolean(HAS_RAIDS, object.hasRaids())

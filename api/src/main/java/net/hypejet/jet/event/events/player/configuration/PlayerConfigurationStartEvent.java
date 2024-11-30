@@ -10,12 +10,12 @@ import java.util.Objects;
 
 /**
  * Represents an event called when a {@linkplain Player player} is switched to
- * a {@linkplain net.hypejet.jet.protocol.ProtocolState#CONFIGURATION configuration protocol state}.
+ * a {@linkplain net.hypejet.jet.network.ProtocolState#CONFIGURATION configuration protocol state}.
  *
  * <p>Note that this event blocks a configuration session thread. Unblocking it will finish the session.</p>
  *
  * @since 1.0
- * @see net.hypejet.jet.protocol.ProtocolState#CONFIGURATION
+ * @see net.hypejet.jet.network.ProtocolState#CONFIGURATION
  */
 public final class PlayerConfigurationStartEvent {
 

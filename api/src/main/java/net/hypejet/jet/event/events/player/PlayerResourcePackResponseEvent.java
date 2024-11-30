@@ -1,7 +1,7 @@
 package net.hypejet.jet.event.events.player;
 
 import net.hypejet.jet.entity.player.Player;
-import net.hypejet.jet.pack.ResourcePackResult;
+import net.hypejet.jet.pack.ResourcePackState;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.UUID;
@@ -14,7 +14,7 @@ import java.util.UUID;
  * @param result a result of the resource pack
  * @since 1.0
  * @author Codestech
- * @see ResourcePackResult
+ * @see ResourcePackState
  */
 public record PlayerResourcePackResponseEvent(@NonNull Player player, @NonNull UUID uniqueId,
-                                              @NonNull ResourcePackResult result) {}
+                                              @NonNull ResourcePackState result) {}

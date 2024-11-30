@@ -1,13 +1,15 @@
 package net.hypejet.jet.server.network.handler;
 
+import net.hypejet.jet.network.PlayerConnection;
+
 /**
  * Represents a function, which handles a disconnection
- * of {@linkplain net.hypejet.jet.protocol.connection.PlayerConnection a player connection}.
+ * of {@linkplain PlayerConnection a player connection}.
  *
  * @since 1.0
  * @author Codestech
  * @since 1.0
- * @see net.hypejet.jet.protocol.connection.PlayerConnection
+ * @see PlayerConnection
  */
 @FunctionalInterface
 public interface NetworkDisconnectionHandler {

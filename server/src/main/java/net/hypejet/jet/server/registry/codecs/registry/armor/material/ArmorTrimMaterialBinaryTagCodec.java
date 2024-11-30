@@ -2,7 +2,7 @@ package net.hypejet.jet.server.registry.codecs.registry.armor.material;
 
 import net.hypejet.jet.data.model.api.registries.armor.material.ArmorTrimMaterial;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.identifier.PackedIdentifierBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.identifier.PackedKeyBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.registry.component.ComponentBinaryTagCodec;
 import net.hypejet.jet.server.util.BinaryTagUtil;
 import net.kyori.adventure.key.Key;
@@ -40,8 +40,8 @@ public final class ArmorTrimMaterialBinaryTagCodec implements BinaryTagCodec<Arm
         if (!(tag instanceof CompoundBinaryTag compound))
             throw new IllegalArgumentException("The binary tag specified must be compound binary tag");
 
-        Key asset = BinaryTagUtil.read(ASSET_NAME_FIELD, compound, PackedIdentifierBinaryTagCodec.instance());
-        Key ingredient = BinaryTagUtil.read(INGREDIENT_FIELD, compound, PackedIdentifierBinaryTagCodec.instance());
+        Key asset = BinaryTagUtil.read(ASSET_NAME_FIELD, compound, PackedKeyBinaryTagCodec.instance());
+        Key ingredient = BinaryTagUtil.read(INGREDIENT_FIELD, compound, PackedKeyBinaryTagCodec.instance());
 
         float itemModelIndex = compound.getFloat(ITEM_MODEL_INDEX_FIELD);
 
@@ -50,7 +50,7 @@ public final class ArmorTrimMaterialBinaryTagCodec implements BinaryTagCodec<Arm
 
         Map<Key, Key> overrideArmorMaterials = new HashMap<>();
         for (Map.Entry<String, ? extends BinaryTag> entry : overrideArmorMaterialsBinaryTag) {
-            Key value = PackedIdentifierBinaryTagCodec.instance().read(entry.getValue());
+            Key value = PackedKeyBinaryTagCodec.instance().read(entry.getValue());
             overrideArmorMaterials.put(Key.key(entry.getKey()), value);
         }
 
@@ -62,13 +62,13 @@ public final class ArmorTrimMaterialBinaryTagCodec implements BinaryTagCodec<Arm
         CompoundBinaryTag.Builder overrideArmorMaterialsBuilder = CompoundBinaryTag.builder();
         for (Map.Entry<Key, Key> entry : object.overrideArmorMaterials().entrySet()) {
             String key = entry.getKey().asString();
-            BinaryTag value = PackedIdentifierBinaryTagCodec.instance().write(entry.getValue());
+            BinaryTag value = PackedKeyBinaryTagCodec.instance().write(entry.getValue());
             overrideArmorMaterialsBuilder.put(key, value);
         }
 
         return CompoundBinaryTag.builder()
                 .putString(ASSET_NAME_FIELD, object.asset().value())
-                .put(INGREDIENT_FIELD, PackedIdentifierBinaryTagCodec.instance().write(object.ingredient()))
+                .put(INGREDIENT_FIELD, PackedKeyBinaryTagCodec.instance().write(object.ingredient()))
                 .putFloat(ITEM_MODEL_INDEX_FIELD, object.itemModelIndex())
                 .put(OVERRIDE_ARMOR_MATERIALS_FIELD, overrideArmorMaterialsBuilder.build())
                 .put(DESCRIPTION_FIELD, ComponentBinaryTagCodec.instance().write(object.description()))

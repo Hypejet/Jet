@@ -1,7 +1,7 @@
 package net.hypejet.jet.event.events.packet;
 
 import net.hypejet.jet.event.events.CancellableEvent;
-import net.hypejet.jet.protocol.packet.Packet;
+import net.hypejet.jet.network.packet.Packet;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

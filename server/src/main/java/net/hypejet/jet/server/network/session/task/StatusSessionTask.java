@@ -3,12 +3,12 @@ package net.hypejet.jet.server.network.session.task;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.event.events.ping.ServerListPingEvent;
 import net.hypejet.jet.ping.ServerListPing;
-import net.hypejet.jet.protocol.packet.client.status.ClientPingRequestStatusPacket;
-import net.hypejet.jet.protocol.packet.server.status.ServerListResponseStatusPacket;
-import net.hypejet.jet.protocol.packet.server.status.ServerPingResponseStatusPacket;
+import net.hypejet.jet.network.packet.client.status.ClientPingRequestStatusPacket;
+import net.hypejet.jet.network.packet.server.status.ServerListResponseStatusPacket;
+import net.hypejet.jet.network.packet.server.status.ServerPingResponseStatusPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
-import net.hypejet.jet.server.network.connection.SocketPlayerConnection;
+import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.util.unit.Unit;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
@@ -24,11 +24,11 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * Represents {@linkplain SessionTask a session task}, which handles
- * {@linkplain net.hypejet.jet.protocol.ProtocolState#STATUS a status protocol state}.
+ * {@linkplain net.hypejet.jet.network.ProtocolState#STATUS a status protocol state}.
  *
  * @since 1.0
  * @author Codestech
- * @see net.hypejet.jet.protocol.ProtocolState#STATUS
+ * @see net.hypejet.jet.network.ProtocolState#STATUS
  * @see SessionTask
  */
 public final class StatusSessionTask implements SessionTask.VirtualThreadTask {
@@ -77,7 +77,7 @@ public final class StatusSessionTask implements SessionTask.VirtualThreadTask {
     }
 
     /**
-     * Handles {@linkplain net.hypejet.jet.protocol.packet.client.status.ClientServerListRequestStatusPacket a client
+     * Handles {@linkplain net.hypejet.jet.network.packet.client.status.ClientServerListRequestStatusPacket a client
      * server list request status packet}.
      *
      * @since 1.0

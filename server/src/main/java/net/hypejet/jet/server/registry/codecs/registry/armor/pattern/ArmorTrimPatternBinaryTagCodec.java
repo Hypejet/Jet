@@ -2,7 +2,7 @@ package net.hypejet.jet.server.registry.codecs.registry.armor.pattern;
 
 import net.hypejet.jet.data.model.api.registries.armor.pattern.ArmorTrimPattern;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.identifier.PackedIdentifierBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.identifier.PackedKeyBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.registry.component.ComponentBinaryTagCodec;
 import net.hypejet.jet.server.util.BinaryTagUtil;
 import net.kyori.adventure.nbt.BinaryTag;
@@ -34,7 +34,7 @@ public final class ArmorTrimPatternBinaryTagCodec implements BinaryTagCodec<Armo
         if (!(tag instanceof CompoundBinaryTag compound))
             throw new IllegalArgumentException("The binary tag specified must be a compound binary tag");
 
-        PackedIdentifierBinaryTagCodec identifierCodec = PackedIdentifierBinaryTagCodec.instance();
+        PackedKeyBinaryTagCodec identifierCodec = PackedKeyBinaryTagCodec.instance();
         return new ArmorTrimPattern(BinaryTagUtil.read(ASSET_ID_FIELD, compound, identifierCodec),
                 BinaryTagUtil.read(TEMPLATE_ITEM_FIELD, compound, identifierCodec),
                 BinaryTagUtil.read(DESCRIPTION_FIELD, compound, ComponentBinaryTagCodec.instance()),
@@ -44,8 +44,8 @@ public final class ArmorTrimPatternBinaryTagCodec implements BinaryTagCodec<Armo
     @Override
     public @NonNull BinaryTag write(@NonNull ArmorTrimPattern object) {
         return CompoundBinaryTag.builder()
-                .put(ASSET_ID_FIELD, PackedIdentifierBinaryTagCodec.instance().write(object.asset()))
-                .put(TEMPLATE_ITEM_FIELD, PackedIdentifierBinaryTagCodec.instance().write(object.templateItem()))
+                .put(ASSET_ID_FIELD, PackedKeyBinaryTagCodec.instance().write(object.asset()))
+                .put(TEMPLATE_ITEM_FIELD, PackedKeyBinaryTagCodec.instance().write(object.templateItem()))
                 .put(DESCRIPTION_FIELD, ComponentBinaryTagCodec.instance().write(object.description()))
                 .putBoolean(DECAL_FIELD, object.decal())
                 .build();

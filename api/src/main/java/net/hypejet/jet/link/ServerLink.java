@@ -1,6 +1,7 @@
 package net.hypejet.jet.link;
 
 import net.hypejet.jet.link.label.ServerLinkLabel;
+import net.hypejet.jet.network.packet.server.common.ServerCustomLinksPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -11,6 +12,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 1.0
  * @author Codestech
  * @see ServerLinkLabel
- * @see net.hypejet.jet.protocol.packet.server.configuration.ServerCustomLinksConfigurationPacket
+ * @see ServerCustomLinksPacket
  */
 public record ServerLink(@NonNull ServerLinkLabel label, @NonNull String url) {}

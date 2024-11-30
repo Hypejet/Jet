@@ -1,6 +1,6 @@
 package net.hypejet.jet.event.events.login;
 
-import net.hypejet.jet.protocol.connection.PlayerConnection;
+import net.hypejet.jet.network.PlayerConnection;
 import net.hypejet.jet.session.handler.LoginSessionHandler;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;

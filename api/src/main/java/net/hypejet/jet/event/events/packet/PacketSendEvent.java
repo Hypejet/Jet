@@ -1,6 +1,6 @@
 package net.hypejet.jet.event.events.packet;
 
-import net.hypejet.jet.protocol.packet.server.ServerPacket;
+import net.hypejet.jet.network.packet.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Objects;

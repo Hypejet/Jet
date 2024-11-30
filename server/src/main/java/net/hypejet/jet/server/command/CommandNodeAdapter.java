@@ -5,12 +5,12 @@ import com.mojang.brigadier.tree.ArgumentCommandNode;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
-import net.hypejet.jet.protocol.packet.server.play.ServerDeclareCommandsPlayPacket.ArgumentNode;
-import net.hypejet.jet.protocol.packet.server.play.ServerDeclareCommandsPlayPacket.ChildrenInitializer;
-import net.hypejet.jet.protocol.packet.server.play.ServerDeclareCommandsPlayPacket.LiteralNode;
-import net.hypejet.jet.protocol.packet.server.play.ServerDeclareCommandsPlayPacket.Node;
-import net.hypejet.jet.protocol.packet.server.play.ServerDeclareCommandsPlayPacket.RootNode;
-import net.hypejet.jet.protocol.packet.server.play.ServerDeclareCommandsPlayPacket.SuggestionsType;
+import net.hypejet.jet.network.packet.server.play.ServerDeclareCommandsPlayPacket.ArgumentNode;
+import net.hypejet.jet.network.packet.server.play.ServerDeclareCommandsPlayPacket.ChildrenInitializer;
+import net.hypejet.jet.network.packet.server.play.ServerDeclareCommandsPlayPacket.LiteralNode;
+import net.hypejet.jet.network.packet.server.play.ServerDeclareCommandsPlayPacket.Node;
+import net.hypejet.jet.network.packet.server.play.ServerDeclareCommandsPlayPacket.RootNode;
+import net.hypejet.jet.network.packet.server.play.ServerDeclareCommandsPlayPacket.SuggestionsType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.ArrayList;

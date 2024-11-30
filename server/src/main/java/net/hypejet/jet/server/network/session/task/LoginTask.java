@@ -3,14 +3,14 @@ package net.hypejet.jet.server.network.session.task;
 import net.hypejet.jet.acquisition.MutableAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.event.events.login.LoginSessionInitializeEvent;
-import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.protocol.packet.client.ClientLoginPacket;
-import net.hypejet.jet.protocol.packet.server.login.ServerLoginSuccessLoginPacket;
-import net.hypejet.jet.protocol.packet.server.login.ServerLoginSuccessLoginPacket.Property;
+import net.hypejet.jet.network.ProtocolState;
+import net.hypejet.jet.network.packet.client.ClientPacket;
+import net.hypejet.jet.network.packet.server.login.ServerLoginSuccessLoginPacket;
+import net.hypejet.jet.network.packet.server.login.ServerLoginSuccessLoginPacket.Property;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.acquisition.value.AcquirableValue;
 import net.hypejet.jet.server.entity.player.JetPlayer;
-import net.hypejet.jet.server.network.connection.SocketPlayerConnection;
+import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.session.Session;
 import net.hypejet.jet.server.util.unit.Unit;
 import net.hypejet.jet.session.LoginSession;
@@ -55,17 +55,17 @@ public final class LoginTask implements SessionTask.EventLoopTask, SessionTask.V
     /**
      * Constructs the {@linkplain LoginTask login task}.
      *
-     * @param sessionAcquirableValue an acquirable value of the session
+     * @param sessionAcquirable an acquirable value of the session
      * @param connection a connection that the session task should be handled for
      * @param clientProtocolVersion a protocol version of the client trying to connect
      * @throws IllegalStateException if the caller thread is not an event loop thread
      */
-    public LoginTask(@NonNull AcquirableValue<Session> sessionAcquirableValue, @NonNull SocketPlayerConnection connection,
+    public LoginTask(@NonNull AcquirableValue<Session> sessionAcquirable, @NonNull SocketPlayerConnection connection,
                      int clientProtocolVersion) {
         NullabilityUtil.requireNonNull(connection, "connection");
         connection.ensureInEventLoop();
 
-        this.sessionAcquirableValue = NullabilityUtil.requireNonNull(sessionAcquirableValue, "session acquirable");
+        this.sessionAcquirableValue = NullabilityUtil.requireNonNull(sessionAcquirable, "session acquirable");
         this.connection = connection;
         this.clientProtocolVersion = clientProtocolVersion;
     }
@@ -76,6 +76,7 @@ public final class LoginTask implements SessionTask.EventLoopTask, SessionTask.V
 
         JetMinecraftServer server = this.connection.server();
         if (this.clientProtocolVersion != server.protocolVersion()) {
+            // TODO: Placeholders?
             this.connection.disconnect(server.configuration().unsupportedVersionMessage());
             return;
         }
@@ -162,12 +163,12 @@ public final class LoginTask implements SessionTask.EventLoopTask, SessionTask.V
     }
 
     /**
-     * Handles {@linkplain ClientLoginPacket a client login packet}.
+     * Handles {@linkplain ClientPacket a client packet} received during this session task.
      *
      * @param packet the packet
      * @since 1.0
      */
-    public void handlePacket(@NonNull ClientLoginPacket packet) {
+    public void handlePacket(@NonNull ClientPacket packet) {
         this.connection.ensureInEventLoop();
         if (this.sessionHandler == null)
             throw new IllegalArgumentException("The session handler has been not initialized");
@@ -181,6 +182,12 @@ public final class LoginTask implements SessionTask.EventLoopTask, SessionTask.V
         MutableAcquisition<Session> sessionAcquisition = this.sessionAcquirableValue.acquireMutable();
 
         try {
+            /* Set the compression threshold here to ensure the lowest chance of compression threshold race condition,
+               which is possible in how the compression is handled in Minecraft. */
+            this.connection.setCompressionThreshold(this.connection.server()
+                    .configuration()
+                    .compressionThreshold());
+
             this.sessionAcquisition = sessionAcquisition;
             // TODO: Handle properties
             this.connection.sendPacket(new ServerLoginSuccessLoginPacket(

@@ -2,7 +2,7 @@ package net.hypejet.jet.server.registry.codecs.registry.biome.effects.particle;
 
 import net.hypejet.jet.data.model.api.registries.biome.effects.particle.BiomeParticleSettings;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.identifier.PackedIdentifierBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.identifier.PackedKeyBinaryTagCodec;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -45,13 +45,13 @@ public final class BiomeParticleSettingsBinaryTagCodec implements BinaryTagCodec
         }
 
         BinaryTag data = binaryOptions.get(OPTIONS_VALUE);
-        return new BiomeParticleSettings(PackedIdentifierBinaryTagCodec.instance().read(typeTag), data, probability);
+        return new BiomeParticleSettings(PackedKeyBinaryTagCodec.instance().read(typeTag), data, probability);
     }
 
     @Override
     public @NonNull BinaryTag write(@NonNull BiomeParticleSettings object) {
         CompoundBinaryTag.Builder binaryOptions = CompoundBinaryTag.builder()
-                .put(OPTIONS_TYPE, PackedIdentifierBinaryTagCodec.instance().write(object.key()));
+                .put(OPTIONS_TYPE, PackedKeyBinaryTagCodec.instance().write(object.key()));
 
         BinaryTag data = object.data();
         if (data != null)

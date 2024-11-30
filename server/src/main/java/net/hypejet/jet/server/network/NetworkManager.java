@@ -6,8 +6,8 @@ import io.netty.channel.EventLoopGroup;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
-import net.hypejet.jet.server.network.netty.PlayerChannelInitializer;
-import net.hypejet.jet.server.network.transport.NettyTransportType;
+import net.hypejet.jet.server.network.netty.ConnectionInitializer;
+import net.hypejet.jet.server.network.netty.transport.NettyTransportType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +51,7 @@ public final class NetworkManager {
         ServerBootstrap bootstrap = new ServerBootstrap()
                 .group(this.bossGroup, this.workerGroup)
                 .channel(transport.getSocketChannel())
-                .childHandler(new PlayerChannelInitializer(server));
+                .childHandler(new ConnectionInitializer(server));
 
         String address = configuration.address();
         int port = configuration.port();

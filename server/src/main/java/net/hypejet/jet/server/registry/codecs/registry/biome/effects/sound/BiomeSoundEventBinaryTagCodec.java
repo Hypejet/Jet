@@ -2,7 +2,7 @@ package net.hypejet.jet.server.registry.codecs.registry.biome.effects.sound;
 
 import net.hypejet.jet.data.model.api.registries.biome.effects.sound.BiomeSoundEvent;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.identifier.PackedIdentifierBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.identifier.PackedKeyBinaryTagCodec;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
@@ -31,7 +31,7 @@ public final class BiomeSoundEventBinaryTagCodec implements BinaryTagCodec<Biome
     @Override
     public @NonNull BiomeSoundEvent read(@NonNull BinaryTag tag) {
         if (tag instanceof StringBinaryTag)
-            return new BiomeSoundEvent(PackedIdentifierBinaryTagCodec.instance().read(tag), null);
+            return new BiomeSoundEvent(PackedKeyBinaryTagCodec.instance().read(tag), null);
 
         if (!(tag instanceof CompoundBinaryTag compound))
             throw new IllegalArgumentException("The binary tag specified is not a compound binary tag");
@@ -40,9 +40,9 @@ public final class BiomeSoundEventBinaryTagCodec implements BinaryTagCodec<Biome
         BinaryTag binaryRange = compound.get(RANGE);
 
         if (binaryIdentifier == null)
-            throw new IllegalArgumentException("The sound identifier was not specified");
+            throw new IllegalArgumentException("The sound key was not specified");
 
-        Key identifier = PackedIdentifierBinaryTagCodec.instance().read(binaryIdentifier);
+        Key identifier = PackedKeyBinaryTagCodec.instance().read(binaryIdentifier);
         Float range = binaryRange instanceof FloatBinaryTag floatTag ? floatTag.value() : null;
 
         return new BiomeSoundEvent(identifier, range);
@@ -50,7 +50,7 @@ public final class BiomeSoundEventBinaryTagCodec implements BinaryTagCodec<Biome
 
     @Override
     public @NonNull BinaryTag write(@NonNull BiomeSoundEvent object) {
-        BinaryTag binarySound = PackedIdentifierBinaryTagCodec.instance().write(object.key());
+        BinaryTag binarySound = PackedKeyBinaryTagCodec.instance().write(object.key());
 
         Float range = object.range();
         if (range == null)

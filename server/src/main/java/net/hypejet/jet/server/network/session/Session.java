@@ -1,8 +1,8 @@
 package net.hypejet.jet.server.network.session;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.server.network.connection.SocketPlayerConnection;
+import net.hypejet.jet.network.ProtocolState;
+import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.handler.NetworkDisconnectionHandler;
 import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -25,8 +25,8 @@ public final class Session implements NetworkDisconnectionHandler {
     /**
      * Constructs the {@linkplain Session session}.
      *
-     * @param protocolState      a protocol state that the session should manage
-     * @param connection         a player connection that should own the session
+     * @param protocolState a protocol state that the session should manage
+     * @param connection a player connection that should own the session
      * @param initialSessionTask an initial session task
      * @throws IllegalStateException if the caller thread is not an event loop thread
      * @since 1.0

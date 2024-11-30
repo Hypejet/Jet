@@ -4,7 +4,7 @@ import io.netty.util.collection.LongObjectHashMap;
 import io.netty.util.collection.LongObjectMap;
 import io.netty.util.collection.LongObjectMap.PrimitiveEntry;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.protocol.packet.server.ServerPacket;
+import net.hypejet.jet.network.packet.server.common.ServerKeepAlivePacket;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.handler.NetworkDisconnectionHandler;
 import net.hypejet.jet.server.util.thread.JetThreadFactory;
@@ -36,26 +36,21 @@ public final class KeepAliveHandler implements NetworkDisconnectionHandler, Keep
     private static final Component TIMED_OUT_DISCONNECT_MESSAGE = Component.text("Timed out");
 
     private final JetPlayer player;
-    private final PacketSupplier packetSupplier;
-
-    private final ScheduledExecutorService executorService;
 
     private final LongObjectMap<CompletableFuture<Unit>> keepAliveFutureMap = new LongObjectHashMap<>();
     private final ReentrantLock lock = new ReentrantLock();
 
+    private final ScheduledExecutorService executorService;
     private boolean scheduled;
 
     /**
      * Constructs the {@linkplain KeepAliveHandler keep alive handler}.
      *
      * @param player a player that the keep alive handler is constructed for
-     * @param packetSupplier a supplier of keep alive packets
      * @since 1.0
      */
-    public KeepAliveHandler(@NonNull JetPlayer player, @NonNull PacketSupplier packetSupplier) {
+    public KeepAliveHandler(@NonNull JetPlayer player) {
         this.player = NullabilityUtil.requireNonNull(player, "player");
-        this.packetSupplier = NullabilityUtil.requireNonNull(packetSupplier, "packet supplier");
-
         this.executorService = Executors.newSingleThreadScheduledExecutor(JetThreadFactory.builder()
                 .name("Keep alive thread #%s - " + player.username())
                 .threadType(JetThreadFactory.ThreadType.VIRTUAL)
@@ -143,7 +138,7 @@ public final class KeepAliveHandler implements NetworkDisconnectionHandler, Keep
             while (this.keepAliveFutureMap.containsKey(keepAliveIdentifier));
 
             this.keepAliveFutureMap.put(keepAliveIdentifier, keepAliveFuture);
-            this.player.sendPacket(this.packetSupplier.create(keepAliveIdentifier));
+            this.player.sendPacket(new ServerKeepAlivePacket(keepAliveIdentifier));
         } finally {
             this.lock.unlock();
         }
@@ -160,23 +155,5 @@ public final class KeepAliveHandler implements NetworkDisconnectionHandler, Keep
         } catch (CancellationException exception) {
             // Do nothing, the task has been cancelled due to disconnection
         }
-    }
-
-    /**
-     * Represents a supplier of {@linkplain ServerPacket a server packet}, which is a keep alive packet.
-     *
-     * @since 1.0
-     * @see ServerPacket
-     */
-    @FunctionalInterface
-    public interface PacketSupplier {
-        /**
-         * Creates the {@linkplain ServerPacket server packet}.
-         *
-         * @param keepAliveIdentifier an identifier of the keep alive
-         * @return the server packet
-         * @since 1.0
-         */
-        @NonNull ServerPacket create(long keepAliveIdentifier);
     }
 }

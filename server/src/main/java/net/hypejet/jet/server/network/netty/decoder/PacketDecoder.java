@@ -5,41 +5,37 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import net.hypejet.jet.acquisition.Acquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.protocol.packet.client.ClientPacket;
-import net.hypejet.jet.server.network.connection.SocketPlayerConnection;
-import net.hypejet.jet.server.network.netty.reader.UnhandledPacket;
-import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
-import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketHandler;
-import net.hypejet.jet.server.network.protocol.packet.client.ClientPacketRegistry;
+import net.hypejet.jet.network.ProtocolState;
+import net.hypejet.jet.network.packet.client.ClientPacket;
+import net.hypejet.jet.server.network.SocketPlayerConnection;
+import net.hypejet.jet.server.network.codec.NetworkReader;
+import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.network.packet.client.ClientPacketRegistry;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 
 /**
- * Represents a {@linkplain ByteToMessageDecoder byte-to-message decoder}, which decodes
- * {@linkplain net.hypejet.jet.protocol.packet.server.ServerPacket server packets} and their identifiers.
+ * Represents {@linkplain ByteToMessageDecoder a byte-to-message decoder}, which decodes
+ * {@linkplain net.hypejet.jet.network.packet.server.ServerPacket server packets} and their identifiers.
  *
  * @since 1.0
  * @author Codestech
- * @see net.hypejet.jet.protocol.packet.server.ServerPacket
+ * @see net.hypejet.jet.network.packet.server.ServerPacket
  * @see ByteToMessageDecoder
  */
 public final class PacketDecoder extends ByteToMessageDecoder {
 
     private final SocketPlayerConnection connection;
-    private final ClientPacketRegistry packetRegistry;
 
     /**
      * Constructs the {@linkplain PacketDecoder packet decoder}.
      *
      * @param connection a connection that the decoding should be handled for
-     * @param packetRegistry a client packet registry that should be used for finding client packet handlers
      * @since 1.0
      */
-    public PacketDecoder(@NonNull SocketPlayerConnection connection, @NonNull ClientPacketRegistry packetRegistry) {
+    public PacketDecoder(@NonNull SocketPlayerConnection connection) {
         this.connection = NullabilityUtil.requireNonNull(connection, "connection");
-        this.packetRegistry = NullabilityUtil.requireNonNull(packetRegistry, "packet registry");
     }
 
     @Override
@@ -48,9 +44,9 @@ public final class PacketDecoder extends ByteToMessageDecoder {
             ProtocolState protocolState = protocolStateAcquisition.get();
             int packetId = VarIntNetworkCodec.INSTANCE.read(in);
 
-            ClientPacketHandler<?> handler = this.packetRegistry.handlerFor(packetId, protocolState);
-            if (handler == null) throw throwPacketHandlerNotFound(packetId, protocolState);
-            UnhandledPacket<?> unhandledPacket = readPacket(in, handler); // Read the packet with generics
+            NetworkReader<? extends ClientPacket> reader = ClientPacketRegistry.readerFor(packetId, protocolState);
+            if (reader == null) throw throwPacketHandlerNotFound(packetId, protocolState);
+            ClientPacket packet = reader.read(in);
 
             int readableBytes = in.readableBytes();
             if (readableBytes > 0) {
@@ -60,7 +56,7 @@ public final class PacketDecoder extends ByteToMessageDecoder {
                 ));
             }
 
-            out.add(unhandledPacket);
+            out.add(packet);
         }
     }
 
@@ -75,11 +71,5 @@ public final class PacketDecoder extends ByteToMessageDecoder {
                 "Could not find a reader of a packet with id of \"%s\" in protocol state \"%s\"",
                 packetId, protocolState
         ));
-    }
-
-    private static <P extends ClientPacket> @NonNull UnhandledPacket<P> readPacket(
-            @NonNull ByteBuf buf,  @NonNull ClientPacketHandler<P> handler
-    ) {
-        return new UnhandledPacket<>(handler.read(buf), handler);
     }
 }

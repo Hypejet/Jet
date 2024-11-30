@@ -1,0 +1,31 @@
+package net.hypejet.jet.network.packet.server.play;
+
+import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.network.packet.server.ServerPacket;
+import net.kyori.adventure.text.Component;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+/**
+ * Represents {@linkplain ServerPacket a server packet}, which is sent to change text of a header and footer
+ * of a player list on a client.
+ *
+ * @param headerText the text to display on the header of the player list
+ * @param footerText the text to display on the footer of the player list
+ * @since 1.0
+ * @author Codestech
+ */
+public record ServerPlayerListHeaderAndFooterPlayPacket(@NonNull Component headerText, @NonNull Component footerText)
+        implements ServerPacket {
+    /**
+     * Constructs the {@linkplain ServerPlayerListHeaderAndFooterPlayPacket server play list header and footer
+     * play packet}.
+     *
+     * @param headerText the text to display on the header of the player list
+     * @param footerText the text to display on the footer of the player list
+     * @since 1.0
+     */
+    public ServerPlayerListHeaderAndFooterPlayPacket {
+        NullabilityUtil.requireNonNull(headerText, "header text");
+        NullabilityUtil.requireNonNull(footerText, "footer text");
+    }
+}

@@ -3,9 +3,9 @@ package net.hypejet.jet.entity.player;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.command.CommandSource;
 import net.hypejet.jet.entity.Entity;
-import net.hypejet.jet.protocol.connection.PlayerConnection;
-import net.hypejet.jet.protocol.packet.client.configuration.ClientInformationConfigurationPacket;
-import net.hypejet.jet.protocol.packet.server.ServerPacket;
+import net.hypejet.jet.network.PlayerConnection;
+import net.hypejet.jet.network.packet.client.common.ClientInformationPacket;
+import net.hypejet.jet.network.packet.server.ServerPacket;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -251,7 +251,7 @@ public interface Player extends Entity, CommandSource {
                     Entity.@NonNull Hand mainHand, boolean textFilteringEnabled, boolean allowServerListings,
                     @NonNull ParticleStatus particleStatus) {
         /**
-         * Constructs the {@linkplain ClientInformationConfigurationPacket information configuration packet}.
+         * Constructs the {@linkplain ClientInformationPacket information configuration packet}.
          *
          * @param locale a locale of the player
          * @param viewDistance a view distance of the player

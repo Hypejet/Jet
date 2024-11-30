@@ -6,26 +6,26 @@ import net.hypejet.jet.data.model.api.pack.PackInfo;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.data.model.server.registry.registries.pack.FeaturePack;
 import net.hypejet.jet.event.events.player.configuration.PlayerConfigurationStartEvent;
-import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.protocol.packet.client.configuration.ClientKnownPacksConfigurationPacket;
-import net.hypejet.jet.protocol.packet.server.configuration.ServerFeatureFlagsConfigurationPacket;
-import net.hypejet.jet.protocol.packet.server.configuration.ServerFinishConfigurationPacket;
-import net.hypejet.jet.protocol.packet.server.configuration.ServerKeepAliveConfigurationPacket;
-import net.hypejet.jet.protocol.packet.server.configuration.ServerKnownPacksConfigurationPacket;
-import net.hypejet.jet.protocol.packet.server.configuration.ServerRegistryDataConfigurationPacket;
-import net.hypejet.jet.protocol.packet.server.configuration.ServerUpdateTagsConfigurationPacket;
-import net.hypejet.jet.protocol.packet.server.configuration.ServerUpdateTagsConfigurationPacket.TagRegistry;
+import net.hypejet.jet.network.ProtocolState;
+import net.hypejet.jet.network.packet.client.configuration.ClientKnownPacksConfigurationPacket;
+import net.hypejet.jet.network.packet.server.common.ServerUpdateTagsPacket;
+import net.hypejet.jet.network.packet.server.common.ServerUpdateTagsPacket.TagRegistry;
+import net.hypejet.jet.network.packet.server.configuration.ServerFeatureFlagsConfigurationPacket;
+import net.hypejet.jet.network.packet.server.configuration.ServerFinishConfigurationPacket;
+import net.hypejet.jet.network.packet.server.configuration.ServerKnownPacksConfigurationPacket;
+import net.hypejet.jet.network.packet.server.configuration.ServerRegistryDataConfigurationPacket;
 import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.acquisition.mapped.MappedAcquisition;
 import net.hypejet.jet.server.acquisition.value.AcquirableValue;
 import net.hypejet.jet.server.entity.player.JetPlayer;
-import net.hypejet.jet.server.network.connection.SocketPlayerConnection;
+import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.session.Session;
 import net.hypejet.jet.server.network.session.keepalive.KeepAliveHandler;
 import net.hypejet.jet.server.network.session.keepalive.KeepAliveResponseHandler;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
 import net.hypejet.jet.server.registry.JetSerializableMinecraftRegistry;
-import net.hypejet.jet.server.registry.session.RegistryTagsUpdater;
+import net.hypejet.jet.server.registry.session.RegistryTagUpdateFunction;
 import net.hypejet.jet.server.util.unit.Unit;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTag;
@@ -52,12 +52,12 @@ import java.util.concurrent.TimeoutException;
  * @see SessionTask
  */
 public final class ConfigurationTask implements SessionTask.VirtualThreadTask, KeepAliveResponseHandler,
-        RegistryTagsUpdater {
+        RegistryTagUpdateFunction {
 
     private static final long TIME_OUT_DURATION = 20;
     private static final TimeUnit TIME_OUT_UNIT = TimeUnit.SECONDS;
 
-    private final AcquirableValue<Session> sessionAcquirableValue;
+    private final AcquirableValue<Session> sessionAcquirable;
     private final AcquirableValue<Boolean> tagsSentValue = new AcquirableValue<>(false);
 
     private final JetPlayer player;
@@ -72,16 +72,16 @@ public final class ConfigurationTask implements SessionTask.VirtualThreadTask, K
      * Constructs the {@linkplain ConfigurationTask configuration task}.
      *
      * @param player a player that the session task should be handled for
-     * @param sessionAcquirableValue an acquirable value of the session
+     * @param sessionAcquirable an acquirable value of the session
      * @since 1.0
      */
-    public ConfigurationTask(@NonNull JetPlayer player, @NonNull AcquirableValue<Session> sessionAcquirableValue) {
+    public ConfigurationTask(@NonNull JetPlayer player, @NonNull AcquirableValue<Session> sessionAcquirable) {
         NullabilityUtil.requireNonNull(player, "player");
         player.connection().ensureInEventLoop();
 
-        this.sessionAcquirableValue = NullabilityUtil.requireNonNull(sessionAcquirableValue, "session acquirable");
+        this.sessionAcquirable = NullabilityUtil.requireNonNull(sessionAcquirable, "session acquirable");
         this.player = player;
-        this.keepAliveHandler = new KeepAliveHandler(player, ServerKeepAliveConfigurationPacket::new);
+        this.keepAliveHandler = new KeepAliveHandler(player);
     }
 
     @Override
@@ -124,7 +124,7 @@ public final class ConfigurationTask implements SessionTask.VirtualThreadTask, K
                     for (Acquisition<TagRegistry> tagRegistryAcquisition : tagRegistryAcquisitions)
                         tagRegistries.add(tagRegistryAcquisition.get());
 
-                    this.player.sendPacket(new ServerUpdateTagsConfigurationPacket(Set.copyOf(tagRegistries)));
+                    this.player.sendPacket(new ServerUpdateTagsPacket(Set.copyOf(tagRegistries)));
                     tagsSentAcquisition.set(true);
                 } finally {
                     tagRegistryAcquisitions.forEach(Acquisition::close);
@@ -166,7 +166,7 @@ public final class ConfigurationTask implements SessionTask.VirtualThreadTask, K
     }
 
     /**
-     * Handles a client response for a {@linkplain ServerKnownPacksConfigurationPacket known packs packet}.
+     * Handles a client response for {@linkplain ServerKnownPacksConfigurationPacket a known packs packet}.
      *
      * @param packet the packet that the client respond with
      * @since 1.0
@@ -210,18 +210,16 @@ public final class ConfigurationTask implements SessionTask.VirtualThreadTask, K
     }
 
     @Override
-    public void synchronizeTags(@NonNull TagRegistry tagRegistry) {
+    public void updateTags(@NonNull Runnable tagUpdateTask) {
         try (Acquisition<Boolean> tagsSentAcquisition = this.tagsSentValue.acquire()) {
-            /* If the tags have been not already sent we do not need to send them, because they are already going to
-               be sent, and they should be up-to-date thanks to the acquisition. */
             if (!tagsSentAcquisition.get()) return;
-            this.player.sendPacket(new ServerUpdateTagsConfigurationPacket(Set.of(tagRegistry)));
+            tagUpdateTask.run();
         }
     }
 
     private void finishSession() {
         this.player.connection().ensureInEventLoop();
-        MutableAcquisition<Session> sessionAcquisition = this.sessionAcquirableValue.acquireMutable();
+        MutableAcquisition<Session> sessionAcquisition = this.sessionAcquirable.acquireMutable();
         try {
             this.sessionAcquisition = sessionAcquisition;
             this.player.sendPacket(new ServerFinishConfigurationPacket());

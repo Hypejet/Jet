@@ -6,7 +6,7 @@ import net.hypejet.jet.configuration.ServerConfiguration;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.plugin.PluginManager;
-import net.hypejet.jet.protocol.ProtocolState;
+import net.hypejet.jet.network.ProtocolState;
 import net.hypejet.jet.registry.RegistryManager;
 import net.hypejet.jet.world.WorldManager;
 import org.checkerframework.checker.nullness.qual.NonNull;

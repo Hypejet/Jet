@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.test.network.protocol.codecs.other;
 
-import net.hypejet.jet.server.network.protocol.codecs.other.UUIDNetworkCodec;
+import net.hypejet.jet.server.network.codec.other.UUIDNetworkCodec;
 import net.hypejet.jet.server.test.network.protocol.codecs.NetworkCodecTestUtil;
 import org.junit.jupiter.api.Test;
 

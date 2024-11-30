@@ -2,7 +2,7 @@ package net.hypejet.jet.server.registry.codecs.registry.wolf;
 
 import net.hypejet.jet.data.model.api.registries.wolf.WolfBiomes;
 import net.hypejet.jet.server.nbt.BinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.identifier.PackedIdentifierBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.identifier.PackedKeyBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.identifier.TagIdentifierBinaryTagCodec;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTag;
@@ -35,12 +35,12 @@ public final class WolfBiomesBinaryTagCodec implements BinaryTagCodec<WolfBiomes
                 String value = stringTag.value();
                 if (value.startsWith(TagIdentifierBinaryTagCodec.HASH_STRING))
                     yield new WolfBiomes.TaggedBiomes(TagIdentifierBinaryTagCodec.instance().read(stringTag));
-                yield new WolfBiomes.SingleBiome(PackedIdentifierBinaryTagCodec.instance().read(stringTag));
+                yield new WolfBiomes.SingleBiome(PackedKeyBinaryTagCodec.instance().read(stringTag));
             }
             case ListBinaryTag listTag -> {
                 List<Key> biomes = new ArrayList<>();
                 for (BinaryTag binaryTag : listTag)
-                    biomes.add(PackedIdentifierBinaryTagCodec.instance().read(binaryTag));
+                    biomes.add(PackedKeyBinaryTagCodec.instance().read(binaryTag));
                 yield new WolfBiomes.Biomes(biomes);
             }
             default -> throw new IllegalStateException("Unexpected value: " + tag);
@@ -50,12 +50,12 @@ public final class WolfBiomesBinaryTagCodec implements BinaryTagCodec<WolfBiomes
     @Override
     public @NonNull BinaryTag write(@NonNull WolfBiomes object) {
         return switch (object) {
-            case WolfBiomes.SingleBiome biomes -> PackedIdentifierBinaryTagCodec.instance().write(biomes.key());
+            case WolfBiomes.SingleBiome biomes -> PackedKeyBinaryTagCodec.instance().write(biomes.key());
             case WolfBiomes.TaggedBiomes biomes -> TagIdentifierBinaryTagCodec.instance().write(biomes.key());
             case WolfBiomes.Biomes biomes -> {
                 List<BinaryTag> tags = new ArrayList<>();
                 for (Key key : biomes.keys())
-                    tags.add(PackedIdentifierBinaryTagCodec.instance().write(key));
+                    tags.add(PackedKeyBinaryTagCodec.instance().write(key));
                 yield ListBinaryTag.from(tags);
             }
         };

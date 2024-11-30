@@ -9,17 +9,17 @@ import net.hypejet.jet.data.model.api.pack.PackInfo;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.data.model.server.registry.registries.pack.FeaturePack;
 import net.hypejet.jet.data.model.server.registry.registries.registry.DataRegistryEntry;
-import net.hypejet.jet.protocol.packet.server.configuration.ServerUpdateTagsConfigurationPacket;
-import net.hypejet.jet.protocol.packet.server.configuration.ServerUpdateTagsConfigurationPacket.TagRegistry;
+import net.hypejet.jet.network.packet.server.common.ServerUpdateTagsPacket;
+import net.hypejet.jet.network.packet.server.common.ServerUpdateTagsPacket.TagRegistry;
 import net.hypejet.jet.registry.MinecraftRegistry;
 import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.acquisition.map.HashMapAcquirable;
 import net.hypejet.jet.server.acquisition.mapped.MappedAcquisition;
 import net.hypejet.jet.server.entity.player.JetPlayer;
-import net.hypejet.jet.server.network.connection.SocketPlayerConnection;
+import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.session.Session;
-import net.hypejet.jet.server.registry.session.RegistryTagsUpdater;
+import net.hypejet.jet.server.registry.session.RegistryTagUpdateFunction;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -201,13 +201,16 @@ public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
             tagMapAcquisition.put(validatedEntry, new Tags(tagUnaryOperator.apply(tags.tags())));
 
             TagRegistry tagRegistry = this.createTagRegistry(tagMap);
+            Set<TagRegistry> tagRegistrySet = Set.of(tagRegistry);
+
             try (Acquisition<? extends Collection<JetPlayer>> playerAcquisition = this.server.players()) {
                 for (JetPlayer player : playerAcquisition.get()) {
                     // TODO: Do the session consumption in an another thread to avoid relying on client (HIGH PRIORITY)
                     SocketPlayerConnection connection = player.connection();
                     try (Acquisition<Session> sessionAcquisition = connection.createOrReuseSessionAcquisition()) {
-                        if (sessionAcquisition.get().sessionTask() instanceof RegistryTagsUpdater tagsUpdater)
-                            tagsUpdater.synchronizeTags(tagRegistry);
+                        if (!(sessionAcquisition.get().sessionTask() instanceof RegistryTagUpdateFunction function))
+                            continue;
+                        function.updateTags(() -> player.sendPacket(new ServerUpdateTagsPacket(tagRegistrySet)));
                     }
                 }
             }
@@ -312,17 +315,17 @@ public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
                 tagMap.computeIfAbsent(tag, ignoredTagKey -> new TagBuilder()).add(this.identifierOf(entry));
         }
 
-        Collection<ServerUpdateTagsConfigurationPacket.Tag> packetTags = new HashSet<>();
+        Collection<ServerUpdateTagsPacket.Tag> packetTags = new HashSet<>();
         tagMap.forEach((key, builder) -> packetTags.add(builder.toPacketTag(key)));
         return new TagRegistry(this.registryKey, Set.copyOf(packetTags));
     }
 
     /**
-     * Represents a builder of a {@linkplain ServerUpdateTagsConfigurationPacket.Tag tag}.
+     * Represents a builder of a {@linkplain ServerUpdateTagsPacket.Tag tag}.
      *
      * @since 1.0
      * @author Codestech
-     * @see ServerUpdateTagsConfigurationPacket.Tag
+     * @see ServerUpdateTagsPacket.Tag
      */
     private static final class TagBuilder {
 
@@ -339,17 +342,17 @@ public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
         }
 
         /**
-         * Builds the {@linkplain ServerUpdateTagsConfigurationPacket.Tag tag}.
+         * Builds the {@linkplain ServerUpdateTagsPacket.Tag tag}.
          *
          * @param tagKey a key of the tag
          * @return the tag
          * @since 1.0
          */
-        private ServerUpdateTagsConfigurationPacket.@NonNull Tag toPacketTag(@NonNull Key tagKey) {
+        private ServerUpdateTagsPacket.@NonNull Tag toPacketTag(@NonNull Key tagKey) {
             int[] array = new int[this.identifiers.size()];
             for (int index = 0; index < this.identifiers.size(); index++)
                 array[index] = this.identifiers.get(index);
-            return new ServerUpdateTagsConfigurationPacket.Tag(tagKey, array);
+            return new ServerUpdateTagsPacket.Tag(tagKey, array);
         }
     }
 }

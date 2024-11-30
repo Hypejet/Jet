@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.world.chunk;
 
-import net.hypejet.jet.protocol.packet.server.play.ServerChunkAndLightDataPlayPacket;
+import net.hypejet.jet.network.packet.server.play.ServerChunkAndLightDataPlayPacket;
 import net.hypejet.jet.world.chunk.BlockEntity;
 import net.hypejet.jet.world.chunk.Chunk;
 import net.hypejet.jet.world.chunk.ChunkSection;

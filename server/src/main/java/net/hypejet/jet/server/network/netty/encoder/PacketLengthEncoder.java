@@ -3,17 +3,18 @@ package net.hypejet.jet.server.network.netty.encoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import net.hypejet.jet.server.network.connection.SocketPlayerConnection;
-import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
+import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.server.network.SocketPlayerConnection;
+import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain MessageToByteEncoder message-to-byte encoder}, which writes a length of a serialized
- * and compressed {@linkplain net.hypejet.jet.protocol.packet.server.ServerPacket server packet}.
+ * Represents {@linkplain MessageToByteEncoder a message-to-byte encoder}, which writes a length of a serialized
+ * and compressed {@linkplain net.hypejet.jet.network.packet.server.ServerPacket server packet}.
  *
  * @since 1.0
  * @author Codestech
- * @see net.hypejet.jet.protocol.packet.server.ServerPacket
+ * @see net.hypejet.jet.network.packet.server.ServerPacket
  * @see MessageToByteEncoder
  */
 public final class PacketLengthEncoder extends MessageToByteEncoder<ByteBuf> {
@@ -27,7 +28,7 @@ public final class PacketLengthEncoder extends MessageToByteEncoder<ByteBuf> {
      * @since 1.0
      */
     public PacketLengthEncoder(@NonNull SocketPlayerConnection connection) {
-        this.connection = connection;
+        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
     }
 
     @Override

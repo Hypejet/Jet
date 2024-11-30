@@ -3,20 +3,21 @@ package net.hypejet.jet.server.network.netty.decoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import net.hypejet.jet.server.network.connection.SocketPlayerConnection;
-import net.hypejet.jet.server.network.protocol.codecs.number.VarIntNetworkCodec;
+import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.server.network.SocketPlayerConnection;
+import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 
 /**
- * Represents a {@linkplain ByteToMessageDecoder byte-to-message decoder}, which decodes lengths of
- * {@linkplain net.hypejet.jet.protocol.packet.server.ServerPacket server packets} and creates a frame
+ * Represents {@linkplain ByteToMessageDecoder a byte-to-message decoder}, which decodes lengths of
+ * {@linkplain net.hypejet.jet.network.packet.server.ServerPacket server packets} and creates a frame
  * with a length of them.
  *
  * @since 1.0
  * @author Codestech
- * @see net.hypejet.jet.protocol.packet.server.ServerPacket
+ * @see net.hypejet.jet.network.packet.server.ServerPacket
  * @see ByteToMessageDecoder
  */
 public final class PacketLengthDecoder extends ByteToMessageDecoder {
@@ -30,7 +31,7 @@ public final class PacketLengthDecoder extends ByteToMessageDecoder {
      * @since 1.0
      */
     public PacketLengthDecoder(@NonNull SocketPlayerConnection connection) {
-        this.connection = connection;
+        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
     }
 
     @Override
