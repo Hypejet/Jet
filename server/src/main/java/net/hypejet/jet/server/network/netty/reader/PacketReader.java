@@ -39,7 +39,7 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(@NonNull ChannelHandlerContext ctx, @NonNull Object msg) {
-        try (Acquisition<Session> sessionAcquisition = this.connection.createOrReuseSessionAcquisition()) {
+        try (Acquisition<Session> sessionAcquisition = this.connection.createSessionAcquisition()) {
             if (!(msg instanceof ClientPacket packet))
                 throw new IllegalStateException("A message received is not a client packet");
 

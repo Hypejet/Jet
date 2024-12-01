@@ -207,7 +207,7 @@ public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
                 for (JetPlayer player : playerAcquisition.get()) {
                     // TODO: Do the session consumption in an another thread to avoid relying on client (HIGH PRIORITY)
                     SocketPlayerConnection connection = player.connection();
-                    try (Acquisition<Session> sessionAcquisition = connection.createOrReuseSessionAcquisition()) {
+                    try (Acquisition<Session> sessionAcquisition = connection.createSessionAcquisition()) {
                         if (!(sessionAcquisition.get().sessionTask() instanceof RegistryTagUpdateFunction function))
                             continue;
                         function.updateTags(() -> player.sendPacket(new ServerUpdateTagsPacket(tagRegistrySet)));

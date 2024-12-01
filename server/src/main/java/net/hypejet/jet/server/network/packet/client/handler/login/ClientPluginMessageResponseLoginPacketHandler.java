@@ -1,6 +1,8 @@
 package net.hypejet.jet.server.network.packet.client.handler.login;
 
+import net.hypejet.jet.event.events.pluginmessage.PluginMessageResponseEvent;
 import net.hypejet.jet.network.packet.client.login.ClientPluginMessageResponseLoginPacket;
+import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.packet.client.handler.ClientPacketHandler;
 import net.hypejet.jet.server.network.session.Session;
 import net.hypejet.jet.server.network.session.task.LoginTask;
@@ -31,7 +33,10 @@ public final class ClientPluginMessageResponseLoginPacketHandler
     public void handle(@NonNull ClientPluginMessageResponseLoginPacket packet, @NonNull Session session) {
         if (!(session.sessionTask() instanceof LoginTask loginTask))
             throw new IllegalArgumentException("The current session task is not a login session task");
-        // TODO: Call an event?
         loginTask.handlePacket(packet);
+
+        SocketPlayerConnection connection = session.connection();
+        connection.server().eventNode().call(new PluginMessageResponseEvent(connection, packet.messageId(),
+                packet.successful(), packet.data()));
     }
 }

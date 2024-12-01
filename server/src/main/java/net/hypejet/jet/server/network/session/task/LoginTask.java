@@ -8,7 +8,7 @@ import net.hypejet.jet.network.packet.client.ClientPacket;
 import net.hypejet.jet.network.packet.server.login.ServerLoginSuccessLoginPacket;
 import net.hypejet.jet.network.packet.server.login.ServerLoginSuccessLoginPacket.Property;
 import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.acquisition.value.AcquirableValue;
+import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.session.Session;
@@ -36,15 +36,13 @@ import java.util.concurrent.TimeoutException;
  * @see LoginSession
  * @see SessionTask
  */
-public final class LoginTask implements SessionTask.EventLoopTask, SessionTask.VirtualThreadTask, LoginSession {
+public final class LoginTask implements SessionTask, LoginSession {
 
     private static final int TIME_OUT_TIME = 20;
     private static final TimeUnit TIME_OUT_UNIT = TimeUnit.SECONDS;
-
-    private final AcquirableValue<Session> sessionAcquirableValue;
+    private static final String VIRTUAL_THREAD_NAME = "Login session task thread";
 
     private final SocketPlayerConnection connection;
-    private final int clientProtocolVersion;
 
     private final CompletableFuture<Unit> handlerFuture = new CompletableFuture<>();
     private final CompletableFuture<Unit> acknowledgeFuture = new CompletableFuture<>();
@@ -55,27 +53,24 @@ public final class LoginTask implements SessionTask.EventLoopTask, SessionTask.V
     /**
      * Constructs the {@linkplain LoginTask login task}.
      *
-     * @param sessionAcquirable an acquirable value of the session
      * @param connection a connection that the session task should be handled for
      * @param clientProtocolVersion a protocol version of the client trying to connect
+     * @param transferring whether the client is joining due to transferring from another server
      * @throws IllegalStateException if the caller thread is not an event loop thread
      */
-    public LoginTask(@NonNull AcquirableValue<Session> sessionAcquirable, @NonNull SocketPlayerConnection connection,
-                     int clientProtocolVersion) {
-        NullabilityUtil.requireNonNull(connection, "connection");
-        connection.ensureInEventLoop();
+    public LoginTask(@NonNull SocketPlayerConnection connection, int clientProtocolVersion, boolean transferring) {
+        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
 
-        this.sessionAcquirableValue = NullabilityUtil.requireNonNull(sessionAcquirable, "session acquirable");
-        this.connection = connection;
-        this.clientProtocolVersion = clientProtocolVersion;
-    }
-
-    @Override
-    public void runEventLoopTask() {
-        this.connection.ensureInEventLoop();
+        if (transferring) {
+            JetServerConfiguration configuration = this.connection.server().configuration();
+            if (!configuration.areTransfersAllowed()) {
+                this.connection.disconnect(configuration.transfersNotAllowedMessage());
+                return;
+            }
+        }
 
         JetMinecraftServer server = this.connection.server();
-        if (this.clientProtocolVersion != server.protocolVersion()) {
+        if (clientProtocolVersion != server.protocolVersion()) {
             // TODO: Placeholders?
             this.connection.disconnect(server.configuration().unsupportedVersionMessage());
             return;
@@ -88,33 +83,11 @@ public final class LoginTask implements SessionTask.EventLoopTask, SessionTask.V
         if (sessionHandler == null)
             throw new IllegalArgumentException("The login session handler has not been set");
         this.sessionHandler = sessionHandler;
-    }
 
-    @Override
-    public void runVirtualThreadTask() {
-        try {
-            try {
-                this.handlerFuture.get(TIME_OUT_TIME, TIME_OUT_UNIT);
-            } catch (TimeoutException exception) {
-                this.sessionHandler.handleTimeOut(this);
-                throw new RuntimeException("The login session handler has timed out", exception);
-            }
-
-            this.connection.submitToEventLoop(this::finishSession).get();
-
-            try {
-                this.acknowledgeFuture.get(TIME_OUT_TIME, TIME_OUT_UNIT);
-            } catch (TimeoutException exception) {
-                throw new RuntimeException("The login session finish has been not acknowledged on time", exception);
-            }
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt(); // Restore the interrupted status
-            throw new RuntimeException("The login task has been interrupted", exception);
-        } catch (ExecutionException exception) {
-            throw new RuntimeException("An error occurred during a login task", exception);
-        } catch (CancellationException exception) {
-            // Do nothing, the task has been cancelled due to disconnection
-        }
+        Thread.ofVirtual()
+                .name(VIRTUAL_THREAD_NAME)
+                .uncaughtExceptionHandler(connection)
+                .start(this::runVirtualThreadTask);
     }
 
     @Override
@@ -157,8 +130,10 @@ public final class LoginTask implements SessionTask.EventLoopTask, SessionTask.V
             throw new IllegalArgumentException("The session acquirable has been not acquired");
 
         try (sessionAcquisition) {
-            sessionAcquisition.set(new Session(ProtocolState.CONFIGURATION, this.connection,
-                    new ConfigurationTask(this.connection.playerOrThrow(), this.sessionAcquirableValue)));
+            sessionAcquisition.set(new Session(
+                    ProtocolState.CONFIGURATION, this.connection,
+                    () -> new ConfigurationTask(this.connection.playerOrThrow())
+            ));
         }
     }
 
@@ -175,15 +150,41 @@ public final class LoginTask implements SessionTask.EventLoopTask, SessionTask.V
         this.sessionHandler.handlePacket(packet, this);
     }
 
-    private void finishSession() {
-        this.connection.ensureInEventLoop();
+    private void runVirtualThreadTask() {
+        try {
+            try {
+                this.handlerFuture.get(TIME_OUT_TIME, TIME_OUT_UNIT);
+            } catch (TimeoutException exception) {
+                this.sessionHandler.handleTimeOut(this);
+                throw new RuntimeException("The login session handler has timed out", exception);
+            }
 
+            this.connection.submitToEventLoop(this::finishSession).get();
+
+            try {
+                this.acknowledgeFuture.get(TIME_OUT_TIME, TIME_OUT_UNIT);
+            } catch (TimeoutException exception) {
+                throw new RuntimeException("The login session finish has been not acknowledged on time", exception);
+            }
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt(); // Restore the interrupted status
+            throw new RuntimeException("The login task has been interrupted", exception);
+        } catch (ExecutionException exception) {
+            throw new RuntimeException("An error occurred during a login task", exception);
+        } catch (CancellationException exception) {
+            // Do nothing, the task has been cancelled due to disconnection
+        }
+    }
+
+    private void finishSession() {
         JetPlayer player = this.connection.playerOrThrow();
-        MutableAcquisition<Session> sessionAcquisition = this.sessionAcquirableValue.acquireMutable();
+        MutableAcquisition<Session> sessionAcquisition = this.connection.createMutableSessionAcquisition();
 
         try {
-            /* Set the compression threshold here to ensure the lowest chance of compression threshold race condition,
-               which is possible in how the compression is handled in Minecraft. */
+            /* Set the compression threshold here to ensure that there will be no race conditions. Technically,
+               it is possible anyway, but login protocol state by design is a state where no packet that were
+               not requested by a server should come, except of "login request". Modded clients are obliged
+               to keep this approach. */
             this.connection.setCompressionThreshold(this.connection.server()
                     .configuration()
                     .compressionThreshold());

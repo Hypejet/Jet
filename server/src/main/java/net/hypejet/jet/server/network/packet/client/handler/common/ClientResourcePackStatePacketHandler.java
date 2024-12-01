@@ -29,8 +29,7 @@ public final class ClientResourcePackStatePacketHandler extends ClientPacketHand
 
     @Override
     public void handle(@NonNull ClientResourcePackStatePacket packet, @NonNull Session session) {
-        JetPlayer player = session.connection().player();
-        if (player == null) return; // TODO: print a warning?
+        JetPlayer player = session.connection().playerOrThrow();
         EventNode<Object> eventNode = player.server().eventNode();
         eventNode.call(new PlayerResourcePackResponseEvent(player, packet.uniqueId(), packet.state()));
     }

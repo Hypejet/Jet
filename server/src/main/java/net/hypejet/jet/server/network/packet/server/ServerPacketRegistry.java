@@ -203,6 +203,19 @@ public final class ServerPacketRegistry {
     private ServerPacketRegistry() {}
 
     /**
+     * Gets whether a packet is supported in {@linkplain ProtocolState a protocol state} specified.
+     *
+     * @param protocolState the protocol state
+     * @param packetClass a class of the packet
+     * @return {@code true} if the packet is supported in the protocol state specified, {@code false} otherwise
+     * @since 1.0
+     */
+    public static boolean isSupported(@NonNull ProtocolState protocolState,
+                                      @NonNull Class<? extends ServerPacket> packetClass) {
+        return specificationFor(protocolState, packetClass) != null;
+    }
+
+    /**
      * Gets {@linkplain RegistryPacketSpecification a registry packet specification} for a packet with
      * a class specified.
      *

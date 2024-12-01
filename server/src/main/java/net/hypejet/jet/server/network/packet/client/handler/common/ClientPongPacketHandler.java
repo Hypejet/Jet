@@ -29,8 +29,7 @@ public final class ClientPongPacketHandler extends ClientPacketHandler<ClientPon
 
     @Override
     public void handle(@NonNull ClientPongPacket packet, @NonNull Session session){
-        JetPlayer player = session.connection().player();
-        if (player == null) return; // TODO: print a warning?
+        JetPlayer player = session.connection().playerOrThrow();
         EventNode<Object> eventNode = player.server().eventNode();
         eventNode.call(new PlayerPongEvent(player, packet.pingIdentifier()));
     }

@@ -3,7 +3,6 @@ package net.hypejet.jet.network;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.acquisition.Acquisition;
 import net.hypejet.jet.entity.player.Player;
-import net.hypejet.jet.network.packet.Packet;
 import net.hypejet.jet.network.packet.server.ServerPacket;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;

@@ -15,7 +15,11 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @author Codestech
  * @see SessionTask
  */
-public final class PlayTask implements SessionTask.EventLoopTask, RegistryTagUpdateFunction {
+public final class PlayTask implements SessionTask, RegistryTagUpdateFunction {
+
+    private static final Component NOT_IMPLEMENTED_DISCONNECTION_MESSAGE = Component.text(
+            "The play session has been not implemented yet.", NamedTextColor.RED
+    );
 
     private final JetPlayer player;
 
@@ -27,16 +31,17 @@ public final class PlayTask implements SessionTask.EventLoopTask, RegistryTagUpd
      */
     public PlayTask(@NonNull JetPlayer player) {
         this.player = NullabilityUtil.requireNonNull(player, "player");
-    }
-
-    @Override
-    public void runEventLoopTask() {
-        this.player.disconnect(Component.text("The play session has been not implemented yet.", NamedTextColor.RED));
+        this.player.disconnect(NOT_IMPLEMENTED_DISCONNECTION_MESSAGE);
     }
 
     @Override
     public void handleDisconnection() {
         // NOOP
+    }
+
+    @Override
+    public void updateTags(@NonNull Runnable tagUpdateTask) {
+        tagUpdateTask.run();
     }
 
     /**
@@ -47,10 +52,5 @@ public final class PlayTask implements SessionTask.EventLoopTask, RegistryTagUpd
      */
     public @NonNull JetPlayer player() {
         return this.player;
-    }
-
-    @Override
-    public void updateTags(@NonNull Runnable tagUpdateTask) {
-        tagUpdateTask.run();
     }
 }

@@ -31,11 +31,12 @@ import java.util.concurrent.TimeoutException;
  * @see net.hypejet.jet.network.ProtocolState#STATUS
  * @see SessionTask
  */
-public final class StatusSessionTask implements SessionTask.VirtualThreadTask {
+public final class StatusSessionTask implements SessionTask {
 
     private static final int TIME_OUT_DURATION = 20;
     private static final TimeUnit TIME_OUT_UNIT = TimeUnit.SECONDS;
 
+    private static final String VIRTUAL_THREAD_NAME = "Status session task thread";
     private static final Logger LOGGER = LoggerFactory.getLogger(StatusSessionTask.class);
 
     private final SocketPlayerConnection connection;
@@ -51,23 +52,10 @@ public final class StatusSessionTask implements SessionTask.VirtualThreadTask {
      */
     public StatusSessionTask(@NonNull SocketPlayerConnection connection) {
         this.connection = NullabilityUtil.requireNonNull(connection, "connection");
-    }
-
-    @Override
-    public void runVirtualThreadTask() {
-        try {
-            this.serverListRequestFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
-            this.pingRequestFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
-        } catch (ExecutionException exception) {
-            throw new RuntimeException("An error occurred during a status session task", exception);
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt(); // Restore the interrupted status
-            throw new RuntimeException("The status session task has been interrupted", exception);
-        } catch (TimeoutException exception) {
-            throw new RuntimeException("The status packets have not been sent on time", exception);
-        } catch (CancellationException exception) {
-            // Do nothing, the task has been cancelled due to disconnection
-        }
+        Thread.ofVirtual()
+                .name(VIRTUAL_THREAD_NAME)
+                .uncaughtExceptionHandler(connection)
+                .start(this::runVirtualThreadTask);
     }
 
     @Override
@@ -123,6 +111,22 @@ public final class StatusSessionTask implements SessionTask.VirtualThreadTask {
 
         this.connection.sendPacket(new ServerPingResponseStatusPacket(packet.payload()));
         this.connection.close(); // The status session has finished
+    }
+
+    private void runVirtualThreadTask() {
+        try {
+            this.serverListRequestFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
+            this.pingRequestFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
+        } catch (ExecutionException exception) {
+            throw new RuntimeException("An error occurred during a status session task", exception);
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt(); // Restore the interrupted status
+            throw new RuntimeException("The status session task has been interrupted", exception);
+        } catch (TimeoutException exception) {
+            throw new RuntimeException("The status packets have not been sent on time", exception);
+        } catch (CancellationException exception) {
+            // Do nothing, the task has been cancelled due to disconnection
+        }
     }
 
     private static @NotNull ServerListPing createDefaultServerListPing(@NonNull JetMinecraftServer server) {

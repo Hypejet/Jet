@@ -19,7 +19,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class AcquirableValue<V> extends AbstractAcquirable<V> {
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    private V value;
+    private @NonNull V value;
 
     /**
      * Constructs the {@linkplain AcquirableValue acquirable value}.
@@ -32,43 +32,16 @@ public class AcquirableValue<V> extends AbstractAcquirable<V> {
     }
 
     /**
-     * Constructs the {@linkplain AcquirableValue acquirable value}.
-     *
-     * @param initializer an initializer of the initial value
-     * @since 1.0
-     */
-    public AcquirableValue(@NonNull ValueInitializer<V> initializer) {
-        this.value = NullabilityUtil.requireNonNull(initializer.initialize(this), "initial value");
-    }
-
-    /**
      * Creates {@linkplain MutableAcquisition a mutable acquisition} of a value held by
      * this {@linkplain AcquirableValue acquirable value}.
      *
      * @return the immutable acquisition
      * @since 1.0
+     * @throws IllegalStateException if the caller thread is forbidden to create a mutable acquisition
      */
     public final @NonNull MutableAcquisition<V> acquireMutable() {
         return new MutableAcquisitionImpl<>(this);
     }
-
-    /**
-     * Called before a value is set.
-     *
-     * @param value the value that is going to be set
-     * @param currentValue the current value
-     * @since 1.0
-     */
-    protected void onPreSet(@NonNull V value, @NonNull V currentValue) {}
-
-    /**
-     * Called after a value is set.
-     *
-     * @param value the value that was set
-     * @param previousValue the previous value
-     * @since 1.0
-     */
-    protected void onPostSet(@NonNull V value, @NonNull V previousValue) {}
 
     @Override
     protected final @NonNull Acquisition<V> createAcquisition() {
@@ -139,10 +112,7 @@ public class AcquirableValue<V> extends AbstractAcquirable<V> {
         @Override
         public void set(@NonNull V value) {
             this.runChecks();
-            V initialValue = this.acquirableValue.value;
-            this.acquirableValue.onPreSet(value, initialValue);
             this.acquirableValue.value = value;
-            this.acquirableValue.onPostSet(value, initialValue);
         }
     }
 

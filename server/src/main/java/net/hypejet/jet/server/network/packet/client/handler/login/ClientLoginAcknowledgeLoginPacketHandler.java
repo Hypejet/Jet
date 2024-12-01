@@ -31,7 +31,6 @@ public final class ClientLoginAcknowledgeLoginPacketHandler
     public void handle(@NonNull ClientLoginAcknowledgeLoginPacket packet, @NonNull Session session) {
         if (!(session.sessionTask() instanceof LoginTask loginTask))
             throw new IllegalArgumentException("The current session task is not a login session task");
-        // TODO: Call an event?
         loginTask.acknowledgeFinishLogin();
     }
 }

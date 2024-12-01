@@ -27,8 +27,10 @@ public final class ClientKeepAlivePacketHandler extends ClientPacketHandler<Clie
 
     @Override
     public void handle(@NonNull ClientKeepAlivePacket packet, @NonNull Session session) {
-        // TODO: Print a warning when the session task is not a keep alive response handler?
-        if (!(session.sessionTask() instanceof KeepAliveResponseHandler responseHandler)) return;
+        if (!(session.sessionTask() instanceof KeepAliveResponseHandler responseHandler)) {
+            throw new IllegalStateException("A keep alive packet has been received in a session" +
+                    ", which is not a keep alive response handler");
+        }
         responseHandler.handleKeepAliveResponse(packet.keepAliveIdentifier());
     }
 }

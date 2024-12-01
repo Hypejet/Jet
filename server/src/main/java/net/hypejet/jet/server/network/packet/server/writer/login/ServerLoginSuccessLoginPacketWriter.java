@@ -21,8 +21,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class ServerLoginSuccessLoginPacketWriter implements NetworkWriter<ServerLoginSuccessLoginPacket> {
 
-    private static final CollectionNetworkWriter<Property> PROPERTIES_CODEC =
-            new CollectionNetworkWriter<>(new PropertyWriter()); // TODO
+    private static final CollectionNetworkWriter<Property>
+            PROPERTIES_CODEC = new CollectionNetworkWriter<>(new PropertyWriter());
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerLoginSuccessLoginPacket object) {

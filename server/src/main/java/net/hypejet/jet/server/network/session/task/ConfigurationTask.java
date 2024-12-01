@@ -16,7 +16,6 @@ import net.hypejet.jet.network.packet.server.configuration.ServerKnownPacksConfi
 import net.hypejet.jet.network.packet.server.configuration.ServerRegistryDataConfigurationPacket;
 import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.acquisition.mapped.MappedAcquisition;
 import net.hypejet.jet.server.acquisition.value.AcquirableValue;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
@@ -51,14 +50,12 @@ import java.util.concurrent.TimeoutException;
  * @author Codestech
  * @see SessionTask
  */
-public final class ConfigurationTask implements SessionTask.VirtualThreadTask, KeepAliveResponseHandler,
-        RegistryTagUpdateFunction {
+public final class ConfigurationTask implements SessionTask, KeepAliveResponseHandler, RegistryTagUpdateFunction {
 
     private static final long TIME_OUT_DURATION = 20;
     private static final TimeUnit TIME_OUT_UNIT = TimeUnit.SECONDS;
 
-    private final AcquirableValue<Session> sessionAcquirable;
-    private final AcquirableValue<Boolean> tagsSentValue = new AcquirableValue<>(false);
+    private final AcquirableValue<Boolean> tagsSent = new AcquirableValue<>(false);
 
     private final JetPlayer player;
     private final KeepAliveHandler keepAliveHandler;
@@ -72,82 +69,16 @@ public final class ConfigurationTask implements SessionTask.VirtualThreadTask, K
      * Constructs the {@linkplain ConfigurationTask configuration task}.
      *
      * @param player a player that the session task should be handled for
-     * @param sessionAcquirable an acquirable value of the session
      * @since 1.0
      */
-    public ConfigurationTask(@NonNull JetPlayer player, @NonNull AcquirableValue<Session> sessionAcquirable) {
-        NullabilityUtil.requireNonNull(player, "player");
-        player.connection().ensureInEventLoop();
-
-        this.sessionAcquirable = NullabilityUtil.requireNonNull(sessionAcquirable, "session acquirable");
-        this.player = player;
+    public ConfigurationTask(@NonNull JetPlayer player) {
+        this.player = NullabilityUtil.requireNonNull(player, "player");
         this.keepAliveHandler = new KeepAliveHandler(player);
-    }
 
-    @Override
-    public void runVirtualThreadTask() {
-        this.keepAliveHandler.schedule();
-
-        JetMinecraftServer server = this.player.server();
-        server.eventNode().call(new PlayerConfigurationStartEvent(this.player));
-        this.player.sendServerBrand(server.brandName());
-
-        Set<FeaturePack> enabledFeaturePacks = this.player.server().registryManager().enabledFeaturePacks();
-
-        Set<Key> featureFlags = new HashSet<>();
-        for (FeaturePack featurePack : enabledFeaturePacks)
-            featureFlags.addAll(featurePack.requiredFeatureFlags());
-        this.player.sendPacket(new ServerFeatureFlagsConfigurationPacket(Set.copyOf(featureFlags)));
-
-        Set<PackInfo> packInfos = new HashSet<>();
-        enabledFeaturePacks.forEach(dataPack -> packInfos.add(dataPack.info()));
-        this.player.sendPacket(new ServerKnownPacksConfigurationPacket(Set.copyOf(packInfos)));
-
-        ClientKnownPacksConfigurationPacket packet;
-
-        try {
-            packet = this.knownPacksFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
-
-            Collection<JetMinecraftRegistry<?>> registries = server.registryManager().getRegistries().values();
-            for (JetMinecraftRegistry<?> registry : registries) {
-                if (!(registry instanceof JetSerializableMinecraftRegistry<?> serializableRegistry)) continue;
-                sendRegistry(this.player, serializableRegistry, packet.featurePacks());
-            }
-
-            try (MutableAcquisition<Boolean> tagsSentAcquisition = this.tagsSentValue.acquireMutable()) {
-                Collection<Acquisition<TagRegistry>> tagRegistryAcquisitions = new HashSet<>();
-                try {
-                    for (JetMinecraftRegistry<?> registry : registries)
-                        tagRegistryAcquisitions.add(registry.createTagRegistry());
-
-                    Collection<TagRegistry> tagRegistries = new HashSet<>();
-                    for (Acquisition<TagRegistry> tagRegistryAcquisition : tagRegistryAcquisitions)
-                        tagRegistries.add(tagRegistryAcquisition.get());
-
-                    this.player.sendPacket(new ServerUpdateTagsPacket(Set.copyOf(tagRegistries)));
-                    tagsSentAcquisition.set(true);
-                } finally {
-                    tagRegistryAcquisitions.forEach(Acquisition::close);
-                }
-            }
-
-            if (!this.keepAliveHandler.stopAndAwaitTermination(TIME_OUT_DURATION, TIME_OUT_UNIT)) {
-                this.player.connection().close(); // The keep alive handler has timed out
-                return;
-            }
-
-            this.player.connection().submitToEventLoop(this::finishSession).get();
-            this.acknowledgeFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt(); // Restore the interrupted status
-            throw new RuntimeException("The configuration task has been interrupted", exception);
-        } catch (ExecutionException exception) {
-            throw new RuntimeException("An error occurred during a login task", exception);
-        } catch (TimeoutException exception) {
-            throw new RuntimeException("The configuration task has timed out", exception);
-        } catch (CancellationException exception) {
-            // Do nothing, the task has been cancelled due to disconnection
-        }
+        Thread.ofVirtual()
+                .name(String.format("Configuration session task - %s", player.username()))
+                .uncaughtExceptionHandler(player.connection())
+                .start(this::runVirtualThreadTask);
     }
 
     @Override
@@ -163,6 +94,14 @@ public final class ConfigurationTask implements SessionTask.VirtualThreadTask, K
     @Override
     public void handleKeepAliveResponse(long keepAliveIdentifier) {
         this.keepAliveHandler.handleKeepAliveResponse(keepAliveIdentifier);
+    }
+
+    @Override
+    public void updateTags(@NonNull Runnable tagUpdateTask) {
+        try (Acquisition<Boolean> tagsSentAcquisition = this.tagsSent.acquire()) {
+            if (!tagsSentAcquisition.get()) return;
+            tagUpdateTask.run();
+        }
     }
 
     /**
@@ -195,7 +134,7 @@ public final class ConfigurationTask implements SessionTask.VirtualThreadTask, K
             throw new IllegalArgumentException("The session acquirable has been not acquired");
 
         try (sessionAcquisition) {
-            sessionAcquisition.set(new Session(ProtocolState.PLAY, connection, new PlayTask(this.player)));
+            sessionAcquisition.set(new Session(ProtocolState.PLAY, connection, () -> new PlayTask(this.player)));
         }
     }
 
@@ -209,20 +148,79 @@ public final class ConfigurationTask implements SessionTask.VirtualThreadTask, K
         return this.player;
     }
 
-    @Override
-    public void updateTags(@NonNull Runnable tagUpdateTask) {
-        try (Acquisition<Boolean> tagsSentAcquisition = this.tagsSentValue.acquire()) {
-            if (!tagsSentAcquisition.get()) return;
-            tagUpdateTask.run();
+    private void runVirtualThreadTask() {
+        this.keepAliveHandler.schedule();
+
+        JetMinecraftServer server = this.player.server();
+        server.eventNode().call(new PlayerConfigurationStartEvent(this.player));
+        this.player.sendServerBrand(server.brandName());
+
+        Set<FeaturePack> enabledFeaturePacks = this.player.server().registryManager().enabledFeaturePacks();
+
+        Set<Key> featureFlags = new HashSet<>();
+        for (FeaturePack featurePack : enabledFeaturePacks)
+            featureFlags.addAll(featurePack.requiredFeatureFlags());
+        this.player.sendPacket(new ServerFeatureFlagsConfigurationPacket(Set.copyOf(featureFlags)));
+
+        Set<PackInfo> packInfos = new HashSet<>();
+        enabledFeaturePacks.forEach(dataPack -> packInfos.add(dataPack.info()));
+        this.player.sendPacket(new ServerKnownPacksConfigurationPacket(Set.copyOf(packInfos)));
+
+        ClientKnownPacksConfigurationPacket packet;
+
+        try {
+            packet = this.knownPacksFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
+
+            Collection<JetMinecraftRegistry<?>> registries = server.registryManager().getRegistries().values();
+            for (JetMinecraftRegistry<?> registry : registries) {
+                if (!(registry instanceof JetSerializableMinecraftRegistry<?> serializableRegistry)) continue;
+                sendRegistry(this.player, serializableRegistry, packet.featurePacks());
+            }
+
+            try (MutableAcquisition<Boolean> tagsSentAcquisition = this.tagsSent.acquireMutable()) {
+                Collection<Acquisition<TagRegistry>> tagRegistryAcquisitions = new HashSet<>();
+                try {
+                    for (JetMinecraftRegistry<?> registry : registries)
+                        tagRegistryAcquisitions.add(registry.createTagRegistry());
+
+                    Collection<TagRegistry> tagRegistries = new HashSet<>();
+                    for (Acquisition<TagRegistry> tagRegistryAcquisition : tagRegistryAcquisitions)
+                        tagRegistries.add(tagRegistryAcquisition.get());
+
+                    this.player.sendPacket(new ServerUpdateTagsPacket(Set.copyOf(tagRegistries)));
+                    tagsSentAcquisition.set(true);
+                } finally {
+                    tagRegistryAcquisitions.forEach(Acquisition::close);
+                }
+            }
+
+            SocketPlayerConnection connection = this.player.connection();
+            if (!this.keepAliveHandler.stopAndAwaitTermination(TIME_OUT_DURATION, TIME_OUT_UNIT)) {
+                connection.close(); // The keep alive handler has timed out
+                return;
+            }
+
+            connection.submitToEventLoop(this::finishSession).get();
+            this.acknowledgeFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt(); // Restore the interrupted status
+            throw new RuntimeException("The configuration task has been interrupted", exception);
+        } catch (ExecutionException exception) {
+            throw new RuntimeException("An error occurred during a login task", exception);
+        } catch (TimeoutException exception) {
+            throw new RuntimeException("The configuration task has timed out", exception);
+        } catch (CancellationException exception) {
+            // Do nothing, the task has been cancelled due to disconnection
         }
     }
 
     private void finishSession() {
-        this.player.connection().ensureInEventLoop();
-        MutableAcquisition<Session> sessionAcquisition = this.sessionAcquirable.acquireMutable();
+        SocketPlayerConnection connection = this.player.connection();
+        MutableAcquisition<Session> sessionAcquisition = connection.createMutableSessionAcquisition();
+
         try {
             this.sessionAcquisition = sessionAcquisition;
-            this.player.sendPacket(new ServerFinishConfigurationPacket());
+            connection.sendPacket(new ServerFinishConfigurationPacket());
         } catch (Throwable throwable) {
             sessionAcquisition.close();
             throw throwable; // Re-throw the throwable, since it has been not completely handled

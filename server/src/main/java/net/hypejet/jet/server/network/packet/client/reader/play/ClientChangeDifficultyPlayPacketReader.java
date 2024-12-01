@@ -3,8 +3,8 @@ package net.hypejet.jet.server.network.packet.client.reader.play;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.data.codecs.util.mapper.Mapper;
 import net.hypejet.jet.network.packet.client.play.ClientChangeDifficultyPlayPacket;
-import net.hypejet.jet.server.network.codec.CombinedNetworkCodec;
 import net.hypejet.jet.server.network.codec.NetworkReader;
+import net.hypejet.jet.server.network.codec.PrimitiveNetworkCodecs;
 import net.hypejet.jet.server.network.codec.mapper.MapperNetworkCodec;
 import net.hypejet.jet.world.difficulty.Difficulty;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -27,8 +27,7 @@ public final class ClientChangeDifficultyPlayPacketReader implements NetworkRead
                     .register(Difficulty.NORMAL, (byte) 2)
                     .register(Difficulty.HARD, (byte) 3)
                     .build(),
-            // TODO
-            new CombinedNetworkCodec<>(ByteBuf::readByte, (buf, object) -> buf.writeByte(object))
+            PrimitiveNetworkCodecs.BYTE
     );
 
     @Override

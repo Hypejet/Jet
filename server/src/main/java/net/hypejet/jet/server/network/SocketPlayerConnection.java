@@ -2,22 +2,24 @@ package net.hypejet.jet.server.network;
 
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoop;
 import io.netty.channel.SingleThreadEventLoop;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.util.concurrent.FailedFuture;
 import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.SucceededFuture;
 import net.hypejet.jet.acquisition.Acquisition;
 import net.hypejet.jet.acquisition.MutableAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.event.events.packet.PacketSendEvent;
-import net.hypejet.jet.network.ProtocolState;
 import net.hypejet.jet.network.PlayerConnection;
+import net.hypejet.jet.network.ProtocolState;
 import net.hypejet.jet.network.packet.server.ServerPacket;
 import net.hypejet.jet.network.packet.server.common.ServerDisconnectPacket;
 import net.hypejet.jet.network.packet.server.login.ServerEnableCompressionLoginPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.acquisition.AbstractAcquirable;
 import net.hypejet.jet.server.acquisition.mapped.MappedAcquisition;
-import net.hypejet.jet.server.acquisition.value.AcquirableValue;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.exception.NetworkException;
 import net.hypejet.jet.server.network.handler.NetworkDisconnectionHandler;
@@ -28,9 +30,12 @@ import net.hypejet.jet.server.network.netty.encoder.PacketCompressor;
 import net.hypejet.jet.server.network.netty.encoder.PacketEncoder;
 import net.hypejet.jet.server.network.netty.encoder.PacketLengthEncoder;
 import net.hypejet.jet.server.network.netty.reader.PacketReader;
+import net.hypejet.jet.server.network.packet.server.ServerPacketRegistry;
 import net.hypejet.jet.server.network.session.Session;
 import net.hypejet.jet.server.network.session.task.HandshakeTask;
+import net.hypejet.jet.server.util.unit.Unit;
 import net.kyori.adventure.text.Component;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
@@ -38,6 +43,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -71,12 +77,10 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     private final SocketChannel channel;
     private final JetMinecraftServer server;
 
-    private final AcquirableValue<Session> sessionAcquirableValue;
-
     private final ReentrantReadWriteLock playerLock = new ReentrantReadWriteLock();
     private JetPlayer player;
 
-    private final AcquirableValue<Integer> compressionThreshold = new AcquirableValue<>(-1);
+    private final SessionAcquirable session;
 
     /**
      * Constructs the {@link SocketPlayerConnection socket player connection}.
@@ -93,14 +97,20 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
 
         this.channel = NullabilityUtil.requireNonNull(channel, "channel");
         this.server = NullabilityUtil.requireNonNull(server, "server");
-        this.sessionAcquirableValue = new SessionAcquirableValue(this);
 
-        this.updateHandlers();
+        this.ensureInEventLoop();
+        this.updateHandlers(-1);
+
+        this.session = new SessionAcquirable(this);
+        this.session.initialize(new Session(
+                ProtocolState.HANDSHAKE, this,
+                () -> new HandshakeTask(this)
+        ));
     }
 
     @Override
     public @NonNull Acquisition<ProtocolState> protocolState() {
-        return new MappedAcquisition<>(this.sessionAcquirableValue.acquire(), Session::protocolState);
+        return new MappedAcquisition<>(this.createSessionAcquisition(), Session::protocolState);
     }
 
     @Override
@@ -133,10 +143,18 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
 
     @Override
     public void disconnect(@NonNull Component reason) {
-        try (Acquisition<Session> ignoredAcquisition = this.sessionAcquirableValue.acquire()) {
-            // TODO: Do checks? Check whether the acquisition is actually needed?
-            this.sendPacket(new ServerDisconnectPacket(reason));
-            this.close();
+        // TODO: Run in an event loop
+        CompletableFuture<?> packetSendFuture;
+
+        try (Acquisition<ProtocolState> protocolStateAcquisition = this.protocolState()) {
+            if (ServerPacketRegistry.isSupported(protocolStateAcquisition.get(), ServerDisconnectPacket.class))
+                packetSendFuture = this.sendPacket(new ServerDisconnectPacket(reason));
+            else packetSendFuture = CompletableFuture.completedFuture(Unit.INSTANCE);
+
+            packetSendFuture.handle((result, throwable) -> {
+                this.close();
+                return Unit.INSTANCE;
+            });
         }
     }
 
@@ -165,7 +183,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
 
     @Override
     public boolean isClosed() {
-        return !this.channel.isActive();
+        return !this.channel.isActive(); // TODO
     }
 
     @Override
@@ -181,13 +199,20 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     @Override
     public void handleDisconnection() {
         this.ensureInEventLoop();
-
-        try (Acquisition<Session> sessionAcquisition = this.createOrReuseSessionAcquisition()) {
+        try (Acquisition<Session> sessionAcquisition = this.createSessionAcquisition()) {
             sessionAcquisition.get().handleDisconnection();
         }
 
         if (this.player != null)
             this.server.unregisterPlayer(this.player);
+    }
+
+    public @NonNull Acquisition<Session> createSessionAcquisition() {
+        return this.session.acquire();
+    }
+
+    public @NonNull MutableAcquisition<Session> createMutableSessionAcquisition() {
+        return this.session.createMutableAcquisition();
     }
 
     /**
@@ -196,12 +221,10 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
      * @since 1.0
      */
     public void close() {
-        try {
-            if (!this.channel.isActive()) return; // The connection has been already closed
-            this.channel.close().sync();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        this.submitToEventLoop(() -> {
+            if (!this.isClosed()) return; // The connection has been already closed
+            this.channel.close();
+        });
     }
 
     /**
@@ -212,14 +235,8 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
      * @since 1.0
      */
     public void setCompressionThreshold(int compressionThreshold) {
-        this.ensureInEventLoop(); // The handler updating requires to be executed in an event loop
-        try (Acquisition<Session> sessionAcquisition = this.createOrReuseSessionAcquisition()) {
-            // TODO: This can be replaced with an interface
-            if (sessionAcquisition.get().protocolState() != ProtocolState.LOGIN) {
-                throw new IllegalStateException("You cannot set a compression threshold in" +
-                        " protocol state other than login");
-            }
-
+        this.ensureInEventLoop(); // The handlers can be updates only in event loop threads
+        try {
             ServerEnableCompressionLoginPacket packet = new ServerEnableCompressionLoginPacket(compressionThreshold);
             if (!(this.sendPacket(packet).get() instanceof PacketSendResult.Success(ServerPacket finalPacket))) return;
 
@@ -227,12 +244,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
             packet = compressionPacket;
             compressionThreshold = packet.compressionThreshold();
 
-            try (MutableAcquisition<Integer> thresholdAcquisition = this.compressionThreshold.acquireMutable()) {
-                /* Handlers need to be updated after the compression threshold
-                   is set, because that field is going to be used. */
-                thresholdAcquisition.set(compressionThreshold);
-                this.updateHandlers();
-            }
+            this.updateHandlers(compressionThreshold);
         } catch (Throwable throwable) {
             Thread currentThread = Thread.currentThread();
             this.uncaughtException(currentThread, throwable);
@@ -240,17 +252,6 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
             if (throwable instanceof InterruptedException)
                 currentThread.interrupt(); // Restore the interrupted status
         }
-    }
-
-    /**
-     * Creates {@linkplain Acquisition an acquisition} of the session or uses a reused one if the caller thread already
-     * created an acquisition. See {@link AbstractAcquirable#acquire()} for more information.
-     *
-     * @return the acquisition
-     * @see AbstractAcquirable#acquire()
-     */
-    public @NonNull Acquisition<Session> createOrReuseSessionAcquisition() {
-        return this.sessionAcquirableValue.acquire();
     }
 
     /**
@@ -273,7 +274,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     }
 
     /**
-     * Ensures that the caller thread is {@linkplain io.netty.channel.EventLoop an event loop} thread.
+     * Ensures that the caller thread is {@linkplain EventLoop an event loop} thread.
      *
      * @since 1.0
      * @throws IllegalStateException if the caller thread is not an event loop thread
@@ -284,77 +285,123 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     }
 
     /**
-     * Submits a task to {@linkplain io.netty.channel.EventLoop an event loop}.
+     * Submits {@linkplain Runnable a runnable} task to {@linkplain EventLoop an event loop}. If the caller thread is
+     * an event loop thread then the task is executed immediately.
      *
      * @param task the task
      * @return a future to manage the task
      * @since 1.0
      */
     public @NonNull Future<?> submitToEventLoop(@NonNull Runnable task) {
-        return this.channel.eventLoop().submit(task);
+        EventLoop eventLoop = this.channel.eventLoop();
+        if (eventLoop.inEventLoop()) {
+            try {
+                return new SucceededFuture<>(eventLoop, Unit.INSTANCE);
+            } catch (Exception exception) {
+                return new FailedFuture<>(eventLoop, exception);
+            }
+        }
+        return eventLoop.submit(task);
     }
 
-    private void updateHandlers() {
+    private void updateHandlers(int compressionThreshold) {
         this.ensureInEventLoop();
-        try (Acquisition<Integer> compressionThresholdAcquisition = this.compressionThreshold.acquire()) {
-            ChannelPipeline pipeline = this.channel.pipeline();
-            for (String handlerName : HANDLER_SET) {
-                ChannelHandler handler = pipeline.get(handlerName);
-                if (handler == null) continue;
-                pipeline.remove(handler);
-            }
 
-            pipeline.addFirst(PACKET_ENCODER, new PacketEncoder(this));
-            pipeline.addFirst(PACKET_DECODER, new PacketDecoder(this));
-            pipeline.addBefore(PACKET_DECODER, PACKET_LENGTH_DECODER, new PacketLengthDecoder(this));
-            pipeline.addBefore(PACKET_ENCODER, PACKET_LENGTH_ENCODER, new PacketLengthEncoder(this));
-            pipeline.addAfter(PACKET_DECODER, PACKET_READER, new PacketReader(this));
+        ChannelPipeline pipeline = this.channel.pipeline();
+        for (String handlerName : HANDLER_SET) {
+            ChannelHandler handler = pipeline.get(handlerName);
+            if (handler == null) continue;
+            pipeline.remove(handler);
+        }
 
-            int threshold = compressionThresholdAcquisition.get();
-            if (threshold >= 0) {
-                pipeline.addBefore(PACKET_DECODER, PACKET_DECOMPRESSOR, new PacketDecompressor(this));
-                pipeline.addBefore(PACKET_ENCODER, PACKET_COMPRESSOR, new PacketCompressor(this, threshold));
-            }
+        pipeline.addFirst(PACKET_ENCODER, new PacketEncoder(this));
+        pipeline.addFirst(PACKET_DECODER, new PacketDecoder(this));
+        pipeline.addBefore(PACKET_DECODER, PACKET_LENGTH_DECODER, new PacketLengthDecoder(this));
+        pipeline.addBefore(PACKET_ENCODER, PACKET_LENGTH_ENCODER, new PacketLengthEncoder(this));
+        pipeline.addAfter(PACKET_DECODER, PACKET_READER, new PacketReader(this));
+
+        if (compressionThreshold >= 0) {
+            pipeline.addBefore(PACKET_DECODER, PACKET_DECOMPRESSOR, new PacketDecompressor(this));
+            pipeline.addBefore(PACKET_ENCODER, PACKET_COMPRESSOR, new PacketCompressor(this, compressionThreshold));
         }
     }
 
-    /**
-     * Represents {@linkplain AcquirableValue an acquirable value}, which holds {@linkplain Session a session}.
-     *
-     * @since 1.0
-     * @author Codestech
-     * @see Session
-     * @see AcquirableValue
-     */
-    private static final class SessionAcquirableValue extends AcquirableValue<Session> {
+    private static final class SessionAcquirable extends AbstractAcquirable<Session> {
 
-        private final SocketPlayerConnection connection;
+        private final SocketPlayerConnection playerConnection;
 
-        /**
-         * Constructs the {@linkplain SessionAcquirableValue session acquirable value}.
-         *
-         * @param connection a connection that should own the acquirable value
-         * @since 1.0
-         */
-        private SessionAcquirableValue(@NonNull SocketPlayerConnection connection) {
-            super(acquirable -> {
-                connection.ensureInEventLoop();
-                Session session = new Session(ProtocolState.HANDSHAKE, connection,
-                        new HandshakeTask(acquirable, connection));
-                session.startSession();
-                return session;
-            });
-            this.connection = connection;
+        private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+        private @MonotonicNonNull Session session;
+
+        private SessionAcquirable(@NonNull SocketPlayerConnection playerConnection) {
+            this.playerConnection = NullabilityUtil.requireNonNull(playerConnection, "player connection");
         }
 
         @Override
-        protected void onPreSet(@NonNull Session value, @NonNull Session currentValue) {
-            this.connection.ensureInEventLoop();
+        protected @NonNull Acquisition<Session> createAcquisition() {
+            return new SessionAcquisition(this, this.lock.readLock());
         }
 
-        @Override
-        protected void onPostSet(@NonNull Session value, @NonNull Session previousValue) {
-            value.startSession();
+        private @NonNull MutableAcquisition<Session> createMutableAcquisition() {
+            return new MutableSessionAcquisition(this);
+        }
+
+        // Unfortunately, this is probably the only method to achieve correctness with acquisitions and sessions
+        private void initialize(@NonNull Session session) {
+            this.playerConnection.ensureInEventLoop();
+            if (this.isInitialized())
+                throw new IllegalStateException("The session has been already initialized");
+            this.set(session);
+        }
+
+        private boolean isInitialized() {
+            return this.session != null;
+        }
+
+        private void ensureInitialized() {
+            if (!this.isInitialized())
+                throw new IllegalStateException("The session has been not initialized");
+        }
+
+        private void set(@NonNull Session session) {
+            this.session = NullabilityUtil.requireNonNull(session, "value");
+            session.startSession();
+        }
+
+        private static final class MutableSessionAcquisition extends SessionAcquisition
+                implements MutableAcquisition<Session> {
+
+            private MutableSessionAcquisition(@NonNull SessionAcquirable acquirable) {
+                super(acquirable, acquirable.lock.writeLock());
+                acquirable.playerConnection.ensureInEventLoop();
+            }
+
+            @Override
+            public void set(@NonNull Session value) {
+                this.runChecksAndEnsureInitialized();
+                this.acquirable.set(value);
+            }
+        }
+
+        private static class SessionAcquisition extends AbstractAcquirable.AbstractAcquisition<Session> {
+
+            protected final SessionAcquirable acquirable;
+
+            private SessionAcquisition(@NonNull SessionAcquirable acquirable, @NonNull Lock lock) {
+                super(acquirable, lock);
+                this.acquirable = acquirable;
+            }
+
+            @Override
+            public @NonNull Session get() {
+                this.runChecksAndEnsureInitialized();
+                return this.acquirable.session;
+            }
+
+            protected void runChecksAndEnsureInitialized() {
+                this.runChecks();
+                this.acquirable.ensureInitialized();
+            }
         }
     }
 }

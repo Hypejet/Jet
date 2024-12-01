@@ -6,11 +6,8 @@ import net.hypejet.jet.acquisition.Acquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.player.PlayerChangeSettingsEvent;
-import net.hypejet.jet.event.events.player.PlayerPongEvent;
-import net.hypejet.jet.event.events.player.PlayerResourcePackResponseEvent;
-import net.hypejet.jet.event.node.EventNode;
+import net.hypejet.jet.network.ProtocolState;
 import net.hypejet.jet.network.packet.server.common.ServerPluginMessagePacket;
-import net.hypejet.jet.pack.ResourcePackState;
 import net.hypejet.jet.network.packet.server.ServerPacket;
 import net.hypejet.jet.network.packet.server.play.ServerActionBarPlayPacket;
 import net.hypejet.jet.network.packet.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
@@ -19,7 +16,7 @@ import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
-import net.hypejet.jet.server.network.session.Session;
+import net.hypejet.jet.server.network.packet.server.ServerPacketRegistry;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
@@ -111,8 +108,9 @@ public final class JetPlayer extends JetEntity implements Player {
         NullabilityUtil.requireNonNull(identifier, "identifier");
         NullabilityUtil.requireNonNull(data, "data");
 
-        try (Acquisition<Session> ignoredAcquisition = this.connection.createOrReuseSessionAcquisition()) {
-            // TODO: Do checks? Check whether the acquisition is actually necessary?
+        try (Acquisition<ProtocolState> acquisition = this.connection.protocolState()) {
+            if (!ServerPacketRegistry.isSupported(acquisition.get(), ServerPluginMessagePacket.class))
+                throw new IllegalStateException("The operation is not supported at current protocol state");
             this.sendPacket(new ServerPluginMessagePacket(identifier, data));
         }
     }

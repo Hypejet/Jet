@@ -70,13 +70,49 @@ public final class JetServerConfiguration extends OkaeriConfig implements Server
     @Comments({
             @Comment("Feature packs that should be enabled on the server."),
             @Comment,
-            @Comment("The feature packs add additional functionality on the server and client"),
+            @Comment("The feature packs add additional functionality on the server and client."),
             @Comment("Make sure that you put actual Minecraft feature pack keys here.")
     })
     @CustomKey("enabled-packs")
     private @MonotonicNonNull Set<Key> enabledFeaturePacks = createDefaultEnabledFeaturePacks();
 
+    @Comments({
+            @Comment("Defines whether clients joining due a server transfer should be allowed."),
+            @Comment("\"true\" for yes, \"false\" for no")
+    })
+    @CustomKey("transfers-allowed")
+    private boolean transfersAllowed = false;
+
+    @Comment("A message used during disconnection when a player is trying to join due a server transfer when it is" +
+            " not allowed.")
+    @CustomKey("transfers-not-allowed-message")
+    private @MonotonicNonNull Component transfersNotAllowedMessage = createTransfersNotAllowedMessage();
+
     private JetServerConfiguration() {}
+
+    @Override
+    public int compressionThreshold() {
+        return this.compressionThreshold;
+    }
+
+    @Override
+    public @NonNull Component unsupportedVersionMessage() {
+        if (this.unsupportedVersionMessage == null)
+            this.unsupportedVersionMessage = createDefaultUnsupportedVersionMessage();
+        return this.unsupportedVersionMessage;
+    }
+
+    @Override
+    public @NonNull Component serverListDescription() {
+        if (this.serverListDescription == null)
+            this.serverListDescription = createDefaultServerListDescription();
+        return this.serverListDescription;
+    }
+
+    @Override
+    public int maxPlayers() {
+        return this.maxPlayers;
+    }
 
     /**
      * Gets an address that the server should bind to.
@@ -99,7 +135,6 @@ public final class JetServerConfiguration extends OkaeriConfig implements Server
     public int port() {
         return this.port;
     }
-
 
     /**
      * Gets the {@linkplain NettyTransportSelector netty transport selector}.
@@ -134,42 +169,26 @@ public final class JetServerConfiguration extends OkaeriConfig implements Server
     }
 
     /**
-     * {@inheritDoc}
+     * Gets whether clients joining due a server transfer are allowed.
+     *
+     * @return {@code true} if the clients joining due a server transfer are allowed, {@code false} otherwise
+     * @since 1.0
      */
-    @Override
-    public int compressionThreshold() {
-        return this.compressionThreshold;
+    public boolean areTransfersAllowed() {
+        return this.transfersAllowed;
     }
 
     /**
-     * Gets a message used during disconnection when a player is trying to join with an unsupported version.
+     * Gets a message used during disconnection when a player is trying to join due a server transfer when it is not
+     * allowed.
      *
      * @return the message
      * @since 1.0
      */
-    @Override
-    public @NonNull Component unsupportedVersionMessage() {
-        if (this.unsupportedVersionMessage == null)
-            this.unsupportedVersionMessage = createDefaultUnsupportedVersionMessage();
-        return this.unsupportedVersionMessage;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public @NonNull Component serverListDescription() {
-        if (this.serverListDescription == null)
-            this.serverListDescription = createDefaultServerListDescription();
-        return this.serverListDescription;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int maxPlayers() {
-        return this.maxPlayers;
+    public @NonNull Component transfersNotAllowedMessage() {
+        if (this.transfersNotAllowedMessage == null)
+            this.transfersNotAllowedMessage = createTransfersNotAllowedMessage();
+        return this.transfersNotAllowedMessage;
     }
 
     /**
@@ -205,5 +224,9 @@ public final class JetServerConfiguration extends OkaeriConfig implements Server
 
     private static @NonNull Set<Key> createDefaultEnabledFeaturePacks() {
         return Set.of(FeaturePacks.CORE);
+    }
+
+    private static @NonNull Component createTransfersNotAllowedMessage() {
+        return Component.text("Transfers are not allowed on this server!", NamedTextColor.RED);
     }
 }
