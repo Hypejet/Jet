@@ -134,7 +134,9 @@ public final class ConfigurationTask implements SessionTask, KeepAliveResponseHa
             throw new IllegalArgumentException("The session acquirable has been not acquired");
 
         try (sessionAcquisition) {
-            sessionAcquisition.set(new Session(ProtocolState.PLAY, connection, () -> new PlayTask(this.player)));
+            Session playSession = new Session(ProtocolState.PLAY, connection);
+            sessionAcquisition.set(playSession);
+            playSession.startSession(new PlayTask(this.player));
         }
     }
 
@@ -216,7 +218,9 @@ public final class ConfigurationTask implements SessionTask, KeepAliveResponseHa
 
     private void finishSession() {
         SocketPlayerConnection connection = this.player.connection();
-        MutableAcquisition<Session> sessionAcquisition = connection.createMutableSessionAcquisition();
+        connection.ensureInEventLoop(); // The session acquisition should be created in an event loop
+
+        MutableAcquisition<Session> sessionAcquisition = connection.session().acquireMutable();
 
         try {
             this.sessionAcquisition = sessionAcquisition;

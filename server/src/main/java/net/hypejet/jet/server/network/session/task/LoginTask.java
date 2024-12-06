@@ -130,10 +130,9 @@ public final class LoginTask implements SessionTask, LoginSession {
             throw new IllegalArgumentException("The session acquirable has been not acquired");
 
         try (sessionAcquisition) {
-            sessionAcquisition.set(new Session(
-                    ProtocolState.CONFIGURATION, this.connection,
-                    () -> new ConfigurationTask(this.connection.playerOrThrow())
-            ));
+            Session configurationSession = new Session(ProtocolState.CONFIGURATION, this.connection);
+            sessionAcquisition.set(configurationSession);
+            configurationSession.startSession(new ConfigurationTask(this.connection.playerOrThrow()));
         }
     }
 
@@ -177,13 +176,15 @@ public final class LoginTask implements SessionTask, LoginSession {
     }
 
     private void finishSession() {
+        this.connection.ensureInEventLoop(); // The session acquisition should be created in an event loop
+
         JetPlayer player = this.connection.playerOrThrow();
-        MutableAcquisition<Session> sessionAcquisition = this.connection.createMutableSessionAcquisition();
+        MutableAcquisition<Session> sessionAcquisition = this.connection.session().acquireMutable();
 
         try {
             /* Set the compression threshold here to ensure that there will be no race conditions. Technically,
                it is possible anyway, but login protocol state by design is a state where no packet that were
-               not requested by a server should come, except of "login request". Modded clients are obliged
+               not requested by a server should come, except of the "login request". Modded clients are obliged
                to keep this approach. */
             this.connection.setCompressionThreshold(this.connection.server()
                     .configuration()

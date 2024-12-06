@@ -44,8 +44,11 @@ public final class HandshakeTask implements SessionTask {
      * @since 1.0
      */
     public HandshakeTask(@NonNull SocketPlayerConnection connection) {
+        // We do not care about the acquisition if it is not null, it is up to user not to provide null values
         this.connection = NullabilityUtil.requireNonNull(connection, "connection");
-        this.sessionAcquisition = connection.createMutableSessionAcquisition();
+
+        connection.ensureInEventLoop(); // The session acquisition should be created in an event loop
+        this.sessionAcquisition = connection.session().acquireMutable();
 
         Thread.ofVirtual()
                 .name(VIRTUAL_THREAD_NAME)
@@ -71,15 +74,21 @@ public final class HandshakeTask implements SessionTask {
             this.connection.ensureInEventLoop();
             this.handshakeFuture.complete(packet);
 
-            Session nextSession = switch (packet.intent()) {
-                case STATUS -> new Session(
-                        ProtocolState.STATUS, this.connection,
-                        () -> new StatusSessionTask(this.connection)
-                );
-                case LOGIN -> createLoginSession(packet, false);
-                case TRANSFER -> createLoginSession(packet, true);
+            ProtocolState nextProtocolState = switch (packet.intent()) {
+                case STATUS -> ProtocolState.STATUS;
+                case LOGIN, TRANSFER -> ProtocolState.LOGIN;
             };
-            this.sessionAcquisition.set(nextSession);
+
+            Session session = new Session(nextProtocolState, this.connection);
+            this.sessionAcquisition.set(session);
+
+            SessionTask nextSessionTask = switch (packet.intent()) {
+                case STATUS -> new StatusSessionTask(this.connection);
+                case LOGIN -> new LoginTask(this.connection, packet.protocolVersion(), false);
+                case TRANSFER -> new LoginTask(this.connection, packet.protocolVersion(), true);
+            };
+
+            session.startSession(nextSessionTask);
         } catch (Throwable throwable) {
             throw new RuntimeException(throwable);
         } finally {
@@ -100,12 +109,5 @@ public final class HandshakeTask implements SessionTask {
         } catch (CancellationException exception) {
             // Do nothing, the task has been cancelled due to disconnection
         }
-    }
-
-    private @NonNull Session createLoginSession(@NonNull ClientHandshakePacket handshakePacket, boolean transferring) {
-        return new Session(
-                ProtocolState.LOGIN, this.connection,
-                () -> new LoginTask(this.connection, handshakePacket.protocolVersion(), transferring)
-        );
     }
 }

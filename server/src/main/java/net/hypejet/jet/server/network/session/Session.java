@@ -7,12 +7,18 @@ import net.hypejet.jet.server.network.handler.NetworkDisconnectionHandler;
 import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Supplier;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * Represents something that manages {@linkplain ProtocolState a protocol state}.
+ * Represents something that manages {@linkplain ProtocolState a protocol state} with {@linkplain SessionTask a session
+ * task}.
+ *
+ * <p>Session after construction does not do anything. It is required to {@linkplain #startSession(SessionTask) start
+ * the session manually}. Sessions work like that to ensure that everything works correctly. Some session tasks acquire
+ * sessions at the construction and to ensure that session has been already fully initialized and set we use
+ * this approach.</p>
  *
  * @author Codestech
  * @since 1.0
@@ -22,24 +28,20 @@ public final class Session implements NetworkDisconnectionHandler {
 
     private final ProtocolState protocolState;
     private final SocketPlayerConnection connection;
-    private final Supplier<SessionTask> sessionTaskSupplier;
 
     private @MonotonicNonNull SessionTask sessionTask;
-    private final ReentrantLock startSessionLock = new ReentrantLock();
+    private final ReentrantReadWriteLock startSessionLock = new ReentrantReadWriteLock();
 
     /**
      * Constructs the {@linkplain Session session}.
      *
      * @param protocolState a protocol state that the session should manage
      * @param connection a connection that should own the session
-     * @param sessionTaskSupplier a supplier of a session task that should manage the session
      * @since 1.0
      */
-    public Session(@NonNull ProtocolState protocolState, @NonNull SocketPlayerConnection connection,
-                   @NonNull Supplier<SessionTask> sessionTaskSupplier) {
+    public Session(@NonNull ProtocolState protocolState, @NonNull SocketPlayerConnection connection) {
         this.protocolState = NullabilityUtil.requireNonNull(protocolState, "protocol state");
         this.connection = NullabilityUtil.requireNonNull(connection, "connection");
-        this.sessionTaskSupplier =  NullabilityUtil.requireNonNull(sessionTaskSupplier, "session task supplier");
     }
 
     @Override
@@ -50,17 +52,18 @@ public final class Session implements NetworkDisconnectionHandler {
     /**
      * Starts the session.
      *
+     * @param sessionTask a session task that should manage the session
      * @since 1.0
      * @throws IllegalStateException if the session has been already started
      */
-    public void startSession() {
+    public void startSession(@NonNull SessionTask sessionTask) {
         try {
-            this.startSessionLock.lock();
+            this.startSessionLock.writeLock().lock();
             if (this.sessionTask != null)
                 throw new IllegalStateException("The session has been already started");
-            this.sessionTask = this.sessionTaskSupplier.get();
+            this.sessionTask = NullabilityUtil.requireNonNull(sessionTask, "session task");
         } finally {
-            this.startSessionLock.unlock();
+            this.startSessionLock.writeLock().unlock();
         }
     }
 
@@ -87,13 +90,15 @@ public final class Session implements NetworkDisconnectionHandler {
     /**
      * Gets {@linkplain SessionTask a session task} that manages the session.
      *
-     * @return the session task
+     * @return the session task, {@code null} if the session has not benn started yet
      * @since 1.0
-     * @throws IllegalStateException if the session task has been not initialized
      */
-    public @NonNull SessionTask sessionTask() {
-        if (this.sessionTask == null)
-            throw new IllegalStateException("The session task has not been initialized");
-        return this.sessionTask;
+    public @Nullable SessionTask sessionTask() {
+        try {
+            this.startSessionLock.readLock().lock();
+            return this.sessionTask;
+        } finally {
+            this.startSessionLock.readLock().unlock();
+        }
     }
 }

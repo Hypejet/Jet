@@ -9,7 +9,6 @@ import io.netty.util.concurrent.FailedFuture;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.SucceededFuture;
 import net.hypejet.jet.acquisition.Acquisition;
-import net.hypejet.jet.acquisition.MutableAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.event.events.packet.PacketSendEvent;
 import net.hypejet.jet.network.PlayerConnection;
@@ -18,8 +17,8 @@ import net.hypejet.jet.network.packet.server.ServerPacket;
 import net.hypejet.jet.network.packet.server.common.ServerDisconnectPacket;
 import net.hypejet.jet.network.packet.server.login.ServerEnableCompressionLoginPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.acquisition.AbstractAcquirable;
 import net.hypejet.jet.server.acquisition.mapped.MappedAcquisition;
+import net.hypejet.jet.server.acquisition.value.AcquirableValue;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.exception.NetworkException;
 import net.hypejet.jet.server.network.handler.NetworkDisconnectionHandler;
@@ -35,7 +34,6 @@ import net.hypejet.jet.server.network.session.Session;
 import net.hypejet.jet.server.network.session.task.HandshakeTask;
 import net.hypejet.jet.server.util.unit.Unit;
 import net.kyori.adventure.text.Component;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
@@ -43,7 +41,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -80,7 +77,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     private final ReentrantReadWriteLock playerLock = new ReentrantReadWriteLock();
     private JetPlayer player;
 
-    private final SessionAcquirable session;
+    private final AcquirableValue<Session> session;
 
     /**
      * Constructs the {@link SocketPlayerConnection socket player connection}.
@@ -98,19 +95,22 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
         this.channel = NullabilityUtil.requireNonNull(channel, "channel");
         this.server = NullabilityUtil.requireNonNull(server, "server");
 
+        // We update handlers after the instantiation and such an operation require to be executed in an event loop
         this.ensureInEventLoop();
-        this.updateHandlers(-1);
 
-        this.session = new SessionAcquirable(this);
-        this.session.initialize(new Session(
-                ProtocolState.HANDSHAKE, this,
-                () -> new HandshakeTask(this)
-        ));
+        Session initialSession = new Session(ProtocolState.HANDSHAKE, this);
+        this.session = new AcquirableSession(initialSession, channel);
+
+        /* We need to update the handlers after the initial session is set, since they are going to be used.
+           The session needs to be started later however, since it might send packets, which require handlers to
+           be already set. */
+        this.updateHandlers(-1);
+        initialSession.startSession(new HandshakeTask(this));
     }
 
     @Override
     public @NonNull Acquisition<ProtocolState> protocolState() {
-        return new MappedAcquisition<>(this.createSessionAcquisition(), Session::protocolState);
+        return new MappedAcquisition<>(this.session.acquire(), Session::protocolState);
     }
 
     @Override
@@ -199,7 +199,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     @Override
     public void handleDisconnection() {
         this.ensureInEventLoop();
-        try (Acquisition<Session> sessionAcquisition = this.createSessionAcquisition()) {
+        try (Acquisition<Session> sessionAcquisition = this.session.acquire()) {
             sessionAcquisition.get().handleDisconnection();
         }
 
@@ -207,12 +207,14 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
             this.server.unregisterPlayer(this.player);
     }
 
-    public @NonNull Acquisition<Session> createSessionAcquisition() {
-        return this.session.acquire();
-    }
-
-    public @NonNull MutableAcquisition<Session> createMutableSessionAcquisition() {
-        return this.session.createMutableAcquisition();
+    /**
+     * Gets {@linkplain AcquirableValue an acquirable value} of {@linkplain Session a session}.
+     *
+     * @return the acquirable value
+     * @since 1.0
+     */
+    public @NonNull AcquirableValue<Session> session() {
+        return this.session;
     }
 
     /**
@@ -305,103 +307,72 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     }
 
     private void updateHandlers(int compressionThreshold) {
+        // No need for a lock for the handlers, we just require the code to be executed in the event loop
         this.ensureInEventLoop();
 
-        ChannelPipeline pipeline = this.channel.pipeline();
-        for (String handlerName : HANDLER_SET) {
-            ChannelHandler handler = pipeline.get(handlerName);
-            if (handler == null) continue;
-            pipeline.remove(handler);
-        }
+        try (Acquisition<ProtocolState> protocolStateAcquisition = this.protocolState()) {
+            ChannelPipeline pipeline = this.channel.pipeline();
+            for (String handlerName : HANDLER_SET) {
+                ChannelHandler handler = pipeline.get(handlerName);
+                if (handler == null) continue;
+                pipeline.remove(handler);
+            }
 
-        pipeline.addFirst(PACKET_ENCODER, new PacketEncoder(this));
-        pipeline.addFirst(PACKET_DECODER, new PacketDecoder(this));
-        pipeline.addBefore(PACKET_DECODER, PACKET_LENGTH_DECODER, new PacketLengthDecoder(this));
-        pipeline.addBefore(PACKET_ENCODER, PACKET_LENGTH_ENCODER, new PacketLengthEncoder(this));
-        pipeline.addAfter(PACKET_DECODER, PACKET_READER, new PacketReader(this));
+            ProtocolState protocolState = protocolStateAcquisition.get();
+            pipeline.addFirst(PACKET_ENCODER, new PacketEncoder(this, protocolState));
+            pipeline.addFirst(PACKET_DECODER, new PacketDecoder(this, protocolState));
 
-        if (compressionThreshold >= 0) {
+            pipeline.addBefore(PACKET_DECODER, PACKET_LENGTH_DECODER, new PacketLengthDecoder(this));
+            pipeline.addBefore(PACKET_ENCODER, PACKET_LENGTH_ENCODER, new PacketLengthEncoder(this));
+            pipeline.addAfter(PACKET_DECODER, PACKET_READER, new PacketReader(this));
+
+            if (compressionThreshold < 0) return;
             pipeline.addBefore(PACKET_DECODER, PACKET_DECOMPRESSOR, new PacketDecompressor(this));
             pipeline.addBefore(PACKET_ENCODER, PACKET_COMPRESSOR, new PacketCompressor(this, compressionThreshold));
         }
     }
 
-    private static final class SessionAcquirable extends AbstractAcquirable<Session> {
+    /**
+     * Represents {@linkplain AcquirableValue an acquirable value}, which holds {@linkplain Session a session}.
+     *
+     * @since 1.0
+     * @see Session
+     * @see AcquirableValue
+     */
+    private static final class AcquirableSession extends AcquirableValue<Session> {
 
-        private final SocketPlayerConnection playerConnection;
+        private final SocketChannel channel;
 
-        private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-        private @MonotonicNonNull Session session;
-
-        private SessionAcquirable(@NonNull SocketPlayerConnection playerConnection) {
-            this.playerConnection = NullabilityUtil.requireNonNull(playerConnection, "player connection");
+        /**
+         * Constructs the {@linkplain AcquirableSession acquirable session}.
+         *
+         * @param initialValue an initial session
+         * @since 1.0
+         */
+        public AcquirableSession(@NonNull Session initialValue, @NonNull SocketChannel channel) {
+            super(initialValue);
+            this.channel = NullabilityUtil.requireNonNull(channel, "channel");
         }
 
         @Override
-        protected @NonNull Acquisition<Session> createAcquisition() {
-            return new SessionAcquisition(this, this.lock.readLock());
-        }
+        protected void onSet(@NonNull Session value) {
+            ChannelPipeline pipeline = this.channel.pipeline();
+            ProtocolState protocolState = value.protocolState();
 
-        private @NonNull MutableAcquisition<Session> createMutableAcquisition() {
-            return new MutableSessionAcquisition(this);
-        }
+            /* Packet encoders and decoders hold a protocol state, because they need it for packet serialization
+               and sometimes cannot use the protocol state from a session. An example of such a case is where
+               a session has been acquired with mutability by another thread and the acquisition is closed only when
+               a packet is received, so a packet handler waits for it to unlock, but it unlocks only when the packet
+               is received, therefore we get a deadlock. This kind of situation is present in a handshake session
+               for example. */
 
-        // Unfortunately, this is probably the only method to achieve correctness with acquisitions and sessions
-        private void initialize(@NonNull Session session) {
-            this.playerConnection.ensureInEventLoop();
-            if (this.isInitialized())
-                throw new IllegalStateException("The session has been already initialized");
-            this.set(session);
-        }
+            PacketEncoder encoder = pipeline.get(PacketEncoder.class);
+            if (encoder != null)
+                encoder.updateProtocolState(protocolState);
 
-        private boolean isInitialized() {
-            return this.session != null;
-        }
-
-        private void ensureInitialized() {
-            if (!this.isInitialized())
-                throw new IllegalStateException("The session has been not initialized");
-        }
-
-        private void set(@NonNull Session session) {
-            this.session = NullabilityUtil.requireNonNull(session, "value");
-            session.startSession();
-        }
-
-        private static final class MutableSessionAcquisition extends SessionAcquisition
-                implements MutableAcquisition<Session> {
-
-            private MutableSessionAcquisition(@NonNull SessionAcquirable acquirable) {
-                super(acquirable, acquirable.lock.writeLock());
-                acquirable.playerConnection.ensureInEventLoop();
-            }
-
-            @Override
-            public void set(@NonNull Session value) {
-                this.runChecksAndEnsureInitialized();
-                this.acquirable.set(value);
-            }
-        }
-
-        private static class SessionAcquisition extends AbstractAcquirable.AbstractAcquisition<Session> {
-
-            protected final SessionAcquirable acquirable;
-
-            private SessionAcquisition(@NonNull SessionAcquirable acquirable, @NonNull Lock lock) {
-                super(acquirable, lock);
-                this.acquirable = acquirable;
-            }
-
-            @Override
-            public @NonNull Session get() {
-                this.runChecksAndEnsureInitialized();
-                return this.acquirable.session;
-            }
-
-            protected void runChecksAndEnsureInitialized() {
-                this.runChecks();
-                this.acquirable.ensureInitialized();
-            }
+            PacketDecoder decoder = pipeline.get(PacketDecoder.class);
+            if (decoder != null)
+                decoder.updateProtocolState(protocolState);
         }
     }
 }

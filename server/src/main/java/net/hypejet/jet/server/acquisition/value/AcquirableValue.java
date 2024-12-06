@@ -49,6 +49,14 @@ public class AcquirableValue<V> extends AbstractAcquirable<V> {
     }
 
     /**
+     * Invoked when a value of this acquirable is set.
+     *
+     * @param value the new value
+     * @since 1.0
+     */
+    protected void onSet(@NonNull V value) {}
+
+    /**
      * Represents a function that initializes a value of {@linkplain AcquirableValue an acquirable value} giving access
      * to the initializer to the acquirable value.
      *
@@ -113,6 +121,7 @@ public class AcquirableValue<V> extends AbstractAcquirable<V> {
         public void set(@NonNull V value) {
             this.runChecks();
             this.acquirableValue.value = value;
+            this.acquirableValue.onSet(value);
         }
     }
 
