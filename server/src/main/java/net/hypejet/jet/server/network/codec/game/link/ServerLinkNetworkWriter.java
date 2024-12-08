@@ -42,14 +42,14 @@ public final class ServerLinkNetworkWriter implements NetworkWriter<ServerLink> 
     );
 
     /**
-     * An instance of {@linkplain ServerLinkNetworkWriter a server link network writer}.
+     * An instance of the {@linkplain ServerLinkNetworkWriter server link network writer}.
      *
      * @since 1.0
      */
     public static final ServerLinkNetworkWriter INSTANCE = new ServerLinkNetworkWriter();
 
     /**
-     * An instance of {@linkplain CollectionNetworkWriter a collection network writer}, which writes elements
+     * An instance of the {@linkplain CollectionNetworkWriter collection network writer}, which writes elements
      * with a type of {@linkplain ServerLink server link}.
      *
      * @since 1.0

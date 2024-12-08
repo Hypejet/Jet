@@ -6,15 +6,16 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Represents {@linkplain MessageToByteEncoder a message-to-byte encoder}, which writes a length of a serialized
- * and compressed {@linkplain net.hypejet.jet.network.packet.server.ServerPacket server packet}.
+ * and compressed {@linkplain ServerPacket server packet}.
  *
  * @since 1.0
  * @author Codestech
- * @see net.hypejet.jet.network.packet.server.ServerPacket
+ * @see ServerPacket
  * @see MessageToByteEncoder
  */
 public final class PacketLengthEncoder extends MessageToByteEncoder<ByteBuf> {

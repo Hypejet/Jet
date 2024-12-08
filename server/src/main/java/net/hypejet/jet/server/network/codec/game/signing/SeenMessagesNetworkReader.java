@@ -23,7 +23,7 @@ public final class SeenMessagesNetworkReader implements NetworkReader<SeenMessag
     private static final NetworkReader<BitSet> ACKNOWLEDGED_CODEC = new FixedBitSetNetworkCodec(ACKNOWLEDGED_LENGTH);
 
     /**
-     * An instance of {@linkplain SeenMessagesNetworkReader a seen messages network reader}.
+     * An instance of the {@linkplain SeenMessagesNetworkReader seen messages network reader}.
      *
      * @since 1.0
      */

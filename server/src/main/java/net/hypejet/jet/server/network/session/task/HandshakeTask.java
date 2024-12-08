@@ -2,8 +2,8 @@ package net.hypejet.jet.server.network.session.task;
 
 import net.hypejet.jet.acquisition.MutableAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.network.ProtocolState;
-import net.hypejet.jet.network.packet.client.handshake.ClientHandshakePacket;
+import net.hypejet.jet.server.network.ProtocolState;
+import net.hypejet.jet.server.network.packet.packets.client.handshake.ClientHandshakePacket;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.session.Session;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -38,7 +38,7 @@ public final class HandshakeTask implements SessionTask {
     private final CompletableFuture<ClientHandshakePacket> handshakeFuture = new CompletableFuture<>();
 
     /**
-     * Constructs the {@linkplain HandshakeTask handshaking task}.
+     * Constructs the {@linkplain HandshakeTask handshake task}.
      *
      * @param connection a socket player connection that the task is done for
      * @since 1.0

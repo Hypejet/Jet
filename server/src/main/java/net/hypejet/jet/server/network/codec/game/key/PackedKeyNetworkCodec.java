@@ -24,7 +24,7 @@ import java.util.Collection;
 public final class PackedKeyNetworkCodec implements NetworkCodec<Key> {
 
     /**
-     * An instance of {@linkplain PackedKeyNetworkCodec a packed key network codec}.
+     * An instance of the {@linkplain PackedKeyNetworkCodec packed key network codec}.
      *
      * @since 1.0
      */

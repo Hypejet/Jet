@@ -13,6 +13,7 @@ import net.hypejet.jet.server.command.JetCommandManager;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.NetworkManager;
+import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.plugin.JetPluginManager;
 import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.ServerPingUtil;
@@ -23,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Represents an implementation of {@linkplain MinecraftServer Minecraft server}.
@@ -47,7 +49,7 @@ public final class JetMinecraftServer implements MinecraftServer {
     private final JetCommandManager commandManager;
     private final JetRegistryManager registryManager;
 
-    private final HashSetAcquirable<JetPlayer> playersAcquirable = new HashSetAcquirable<>();
+    private final HashSetAcquirable<JetPlayer> players = new HashSetAcquirable<>();
 
     /**
      * Constructs the {@linkplain JetMinecraftServer Jet Minecraft server}.
@@ -100,7 +102,7 @@ public final class JetMinecraftServer implements MinecraftServer {
 
     @Override
     public @NonNull Acquisition<? extends Collection<JetPlayer>> players() {
-        return this.playersAcquirable.acquire();
+        return this.players.acquire();
     }
 
     @Override
@@ -130,10 +132,21 @@ public final class JetMinecraftServer implements MinecraftServer {
      * @since 1.0
      */
     public void registerPlayer(@NonNull JetPlayer player) {
-        try (MutableCollectionAcquisition<JetPlayer, ?> acquisition = this.playersAcquirable.acquireMutable()) {
-            if (!player.connection().isClosed()) { // TODO: Check whether this check is actually needed
-                acquisition.add(player);
-            }
+        try {
+            SocketPlayerConnection connection = player.connection();
+            // Checking whether a player connection has been closed is only safe in an event loop
+            connection.submitToEventLoop(() -> {
+                try (MutableCollectionAcquisition<JetPlayer, ?> acquisition = this.players.acquireMutable()) {
+                    if (!connection.isClosed())
+                        acquisition.add(player);
+                }
+            }).get();
+        } catch (InterruptedException exception) {
+            Thread currentThread = Thread.currentThread();
+            if (currentThread.isInterrupted())
+                currentThread.interrupt(); // Restore the interrupted status
+        } catch (ExecutionException exception) {
+            throw new RuntimeException("An error occured during registering a player", exception);
         }
     }
 
@@ -144,7 +157,7 @@ public final class JetMinecraftServer implements MinecraftServer {
      * @since 1.0
      */
     public void unregisterPlayer(@NonNull JetPlayer player) {
-        try (MutableCollectionAcquisition<JetPlayer, ?> acquisition = this.playersAcquirable.acquireMutable()) {
+        try (MutableCollectionAcquisition<JetPlayer, ?> acquisition = this.players.acquireMutable()) {
             acquisition.remove(player);
         }
     }

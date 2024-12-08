@@ -10,14 +10,14 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public enum NettyTransportSelector {
     /**
-     * Represents a transport selector, which always selects a {@linkplain NettyTransportType#NIO NIO transport type}.
+     * Represents a transport selector, which always selects {@linkplain NettyTransportType#NIO an NIO transport type}.
      *
      * @since 1.0
      */
     NIO(NettyTransportType.NIO),
 
     /**
-     * Represents a transport selector, which always selects a {@linkplain NettyTransportType#EPOLL epoll transport
+     * Represents a transport selector, which always selects {@linkplain NettyTransportType#EPOLL an epoll transport
      * type}.
      *
      * @since 1.0
@@ -25,7 +25,7 @@ public enum NettyTransportSelector {
     EPOLL(NettyTransportType.EPOLL),
 
     /**
-     * Represents a transport selector, which always selects a {@linkplain NettyTransportType#KQUEUE kqueue transport
+     * Represents a transport selector, which always selects {@linkplain NettyTransportType#KQUEUE an KQueue transport
      * type}.
      *
      * @since 1.0
@@ -33,7 +33,7 @@ public enum NettyTransportSelector {
     KQUEUE(NettyTransportType.KQUEUE),
 
     /**
-     * Represents a transport selector, which selects a {@linkplain NettyTransportType netty transport type} using
+     * Represents a transport selector, which selects {@linkplain NettyTransportType a netty transport type} using
      * {@link NettyTransportType#select()}.
      *
      * @since 1.0
@@ -43,7 +43,7 @@ public enum NettyTransportSelector {
     private final NettyTransportType transportType;
 
     /**
-     * Constructs {@linkplain NettyTransportType a netty transport selector}.
+     * Constructs the {@linkplain NettyTransportType netty transport selector}.
      *
      * @param transportType the transport type selected
      * @since 1.0

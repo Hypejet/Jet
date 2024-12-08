@@ -1,7 +1,9 @@
 package net.hypejet.jet.server.network;
 
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
+import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoop;
 import io.netty.channel.SingleThreadEventLoop;
 import io.netty.channel.socket.SocketChannel;
@@ -10,18 +12,17 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.SucceededFuture;
 import net.hypejet.jet.acquisition.Acquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.event.events.packet.PacketSendEvent;
 import net.hypejet.jet.network.PlayerConnection;
-import net.hypejet.jet.network.ProtocolState;
-import net.hypejet.jet.network.packet.server.ServerPacket;
-import net.hypejet.jet.network.packet.server.common.ServerDisconnectPacket;
-import net.hypejet.jet.network.packet.server.login.ServerEnableCompressionLoginPacket;
+import net.hypejet.jet.network.PlayerConnectionState;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
+import net.hypejet.jet.server.network.packet.packets.server.common.ServerDisconnectPacket;
+import net.hypejet.jet.server.network.packet.packets.server.login.ServerEnableCompressionLoginPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.acquisition.mapped.MappedAcquisition;
 import net.hypejet.jet.server.acquisition.value.AcquirableValue;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.exception.NetworkException;
-import net.hypejet.jet.server.network.handler.NetworkDisconnectionHandler;
+import net.hypejet.jet.server.network.packet.handler.NetworkDisconnectionHandler;
 import net.hypejet.jet.server.network.netty.decoder.PacketDecoder;
 import net.hypejet.jet.server.network.netty.decoder.PacketDecompressor;
 import net.hypejet.jet.server.network.netty.decoder.PacketLengthDecoder;
@@ -29,7 +30,7 @@ import net.hypejet.jet.server.network.netty.encoder.PacketCompressor;
 import net.hypejet.jet.server.network.netty.encoder.PacketEncoder;
 import net.hypejet.jet.server.network.netty.encoder.PacketLengthEncoder;
 import net.hypejet.jet.server.network.netty.reader.PacketReader;
-import net.hypejet.jet.server.network.packet.server.ServerPacketRegistry;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry;
 import net.hypejet.jet.server.network.session.Session;
 import net.hypejet.jet.server.network.session.task.HandshakeTask;
 import net.hypejet.jet.server.util.unit.Unit;
@@ -44,8 +45,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * Represents an implementation of {@link PlayerConnection}, which is handled
- * by {@link SocketChannel a socket channel}.
+ * Represents an implementation of {@link PlayerConnection}, which is handled by {@link SocketChannel a socket
+ * channel}.
  *
  * @since 1.0
  * @author Codestech
@@ -109,49 +110,24 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     }
 
     @Override
-    public @NonNull Acquisition<ProtocolState> protocolState() {
-        return new MappedAcquisition<>(this.session.acquire(), Session::protocolState);
-    }
-
-    @Override
-    public @NonNull CompletableFuture<PacketSendResult> sendPacket(@NonNull ServerPacket packet) {
-        if (this.isClosed())
-            return CompletableFuture.completedFuture(PacketSendResult.cancellation());
-
-        PacketSendEvent event = new PacketSendEvent(packet);
-        this.server.eventNode().call(event);
-
-        if (event.isCancelled())
-            return CompletableFuture.completedFuture(PacketSendResult.cancellation());
-        ServerPacket finalPacket = event.getPacket(); // Java requires this to access the packet from a lambda function
-
-        CompletableFuture<PacketSendResult> packetFuture = new CompletableFuture<>();
-        this.channel.writeAndFlush(finalPacket).addListener(future -> {
-            Future.State futureState = future.state();
-            switch (futureState) {
-                case SUCCESS -> packetFuture.complete(new PacketSendResult.Success(finalPacket));
-                case FAILED -> packetFuture.complete(PacketSendResult.networkError());
-                case CANCELLED -> packetFuture.complete(PacketSendResult.cancellation());
-                default -> packetFuture.completeExceptionally(new IllegalArgumentException(
-                        String.format("The future is in an unexpected state of %s", futureState.name())
-                ));
-            }
-        });
-
-        return packetFuture;
+    public @NonNull Acquisition<PlayerConnectionState> connectionState() {
+        return new MappedAcquisition<>(this.protocolState(), ProtocolState::toConnectionState);
     }
 
     @Override
     public void disconnect(@NonNull Component reason) {
-        // TODO: Run in an event loop
-        CompletableFuture<?> packetSendFuture;
-
         try (Acquisition<ProtocolState> protocolStateAcquisition = this.protocolState()) {
-            if (ServerPacketRegistry.isSupported(protocolStateAcquisition.get(), ServerDisconnectPacket.class))
-                packetSendFuture = this.sendPacket(new ServerDisconnectPacket(reason));
-            else packetSendFuture = CompletableFuture.completedFuture(Unit.INSTANCE);
+            CompletableFuture<?> disconnectPacketResultFuture;
 
-            packetSendFuture.handle((result, throwable) -> {
+            if (ServerPacketRegistry.isSupported(protocolStateAcquisition.get(), ServerDisconnectPacket.class)) {
+                CompletableFuture<PacketSendResult> packetFuture = new CompletableFuture<>();
+                disconnectPacketResultFuture = packetFuture;
+                this.sendPacket(new ServerDisconnectPacket(reason), packetFuture);
+            } else {
+                disconnectPacketResultFuture = CompletableFuture.completedFuture(Unit.INSTANCE);
+            }
+
+            disconnectPacketResultFuture.handle((result, throwable) -> {
                 this.close();
                 return Unit.INSTANCE;
             });
@@ -182,11 +158,6 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     }
 
     @Override
-    public boolean isClosed() {
-        return !this.channel.isActive(); // TODO
-    }
-
-    @Override
     public void uncaughtException(Thread t, Throwable e) {
         if (e instanceof NetworkException)
             return; // The exception has been already handled
@@ -208,6 +179,55 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     }
 
     /**
+     * Creates {@linkplain Acquisition an acquisition} of {@linkplain ProtocolState a protocol state} of this
+     * connection.
+     *
+     * @return the acquisition
+     * @since 1.0
+     */
+    public @NonNull Acquisition<ProtocolState> protocolState() {
+        return new MappedAcquisition<>(this.session.acquire(), Session::protocolState);
+    }
+
+    /**
+     * Sends {@linkplain ServerPacket a server packet} to a client backed by this connection without waiting for
+     * a result.
+     *
+     * @param packet the server packet
+     * @since 1.0
+     */
+    public void sendPacket(@NonNull ServerPacket packet) {
+        this.sendPacket(packet, null);
+    }
+
+    /**
+     * Sends {@linkplain ServerPacket a server packet} to a client backed by this connection.
+     *
+     * @param packet the server packet
+     * @param resultFuture a completable future that should be completed when a result of the operation is available
+     * @since 1.0
+     */
+    public void sendPacket(@NonNull ServerPacket packet,
+                           @Nullable CompletableFuture<? super PacketSendResult> resultFuture) {
+        ChannelPromise promise = resultFuture == null ? this.channel.voidPromise() : this.channel.newPromise();
+        ChannelFuture channelFuture = this.channel.writeAndFlush(packet);
+
+        if (!promise.isVoid() && resultFuture != null) {
+            channelFuture.addListener(future -> {
+                Future.State futureState = future.state();
+                switch (futureState) {
+                    case SUCCESS -> resultFuture.complete(PacketSendResult.SUCCESS);
+                    case FAILED -> resultFuture.complete(PacketSendResult.NETWORK_ERROR);
+                    case CANCELLED -> resultFuture.complete(PacketSendResult.CANCELLATION);
+                    default -> resultFuture.completeExceptionally(new IllegalArgumentException(
+                            String.format("The future is in an unexpected state of %s", futureState.name())
+                    ));
+                }
+            });
+        }
+    }
+
+    /**
      * Gets {@linkplain AcquirableValue an acquirable value} of {@linkplain Session a session}.
      *
      * @return the acquirable value
@@ -218,42 +238,39 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     }
 
     /**
-     * Closes the connection, nothing will happen if the connection has been already closed.
+     * Closes the connection.
      *
      * @since 1.0
+     * @see SocketChannel#close()
      */
     public void close() {
-        this.submitToEventLoop(() -> {
-            if (!this.isClosed()) return; // The connection has been already closed
-            this.channel.close();
-        });
+        this.channel.close();
+    }
+
+    /**
+     * Gets whether the connection has been closed.
+     *
+     * @return {@code true} if the connection has been closed, {@code false} otherwise
+     * @since 1.0
+     */
+    public boolean isClosed() {
+        this.ensureInEventLoop();
+        return !this.channel.isActive();
     }
 
     /**
      * Sets a compression threshold of this connection.
      *
      * @param compressionThreshold the compression threshold
-     * @throws IllegalStateException if the current protocol state of the player is not {@link ProtocolState#LOGIN}
      * @since 1.0
      */
     public void setCompressionThreshold(int compressionThreshold) {
-        this.ensureInEventLoop(); // The handlers can be updates only in event loop threads
-        try {
-            ServerEnableCompressionLoginPacket packet = new ServerEnableCompressionLoginPacket(compressionThreshold);
-            if (!(this.sendPacket(packet).get() instanceof PacketSendResult.Success(ServerPacket finalPacket))) return;
-
-            if (!(finalPacket instanceof ServerEnableCompressionLoginPacket compressionPacket)) return;
-            packet = compressionPacket;
-            compressionThreshold = packet.compressionThreshold();
-
-            this.updateHandlers(compressionThreshold);
-        } catch (Throwable throwable) {
-            Thread currentThread = Thread.currentThread();
-            this.uncaughtException(currentThread, throwable);
-
-            if (throwable instanceof InterruptedException)
-                currentThread.interrupt(); // Restore the interrupted status
-        }
+        CompletableFuture<PacketSendResult> resultFuture = new CompletableFuture<>();
+        resultFuture.thenAccept(result -> {
+            if (result == PacketSendResult.SUCCESS)
+                this.updateHandlers(compressionThreshold);
+        });
+        this.sendPacket(new ServerEnableCompressionLoginPacket(compressionThreshold), resultFuture);
     }
 
     /**
@@ -298,9 +315,10 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
         EventLoop eventLoop = this.channel.eventLoop();
         if (eventLoop.inEventLoop()) {
             try {
+                task.run();
                 return new SucceededFuture<>(eventLoop, Unit.INSTANCE);
-            } catch (Exception exception) {
-                return new FailedFuture<>(eventLoop, exception);
+            } catch (Throwable throwable) {
+                return new FailedFuture<>(eventLoop, throwable);
             }
         }
         return eventLoop.submit(task);
@@ -374,5 +392,34 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
             if (decoder != null)
                 decoder.updateProtocolState(protocolState);
         }
+    }
+
+    /**
+     * Represents a result of sending {@linkplain ServerPacket a server packet}.
+     *
+     * @since 1.0
+     * @see ServerPacket
+     */
+    public enum PacketSendResult {
+        /**
+          {@linkplain PacketSendResult A packet send result}, which represents a success.
+         *
+         * @since 1.0
+         */
+        SUCCESS,
+        /**
+         * {@linkplain PacketSendResult A packet send result}, which represents a cancellation of packet sending, which
+         * could have been caused by a packet event cancellation or an internal reason.
+         *
+         * @since 1.0
+         */
+        CANCELLATION,
+        /**
+         * {@linkplain PacketSendResult A packet send result}, which represents a network error, which has been
+         * already handled.
+         *
+         * @since 1.0
+         */
+        NETWORK_ERROR
     }
 }

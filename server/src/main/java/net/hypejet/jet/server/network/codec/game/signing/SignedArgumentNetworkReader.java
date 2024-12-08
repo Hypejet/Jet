@@ -21,14 +21,14 @@ public final class SignedArgumentNetworkReader implements NetworkReader<SignedAr
     private static final int ARGUMENT_SIGNATURE_LENGTH = 256;
 
     /**
-     * An instance of {@linkplain SignedArgumentNetworkReader a signed argument network reader}.
+     * An instance of the {@linkplain SignedArgumentNetworkReader signed argument network reader}.
      *
      * @since 1.0
      */
     public static final SignedArgumentNetworkReader INSTANCE = new SignedArgumentNetworkReader();
 
     /**
-     * An instance of {@linkplain CollectionNetworkReader a collection network reader}, which reads elements
+     * An instance of the {@linkplain CollectionNetworkReader collection network reader}, which reads elements
      * with a type of {@linkplain SignedArgument signed argument}.
      */
     public static final CollectionNetworkReader<SignedArgument> COLLECTION_READER =

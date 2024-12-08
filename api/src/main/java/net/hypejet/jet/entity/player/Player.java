@@ -4,8 +4,6 @@ import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.command.CommandSource;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.network.PlayerConnection;
-import net.hypejet.jet.network.packet.client.common.ClientInformationPacket;
-import net.hypejet.jet.network.packet.server.ServerPacket;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -40,15 +38,6 @@ public interface Player extends Entity, CommandSource {
      * @since 1.0-
      */
     @NonNull PlayerConnection connection();
-
-    /**
-     * A shortcut for {@link PlayerConnection#sendPacket(ServerPacket)}, which is accessed by {@link #connection()}.
-     *
-     * @param packet the packet
-     * @since 1.0
-     * @see PlayerConnection#sendPacket(ServerPacket)
-     */
-    void sendPacket(@NonNull ServerPacket packet);
 
     /**
      * A shortcut for {@link PlayerConnection#disconnect(Component)}, which is accessed by {@link #connection()}.
@@ -233,7 +222,7 @@ public interface Player extends Entity, CommandSource {
     }
 
     /**
-     * Represents a settings of a {@linkplain Player player}.
+     * Represents a settings of {@linkplain Player a player}.
      *
      * @param locale a locale of the player
      * @param viewDistance a view distance of the player
@@ -251,7 +240,7 @@ public interface Player extends Entity, CommandSource {
                     Entity.@NonNull Hand mainHand, boolean textFilteringEnabled, boolean allowServerListings,
                     @NonNull ParticleStatus particleStatus) {
         /**
-         * Constructs the {@linkplain ClientInformationPacket information configuration packet}.
+         * Constructs the {@linkplain Settings settings}.
          *
          * @param locale a locale of the player
          * @param viewDistance a view distance of the player

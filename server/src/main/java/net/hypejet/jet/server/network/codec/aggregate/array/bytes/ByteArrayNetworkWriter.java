@@ -14,7 +14,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class ByteArrayNetworkWriter extends AggregateNetworkWriter<byte[]> {
 
     /**
-     * An instance of {@linkplain ByteArrayNetworkWriter a byte array network writer}, which allows lengths
+     * An instance of the {@linkplain ByteArrayNetworkWriter byte array network writer}, which allows lengths
      * up to {@link Integer#MAX_VALUE}.
      *
      * @since 1.0

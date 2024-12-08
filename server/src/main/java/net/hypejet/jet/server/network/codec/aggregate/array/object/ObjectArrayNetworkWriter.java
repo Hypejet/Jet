@@ -20,7 +20,7 @@ public final class ObjectArrayNetworkWriter<E> extends AggregateNetworkWriter<E[
     private final NetworkWriter<E> elementWriter;
 
     /**
-     * Constructs the {@linkplain ObjectArrayNetworkWriter an object array network writer} with support for lengths
+     * Constructs the {@linkplain ObjectArrayNetworkWriter object array network writer} with support for lengths
      * up to {@link Integer#MAX_VALUE}.
      *
      * @param elementWriter a network writer, which writes elements of the array
@@ -32,7 +32,7 @@ public final class ObjectArrayNetworkWriter<E> extends AggregateNetworkWriter<E[
     }
 
     /**
-     * Constructs the {@linkplain ObjectArrayNetworkWriter an object array network writer}.
+     * Constructs the {@linkplain ObjectArrayNetworkWriter object array network writer}.
      *
      * @param maxLength a max length that an object array can have
      * @param elementWriter a network writer, which writes elements of the array

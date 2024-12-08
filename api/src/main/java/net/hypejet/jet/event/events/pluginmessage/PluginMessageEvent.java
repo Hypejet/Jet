@@ -9,9 +9,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Represents an event called when a client sends a plugin message, but it was not requested by a server.
  *
- * <p>Note that calling {@linkplain PluginMessageResponseEvent a plugin message response event} does not trigger
- * this.</p>
- *
  * @param player a player that the client is attached to
  * @param key a key of the plugin message
  * @param data a data of the plugin message

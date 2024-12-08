@@ -1,9 +1,9 @@
 package net.hypejet.jet.server.network.session;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.network.ProtocolState;
+import net.hypejet.jet.server.network.ProtocolState;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
-import net.hypejet.jet.server.network.handler.NetworkDisconnectionHandler;
+import net.hypejet.jet.server.network.packet.handler.NetworkDisconnectionHandler;
 import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -46,7 +46,9 @@ public final class Session implements NetworkDisconnectionHandler {
 
     @Override
     public void handleDisconnection() {
-        this.sessionTask.handleDisconnection();
+        // The session task might have not been initialized yet
+        if (this.sessionTask != null)
+            this.sessionTask.handleDisconnection();
     }
 
     /**

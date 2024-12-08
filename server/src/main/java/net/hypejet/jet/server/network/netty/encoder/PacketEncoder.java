@@ -6,13 +6,13 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import net.hypejet.jet.acquisition.Acquisition;
 import net.hypejet.jet.acquisition.MutableAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.network.ProtocolState;
-import net.hypejet.jet.network.packet.server.ServerPacket;
+import net.hypejet.jet.server.network.ProtocolState;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.acquisition.value.AcquirableValue;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
-import net.hypejet.jet.server.network.packet.server.ServerPacketRegistry;
-import net.hypejet.jet.server.network.packet.server.ServerPacketRegistry.RegistryPacketSpecification;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry.RegistryPacketSpecification;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

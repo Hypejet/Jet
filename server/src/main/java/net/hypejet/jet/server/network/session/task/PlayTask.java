@@ -2,6 +2,7 @@ package net.hypejet.jet.server.network.session.task;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.network.ProtocolState;
 import net.hypejet.jet.server.registry.session.RegistryTagUpdateFunction;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -9,7 +10,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Represents {@linkplain SessionTask a session task}, which handles
- * {@linkplain net.hypejet.jet.network.ProtocolState#PLAY a play protocol state}.
+ * {@linkplain ProtocolState#PLAY a play protocol state}.
  *
  * @since 1.0
  * @author Codestech

@@ -16,7 +16,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class VarIntArrayNetworkWriter extends AggregateNetworkWriter<int[]> {
 
     /**
-     * An instance {@linkplain VarIntArrayNetworkReader a variable-length integer array network reader}, which
+     * An instance of the {@linkplain VarIntArrayNetworkReader variable-length integer array network reader}, which
      * allows length up to {@link Integer#MAX_VALUE}.
      *
      * @since 1.0

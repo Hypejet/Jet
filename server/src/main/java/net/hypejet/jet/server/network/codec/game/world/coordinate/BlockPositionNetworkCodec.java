@@ -28,7 +28,7 @@ public final class BlockPositionNetworkCodec implements NetworkCodec<BlockPositi
     private static final int X_OR_Z_MASK = 0x3FFFFFF;
 
     /**
-     * An instance of {@linkplain BlockPositionNetworkCodec a block position network codec}.
+     * An instance of the {@linkplain BlockPositionNetworkCodec block position network codec}.
      *
      * @since 1.0
      */

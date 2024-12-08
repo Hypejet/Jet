@@ -16,7 +16,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class VectorNetworkCodec implements NetworkCodec<Vector> {
 
     /**
-     * An instance of {@linkplain VectorNetworkCodec a vector network codec}.
+     * An instance of the {@linkplain VectorNetworkCodec vector network codec}.
      *
      * @since 1.0
      */

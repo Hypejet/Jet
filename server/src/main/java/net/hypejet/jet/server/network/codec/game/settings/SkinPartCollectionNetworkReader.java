@@ -25,7 +25,7 @@ public final class SkinPartCollectionNetworkReader implements NetworkReader<Coll
     private static final EnumMap<Player.SkinPart, Byte> SKIN_BIT_MASKS = new EnumMap<>(Player.SkinPart.class);
 
     /**
-     * An instance of {@linkplain SkinPartCollectionNetworkReader a skin part collection network reader}.
+     * An instance of the {@linkplain SkinPartCollectionNetworkReader skin part collection network reader}.
      *
      * @since 1.0
      */

@@ -17,7 +17,7 @@ import java.util.UUID;
 public final class UUIDNetworkCodec implements NetworkCodec<UUID> {
 
     /**
-     * An instance of {@linkplain UUIDNetworkCodec a unique identifier network codec}.
+     * An instance of the {@linkplain UUIDNetworkCodec unique identifier network codec}.
      *
      * @since 1.0
      */

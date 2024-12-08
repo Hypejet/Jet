@@ -1,19 +1,12 @@
 package net.hypejet.jet.server.world;
 
-import net.hypejet.jet.data.model.api.coordinate.Coordinate;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.server.entity.JetEntity;
-import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.world.World;
-import net.hypejet.jet.world.chunk.Chunk;
-import net.hypejet.jet.world.chunk.ChunkPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -33,9 +26,6 @@ public final class JetWorld implements World {
 
     private final Set<JetEntity> entities = new HashSet<>();
     private final ReentrantReadWriteLock entitiesLock = new ReentrantReadWriteLock();
-
-    private final Map<ChunkPosition, JetChunk> chunks = new HashMap<>();
-    private final ReentrantReadWriteLock chunkLock = new ReentrantReadWriteLock();
 
     /**
      * Constructs the {@linkplain JetWorld world}.
@@ -59,27 +49,6 @@ public final class JetWorld implements World {
             return Set.copyOf(this.entities);
         } finally {
             this.entitiesLock.readLock().unlock();
-        }
-    }
-
-    @Override
-    public @Nullable Chunk chunkAt(@NonNull Coordinate<?> coordinate) {
-        return this.chunkAt((int) Math.floor(coordinate.x() / CHUNK_EDGE_LENGTH),
-                (int) Math.floor(coordinate.z() / CHUNK_EDGE_LENGTH));
-    }
-
-    @Override
-    public @Nullable Chunk chunkAt(int chunkX, int chunkZ) {
-        return this.chunkAt(new ChunkPosition(chunkX, chunkZ));
-    }
-
-    @Override
-    public @Nullable Chunk chunkAt(@NonNull ChunkPosition position) {
-        try {
-            this.chunkLock.readLock().lock();
-            return this.chunks.get(position);
-        } finally {
-            this.chunkLock.readLock().unlock();
         }
     }
 

@@ -14,7 +14,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class LongArrayNetworkReader extends AggregateNetworkReader<long[]> {
 
     /**
-     * An instance of {@linkplain LongArrayNetworkReader a long array network reader}, which allows lengths
+     * An instance of the {@linkplain LongArrayNetworkReader long array network reader}, which allows lengths
      * up to {@link Integer#MAX_VALUE}.
      *
      * @since 1.0

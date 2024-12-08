@@ -25,7 +25,7 @@ public final class PositionFlagsReader implements NetworkReader<Collection<Posit
     private static final EnumMap<PositionFlag, Integer> FLAG_IDS = new EnumMap<>(PositionFlag.class);
 
     /**
-     * An instance of {@linkplain PositionFlagsReader a position flags reader}.
+     * An instance of the {@linkplain PositionFlagsReader position flags reader}.
      *
      * @since 1.0
      */

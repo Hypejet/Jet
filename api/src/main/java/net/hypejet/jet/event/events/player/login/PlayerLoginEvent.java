@@ -1,16 +1,17 @@
 package net.hypejet.jet.event.events.player.login;
 
 import net.hypejet.jet.entity.player.Player;
+import net.hypejet.jet.login.LoginManager;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents an event called when a {@linkplain net.hypejet.jet.session.LoginSession login session} is being finished
+ * Represents an event called when a {@linkplain LoginManager login session} is being finished
  * and a {@linkplain Player player} is being created.
  *
  * @since 1.0
  * @author Codestech
- * @see net.hypejet.jet.session.LoginSession
+ * @see LoginManager
  * @see Player
  * @see Result
  */

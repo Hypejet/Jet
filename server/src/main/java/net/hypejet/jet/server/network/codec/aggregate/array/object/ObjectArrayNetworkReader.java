@@ -23,7 +23,7 @@ public final class ObjectArrayNetworkReader<E> extends AggregateNetworkReader<E[
     private final NetworkReader<E> elementReader;
 
     /**
-     * Constructs the {@linkplain ObjectArrayNetworkReader an object array network reader} with a support for lengths
+     * Constructs the {@linkplain ObjectArrayNetworkReader object array network reader} with a support for lengths
      * up to {@link Integer#MAX_VALUE}.
      *
      * @param arraySupplier a supplier of arrays of the objects with the type specified
@@ -37,7 +37,7 @@ public final class ObjectArrayNetworkReader<E> extends AggregateNetworkReader<E[
     }
 
     /**
-     * Constructs the {@linkplain ObjectArrayNetworkReader an object array network reader}.
+     * Constructs the {@linkplain ObjectArrayNetworkReader object array network reader}.
      *
      * @param maxLength a max length that an object array can have
      * @param arraySupplier a supplier of arrays of the objects with the type specified

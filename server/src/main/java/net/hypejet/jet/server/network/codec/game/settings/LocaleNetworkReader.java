@@ -23,7 +23,7 @@ public final class LocaleNetworkReader implements NetworkReader<Locale> {
     private static final StringNetworkCodec LOCALE_CODEC = StringNetworkCodec.MAX_16_INSTANCE;
 
     /**
-     * An instance of {@linkplain LocaleNetworkReader a locale network reader}.
+     * An instance of the {@linkplain LocaleNetworkReader locale network reader}.
      *
      * @since 1.0
      */

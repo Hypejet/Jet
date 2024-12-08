@@ -20,7 +20,7 @@ import java.io.IOException;
 public final class BinaryTagNetworkWriter implements NetworkWriter<BinaryTag> {
 
     /**
-     * An instance of {@linkplain BinaryTagNetworkWriter a binary tag network writer}.
+     * An instance of the {@linkplain BinaryTagNetworkWriter binary tag network writer}.
      *
      * @since 1.0
      */

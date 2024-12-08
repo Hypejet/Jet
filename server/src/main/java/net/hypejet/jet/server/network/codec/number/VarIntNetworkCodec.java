@@ -19,7 +19,7 @@ public final class VarIntNetworkCodec implements NetworkCodec<Integer> {
     private static final int MAX_LENGTH = 32;
 
     /**
-     * An instance of {@linkplain VarIntNetworkCodec a variable-length network codec}.
+     * An instance of the {@linkplain VarIntNetworkCodec variable-length network codec}.
      *
      * @since 1.0
      */

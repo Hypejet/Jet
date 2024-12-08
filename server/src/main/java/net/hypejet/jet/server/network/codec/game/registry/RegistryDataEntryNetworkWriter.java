@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.network.codec.game.registry;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.network.packet.server.configuration.ServerRegistryDataConfigurationPacket.Entry;
+import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerRegistryDataConfigurationPacket.Entry;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.key.PackedKeyNetworkCodec;
@@ -20,14 +20,14 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class RegistryDataEntryNetworkWriter implements NetworkWriter<Entry> {
 
     /**
-     * An instance of {@linkplain RegistryDataEntryNetworkWriter a registry data entry network writer}.
+     * An instance of the {@linkplain RegistryDataEntryNetworkWriter registry data entry network writer}.
      *
      * @since 1.0
      */
     public static final RegistryDataEntryNetworkWriter INSTANCE = new RegistryDataEntryNetworkWriter();
 
     /**
-     * An instance of {@linkplain CollectionNetworkWriter a collection network writer}, which writes elements
+     * An instance of the {@linkplain CollectionNetworkWriter collection network writer}, which writes elements
      * with type of {@linkplain Entry entry}.
      *
      * @since 1.0

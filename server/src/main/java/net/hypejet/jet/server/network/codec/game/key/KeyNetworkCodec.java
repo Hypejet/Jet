@@ -19,7 +19,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class KeyNetworkCodec implements NetworkCodec<Key> {
 
     /**
-     * An instance of {@linkplain KeyNetworkCodec a key network codec}.
+     * An instance of the {@linkplain KeyNetworkCodec key network codec}.
      *
      * @since 1.0
      */

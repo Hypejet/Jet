@@ -1,6 +1,7 @@
 package net.hypejet.jet.event.events.player.configuration;
 
 import net.hypejet.jet.entity.player.Player;
+import net.hypejet.jet.network.PlayerConnectionState;
 import net.hypejet.jet.world.World;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -10,12 +11,12 @@ import java.util.Objects;
 
 /**
  * Represents an event called when a {@linkplain Player player} is switched to
- * a {@linkplain net.hypejet.jet.network.ProtocolState#CONFIGURATION configuration protocol state}.
+ * a {@linkplain PlayerConnectionState#CONFIGURATION configuration protocol state}.
  *
  * <p>Note that this event blocks a configuration session thread. Unblocking it will finish the session.</p>
  *
  * @since 1.0
- * @see net.hypejet.jet.network.ProtocolState#CONFIGURATION
+ * @see PlayerConnectionState#CONFIGURATION
  */
 public final class PlayerConfigurationStartEvent {
 

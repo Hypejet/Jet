@@ -6,24 +6,25 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import net.hypejet.jet.acquisition.Acquisition;
 import net.hypejet.jet.acquisition.MutableAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.network.ProtocolState;
-import net.hypejet.jet.network.packet.client.ClientPacket;
+import net.hypejet.jet.server.network.ProtocolState;
+import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import net.hypejet.jet.server.acquisition.value.AcquirableValue;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
-import net.hypejet.jet.server.network.packet.client.ClientPacketRegistry;
+import net.hypejet.jet.server.network.packet.packets.client.ClientPacketRegistry;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 
 /**
  * Represents {@linkplain ByteToMessageDecoder a byte-to-message decoder}, which decodes
- * {@linkplain net.hypejet.jet.network.packet.server.ServerPacket server packets} and their identifiers.
+ * {@linkplain ServerPacket server packets} and their identifiers.
  *
  * @since 1.0
  * @author Codestech
- * @see net.hypejet.jet.network.packet.server.ServerPacket
+ * @see ServerPacket
  * @see ByteToMessageDecoder
  */
 public final class PacketDecoder extends ByteToMessageDecoder {

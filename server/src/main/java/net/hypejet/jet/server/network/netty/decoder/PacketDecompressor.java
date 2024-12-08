@@ -7,6 +7,7 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.util.CompressionUtil;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -15,11 +16,11 @@ import java.util.List;
 
 /**
  * Represents {@linkplain ByteToMessageDecoder a byte-to-message decoder}, which decompresses
- * {@linkplain net.hypejet.jet.network.packet.server.ServerPacket server packets}.
+ * {@linkplain ServerPacket server packets}.
  *
  * @since 1.0
  * @author Codestech
- * @see net.hypejet.jet.network.packet.server.ServerPacket
+ * @see ServerPacket
  * @see ByteToMessageDecoder
  */
 public final class PacketDecompressor extends ByteToMessageDecoder {

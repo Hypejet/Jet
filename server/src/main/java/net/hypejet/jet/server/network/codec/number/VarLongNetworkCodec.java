@@ -17,7 +17,7 @@ public final class VarLongNetworkCodec implements NetworkCodec<Long> {
     private static final int CONTINUE_BIT = 0x80;
 
     /**
-     * An instance of {@linkplain VarLongNetworkCodec a variable-length long network codec}.
+     * An instance of the {@linkplain VarLongNetworkCodec variable-length long network codec}.
      *
      * @since 1.0
      */

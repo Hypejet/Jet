@@ -6,17 +6,18 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.util.CompressionUtil;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Represents {@linkplain MessageToByteEncoder a message-to-byte encoder}, which compresses serialized
- * {@linkplain net.hypejet.jet.network.packet.server.ServerPacket server packets}.
+ * {@linkplain ServerPacket server packets}.
  *
  * @since 1.0
  * @author Codsestech
- * @see net.hypejet.jet.network.packet.server.ServerPacket
+ * @see ServerPacket
  * @see MessageToByteEncoder
  */
 public final class PacketCompressor extends MessageToByteEncoder<ByteBuf> {

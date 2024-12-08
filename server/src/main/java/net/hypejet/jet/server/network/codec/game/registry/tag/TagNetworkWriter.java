@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.network.codec.game.registry.tag;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.network.packet.server.common.ServerUpdateTagsPacket.Tag;
+import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket.Tag;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.array.varint.VarIntArrayNetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
@@ -19,14 +19,14 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class TagNetworkWriter implements NetworkWriter<Tag> {
 
     /**
-     * An instance of {@linkplain TagNetworkWriter a tag network writer}.
+     * An instance of the {@linkplain TagNetworkWriter tag network writer}.
      *
      * @since 1.0
      */
     public static final TagNetworkWriter INSTANCE = new TagNetworkWriter();
 
     /**
-     * An instance of {@linkplain CollectionNetworkWriter a collection network writer}, which writes elements
+     * An instance of the {@linkplain CollectionNetworkWriter collection network writer}, which writes elements
      * with type of {@linkplain Tag tag}.
      *
      * @since 1.0

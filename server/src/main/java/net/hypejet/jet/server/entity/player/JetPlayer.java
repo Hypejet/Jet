@@ -6,17 +6,17 @@ import net.hypejet.jet.acquisition.Acquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.player.PlayerChangeSettingsEvent;
-import net.hypejet.jet.network.ProtocolState;
-import net.hypejet.jet.network.packet.server.common.ServerPluginMessagePacket;
-import net.hypejet.jet.network.packet.server.ServerPacket;
-import net.hypejet.jet.network.packet.server.play.ServerActionBarPlayPacket;
-import net.hypejet.jet.network.packet.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
-import net.hypejet.jet.network.packet.server.play.ServerSystemMessagePlayPacket;
+import net.hypejet.jet.server.network.ProtocolState;
+import net.hypejet.jet.server.network.packet.packets.server.common.ServerPluginMessagePacket;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerActionBarPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerSystemMessagePlayPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
-import net.hypejet.jet.server.network.packet.server.ServerPacketRegistry;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
@@ -30,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Represents an implementation of {@linkplain Player player}.
@@ -76,11 +77,6 @@ public final class JetPlayer extends JetEntity implements Player {
     @Override
     public @NonNull SocketPlayerConnection connection() {
         return this.connection;
-    }
-
-    @Override
-    public void sendPacket(@NonNull ServerPacket packet) {
-        this.connection.sendPacket(packet);
     }
 
     @Override
@@ -174,5 +170,31 @@ public final class JetPlayer extends JetEntity implements Player {
      */
     public void setClientBrand(@NonNull String clientBrand) {
         this.clientBrand = NullabilityUtil.requireNonNull(clientBrand, "client brand");
+    }
+
+    /**
+     * Sends a packet to a client backed by {@linkplain SocketPlayerConnection a socket player connection} attached
+     * to this player.
+     *
+     * @param packet the server packet
+     * @since 1.0
+     * @see SocketPlayerConnection#sendPacket(ServerPacket)
+     */
+    public void sendPacket(@NonNull ServerPacket packet) {
+        this.connection.sendPacket(packet);
+    }
+
+    /**
+     * Sends a packet to a client backed by {@linkplain SocketPlayerConnection a socket player connection} attached
+     * to this player.
+     *
+     * @param packet the server packet
+     * @param resultFuture a completable future that should be completed when a result of the operation is available
+     * @since 1.0
+     * @see SocketPlayerConnection#sendPacket(ServerPacket, CompletableFuture)
+     */
+    public void sendPacket(@NonNull ServerPacket packet,
+                           @Nullable CompletableFuture<SocketPlayerConnection.PacketSendResult> resultFuture) {
+        this.connection.sendPacket(packet, resultFuture);
     }
 }

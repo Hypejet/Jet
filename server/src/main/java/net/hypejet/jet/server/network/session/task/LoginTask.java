@@ -2,19 +2,18 @@ package net.hypejet.jet.server.network.session.task;
 
 import net.hypejet.jet.acquisition.MutableAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.event.events.login.LoginSessionInitializeEvent;
-import net.hypejet.jet.network.ProtocolState;
-import net.hypejet.jet.network.packet.client.ClientPacket;
-import net.hypejet.jet.network.packet.server.login.ServerLoginSuccessLoginPacket;
-import net.hypejet.jet.network.packet.server.login.ServerLoginSuccessLoginPacket.Property;
+import net.hypejet.jet.login.profile.GameProfileProperty;
+import net.hypejet.jet.server.acquisition.value.AcquirableValue;
+import net.hypejet.jet.server.network.ProtocolState;
+import net.hypejet.jet.server.network.packet.packets.client.login.ClientEncryptionResponseLoginPacket;
+import net.hypejet.jet.server.network.packet.packets.server.login.ServerLoginSuccessLoginPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.session.Session;
 import net.hypejet.jet.server.util.unit.Unit;
-import net.hypejet.jet.session.LoginSession;
-import net.hypejet.jet.session.handler.LoginSessionHandler;
+import net.hypejet.jet.login.LoginManager;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -33,10 +32,10 @@ import java.util.concurrent.TimeoutException;
  *
  * @since 1.0
  * @author Codestech
- * @see LoginSession
+ * @see LoginManager
  * @see SessionTask
  */
-public final class LoginTask implements SessionTask, LoginSession {
+public final class LoginTask implements SessionTask, LoginManager {
 
     private static final int TIME_OUT_TIME = 20;
     private static final TimeUnit TIME_OUT_UNIT = TimeUnit.SECONDS;
@@ -44,11 +43,12 @@ public final class LoginTask implements SessionTask, LoginSession {
 
     private final SocketPlayerConnection connection;
 
-    private final CompletableFuture<Unit> handlerFuture = new CompletableFuture<>();
+    private final CompletableFuture<Unit> pluginFuture = new CompletableFuture<>();
     private final CompletableFuture<Unit> acknowledgeFuture = new CompletableFuture<>();
 
     private @MonotonicNonNull MutableAcquisition<Session> sessionAcquisition;
-    private @MonotonicNonNull LoginSessionHandler sessionHandler;
+    // TODO: acquirable objects for primitive types?
+    private final AcquirableValue<Boolean> finished = new AcquirableValue<>(false);
 
     /**
      * Constructs the {@linkplain LoginTask login task}.
@@ -76,14 +76,6 @@ public final class LoginTask implements SessionTask, LoginSession {
             return;
         }
 
-        LoginSessionInitializeEvent sessionInitializeEvent = new LoginSessionInitializeEvent(this.connection);
-        server.eventNode().call(sessionInitializeEvent);
-
-        LoginSessionHandler sessionHandler = sessionInitializeEvent.getSessionHandler();
-        if (sessionHandler == null)
-            throw new IllegalArgumentException("The login session handler has not been set");
-        this.sessionHandler = sessionHandler;
-
         Thread.ofVirtual()
                 .name(VIRTUAL_THREAD_NAME)
                 .uncaughtExceptionHandler(connection)
@@ -92,7 +84,7 @@ public final class LoginTask implements SessionTask, LoginSession {
 
     @Override
     public void handleDisconnection() {
-        this.handlerFuture.cancel(false);
+        this.pluginFuture.cancel(false);
         this.acknowledgeFuture.cancel(false);
 
         if (this.sessionAcquisition != null)
@@ -105,16 +97,25 @@ public final class LoginTask implements SessionTask, LoginSession {
     }
 
     @Override
-    public void finish(@NonNull String username, @NonNull UUID uniqueId, @NonNull Collection<Property> properties) {
-        if (this.handlerFuture.isDone())
-            throw new IllegalArgumentException("The session has been already finished");
-        // TODO: Handle properties
-        this.connection.initializePlayer(new JetPlayer(uniqueId, username, this.connection));
-        this.handlerFuture.complete(Unit.INSTANCE);
+    public void finish(@NonNull String username, @NonNull UUID uniqueId) {
+        this.finish(username, uniqueId, Set.of());
+    }
+
+    @Override
+    public void finish(@NonNull String username, @NonNull UUID uniqueId,
+                       @NonNull Collection<GameProfileProperty> properties) {
+        try (MutableAcquisition<Boolean> finishedAcquisition = this.finished.acquireMutable()) {
+            if (finishedAcquisition.get())
+                throw new IllegalArgumentException("The session has been already finished");
+            finishedAcquisition.set(true);
+            // TODO: Handle properties
+            this.connection.initializePlayer(new JetPlayer(uniqueId, username, this.connection));
+            this.pluginFuture.complete(Unit.INSTANCE);
+        }
     }
 
     /**
-     * Handles an acknowledgement to the login finish from the client.
+     * Handles an acknowledgement to the login finish from a client.
      *
      * @since 1.0
      */
@@ -137,25 +138,22 @@ public final class LoginTask implements SessionTask, LoginSession {
     }
 
     /**
-     * Handles {@linkplain ClientPacket a client packet} received during this session task.
+     * Handles {@linkplain ClientEncryptionResponseLoginPacket a client encryption response login packet}
+     * from a client.
      *
      * @param packet the packet
      * @since 1.0
      */
-    public void handlePacket(@NonNull ClientPacket packet) {
-        this.connection.ensureInEventLoop();
-        if (this.sessionHandler == null)
-            throw new IllegalArgumentException("The session handler has been not initialized");
-        this.sessionHandler.handlePacket(packet, this);
+    public void handleEncryptionResponse(@NonNull ClientEncryptionResponseLoginPacket packet) {
+        // TODO
     }
 
     private void runVirtualThreadTask() {
         try {
             try {
-                this.handlerFuture.get(TIME_OUT_TIME, TIME_OUT_UNIT);
+                this.pluginFuture.get(TIME_OUT_TIME, TIME_OUT_UNIT);
             } catch (TimeoutException exception) {
-                this.sessionHandler.handleTimeOut(this);
-                throw new RuntimeException("The login session handler has timed out", exception);
+                throw new RuntimeException("The login session has been not finished on time", exception);
             }
 
             this.connection.submitToEventLoop(this::finishSession).get();

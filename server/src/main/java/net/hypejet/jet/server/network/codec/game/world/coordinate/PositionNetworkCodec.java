@@ -16,7 +16,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class PositionNetworkCodec implements NetworkCodec<Position> {
 
     /**
-     * An instance of {@linkplain PositionNetworkCodec a position network codec}.
+     * An instance of the {@linkplain PositionNetworkCodec position network codec}.
      *
      * @since 1.0
      */

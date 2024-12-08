@@ -14,7 +14,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class ByteArrayNetworkReader extends AggregateNetworkReader<byte[]> {
 
     /**
-     * An instance of {@linkplain ByteArrayNetworkReader a byte array network reader}, which allows lengths
+     * An instance of the {@linkplain ByteArrayNetworkReader byte array network reader}, which allows lengths
      * up to {@link Integer#MAX_VALUE}.
      *
      * @since 1.0

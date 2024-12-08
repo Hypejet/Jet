@@ -23,7 +23,7 @@ public final class FixedBitSetNetworkCodec implements NetworkCodec<BitSet> {
     private final int fixedByteSize;
 
     /**
-     * Creates {@linkplain FixedBitSetNetworkCodec a fixed bitset network codec}.
+     * Constructs the {@linkplain FixedBitSetNetworkCodec fixed bitset network codec}.
      *
      * @param fixedSize the length
      * @since 1.0

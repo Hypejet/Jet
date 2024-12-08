@@ -14,7 +14,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class LongArrayNetworkWriter extends AggregateNetworkWriter<long[]> {
 
     /**
-     * An instance of {@linkplain LongArrayNetworkWriter a long array network writer}, which allows lengths
+     * An instance of the {@linkplain LongArrayNetworkWriter long array network writer}, which allows lengths
      * up to {@link Integer#MAX_VALUE}.
      *
      * @since 1.0

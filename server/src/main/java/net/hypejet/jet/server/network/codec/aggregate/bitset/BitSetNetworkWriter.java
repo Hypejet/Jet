@@ -17,7 +17,7 @@ import java.util.BitSet;
  */
 public final class BitSetNetworkWriter extends AggregateNetworkWriter<BitSet> {
     /**
-     * An instance of {@linkplain BitSetNetworkWriter a bit set network writer}, which allows lengths
+     * An instance of the {@linkplain BitSetNetworkWriter bit set network writer}, which allows lengths
      * up to {@link Integer#MAX_VALUE}.
      *
      * @since 1.0

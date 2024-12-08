@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Represents something that manages player connections using netty.
+ * Represents something that manages player {@linkplain net.hypejet.jet.network.PlayerConnection player connections}.
  *
  * @since 1.0
  * @author Codestech

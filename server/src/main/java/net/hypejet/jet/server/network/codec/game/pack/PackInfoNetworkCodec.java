@@ -23,7 +23,7 @@ import java.util.Collection;
 public final class PackInfoNetworkCodec implements NetworkCodec<PackInfo> {
 
     /**
-     * An instance of {@linkplain PackInfoNetworkCodec a pack info network writer}.
+     * An instance of the {@linkplain PackInfoNetworkCodec pack info network writer}.
      *
      * @since 1.0
      */

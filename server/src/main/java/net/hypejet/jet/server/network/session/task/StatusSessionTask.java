@@ -1,14 +1,16 @@
 package net.hypejet.jet.server.network.session.task;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.event.events.ping.ServerListPingEvent;
+import net.hypejet.jet.event.events.serverlist.ServerListPingEvent;
 import net.hypejet.jet.ping.ServerListPing;
-import net.hypejet.jet.network.packet.client.status.ClientPingRequestStatusPacket;
-import net.hypejet.jet.network.packet.server.status.ServerListResponseStatusPacket;
-import net.hypejet.jet.network.packet.server.status.ServerPingResponseStatusPacket;
+import net.hypejet.jet.server.network.ProtocolState;
+import net.hypejet.jet.server.network.packet.packets.client.common.ClientPingRequestPacket;
+import net.hypejet.jet.server.network.packet.packets.server.status.ServerListResponseStatusPacket;
+import net.hypejet.jet.server.network.packet.packets.server.common.ServerPingResponsePacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
+import net.hypejet.jet.server.network.packet.packets.client.status.ClientServerListRequestStatusPacket;
 import net.hypejet.jet.server.util.unit.Unit;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
@@ -23,12 +25,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Represents {@linkplain SessionTask a session task}, which handles
- * {@linkplain net.hypejet.jet.network.ProtocolState#STATUS a status protocol state}.
+ * Represents {@linkplain SessionTask a session task}, which handles {@linkplain ProtocolState#STATUS a status
+ * protocol state}.
  *
  * @since 1.0
  * @author Codestech
- * @see net.hypejet.jet.network.ProtocolState#STATUS
+ * @see ProtocolState#STATUS
  * @see SessionTask
  */
 public final class StatusSessionTask implements SessionTask {
@@ -65,8 +67,7 @@ public final class StatusSessionTask implements SessionTask {
     }
 
     /**
-     * Handles {@linkplain net.hypejet.jet.network.packet.client.status.ClientServerListRequestStatusPacket a client
-     * server list request status packet}.
+     * Handles {@linkplain ClientServerListRequestStatusPacket a client server list request status packet}.
      *
      * @since 1.0
      */
@@ -93,12 +94,12 @@ public final class StatusSessionTask implements SessionTask {
     }
 
     /**
-     * Handles {@linkplain ClientPingRequestStatusPacket a client ping request status packet}.
+     * Handles {@linkplain ClientPingRequestPacket a client ping request status packet}.
      *
      * @param packet the packet
      * @since 1.0
      */
-    public void handlePingRequest(@NonNull ClientPingRequestStatusPacket packet) {
+    public void handlePingRequest(@NonNull ClientPingRequestPacket packet) {
         this.connection.ensureInEventLoop();
 
         if (!this.serverListRequestFuture.isDone())
@@ -109,7 +110,7 @@ public final class StatusSessionTask implements SessionTask {
             throw new IllegalArgumentException("The ping request packet has been already received");
         this.pingRequestFuture.complete(Unit.INSTANCE);
 
-        this.connection.sendPacket(new ServerPingResponseStatusPacket(packet.payload()));
+        this.connection.sendPacket(new ServerPingResponsePacket(packet.timestamp()));
         this.connection.close(); // The status session has finished
     }
 

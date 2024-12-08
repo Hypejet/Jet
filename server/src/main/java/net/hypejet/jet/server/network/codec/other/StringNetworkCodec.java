@@ -10,7 +10,7 @@ import org.checkerframework.common.value.qual.IntRange;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Represents {@linkplain NetworkCodec a network codec}, which reads and writes a {@linkplain String string}.
+ * Represents {@linkplain NetworkCodec a network codec}, which reads and writes {@linkplain String a string}.
  *
  * @since 1.0
  * @author Codestech
@@ -22,7 +22,7 @@ public final class StringNetworkCodec implements NetworkCodec<String> {
     private static final short MAX_STRING_SIZE = 32767;
 
     /**
-     * An instance of {@linkplain StringNetworkCodec a string network codec}, which
+     * An instance of the {@linkplain StringNetworkCodec string network codec}, which
      * supports string sizes up to {@linkplain #MAX_STRING_SIZE a maximum allowed string size}.
      *
      * @since 1.0
@@ -30,7 +30,7 @@ public final class StringNetworkCodec implements NetworkCodec<String> {
     public static final StringNetworkCodec INSTANCE = new StringNetworkCodec(MAX_STRING_SIZE);
 
     /**
-     * An instance of {@linkplain StringNetworkCodec a string network codec}, which supports string
+     * An instance of the {@linkplain StringNetworkCodec string network codec}, which supports string
      * sizes up to {@code 16}.
      *
      * @since 1.0
@@ -79,7 +79,7 @@ public final class StringNetworkCodec implements NetworkCodec<String> {
     }
 
     /**
-     * Creates a {@linkplain StringNetworkCodec string network codec}.
+     * Creates {@linkplain StringNetworkCodec a string network codec}.
      *
      * @param maxStringSize a maximum length of string allowed by the codec, the {@link #INSTANCE}
      *                      or {@link #MAX_16_INSTANCE} may be returned if the max string size specified is the same

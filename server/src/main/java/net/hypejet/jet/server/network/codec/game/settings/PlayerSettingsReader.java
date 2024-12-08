@@ -48,7 +48,7 @@ public final class PlayerSettingsReader implements NetworkReader<Player.Settings
     );
 
     /**
-     * An instance of {@linkplain PlayerSettingsReader a player settings reader}.
+     * An instance of the {@linkplain PlayerSettingsReader player settings reader}.
      *
      * @since 1.0
      */

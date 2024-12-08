@@ -18,7 +18,7 @@ import java.util.BitSet;
 public final class BitSetNetworkReader extends AggregateNetworkReader<BitSet> {
 
     /**
-     * An instance of {@linkplain BitSetNetworkReader a bit set network reader}, which allows lengths
+     * An instance of the {@linkplain BitSetNetworkReader bit set network reader}, which allows lengths
      * up to {@link Integer#MAX_VALUE}.
      *
      * @since 1.0
