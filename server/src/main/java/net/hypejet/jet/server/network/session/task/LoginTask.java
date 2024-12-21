@@ -1,11 +1,11 @@
 package net.hypejet.jet.server.network.session.task;
 
-import net.hypejet.jet.acquisition.MutableAcquisition;
+import net.hypejet.concurrency.object.WriteObjectAcquisition;
+import net.hypejet.concurrency.primitive.booleans.BooleanAcquirable;
+import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.login.profile.GameProfileProperty;
-import net.hypejet.jet.server.acquisition.value.AcquirableValue;
 import net.hypejet.jet.server.network.ProtocolState;
-import net.hypejet.jet.server.network.packet.packets.client.login.ClientEncryptionResponseLoginPacket;
 import net.hypejet.jet.server.network.packet.packets.server.login.ServerLoginSuccessLoginPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
@@ -14,7 +14,6 @@ import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.session.Session;
 import net.hypejet.jet.server.util.unit.Unit;
 import net.hypejet.jet.login.LoginManager;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -46,9 +45,7 @@ public final class LoginTask implements SessionTask, LoginManager {
     private final CompletableFuture<Unit> pluginFuture = new CompletableFuture<>();
     private final CompletableFuture<Unit> acknowledgeFuture = new CompletableFuture<>();
 
-    private @MonotonicNonNull MutableAcquisition<Session> sessionAcquisition;
-    // TODO: acquirable objects for primitive types?
-    private final AcquirableValue<Boolean> finished = new AcquirableValue<>(false);
+    private final BooleanAcquirable finished = new BooleanAcquirable();
 
     /**
      * Constructs the {@linkplain LoginTask login task}.
@@ -86,9 +83,6 @@ public final class LoginTask implements SessionTask, LoginManager {
     public void handleDisconnection() {
         this.pluginFuture.cancel(false);
         this.acknowledgeFuture.cancel(false);
-
-        if (this.sessionAcquisition != null)
-            this.sessionAcquisition.close();
     }
 
     @Override
@@ -104,7 +98,7 @@ public final class LoginTask implements SessionTask, LoginManager {
     @Override
     public void finish(@NonNull String username, @NonNull UUID uniqueId,
                        @NonNull Collection<GameProfileProperty> properties) {
-        try (MutableAcquisition<Boolean> finishedAcquisition = this.finished.acquireMutable()) {
+        try (WriteBooleanAcquisition finishedAcquisition = this.finished.acquireWrite()) {
             if (finishedAcquisition.get())
                 throw new IllegalArgumentException("The session has been already finished");
             finishedAcquisition.set(true);
@@ -120,32 +114,9 @@ public final class LoginTask implements SessionTask, LoginManager {
      * @since 1.0
      */
     public void acknowledgeFinishLogin() {
-        this.connection.ensureInEventLoop();
-
         if (this.acknowledgeFuture.isDone())
             throw new IllegalArgumentException("The login finish has been already acknowledged");
         this.acknowledgeFuture.complete(Unit.INSTANCE);
-
-        MutableAcquisition<Session> sessionAcquisition = this.sessionAcquisition;
-        if (sessionAcquisition == null)
-            throw new IllegalArgumentException("The session acquirable has been not acquired");
-
-        try (sessionAcquisition) {
-            Session configurationSession = new Session(ProtocolState.CONFIGURATION, this.connection);
-            sessionAcquisition.set(configurationSession);
-            configurationSession.startSession(new ConfigurationTask(this.connection.playerOrThrow()));
-        }
-    }
-
-    /**
-     * Handles {@linkplain ClientEncryptionResponseLoginPacket a client encryption response login packet}
-     * from a client.
-     *
-     * @param packet the packet
-     * @since 1.0
-     */
-    public void handleEncryptionResponse(@NonNull ClientEncryptionResponseLoginPacket packet) {
-        // TODO
     }
 
     private void runVirtualThreadTask() {
@@ -156,10 +127,24 @@ public final class LoginTask implements SessionTask, LoginManager {
                 throw new RuntimeException("The login session has been not finished on time", exception);
             }
 
-            this.connection.submitToEventLoop(this::finishSession).get();
+            try (WriteObjectAcquisition<Session> sessionAcquisition = this.connection.acquireSessionWrite()) {
+                /* Set the compression threshold here to ensure that there will be no race conditions. Technically,
+                   it is possible anyway, but login protocol state by design is a state where no packet that were
+                   not requested by a server should come, except of the "login request". Modded clients are obliged
+                   to keep this approach. */
+                /*this.connection.setCompressionThreshold(this.connection.server()
+                        .configuration()
+                        .compressionThreshold());*/
 
-            try {
+                JetPlayer player = this.connection.playerOrThrow();
+                // TODO: Handle properties
+                player.sendPacket(new ServerLoginSuccessLoginPacket(player.uniqueId(), player.username(), Set.of()));
+
                 this.acknowledgeFuture.get(TIME_OUT_TIME, TIME_OUT_UNIT);
+
+                Session configurationSession = new Session(ProtocolState.CONFIGURATION, this.connection);
+                sessionAcquisition.set(configurationSession);
+                configurationSession.startSession(new ConfigurationTask(player));
             } catch (TimeoutException exception) {
                 throw new RuntimeException("The login session finish has been not acknowledged on time", exception);
             }
@@ -170,32 +155,6 @@ public final class LoginTask implements SessionTask, LoginManager {
             throw new RuntimeException("An error occurred during a login task", exception);
         } catch (CancellationException exception) {
             // Do nothing, the task has been cancelled due to disconnection
-        }
-    }
-
-    private void finishSession() {
-        this.connection.ensureInEventLoop(); // The session acquisition should be created in an event loop
-
-        JetPlayer player = this.connection.playerOrThrow();
-        MutableAcquisition<Session> sessionAcquisition = this.connection.session().acquireMutable();
-
-        try {
-            /* Set the compression threshold here to ensure that there will be no race conditions. Technically,
-               it is possible anyway, but login protocol state by design is a state where no packet that were
-               not requested by a server should come, except of the "login request". Modded clients are obliged
-               to keep this approach. */
-            this.connection.setCompressionThreshold(this.connection.server()
-                    .configuration()
-                    .compressionThreshold());
-
-            this.sessionAcquisition = sessionAcquisition;
-            // TODO: Handle properties
-            this.connection.sendPacket(new ServerLoginSuccessLoginPacket(
-                    player.uniqueId(), player.username(), Set.of()
-            ));
-        } catch (Throwable throwable) {
-            sessionAcquisition.close();
-            throw throwable; // Re-throw the throwable, since it has been not completely handled
         }
     }
 }

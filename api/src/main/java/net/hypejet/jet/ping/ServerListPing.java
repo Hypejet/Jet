@@ -26,7 +26,6 @@ import java.util.UUID;
  * @param customData an additional data, which will be appended to the server ping data
  * @since 1.0
  * @author Codestech
- * @see net.hypejet.jet.network.packet.server.status.ServerListResponseStatusPacket
  */
 public record ServerListPing(@NonNull Version version, @Nullable Players players, @Nullable Component description,
                              @Nullable Favicon favicon, boolean enforcesSecureChat, boolean previewsChat,
@@ -87,7 +86,7 @@ public record ServerListPing(@NonNull Version version, @Nullable Players players
      * Represents a player connected to the server, which is displayed on the server list.
      *
      * @param name a name of the player
-     * @param uniqueId an unique id of the player
+     * @param uniqueId a unique id of the player
      * @since 1.0
      */
     public record PingPlayer(@NonNull String name, @NonNull UUID uniqueId) {}

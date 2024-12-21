@@ -1,6 +1,6 @@
 package net.hypejet.jet;
 
-import net.hypejet.jet.acquisition.Acquisition;
+import net.hypejet.concurrency.collection.CollectionAcquisition;
 import net.hypejet.jet.command.CommandManager;
 import net.hypejet.jet.configuration.ServerConfiguration;
 import net.hypejet.jet.entity.player.Player;
@@ -9,8 +9,6 @@ import net.hypejet.jet.plugin.PluginManager;
 import net.hypejet.jet.registry.RegistryManager;
 import net.hypejet.jet.world.WorldManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.Collection;
 
 /**
  * Represents an interface for managing a Minecraft server.
@@ -70,15 +68,16 @@ public interface MinecraftServer {
     void shutdown();
 
     /**
-     * Creates {@linkplain Acquisition an acquisition} of all players, which are connected to the server.
+     * Creates {@linkplain CollectionAcquisition a collection acquisition} of all players, which are connected to the
+     * server.
      *
-     * <p>Note that all players are returned, even those, which are not in {@linkplain ProtocolState#PLAY play
-     * protocol state} yet.</p>
+     * <p>Note that all players are returned, even those, which are not in
+     * {@linkplain net.hypejet.jet.network.PlayerConnectionState#PLAY play protocol state} yet.</p>
      *
      * @return the acquisition
      * @since 1.0
      */
-    @NonNull Acquisition<? extends Collection<? extends Player>> players();
+    @NonNull CollectionAcquisition<? extends Player, ?> players();
 
     /**
      * Gets a {@linkplain WorldManager world manager} of the server.

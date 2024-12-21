@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.session.task;
 
-import net.hypejet.jet.acquisition.MutableAcquisition;
+import net.hypejet.concurrency.object.WriteObjectAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.ProtocolState;
 import net.hypejet.jet.server.network.packet.packets.client.handshake.ClientHandshakePacket;
@@ -33,8 +33,6 @@ public final class HandshakeTask implements SessionTask {
     private static final String VIRTUAL_THREAD_NAME = "Handshake session task thread";
 
     private final SocketPlayerConnection connection;
-
-    private final MutableAcquisition<Session> sessionAcquisition;
     private final CompletableFuture<ClientHandshakePacket> handshakeFuture = new CompletableFuture<>();
 
     /**
@@ -47,9 +45,6 @@ public final class HandshakeTask implements SessionTask {
         // We do not care about the acquisition if it is not null, it is up to user not to provide null values
         this.connection = NullabilityUtil.requireNonNull(connection, "connection");
 
-        connection.ensureInEventLoop(); // The session acquisition should be created in an event loop
-        this.sessionAcquisition = connection.session().acquireMutable();
-
         Thread.ofVirtual()
                 .name(VIRTUAL_THREAD_NAME)
                 .uncaughtExceptionHandler(connection)
@@ -59,8 +54,6 @@ public final class HandshakeTask implements SessionTask {
     @Override
     public void handleDisconnection() {
         this.handshakeFuture.cancel(false);
-        if (this.sessionAcquisition != null)
-            this.sessionAcquisition.close();
     }
 
     /**
@@ -70,9 +63,12 @@ public final class HandshakeTask implements SessionTask {
      * @since 1.0
      */
     public void handleHandshakePacket(@NonNull ClientHandshakePacket packet) {
-        try {
-            this.connection.ensureInEventLoop();
-            this.handshakeFuture.complete(packet);
+        this.handshakeFuture.complete(packet);
+    }
+
+    private void runVirtualThreadTask() {
+        try (WriteObjectAcquisition<Session> sessionAcquisition = this.connection.acquireSessionWrite()) {
+            ClientHandshakePacket packet = this.handshakeFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
 
             ProtocolState nextProtocolState = switch (packet.intent()) {
                 case STATUS -> ProtocolState.STATUS;
@@ -80,7 +76,7 @@ public final class HandshakeTask implements SessionTask {
             };
 
             Session session = new Session(nextProtocolState, this.connection);
-            this.sessionAcquisition.set(session);
+            sessionAcquisition.set(session);
 
             SessionTask nextSessionTask = switch (packet.intent()) {
                 case STATUS -> new StatusSessionTask(this.connection);
@@ -89,16 +85,6 @@ public final class HandshakeTask implements SessionTask {
             };
 
             session.startSession(nextSessionTask);
-        } catch (Throwable throwable) {
-            throw new RuntimeException(throwable);
-        } finally {
-            this.sessionAcquisition.close();
-        }
-    }
-
-    private void runVirtualThreadTask() {
-        try {
-            this.handshakeFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
         } catch (ExecutionException exception) {
             throw new RuntimeException("An error occurred during a handshaking task", exception);
         } catch (InterruptedException exception) {

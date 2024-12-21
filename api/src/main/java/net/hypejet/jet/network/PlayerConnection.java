@@ -1,7 +1,7 @@
 package net.hypejet.jet.network;
 
+import net.hypejet.concurrency.object.ObjectAcquisition;
 import net.hypejet.jet.MinecraftServer;
-import net.hypejet.jet.acquisition.Acquisition;
 import net.hypejet.jet.entity.player.Player;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -15,12 +15,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public interface PlayerConnection {
     /**
-     * Creates {@linkplain Acquisition an acquisition} of {@linkplain PlayerConnectionState a state of the connection}.
+     * Creates {@linkplain ObjectAcquisition an object acquisition} of {@linkplain PlayerConnectionState a state
+     * of the connection}.
      *
      * @return the acquisition
      * @since 1.0
      */
-    @NonNull Acquisition<PlayerConnectionState> connectionState();
+    @NonNull ObjectAcquisition<PlayerConnectionState> connectionState();
 
     /**
      * Sends a disconnection packet and closes the connection.
@@ -55,6 +56,4 @@ public interface PlayerConnection {
      * @since 1.0
      */
     @Nullable Player player();
-
-
 }

@@ -2,7 +2,7 @@ package net.hypejet.jet.server.entity.player;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.hypejet.jet.acquisition.Acquisition;
+import net.hypejet.concurrency.object.ObjectAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.player.PlayerChangeSettingsEvent;
@@ -104,7 +104,7 @@ public final class JetPlayer extends JetEntity implements Player {
         NullabilityUtil.requireNonNull(identifier, "identifier");
         NullabilityUtil.requireNonNull(data, "data");
 
-        try (Acquisition<ProtocolState> acquisition = this.connection.protocolState()) {
+        try (ObjectAcquisition<ProtocolState> acquisition = this.connection.protocolState()) {
             if (!ServerPacketRegistry.isSupported(acquisition.get(), ServerPluginMessagePacket.class))
                 throw new IllegalStateException("The operation is not supported at current protocol state");
             this.sendPacket(new ServerPluginMessagePacket(identifier, data));

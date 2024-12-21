@@ -1,7 +1,10 @@
 package net.hypejet.jet.server.network.session.task;
 
-import net.hypejet.jet.acquisition.Acquisition;
-import net.hypejet.jet.acquisition.MutableAcquisition;
+import net.hypejet.concurrency.object.ObjectAcquisition;
+import net.hypejet.concurrency.object.WriteObjectAcquisition;
+import net.hypejet.concurrency.primitive.booleans.BooleanAcquirable;
+import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
+import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.data.model.api.pack.PackInfo;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.data.model.server.registry.registries.pack.FeaturePack;
@@ -16,7 +19,6 @@ import net.hypejet.jet.server.network.packet.packets.server.configuration.Server
 import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerRegistryDataConfigurationPacket;
 import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.acquisition.value.AcquirableValue;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.session.Session;
@@ -28,7 +30,6 @@ import net.hypejet.jet.server.registry.session.RegistryTagUpdateFunction;
 import net.hypejet.jet.server.util.unit.Unit;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTag;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.ArrayList;
@@ -55,15 +56,13 @@ public final class ConfigurationTask implements SessionTask, KeepAliveResponseHa
     private static final long TIME_OUT_DURATION = 20;
     private static final TimeUnit TIME_OUT_UNIT = TimeUnit.SECONDS;
 
-    private final AcquirableValue<Boolean> tagsSent = new AcquirableValue<>(false);
+    private final BooleanAcquirable tagsSent = new BooleanAcquirable();
 
     private final JetPlayer player;
     private final KeepAliveHandler keepAliveHandler;
 
     private final CompletableFuture<ClientKnownPacksConfigurationPacket> knownPacksFuture = new CompletableFuture<>();
     private final CompletableFuture<Unit> acknowledgeFuture = new CompletableFuture<>();
-
-    private @MonotonicNonNull MutableAcquisition<Session> sessionAcquisition;
 
     /**
      * Constructs the {@linkplain ConfigurationTask configuration task}.
@@ -86,9 +85,6 @@ public final class ConfigurationTask implements SessionTask, KeepAliveResponseHa
         this.keepAliveHandler.handleDisconnection();
         this.knownPacksFuture.cancel(false);
         this.acknowledgeFuture.cancel(false);
-
-        if (this.sessionAcquisition != null)
-            this.sessionAcquisition.close();
     }
 
     @Override
@@ -98,7 +94,7 @@ public final class ConfigurationTask implements SessionTask, KeepAliveResponseHa
 
     @Override
     public void updateTags(@NonNull Runnable tagUpdateTask) {
-        try (Acquisition<Boolean> tagsSentAcquisition = this.tagsSent.acquire()) {
+        try (BooleanAcquisition tagsSentAcquisition = this.tagsSent.acquireWrite()) {
             if (!tagsSentAcquisition.get()) return;
             tagUpdateTask.run();
         }
@@ -128,16 +124,6 @@ public final class ConfigurationTask implements SessionTask, KeepAliveResponseHa
         if (this.acknowledgeFuture.isDone())
             throw new IllegalStateException("The configuration finish has been already acknowledged");
         this.acknowledgeFuture.complete(Unit.INSTANCE);
-
-        MutableAcquisition<Session> sessionAcquisition = this.sessionAcquisition;
-        if (sessionAcquisition == null)
-            throw new IllegalArgumentException("The session acquirable has been not acquired");
-
-        try (sessionAcquisition) {
-            Session playSession = new Session(ProtocolState.PLAY, connection);
-            sessionAcquisition.set(playSession);
-            playSession.startSession(new PlayTask(this.player));
-        }
     }
 
     /**
@@ -168,10 +154,8 @@ public final class ConfigurationTask implements SessionTask, KeepAliveResponseHa
         enabledFeaturePacks.forEach(dataPack -> packInfos.add(dataPack.info()));
         this.player.sendPacket(new ServerKnownPacksConfigurationPacket(Set.copyOf(packInfos)));
 
-        ClientKnownPacksConfigurationPacket packet;
-
         try {
-            packet = this.knownPacksFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
+            ClientKnownPacksConfigurationPacket packet = this.knownPacksFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
 
             Collection<JetMinecraftRegistry<?>> registries = server.registryManager().getRegistries().values();
             for (JetMinecraftRegistry<?> registry : registries) {
@@ -179,20 +163,20 @@ public final class ConfigurationTask implements SessionTask, KeepAliveResponseHa
                 sendRegistry(this.player, serializableRegistry, packet.featurePacks());
             }
 
-            try (MutableAcquisition<Boolean> tagsSentAcquisition = this.tagsSent.acquireMutable()) {
-                Collection<Acquisition<TagRegistry>> tagRegistryAcquisitions = new HashSet<>();
+            try (WriteBooleanAcquisition tagsSentAcquisition = this.tagsSent.acquireWrite()) {
+                Collection<ObjectAcquisition<TagRegistry>> tagRegistryAcquisitions = new HashSet<>();
                 try {
                     for (JetMinecraftRegistry<?> registry : registries)
                         tagRegistryAcquisitions.add(registry.createTagRegistry());
 
                     Collection<TagRegistry> tagRegistries = new HashSet<>();
-                    for (Acquisition<TagRegistry> tagRegistryAcquisition : tagRegistryAcquisitions)
+                    for (ObjectAcquisition<TagRegistry> tagRegistryAcquisition : tagRegistryAcquisitions)
                         tagRegistries.add(tagRegistryAcquisition.get());
 
                     this.player.sendPacket(new ServerUpdateTagsPacket(Set.copyOf(tagRegistries)));
                     tagsSentAcquisition.set(true);
                 } finally {
-                    tagRegistryAcquisitions.forEach(Acquisition::close);
+                    tagRegistryAcquisitions.forEach(ObjectAcquisition::close);
                 }
             }
 
@@ -202,8 +186,14 @@ public final class ConfigurationTask implements SessionTask, KeepAliveResponseHa
                 return;
             }
 
-            connection.submitToEventLoop(this::finishSession).get();
-            this.acknowledgeFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
+            try (WriteObjectAcquisition<Session> sessionAcquisition = connection.acquireSessionWrite()) {
+                connection.sendPacket(new ServerFinishConfigurationPacket());
+                this.acknowledgeFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
+
+                Session playSession = new Session(ProtocolState.PLAY, connection);
+                sessionAcquisition.set(playSession);
+                playSession.startSession(new PlayTask(this.player));
+            }
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt(); // Restore the interrupted status
             throw new RuntimeException("The configuration task has been interrupted", exception);
@@ -213,21 +203,6 @@ public final class ConfigurationTask implements SessionTask, KeepAliveResponseHa
             throw new RuntimeException("The configuration task has timed out", exception);
         } catch (CancellationException exception) {
             // Do nothing, the task has been cancelled due to disconnection
-        }
-    }
-
-    private void finishSession() {
-        SocketPlayerConnection connection = this.player.connection();
-        connection.ensureInEventLoop(); // The session acquisition should be created in an event loop
-
-        MutableAcquisition<Session> sessionAcquisition = connection.session().acquireMutable();
-
-        try {
-            this.sessionAcquisition = sessionAcquisition;
-            connection.sendPacket(new ServerFinishConfigurationPacket());
-        } catch (Throwable throwable) {
-            sessionAcquisition.close();
-            throw throwable; // Re-throw the throwable, since it has been not completely handled
         }
     }
 

@@ -29,8 +29,8 @@ public final class ClientEncryptionResponseLoginPacketHandler
 
     @Override
     public void handle(@NonNull ClientEncryptionResponseLoginPacket packet, @NonNull Session session) {
-        if (!(session.sessionTask() instanceof LoginTask loginTask))
+        if (!(session.sessionTask() instanceof LoginTask))
             throw new IllegalArgumentException("The current session task is not a login session task");
-        loginTask.handleEncryptionResponse(packet);
+        // TODO
     }
 }

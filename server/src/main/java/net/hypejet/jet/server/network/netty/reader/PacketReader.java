@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.netty.reader;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import net.hypejet.jet.acquisition.Acquisition;
+import net.hypejet.concurrency.object.ObjectAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
@@ -39,7 +39,7 @@ public final class PacketReader extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(@NonNull ChannelHandlerContext ctx, @NonNull Object msg) {
-        try (Acquisition<Session> sessionAcquisition = this.connection.session().acquire()) {
+        try (ObjectAcquisition<Session> sessionAcquisition = this.connection.acquireSessionRead()) {
             if (!(msg instanceof ClientPacket packet))
                 throw new IllegalStateException("A message received is not a client packet");
 

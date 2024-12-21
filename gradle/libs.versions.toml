@@ -2,7 +2,10 @@
 # Fat jar compilation
 shadow = "8.1.7"
 
+# Nullability
 checker-framework-plugin = "0.6.39"
+
+# Networking
 netty = "4.1.110.Final"
 
 # Logging
@@ -27,7 +30,11 @@ brigadier = "1.0.18"
 # Dependency injection
 guice = "7.0.0"
 
+# Utilities
+concurrencyUtilities = "1.0"
+
 [libraries]
+# Networking
 netty = { module = "io.netty:netty-all", version.ref = "netty" }
 
 # Minecraft text
@@ -64,6 +71,9 @@ brigadier = { module = "com.mojang:brigadier", version.ref = "brigadier" }
 
 # Dependency injection
 guice = { module = "com.google.inject:guice", version.ref = "guice" }
+
+# Utilities
+concurrencyUtilities = { module = "net.hypejet:concurrency-utilities", version.ref = "concurrencyUtilities" }
 
 [bundles]
 # Configuration

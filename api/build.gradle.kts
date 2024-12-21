@@ -8,6 +8,7 @@ dependencies {
     api(libs.gson)
     api(libs.guice)
     api(libs.brigadier)
+    api(libs.concurrencyUtilities)
     api(libs.bundles.adventure)
     api(libs.bundles.jetData)
     testImplementation(libs.junit.jupiter)

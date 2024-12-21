@@ -3,8 +3,11 @@ package net.hypejet.jet.server.registry;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import net.hypejet.jet.acquisition.Acquisition;
-import net.hypejet.jet.acquisition.map.MutableMapAcquisition;
+import net.hypejet.concurrency.collection.CollectionAcquisition;
+import net.hypejet.concurrency.map.WriteMapAcquisition;
+import net.hypejet.concurrency.map.hashmap.HashMapAcquirable;
+import net.hypejet.concurrency.object.ObjectAcquisition;
+import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.jet.data.model.api.pack.PackInfo;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.data.model.server.registry.registries.pack.FeaturePack;
@@ -14,12 +17,13 @@ import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateT
 import net.hypejet.jet.registry.MinecraftRegistry;
 import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.acquisition.map.HashMapAcquirable;
-import net.hypejet.jet.server.acquisition.mapped.MappedAcquisition;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.session.Session;
 import net.hypejet.jet.server.registry.session.RegistryTagUpdateFunction;
+import net.hypejet.jet.server.util.acquisition.CollectionToBooleanMappedAcquisition;
+import net.hypejet.jet.server.util.acquisition.MapToCollectionMappedAcquisition;
+import net.hypejet.jet.server.util.acquisition.MapToObjectMappedAcquisition;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -164,36 +168,28 @@ public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
     }
 
     @Override
-    public @NonNull Acquisition<Boolean> hasTag(@NonNull RegistryEntry<V> entry, @NonNull Key tag) {
+    public @NonNull BooleanAcquisition hasTag(@NonNull RegistryEntry<V> entry, @NonNull Key tag) {
         NullabilityUtil.requireNonNull(tag, "tag");
-        return new MappedAcquisition<>(this.tagsFor(entry), tags -> tags.contains(tag));
+        return new CollectionToBooleanMappedAcquisition<>(this.tagsFor(entry), tags -> tags.contains(tag));
     }
 
     @Override
-    public @NonNull Acquisition<Collection<Key>> tagsFor(@NonNull RegistryEntry<V> entry) {
+    public @NonNull CollectionAcquisition<Key, ?> tagsFor(@NonNull RegistryEntry<V> entry) {
         JetRegistryEntry<V> validatedEntry = validateEntry(entry);
-        Acquisition<Map<JetRegistryEntry<V>, Tags>> acquisition = this.tags.acquire();
-
-        try {
-            Map<JetRegistryEntry<V>, Tags> map = acquisition.get();
+        return new MapToCollectionMappedAcquisition<>(this.tags.acquireRead(), map -> {
             Tags tags = map.get(validatedEntry);
-
             if (tags == null)
                 throw new IllegalArgumentException("Could not find a tags for an entry specified");
-            // TODO: A better acquisition implementation for this case?
-            return new MappedAcquisition<>(acquisition, ignoredMap -> tags.tags());
-        } catch (Throwable throwable) {
-            acquisition.close(); // Unlock the acquisition if an error occurs
-            throw throwable; // The throwable was not handled completely
-        }
+            return tags.tags();
+        });
     }
 
     @Override
     public void updateTags(@NonNull RegistryEntry<V> entry, @NonNull UnaryOperator<Collection<Key>> tagUnaryOperator) {
         JetRegistryEntry<V> validatedEntry = validateEntry(entry);
 
-        try (MutableMapAcquisition<JetRegistryEntry<V>, Tags, ?> tagMapAcquisition = this.tags.acquireMutable()) {
-            Map<JetRegistryEntry<V>, Tags> tagMap = tagMapAcquisition.get();
+        try (WriteMapAcquisition<JetRegistryEntry<V>, Tags, ?> tagMapAcquisition = this.tags.acquireWrite()) {
+            Map<JetRegistryEntry<V>, Tags> tagMap = tagMapAcquisition.map();
             Tags tags = tagMap.get(validatedEntry);
 
             if (tags == null)
@@ -203,11 +199,11 @@ public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
             TagRegistry tagRegistry = this.createTagRegistry(tagMap);
             Set<TagRegistry> tagRegistrySet = Set.of(tagRegistry);
 
-            try (Acquisition<? extends Collection<JetPlayer>> playerAcquisition = this.server.players()) {
-                for (JetPlayer player : playerAcquisition.get()) {
+            try (CollectionAcquisition<JetPlayer, ?> playerAcquisition = this.server.players()) {
+                for (JetPlayer player : playerAcquisition.collection()) {
                     // TODO: Do the session consumption in an another thread to avoid relying on client (HIGH PRIORITY)
                     SocketPlayerConnection connection = player.connection();
-                    try (Acquisition<Session> sessionAcquisition = connection.session().acquire()) {
+                    try (ObjectAcquisition<Session> sessionAcquisition = connection.acquireSessionRead()) {
                         if (!(sessionAcquisition.get().sessionTask() instanceof RegistryTagUpdateFunction function))
                             continue;
                         function.updateTags(() -> player.sendPacket(new ServerUpdateTagsPacket(tagRegistrySet)));
@@ -224,8 +220,8 @@ public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
      * @return the tag registry
      * @since 1.0
      */
-    public @NonNull Acquisition<TagRegistry> createTagRegistry() {
-        return new MappedAcquisition<>(this.tags.acquire(), this::createTagRegistry);
+    public @NonNull ObjectAcquisition<TagRegistry> createTagRegistry() {
+        return new MapToObjectMappedAcquisition<>(this.tags.acquireRead(), this::createTagRegistry);
     }
 
     /**

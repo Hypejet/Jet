@@ -1,6 +1,7 @@
 package net.hypejet.jet.registry;
 
-import net.hypejet.jet.acquisition.Acquisition;
+import net.hypejet.concurrency.collection.CollectionAcquisition;
+import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -89,8 +90,8 @@ public interface MinecraftRegistry<V> {
     @NonNull List<? extends RegistryEntry<V>> entries();
 
     /**
-     * Creates an acquisition defining whether a {@linkplain RegistryEntry registry entry} specified
-     * has a tag specified attached.
+     * Creates {@linkplain BooleanAcquisition a boolean acquisition} defining whether
+     * a {@linkplain RegistryEntry registry entry} specified has a tag specified attached.
      *
      * @param entry the registry entry
      * @param tag the tag
@@ -98,17 +99,17 @@ public interface MinecraftRegistry<V> {
      *         a tag specified attached, {@code false} otherwise
      * @since 1.0
      */
-    @NonNull Acquisition<Boolean> hasTag(@NonNull RegistryEntry<V> entry, @NonNull Key tag);
+    @NonNull BooleanAcquisition hasTag(@NonNull RegistryEntry<V> entry, @NonNull Key tag);
 
     /**
-     * Creates {@linkplain Acquisition an acquisition} of a {@linkplain Collection collection} of tags attached
-     * to a {@linkplain RegistryEntry registry entry} specified.
+     * Creates {@linkplain CollectionAcquisition a collection acquisition} of a {@linkplain Collection collection} of
+     * tags attached to {@linkplain RegistryEntry a registry entry} specified.
      *
      * @param entry the registry entry
      * @return the collection
      * @since 1.0
      */
-    @NonNull Acquisition<Collection<Key>> tagsFor(@NonNull RegistryEntry<V> entry);
+    @NonNull CollectionAcquisition<Key, ?> tagsFor(@NonNull RegistryEntry<V> entry);
 
     /**
      * Updates tags for {@linkplain RegistryEntry a registry entry} specified.

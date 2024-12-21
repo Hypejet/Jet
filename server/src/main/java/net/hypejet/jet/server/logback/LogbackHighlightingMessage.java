@@ -7,7 +7,7 @@ import ch.qos.logback.core.pattern.color.ForegroundCompositeConverterBase;
 
 /**
  * Represents a {@linkplain ForegroundCompositeConverterBase foreground composite converter base} setting logging
- * message colors based on a level of the message.
+ * message colors based on a message level.
  *
  * @since 1.0
  * @author Codestech
