@@ -4,8 +4,10 @@ import net.hypejet.concurrency.object.WriteObjectAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquirable;
 import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.event.events.login.LoginStartEvent;
 import net.hypejet.jet.login.profile.GameProfileProperty;
 import net.hypejet.jet.server.network.ProtocolState;
+import net.hypejet.jet.server.network.packet.packets.client.login.ClientLoginRequestLoginPacket;
 import net.hypejet.jet.server.network.packet.packets.server.login.ServerLoginSuccessLoginPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
@@ -42,6 +44,7 @@ public final class LoginTask implements SessionTask, LoginManager {
 
     private final SocketPlayerConnection connection;
 
+    private final CompletableFuture<Unit> loginRequestFuture = new CompletableFuture<>();
     private final CompletableFuture<Unit> pluginFuture = new CompletableFuture<>();
     private final CompletableFuture<Unit> acknowledgeFuture = new CompletableFuture<>();
 
@@ -83,6 +86,7 @@ public final class LoginTask implements SessionTask, LoginManager {
     public void handleDisconnection() {
         this.pluginFuture.cancel(false);
         this.acknowledgeFuture.cancel(false);
+        this.loginRequestFuture.cancel(false);
     }
 
     @Override
@@ -109,9 +113,26 @@ public final class LoginTask implements SessionTask, LoginManager {
     }
 
     /**
+     * Handles a login request from a client.
+     *
+     * @param packet a packet of the login request
+     * @since 1.0
+     * @throws IllegalArgumentException if the client has already sent a login request
+     */
+    public void handleLoginRequest(@NonNull ClientLoginRequestLoginPacket packet) {
+        if (this.loginRequestFuture.isDone())
+            throw new IllegalArgumentException("The login request has been already handled");
+        this.loginRequestFuture.complete(Unit.INSTANCE);
+
+        LoginStartEvent loginStartEvent = new LoginStartEvent(packet.username(), packet.uniqueId(), this);
+        this.connection.server().eventNode().call(loginStartEvent);
+    }
+
+    /**
      * Handles an acknowledgement to the login finish from a client.
      *
      * @since 1.0
+     * @throws IllegalArgumentException if the client has already sent an acknowledgement
      */
     public void acknowledgeFinishLogin() {
         if (this.acknowledgeFuture.isDone())
@@ -120,6 +141,27 @@ public final class LoginTask implements SessionTask, LoginManager {
 
         // Ensure that no packet from the further session is handled
         this.connection.clientPacketReader().pausePacketReading();
+    }
+
+    /**
+     * Awaits for when the client sends a login request.
+     *
+     * @param timeout a maximum time to wait
+     * @param timeUnit a unit of the maximum time to wait
+     * @since 1.0
+     */
+    public void awaitForLoginRequest(long timeout, @NonNull TimeUnit timeUnit) {
+        try {
+            this.loginRequestFuture.get(timeout, timeUnit);
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt(); // Restore the interrupted status
+        } catch (TimeoutException exception) {
+            throw new RuntimeException("The client has not sent the login request on time", exception);
+        } catch (ExecutionException exception) {
+            throw new RuntimeException("An error occurred during awaiting for the login request", exception);
+        } catch (CancellationException exception) {
+            // Do nothing, the task has been cancelled due to disconnection
+        }
     }
 
     private void runVirtualThreadTask() {
@@ -131,14 +173,6 @@ public final class LoginTask implements SessionTask, LoginManager {
             }
 
             try (WriteObjectAcquisition<Session> sessionAcquisition = this.connection.acquireSessionWrite()) {
-                /* Set the compression threshold here to ensure that there will be no race conditions. Technically,
-                   it is possible anyway, but login protocol state by design is a state where no packet that were
-                   not requested by a server should come, except of the "login request". Modded clients are obliged
-                   to keep this approach. */
-                /*this.connection.setCompressionThreshold(this.connection.server()
-                        .configuration()
-                        .compressionThreshold());*/
-
                 JetPlayer player = this.connection.playerOrThrow();
                 // TODO: Handle properties
                 player.sendPacket(new ServerLoginSuccessLoginPacket(player.uniqueId(), player.username(), Set.of()));

@@ -86,6 +86,21 @@ public final class HandshakeTask implements SessionTask {
 
             session.startSession(nextSessionTask);
             this.connection.clientPacketReader().resumePacketReading();
+
+            /* Set the compression threshold here to ensure that there will be no race conditions. Technically,
+               it is possible anyway, but login protocol state by design is a state where no packet that was
+               not requested by a server should come, except of the "login request". Modded clients are obliged
+               to keep this approach. Since plugins are allowed to send any request packet during login without
+               waiting for a response, the most safe place to enable the compression is here, because the session
+               acquisition is still locked since handshake and no login packet was sent by any plugin. */
+            if (nextSessionTask instanceof LoginTask loginTask) {
+                loginTask.awaitForLoginRequest(TIME_OUT_DURATION, TIME_OUT_UNIT);
+
+                int compressionThreshold = this.connection.server().configuration().compressionThreshold();
+                if (compressionThreshold < 0) return; // The compression is disabled
+
+                this.connection.setCompressionThreshold(compressionThreshold);
+            }
         } catch (ExecutionException exception) {
             throw new RuntimeException("An error occurred during a handshaking task", exception);
         } catch (InterruptedException exception) {
