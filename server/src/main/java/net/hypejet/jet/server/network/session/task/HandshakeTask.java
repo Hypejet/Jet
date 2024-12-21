@@ -30,8 +30,6 @@ public final class HandshakeTask implements SessionTask {
     private static final int TIME_OUT_DURATION = 20;
     private static final TimeUnit TIME_OUT_UNIT = TimeUnit.SECONDS;
 
-    private static final String VIRTUAL_THREAD_NAME = "Handshake session task thread";
-
     private final SocketPlayerConnection connection;
     private final CompletableFuture<ClientHandshakePacket> handshakeFuture = new CompletableFuture<>();
 
@@ -46,7 +44,7 @@ public final class HandshakeTask implements SessionTask {
         this.connection = NullabilityUtil.requireNonNull(connection, "connection");
 
         Thread.ofVirtual()
-                .name(VIRTUAL_THREAD_NAME)
+                .name("Handshake session task thread")
                 .uncaughtExceptionHandler(connection)
                 .start(this::runVirtualThreadTask);
     }
@@ -64,6 +62,8 @@ public final class HandshakeTask implements SessionTask {
      */
     public void handleHandshakePacket(@NonNull ClientHandshakePacket packet) {
         this.handshakeFuture.complete(packet);
+        // Ensure that no packet from the further session is handled
+        this.connection.clientPacketReader().pausePacketReading();
     }
 
     private void runVirtualThreadTask() {
@@ -85,6 +85,7 @@ public final class HandshakeTask implements SessionTask {
             };
 
             session.startSession(nextSessionTask);
+            this.connection.clientPacketReader().resumePacketReading();
         } catch (ExecutionException exception) {
             throw new RuntimeException("An error occurred during a handshaking task", exception);
         } catch (InterruptedException exception) {

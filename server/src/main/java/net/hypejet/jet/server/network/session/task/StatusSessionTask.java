@@ -72,8 +72,6 @@ public final class StatusSessionTask implements SessionTask {
      * @since 1.0
      */
     public void handleServerListRequest() {
-        this.connection.ensureInEventLoop();
-
         if (this.serverListRequestFuture.isDone())
             throw new IllegalArgumentException("The server list request packet has been already received");
         this.serverListRequestFuture.complete(Unit.INSTANCE);
@@ -100,8 +98,6 @@ public final class StatusSessionTask implements SessionTask {
      * @since 1.0
      */
     public void handlePingRequest(@NonNull ClientPingRequestPacket packet) {
-        this.connection.ensureInEventLoop();
-
         if (!this.serverListRequestFuture.isDone())
             // The client can skip the server list request, it is a natural vanilla behaviour
             this.serverListRequestFuture.complete(Unit.INSTANCE);

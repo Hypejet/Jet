@@ -117,6 +117,9 @@ public final class LoginTask implements SessionTask, LoginManager {
         if (this.acknowledgeFuture.isDone())
             throw new IllegalArgumentException("The login finish has been already acknowledged");
         this.acknowledgeFuture.complete(Unit.INSTANCE);
+
+        // Ensure that no packet from the further session is handled
+        this.connection.clientPacketReader().pausePacketReading();
     }
 
     private void runVirtualThreadTask() {
@@ -145,6 +148,8 @@ public final class LoginTask implements SessionTask, LoginManager {
                 Session configurationSession = new Session(ProtocolState.CONFIGURATION, this.connection);
                 sessionAcquisition.set(configurationSession);
                 configurationSession.startSession(new ConfigurationTask(player));
+
+                this.connection.clientPacketReader().resumePacketReading();
             } catch (TimeoutException exception) {
                 throw new RuntimeException("The login session finish has been not acknowledged on time", exception);
             }

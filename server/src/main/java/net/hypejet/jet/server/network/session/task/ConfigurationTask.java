@@ -119,11 +119,13 @@ public final class ConfigurationTask implements SessionTask, KeepAliveResponseHa
      */
     public void handleFinishAcknowledge() {
         SocketPlayerConnection connection = this.player.connection();
-        connection.ensureInEventLoop();
 
         if (this.acknowledgeFuture.isDone())
             throw new IllegalStateException("The configuration finish has been already acknowledged");
         this.acknowledgeFuture.complete(Unit.INSTANCE);
+
+        // Ensure that no packet from the further session is handled
+        connection.clientPacketReader().pausePacketReading();
     }
 
     /**
@@ -193,6 +195,8 @@ public final class ConfigurationTask implements SessionTask, KeepAliveResponseHa
                 Session playSession = new Session(ProtocolState.PLAY, connection);
                 sessionAcquisition.set(playSession);
                 playSession.startSession(new PlayTask(this.player));
+
+                connection.clientPacketReader().pausePacketReading();
             }
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt(); // Restore the interrupted status

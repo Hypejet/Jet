@@ -1,5 +1,7 @@
 package net.hypejet.jet.server.network;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
@@ -16,7 +18,10 @@ import net.hypejet.concurrency.object.WriteObjectAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.network.PlayerConnection;
 import net.hypejet.jet.network.PlayerConnectionState;
-import net.hypejet.jet.server.network.netty.reader.PacketReader;
+import net.hypejet.jet.server.network.netty.handler.RawPacketHandler;
+import net.hypejet.jet.server.network.packet.RawPacket;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry.RegistryPacketSpecification;
+import net.hypejet.jet.server.network.packet.reader.ClientPacketReader;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerDisconnectPacket;
 import net.hypejet.jet.server.network.packet.packets.server.login.ServerEnableCompressionLoginPacket;
@@ -24,16 +29,16 @@ import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.exception.NetworkException;
 import net.hypejet.jet.server.network.packet.handler.NetworkDisconnectionHandler;
-import net.hypejet.jet.server.network.netty.decoder.PacketDecoder;
+import net.hypejet.jet.server.network.netty.decoder.RawPacketDecoder;
 import net.hypejet.jet.server.network.netty.decoder.PacketDecompressor;
 import net.hypejet.jet.server.network.netty.decoder.PacketLengthDecoder;
 import net.hypejet.jet.server.network.netty.encoder.PacketCompressor;
-import net.hypejet.jet.server.network.netty.encoder.PacketEncoder;
+import net.hypejet.jet.server.network.netty.encoder.RawPacketEncoder;
 import net.hypejet.jet.server.network.netty.encoder.PacketLengthEncoder;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry;
 import net.hypejet.jet.server.network.session.Session;
-import net.hypejet.jet.server.network.session.SessionUpdateHandler;
 import net.hypejet.jet.server.network.session.task.HandshakeTask;
+import net.hypejet.jet.server.util.NetworkUtil;
 import net.hypejet.jet.server.util.acquisition.MappedObjectAcquisition;
 import net.hypejet.jet.server.util.unit.Unit;
 import net.kyori.adventure.text.Component;
@@ -82,6 +87,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     private JetPlayer player;
 
     private final ObjectAcquirable<Session> session;
+    private final ClientPacketReader clientPacketReader;
 
     /**
      * Constructs the {@link SocketPlayerConnection socket player connection}.
@@ -105,10 +111,12 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
         Session initialSession = new Session(ProtocolState.HANDSHAKE, this);
         this.session = new ObjectAcquirable<>(initialSession);
 
-        /* We need to update the handlers after the initial session is set, since they are going to be used.
-           The session needs to be started later however, since it might send packets, which require handlers to
-           be already set. */
+        /* We need to update the handlers and initialize the client packet reader after the initial session is set,
+           since they are going to be used. The session needs to be started later however, since it might send packets,
+           which require handlers to be already set. */
         this.updateHandlers(-1);
+        this.clientPacketReader = new ClientPacketReader(this, initialSession);
+
         initialSession.startSession(new HandshakeTask(this));
     }
 
@@ -179,6 +187,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
 
         if (this.player != null)
             this.server.unregisterPlayer(this.player);
+        this.clientPacketReader.handleDisconnection();
     }
 
     /**
@@ -234,22 +243,36 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
      */
     public void sendPacket(@NonNull ServerPacket packet,
                            @Nullable CompletableFuture<? super PacketSendResult> resultFuture) {
-        ChannelPromise promise = resultFuture == null ? this.channel.voidPromise() : this.channel.newPromise();
-        ChannelFuture channelFuture = this.channel.writeAndFlush(packet, promise);
+        try (ObjectAcquisition<ProtocolState> protocolStateAcquisition = this.protocolState()) {
+            RawPacket rawPacket = encode(packet, protocolStateAcquisition.get());
 
-        if (!promise.isVoid() && resultFuture != null) {
-            channelFuture.addListener(future -> {
-                Future.State futureState = future.state();
-                switch (futureState) {
-                    case SUCCESS -> resultFuture.complete(PacketSendResult.SUCCESS);
-                    case FAILED -> resultFuture.complete(PacketSendResult.NETWORK_ERROR);
-                    case CANCELLED -> resultFuture.complete(PacketSendResult.CANCELLATION);
-                    default -> resultFuture.completeExceptionally(new IllegalArgumentException(
-                            String.format("The future is in an unexpected state of %s", futureState.name())
-                    ));
-                }
-            });
+            ChannelPromise promise = resultFuture == null ? this.channel.voidPromise() : this.channel.newPromise();
+            ChannelFuture channelFuture = this.channel.writeAndFlush(rawPacket, promise);
+
+            if (!promise.isVoid() && resultFuture != null) {
+                channelFuture.addListener(future -> {
+                    Future.State futureState = future.state();
+                    switch (futureState) {
+                        case SUCCESS -> resultFuture.complete(PacketSendResult.SUCCESS);
+                        case FAILED -> resultFuture.complete(PacketSendResult.NETWORK_ERROR);
+                        case CANCELLED -> resultFuture.complete(PacketSendResult.CANCELLATION);
+                        default -> resultFuture.completeExceptionally(new IllegalArgumentException(
+                                String.format("The future is in an unexpected state of %s", futureState.name())
+                        ));
+                    }
+                });
+            }
         }
+    }
+
+    /**
+     * Gets {@linkplain ClientPacketReader client packet reader} of this connection.
+     *
+     * @return the client packet reader
+     * @since 1.0
+     */
+    public @NonNull ClientPacketReader clientPacketReader() {
+        return this.clientPacketReader;
     }
 
     /**
@@ -344,29 +367,47 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
         // No need for a lock for the handlers, we just require the code to be executed in the event loop
         this.ensureInEventLoop();
 
-        try (ObjectAcquisition<Session> sessionAcquisition = this.acquireSessionRead()) {
-            ChannelPipeline pipeline = this.channel.pipeline();
-            for (String handlerName : HANDLER_SET) {
-                ChannelHandler handler = pipeline.get(handlerName);
-                if (handler == null) continue;
-                pipeline.remove(handler);
-            }
-
-            Session session = sessionAcquisition.get();
-            ProtocolState protocolState = session.protocolState();
-
-            pipeline.addFirst(PACKET_ENCODER, new PacketEncoder(this, protocolState));
-            pipeline.addFirst(PACKET_DECODER, new PacketDecoder(this, protocolState));
-
-            pipeline.addBefore(PACKET_DECODER, PACKET_LENGTH_DECODER, new PacketLengthDecoder(this));
-            pipeline.addBefore(PACKET_ENCODER, PACKET_LENGTH_ENCODER, new PacketLengthEncoder(this));
-
-            pipeline.addAfter(PACKET_DECODER, PACKET_READER, new PacketReader(this));
-
-            if (compressionThreshold < 0) return;
-            pipeline.addBefore(PACKET_DECODER, PACKET_DECOMPRESSOR, new PacketDecompressor(this));
-            pipeline.addBefore(PACKET_ENCODER, PACKET_COMPRESSOR, new PacketCompressor(this, compressionThreshold));
+        ChannelPipeline pipeline = this.channel.pipeline();
+        for (String handlerName : HANDLER_SET) {
+            ChannelHandler handler = pipeline.get(handlerName);
+            if (handler == null) continue;
+            pipeline.remove(handler);
         }
+
+        pipeline.addFirst(PACKET_ENCODER, new RawPacketEncoder(this));
+        pipeline.addFirst(PACKET_DECODER, new RawPacketDecoder(this));
+
+        pipeline.addBefore(PACKET_DECODER, PACKET_LENGTH_DECODER, new PacketLengthDecoder(this));
+        pipeline.addBefore(PACKET_ENCODER, PACKET_LENGTH_ENCODER, new PacketLengthEncoder(this));
+
+        pipeline.addAfter(PACKET_DECODER, PACKET_READER, new RawPacketHandler(this));
+
+        if (compressionThreshold < 0) return;
+        pipeline.addBefore(PACKET_DECODER, PACKET_DECOMPRESSOR, new PacketDecompressor(this));
+        pipeline.addBefore(PACKET_ENCODER, PACKET_COMPRESSOR, new PacketCompressor(this, compressionThreshold));
+    }
+
+    private static @NonNull RawPacket encode(@NonNull ServerPacket packet, @NonNull ProtocolState state) {
+        Class<? extends ServerPacket> packetClass = packet.getClass();
+        RegistryPacketSpecification<?> specification = ServerPacketRegistry.specificationFor(state, packetClass);
+
+        if (specification == null) {
+            String name = packetClass.getSimpleName();
+            throw new IllegalArgumentException(String.format("Could not find a packet codec for packet %s", name));
+        }
+
+        ByteBuf buf = Unpooled.buffer();
+        try {
+            write(specification, buf, packet); // Write the packet body with java generics
+            return new RawPacket(specification.packetIdentifier(), NetworkUtil.readRemainingBytes(buf));
+        } finally {
+            buf.release();
+        }
+    }
+
+    private static <P extends ServerPacket> void write(@NonNull RegistryPacketSpecification<P> specification,
+                                                       @NonNull ByteBuf buf, @NonNull ServerPacket packet) {
+        specification.packetWriter().write(buf, specification.packetClass().cast(packet));
     }
 
     /**
@@ -424,25 +465,15 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
 
         @Override
         public void set(@NotNull Session value) {
-            // There is no need for a nullability check, since the method will do that for us
+            // There is no need for nullability, owner checks and lock ensuring, since the method will do that for us
             this.originalAcquisition.set(value);
-
-            // TODO: Do comments about runChecks
-
-            SocketPlayerConnection connection = value.connection();
-            ChannelPipeline pipeline = connection.channel.pipeline();
 
             /* Sessions are hard to implement in terms of thread-safety and avoiding race-conditions. A write
                acquisition is needed to be created when a packet informing that the session has been finished is sent.
                We need to handle an acknowledgment to that then, se we cannot rely on the same session acquirable,
-               that is why channel handlers use their own session and protocol state acquirable instances. Due to that,
-               we need to update these fields when the session is set. It is done in an event loop to avoid race
-               conditions on handlers. If a handler implements session update handler, we call the function
-               and the handler is expected to update their session-related acquirable instances with the new state.*/
-            pipeline.names().forEach(name -> {
-                if (pipeline.get(name) instanceof SessionUpdateHandler updateHandler)
-                    updateHandler.handleSessionUpdate(value);
-            }); // TODO: Execute in an event loop?
+               that is why sometimes another session fields are made. Due to that, we need to update these fields when
+               the session is set. */
+            value.connection().clientPacketReader().updateSession(value);
         }
 
         @Override
