@@ -54,6 +54,10 @@ public final class StatusSessionTask implements SessionTask {
      */
     public StatusSessionTask(@NonNull SocketPlayerConnection connection) {
         this.connection = NullabilityUtil.requireNonNull(connection, "connection");
+    }
+
+    @Override
+    public void start() {
         Thread.ofVirtual()
                 .name(VIRTUAL_THREAD_NAME)
                 .uncaughtExceptionHandler(connection)
@@ -116,11 +120,10 @@ public final class StatusSessionTask implements SessionTask {
             this.pingRequestFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
         } catch (ExecutionException exception) {
             throw new RuntimeException("An error occurred during a status session task", exception);
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt(); // Restore the interrupted status
-            throw new RuntimeException("The status session task has been interrupted", exception);
         } catch (TimeoutException exception) {
             throw new RuntimeException("The status packets have not been sent on time", exception);
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt(); // Restore the interrupted status
         } catch (CancellationException exception) {
             // Do nothing, the task has been cancelled due to disconnection
         }

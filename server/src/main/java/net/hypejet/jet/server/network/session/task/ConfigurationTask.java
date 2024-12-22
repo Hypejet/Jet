@@ -73,10 +73,13 @@ public final class ConfigurationTask implements SessionTask, KeepAliveResponseHa
     public ConfigurationTask(@NonNull JetPlayer player) {
         this.player = NullabilityUtil.requireNonNull(player, "player");
         this.keepAliveHandler = new KeepAliveHandler(player);
+    }
 
+    @Override
+    public void start() {
         Thread.ofVirtual()
-                .name(String.format("Configuration session task - %s", player.username()))
-                .uncaughtExceptionHandler(player.connection())
+                .name(String.format("Configuration session task - %s", this.player.username()))
+                .uncaughtExceptionHandler(this.player.connection())
                 .start(this::runVirtualThreadTask);
     }
 
@@ -192,19 +195,15 @@ public final class ConfigurationTask implements SessionTask, KeepAliveResponseHa
                 connection.sendPacket(new ServerFinishConfigurationPacket());
                 this.acknowledgeFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
 
-                Session playSession = new Session(ProtocolState.PLAY, connection);
-                sessionAcquisition.set(playSession);
-                playSession.startSession(new PlayTask(this.player));
-
+                sessionAcquisition.set(new Session(ProtocolState.PLAY, connection, new PlayTask(this.player)));
                 connection.clientPacketReader().pausePacketReading();
             }
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt(); // Restore the interrupted status
-            throw new RuntimeException("The configuration task has been interrupted", exception);
         } catch (ExecutionException exception) {
             throw new RuntimeException("An error occurred during a login task", exception);
         } catch (TimeoutException exception) {
             throw new RuntimeException("The configuration task has timed out", exception);
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt(); // Restore the interrupted status
         } catch (CancellationException exception) {
             // Do nothing, the task has been cancelled due to disconnection
         }

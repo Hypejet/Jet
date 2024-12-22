@@ -22,8 +22,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ExecutionException;
-
 /**
  * Represents an implementation of {@linkplain MinecraftServer Minecraft server}.
  *
@@ -133,7 +131,7 @@ public final class JetMinecraftServer implements MinecraftServer {
         try (WriteCollectionAcquisition<JetPlayer, ?> acquisition = this.players.acquireWrite()) {
             /* A call outside event loop is safe in this case, when a player gets disconnected the unregister method
                is going to be called, and that method also created a write acquisition. */
-            if (!player.connection().isClosed())
+            if (player.connection().isActive())
                 acquisition.add(player);
         }
     }

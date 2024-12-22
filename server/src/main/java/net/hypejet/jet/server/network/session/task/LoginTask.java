@@ -44,11 +44,15 @@ public final class LoginTask implements SessionTask, LoginManager {
 
     private final SocketPlayerConnection connection;
 
-    private final CompletableFuture<Unit> loginRequestFuture = new CompletableFuture<>();
+    private final CompletableFuture<ClientLoginRequestLoginPacket> requestFuture = new CompletableFuture<>();
+
     private final CompletableFuture<Unit> pluginFuture = new CompletableFuture<>();
     private final CompletableFuture<Unit> acknowledgeFuture = new CompletableFuture<>();
 
     private final BooleanAcquirable finished = new BooleanAcquirable();
+
+    private final int clientProtocolVersion;
+    private final boolean transferring;
 
     /**
      * Constructs the {@linkplain LoginTask login task}.
@@ -60,8 +64,13 @@ public final class LoginTask implements SessionTask, LoginManager {
      */
     public LoginTask(@NonNull SocketPlayerConnection connection, int clientProtocolVersion, boolean transferring) {
         this.connection = NullabilityUtil.requireNonNull(connection, "connection");
+        this.clientProtocolVersion = clientProtocolVersion;
+        this.transferring = transferring;
+    }
 
-        if (transferring) {
+    @Override
+    public void start() {
+        if (this.transferring) {
             JetServerConfiguration configuration = this.connection.server().configuration();
             if (!configuration.areTransfersAllowed()) {
                 this.connection.disconnect(configuration.transfersNotAllowedMessage());
@@ -70,7 +79,7 @@ public final class LoginTask implements SessionTask, LoginManager {
         }
 
         JetMinecraftServer server = this.connection.server();
-        if (clientProtocolVersion != server.protocolVersion()) {
+        if (this.clientProtocolVersion != server.protocolVersion()) {
             // TODO: Placeholders?
             this.connection.disconnect(server.configuration().unsupportedVersionMessage());
             return;
@@ -86,7 +95,7 @@ public final class LoginTask implements SessionTask, LoginManager {
     public void handleDisconnection() {
         this.pluginFuture.cancel(false);
         this.acknowledgeFuture.cancel(false);
-        this.loginRequestFuture.cancel(false);
+        this.requestFuture.cancel(false);
     }
 
     @Override
@@ -120,12 +129,9 @@ public final class LoginTask implements SessionTask, LoginManager {
      * @throws IllegalArgumentException if the client has already sent a login request
      */
     public void handleLoginRequest(@NonNull ClientLoginRequestLoginPacket packet) {
-        if (this.loginRequestFuture.isDone())
+        if (this.requestFuture.isDone())
             throw new IllegalArgumentException("The login request has been already handled");
-        this.loginRequestFuture.complete(Unit.INSTANCE);
-
-        LoginStartEvent loginStartEvent = new LoginStartEvent(packet.username(), packet.uniqueId(), this);
-        this.connection.server().eventNode().call(loginStartEvent);
+        this.requestFuture.complete(packet);
     }
 
     /**
@@ -144,32 +150,38 @@ public final class LoginTask implements SessionTask, LoginManager {
     }
 
     /**
-     * Awaits for when the client sends a login request.
+     * Awaits for a client login request and setups a compression for {@linkplain SocketPlayerConnection a socket
+     * player connection} of this {@linkplain LoginTask login session task}.
      *
-     * @param timeout a maximum time to wait
-     * @param timeUnit a unit of the maximum time to wait
+     * @throws InterruptedException if the current thread has been interrupted during waiting
      * @since 1.0
      */
-    public void awaitForLoginRequest(long timeout, @NonNull TimeUnit timeUnit) {
+    public void setupCompression() throws InterruptedException {
         try {
-            this.loginRequestFuture.get(timeout, timeUnit);
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt(); // Restore the interrupted status
-        } catch (TimeoutException exception) {
-            throw new RuntimeException("The client has not sent the login request on time", exception);
-        } catch (ExecutionException exception) {
-            throw new RuntimeException("An error occurred during awaiting for the login request", exception);
-        } catch (CancellationException exception) {
-            // Do nothing, the task has been cancelled due to disconnection
+            this.requestFuture.get(TIME_OUT_TIME, TIME_OUT_UNIT);
+            int compressionThreshold = this.connection.server().configuration().compressionThreshold();
+            if (compressionThreshold < 0) return; // The compression is disabled
+            this.connection.setCompressionThreshold(compressionThreshold);
+        } catch (ExecutionException | TimeoutException | CancellationException exception) {
+            // The exception has been already handled by the login session task thread
         }
     }
 
     private void runVirtualThreadTask() {
         try {
             try {
+                ClientLoginRequestLoginPacket requestPacket = this.requestFuture.get(TIME_OUT_TIME, TIME_OUT_UNIT);
+                this.connection.server().eventNode().call(new LoginStartEvent(
+                        requestPacket.username(), requestPacket.uniqueId(), this
+                ));
+            } catch (TimeoutException exception) {
+                throw new RuntimeException("The login request has not been sent by a client on time", exception);
+            }
+
+            try {
                 this.pluginFuture.get(TIME_OUT_TIME, TIME_OUT_UNIT);
             } catch (TimeoutException exception) {
-                throw new RuntimeException("The login session has been not finished on time", exception);
+                throw new RuntimeException("The login session has not been finished on time", exception);
             }
 
             try (WriteObjectAcquisition<Session> sessionAcquisition = this.connection.acquireSessionWrite()) {
@@ -179,19 +191,20 @@ public final class LoginTask implements SessionTask, LoginManager {
 
                 this.acknowledgeFuture.get(TIME_OUT_TIME, TIME_OUT_UNIT);
 
-                Session configurationSession = new Session(ProtocolState.CONFIGURATION, this.connection);
-                sessionAcquisition.set(configurationSession);
-                configurationSession.startSession(new ConfigurationTask(player));
+                sessionAcquisition.set(new Session(ProtocolState.CONFIGURATION, this.connection,
+                        new ConfigurationTask(player)));
 
                 this.connection.clientPacketReader().resumePacketReading();
             } catch (TimeoutException exception) {
-                throw new RuntimeException("The login session finish has been not acknowledged on time", exception);
+                throw new RuntimeException(
+                        "The login session finish has not been acknowledged by client on time",
+                        exception
+                );
             }
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt(); // Restore the interrupted status
-            throw new RuntimeException("The login task has been interrupted", exception);
         } catch (ExecutionException exception) {
             throw new RuntimeException("An error occurred during a login task", exception);
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt(); // Restore the interrupted status
         } catch (CancellationException exception) {
             // Do nothing, the task has been cancelled due to disconnection
         }

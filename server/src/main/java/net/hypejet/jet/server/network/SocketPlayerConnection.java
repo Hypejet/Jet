@@ -108,7 +108,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
         // We update handlers after the instantiation and such an operation require to be executed in an event loop
         this.ensureInEventLoop();
 
-        Session initialSession = new Session(ProtocolState.HANDSHAKE, this);
+        Session initialSession = new Session(ProtocolState.HANDSHAKE, this, new HandshakeTask(this));
         this.session = new ObjectAcquirable<>(initialSession);
 
         /* We need to update the handlers and initialize the client packet reader after the initial session is set,
@@ -117,7 +117,8 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
         this.updateHandlers(-1);
         this.clientPacketReader = new ClientPacketReader(this, initialSession);
 
-        initialSession.startSession(new HandshakeTask(this));
+        // During the initialization, the session task must be started manually
+        initialSession.sessionTask().start();
     }
 
     @Override
@@ -286,15 +287,15 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     }
 
     /**
-     * Gets whether the connection has been closed.
+     * Gets whether the connection is active.
      *
      * <p>Note that calling this method outside event loop may lead to race conditions.</p>
      *
-     * @return {@code true} if the connection has been closed, {@code false} otherwise
+     * @return {@code true} if the connection is active, {@code false} otherwise
      * @since 1.0
      */
-    public boolean isClosed() {
-        return !this.channel.isActive();
+    public boolean isActive() {
+        return this.channel.isActive();
     }
 
     /**
@@ -465,6 +466,11 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
 
         @Override
         public void set(@NotNull Session value) {
+            if (this.originalAcquisition.get() == value) {
+                throw new IllegalArgumentException("A session cannot be set to the same value that it is currently" +
+                        " bound to");
+            }
+
             // There is no need for nullability, owner checks and lock ensuring, since the method will do that for us
             this.originalAcquisition.set(value);
 
@@ -474,6 +480,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
                that is why sometimes another session fields are made. Due to that, we need to update these fields when
                the session is set. */
             value.connection().clientPacketReader().updateSession(value);
+            value.sessionTask().start();
         }
 
         @Override

@@ -32,6 +32,10 @@ public final class PlayTask implements SessionTask, RegistryTagUpdateFunction {
      */
     public PlayTask(@NonNull JetPlayer player) {
         this.player = NullabilityUtil.requireNonNull(player, "player");
+    }
+
+    @Override
+    public void start() {
         this.player.disconnect(NOT_IMPLEMENTED_DISCONNECTION_MESSAGE);
     }
 

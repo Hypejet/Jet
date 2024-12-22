@@ -119,7 +119,7 @@ public final class ClientPacketReader implements NetworkDisconnectionHandler {
     }
 
     private void readPackets() {
-        while (!this.connection.isClosed()) {
+        while (this.connection.isActive()) {
             try (WriteBooleanAcquisition acquisition = this.paused.acquireWrite()) {
                 if (acquisition.get()) {
                     this.resumeCondition.awaitUninterruptibly();

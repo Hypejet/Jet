@@ -42,16 +42,19 @@ public final class HandshakeTask implements SessionTask {
     public HandshakeTask(@NonNull SocketPlayerConnection connection) {
         // We do not care about the acquisition if it is not null, it is up to user not to provide null values
         this.connection = NullabilityUtil.requireNonNull(connection, "connection");
-
-        Thread.ofVirtual()
-                .name("Handshake session task thread")
-                .uncaughtExceptionHandler(connection)
-                .start(this::runVirtualThreadTask);
     }
 
     @Override
     public void handleDisconnection() {
         this.handshakeFuture.cancel(false);
+    }
+
+    @Override
+    public void start() {
+        Thread.ofVirtual()
+                .name("Handshake session task thread")
+                .uncaughtExceptionHandler(this.connection)
+                .start(this::runVirtualThreadTask);
     }
 
     /**
@@ -75,16 +78,13 @@ public final class HandshakeTask implements SessionTask {
                 case LOGIN, TRANSFER -> ProtocolState.LOGIN;
             };
 
-            Session session = new Session(nextProtocolState, this.connection);
-            sessionAcquisition.set(session);
-
             SessionTask nextSessionTask = switch (packet.intent()) {
                 case STATUS -> new StatusSessionTask(this.connection);
                 case LOGIN -> new LoginTask(this.connection, packet.protocolVersion(), false);
                 case TRANSFER -> new LoginTask(this.connection, packet.protocolVersion(), true);
             };
 
-            session.startSession(nextSessionTask);
+            sessionAcquisition.set(new Session(nextProtocolState, this.connection, nextSessionTask));
             this.connection.clientPacketReader().resumePacketReading();
 
             /* Set the compression threshold here to ensure that there will be no race conditions. Technically,
@@ -92,22 +92,16 @@ public final class HandshakeTask implements SessionTask {
                not requested by a server should come, except of the "login request". Modded clients are obliged
                to keep this approach. Since plugins are allowed to send any request packet during login without
                waiting for a response, the most safe place to enable the compression is here, because the session
-               acquisition is still locked since handshake and no login packet was sent by any plugin. */
-            if (nextSessionTask instanceof LoginTask loginTask) {
-                loginTask.awaitForLoginRequest(TIME_OUT_DURATION, TIME_OUT_UNIT);
-
-                int compressionThreshold = this.connection.server().configuration().compressionThreshold();
-                if (compressionThreshold < 0) return; // The compression is disabled
-
-                this.connection.setCompressionThreshold(compressionThreshold);
-            }
+               acquisition is still locked since handshake, no login packet was sent by any plugin and we are going
+               to await for the login request. */
+            if (nextSessionTask instanceof LoginTask loginTask)
+                loginTask.setupCompression();
         } catch (ExecutionException exception) {
             throw new RuntimeException("An error occurred during a handshaking task", exception);
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt(); // Restore the interrupted status
-            throw new RuntimeException("The handshaking task has been interrupted", exception);
         } catch (TimeoutException exception) {
             throw new RuntimeException("The handshake packet has not been sent on time", exception);
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt(); // Restore the interrupted status
         } catch (CancellationException exception) {
             // Do nothing, the task has been cancelled due to disconnection
         }
