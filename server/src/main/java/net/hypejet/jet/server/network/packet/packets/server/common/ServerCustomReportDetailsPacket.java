@@ -8,12 +8,11 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Represents {@linkplain ServerPacket a server packet} that adds details that are included in crash reports
- * on the client.
+ * Represents {@linkplain ServerPacket a server packet} that adds details that are included in crash reports on the
+ * client.
  *
  * @param details the details
  * @since 1.0
- * @author Codestech
  * @see Details
  * @see ServerPacket
  */

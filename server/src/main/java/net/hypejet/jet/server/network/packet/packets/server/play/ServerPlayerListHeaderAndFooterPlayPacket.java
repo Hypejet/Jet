@@ -9,10 +9,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Represents {@linkplain ServerPacket a server packet}, which is sent to change text of a header and footer
  * of a player list on a client.
  *
- * @param headerText the text to display on the header of the player list
- * @param footerText the text to display on the footer of the player list
+ * @param headerText the text to display as the header of the player list
+ * @param footerText the text to display as the footer of the player list
  * @since 1.0
- * @author Codestech
  */
 public record ServerPlayerListHeaderAndFooterPlayPacket(@NonNull Component headerText, @NonNull Component footerText)
         implements ServerPacket {
@@ -20,8 +19,8 @@ public record ServerPlayerListHeaderAndFooterPlayPacket(@NonNull Component heade
      * Constructs the {@linkplain ServerPlayerListHeaderAndFooterPlayPacket server play list header and footer
      * play packet}.
      *
-     * @param headerText the text to display on the header of the player list
-     * @param footerText the text to display on the footer of the player list
+     * @param headerText the text to display as the header of the player list
+     * @param footerText the text to display as the footer of the player list
      * @since 1.0
      */
     public ServerPlayerListHeaderAndFooterPlayPacket {

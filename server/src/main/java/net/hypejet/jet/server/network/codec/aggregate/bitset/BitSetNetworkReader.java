@@ -7,11 +7,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.BitSet;
 
 /**
- * Represents {@linkplain AggregateNetworkReader an aggregate network reader}, which
- * reads {@linkplain BitSet a bitset}.
+ * Represents {@linkplain AggregateNetworkReader an aggregate network reader}, which reads
+ * {@linkplain BitSet a bitset}.
  *
  * @since 1.0
- * @author Codestech
  * @see BitSet
  * @see AggregateNetworkReader
  */

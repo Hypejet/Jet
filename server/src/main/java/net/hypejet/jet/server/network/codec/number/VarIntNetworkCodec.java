@@ -8,15 +8,14 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Represents {@linkplain NetworkCodec a network codec}, which reads and writes a variable-length integer.
  *
  * @since 1.0
- * @author Codestech
  * @see NetworkCodec
  */
 public final class VarIntNetworkCodec implements NetworkCodec<Integer> {
 
     private static final byte SEGMENT_BITS = 0x7F;
-    private static final int CONTINUE_BIT = 0x80;
+    private static final short CONTINUE_BIT = 0x80;
 
-    private static final int MAX_LENGTH = 32;
+    private static final byte MAX_LENGTH = 32;
 
     /**
      * An instance of the {@linkplain VarIntNetworkCodec variable-length network codec}.

@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import net.hypejet.concurrency.collection.CollectionAcquisition;
-import net.hypejet.concurrency.map.WriteMapAcquisition;
+import net.hypejet.concurrency.map.MapAcquisition;
 import net.hypejet.concurrency.map.hashmap.HashMapAcquirable;
 import net.hypejet.concurrency.object.ObjectAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
@@ -188,13 +188,14 @@ public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
     public void updateTags(@NonNull RegistryEntry<V> entry, @NonNull UnaryOperator<Collection<Key>> tagUnaryOperator) {
         JetRegistryEntry<V> validatedEntry = validateEntry(entry);
 
-        try (WriteMapAcquisition<JetRegistryEntry<V>, Tags, ?> tagMapAcquisition = this.tags.acquireWrite()) {
+        try (MapAcquisition<JetRegistryEntry<V>, Tags, ?> tagMapAcquisition = this.tags.acquireWrite()) {
             Map<JetRegistryEntry<V>, Tags> tagMap = tagMapAcquisition.map();
-            Tags tags = tagMap.get(validatedEntry);
 
+            Tags tags = tagMap.get(validatedEntry);
             if (tags == null)
                 throw new IllegalArgumentException("Could not find tags for a registry entry specified");
-            tagMapAcquisition.put(validatedEntry, new Tags(tagUnaryOperator.apply(tags.tags())));
+
+            tagMap.put(validatedEntry, new Tags(tagUnaryOperator.apply(tags.tags())));
 
             TagRegistry tagRegistry = this.createTagRegistry(tagMap);
             Set<TagRegistry> tagRegistrySet = Set.of(tagRegistry);
@@ -222,6 +223,19 @@ public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
      */
     public @NonNull ObjectAcquisition<TagRegistry> createTagRegistry() {
         return new MapToObjectMappedAcquisition<>(this.tags.acquireRead(), this::createTagRegistry);
+    }
+
+    private @NonNull TagRegistry createTagRegistry(@NonNull Map<JetRegistryEntry<V>, Tags> tags) {
+        Map<Key, TagBuilder> tagMap = new HashMap<>();
+        for (Map.Entry<JetRegistryEntry<V>, Tags> mapEntry : tags.entrySet()) {
+            JetRegistryEntry<V> entry = mapEntry.getKey();
+            for (Key tag : mapEntry.getValue().tags())
+                tagMap.computeIfAbsent(tag, ignoredTagKey -> new TagBuilder()).add(this.identifierOf(entry));
+        }
+
+        Collection<ServerUpdateTagsPacket.Tag> packetTags = new HashSet<>();
+        tagMap.forEach((key, builder) -> packetTags.add(builder.toPacketTag(key)));
+        return new TagRegistry(this.registryKey, Set.copyOf(packetTags));
     }
 
     /**
@@ -301,19 +315,6 @@ public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
         if (!(entry instanceof JetRegistryEntry<V> castEntry))
             throw new IllegalArgumentException("The entry specified is not a valid registry entry");
         return castEntry;
-    }
-
-    private @NonNull TagRegistry createTagRegistry(@NonNull Map<JetRegistryEntry<V>, Tags> tags) {
-        Map<Key, TagBuilder> tagMap = new HashMap<>();
-        for (Map.Entry<JetRegistryEntry<V>, Tags> mapEntry : tags.entrySet()) {
-            JetRegistryEntry<V> entry = mapEntry.getKey();
-            for (Key tag : mapEntry.getValue().tags())
-                tagMap.computeIfAbsent(tag, ignoredTagKey -> new TagBuilder()).add(this.identifierOf(entry));
-        }
-
-        Collection<ServerUpdateTagsPacket.Tag> packetTags = new HashSet<>();
-        tagMap.forEach((key, builder) -> packetTags.add(builder.toPacketTag(key)));
-        return new TagRegistry(this.registryKey, Set.copyOf(packetTags));
     }
 
     /**

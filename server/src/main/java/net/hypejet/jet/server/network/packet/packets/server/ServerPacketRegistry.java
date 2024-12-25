@@ -9,6 +9,38 @@ import net.hypejet.jet.data.codecs.JetDataJson;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.data.model.server.registry.registries.registry.DataRegistryEntry;
 import net.hypejet.jet.server.network.ProtocolState;
+import net.hypejet.jet.server.network.codec.NetworkWriter;
+import net.hypejet.jet.server.network.codec.packet.server.common.ServerAddResourcePackPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.common.ServerCookieRequestPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.common.ServerCustomLinksPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.common.ServerCustomReportDetailsPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.common.ServerDisconnectPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.common.ServerKeepAlivePacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.common.ServerPingPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.common.ServerPingResponsePacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.common.ServerPluginMessagePacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.common.ServerRemoveResourcePackPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.common.ServerStoreCookiePacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.common.ServerTransferPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.common.ServerUpdateTagsPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.configuration.ServerFeatureFlagsConfigurationPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.configuration.ServerKnownPacksConfigurationPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.configuration.ServerRegistryDataConfigurationPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.login.ServerDisconnectLoginPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.login.ServerEnableCompressionLoginPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.login.ServerEncryptionRequestLoginPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.login.ServerLoginSuccessLoginPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.login.ServerPluginMessageRequestLoginPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerActionBarPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerCenterChunkPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerCommandSuggestionsResponsePlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerDeclareCommandsPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerGameEventPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerJoinGamePlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerPlayerListHeaderAndFooterPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizePositionPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerSystemMessagePlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.status.ServerListResponseStatusPacketWriter;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerAddResourcePackPacket;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerCookieRequestPacket;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerCustomLinksPacket;
@@ -16,6 +48,7 @@ import net.hypejet.jet.server.network.packet.packets.server.common.ServerCustomR
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerDisconnectPacket;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerKeepAlivePacket;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerPingPacket;
+import net.hypejet.jet.server.network.packet.packets.server.common.ServerPingResponsePacket;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerPluginMessagePacket;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerRemoveResourcePackPacket;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerStoreCookiePacket;
@@ -40,39 +73,6 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerPlayerLis
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSystemMessagePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.status.ServerListResponseStatusPacket;
-import net.hypejet.jet.server.network.packet.packets.server.common.ServerPingResponsePacket;
-import net.hypejet.jet.server.network.codec.NetworkWriter;
-import net.hypejet.jet.server.network.codec.packet.server.common.ServerAddResourcePackPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.common.ServerCookieRequestPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.common.ServerCustomLinksPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.common.ServerCustomReportDetailsPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.common.ServerDisconnectPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.common.ServerKeepAlivePacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.common.ServerPingPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.common.ServerPluginMessagePacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.common.ServerRemoveResourcePackPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.common.ServerStoreCookiePacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.common.ServerTransferPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.common.ServerUpdateTagsPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.configuration.ServerFeatureFlagsConfigurationPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.configuration.ServerKnownPacksConfigurationPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.configuration.ServerRegistryDataConfigurationPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.login.ServerDisconnectLoginPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.login.ServerEnableCompressionLoginPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.login.ServerEncryptionRequestLoginPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.login.ServerLoginSuccessLoginPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.play.ServerPlayerListHeaderAndFooterPlayPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.login.ServerPluginMessageRequestLoginPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.play.ServerActionBarPlayPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.play.ServerCenterChunkPlayPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.play.ServerCommandSuggestionsResponsePlayPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.play.ServerDeclareCommandsPlayPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.play.ServerGameEventPlayPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.play.ServerJoinGamePlayPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizePositionPlayPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.play.ServerSystemMessagePlayPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.status.ServerListResponseStatusPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.common.ServerPingResponsePacketWriter;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -90,7 +90,6 @@ import java.util.Set;
  * packets}.
  *
  * @since 1.0
- * @author Codestech
  * @see ServerPacket
  * @see NetworkWriter
  */
@@ -101,73 +100,67 @@ public final class ServerPacketRegistry {
     static {
         Map<ProtocolState, ProtocolStateSpecification> specifications = new EnumMap<>(ProtocolState.class);
 
-        ServerCookieRequestPacketWriter cookieRequestWriter = new ServerCookieRequestPacketWriter();
-        ServerCustomLinksPacketWriter customLinksWriter = new ServerCustomLinksPacketWriter();
-        ServerDisconnectPacketWriter disconnectWriter = new ServerDisconnectPacketWriter();
-        ServerKeepAlivePacketWriter keepAliveWriter = new ServerKeepAlivePacketWriter();
-        ServerPingPacketWriter pingWriter = new ServerPingPacketWriter();
-        ServerPluginMessagePacketWriter pluginMessageWriter = new ServerPluginMessagePacketWriter();
-        ServerTransferPacketWriter transferWriter = new ServerTransferPacketWriter();
-        ServerStoreCookiePacketWriter storeCookieWriter = new ServerStoreCookiePacketWriter();
-        ServerUpdateTagsPacketWriter updateTagsWriter = new ServerUpdateTagsPacketWriter();
-        ServerCustomReportDetailsPacketWriter customReportDetailsWriter = new ServerCustomReportDetailsPacketWriter();
-        ServerAddResourcePackPacketWriter addResourcePackWriter = new ServerAddResourcePackPacketWriter();
-        ServerRemoveResourcePackPacketWriter removeResourcePackWriter = new ServerRemoveResourcePackPacketWriter();
-        ServerPingResponsePacketWriter pingResponseWriter = new ServerPingResponsePacketWriter();
-
         specifications.put(
                 ProtocolState.STATUS,
                 new ProtocolStateSpecification.Builder(ResourceFileNames.SERVER_STATUS_PACKET_GENERATOR)
-                        .add(ServerStatusPackets.PONG_RESPONSE, ServerPingResponsePacket.class, pingResponseWriter)
+                        .add(ServerStatusPackets.PONG_RESPONSE, ServerPingResponsePacket.class,
+                                ServerPingResponsePacketWriter.INSTANCE)
                         .add(ServerStatusPackets.STATUS_RESPONSE, ServerListResponseStatusPacket.class,
-                                new ServerListResponseStatusPacketWriter())
+                                ServerListResponseStatusPacketWriter.INSTANCE)
                         .build()
         );
 
         specifications.put(
                 ProtocolState.LOGIN,
                 new ProtocolStateSpecification.Builder(ResourceFileNames.SERVER_LOGIN_PACKET_GENERATOR)
-                        .add(ServerLoginPackets.COOKIE_REQUEST, ServerCookieRequestPacket.class, cookieRequestWriter)
+                        .add(ServerLoginPackets.COOKIE_REQUEST, ServerCookieRequestPacket.class,
+                                ServerCookieRequestPacketWriter.INSTANCE)
                         .add(ServerLoginPackets.LOGIN_DISCONNECT, ServerDisconnectPacket.class,
-                                new ServerDisconnectLoginPacketWriter())
+                                ServerDisconnectLoginPacketWriter.INSTANCE)
                         .add(ServerLoginPackets.HELLO, ServerEncryptionRequestLoginPacket.class,
-                                new ServerEncryptionRequestLoginPacketWriter())
+                                ServerEncryptionRequestLoginPacketWriter.INSTANCE)
                         .add(ServerLoginPackets.LOGIN_FINISHED, ServerLoginSuccessLoginPacket.class,
-                                new ServerLoginSuccessLoginPacketWriter())
+                                ServerLoginSuccessLoginPacketWriter.INSTANCE)
                         .add(ServerLoginPackets.LOGIN_COMPRESSION, ServerEnableCompressionLoginPacket.class,
-                                new ServerEnableCompressionLoginPacketWriter())
+                                ServerEnableCompressionLoginPacketWriter.INSTANCE)
                         .add(ServerLoginPackets.CUSTOM_QUERY, ServerPluginMessageRequestLoginPacket.class,
-                                new ServerPluginMessageRequestLoginPacketWriter())
+                                ServerPluginMessageRequestLoginPacketWriter.INSTANCE)
                         .build()
         );
 
         specifications.put(
                 ProtocolState.CONFIGURATION,
                 new ProtocolStateSpecification.Builder(ResourceFileNames.SERVER_CONFIGURATION_PACKET_GENERATOR)
-                        .add(ServerConfigurationPackets.SERVER_LINKS, ServerCustomLinksPacket.class, customLinksWriter)
-                        .add(ServerConfigurationPackets.DISCONNECT, ServerDisconnectPacket.class, disconnectWriter)
-                        .add(ServerConfigurationPackets.KEEP_ALIVE, ServerKeepAlivePacket.class, keepAliveWriter)
-                        .add(ServerConfigurationPackets.PING, ServerPingPacket.class, pingWriter)
-                        .add(ServerConfigurationPackets.TRANSFER, ServerTransferPacket.class, transferWriter)
-                        .add(ServerConfigurationPackets.STORE_COOKIE, ServerStoreCookiePacket.class, storeCookieWriter)
-                        .add(ServerConfigurationPackets.UPDATE_TAGS, ServerUpdateTagsPacket.class, updateTagsWriter)
+                        .add(ServerConfigurationPackets.PING, ServerPingPacket.class, ServerPingPacketWriter.INSTANCE)
+                        .add(ServerConfigurationPackets.SERVER_LINKS, ServerCustomLinksPacket.class,
+                                ServerCustomLinksPacketWriter.INSTANCE)
+                        .add(ServerConfigurationPackets.DISCONNECT, ServerDisconnectPacket.class,
+                                ServerDisconnectPacketWriter.INSTANCE)
+                        .add(ServerConfigurationPackets.KEEP_ALIVE, ServerKeepAlivePacket.class,
+                                ServerKeepAlivePacketWriter.INSTANCE)
+                        .add(ServerConfigurationPackets.TRANSFER, ServerTransferPacket.class,
+                                ServerTransferPacketWriter.INSTANCE)
+                        .add(ServerConfigurationPackets.STORE_COOKIE, ServerStoreCookiePacket.class,
+                                ServerStoreCookiePacketWriter.INSTANCE)
+                        .add(ServerConfigurationPackets.UPDATE_TAGS, ServerUpdateTagsPacket.class,
+                                ServerUpdateTagsPacketWriter.INSTANCE)
                         .add(ServerConfigurationPackets.COOKIE_REQUEST, ServerCookieRequestPacket.class,
-                                cookieRequestWriter)
+                                ServerCookieRequestPacketWriter.INSTANCE)
                         .add(ServerConfigurationPackets.CUSTOM_PAYLOAD, ServerPluginMessagePacket.class,
-                                pluginMessageWriter)
+                                ServerPluginMessagePacketWriter.INSTANCE)
                         .add(ServerConfigurationPackets.CUSTOM_REPORT_DETAILS, ServerCustomReportDetailsPacket.class,
-                                customReportDetailsWriter)
+                                ServerCustomReportDetailsPacketWriter.INSTANCE)
                         .add(ServerConfigurationPackets.RESOURCE_PACK_PUSH, ServerAddResourcePackPacket.class,
-                                addResourcePackWriter)
+                                ServerAddResourcePackPacketWriter.INSTANCE)
                         .add(ServerConfigurationPackets.RESOURCE_PACK_POP, ServerRemoveResourcePackPacket.class,
-                                removeResourcePackWriter)
+                                ServerRemoveResourcePackPacketWriter.INSTANCE)
                         .add(ServerConfigurationPackets.SELECT_KNOWN_PACKS, ServerKnownPacksConfigurationPacket.class,
-                                new ServerKnownPacksConfigurationPacketWriter())
+                                ServerKnownPacksConfigurationPacketWriter.INSTANCE)
                         .add(ServerConfigurationPackets.REGISTRY_DATA, ServerRegistryDataConfigurationPacket.class,
-                                new ServerRegistryDataConfigurationPacketWriter())
+                                ServerRegistryDataConfigurationPacketWriter.INSTANCE)
                         .add(ServerConfigurationPackets.UPDATE_ENABLED_FEATURES,
                                 ServerFeatureFlagsConfigurationPacket.class,
-                                new ServerFeatureFlagsConfigurationPacketWriter())
+                                ServerFeatureFlagsConfigurationPacketWriter.INSTANCE)
                         .add(ServerConfigurationPackets.FINISH_CONFIGURATION, ServerFinishConfigurationPacket.class,
                                 (buf, object) -> {})
                         .add(ServerConfigurationPackets.RESET_CHAT, ServerResetChatConfigurationPacket.class,
@@ -178,40 +171,49 @@ public final class ServerPacketRegistry {
         specifications.put(
                 ProtocolState.PLAY,
                 new ProtocolStateSpecification.Builder(ResourceFileNames.SERVER_PLAY_PACKET_GENERATOR)
-                        .add(ServerPlayPackets.COOKIE_REQUEST, ServerCookieRequestPacket.class, cookieRequestWriter)
-                        .add(ServerPlayPackets.KEEP_ALIVE, ServerKeepAlivePacket.class, keepAliveWriter)
-                        .add(ServerPlayPackets.DISCONNECT, ServerDisconnectPacket.class, disconnectWriter)
-                        .add(ServerPlayPackets.CUSTOM_PAYLOAD, ServerPluginMessagePacket.class, pluginMessageWriter)
-                        .add(ServerPlayPackets.SERVER_LINKS, ServerCustomLinksPacket.class, customLinksWriter)
-                        .add(ServerPlayPackets.PING, ServerPingPacket.class, pingWriter)
-                        .add(ServerPlayPackets.TRANSFER, ServerTransferPacket.class, transferWriter)
-                        .add(ServerPlayPackets.STORE_COOKIE, ServerStoreCookiePacket.class, storeCookieWriter)
-                        .add(ServerPlayPackets.UPDATE_TAGS, ServerUpdateTagsPacket.class, updateTagsWriter)
-                        .add(ServerPlayPackets.PONG_RESPONSE, ServerPingResponsePacket.class, pingResponseWriter)
+                        .add(ServerPlayPackets.PING, ServerPingPacket.class, ServerPingPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.COOKIE_REQUEST, ServerCookieRequestPacket.class,
+                                ServerCookieRequestPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.KEEP_ALIVE, ServerKeepAlivePacket.class,
+                                ServerKeepAlivePacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.DISCONNECT, ServerDisconnectPacket.class,
+                                ServerDisconnectPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.CUSTOM_PAYLOAD, ServerPluginMessagePacket.class,
+                                ServerPluginMessagePacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.SERVER_LINKS, ServerCustomLinksPacket.class,
+                                ServerCustomLinksPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.TRANSFER, ServerTransferPacket.class,
+                                ServerTransferPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.STORE_COOKIE, ServerStoreCookiePacket.class,
+                                ServerStoreCookiePacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.UPDATE_TAGS, ServerUpdateTagsPacket.class,
+                                ServerUpdateTagsPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.PONG_RESPONSE, ServerPingResponsePacket.class,
+                                ServerPingResponsePacketWriter.INSTANCE)
                         .add(ServerPlayPackets.CUSTOM_REPORT_DETAILS, ServerCustomReportDetailsPacket.class,
-                                customReportDetailsWriter)
+                                ServerCustomReportDetailsPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.RESOURCE_PACK_PUSH, ServerAddResourcePackPacket.class,
-                                addResourcePackWriter)
+                                ServerAddResourcePackPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.RESOURCE_PACK_POP, ServerRemoveResourcePackPacket.class,
-                                removeResourcePackWriter)
+                                ServerRemoveResourcePackPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.LOGIN, ServerJoinGamePlayPacket.class,
-                                new ServerJoinGamePlayPacketWriter())
+                                ServerJoinGamePlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.GAME_EVENT, ServerGameEventPlayPacket.class,
-                                new ServerGameEventPlayPacketWriter())
+                                ServerGameEventPlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.SYSTEM_CHAT, ServerSystemMessagePlayPacket.class,
-                                new ServerSystemMessagePlayPacketWriter())
+                                ServerSystemMessagePlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.SET_ACTION_BAR_TEXT, ServerActionBarPlayPacket.class,
-                                new ServerActionBarPlayPacketWriter())
+                                ServerActionBarPlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.TAB_LIST, ServerPlayerListHeaderAndFooterPlayPacket.class,
-                                new ServerPlayerListHeaderAndFooterPlayPacketWriter())
+                                ServerPlayerListHeaderAndFooterPlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.ENTITY_POSITION_SYNC, ServerSynchronizePositionPlayPacket.class,
-                                new ServerSynchronizePositionPlayPacketWriter())
+                                ServerSynchronizePositionPlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.SET_CHUNK_CACHE_CENTER, ServerCenterChunkPlayPacket.class,
-                                new ServerCenterChunkPlayPacketWriter())
+                                ServerCenterChunkPlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.COMMANDS, ServerDeclareCommandsPlayPacket.class,
-                                new ServerDeclareCommandsPlayPacketWriter())
+                                ServerDeclareCommandsPlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.COMMAND_SUGGESTIONS, ServerCommandSuggestionsResponsePlayPacket.class,
-                                new ServerCommandSuggestionsResponsePlayPacketWriter())
+                                ServerCommandSuggestionsResponsePlayPacketWriter.INSTANCE)
                         .build()
         );
 
@@ -234,8 +236,8 @@ public final class ServerPacketRegistry {
     }
 
     /**
-     * Gets {@linkplain RegistryPacketSpecification a registry packet specification} for a packet with
-     * a class specified.
+     * Gets {@linkplain RegistryPacketSpecification a registry packet specification} for a packet with a class
+     * specified.
      *
      * @param protocolState a protocol state, during which the packet is written
      * @param packetClass a class of the packet

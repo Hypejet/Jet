@@ -4,14 +4,14 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.RawPacket;
-import net.hypejet.jet.server.network.SocketPlayerConnection;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents {@linkplain MessageToByteEncoder a message-to-byte encoder}, which encodes {@linkplain RawPacket raw
- * packets}.
+ * Represents {@linkplain MessageToByteEncoder a message-to-byte encoder}, which encodes outgoing packets into
+ * {@linkplain RawPacket raw packets}.
  *
  * @since 1.0
  * @see RawPacket

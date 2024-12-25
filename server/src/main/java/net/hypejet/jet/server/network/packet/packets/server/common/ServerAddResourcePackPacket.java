@@ -17,7 +17,6 @@ import java.util.UUID;
  * @param forced whether the resource pack is required
  * @param prompt a message shown on a request screen, {@code null} if none
  * @since 1.0
- * @author Codestech
  * @see ServerPacket
  */
 public record ServerAddResourcePackPacket(@NonNull UUID uniqueId, @NonNull String url, @NonNull String hash,

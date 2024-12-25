@@ -6,19 +6,15 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
-import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 
 /**
- * Represents {@linkplain ByteToMessageDecoder a byte-to-message decoder}, which decodes lengths of
- * {@linkplain ServerPacket server packets} and creates a frame
- * with a length of them.
+ * Represents {@linkplain ByteToMessageDecoder a byte-to-message decoder}, which decodes lengths of incoming packets
+ * and creates frames with length equal to lengths of them.
  *
  * @since 1.0
- * @author Codestech
- * @see ServerPacket
  * @see ByteToMessageDecoder
  */
 public final class PacketLengthDecoder extends ByteToMessageDecoder {

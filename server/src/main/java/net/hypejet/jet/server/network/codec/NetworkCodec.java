@@ -6,6 +6,5 @@ package net.hypejet.jet.server.network.codec;
  *
  * @param <T> a type of the object
  * @since 1.0
- * @author Codestech
  */
 public interface NetworkCodec<T> extends NetworkReader<T>, NetworkWriter<T> {}

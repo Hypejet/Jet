@@ -14,7 +14,6 @@ import java.util.function.IntFunction;
  *
  * @param <E> a type of the element
  * @since 1.0
- * @author Codestech
  * @see AggregateNetworkReader
  */
 public final class ObjectArrayNetworkReader<E> extends AggregateNetworkReader<E[]> {

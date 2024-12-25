@@ -7,7 +7,6 @@ import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
  *
  * @param teleportationId an identifier of the teleportation
  * @since 1.0
- * @author Codestech
  * @see ClientPacket
  */
 public record ClientConfirmTeleportationPlayPacket(int teleportationId) implements ClientPacket {}

@@ -9,35 +9,32 @@ import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoop;
 import io.netty.channel.SingleThreadEventLoop;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.util.concurrent.FailedFuture;
 import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.SucceededFuture;
 import net.hypejet.concurrency.object.ObjectAcquirable;
 import net.hypejet.concurrency.object.ObjectAcquisition;
 import net.hypejet.concurrency.object.WriteObjectAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.network.PlayerConnection;
 import net.hypejet.jet.network.PlayerConnectionState;
-import net.hypejet.jet.server.network.netty.handler.RawPacketHandler;
-import net.hypejet.jet.server.network.packet.RawPacket;
-import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry.RegistryPacketSpecification;
-import net.hypejet.jet.server.network.packet.reader.ClientPacketReader;
-import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
-import net.hypejet.jet.server.network.packet.packets.server.common.ServerDisconnectPacket;
-import net.hypejet.jet.server.network.packet.packets.server.login.ServerEnableCompressionLoginPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.exception.NetworkException;
-import net.hypejet.jet.server.network.packet.handler.NetworkDisconnectionHandler;
-import net.hypejet.jet.server.network.netty.decoder.RawPacketDecoder;
 import net.hypejet.jet.server.network.netty.decoder.PacketDecompressor;
 import net.hypejet.jet.server.network.netty.decoder.PacketLengthDecoder;
+import net.hypejet.jet.server.network.netty.decoder.RawPacketDecoder;
 import net.hypejet.jet.server.network.netty.encoder.PacketCompressor;
-import net.hypejet.jet.server.network.netty.encoder.RawPacketEncoder;
 import net.hypejet.jet.server.network.netty.encoder.PacketLengthEncoder;
+import net.hypejet.jet.server.network.netty.encoder.RawPacketEncoder;
+import net.hypejet.jet.server.network.netty.handler.RawPacketHandler;
+import net.hypejet.jet.server.network.packet.RawPacket;
+import net.hypejet.jet.server.network.packet.handler.NetworkDisconnectionHandler;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry.RegistryPacketSpecification;
+import net.hypejet.jet.server.network.packet.packets.server.common.ServerDisconnectPacket;
+import net.hypejet.jet.server.network.packet.reader.ClientPacketReader;
 import net.hypejet.jet.server.network.session.Session;
-import net.hypejet.jet.server.network.session.task.HandshakeTask;
+import net.hypejet.jet.server.network.session.task.HandshakeSessionTask;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.hypejet.jet.server.util.acquisition.MappedObjectAcquisition;
 import net.hypejet.jet.server.util.unit.Unit;
@@ -53,29 +50,28 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * Represents an implementation of {@link PlayerConnection}, which is handled by {@link SocketChannel a socket
- * channel}.
+ * Represents an implementation of {@linkplain PlayerConnection a player connection}, which is handled
+ * by {@link SocketChannel a socket channel}.
  *
  * @since 1.0
- * @author Codestech
  */
 public final class SocketPlayerConnection implements PlayerConnection, Thread.UncaughtExceptionHandler,
         NetworkDisconnectionHandler {
 
-    private static final String PACKET_ENCODER = "minecraft-packet-encoder";
+    private static final String RAW_PACKET_ENCODER = "minecraft-raw-packet-encoder";
     private static final String PACKET_COMPRESSOR = "minecraft-packet-compressor";
     private static final String PACKET_LENGTH_ENCODER = "minecraft-packet-length-encoder";
 
-    private static final String PACKET_DECODER = "minecraft-packet-decoder";
+    private static final String RAW_PACKET_DECODER = "minecraft-raw-packet-decoder";
     private static final String PACKET_DECOMPRESSOR = "minecraft-packet-decompressor";
     private static final String PACKET_LENGTH_DECODER = "minecraft-packet-length-decoder";
 
-    private static final String PACKET_READER = "minecraft-packet-reader";
+    private static final String RAW_PACKET_HANDLER = "minecraft-raw-packet-reader";
 
     private static final Set<String> HANDLER_SET = Set.of(
-            PACKET_ENCODER, PACKET_COMPRESSOR, PACKET_LENGTH_ENCODER,
-            PACKET_DECODER, PACKET_DECOMPRESSOR, PACKET_LENGTH_DECODER,
-            PACKET_READER
+            RAW_PACKET_ENCODER, PACKET_COMPRESSOR, PACKET_LENGTH_ENCODER,
+            RAW_PACKET_DECODER, PACKET_DECOMPRESSOR, PACKET_LENGTH_DECODER,
+            RAW_PACKET_HANDLER
     );
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SocketPlayerConnection.class);
@@ -108,7 +104,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
         // We update handlers after the instantiation and such an operation require to be executed in an event loop
         this.ensureInEventLoop();
 
-        Session initialSession = new Session(ProtocolState.HANDSHAKE, this, new HandshakeTask(this));
+        Session initialSession = new Session(ProtocolState.HANDSHAKE, this, new HandshakeSessionTask(this));
         this.session = new ObjectAcquirable<>(initialSession);
 
         /* We need to update the handlers and initialize the client packet reader after the initial session is set,
@@ -134,7 +130,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
             if (ServerPacketRegistry.isSupported(protocolStateAcquisition.get(), ServerDisconnectPacket.class)) {
                 CompletableFuture<PacketSendResult> packetFuture = new CompletableFuture<>();
                 disconnectPacketResultFuture = packetFuture;
-                this.sendPacket(new ServerDisconnectPacket(reason), packetFuture);
+                this.sendPacket(new ServerDisconnectPacket(reason), packetFuture); // FIXME: Do that later
             } else {
                 disconnectPacketResultFuture = CompletableFuture.completedFuture(Unit.INSTANCE);
             }
@@ -267,7 +263,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     }
 
     /**
-     * Gets {@linkplain ClientPacketReader client packet reader} of this connection.
+     * Gets {@linkplain ClientPacketReader a client packet reader} of this connection.
      *
      * @return the client packet reader
      * @since 1.0
@@ -299,22 +295,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     }
 
     /**
-     * Sets a compression threshold of this connection.
-     *
-     * @param compressionThreshold the compression threshold
-     * @since 1.0
-     */
-    public void setCompressionThreshold(int compressionThreshold) {
-        CompletableFuture<PacketSendResult> resultFuture = new CompletableFuture<>();
-        resultFuture.thenAccept(result -> {
-            if (result == PacketSendResult.SUCCESS)
-                this.updateHandlers(compressionThreshold);
-        });
-        this.sendPacket(new ServerEnableCompressionLoginPacket(compressionThreshold), resultFuture);
-    }
-
-    /**
-     * Initializes the {@linkplain JetPlayer player} on this connection.
+     * Initializes the {@linkplain JetPlayer player} of this connection.
      *
      * @param player the player
      * @since 1.0
@@ -340,32 +321,18 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
      */
     public void ensureInEventLoop() {
         if (!this.channel.eventLoop().inEventLoop())
-            throw new IllegalStateException("Current thread is not in an event loop");
+            throw new IllegalStateException("Current thread is not an event loop thread");
     }
 
     /**
-     * Submits {@linkplain Runnable a runnable} task to {@linkplain EventLoop an event loop}. If the caller thread is
-     * an event loop thread then the task is executed immediately.
+     * Updates {@linkplain ChannelHandler channel handlers} of {@linkplain SocketChannel a socket channel} of this
+     * connection.
      *
-     * @param task the task
-     * @return a future to manage the task
+     * @param compressionThreshold a compression threshold that should be used for packet encoding and decoding
      * @since 1.0
      */
-    public @NonNull Future<?> submitToEventLoop(@NonNull Runnable task) {
-        EventLoop eventLoop = this.channel.eventLoop();
-        if (eventLoop.inEventLoop()) {
-            try {
-                task.run();
-                return new SucceededFuture<>(eventLoop, Unit.INSTANCE);
-            } catch (Throwable throwable) {
-                return new FailedFuture<>(eventLoop, throwable);
-            }
-        }
-        return eventLoop.submit(task);
-    }
-
-    private void updateHandlers(int compressionThreshold) {
-        // No need for a lock for the handlers, we just require the code to be executed in the event loop
+    public void updateHandlers(int compressionThreshold) {
+        // Channel handlers can be updates safely only in an event loop
         this.ensureInEventLoop();
 
         ChannelPipeline pipeline = this.channel.pipeline();
@@ -375,17 +342,17 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
             pipeline.remove(handler);
         }
 
-        pipeline.addFirst(PACKET_ENCODER, new RawPacketEncoder(this));
-        pipeline.addFirst(PACKET_DECODER, new RawPacketDecoder(this));
+        pipeline.addFirst(RAW_PACKET_ENCODER, new RawPacketEncoder(this));
+        pipeline.addFirst(RAW_PACKET_DECODER, new RawPacketDecoder(this));
 
-        pipeline.addBefore(PACKET_DECODER, PACKET_LENGTH_DECODER, new PacketLengthDecoder(this));
-        pipeline.addBefore(PACKET_ENCODER, PACKET_LENGTH_ENCODER, new PacketLengthEncoder(this));
+        pipeline.addBefore(RAW_PACKET_DECODER, PACKET_LENGTH_DECODER, new PacketLengthDecoder(this));
+        pipeline.addBefore(RAW_PACKET_ENCODER, PACKET_LENGTH_ENCODER, new PacketLengthEncoder(this));
 
-        pipeline.addAfter(PACKET_DECODER, PACKET_READER, new RawPacketHandler(this));
+        pipeline.addAfter(RAW_PACKET_DECODER, RAW_PACKET_HANDLER, new RawPacketHandler(this));
 
-        if (compressionThreshold < 0) return;
-        pipeline.addBefore(PACKET_DECODER, PACKET_DECOMPRESSOR, new PacketDecompressor(this));
-        pipeline.addBefore(PACKET_ENCODER, PACKET_COMPRESSOR, new PacketCompressor(this, compressionThreshold));
+        if (compressionThreshold < 0) return; // The compression is disabled
+        pipeline.addBefore(RAW_PACKET_DECODER, PACKET_DECOMPRESSOR, new PacketDecompressor(this));
+        pipeline.addBefore(RAW_PACKET_ENCODER, PACKET_COMPRESSOR, new PacketCompressor(this, compressionThreshold));
     }
 
     private static @NonNull RawPacket encode(@NonNull ServerPacket packet, @NonNull ProtocolState state) {
@@ -393,8 +360,10 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
         RegistryPacketSpecification<?> specification = ServerPacketRegistry.specificationFor(state, packetClass);
 
         if (specification == null) {
-            String name = packetClass.getSimpleName();
-            throw new IllegalArgumentException(String.format("Could not find a packet codec for packet %s", name));
+            throw new IllegalArgumentException(String.format(
+                    "Could not find a packet codec for packet %s in protocol state %s",
+                    packetClass.getSimpleName(), state
+            ));
         }
 
         ByteBuf buf = Unpooled.buffer();
@@ -426,7 +395,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
         SUCCESS,
         /**
          * {@linkplain PacketSendResult A packet send result}, which represents a cancellation of packet sending, which
-         * could have been caused by a packet event cancellation or an internal reason.
+         * could have been caused by an internal reason.
          *
          * @since 1.0
          */
@@ -491,6 +460,16 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
         @Override
         public void close() {
             this.originalAcquisition.close();
+        }
+
+        @Override
+        public void ensurePermittedAndLocked() {
+            this.originalAcquisition.ensurePermittedAndLocked();
+        }
+
+        @Override
+        public @NotNull AcquisitionType acquisitionType() {
+            return this.originalAcquisition.acquisitionType();
         }
     }
 }

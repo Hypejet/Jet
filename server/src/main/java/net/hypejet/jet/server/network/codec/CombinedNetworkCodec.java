@@ -10,7 +10,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <T> a type of the object that the codec should read and write
  * @since 1.0
- * @author Codestech
  * @see NetworkReader
  * @see NetworkWriter
  * @see NetworkCodec

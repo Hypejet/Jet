@@ -9,7 +9,11 @@ import net.hypejet.jet.data.model.api.pack.PackInfo;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.data.model.server.registry.registries.pack.FeaturePack;
 import net.hypejet.jet.event.events.player.configuration.PlayerConfigurationStartEvent;
+import net.hypejet.jet.registry.RegistryEntry;
+import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.ProtocolState;
+import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.packet.packets.client.configuration.ClientKnownPacksConfigurationPacket;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket.TagRegistry;
@@ -17,10 +21,6 @@ import net.hypejet.jet.server.network.packet.packets.server.configuration.Server
 import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerFinishConfigurationPacket;
 import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerKnownPacksConfigurationPacket;
 import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerRegistryDataConfigurationPacket;
-import net.hypejet.jet.registry.RegistryEntry;
-import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.entity.player.JetPlayer;
-import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.session.Session;
 import net.hypejet.jet.server.network.session.keepalive.KeepAliveHandler;
 import net.hypejet.jet.server.network.session.keepalive.KeepAliveResponseHandler;
@@ -44,14 +44,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Represents {@linkplain SessionTask a session task}, which handles {@linkplain ProtocolState#CONFIGURATION
- * a configuration protocol state}.
+ * Represents {@linkplain SessionTask a session task}, which handles
+ * {@linkplain ProtocolState#CONFIGURATION a configuration protocol state}.
  *
  * @since 1.0
- * @author Codestech
+ * @see ProtocolState#CONFIGURATION
  * @see SessionTask
  */
-public final class ConfigurationTask implements SessionTask, KeepAliveResponseHandler, RegistryTagUpdateFunction {
+public final class ConfigurationSessionTask implements SessionTask, KeepAliveResponseHandler, RegistryTagUpdateFunction {
 
     private static final long TIME_OUT_DURATION = 20;
     private static final TimeUnit TIME_OUT_UNIT = TimeUnit.SECONDS;
@@ -65,12 +65,12 @@ public final class ConfigurationTask implements SessionTask, KeepAliveResponseHa
     private final CompletableFuture<Unit> acknowledgeFuture = new CompletableFuture<>();
 
     /**
-     * Constructs the {@linkplain ConfigurationTask configuration task}.
+     * Constructs the {@linkplain ConfigurationSessionTask configuration session task}.
      *
      * @param player a player that the session task should be handled for
      * @since 1.0
      */
-    public ConfigurationTask(@NonNull JetPlayer player) {
+    public ConfigurationSessionTask(@NonNull JetPlayer player) {
         this.player = NullabilityUtil.requireNonNull(player, "player");
         this.keepAliveHandler = new KeepAliveHandler(player);
     }
@@ -78,7 +78,7 @@ public final class ConfigurationTask implements SessionTask, KeepAliveResponseHa
     @Override
     public void start() {
         Thread.ofVirtual()
-                .name(String.format("Configuration session task - %s", this.player.username()))
+                .name(String.format("Configuration session task thread - %s", this.player.username()))
                 .uncaughtExceptionHandler(this.player.connection())
                 .start(this::runVirtualThreadTask);
     }
@@ -160,7 +160,12 @@ public final class ConfigurationTask implements SessionTask, KeepAliveResponseHa
         this.player.sendPacket(new ServerKnownPacksConfigurationPacket(Set.copyOf(packInfos)));
 
         try {
-            ClientKnownPacksConfigurationPacket packet = this.knownPacksFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
+            ClientKnownPacksConfigurationPacket packet;
+            try {
+                packet = this.knownPacksFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
+            } catch (TimeoutException exception) {
+                throw new RuntimeException("The known packs packet has not been sent on time", exception);
+            }
 
             Collection<JetMinecraftRegistry<?>> registries = server.registryManager().getRegistries().values();
             for (JetMinecraftRegistry<?> registry : registries) {
@@ -195,13 +200,16 @@ public final class ConfigurationTask implements SessionTask, KeepAliveResponseHa
                 connection.sendPacket(new ServerFinishConfigurationPacket());
                 this.acknowledgeFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
 
-                sessionAcquisition.set(new Session(ProtocolState.PLAY, connection, new PlayTask(this.player)));
-                connection.clientPacketReader().pausePacketReading();
+                sessionAcquisition.set(new Session(ProtocolState.PLAY, connection, new PlaySessionTask(this.player)));
+                connection.clientPacketReader().resumePacketReading();
+            } catch (TimeoutException exception) {
+                throw new RuntimeException(
+                        "The configuration session task has not been acknowledged on time",
+                        exception
+                );
             }
         } catch (ExecutionException exception) {
             throw new RuntimeException("An error occurred during a login task", exception);
-        } catch (TimeoutException exception) {
-            throw new RuntimeException("The configuration task has timed out", exception);
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt(); // Restore the interrupted status
         } catch (CancellationException exception) {

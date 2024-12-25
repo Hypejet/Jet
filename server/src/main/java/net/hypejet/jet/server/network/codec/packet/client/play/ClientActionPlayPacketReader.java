@@ -2,23 +2,29 @@ package net.hypejet.jet.server.network.codec.packet.client.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.data.codecs.util.mapper.Mapper;
-import net.hypejet.jet.server.network.packet.packets.client.play.ClientActionPlayPacket;
-import net.hypejet.jet.server.network.packet.packets.client.play.ClientActionPlayPacket.Action;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.mapper.MapperNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.network.packet.packets.client.play.ClientActionPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.client.play.ClientActionPlayPacket.Action;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents {@linkplain NetworkReader a network reader}, which reads {@linkplain ClientActionPlayPacket an action
- * play packet}.
+ * Represents {@linkplain NetworkReader a network reader}, which reads
+ * {@linkplain ClientActionPlayPacket an action play packet}.
  *
  * @since 1.0
- * @author Codestech
  * @see ClientActionPlayPacket
  * @see NetworkReader
  */
 public final class ClientActionPlayPacketReader implements NetworkReader<ClientActionPlayPacket> {
+
+    /**
+     * An instance of the {@linkplain ClientActionPlayPacket client action play packet reader}.
+     *
+     * @since 1.0
+     */
+    public static final ClientActionPlayPacketReader INSTANCE = new ClientActionPlayPacketReader();
 
     private static final int MIN_JUMP_BOOST = 0;
     private static final int MAX_JUMP_BOOST = 100;
@@ -37,6 +43,8 @@ public final class ClientActionPlayPacketReader implements NetworkReader<ClientA
                     .build(),
             VarIntNetworkCodec.INSTANCE
     );
+
+    private ClientActionPlayPacketReader() {}
 
     @Override
     public @NonNull ClientActionPlayPacket read(@NonNull ByteBuf buf) {

@@ -1,8 +1,8 @@
 package net.hypejet.jet.server.network.codec.game.world.coordinate;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.world.coordinate.PositionFlag;
 import net.hypejet.jet.server.network.codec.NetworkReader;
+import net.hypejet.jet.world.coordinate.PositionFlag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -15,7 +15,6 @@ import java.util.Set;
  * of {@linkplain PositionFlag position flags}.
  *
  * @since 1.0
- * @author Codestech
  * @see PositionFlag
  * @see Collection
  * @see NetworkReader

@@ -9,12 +9,11 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Represents {@linkplain ServerPacket a server packet}, which sets flags of features that should
- * be enabled on a client.
+ * Represents {@linkplain ServerPacket a server packet}, which sets flags of features that should be enabled on
+ * a client.
  *
  * @param featureFlags keys of the features to enable
  * @since 1.0
- * @author Codestech
  * @see ServerFeatureFlagsConfigurationPacket
  */
 public record ServerFeatureFlagsConfigurationPacket(@NonNull Collection<Key> featureFlags)

@@ -18,7 +18,6 @@ import java.util.function.Supplier;
  * Represents a transport type, which should be used by netty.
  *
  * @since 1.0
- * @author Codestech
  */
 public enum NettyTransportType {
     /**
@@ -75,7 +74,7 @@ public enum NettyTransportType {
     }
 
     /**
-     * Gets a class of a type of {@linkplain ServerSocketChannel a server socket channel} that this transport supports.
+     * Gets a class of type of {@linkplain ServerSocketChannel a server socket channel} that this transport supports.
      *
      * @return the class
      * @since 1.0
@@ -95,7 +94,7 @@ public enum NettyTransportType {
     }
 
     /**
-     * Gets the "best" {@linkplain NettyTransportType netty transport type} available.
+     * Gets the most sufficient {@linkplain NettyTransportType netty transport type} available.
      *
      * @return the transport type
      * @since 1.0

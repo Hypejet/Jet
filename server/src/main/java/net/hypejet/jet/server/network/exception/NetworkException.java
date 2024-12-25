@@ -11,7 +11,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * or is during handling.
  *
  * @since 1.0
- * @author Codestech
  */
 public final class NetworkException extends RuntimeException {
 

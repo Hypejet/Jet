@@ -1,8 +1,8 @@
 package net.hypejet.jet.server.network.packet.packets.server.status;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.ping.ServerListPing;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -10,7 +10,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param ping the response data
  * @since 1.0
- * @author Codestech
  * @see ServerPacket
  */
 public record ServerListResponseStatusPacket(@NonNull ServerListPing ping) implements ServerPacket {

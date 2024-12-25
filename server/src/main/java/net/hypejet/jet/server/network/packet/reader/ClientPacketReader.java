@@ -123,12 +123,9 @@ public final class ClientPacketReader implements NetworkDisconnectionHandler {
             try (WriteBooleanAcquisition acquisition = this.paused.acquireWrite()) {
                 if (acquisition.get()) {
                     this.resumeCondition.awaitUninterruptibly();
-                    continue; // We need to recheck whether the connection is closed
+                    continue; // We need to recheck whether the connection is active
                 }
                 this.readNextPacket();
-            } catch (Throwable throwable) {
-                // We need to safely handle the exception and let the loop continue
-                this.connection.uncaughtException(Thread.currentThread(), throwable); // TODO: Check whether this is actually needed
             }
         }
     }
@@ -149,7 +146,7 @@ public final class ClientPacketReader implements NetworkDisconnectionHandler {
 
         if (reader == null) {
             throw new IllegalStateException(String.format(
-                    "Could not find a reader of a packet with id of %s in protocol state \"%s\"",
+                    "Could not find a reader of a packet with id of %s in protocol state %s",
                     identifier, state
             ));
         }

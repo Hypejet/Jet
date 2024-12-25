@@ -3,8 +3,8 @@ package net.hypejet.jet.server.network.session.task;
 import net.hypejet.concurrency.object.WriteObjectAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.ProtocolState;
-import net.hypejet.jet.server.network.packet.packets.client.handshake.ClientHandshakePacket;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
+import net.hypejet.jet.server.network.packet.packets.client.handshake.ClientHandshakePacket;
 import net.hypejet.jet.server.network.session.Session;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -20,12 +20,11 @@ import java.util.concurrent.TimeoutException;
  * in {@linkplain ClientHandshakePacket a client handshake packet}.
  *
  * @since 1.0
- * @author Codestech
  * @see Session
  * @see ClientHandshakePacket
  * @see SessionTask
  */
-public final class HandshakeTask implements SessionTask {
+public final class HandshakeSessionTask implements SessionTask {
 
     private static final int TIME_OUT_DURATION = 20;
     private static final TimeUnit TIME_OUT_UNIT = TimeUnit.SECONDS;
@@ -34,12 +33,12 @@ public final class HandshakeTask implements SessionTask {
     private final CompletableFuture<ClientHandshakePacket> handshakeFuture = new CompletableFuture<>();
 
     /**
-     * Constructs the {@linkplain HandshakeTask handshake task}.
+     * Constructs the {@linkplain HandshakeSessionTask handshake session task}.
      *
-     * @param connection a socket player connection that the task is done for
+     * @param connection a socket player connection that the session task should be handled for
      * @since 1.0
      */
-    public HandshakeTask(@NonNull SocketPlayerConnection connection) {
+    public HandshakeSessionTask(@NonNull SocketPlayerConnection connection) {
         // We do not care about the acquisition if it is not null, it is up to user not to provide null values
         this.connection = NullabilityUtil.requireNonNull(connection, "connection");
     }
@@ -80,8 +79,8 @@ public final class HandshakeTask implements SessionTask {
 
             SessionTask nextSessionTask = switch (packet.intent()) {
                 case STATUS -> new StatusSessionTask(this.connection);
-                case LOGIN -> new LoginTask(this.connection, packet.protocolVersion(), false);
-                case TRANSFER -> new LoginTask(this.connection, packet.protocolVersion(), true);
+                case LOGIN -> new LoginSessionTask(this.connection, packet.protocolVersion(), false);
+                case TRANSFER -> new LoginSessionTask(this.connection, packet.protocolVersion(), true);
             };
 
             sessionAcquisition.set(new Session(nextProtocolState, this.connection, nextSessionTask));
@@ -92,9 +91,10 @@ public final class HandshakeTask implements SessionTask {
                not requested by a server should come, except of the "login request". Modded clients are obliged
                to keep this approach. Since plugins are allowed to send any request packet during login without
                waiting for a response, the most safe place to enable the compression is here, because the session
-               acquisition is still locked since handshake, no login packet was sent by any plugin and we are going
-               to await for the login request. */
-            if (nextSessionTask instanceof LoginTask loginTask)
+               acquisition is still locked since handshake, no login packet was sent by any plugin, and we are going
+               to await for the login request as well as for when handlers are updated with the new compression
+               threshold. */
+            if (nextSessionTask instanceof LoginSessionTask loginTask)
                 loginTask.setupCompression();
         } catch (ExecutionException exception) {
             throw new RuntimeException("An error occurred during a handshaking task", exception);

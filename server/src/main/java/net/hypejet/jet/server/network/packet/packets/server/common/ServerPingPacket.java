@@ -9,7 +9,6 @@ import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
  *
  * @param identifier an identifier of the ping
  * @since 1.0
- * @author Codestech
  * @see ClientPongPacket
  * @see ServerPacket
  */

@@ -10,7 +10,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param transactionId an identifier of the request, the server responds with the same identifier
  * @param text all current typed text of the command on the client, which is behind a cursor
  * @since 1.0
- * @author Codestech
  * @see ClientPacket
  */
 public record ClientCommandSuggestionsRequestPlayPacket(int transactionId, @NonNull String text)

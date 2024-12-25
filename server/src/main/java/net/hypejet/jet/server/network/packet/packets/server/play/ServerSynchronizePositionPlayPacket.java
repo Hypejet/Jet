@@ -16,9 +16,8 @@ import java.util.Set;
  * @param deltaMovement the correct delta movement of the player
  * @param yaw the correct yaw of the player
  * @param pitch the correct pitch of the player
- * @param relativeFlags flags, which define whether a specific value of the position is relative
+ * @param relativeFlags flags, which indicate whether a specific value of the position is relative to previous position
  * @since 1.0
- * @author Codsetech
  */
 public record ServerSynchronizePositionPlayPacket(int teleportId, @NonNull Vector position,
                                                   @NonNull Vector deltaMovement, float yaw, float pitch,
@@ -32,7 +31,8 @@ public record ServerSynchronizePositionPlayPacket(int teleportId, @NonNull Vecto
      * @param deltaMovement the correct delta movement of the player
      * @param yaw the correct yaw of the player
      * @param pitch the correct pitch of the player
-     * @param relativeFlags flags, which define whether a specific value of the position is relative
+     * @param relativeFlags flags, which indicate whether a specific value of the position is relative to previous
+     *                      position
      * @since 1.0
      */
     public ServerSynchronizePositionPlayPacket {
@@ -42,62 +42,61 @@ public record ServerSynchronizePositionPlayPacket(int teleportId, @NonNull Vecto
     }
 
     /**
-     * Represents a flag defining that a value of a position change is relative.
+     * Represents a flag indicating that a value of a position change is relative to previous position.
      *
      * @since 1.0
-     * @author Codestech
      */
     public enum RelativeFlag {
         /**
-         * A relative flag defining that an {@code X} value of a position change is relative.
+         * A relative flag indicating that an {@code X} value of a position change is relative.
          *
          * @since 1.0
          */
         RELATIVE_X,
         /**
-         * A relative flag defining that an {@code Y} value of a position change is relative.
+         * A relative flag indicating that an {@code Y} value of a position change is relative.
          *
          * @since 1.0
          */
         RELATIVE_Y,
         /**
-         * A relative flag defining that an {@code Z} value of a position change is relative.
+         * A relative flag indicating that an {@code Z} value of a position change is relative.
          *
          * @since 1.0
          */
         RELATIVE_Z,
         /**
-         * A relative flag defining that a pitch of a position change is relative.
+         * A relative flag indicating that a pitch of a position change is relative.
          *
          * @since 1.0
          */
         RELATIVE_PITCH,
         /**
-         * A relative flag defining that a yaw value of a position change is relative.
+         * A relative flag indicating that a yaw value of a position change is relative.
          *
          * @since 1.0
          */
         RELATIVE_YAW,
         /**
-         * A relative flag defining that a delta {@code X} value of a position change is relative.
+         * A relative flag indicating that a delta {@code X} value of a position change is relative.
          *
          * @since 1.0
          */
         RELATIVE_DELTA_X,
         /**
-         * A relative flag defining that a delta {@code Y} value of a position change is relative.
+         * A relative flag indicating that a delta {@code Y} value of a position change is relative.
          *
          * @since 1.0
          */
         RELATIVE_DELTA_Y,
         /**
-         * A relative flag defining that a delta {@code Z} value of a position change is relative.
+         * A relative flag indicating that a delta {@code Z} value of a position change is relative.
          *
          * @since 1.0
          */
         RELATIVE_DELTA_Z,
         /**
-         * A relative flag defining that delta values of a position change should be updated with the new rotation
+         * A relative flag indicating that delta values of a position change should be updated with the new rotation
          * values.
          *
          * @since 1.0

@@ -10,11 +10,9 @@ import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents {@linkplain MessageToByteEncoder a message-to-byte encoder}, which writes a length of a serialized
- * and compressed {@linkplain ServerPacket server packet}.
+ * Represents {@linkplain MessageToByteEncoder a message-to-byte encoder}, which writes a length of outgoing packets.
  *
  * @since 1.0
- * @author Codestech
  * @see ServerPacket
  * @see MessageToByteEncoder
  */

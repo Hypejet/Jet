@@ -14,7 +14,6 @@ import java.util.Set;
  *
  * @param featurePacks the feature packs
  * @since 1.0
- * @author Codestech
  */
 public record ServerKnownPacksConfigurationPacket(@NonNull Collection<PackInfo> featurePacks) implements ServerPacket {
     /**

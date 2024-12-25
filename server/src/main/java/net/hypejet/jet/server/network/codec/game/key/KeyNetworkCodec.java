@@ -11,7 +11,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * from/to two {@linkplain String strings}.
  *
  * @since 1.0
- * @author Codestech
  * @see Key
  * @see String
  * @see NetworkCodec

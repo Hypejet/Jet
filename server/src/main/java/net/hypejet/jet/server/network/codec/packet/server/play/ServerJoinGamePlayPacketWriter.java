@@ -1,11 +1,11 @@
 package net.hypejet.jet.server.network.codec.packet.server.play;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.server.network.packet.packets.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
-import net.hypejet.jet.server.network.codec.game.world.coordinate.BlockPositionNetworkCodec;
 import net.hypejet.jet.server.network.codec.game.key.PackedKeyNetworkCodec;
+import net.hypejet.jet.server.network.codec.game.world.coordinate.BlockPositionNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.hypejet.jet.server.util.gamemode.GameModeUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -15,16 +15,24 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * {@linkplain ServerJoinGamePlayPacket a join game play packet}.
  *
  * @since 1.0
- * @author Codestech
  * @see ServerJoinGamePlayPacket
  * @see NetworkWriter
  */
 public final class ServerJoinGamePlayPacketWriter implements NetworkWriter<ServerJoinGamePlayPacket> {
 
+    /**
+     * An instance of the {@linkplain ServerJoinGamePlayPacketWriter server join game play packet writer}.
+     *
+     * @since 1.0
+     */
+    public static final ServerJoinGamePlayPacketWriter INSTANCE = new ServerJoinGamePlayPacketWriter();
+
     private static final int MAX_VIEW_DISTANCE = 32;
     private static final int MIN_VIEW_DISTANCE = 2;
 
     private static final DeathLocationWriter DEATH_LOCATION_WRITER = new DeathLocationWriter();
+
+    private ServerJoinGamePlayPacketWriter() {}
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerJoinGamePlayPacket object) {
@@ -46,7 +54,7 @@ public final class ServerJoinGamePlayPacketWriter implements NetworkWriter<Serve
         buf.writeBoolean(object.limitedCrafting());
 
         VarIntNetworkCodec.INSTANCE.write(buf, object.dimensionType());
-        PackedKeyNetworkCodec.INSTANCE.write(buf, object.dimensionName());
+        PackedKeyNetworkCodec.INSTANCE.write(buf, object.dimensionKey());
 
         buf.writeLong(object.hashedSeed());
 

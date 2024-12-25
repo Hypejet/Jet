@@ -8,7 +8,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Represents {@linkplain AggregateNetworkWriter an aggregate network writer}, which writes a long array.
  *
  * @since 1.0
- * @author Codestech
  * @see AggregateNetworkWriter
  */
 public final class LongArrayNetworkWriter extends AggregateNetworkWriter<long[]> {

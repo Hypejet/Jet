@@ -14,7 +14,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param key a key of the cookie
  * @param data a data of the cookie, {@code null} if none
  * @since 1.0
- * @author Codestech
  * @see ServerCookieRequestPacket
  * @see ClientPacket
  */

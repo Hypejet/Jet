@@ -1,9 +1,9 @@
 package net.hypejet.jet.server.network.packet.handler.common;
 
 import net.hypejet.jet.event.events.cookie.CookieResponseEvent;
-import net.hypejet.jet.server.network.packet.packets.client.common.ClientCookieResponsePacket;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.packet.handler.ClientPacketHandler;
+import net.hypejet.jet.server.network.packet.packets.client.common.ClientCookieResponsePacket;
 import net.hypejet.jet.server.network.session.Session;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -12,7 +12,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * handles {@linkplain ClientCookieResponsePacket a client cookie response packet}.
  *
  * @since 1.0
- * @author Codestech
  * @see ClientCookieResponsePacket
  * @see ClientPacketHandler
  */

@@ -1,10 +1,10 @@
 package net.hypejet.jet.server.network.codec.packet.server.common;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.server.network.packet.packets.server.common.ServerTransferPacket;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
+import net.hypejet.jet.server.network.packet.packets.server.common.ServerTransferPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -12,11 +12,20 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * transfer packet}.
  *
  * @since 1.0
- * @author Codestech
  * @see ServerTransferPacket
  * @see NetworkWriter
  */
 public final class ServerTransferPacketWriter implements NetworkWriter<ServerTransferPacket> {
+
+    /**
+     * An instance of the {@linkplain ServerTransferPacketWriter server transfer packet writer}.
+     *
+     * @since 1.0
+     */
+    public static final ServerTransferPacketWriter INSTANCE = new ServerTransferPacketWriter();
+
+    private ServerTransferPacketWriter() {}
+
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerTransferPacket object) {
         StringNetworkCodec.INSTANCE.write(buf, object.address());

@@ -16,7 +16,6 @@ import java.util.Collection;
  * Represents {@linkplain NetworkCodec a network codec}, which reads and writes {@linkplain PackInfo a pack info}.
  *
  * @since 1.0
- * @author Codestech
  * @see PackInfo
  * @see NetworkCodec
  */

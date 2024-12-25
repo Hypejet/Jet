@@ -15,7 +15,6 @@ import java.util.List;
  * of {@linkplain Player.SkinPart player skin parts}.
  *
  * @since 1.0
- * @author Codestech
  * @see Player.SkinPart
  * @see Collection
  * @see NetworkReader

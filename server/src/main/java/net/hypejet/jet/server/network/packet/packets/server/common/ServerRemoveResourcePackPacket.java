@@ -10,7 +10,6 @@ import java.util.UUID;
  *
  * @param uniqueId a unique identifier of the resource pack to remove, or {@code null} to remove all of them
  * @since 1.0
- * @author Codestech
  * @see ServerPacket
  */
 public record ServerRemoveResourcePackPacket(@Nullable UUID uniqueId) implements ServerPacket {}

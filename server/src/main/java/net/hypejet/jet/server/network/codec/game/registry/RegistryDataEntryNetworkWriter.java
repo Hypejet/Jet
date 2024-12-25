@@ -1,11 +1,11 @@
 package net.hypejet.jet.server.network.codec.game.registry;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerRegistryDataConfigurationPacket.Entry;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.key.PackedKeyNetworkCodec;
 import net.hypejet.jet.server.network.codec.game.miscellaneous.BinaryTagNetworkWriter;
+import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerRegistryDataConfigurationPacket.Entry;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -13,7 +13,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Represents {@linkplain NetworkWriter a network writer}, which writes {@linkplain Entry a registry data entry}.
  *
  * @since 1.0
- * @author Codestech
  * @see Entry
  * @see NetworkWriter
  */

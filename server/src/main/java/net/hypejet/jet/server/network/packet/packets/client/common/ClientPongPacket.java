@@ -8,7 +8,6 @@ import net.hypejet.jet.server.network.packet.packets.server.common.ServerPingPac
  *
  * @param pingIdentifier a numeric identifier of the ping request
  * @since 1.0
- * @author Codestech
  * @see ServerPingPacket
  * @see ClientPacket
  */

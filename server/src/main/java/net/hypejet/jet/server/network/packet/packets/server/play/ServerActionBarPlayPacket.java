@@ -10,7 +10,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param text the text to display
  * @since 1.0
- * @author Codestech
  */
 public record ServerActionBarPlayPacket(@NonNull Component text) implements ServerPacket {
     /**

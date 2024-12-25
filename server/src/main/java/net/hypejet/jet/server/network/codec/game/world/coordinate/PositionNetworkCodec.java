@@ -9,7 +9,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Represents {@linkplain NetworkCodec a network codec}, which reads and writes {@linkplain Position a position}.
  *
  * @since 1.0
- * @author Codestech
  * @see Position
  * @see NetworkCodec
  */

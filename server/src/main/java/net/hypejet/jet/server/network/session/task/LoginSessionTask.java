@@ -5,17 +5,18 @@ import net.hypejet.concurrency.primitive.booleans.BooleanAcquirable;
 import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.event.events.login.LoginStartEvent;
+import net.hypejet.jet.login.LoginManager;
 import net.hypejet.jet.login.profile.GameProfileProperty;
-import net.hypejet.jet.server.network.ProtocolState;
-import net.hypejet.jet.server.network.packet.packets.client.login.ClientLoginRequestLoginPacket;
-import net.hypejet.jet.server.network.packet.packets.server.login.ServerLoginSuccessLoginPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.network.ProtocolState;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
+import net.hypejet.jet.server.network.packet.packets.client.login.ClientLoginRequestLoginPacket;
+import net.hypejet.jet.server.network.packet.packets.server.login.ServerEnableCompressionLoginPacket;
+import net.hypejet.jet.server.network.packet.packets.server.login.ServerLoginSuccessLoginPacket;
 import net.hypejet.jet.server.network.session.Session;
 import net.hypejet.jet.server.util.unit.Unit;
-import net.hypejet.jet.login.LoginManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -28,15 +29,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Represents {@linkplain SessionTask a session task}, which handles {@linkplain ProtocolState#LOGIN a login protocol
- * state}.
+ * Represents {@linkplain SessionTask a session task}, which handles
+ * {@linkplain ProtocolState#LOGIN a login protocol state}.
  *
  * @since 1.0
- * @author Codestech
+ * @see ProtocolState#LOGIN
  * @see LoginManager
  * @see SessionTask
  */
-public final class LoginTask implements SessionTask, LoginManager {
+public final class LoginSessionTask implements SessionTask, LoginManager {
 
     private static final int TIME_OUT_TIME = 20;
     private static final TimeUnit TIME_OUT_UNIT = TimeUnit.SECONDS;
@@ -55,14 +56,15 @@ public final class LoginTask implements SessionTask, LoginManager {
     private final boolean transferring;
 
     /**
-     * Constructs the {@linkplain LoginTask login task}.
+     * Constructs the {@linkplain LoginSessionTask login session task}.
      *
      * @param connection a connection that the session task should be handled for
      * @param clientProtocolVersion a protocol version of the client trying to connect
      * @param transferring whether the client is joining due to transferring from another server
      * @throws IllegalStateException if the caller thread is not an event loop thread
      */
-    public LoginTask(@NonNull SocketPlayerConnection connection, int clientProtocolVersion, boolean transferring) {
+    public LoginSessionTask(@NonNull SocketPlayerConnection connection,
+                            int clientProtocolVersion, boolean transferring) {
         this.connection = NullabilityUtil.requireNonNull(connection, "connection");
         this.clientProtocolVersion = clientProtocolVersion;
         this.transferring = transferring;
@@ -151,19 +153,33 @@ public final class LoginTask implements SessionTask, LoginManager {
 
     /**
      * Awaits for a client login request and setups a compression for {@linkplain SocketPlayerConnection a socket
-     * player connection} of this {@linkplain LoginTask login session task}.
+     * player connection} of this {@linkplain LoginSessionTask login session task}, then awaits for when handlers are
+     * updated with the new compression threshold.
      *
-     * @throws InterruptedException if the current thread has been interrupted during waiting
+     * @throws InterruptedException if the current thread has been interrupted during waiting for the login request
      * @since 1.0
      */
     public void setupCompression() throws InterruptedException {
         try {
             this.requestFuture.get(TIME_OUT_TIME, TIME_OUT_UNIT);
-            int compressionThreshold = this.connection.server().configuration().compressionThreshold();
-            if (compressionThreshold < 0) return; // The compression is disabled
-            this.connection.setCompressionThreshold(compressionThreshold);
         } catch (ExecutionException | TimeoutException | CancellationException exception) {
             // The exception has been already handled by the login session task thread
+        }
+
+        int compressionThreshold = this.connection.server().configuration().compressionThreshold();
+        if (compressionThreshold < 0) return; // The compression is disabled
+
+        try {
+            CompletableFuture<SocketPlayerConnection.PacketSendResult> resultFuture = new CompletableFuture<>();
+            CompletableFuture<Void> handlerUpdateFuture = resultFuture.thenAccept(result -> {
+                if (result == SocketPlayerConnection.PacketSendResult.SUCCESS)
+                    this.connection.updateHandlers(compressionThreshold);
+            });
+
+            this.connection.sendPacket(new ServerEnableCompressionLoginPacket(compressionThreshold), resultFuture);
+            handlerUpdateFuture.get();
+        } catch (ExecutionException exception) {
+            throw new RuntimeException("An error occurred during setting the compression", exception);
         }
     }
 
@@ -192,7 +208,7 @@ public final class LoginTask implements SessionTask, LoginManager {
                 this.acknowledgeFuture.get(TIME_OUT_TIME, TIME_OUT_UNIT);
 
                 sessionAcquisition.set(new Session(ProtocolState.CONFIGURATION, this.connection,
-                        new ConfigurationTask(player)));
+                        new ConfigurationSessionTask(player)));
 
                 this.connection.clientPacketReader().resumePacketReading();
             } catch (TimeoutException exception) {

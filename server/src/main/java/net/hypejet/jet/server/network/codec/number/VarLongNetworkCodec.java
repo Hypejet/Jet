@@ -8,13 +8,14 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Represents {@linkplain NetworkCodec a network codec}, which reads and writes a variable-length long.
  *
  * @since 1.0
- * @author Codestech
  * @see NetworkCodec
  */
 public final class VarLongNetworkCodec implements NetworkCodec<Long> {
 
     private static final byte SEGMENT_BITS = 0x7F;
-    private static final int CONTINUE_BIT = 0x80;
+    private static final short CONTINUE_BIT = 0x80;
+
+    private static final byte MAX_LENGTH = 64;
 
     /**
      * An instance of the {@linkplain VarLongNetworkCodec variable-length long network codec}.
@@ -39,7 +40,12 @@ public final class VarLongNetworkCodec implements NetworkCodec<Long> {
             if ((currentByte & CONTINUE_BIT) == 0) break;
 
             position += 7;
-            if (position >= 64) throw new IllegalArgumentException("VarLong is bigger than maximum allowed");
+            if (position >= MAX_LENGTH) {
+                throw new IllegalArgumentException(String.format(
+                        "Variable-length long is bigger than maximum allowed (%s >= %s)",
+                        position, MAX_LENGTH
+                ));
+            }
         }
 
         return value;

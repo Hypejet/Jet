@@ -12,7 +12,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * from/as {@linkplain net.kyori.adventure.nbt.BinaryTag a binary tag}.
  *
  * @since 1.0
- * @author Codestech
  * @see Component
  * @see net.kyori.adventure.nbt.BinaryTag
  * @see NetworkWriter
@@ -41,7 +40,7 @@ public final class ComponentNetworkWriter implements NetworkWriter<Component> {
      * Creates the {@linkplain ComponentNetworkWriter component network writer}.
      *
      * @param serializer a serializer to serialize components with
-     * @return the writer, {@link #INSTANCE} is returned if the serializer specified is the same as in the instance
+     * @return the writer, {@link #INSTANCE} is returned if the serializer specified is the same as in it
      * @since 1.0
      */
     public static @NonNull ComponentNetworkWriter create(@NonNull NBTComponentSerializer serializer) {

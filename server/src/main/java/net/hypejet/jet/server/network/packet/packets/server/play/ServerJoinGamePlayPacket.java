@@ -1,9 +1,9 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.world.coordinate.BlockPosition;
-import net.hypejet.jet.entity.player.Player;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -23,27 +23,26 @@ import java.util.Set;
  * @param simulationDistance a distance within the player will process specific things, such as entities
  * @param reducedDebugInfo whether the reduced debug screen info should be shown for the player
  * @param enableRespawnScreen whether the respawn screen is enabled
- * @param limitedCrafting whether players can only recipes that they unlocked
+ * @param limitedCrafting whether players can only see recipes that they unlocked
  * @param dimensionType a numeric identifier from a registry of the dimension that the player is being spawned into
- * @param dimensionName a key of the dimension that the player is being spawned into
+ * @param dimensionKey a key of the dimension that the player is being spawned into
  * @param hashedSeed first 8 bytes of the SHA-256 hash of the seed of a world that the player is being spawned into
  * @param gameMode an initial game mode of the player
  * @param previousGameMode a previous game mode of the player, {@code null} if the game mode was not set for the player
  *                         before
  * @param debug whether the world is in the debug mode
  * @param flat whether the world is a super-flat world
- * @param deathLocation a death location of the player, {@code null} if the player did not die
+ * @param deathLocation a location where player has died, {@code null} if the player did not die
  * @param portalCooldown a number of ticks until the player can use portal again
  * @param seaLevel a sea level of the world
  * @param enforcesSecureChat whether the server enforces the player to use secure chat
  * @since 1.0
- * @author Codestech
  * @see ServerPacket
  */
 public record ServerJoinGamePlayPacket(
         int entityId, boolean hardcore, @NonNull Collection<Key> dimensions, int maxPlayers, int viewDistance,
         int simulationDistance, boolean reducedDebugInfo, boolean enableRespawnScreen, boolean limitedCrafting,
-        int dimensionType, @NonNull Key dimensionName, long hashedSeed, Player.@NonNull GameMode gameMode,
+        int dimensionType, @NonNull Key dimensionKey, long hashedSeed, Player.@NonNull GameMode gameMode,
         Player.@Nullable GameMode previousGameMode, boolean debug, boolean flat, @Nullable DeathLocation deathLocation,
         int portalCooldown, int seaLevel, boolean enforcesSecureChat
 ) implements ServerPacket {
@@ -58,16 +57,16 @@ public record ServerJoinGamePlayPacket(
      * @param simulationDistance a distance within the player will process specific things, such as entities
      * @param reducedDebugInfo whether the reduced debug screen info should be shown for the player
      * @param enableRespawnScreen whether the respawn screen is enabled
-     * @param limitedCrafting whether players can only recipes that they unlocked
+     * @param limitedCrafting whether players can only see recipes that they unlocked
      * @param dimensionType a numeric identifier from a registry of the dimension that the player is being spawned into
-     * @param dimensionName a key of the dimension that the player is being spawned into
+     * @param dimensionKey a key of the dimension that the player is being spawned into
      * @param hashedSeed first 8 bytes of the SHA-256 hash of the seed of a world that the player is being spawned into
      * @param gameMode an initial game mode of the player
-     * @param previousGameMode a previous game mode of the player, {@code null} if the game mode was not set for
-     *                         the player before
+     * @param previousGameMode a previous game mode of the player, {@code null} if the game mode was not set for the
+     *                         player before
      * @param debug whether the world is in the debug mode
      * @param flat whether the world is a super-flat world
-     * @param deathLocation a death location of the player, {@code null} if the player did not die
+     * @param deathLocation a location where player has died, {@code null} if the player did not die
      * @param portalCooldown a number of ticks until the player can use portal again
      * @param seaLevel a sea level of the world
      * @param enforcesSecureChat whether the server enforces the player to use secure chat
@@ -75,7 +74,7 @@ public record ServerJoinGamePlayPacket(
      */
     public ServerJoinGamePlayPacket {
         dimensions = Set.copyOf(NullabilityUtil.requireNonNull(dimensions, "dimensions"));
-        NullabilityUtil.requireNonNull(dimensionName, "dimension name");
+        NullabilityUtil.requireNonNull(dimensionKey, "dimension key");
         NullabilityUtil.requireNonNull(gameMode, "game mode");
     }
 
@@ -85,7 +84,6 @@ public record ServerJoinGamePlayPacket(
      * @param deathDimensionName a key of the dimension that the player died in
      * @param deathPosition a position where the player died at
      * @since 1.0
-     * @author Codestech
      */
     public record DeathLocation(@NonNull Key deathDimensionName, @NonNull BlockPosition deathPosition) {
         /**

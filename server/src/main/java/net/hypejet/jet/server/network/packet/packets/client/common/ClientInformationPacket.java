@@ -10,7 +10,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param settings the settings
  * @since 1.0
- * @author Codestech
  * @see ClientPacket
  */
 public record ClientInformationPacket(Player.@NonNull Settings settings)

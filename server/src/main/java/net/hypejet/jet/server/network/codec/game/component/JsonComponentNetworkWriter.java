@@ -12,7 +12,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * from/to a JSON string.
  *
  * @since 1.0
- * @author Codestech
  * @see Component
  * @see NetworkWriter
  */
@@ -41,8 +40,7 @@ public final class JsonComponentNetworkWriter implements NetworkWriter<Component
      * Creates the {@linkplain JsonComponentNetworkWriter json component network writer}.
      *
      * @param serializer a serializer to serialize the components with
-     * @return the component network writer, {@link #INSTANCE} if the serializer specified is the same as in
-     *         the instance
+     * @return the component network writer, {@link #INSTANCE} if the serializer specified is the same as in it
      * @since 1.0
      */
     public static @NonNull JsonComponentNetworkWriter create(@NonNull JSONComponentSerializer serializer) {

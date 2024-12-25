@@ -9,12 +9,11 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.Collection;
 
 /**
- * Represents {@linkplain AggregateNetworkWriter an aggregate network writer}, which
- * writes {@linkplain Collection a collection}.
+ * Represents {@linkplain AggregateNetworkWriter an aggregate network writer}, which writes
+ * {@linkplain Collection a collection}.
  *
  * @param <E> a type of the elements of the collection
  * @since 1.0
- * @author Codestech
  * @see Collection
  * @see AggregateNetworkWriter
  */

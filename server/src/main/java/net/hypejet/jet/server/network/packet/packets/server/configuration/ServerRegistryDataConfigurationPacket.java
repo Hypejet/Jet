@@ -16,7 +16,6 @@ import java.util.List;
  * @param registry an identifier of the registry
  * @param entries entries of the registry
  * @since 1.0
- * @author Coedstech
  * @see Entry
  * @see ServerPacket
  */
@@ -39,7 +38,6 @@ public record ServerRegistryDataConfigurationPacket(@NonNull Key registry, @NonN
      * @param key a key of the entry
      * @param data data of the entry, {@code null} if the client knows the value
      * @since 1.0
-     * @author Codestech
      * @see ServerRegistryDataConfigurationPacket
      */
     public record Entry(@NonNull Key key, @Nullable BinaryTag data) {

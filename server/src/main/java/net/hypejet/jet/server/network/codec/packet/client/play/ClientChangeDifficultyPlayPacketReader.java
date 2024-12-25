@@ -2,10 +2,10 @@ package net.hypejet.jet.server.network.codec.packet.client.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.data.codecs.util.mapper.Mapper;
-import net.hypejet.jet.server.network.packet.packets.client.play.ClientChangeDifficultyPlayPacket;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.PrimitiveNetworkCodecs;
 import net.hypejet.jet.server.network.codec.mapper.MapperNetworkCodec;
+import net.hypejet.jet.server.network.packet.packets.client.play.ClientChangeDifficultyPlayPacket;
 import net.hypejet.jet.world.difficulty.Difficulty;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -14,11 +14,18 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * {@linkplain ClientChangeDifficultyPlayPacket a change difficulty play packet}.
  *
  * @since 1.0
- * @author Codestech
  * @see ClientChangeDifficultyPlayPacket
  * @see NetworkReader
  */
 public final class ClientChangeDifficultyPlayPacketReader implements NetworkReader<ClientChangeDifficultyPlayPacket> {
+
+    /**
+     * An instance of the {@linkplain ClientChangeDifficultyPlayPacketReader client change difficulty play packet
+     * reader}.
+     *
+     * @since 1.0
+     */
+    public static final ClientChangeDifficultyPlayPacketReader INSTANCE = new ClientChangeDifficultyPlayPacketReader();
 
     private static final MapperNetworkCodec<Difficulty, Byte> DIFFICULTY_CODEC = new MapperNetworkCodec<>(
             Mapper.builder(Difficulty.class, byte.class)
@@ -29,6 +36,8 @@ public final class ClientChangeDifficultyPlayPacketReader implements NetworkRead
                     .build(),
             PrimitiveNetworkCodecs.BYTE
     );
+
+    private ClientChangeDifficultyPlayPacketReader() {}
 
     @Override
     public @NonNull ClientChangeDifficultyPlayPacket read(@NonNull ByteBuf buf) {

@@ -1,12 +1,12 @@
 package net.hypejet.jet.server.network.codec.packet.server.play;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket;
-import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket.RelativeFlag;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.world.coordinate.VectorNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket.RelativeFlag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -19,14 +19,24 @@ import java.util.Set;
  * {@linkplain ServerSynchronizePositionPlayPacket a synchronize position play packet}.
  *
  * @since 1.0
- * @author Codestech
  * @see ServerSynchronizePositionPlayPacket
  * @see NetworkWriter
  */
 public final class ServerSynchronizePositionPlayPacketWriter
         implements NetworkWriter<ServerSynchronizePositionPlayPacket> {
 
+    /**
+     * An instance of the {@linkplain ServerSynchronizePositionPlayPacketWriter server synchronize position play packet
+     * writer}.
+     *
+     * @since 1.0
+     */
+    public static final ServerSynchronizePositionPlayPacketWriter
+            INSTANCE = new ServerSynchronizePositionPlayPacketWriter();
+
     private static final RelativeFlagCollectionNetworkCodec FLAG_CODEC = new RelativeFlagCollectionNetworkCodec();
+
+    private ServerSynchronizePositionPlayPacketWriter() {}
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerSynchronizePositionPlayPacket object) {
@@ -43,7 +53,6 @@ public final class ServerSynchronizePositionPlayPacketWriter
      * {@linkplain Collection a collection} of {@linkplain RelativeFlag relative flags}.
      *
      * @since 1.0
-     * @author Codestech
      * @see RelativeFlag
      * @see Collection
      * @see NetworkCodec

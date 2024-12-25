@@ -13,7 +13,6 @@ import java.util.BitSet;
  * Represents {@linkplain NetworkReader a network reader}, which reads {@linkplain SeenMessages seen messages}.
  *
  * @since 1.0
- * @author Codesteh
  * @see SeenMessages
  * @see NetworkReader
  */

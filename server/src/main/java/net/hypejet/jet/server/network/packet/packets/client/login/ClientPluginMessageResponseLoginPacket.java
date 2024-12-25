@@ -14,7 +14,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param successful whether the client understood the plugin message
  * @param data a response data, {@code null} if none
  * @since 1.0
- * @author Codestech
  * @see ServerPluginMessageRequestLoginPacket
  * @see ClientPacket
  */

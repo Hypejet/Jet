@@ -1,8 +1,8 @@
 package net.hypejet.jet.server.network.codec.game.world.coordinate;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
+import net.hypejet.jet.world.coordinate.BlockPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -10,7 +10,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * position}.
  *
  * @since 1.0
- * @author Codestech
  * @see BlockPosition
  * @see NetworkCodec
  */

@@ -8,7 +8,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Represents {@linkplain AggregateNetworkReader an aggregate network reader}, which reads a byte array.
  *
  * @since 1.0
- * @author Codestech
  * @see AggregateNetworkReader
  */
 public final class ByteArrayNetworkReader extends AggregateNetworkReader<byte[]> {

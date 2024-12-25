@@ -17,7 +17,6 @@ import java.util.List;
  * @param length a length of the text to replace
  * @param suggestions the suggestions
  * @since 1.0
- * @author Codestech
  * @see ServerPacket
  */
 public record ServerCommandSuggestionsResponsePlayPacket(int transactionId, int start, int length,
@@ -42,17 +41,16 @@ public record ServerCommandSuggestionsResponsePlayPacket(int transactionId, int 
      * response play packet}.
      *
      * @param text a text of the suggestion
-     * @param tooltip a tooltip of the suggestion, which is displayed when the suggestion is being hovered
+     * @param tooltip a tooltip of the suggestion, which should be displayed when the suggestion is being hovered
      *                on a client, {@code null} if none
      * @since 1.0
-     * @author Codestech
      */
     public record Suggestion(@NonNull String text, @Nullable Component tooltip) {
         /**
          * Constructs the {@linkplain Suggestion suggestion}.
          *
          * @param text a text of the suggestion
-         * @param tooltip a tooltip of the suggestion, which is displayed when the suggestion is being hovered
+         * @param tooltip a tooltip of the suggestion, which should be displayed when the suggestion is being hovered
          *                on a client, {@code null} if none
          * @since 1.0
          */

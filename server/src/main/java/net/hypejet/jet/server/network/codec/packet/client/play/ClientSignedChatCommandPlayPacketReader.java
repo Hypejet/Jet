@@ -1,11 +1,11 @@
 package net.hypejet.jet.server.network.codec.packet.client.play;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.server.network.packet.packets.client.play.ClientSignedChatCommandPlayPacket;
 import net.hypejet.jet.server.network.codec.NetworkReader;
-import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.codec.game.signing.SeenMessagesNetworkReader;
 import net.hypejet.jet.server.network.codec.game.signing.SignedArgumentNetworkReader;
+import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
+import net.hypejet.jet.server.network.packet.packets.client.play.ClientSignedChatCommandPlayPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -13,12 +13,23 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * {@linkplain ClientSignedChatCommandPlayPacket a signed chat command play packet}.
  *
  * @since 1.0
- * @author Codestech
  * @see ClientSignedChatCommandPlayPacket
  * @see NetworkReader
  */
 public final class ClientSignedChatCommandPlayPacketReader
         implements NetworkReader<ClientSignedChatCommandPlayPacket> {
+
+    /**
+     * An instance of the {@linkplain ClientSignedChatCommandPlayPacketReader client signed chat command play packet
+     * reader}.
+     *
+     * @since 1.0
+     */
+    public static final ClientSignedChatCommandPlayPacketReader
+            INSTANCE = new ClientSignedChatCommandPlayPacketReader();
+
+    private ClientSignedChatCommandPlayPacketReader() {}
+
     @Override
     public @NonNull ClientSignedChatCommandPlayPacket read(@NonNull ByteBuf buf) {
         return new ClientSignedChatCommandPlayPacket(

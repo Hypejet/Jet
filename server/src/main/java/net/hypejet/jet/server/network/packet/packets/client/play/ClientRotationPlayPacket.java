@@ -16,7 +16,6 @@ import java.util.EnumSet;
  * @param pitch an absolute rotation on the {@code Y} axis, in degrees
  * @param flags flags of the new position
  * @since 1.0
- * @author Codestech
  * @see ClientPacket
  */
 public record ClientRotationPlayPacket(float yaw, float pitch, @NonNull Collection<PositionFlag> flags)

@@ -12,7 +12,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <E> the type of the objects
  * @since 1.0
- * @author Codestech
  * @see AggregateNetworkWriter
  */
 public final class ObjectArrayNetworkWriter<E> extends AggregateNetworkWriter<E[]> {

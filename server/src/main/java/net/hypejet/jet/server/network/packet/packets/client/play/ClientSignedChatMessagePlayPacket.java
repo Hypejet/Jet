@@ -17,7 +17,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param signature the signature, {@code null} if not present
  * @param seenMessages last messages, which were sent by the client
  * @since 1.0
- * @author Codestech
  * @see ClientPacket
  */
 public record ClientSignedChatMessagePlayPacket(@NonNull String message, long timestamp,

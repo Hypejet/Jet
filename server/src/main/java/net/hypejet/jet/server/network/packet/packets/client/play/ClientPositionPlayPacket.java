@@ -12,11 +12,10 @@ import java.util.EnumSet;
  * Represents {@linkplain ClientPacket a client packet}, which is sent by a client when it changes their position.
  *
  * @param x an absolute {@code X} value of the new position
- * @param feetY an absolute {@code Y feet Y} of the new position
+ * @param feetY an absolute {@code feet Y} value of the new position
  * @param z an absolute {@code Z} value of the new position
  * @param flags flags of the new position
  * @since 1.0
- * @author Codestech
  * @see ClientPacket
  */
 public record ClientPositionPlayPacket(double x, double feetY, double z, @NonNull Collection<PositionFlag> flags)
@@ -25,7 +24,7 @@ public record ClientPositionPlayPacket(double x, double feetY, double z, @NonNul
      * Constructs the {@linkplain ClientPositionPlayPacket client position play packet}.
      *
      * @param x an absolute {@code X} value of the new position
-     * @param feetY an absolute {@code Y feet Y} of the new position
+     * @param feetY an absolute {@code feet Y} value of the new position
      * @param z an absolute {@code Z} value of the new position
      * @param flags flags of the new position
      * @since 1.0

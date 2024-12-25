@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.network.packet.handler.status;
 
-import net.hypejet.jet.server.network.packet.packets.client.common.ClientPingRequestPacket;
 import net.hypejet.jet.server.network.packet.handler.ClientPacketHandler;
+import net.hypejet.jet.server.network.packet.packets.client.common.ClientPingRequestPacket;
 import net.hypejet.jet.server.network.session.Session;
 import net.hypejet.jet.server.network.session.task.StatusSessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -10,10 +10,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Represents {@linkplain ClientPacketHandler a client packet handler}, which handles
  * {@linkplain ClientPingRequestPacket a client ping request status packet}.
  *
- * @author Codestech
+ * @since 1.0
  * @see ClientPingRequestPacket
  * @see ClientPacketHandler
- * @since 1.0
  */
 public final class ClientPingRequestStatusPacketHandler extends ClientPacketHandler<ClientPingRequestPacket> {
     /**

@@ -14,7 +14,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param channel a key of the channel that the message should be sent in
  * @param data a data of the plugin message
  * @since 1.0
- * @author Codestech
  * @see ServerPacket
  */
 public record ServerPluginMessageRequestLoginPacket(int messageId, @NonNull Key channel,

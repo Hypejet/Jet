@@ -10,7 +10,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <A> a type of the aggregate
  * @since 1.0
- * @author Codestech
  * @see NetworkReader
  */
 public abstract class AggregateNetworkReader<A> implements NetworkReader<A> {
@@ -30,8 +29,12 @@ public abstract class AggregateNetworkReader<A> implements NetworkReader<A> {
     @Override
     public @NonNull A read(@NonNull ByteBuf buf) {
         int length = VarIntNetworkCodec.INSTANCE.read(buf);
-        if (length > this.maxLength)
-            throw tooLongAggregateException(length, this.maxLength);
+        if (length > this.maxLength) {
+            throw new IllegalArgumentException(String.format(
+                    "The aggregate is long than allowed (%s > %s).",
+                    length, this.maxLength
+            ));
+        }
         return this.decodeElements(length, buf);
     }
 
@@ -44,11 +47,4 @@ public abstract class AggregateNetworkReader<A> implements NetworkReader<A> {
      * @since 1.0
      */
     protected abstract @NonNull A decodeElements(int length, @NonNull ByteBuf buf);
-
-    private static @NonNull IllegalArgumentException tooLongAggregateException(int length, int maxLength) {
-        return new IllegalArgumentException(String.format(
-                "The aggregate is long than allowed (%s > %s).",
-                length, maxLength
-        ));
-    }
 }

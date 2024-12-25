@@ -11,12 +11,11 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Represents {@linkplain AggregateNetworkReader an aggregate network reader}, which
- * reads {@linkplain Collection a collection}.
+ * Represents {@linkplain AggregateNetworkReader an aggregate network reader}, which reads
+ * {@linkplain Collection a collection}.
  *
  * @param <E> a type of elements of the collection
  * @since 1.0
- * @author Codestech
  * @see Collection
  * @see AggregateNetworkReader
  */

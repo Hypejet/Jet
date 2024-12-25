@@ -11,7 +11,6 @@ import java.util.Locale;
  * Represents {@linkplain NetworkReader a network reader}, which reads {@linkplain Locale a locale}.
  *
  * @since 1.0
- * @author Codestech
  * @see Locale
  * @see NetworkReader
  */

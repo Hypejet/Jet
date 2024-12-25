@@ -9,12 +9,11 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Represents {@linkplain ServerPacket a server packet}, which changes server links displayed on a client
- * in a pause menu.
+ * Represents {@linkplain ServerPacket a server packet}, which changes server links displayed on a client in a pause
+ * menu.
  *
  * @param serverLinks the server links
  * @since 1.0
- * @author Codestech
  * @see ServerLink
  * @see ServerPacket
  */

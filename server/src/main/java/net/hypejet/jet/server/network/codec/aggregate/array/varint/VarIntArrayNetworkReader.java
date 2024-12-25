@@ -10,7 +10,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * array.
  *
  * @since 1.0
- * @author Codestech
  * @see AggregateNetworkReader
  */
 public final class VarIntArrayNetworkReader extends AggregateNetworkReader<int[]> {

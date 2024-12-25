@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.network.packet.handler.common;
 
-import net.hypejet.jet.server.network.packet.packets.client.common.ClientInformationPacket;
 import net.hypejet.jet.server.network.packet.handler.ClientPacketHandler;
+import net.hypejet.jet.server.network.packet.packets.client.common.ClientInformationPacket;
 import net.hypejet.jet.server.network.session.Session;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -10,7 +10,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * handles {@linkplain ClientInformationPacket a client information packet}.
  *
  * @since 1.0
- * @author Codestech
  * @see ClientInformationPacket
  * @see ClientPacketHandler
  */

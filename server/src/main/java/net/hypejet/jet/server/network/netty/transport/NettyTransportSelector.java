@@ -6,7 +6,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Represents a something that selects {@linkplain NettyTransportType a netty transport type}.
  *
  * @since 1.0
- * @author Codestech
  */
 public enum NettyTransportSelector {
     /**

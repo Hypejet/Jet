@@ -3,12 +3,12 @@ package net.hypejet.jet.server.network.packet.handler.play;
 import com.mojang.brigadier.Message;
 import com.mojang.brigadier.context.StringRange;
 import net.hypejet.jet.command.tooltip.ComponentTooltip;
-import net.hypejet.jet.server.network.packet.packets.client.play.ClientCommandSuggestionsRequestPlayPacket;
-import net.hypejet.jet.server.network.packet.packets.server.play.ServerCommandSuggestionsResponsePlayPacket;
-import net.hypejet.jet.server.network.packet.packets.server.play.ServerCommandSuggestionsResponsePlayPacket.Suggestion;
 import net.hypejet.jet.server.command.JetCommandManager;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.handler.ClientPacketHandler;
+import net.hypejet.jet.server.network.packet.packets.client.play.ClientCommandSuggestionsRequestPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerCommandSuggestionsResponsePlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerCommandSuggestionsResponsePlayPacket.Suggestion;
 import net.hypejet.jet.server.network.session.Session;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -20,10 +20,9 @@ import java.util.List;
  * Represents {@linkplain ClientPacketHandler a client packet handler}, which handles
  * {@linkplain ClientCommandSuggestionsRequestPlayPacket a client command suggestions request play packet}.
  *
- * @author Codestech
+ * @since 1.0
  * @see ClientCommandSuggestionsRequestPlayPacket
  * @see ClientPacketHandler
- * @since 1.0
  */
 public final class ClientCommandSuggestionsRequestPlayPacketHandler
         extends ClientPacketHandler<ClientCommandSuggestionsRequestPlayPacket> {

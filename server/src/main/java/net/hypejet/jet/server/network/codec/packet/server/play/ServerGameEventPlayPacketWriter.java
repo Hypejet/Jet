@@ -2,8 +2,8 @@ package net.hypejet.jet.server.network.codec.packet.server.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.entity.player.Player;
-import net.hypejet.jet.server.network.packet.packets.server.play.ServerGameEventPlayPacket;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerGameEventPlayPacket;
 import net.hypejet.jet.server.util.gamemode.GameModeUtil;
 import net.hypejet.jet.world.event.GameEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -13,11 +13,17 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * {@linkplain ServerGameEventPlayPacket a game event play packet}.
  *
  * @since 1.0
- * @author Codestech
  * @see ServerGameEventPlayPacket
  * @see NetworkWriter
  */
 public final class ServerGameEventPlayPacketWriter implements NetworkWriter<ServerGameEventPlayPacket> {
+
+    /**
+     * An instance of the {@linkplain ServerGameEventPlayPacketWriter server game event play packet writer}.
+     *
+     * @since 1.0
+     */
+    public static final ServerGameEventPlayPacketWriter INSTANCE = new ServerGameEventPlayPacketWriter();
 
     private static final byte NO_RESPAWN_BLOCK_AVAILABLE = 0;
     private static final byte BEGIN_RAINING = 1;
@@ -43,8 +49,11 @@ public final class ServerGameEventPlayPacketWriter implements NetworkWriter<Serv
     private static final int MIN_RAIN_LEVEL = 0;
     private static final int MAX_RAIN_LEVEL = 1;
 
+    private ServerGameEventPlayPacketWriter() {}
+
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerGameEventPlayPacket object) {
+        // TODO: Consider creating codecs for each game event and putting them into a map
         byte identifier;
         float value = 0;
 

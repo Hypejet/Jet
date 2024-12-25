@@ -7,12 +7,11 @@ import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents {@linkplain ServerPacket a server packet}, which sends a custom message to a client.
+ * Represents {@linkplain ServerPacket a server packet}, which contains a custom data sent by a server.
  *
- * @param key a key of the message
- * @param data data of the message
+ * @param key a key that the data should be distinguished with
+ * @param data the data
  * @since 1.0
- * @author Codesetech
  * @see ServerPacket
  */
 public record ServerPluginMessagePacket(@NonNull Key key, @NonNull UnmodifiableByteArray data)
@@ -20,8 +19,8 @@ public record ServerPluginMessagePacket(@NonNull Key key, @NonNull UnmodifiableB
     /**
      * Constructs the {@linkplain ServerPluginMessagePacket server plugin message packet}.
      *
-     * @param key a key of the message
-     * @param data data of the message
+     * @param key a key that the data should be distinguished with
+     * @param data the data
      * @since 1.0
      */
     public ServerPluginMessagePacket(@NonNull Key key, byte @NonNull [] data) {
@@ -31,8 +30,8 @@ public record ServerPluginMessagePacket(@NonNull Key key, @NonNull UnmodifiableB
     /**
      * Constructs the {@linkplain ServerPluginMessagePacket server plugin message packet}.
      *
-     * @param key a key of the message
-     * @param data data of the message
+     * @param key a key that the data should be distinguished with
+     * @param data the data
      * @since 1.0
      */
     public ServerPluginMessagePacket {

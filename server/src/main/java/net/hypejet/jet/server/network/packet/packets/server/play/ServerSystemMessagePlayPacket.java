@@ -11,7 +11,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param message the system message
  * @param overlay whether the message should be displayed on the action bar
  * @since 1.0
- * @author Codestech
  */
 public record ServerSystemMessagePlayPacket(@NonNull Component message, boolean overlay) implements ServerPacket {
     /**

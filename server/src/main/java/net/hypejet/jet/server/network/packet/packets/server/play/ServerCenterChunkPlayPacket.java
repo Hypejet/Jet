@@ -9,6 +9,5 @@ import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
  * @param chunkX an {@code X} value of the position
  * @param chunkZ an {@code Z} value of the position
  * @since 1.0
- * @author Codestech
  */
 public record ServerCenterChunkPlayPacket(int chunkX, int chunkZ) implements ServerPacket {}

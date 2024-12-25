@@ -9,7 +9,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param commandString the unparsed chat command
  * @since 1.0
- * @author Codestech
  * @see ClientPacket
  */
 public record ClientChatCommandPlayPacket(@NonNull String commandString) implements ClientPacket {

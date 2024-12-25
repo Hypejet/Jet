@@ -7,7 +7,6 @@ import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
  *
  * @param timestamp a system-dependent timestamp value counted in milliseconds of the time when the request was made
  * @since 1.0
- * @author Codestech
  * @see ClientPacket
  */
 public record ClientPingRequestPacket(long timestamp) implements ClientPacket {}

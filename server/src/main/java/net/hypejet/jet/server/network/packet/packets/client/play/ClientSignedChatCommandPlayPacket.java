@@ -1,5 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.client.play;
 
+import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import net.hypejet.jet.signing.SeenMessages;
 import net.hypejet.jet.signing.SignedArgument;
@@ -33,6 +34,6 @@ public record ClientSignedChatCommandPlayPacket(@NonNull String command, long ti
      * @since 1.0
      */
     public ClientSignedChatCommandPlayPacket {
-        arguments = Set.copyOf(arguments);
+        arguments = Set.copyOf(NullabilityUtil.requireNonNull(arguments, "arguments"));
     }
 }

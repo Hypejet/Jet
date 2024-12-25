@@ -15,7 +15,6 @@ import java.util.List;
  *
  * @param rootNode a command node containing all commands registered on the server
  * @since 1.0
- * @author Codestech
  */
 public record ServerDeclareCommandsPlayPacket(@NonNull RootNode rootNode) implements ServerPacket {
     /**
@@ -35,7 +34,6 @@ public record ServerDeclareCommandsPlayPacket(@NonNull RootNode rootNode) implem
      * since it is hard - if not impossible - to do while children can redirect to their parents.</p>
      *
      * @since 1.0
-     * @author Codestech
      * @see ServerDeclareCommandsPlayPacket
      */
     public sealed interface Node {
@@ -68,7 +66,6 @@ public record ServerDeclareCommandsPlayPacket(@NonNull RootNode rootNode) implem
      * Represents {@linkplain Node a command node}, which is a root of a command node tree.
      *
      * @since 1.0
-     * @author Codestech
      * @see Node
      */
     public static final class RootNode implements Node {
@@ -129,7 +126,6 @@ public record ServerDeclareCommandsPlayPacket(@NonNull RootNode rootNode) implem
      * Represents {@linkplain Node a command node}, which requires a literal string to be typed to execute the node.
      *
      * @since 1.0
-     * @author Codestech
      * @see Node
      */
     public static final class LiteralNode implements Node {
@@ -206,7 +202,6 @@ public record ServerDeclareCommandsPlayPacket(@NonNull RootNode rootNode) implem
      * Represents {@linkplain Node a node}, which executes with an argument typed by a command source.
      *
      * @since 1.0
-     * @author Codestech
      */
     public static final class ArgumentNode implements Node {
 
@@ -316,7 +311,6 @@ public record ServerDeclareCommandsPlayPacket(@NonNull RootNode rootNode) implem
      * Represents a method how suggestions of an argument are displayed.
      *
      * @since 1.0
-     * @author Codestech
      * @see Node
      */
     public enum SuggestionsType {
@@ -352,7 +346,6 @@ public record ServerDeclareCommandsPlayPacket(@NonNull RootNode rootNode) implem
      * <p>This allows to use node before children initialization.</p>
      *
      * @since 1.0
-     * @author Codestech
      * @see Node
      */
     @FunctionalInterface

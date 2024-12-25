@@ -1,10 +1,10 @@
 package net.hypejet.jet.server.network.codec.packet.client.login;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.server.network.packet.packets.client.login.ClientLoginRequestLoginPacket;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.codec.other.UUIDNetworkCodec;
+import net.hypejet.jet.server.network.packet.packets.client.login.ClientLoginRequestLoginPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -12,11 +12,20 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * login packet}.
  *
  * @since 1.0
- * @author Codestech
  * @see ClientLoginRequestLoginPacket
  * @see NetworkReader
  */
 public final class ClientLoginRequestLoginPacketReader implements NetworkReader<ClientLoginRequestLoginPacket> {
+
+    /**
+     * An instance of the {@linkplain ClientLoginRequestLoginPacketReader client login request login packet reader}.
+     *
+     * @since 1.0
+     */
+    public static final ClientLoginRequestLoginPacketReader INSTANCE = new ClientLoginRequestLoginPacketReader();
+
+    private ClientLoginRequestLoginPacketReader() {}
+
     @Override
     public @NonNull ClientLoginRequestLoginPacket read(@NonNull ByteBuf buf) {
         return new ClientLoginRequestLoginPacket(

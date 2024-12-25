@@ -13,9 +13,9 @@ import java.util.function.Function;
  * Represents {@linkplain ObjectAcquisition an object acquisition}, which maps a map of an already existing
  * {@linkplain MapAcquisition map acquisition}.
  *
- * @param <K> a type of key of map of the map acquisition
- * @param <V> a type of value of map of the map acquisition
- * @param <M> a type of map of the map acquisition
+ * @param <K> a type of key of guarded map of the map acquisition
+ * @param <V> a type of value of guarded map of the map acquisition
+ * @param <M> a type of guarded map of the map acquisition
  * @param <O> a type that map of the map acquisition map should be mapped to
  * @since 1.0
  * @see MapAcquisition
@@ -52,5 +52,15 @@ public final class MapToObjectMappedAcquisition<K, V, M extends Map<K, V>, O> im
     @Override
     public void close() {
         this.originalAcquisition.close();
+    }
+
+    @Override
+    public void ensurePermittedAndLocked() {
+        this.originalAcquisition.ensurePermittedAndLocked();
+    }
+
+    @Override
+    public @NotNull AcquisitionType acquisitionType() {
+        return this.originalAcquisition.acquisitionType();
     }
 }

@@ -9,10 +9,9 @@ import net.hypejet.jet.signing.SignedArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents {@linkplain NetworkReader a network reader}, which {@linkplain SignedArgument a signed argument}.
+ * Represents {@linkplain NetworkReader a network reader}, which reads {@linkplain SignedArgument a signed argument}.
  *
  * @since 1.0
- * @author Codestech
  * @see SignedArgument
  * @see NetworkReader
  */

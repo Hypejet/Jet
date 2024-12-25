@@ -3,14 +3,13 @@ package net.hypejet.jet.server.network.session.task;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.event.events.serverlist.ServerListPingEvent;
 import net.hypejet.jet.ping.ServerListPing;
-import net.hypejet.jet.server.network.ProtocolState;
-import net.hypejet.jet.server.network.packet.packets.client.common.ClientPingRequestPacket;
-import net.hypejet.jet.server.network.packet.packets.server.status.ServerListResponseStatusPacket;
-import net.hypejet.jet.server.network.packet.packets.server.common.ServerPingResponsePacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
+import net.hypejet.jet.server.network.packet.packets.client.common.ClientPingRequestPacket;
 import net.hypejet.jet.server.network.packet.packets.client.status.ClientServerListRequestStatusPacket;
+import net.hypejet.jet.server.network.packet.packets.server.common.ServerPingResponsePacket;
+import net.hypejet.jet.server.network.packet.packets.server.status.ServerListResponseStatusPacket;
 import net.hypejet.jet.server.util.unit.Unit;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
@@ -25,12 +24,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Represents {@linkplain SessionTask a session task}, which handles {@linkplain ProtocolState#STATUS a status
- * protocol state}.
+ * Represents {@linkplain SessionTask a session task}, which handles
+ * {@linkplain net.hypejet.jet.server.network.ProtocolState#STATUS a status protocol state}.
  *
  * @since 1.0
- * @author Codestech
- * @see ProtocolState#STATUS
+ * @see net.hypejet.jet.server.network.ProtocolState#STATUS
  * @see SessionTask
  */
 public final class StatusSessionTask implements SessionTask {
@@ -134,7 +132,7 @@ public final class StatusSessionTask implements SessionTask {
         return new ServerListPing(new ServerListPing.Version(server.minecraftVersion(), server.protocolVersion()),
                 // TODO: An actual list of players online
                 new ServerListPing.Players(configuration.maxPlayers(), 0, List.of()),
-                configuration.serverListDescription(), server.serverIcon(), false, /* TODO: An actual property*/ false,
-                /* TODO: An actual property*/ null);
+                configuration.serverListDescription(), server.serverIcon(), false,
+                /* TODO: An actual property*/ false, /* TODO: An actual property*/ null);
     }
 }

@@ -12,7 +12,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param sharedSecret a shared secret value, which is encrypted with a public key of the server
  * @param verifyToken a verify token value, which is encrypted with a public key of the server
  * @since 1.0
- * @author Codestech
  * @see ClientPacket
  * @see ServerEncryptionRequestLoginPacket
  */

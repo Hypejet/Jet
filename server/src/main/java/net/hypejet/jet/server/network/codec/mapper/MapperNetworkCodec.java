@@ -7,13 +7,12 @@ import net.hypejet.jet.server.network.codec.NetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents {@linkplain NetworkCodec a network codec}, which reads and writes values
- * using {@linkplain Mapper a mapper}.
+ * Represents {@linkplain NetworkCodec a network codec}, which reads and writes values using
+ * {@linkplain Mapper a mapper}.
  *
  * @param <R> a type of read value of the mapper
  * @param <W> a type of written value of the mapper
  * @since 1.0
- * @author Codestech
  * @see Mapper
  * @see NetworkCodec
  */

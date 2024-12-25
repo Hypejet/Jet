@@ -4,6 +4,7 @@ import net.hypejet.concurrency.collection.CollectionAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.function.Predicate;
@@ -48,5 +49,15 @@ public final class CollectionToBooleanMappedAcquisition<V, C extends Collection<
     @Override
     public void close() {
         this.originalAcquisition.close();
+    }
+
+    @Override
+    public void ensurePermittedAndLocked() {
+        this.originalAcquisition.ensurePermittedAndLocked();
+    }
+
+    @Override
+    public @NotNull AcquisitionType acquisitionType() {
+        return this.originalAcquisition.acquisitionType();
     }
 }

@@ -5,11 +5,10 @@ import net.hypejet.jet.server.network.packet.handler.NetworkDisconnectionHandler
 /**
  * Represents a task of {@linkplain net.hypejet.jet.server.network.session.Session a session}.
  *
- * <p>Session tasks during construction are not safe for all packet operations. That should be done in {@link #start()}
- * instead.</p>
+ * <p>Session tasks during construction are not safe for any packet operations. They should be done in {@link #start()}
+ * method instead.</p>
  *
  * @since 1.0
- * @author Codestech
  */
 public interface SessionTask extends NetworkDisconnectionHandler {
     /**

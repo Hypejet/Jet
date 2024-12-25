@@ -1,13 +1,13 @@
 package net.hypejet.jet.server.network.codec.packet.server.play;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.server.network.packet.packets.server.play.ServerCommandSuggestionsResponsePlayPacket;
-import net.hypejet.jet.server.network.packet.packets.server.play.ServerCommandSuggestionsResponsePlayPacket.Suggestion;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.component.ComponentNetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerCommandSuggestionsResponsePlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerCommandSuggestionsResponsePlayPacket.Suggestion;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -16,15 +16,25 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * {@linkplain ServerCommandSuggestionsResponsePlayPacket a command suggestions response play packet}.
  *
  * @since 1.0
- * @author Codestech
  * @see ServerCommandSuggestionsResponsePlayPacket
  * @see NetworkWriter
  */
 public final class ServerCommandSuggestionsResponsePlayPacketWriter
         implements NetworkWriter<ServerCommandSuggestionsResponsePlayPacket> {
 
+    /**
+     * An instance of the {@linkplain ServerCommandSuggestionsResponsePlayPacketWriter server command suggestions
+     * response play packet writer}.
+     *
+     * @since 1.0
+     */
+    public static final ServerCommandSuggestionsResponsePlayPacketWriter
+            INSTANCE = new ServerCommandSuggestionsResponsePlayPacketWriter();
+
     private static final CollectionNetworkWriter<Suggestion> SUGGESTIONS_WRITER =
             new CollectionNetworkWriter<>(new SuggestionWriter());
+
+    private ServerCommandSuggestionsResponsePlayPacketWriter() {}
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerCommandSuggestionsResponsePlayPacket object) {
@@ -38,7 +48,6 @@ public final class ServerCommandSuggestionsResponsePlayPacketWriter
      * Represents {@linkplain NetworkWriter a network writer}, which writes {@linkplain Suggestion a suggestion}.
      *
      * @since 1.0
-     * @author Codestech
      * @see Suggestion
      * @see NetworkWriter
      */

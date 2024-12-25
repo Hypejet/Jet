@@ -14,7 +14,6 @@ import java.util.EnumSet;
  *
  * @param flags the new position flags
  * @since 1.0
- * @author Codestech
  * @see PositionFlag
  * @see ClientPacket
  */

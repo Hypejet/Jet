@@ -1,8 +1,8 @@
 package net.hypejet.jet.server.network.packet.packets.client.common;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import net.hypejet.jet.pack.ResourcePackState;
+import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.UUID;
@@ -14,7 +14,6 @@ import java.util.UUID;
  * @param uniqueId a unique identifier of the resource pack
  * @param state the state
  * @since 1.0
- * @author Codestech
  * @see ResourcePackState
  * @see ClientPacket
  */

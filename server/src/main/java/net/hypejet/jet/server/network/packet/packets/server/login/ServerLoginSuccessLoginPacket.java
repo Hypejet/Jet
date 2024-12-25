@@ -1,7 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.server.login;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.server.network.ProtocolState;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -18,8 +17,7 @@ import java.util.UUID;
  * @param username a username of a player that has logged in
  * @param properties additional properties of the login
  * @since 1.0
- * @author Codestech
- * @see ProtocolState#LOGIN
+ * @see net.hypejet.jet.server.network.ProtocolState#LOGIN
  * @see ServerPacket
  */
 public record ServerLoginSuccessLoginPacket(@NonNull UUID uniqueId, @NonNull String username,

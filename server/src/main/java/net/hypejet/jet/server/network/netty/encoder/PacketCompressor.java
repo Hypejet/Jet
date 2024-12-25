@@ -6,18 +6,14 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
-import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.util.CompressionUtil;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents {@linkplain MessageToByteEncoder a message-to-byte encoder}, which compresses serialized
- * {@linkplain ServerPacket server packets}.
+ * Represents {@linkplain MessageToByteEncoder a message-to-byte encoder}, which compresses outgoing packets.
  *
  * @since 1.0
- * @author Codsestech
- * @see ServerPacket
  * @see MessageToByteEncoder
  */
 public final class PacketCompressor extends MessageToByteEncoder<ByteBuf> {
@@ -42,7 +38,7 @@ public final class PacketCompressor extends MessageToByteEncoder<ByteBuf> {
         try {
             int dataLength = msg.readableBytes();
             if (this.compressionThreshold > dataLength) {
-                VarIntNetworkCodec.INSTANCE.write(out, 0);
+                VarIntNetworkCodec.INSTANCE.write(out, 0); // 0 indicates uncompressed
                 out.writeBytes(msg);
             } else {
                 VarIntNetworkCodec.INSTANCE.write(out, dataLength);

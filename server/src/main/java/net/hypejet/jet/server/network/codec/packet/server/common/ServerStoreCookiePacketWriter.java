@@ -1,9 +1,9 @@
 package net.hypejet.jet.server.network.codec.packet.server.common;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.server.network.packet.packets.server.common.ServerStoreCookiePacket;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.key.PackedKeyNetworkCodec;
+import net.hypejet.jet.server.network.packet.packets.server.common.ServerStoreCookiePacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -11,13 +11,21 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * store cookie packet}.
  *
  * @since 1.0
- * @author Codestech
  * @see ServerStoreCookiePacket
  * @see NetworkWriter
  */
 public final class ServerStoreCookiePacketWriter implements NetworkWriter<ServerStoreCookiePacket> {
 
+    /**
+     * An instance of the {@linkplain ServerStoreCookiePacketWriter sever store cookie packet writer}.
+     *
+     * @since 1.0
+     */
+    public static final ServerStoreCookiePacketWriter INSTANCE = new ServerStoreCookiePacketWriter();
+
     private static final int MAX_COOKIE_LENGTH = 5120;
+
+    private ServerStoreCookiePacketWriter() {}
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerStoreCookiePacket object) {

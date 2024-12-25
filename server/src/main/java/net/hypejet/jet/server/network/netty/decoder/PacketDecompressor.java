@@ -7,7 +7,6 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
-import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.util.CompressionUtil;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -15,12 +14,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.List;
 
 /**
- * Represents {@linkplain ByteToMessageDecoder a byte-to-message decoder}, which decompresses
- * {@linkplain ServerPacket server packets}.
+ * Represents {@linkplain ByteToMessageDecoder a byte-to-message decoder}, which decompresses incoming packets.
  *
  * @since 1.0
- * @author Codestech
- * @see ServerPacket
  * @see ByteToMessageDecoder
  */
 public final class PacketDecompressor extends ByteToMessageDecoder {
@@ -39,7 +35,7 @@ public final class PacketDecompressor extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-        if (!ctx.channel().isActive()) return; // The connection was closed
+        if (!ctx.channel().isActive()) return; // The connection has been closed
         int dataLength = VarIntNetworkCodec.INSTANCE.read(in);
 
         if (dataLength == 0) {

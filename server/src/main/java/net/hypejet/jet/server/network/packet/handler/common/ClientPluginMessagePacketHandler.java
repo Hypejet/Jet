@@ -3,9 +3,9 @@ package net.hypejet.jet.server.network.packet.handler.common;
 import net.hypejet.jet.event.events.player.PlayerChangeClientBrandEvent;
 import net.hypejet.jet.event.events.pluginmessage.PluginMessageEvent;
 import net.hypejet.jet.event.node.EventNode;
-import net.hypejet.jet.server.network.packet.packets.client.common.ClientPluginMessagePacket;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.handler.ClientPacketHandler;
+import net.hypejet.jet.server.network.packet.packets.client.common.ClientPluginMessagePacket;
 import net.hypejet.jet.server.network.session.Session;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -16,10 +16,9 @@ import java.nio.charset.StandardCharsets;
  * Represents {@linkplain ClientPacketHandler a client packet handler}, which handles
  * {@linkplain ClientPluginMessagePacket a client plugin message packet}.
  *
- * @author Codestech
+ * @since 1.0
  * @see ClientPluginMessagePacket
  * @see ClientPacketHandler
- * @since 1.0
  */
 public final class ClientPluginMessagePacketHandler extends ClientPacketHandler<ClientPluginMessagePacket> {
 

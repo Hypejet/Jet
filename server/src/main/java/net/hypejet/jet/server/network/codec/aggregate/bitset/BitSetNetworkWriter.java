@@ -11,7 +11,6 @@ import java.util.BitSet;
  * writes {@linkplain BitSet a bitset}.
  *
  * @since 1.0
- * @author Codestech
  * @see BitSet
  * @see AggregateNetworkWriter
  */

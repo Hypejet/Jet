@@ -13,7 +13,6 @@ import java.util.BitSet;
  * a length specified during creation of the codec.
  *
  * @since 1.0
- * @author Codestech
  * @see BitSet
  * @see NetworkCodec
  */

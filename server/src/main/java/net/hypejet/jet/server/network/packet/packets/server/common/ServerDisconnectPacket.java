@@ -10,7 +10,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param reason the reason
  * @since 1.0
- * @author Codestech
  * @see ServerPacket
  */
 public record ServerDisconnectPacket(@NonNull Component reason) implements ServerPacket {

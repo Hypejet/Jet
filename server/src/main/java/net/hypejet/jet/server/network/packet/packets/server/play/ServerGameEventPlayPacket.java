@@ -10,7 +10,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param gameEvent the game event to trigger
  * @since 1.0
- * @author Codestech
  * @see GameEvent
  */
 public record ServerGameEventPlayPacket(@NonNull GameEvent gameEvent) implements ServerPacket {

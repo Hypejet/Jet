@@ -13,13 +13,12 @@ import java.nio.charset.StandardCharsets;
  * Represents {@linkplain NetworkCodec a network codec}, which reads and writes {@linkplain String a string}.
  *
  * @since 1.0
- * @author Codestech
  * @see String
  * @see NetworkCodec
  */
 public final class StringNetworkCodec implements NetworkCodec<String> {
 
-    private static final short MAX_STRING_SIZE = 32767;
+    private static final short MAX_STRING_SIZE = Short.MAX_VALUE;
 
     /**
      * An instance of the {@linkplain StringNetworkCodec string network codec}, which

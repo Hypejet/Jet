@@ -12,7 +12,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param key a key of the cookie
  * @param data a data of the cookie
  * @since 1.0
- * @author Codestech
  * @see ServerPacket
  */
 public record ServerStoreCookiePacket(@NonNull Key key, @NonNull UnmodifiableByteArray data)

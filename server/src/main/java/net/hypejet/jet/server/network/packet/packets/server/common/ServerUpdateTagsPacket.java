@@ -11,11 +11,10 @@ import java.util.Set;
 
 /**
  * Represents {@linkplain ServerPacket a server packet}, which performs an update
- * of {@linkplain TagRegistry tag registries} on client to synchronize with the server.
+ * of {@linkplain TagRegistry tag registries} on client to synchronize them with the server.
  *
  * @param registries the tag registries
  * @since 1.0
- * @author Codestech
  * @see TagRegistry
  * @see ServerPacket
  */
@@ -31,24 +30,25 @@ public record ServerUpdateTagsPacket(@NonNull Collection<TagRegistry> registries
     }
 
     /**
-     * Represents something that hold {@linkplain Tag tags} of
+     * Represents something that holds {@linkplain Tag tags} of
      * {@linkplain net.hypejet.jet.registry.MinecraftRegistry a Minecraft registry}.
      *
-     * @param identifier a key of the registry
+     * @param key a key of the registry
      * @param tags the tags
      * @since 1.0
      * @see net.hypejet.jet.registry.MinecraftRegistry
      * @see Tag
      */
-    public record TagRegistry(@NonNull Key identifier, @NonNull Collection<Tag> tags) {
+    public record TagRegistry(@NonNull Key key, @NonNull Collection<Tag> tags) {
         /**
          * Constructs the {@linkplain TagRegistry tag registry}.
          *
-         * @param identifier a key of the registry
+         * @param key a key of the registry
          * @param tags the tags
          * @since 1.0
          */
         public TagRegistry {
+            NullabilityUtil.requireNonNull(key, "key");
             tags = Set.copyOf(NullabilityUtil.requireNonNull(tags, "tags"));
         }
     }

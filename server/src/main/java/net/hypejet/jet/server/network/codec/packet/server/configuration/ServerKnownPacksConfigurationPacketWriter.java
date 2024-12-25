@@ -1,9 +1,9 @@
 package net.hypejet.jet.server.network.codec.packet.server.configuration;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerKnownPacksConfigurationPacket;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.pack.PackInfoNetworkCodec;
+import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerKnownPacksConfigurationPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -11,12 +11,23 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * {@linkplain ServerKnownPacksConfigurationPacket a known packs configuration packet}.
  *
  * @since 1.0
- * @author Codestech
  * @see ServerKnownPacksConfigurationPacket
  * @see NetworkWriter
  */
 public final class ServerKnownPacksConfigurationPacketWriter
         implements NetworkWriter<ServerKnownPacksConfigurationPacket> {
+
+    /**
+     * An instance of the {@linkplain ServerKnownPacksConfigurationPacketWriter server known packs configuration packet
+     * writer}.
+     *
+     * @since 1.0
+     */
+    public static final ServerKnownPacksConfigurationPacketWriter
+            INSTANCE = new ServerKnownPacksConfigurationPacketWriter();
+
+    private ServerKnownPacksConfigurationPacketWriter() {}
+
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerKnownPacksConfigurationPacket object) {
         PackInfoNetworkCodec.COLLECTION_CODEC.write(buf, object.featurePacks());

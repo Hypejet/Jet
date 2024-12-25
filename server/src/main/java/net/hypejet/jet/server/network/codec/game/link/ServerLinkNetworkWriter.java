@@ -19,7 +19,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Represents {@linkplain NetworkWriter a network writer}, which writes {@linkplain ServerLink a server link}.
  *
  * @since 1.0
- * @author Codestech
  * @see ServerLink
  * @see NetworkWriter
  */

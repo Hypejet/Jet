@@ -10,9 +10,9 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.ping.ServerListPing;
+import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.status.ServerListResponseStatusPacket;
-import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -25,13 +25,21 @@ import java.util.Map;
  * {@linkplain ServerListResponseStatusPacket a server list response status packet}.
  * 
  * @since 1.0
- * @author Codestech
  * @see ServerListResponseStatusPacket
  * @see NetworkWriter
  */
 public final class ServerListResponseStatusPacketWriter implements NetworkWriter<ServerListResponseStatusPacket> {
 
+    /**
+     * An instance of the {@linkplain ServerListResponseStatusPacketWriter server list response status packet writer}.
+     *
+     * @since 1.0
+     */
+    public static final ServerListResponseStatusPacketWriter INSTANCE = new ServerListResponseStatusPacketWriter();
+
     private static final ServerListPingNetworkWriter SERVER_LIST_PING_WRITER = new ServerListPingNetworkWriter();
+
+    private ServerListResponseStatusPacketWriter() {}
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerListResponseStatusPacket object) {
@@ -129,7 +137,7 @@ public final class ServerListResponseStatusPacketWriter implements NetworkWriter
 
     /**
      * Represents {@linkplain JsonSerializer a json serializer}, which serializes
-     * {@linkplain ServerListPing.Players server list ping players} to {@linkplain JsonElement s json element}.
+     * {@linkplain ServerListPing.Players server list ping players} to {@linkplain JsonElement a json element}.
      *
      * @since 1.0
      * @see ServerListPing.Players

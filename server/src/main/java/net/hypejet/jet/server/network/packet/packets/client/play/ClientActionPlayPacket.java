@@ -5,21 +5,21 @@ import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents {@linkplain ClientPacket a client packet}, which is received when a player on a client performs
- * an action.
+ * Represents {@linkplain ClientPacket a client packet}, which is received when a player on a client performs an
+ * action.
  *
- * @param entityId an identifier of an entity, which taken part in the action, or an identifier of the player if none
+ * @param entityId an identifier of an entity, which has taken part in the action, or an identifier of the player
+ *                 if none
  * @param action the action
  * @param jumpBoost a horse jump boost of the player, used only if the action is {@link Action#START_JUMPING_WITH_HORSE}
  * @since 1.0
- * @author Codestech
  * @see ClientPacket
  */
 public record ClientActionPlayPacket(int entityId, @NonNull Action action, int jumpBoost) implements ClientPacket {
     /**
      * Constructs the {@linkplain ClientActionPlayPacket client action play packet}.
      *
-     * @param entityId an identifier of an entity, which taken part in the action, or an identifier of the player
+     * @param entityId an identifier of an entity, which has taken part in the action, or an identifier of the player
      *                 if none
      * @param action the action
      * @param jumpBoost a horse jump boost of the player, used only if the action

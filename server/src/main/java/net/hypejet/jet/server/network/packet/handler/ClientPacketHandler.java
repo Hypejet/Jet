@@ -10,7 +10,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <P> a type of the client packet
  * @since 1.0
- * @author Codestech
  * @see ClientPacket
  */
 public abstract class ClientPacketHandler<P extends ClientPacket> {

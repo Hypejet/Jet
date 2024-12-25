@@ -3,8 +3,8 @@ package net.hypejet.jet.server.network.netty.handler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.server.network.packet.RawPacket;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
+import net.hypejet.jet.server.network.packet.RawPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -12,7 +12,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * handles {@linkplain RawPacket raw packets} and adds them to a queue of incoming packets.
  *
  * @since 1.0
- * @author Codestech
  */
 public final class RawPacketHandler extends SimpleChannelInboundHandler<RawPacket> {
 

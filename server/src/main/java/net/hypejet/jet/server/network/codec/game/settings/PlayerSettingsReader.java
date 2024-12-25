@@ -15,7 +15,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Represents {@linkplain NetworkReader a network reader}, which reads {@linkplain Player.Settings player settings}.
  *
  * @since 1.0
- * @author Codestech
  * @see Player.Settings
  * @see NetworkReader
  */

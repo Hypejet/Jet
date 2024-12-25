@@ -10,7 +10,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <A> a type of the aggregate
  * @since 1.0
- * @author Codestech
  * @see NetworkWriter
  */
 public abstract class AggregateNetworkWriter<A> implements NetworkWriter<A> {
@@ -31,8 +30,12 @@ public abstract class AggregateNetworkWriter<A> implements NetworkWriter<A> {
     public final void write(@NonNull ByteBuf buf, @NonNull A object) {
         int length = this.length(object);
 
-        if (length > this.maxLength)
-            throw tooLongAggregateException(length, this.maxLength);
+        if (length > this.maxLength) {
+            throw new IllegalArgumentException(String.format(
+                    "The aggregate is long than allowed (%s > %s).",
+                    length, this.maxLength
+            ));
+        }
 
         VarIntNetworkCodec.INSTANCE.write(buf, length);
         this.encodeElements(object, buf);
@@ -55,11 +58,4 @@ public abstract class AggregateNetworkWriter<A> implements NetworkWriter<A> {
      * @since 1.0
      */
     protected abstract void encodeElements(@NonNull A aggregate, @NonNull ByteBuf buf);
-
-    private static @NonNull IllegalArgumentException tooLongAggregateException(int length, int maxLength) {
-        return new IllegalArgumentException(String.format(
-                "The aggregate is long than allowed (%s > %s).",
-                length, maxLength
-        ));
-    }
 }

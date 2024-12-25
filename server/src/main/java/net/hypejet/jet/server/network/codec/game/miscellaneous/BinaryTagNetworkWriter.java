@@ -13,7 +13,6 @@ import java.io.IOException;
  * Represents {@linkplain NetworkWriter a network writer}, which writes {@linkplain BinaryTag a binary tag}.
  *
  * @since 1.0
- * @author Codestech
  * @see BinaryTag
  * @see NetworkWriter
  */
@@ -30,10 +29,10 @@ public final class BinaryTagNetworkWriter implements NetworkWriter<BinaryTag> {
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull BinaryTag object) {
-        try {
+        try (ByteBufOutputStream outputStream = new ByteBufOutputStream(buf)) {
             BinaryTagType type = object.type();
             buf.writeByte(type.id());
-            type.write(object, new ByteBufOutputStream(buf));
+            type.write(object, outputStream);
         } catch (IOException exception) {
             throw new IllegalStateException(exception);
         }

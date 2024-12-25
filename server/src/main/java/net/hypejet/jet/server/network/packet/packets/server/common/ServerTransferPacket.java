@@ -10,7 +10,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param address an address of the new server
  * @param port a port of the new server
  * @since 1.0
- * @author Codestech
  * @see ServerPacket
  */
 public record ServerTransferPacket(@NonNull String address, int port) implements ServerPacket {

@@ -10,7 +10,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param key a key of the cookie
  * @since 1.0
- * @author Codestech
  * @see ServerStoreCookiePacket
  * @see ServerPacket
  */

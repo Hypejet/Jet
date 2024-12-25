@@ -10,7 +10,6 @@ import io.netty.buffer.ByteBuf;
  * This approach however should be avoided as much as possible.</p>
  *
  * @since 1.0
- * @author Codestech
  * @see ByteBuf
  * @see NetworkCodec
  */

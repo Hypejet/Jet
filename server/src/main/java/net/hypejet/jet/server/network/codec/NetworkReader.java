@@ -8,7 +8,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <T> a type of the object
  * @since 1.0
- * @author Codestech
  */
 @FunctionalInterface
 public interface NetworkReader<T> {

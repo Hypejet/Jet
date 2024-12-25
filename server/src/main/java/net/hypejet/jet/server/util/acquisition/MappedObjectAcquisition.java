@@ -46,4 +46,14 @@ public final class MappedObjectAcquisition<O, M> implements ObjectAcquisition<M>
     public void close() {
         this.originalAcquisition.close();
     }
+
+    @Override
+    public void ensurePermittedAndLocked() {
+        this.originalAcquisition.ensurePermittedAndLocked();
+    }
+
+    @Override
+    public @NotNull AcquisitionType acquisitionType() {
+        return this.originalAcquisition.acquisitionType();
+    }
 }

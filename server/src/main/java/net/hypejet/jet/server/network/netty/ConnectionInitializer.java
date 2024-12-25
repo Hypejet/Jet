@@ -16,8 +16,6 @@ import org.slf4j.LoggerFactory;
  * connections}.
  *
  * @since 1.0
- * @author Codestech
- *
  * @see ChannelInitializer
  * @see PlayerConnection
  */

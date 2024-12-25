@@ -16,7 +16,6 @@ import java.util.UUID;
  * @param keySignature a signature of the session, consists of a unique identifier of a player, a key expiration
  *                     timestamp and a public key data, hashed with SHA-1 and signed using private RSA key
  * @since 1.0
- * @author Codestech
  */
 public record ClientChatSessionUpdatePlayPacket(@NonNull UUID sessionId, long expiresAt,
                                                 @NonNull UnmodifiableByteArray publicKey,

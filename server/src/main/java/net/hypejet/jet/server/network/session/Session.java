@@ -14,9 +14,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param protocolState a protocol state that the session should manage
  * @param connection a connection that should own the session
  * @param sessionTask a session task that should manage the session
- * @author Codestech
- * @see ProtocolState
  * @since 1.0
+ * @see ProtocolState
  */
 public record Session(@NonNull ProtocolState protocolState, @NonNull SocketPlayerConnection connection,
                       @NonNull SessionTask sessionTask) implements NetworkDisconnectionHandler {

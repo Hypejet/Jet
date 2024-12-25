@@ -16,7 +16,6 @@ import java.util.Collection;
  * from/to a single {@linkplain String string}.
  *
  * @since 1.0
- * @author Codestech
  * @see Key
  * @see String
  * @see NetworkCodec
@@ -32,8 +31,8 @@ public final class PackedKeyNetworkCodec implements NetworkCodec<Key> {
 
     /**
      * An instance of {@linkplain NetworkCodec a network codec}, which reads and writes
-     * {@linkplain Collection collections} of {@linkplain Key keys} using {@linkplain PackedKeyNetworkCodec a packed
-     * key network codec}.
+     * {@linkplain Collection collections} of {@linkplain Key keys} using
+     * {@linkplain PackedKeyNetworkCodec a packed key network codec}.
      *
      * @since 1.0
      */

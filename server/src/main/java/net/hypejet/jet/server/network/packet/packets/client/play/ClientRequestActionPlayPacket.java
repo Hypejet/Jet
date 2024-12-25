@@ -9,7 +9,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param action the action
  * @since 1.0
- * @author Codestech
  * @see ClientPacket
  */
 public record ClientRequestActionPlayPacket(@NonNull Action action) implements ClientPacket {
@@ -27,7 +26,6 @@ public record ClientRequestActionPlayPacket(@NonNull Action action) implements C
      * Represents an action of {@linkplain ClientRequestActionPlayPacket a request action play packet}.
      *
      * @since 1.0
-     * @author Codestech
      * @see ClientRequestActionPlayPacket
      */
     public enum Action {

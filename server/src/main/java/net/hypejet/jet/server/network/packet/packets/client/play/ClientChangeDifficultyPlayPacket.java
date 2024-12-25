@@ -11,7 +11,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param difficulty the new difficulty level
  * @since 1.0
- * @author Codestech
  */
 public record ClientChangeDifficultyPlayPacket(@NonNull Difficulty difficulty) implements ClientPacket {
     /**

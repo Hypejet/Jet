@@ -13,6 +13,37 @@ import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.data.model.server.registry.registries.registry.DataRegistryEntry;
 import net.hypejet.jet.server.network.ProtocolState;
 import net.hypejet.jet.server.network.codec.NetworkReader;
+import net.hypejet.jet.server.network.codec.packet.client.common.ClientCookieResponsePacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.common.ClientInformationPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.common.ClientKeepAlivePacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.common.ClientPingRequestPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.common.ClientPluginMessagePacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.common.ClientPongPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.common.ClientResourcePackStatePacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.configuration.ClientAcknowledgeFinishConfigurationPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.configuration.ClientKnownPacksConfigurationPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.handshake.HandshakePacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.login.ClientEncryptionResponseLoginPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.login.ClientLoginAcknowledgeLoginPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.login.ClientLoginRequestLoginPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.login.ClientPluginMessageResponseLoginPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.play.ClientAcknowledgeMessagePlayPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.play.ClientActionPlayPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.play.ClientChangeDifficultyPlayPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.play.ClientChatCommandPlayPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.play.ClientChatSessionUpdatePlayPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.play.ClientCommandSuggestionsRequestPlayPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.play.ClientConfirmTeleportationPlayPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.play.ClientEndTickPlayPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.play.ClientPositionFlagsPlayPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.play.ClientPositionPlayPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.play.ClientQueryBlockEntityTagPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.play.ClientRequestActionPlayPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.play.ClientRotationAndPositionPlayPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.play.ClientRotationPlayPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.play.ClientSignedChatCommandPlayPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.play.ClientSignedChatMessagePlayPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.status.ClientServerListRequestStatusPacketReader;
 import net.hypejet.jet.server.network.packet.handler.ClientPacketHandler;
 import net.hypejet.jet.server.network.packet.handler.common.ClientCookieResponsePacketHandler;
 import net.hypejet.jet.server.network.packet.handler.common.ClientInformationPacketHandler;
@@ -31,37 +62,6 @@ import net.hypejet.jet.server.network.packet.handler.play.ClientChatCommandPlayP
 import net.hypejet.jet.server.network.packet.handler.play.ClientCommandSuggestionsRequestPlayPacketHandler;
 import net.hypejet.jet.server.network.packet.handler.status.ClientPingRequestStatusPacketHandler;
 import net.hypejet.jet.server.network.packet.handler.status.ClientServerListRequestStatusPacketHandler;
-import net.hypejet.jet.server.network.codec.packet.client.common.ClientCookieResponsePacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.common.ClientInformationPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.common.ClientKeepAlivePacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.common.ClientPluginMessagePacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.common.ClientPongPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.common.ClientResourcePackStatePacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.play.ClientAcknowledgeMessagePlayPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.play.ClientActionPlayPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.play.ClientChangeDifficultyPlayPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.play.ClientChatCommandPlayPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.play.ClientChatSessionUpdatePlayPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.play.ClientCommandSuggestionsRequestPlayPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.play.ClientConfirmTeleportationPlayPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.play.ClientEndTickPlayPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.play.ClientPositionFlagsPlayPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.play.ClientPositionPlayPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.play.ClientQueryBlockEntityTagPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.play.ClientRequestActionPlayPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.play.ClientRotationAndPositionPlayPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.play.ClientRotationPlayPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.play.ClientSignedChatCommandPlayPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.play.ClientSignedChatMessagePlayPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.configuration.ClientAcknowledgeFinishConfigurationPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.configuration.ClientKnownPacksConfigurationPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.handshake.HandshakePacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.login.ClientEncryptionResponseLoginPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.login.ClientLoginAcknowledgeLoginPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.login.ClientLoginRequestLoginPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.login.ClientPluginMessageResponseLoginPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.common.ClientPingRequestPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.status.ClientServerListRequestStatusPacketReader;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -79,7 +79,6 @@ import java.util.Set;
  * read {@linkplain ClientPacket client packets} and {@linkplain ClientPacketHandler client packet handlers}.
  *
  * @since 1.0
- * @author Codestech
  * @see ClientPacket
  * @see NetworkReader
  */
@@ -115,84 +114,77 @@ public final class ClientPacketRegistry {
     static {
         Map<ProtocolState, ProtocolStateSpecification> specifications = new EnumMap<>(ProtocolState.class);
 
-        ClientCookieResponsePacketReader cookieResponseReader = new ClientCookieResponsePacketReader();
-        ClientPongPacketReader pongReader = new ClientPongPacketReader();
-        ClientKeepAlivePacketReader keepAliveReader = new ClientKeepAlivePacketReader();
-        ClientPluginMessagePacketReader pluginMessageReader = new ClientPluginMessagePacketReader();
-        ClientInformationPacketReader clientInformationReader = new ClientInformationPacketReader();
-        ClientResourcePackStatePacketReader resourcePackStateReader = new ClientResourcePackStatePacketReader();
-        ClientPingRequestPacketReader pingRequestReader = new ClientPingRequestPacketReader();
-
         specifications.put(
                 ProtocolState.HANDSHAKE,
                 new ProtocolStateSpecification.Builder(ResourceFileNames.CLIENT_HANDSHAKE_PACKET_GENERATOR)
-                        .add(ClientHandshakePackets.INTENTION, new HandshakePacketReader())
+                        .add(ClientHandshakePackets.INTENTION, HandshakePacketReader.INSTANCE)
                         .build()
         );
 
         specifications.put(
                 ProtocolState.STATUS,
                 new ProtocolStateSpecification.Builder(ResourceFileNames.CLIENT_STATUS_PACKET_GENERATOR)
-                        .add(ClientStatusPackets.STATUS_REQUEST, new ClientServerListRequestStatusPacketReader())
-                        .add(ClientStatusPackets.PING_REQUEST, pingRequestReader)
+                        .add(ClientStatusPackets.STATUS_REQUEST, ClientServerListRequestStatusPacketReader.INSTANCE)
+                        .add(ClientStatusPackets.PING_REQUEST, ClientPingRequestPacketReader.INSTANCE)
                         .build()
         );
 
         specifications.put(
                 ProtocolState.LOGIN,
                 new ProtocolStateSpecification.Builder(ResourceFileNames.CLIENT_LOGIN_PACKET_GENERATOR)
-                        .add(ClientLoginPackets.COOKIE_RESPONSE, cookieResponseReader)
-                        .add(ClientLoginPackets.HELLO, new ClientLoginRequestLoginPacketReader())
-                        .add(ClientLoginPackets.KEY, new ClientEncryptionResponseLoginPacketReader())
-                        .add(ClientLoginPackets.LOGIN_ACKNOWLEDGED, new ClientLoginAcknowledgeLoginPacketReader())
+                        .add(ClientLoginPackets.COOKIE_RESPONSE, ClientCookieResponsePacketReader.INSTANCE)
+                        .add(ClientLoginPackets.HELLO, ClientLoginRequestLoginPacketReader.INSTANCE)
+                        .add(ClientLoginPackets.KEY, ClientEncryptionResponseLoginPacketReader.INSTANCE)
+                        .add(ClientLoginPackets.LOGIN_ACKNOWLEDGED, ClientLoginAcknowledgeLoginPacketReader.INSTANCE)
                         .add(ClientLoginPackets.CUSTOM_QUERY_ANSWER,
-                                new ClientPluginMessageResponseLoginPacketReader())
+                                ClientPluginMessageResponseLoginPacketReader.INSTANCE)
                         .build()
         );
 
         specifications.put(
                 ProtocolState.CONFIGURATION,
                 new ProtocolStateSpecification.Builder(ResourceFileNames.CLIENT_CONFIGURATION_PACKET_GENERATOR)
-                        .add(ClientConfigurationPackets.PONG, pongReader)
-                        .add(ClientConfigurationPackets.KEEP_ALIVE, keepAliveReader)
-                        .add(ClientConfigurationPackets.CUSTOM_PAYLOAD, pluginMessageReader)
-                        .add(ClientConfigurationPackets.CLIENT_INFORMATION, clientInformationReader)
-                        .add(ClientConfigurationPackets.COOKIE_RESPONSE, cookieResponseReader)
-                        .add(ClientConfigurationPackets.RESOURCE_PACK, resourcePackStateReader)
+                        .add(ClientConfigurationPackets.PONG, ClientPongPacketReader.INSTANCE)
+                        .add(ClientConfigurationPackets.KEEP_ALIVE, ClientKeepAlivePacketReader.INSTANCE)
+                        .add(ClientConfigurationPackets.CUSTOM_PAYLOAD, ClientPluginMessagePacketReader.INSTANCE)
+                        .add(ClientConfigurationPackets.CLIENT_INFORMATION, ClientInformationPacketReader.INSTANCE)
+                        .add(ClientConfigurationPackets.COOKIE_RESPONSE, ClientCookieResponsePacketReader.INSTANCE)
+                        .add(ClientConfigurationPackets.RESOURCE_PACK, ClientResourcePackStatePacketReader.INSTANCE)
                         .add(ClientConfigurationPackets.FINISH_CONFIGURATION,
-                                new ClientAcknowledgeFinishConfigurationPacketReader())
+                                ClientAcknowledgeFinishConfigurationPacketReader.INSTANCE)
                         .add(ClientConfigurationPackets.SELECT_KNOWN_PACKS,
-                                new ClientKnownPacksConfigurationPacketReader())
+                                ClientKnownPacksConfigurationPacketReader.INSTANCE)
                         .build()
         );
 
         specifications.put(
                 ProtocolState.PLAY,
                 new ProtocolStateSpecification.Builder(ResourceFileNames.CLIENT_PLAY_PACKET_GENERATOR)
-                        .add(ClientPlayPackets.KEEP_ALIVE, keepAliveReader)
-                        .add(ClientPlayPackets.CUSTOM_PAYLOAD, pluginMessageReader)
-                        .add(ClientPlayPackets.CLIENT_INFORMATION, clientInformationReader)
-                        .add(ClientPlayPackets.PONG, pongReader)
-                        .add(ClientPlayPackets.COOKIE_RESPONSE, cookieResponseReader)
-                        .add(ClientPlayPackets.RESOURCE_PACK, resourcePackStateReader)
-                        .add(ClientPlayPackets.PING_REQUEST, pingRequestReader)
-                        .add(ClientPlayPackets.MOVE_PLAYER_POS_ROT, new ClientRotationAndPositionPlayPacketReader())
-                        .add(ClientPlayPackets.MOVE_PLAYER_ROT, new ClientRotationPlayPacketReader())
-                        .add(ClientPlayPackets.MOVE_PLAYER_POS, new ClientPositionPlayPacketReader())
-                        .add(ClientPlayPackets.MOVE_PLAYER_STATUS_ONLY, new ClientPositionFlagsPlayPacketReader())
-                        .add(ClientPlayPackets.PLAYER_COMMAND, new ClientActionPlayPacketReader())
-                        .add(ClientPlayPackets.ACCEPT_TELEPORTATION, new ClientConfirmTeleportationPlayPacketReader())
-                        .add(ClientPlayPackets.BLOCK_ENTITY_TAG_QUERY, new ClientQueryBlockEntityTagPacketReader())
-                        .add(ClientPlayPackets.CHANGE_DIFFICULTY, new ClientChangeDifficultyPlayPacketReader())
-                        .add(ClientPlayPackets.CHAT_ACK, new ClientAcknowledgeMessagePlayPacketReader())
-                        .add(ClientPlayPackets.CHAT_COMMAND, new ClientChatCommandPlayPacketReader())
-                        .add(ClientPlayPackets.CHAT_COMMAND_SIGNED, new ClientSignedChatCommandPlayPacketReader())
-                        .add(ClientPlayPackets.CHAT, new ClientSignedChatMessagePlayPacketReader())
-                        .add(ClientPlayPackets.CHAT_SESSION_UPDATE, new ClientChatSessionUpdatePlayPacketReader())
-                        .add(ClientPlayPackets.CLIENT_COMMAND, new ClientRequestActionPlayPacketReader())
-                        .add(ClientPlayPackets.CLIENT_TICK_END, new ClientEndTickPlayPacketReader())
+                        .add(ClientPlayPackets.KEEP_ALIVE, ClientKeepAlivePacketReader.INSTANCE)
+                        .add(ClientPlayPackets.CUSTOM_PAYLOAD, ClientPluginMessagePacketReader.INSTANCE)
+                        .add(ClientPlayPackets.CLIENT_INFORMATION, ClientInformationPacketReader.INSTANCE)
+                        .add(ClientPlayPackets.PONG, ClientPongPacketReader.INSTANCE)
+                        .add(ClientPlayPackets.COOKIE_RESPONSE, ClientCookieResponsePacketReader.INSTANCE)
+                        .add(ClientPlayPackets.RESOURCE_PACK, ClientResourcePackStatePacketReader.INSTANCE)
+                        .add(ClientPlayPackets.PING_REQUEST, ClientPingRequestPacketReader.INSTANCE)
+                        .add(ClientPlayPackets.MOVE_PLAYER_POS_ROT, ClientRotationAndPositionPlayPacketReader.INSTANCE)
+                        .add(ClientPlayPackets.MOVE_PLAYER_ROT, ClientRotationPlayPacketReader.INSTANCE)
+                        .add(ClientPlayPackets.MOVE_PLAYER_POS, ClientPositionPlayPacketReader.INSTANCE)
+                        .add(ClientPlayPackets.MOVE_PLAYER_STATUS_ONLY, ClientPositionFlagsPlayPacketReader.INSTANCE)
+                        .add(ClientPlayPackets.PLAYER_COMMAND, ClientActionPlayPacketReader.INSTANCE)
+                        .add(ClientPlayPackets.BLOCK_ENTITY_TAG_QUERY, ClientQueryBlockEntityTagPacketReader.INSTANCE)
+                        .add(ClientPlayPackets.CHANGE_DIFFICULTY, ClientChangeDifficultyPlayPacketReader.INSTANCE)
+                        .add(ClientPlayPackets.CHAT_ACK, ClientAcknowledgeMessagePlayPacketReader.INSTANCE)
+                        .add(ClientPlayPackets.CHAT_COMMAND, ClientChatCommandPlayPacketReader.INSTANCE)
+                        .add(ClientPlayPackets.CHAT_COMMAND_SIGNED, ClientSignedChatCommandPlayPacketReader.INSTANCE)
+                        .add(ClientPlayPackets.CHAT, ClientSignedChatMessagePlayPacketReader.INSTANCE)
+                        .add(ClientPlayPackets.CHAT_SESSION_UPDATE, ClientChatSessionUpdatePlayPacketReader.INSTANCE)
+                        .add(ClientPlayPackets.CLIENT_COMMAND, ClientRequestActionPlayPacketReader.INSTANCE)
+                        .add(ClientPlayPackets.CLIENT_TICK_END, ClientEndTickPlayPacketReader.INSTANCE)
+                        .add(ClientPlayPackets.ACCEPT_TELEPORTATION,
+                                ClientConfirmTeleportationPlayPacketReader.INSTANCE)
                         .add(ClientPlayPackets.COMMAND_SUGGESTION,
-                                new ClientCommandSuggestionsRequestPlayPacketReader())
+                                ClientCommandSuggestionsRequestPlayPacketReader.INSTANCE)
                         .build()
         );
 

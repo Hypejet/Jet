@@ -14,7 +14,6 @@ import java.util.Set;
  *
  * @param featurePacks the feature packs
  * @since 1.0
- * @author Codestech
  * @see PackInfo
  * @see ClientPacket
  */

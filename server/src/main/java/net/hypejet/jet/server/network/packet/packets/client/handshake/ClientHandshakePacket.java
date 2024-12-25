@@ -6,23 +6,22 @@ import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents {@linkplain ClientPacket a client packet} that initializes connection of a player.
+ * Represents {@linkplain ClientPacket a client packet} that provides basic information about a player connection.
  *
- * @param protocolVersion a version of Minecraft protocol that the client uses
- * @param serverAddress an address of a server that the client tries to connect to
- * @param serverPort a port of a server that the client tries to connect to
+ * @param protocolVersion a version of Minecraft protocol that the connection uses
+ * @param serverAddress an address of a server that the client is connected to
+ * @param serverPort a port of a server that the client is connected to
  * @param intent an intent of the client during handshaking
  * @since 1.0
- * @author Codestech
  */
 public record ClientHandshakePacket(int protocolVersion, @NonNull String serverAddress, int serverPort,
                                     @NonNull HandshakeIntent intent) implements ClientPacket {
     /**
      * Constructs the {@linkplain ClientHandshakePacket client handshake packet}.
      *
-     * @param protocolVersion a version of Minecraft protocol that the client uses
-     * @param serverAddress an address of a server that the client tries to connect to
-     * @param serverPort a port of a server that the client tries to connect to
+     * @param protocolVersion a version of Minecraft protocol that the connection uses
+     * @param serverAddress an address of a server that the client is connected to
+     * @param serverPort a port of a server that the client is connected to
      * @param intent an intent of the client during handshaking
      * @since 1.0
      */
@@ -35,7 +34,6 @@ public record ClientHandshakePacket(int protocolVersion, @NonNull String serverA
      * Represents an intent of the client during handshaking.
      *
      * @since 1.0
-     * @author Codestech
      */
     public enum HandshakeIntent {
         /**

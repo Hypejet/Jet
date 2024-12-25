@@ -4,17 +4,17 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.server.network.packet.RawPacket;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.network.packet.RawPacket;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 
 /**
- * Represents {@linkplain ByteToMessageDecoder a byte-to-message decoder}, which decodes {@linkplain RawPacket raw
- * packets}.
+ * Represents {@linkplain ByteToMessageDecoder a byte-to-message decoder}, which decodes incoming packets into
+ * {@linkplain RawPacket raw packets}.
  *
  * @since 1.0
  * @see RawPacket
@@ -23,6 +23,7 @@ import java.util.List;
 public final class RawPacketDecoder extends ByteToMessageDecoder {
 
     private final SocketPlayerConnection connection;
+
     /**
      * Constructs the {@linkplain RawPacketDecoder packet decoder}.
      *
@@ -35,8 +36,11 @@ public final class RawPacketDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
+        if (!ctx.channel().isActive()) return; // The connection has been closed
+
         int identifier = VarIntNetworkCodec.INSTANCE.read(in);
         byte[] body = NetworkUtil.readRemainingBytes(in);
+
         out.add(new RawPacket(identifier, body));
     }
 

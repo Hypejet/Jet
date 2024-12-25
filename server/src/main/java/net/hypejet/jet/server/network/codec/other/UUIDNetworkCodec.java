@@ -10,7 +10,6 @@ import java.util.UUID;
  * Represents {@linkplain NetworkCodec a network codec}, which reads and writes {@linkplain UUID a unique identifier}.
  *
  * @since 1.0
- * @author Codestech
  * @see UUID
  * @see NetworkCodec
  */

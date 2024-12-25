@@ -12,7 +12,6 @@ import java.util.UUID;
  * @param username a username of the player
  * @param uniqueId a unique identifier of the player
  * @since 1.0
- * @author Codestech
  */
 public record ClientLoginRequestLoginPacket(@NonNull String username, @NonNull UUID uniqueId)
         implements ClientPacket {

@@ -3,12 +3,6 @@ package net.hypejet.jet.server.network.codec.packet.server.play;
 import com.mojang.brigadier.arguments.ArgumentType;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.data.codecs.util.mapper.Mapper;
-import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket;
-import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.ArgumentNode;
-import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.LiteralNode;
-import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.Node;
-import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.RootNode;
-import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.SuggestionsType;
 import net.hypejet.jet.server.command.argument.ArgumentCodec;
 import net.hypejet.jet.server.command.argument.ArgumentCodecRegistry;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
@@ -17,6 +11,12 @@ import net.hypejet.jet.server.network.codec.game.key.PackedKeyNetworkCodec;
 import net.hypejet.jet.server.network.codec.mapper.MapperNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.ArgumentNode;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.LiteralNode;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.Node;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.RootNode;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.SuggestionsType;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -34,11 +34,18 @@ import java.util.Map;
  * {@linkplain ServerDeclareCommandsPlayPacket a declare commands play packet}.
  *
  * @since 1.0
- * @author Codestech
  * @see ServerDeclareCommandsPlayPacket
  * @see NetworkWriter
  */
 public final class ServerDeclareCommandsPlayPacketWriter implements NetworkWriter<ServerDeclareCommandsPlayPacket> {
+
+    /**
+     * An instance of the {@linkplain ServerDeclareCommandsPlayPacketWriter server declare commands play packet
+     * writer}.
+     *
+     * @since 1.0
+     */
+    public static final ServerDeclareCommandsPlayPacketWriter INSTANCE = new ServerDeclareCommandsPlayPacketWriter();
 
     private static final int BEGINNING_NODE_INDEX = 0;
 
@@ -58,6 +65,8 @@ public final class ServerDeclareCommandsPlayPacketWriter implements NetworkWrite
                     .build(),
             PackedKeyNetworkCodec.INSTANCE
     );
+
+    private ServerDeclareCommandsPlayPacketWriter() {}
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerDeclareCommandsPlayPacket object) {
@@ -149,7 +158,7 @@ public final class ServerDeclareCommandsPlayPacketWriter implements NetworkWrite
                 SuggestionsType suggestionsType = argumentNode.suggestionsType();
                 if (suggestionsType != null) SUGGESTIONS_TYPE_CODEC.write(buf, suggestionsType);
             }
-            default -> {}
+            case RootNode ignored -> {}
         }
     }
 
