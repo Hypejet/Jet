@@ -1,34 +1,68 @@
 package net.hypejet.jet.world.difficulty;
 
+import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 /**
- * Represents a Minecraft difficulty.
+ * Represents a level of Minecraft difficulty.
+ *
+ * <p>This is not an enum, since it depends on Minecraft. Adding an enum entry could break enum switch cases for
+ * example.</p>
  *
  * @since 1.0
- * @author Codestech
  */
-public enum Difficulty {
+public final class Difficulty {
     /**
-     * A peaceful difficulty.
+     * A peaceful difficulty level.
      *
      * @since 1.0
      */
-    PEACEFUL,
+    public static final Difficulty PEACEFUL = new Difficulty("peaceful");
+
     /**
-     * An easy difficulty.
+     * An easy difficulty level.
      *
      * @since 1.0
      */
-    EASY,
+    public static final Difficulty EASY = new Difficulty("easy");
+
     /**
-     * A normal difficulty.
+     * A normal difficulty level.
      *
      * @since 1.0
      */
-    NORMAL,
+    public static final Difficulty NORMAL = new Difficulty("normal");
+
     /**
-     * A hard difficulty.
+     * A hard difficulty level.
      *
      * @since 1.0
      */
-    HARD
+    public static final Difficulty HARD = new Difficulty("hard");
+
+    private final String name;
+
+    private Difficulty(@NonNull String name) {
+        this.name = NullabilityUtil.requireNonNull(name, "name");
+    }
+
+    /**
+     * Gets a readable lower-case name of this difficulty level.
+     *
+     * @return the name
+     * @since 1.0
+     */
+    public @NonNull String name() {
+        return this.name;
+    }
+
+    /* Methods #equals and #hashCode are not implemented, since this class is intended to be identity-compared only
+       since all instances are defined in constants of this class. */
+
+    @Override
+    public String toString() {
+        return "Difficulty{" +
+                "name='" + this.name + '\'' +
+                '}';
+    }
 }

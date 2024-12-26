@@ -15,7 +15,6 @@ import net.hypejet.jet.server.network.NetworkManager;
 import net.hypejet.jet.server.plugin.JetPluginManager;
 import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.ServerPingUtil;
-import net.hypejet.jet.server.world.JetWorldManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
@@ -37,8 +36,6 @@ public final class JetMinecraftServer implements MinecraftServer {
 
     private final NetworkManager networkManager;
     private final ServerListPing.Favicon serverIcon;
-
-    private final JetWorldManager worldManager = new JetWorldManager();
 
     private final JetPluginManager pluginManager;
     private final JetCommandManager commandManager;
@@ -98,11 +95,6 @@ public final class JetMinecraftServer implements MinecraftServer {
     @Override
     public @NonNull CollectionAcquisition<JetPlayer, ?> players() {
         return this.players.acquireRead();
-    }
-
-    @Override
-    public @NonNull JetWorldManager worldManager() {
-        return this.worldManager;
     }
 
     @Override

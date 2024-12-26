@@ -7,10 +7,11 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.Objects;
 
 /**
- * Represents an implementation {@linkplain Coordinate a coordinate} representing a position of a Minecraft block.
+ * Represents an implementation of {@linkplain Coordinate a coordinate} representing a position of
+ * {@linkplain ??? a Minecraft block}.
  *
  * @since 1.0
- * @author Codestech
+ * @see ???
  * @see Coordinate
  */
 public final class BlockPosition implements Coordinate<BlockPosition> {
@@ -81,6 +82,21 @@ public final class BlockPosition implements Coordinate<BlockPosition> {
     @Override
     public @NonNull BlockPosition withZ(double z) {
         return blockPosition(this.x, this.y, Math.floor(z));
+    }
+
+    @Override
+    public int blockX() {
+        return this.x;
+    }
+
+    @Override
+    public int blockY() {
+        return this.y;
+    }
+
+    @Override
+    public int blockZ() {
+        return this.z;
     }
 
     /**

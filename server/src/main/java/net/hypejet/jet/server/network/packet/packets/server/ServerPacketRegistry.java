@@ -35,11 +35,11 @@ import net.hypejet.jet.server.network.codec.packet.server.play.ServerActionBarPl
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerCenterChunkPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerCommandSuggestionsResponsePlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerDeclareCommandsPlayPacketWriter;
-import net.hypejet.jet.server.network.codec.packet.server.play.ServerGameEventPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerJoinGamePlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerPlayerListHeaderAndFooterPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizePositionPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSystemMessagePlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerWorldEventPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.status.ServerListResponseStatusPacketWriter;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerAddResourcePackPacket;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerCookieRequestPacket;
@@ -67,11 +67,11 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerActionBar
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerCenterChunkPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerCommandSuggestionsResponsePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket;
-import net.hypejet.jet.server.network.packet.packets.server.play.ServerGameEventPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSystemMessagePlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerWorldEventPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.status.ServerListResponseStatusPacket;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
 import net.kyori.adventure.key.Key;
@@ -198,8 +198,8 @@ public final class ServerPacketRegistry {
                                 ServerRemoveResourcePackPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.LOGIN, ServerJoinGamePlayPacket.class,
                                 ServerJoinGamePlayPacketWriter.INSTANCE)
-                        .add(ServerPlayPackets.GAME_EVENT, ServerGameEventPlayPacket.class,
-                                ServerGameEventPlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.GAME_EVENT, ServerWorldEventPlayPacket.class,
+                                ServerWorldEventPlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.SYSTEM_CHAT, ServerSystemMessagePlayPacket.class,
                                 ServerSystemMessagePlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.SET_ACTION_BAR_TEXT, ServerActionBarPlayPacket.class,

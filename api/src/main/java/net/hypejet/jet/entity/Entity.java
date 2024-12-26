@@ -1,6 +1,5 @@
 package net.hypejet.jet.entity;
 
-import net.hypejet.jet.world.World;
 import net.kyori.adventure.identity.Identified;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
@@ -8,7 +7,6 @@ import net.kyori.adventure.pointer.Pointered;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.event.HoverEventSource;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.UUID;
 
@@ -44,22 +42,6 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
      * @since 1.0
      */
     @NonNull UUID uniqueId();
-
-    /**
-     * Gets a world, which the entity is in.
-     *
-     * @return the world, {@code null} if not set yet
-     * @since 1.0
-     */
-    @Nullable World getWorld();
-
-    /**
-     * Sets and teleports an entity to a world.
-     *
-     * @param world the world
-     * @since 1.0
-     */
-    void setWorld(@NonNull World world);
 
     /**
      * Represents a hand of an entity.

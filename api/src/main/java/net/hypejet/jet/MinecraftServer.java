@@ -7,7 +7,6 @@ import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.plugin.PluginManager;
 import net.hypejet.jet.registry.RegistryManager;
-import net.hypejet.jet.world.WorldManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -78,14 +77,6 @@ public interface MinecraftServer {
      * @since 1.0
      */
     @NonNull CollectionAcquisition<? extends Player, ?> players();
-
-    /**
-     * Gets a {@linkplain WorldManager world manager} of the server.
-     *
-     * @return the world manager
-     * @since 1.0
-     */
-    @NonNull WorldManager worldManager();
 
     /**
      * Gets a {@linkplain CommandManager command manager} of the server.
