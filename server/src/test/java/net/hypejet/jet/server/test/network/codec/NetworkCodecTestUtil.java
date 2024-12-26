@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.test.network.protocol.codecs;
+package net.hypejet.jet.server.test.network.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -11,9 +11,8 @@ import java.util.function.BiConsumer;
 /**
  * Represents a utility for testing of reading and writing of {@linkplain NetworkCodec network codecs}.
  *
- * @since 1.0
- * @author Codestech
  * @see NetworkCodec
+ * @since 1.0
  */
 public final class NetworkCodecTestUtil {
 

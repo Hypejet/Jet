@@ -1,7 +1,7 @@
-package net.hypejet.jet.server.test.network.protocol.codecs.aggregate.bitset;
+package net.hypejet.jet.server.test.network.codec.aggregate.bitset;
 
 import net.hypejet.jet.server.network.codec.aggregate.bitset.FixedBitSetNetworkCodec;
-import net.hypejet.jet.server.test.network.protocol.codecs.NetworkCodecTestUtil;
+import net.hypejet.jet.server.test.network.codec.NetworkCodecTestUtil;
 import org.junit.jupiter.api.Test;
 
 import java.util.BitSet;
@@ -10,7 +10,6 @@ import java.util.BitSet;
  * Represents a test of reading and writing of {@linkplain FixedBitSetNetworkCodec a fixed bitset network codec}.
  *
  * @since 1.0
- * @author Codestech
  * @see FixedBitSetNetworkCodec
  */
 public final class FixedBitSetNetworkCodecTest {

@@ -1,15 +1,14 @@
-package net.hypejet.jet.server.test.network.protocol.codecs.game.world.coordinate;
+package net.hypejet.jet.server.test.network.codec.game.world.coordinate;
 
 import net.hypejet.jet.data.model.api.coordinate.Vector;
 import net.hypejet.jet.server.network.codec.game.world.coordinate.VectorNetworkCodec;
-import net.hypejet.jet.server.test.network.protocol.codecs.NetworkCodecTestUtil;
+import net.hypejet.jet.server.test.network.codec.NetworkCodecTestUtil;
 import org.junit.jupiter.api.Test;
 
 /**
  * Represents a test of reading and writing of {@linkplain VectorNetworkCodec a vector network codec}.
  *
  * @since 1.0
- * @author Codestech
  * @see VectorNetworkCodec
  */
 public final class VectorNetworkCodecTest {

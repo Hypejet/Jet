@@ -7,7 +7,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.command.argument.codecs.EmptyArgumentCodec;
 import net.hypejet.jet.server.command.argument.codecs.NumberArgumentCodec;
 import net.hypejet.jet.server.command.argument.codecs.StringArgumentCodec;
-import net.hypejet.jet.server.test.network.protocol.codecs.NetworkCodecTestUtil;
+import net.hypejet.jet.server.test.network.codec.NetworkCodecTestUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

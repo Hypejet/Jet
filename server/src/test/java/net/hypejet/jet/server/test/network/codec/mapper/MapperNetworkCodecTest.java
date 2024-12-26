@@ -1,16 +1,15 @@
-package net.hypejet.jet.server.test.network.protocol.codecs.mapper;
+package net.hypejet.jet.server.test.network.codec.mapper;
 
 import net.hypejet.jet.data.codecs.util.mapper.Mapper;
 import net.hypejet.jet.server.network.codec.mapper.MapperNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
-import net.hypejet.jet.server.test.network.protocol.codecs.NetworkCodecTestUtil;
+import net.hypejet.jet.server.test.network.codec.NetworkCodecTestUtil;
 import org.junit.jupiter.api.Test;
 
 /**
  * Represents a test of reading and writing of {@linkplain MapperNetworkCodec a mapper network codec}.
  *
  * @since 1.0
- * @author Codestech
  * @see MapperNetworkCodec
  */
 public final class MapperNetworkCodecTest {

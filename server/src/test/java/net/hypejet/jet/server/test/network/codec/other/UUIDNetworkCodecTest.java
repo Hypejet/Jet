@@ -1,7 +1,7 @@
-package net.hypejet.jet.server.test.network.protocol.codecs.other;
+package net.hypejet.jet.server.test.network.codec.other;
 
 import net.hypejet.jet.server.network.codec.other.UUIDNetworkCodec;
-import net.hypejet.jet.server.test.network.protocol.codecs.NetworkCodecTestUtil;
+import net.hypejet.jet.server.test.network.codec.NetworkCodecTestUtil;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -10,7 +10,6 @@ import java.util.UUID;
  * Represents a test of reading and writing of {@linkplain UUIDNetworkCodec a unique identifier network codec}.
  *
  * @since 1.0
- * @author Codestech
  * @see UUIDNetworkCodec
  */
 public final class UUIDNetworkCodecTest {
