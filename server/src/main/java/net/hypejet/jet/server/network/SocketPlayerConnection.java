@@ -118,6 +118,29 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     }
 
     @Override
+    public @NonNull JetMinecraftServer server() {
+        return this.server;
+    }
+
+    @Override
+    public @Nullable JetPlayer player() {
+        try {
+            this.playerLock.readLock().lock();
+            return this.player;
+        } finally {
+            this.playerLock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public @NonNull JetPlayer playerOrThrow() {
+        JetPlayer player = this.player();
+        if (player == null)
+            throw new IllegalStateException("The player has not been initialized yet");
+        return player;
+    }
+
+    @Override
     public @NonNull ObjectAcquisition<PlayerConnectionState> connectionState() {
         return new MappedObjectAcquisition<>(this.protocolState(), ProtocolState::toConnectionState);
     }
@@ -139,29 +162,6 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
                 this.close();
                 return Unit.INSTANCE;
             });
-        }
-    }
-
-    @Override
-    public @NonNull JetMinecraftServer server() {
-        return this.server;
-    }
-
-    @Override
-    public @NonNull JetPlayer playerOrThrow() {
-        JetPlayer player = this.player();
-        if (player == null)
-            throw new IllegalStateException("The player has not been initialized yet");
-        return player;
-    }
-
-    @Override
-    public @Nullable JetPlayer player() {
-        try {
-            this.playerLock.readLock().lock();
-            return this.player;
-        } finally {
-            this.playerLock.readLock().unlock();
         }
     }
 
@@ -305,7 +305,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
         this.playerLock.writeLock().lock();
         try {
             if (this.player != null)
-                throw new IllegalArgumentException("The player was already initialized");
+                throw new IllegalArgumentException("The player has been already initialized");
             this.player = player;
             this.server.registerPlayer(player);
         } finally {

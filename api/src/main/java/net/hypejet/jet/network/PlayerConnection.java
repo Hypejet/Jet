@@ -11,9 +11,34 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Represents a connection with a Minecraft client.
  *
  * @since 1.0
- * @author Codestech
  */
 public interface PlayerConnection {
+    /**
+     * Gets a {@linkplain MinecraftServer minecraft server} owning this connection.
+     *
+     * @return the minecraft server
+     * @since 1.0
+     */
+    @NonNull MinecraftServer server();
+
+    /**
+     * Gets a {@linkplain Player player}, associated with this connection.
+     *
+     * @return the player. {@code null} if not initialized yet
+     * @since 1.0
+     */
+    @Nullable Player player();
+
+    /**
+     * Gets {@linkplain Player a player}, associated with this connection, throws an exception if it has not been
+     * initialized yet.
+     *
+     * @return the player
+     * @throws IllegalStateException if the player has not been initialized yet
+     * @since 1.0
+     */
+    @NonNull Player playerOrThrow();
+
     /**
      * Creates {@linkplain ObjectAcquisition an object acquisition} of {@linkplain PlayerConnectionState a state
      * of the connection}.
@@ -30,30 +55,4 @@ public interface PlayerConnection {
      * @since 1.0
      */
     void disconnect(@NonNull Component reason);
-
-    /**
-     * Gets a {@linkplain MinecraftServer minecraft server} owning this connection.
-     *
-     * @return the minecraft server
-     * @since 1.0
-     */
-    @NonNull MinecraftServer server();
-
-    /**
-     * Gets a {@linkplain Player player}, which is using this connection, throws an exception if it has not been
-     * initialized yet.
-     *
-     * @return the player
-     * @throws IllegalStateException if the player has not been initialized yet
-     * @since 1.0
-     */
-    @NonNull Player playerOrThrow();
-
-    /**
-     * Gets a {@linkplain Player player}, which is using this connection.
-     *
-     * @return the player. {@code null} if not initialized yet
-     * @since 1.0
-     */
-    @Nullable Player player();
 }
