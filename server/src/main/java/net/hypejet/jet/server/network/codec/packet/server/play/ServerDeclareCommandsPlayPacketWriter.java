@@ -3,8 +3,8 @@ package net.hypejet.jet.server.network.codec.packet.server.play;
 import com.mojang.brigadier.arguments.ArgumentType;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.data.codecs.util.mapper.Mapper;
-import net.hypejet.jet.server.command.argument.ArgumentCodec;
-import net.hypejet.jet.server.command.argument.ArgumentCodecRegistry;
+import net.hypejet.jet.server.command.argument.ArgumentWriter;
+import net.hypejet.jet.server.command.argument.ArgumentWriterRegistry;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.array.varint.VarIntArrayNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.key.PackedKeyNetworkCodec;
@@ -143,17 +143,17 @@ public final class ServerDeclareCommandsPlayPacketWriter implements NetworkWrite
 
                 ArgumentType<?> argumentType = argumentNode.argumentType();
                 Class<?> argumentTypeClass = argumentType.getClass();
-                ArgumentCodec<?> codec = ArgumentCodecRegistry.codec(argumentTypeClass);
+                ArgumentWriter<?> writer = ArgumentWriterRegistry.writer(argumentTypeClass);
 
-                if (codec == null) {
+                if (writer == null) {
                     throw new IllegalArgumentException(String.format(
-                            "Could not find a codec for argument type with class name of %s",
+                            "Could not find a network writer for argument type with class name of %s",
                             argumentTypeClass.getSimpleName()
                     ));
                 }
 
-                VarIntNetworkCodec.INSTANCE.write(buf, codec.getParserId());
-                write(argumentType, buf, codec);
+                VarIntNetworkCodec.INSTANCE.write(buf, writer.parserId());
+                write(argumentType, buf, writer);
 
                 SuggestionsType suggestionsType = argumentNode.suggestionsType();
                 if (suggestionsType != null) SUGGESTIONS_TYPE_CODEC.write(buf, suggestionsType);
@@ -163,7 +163,7 @@ public final class ServerDeclareCommandsPlayPacketWriter implements NetworkWrite
     }
 
     private static <A extends ArgumentType<?>> void write(@NonNull ArgumentType<?> type, @NonNull ByteBuf buf,
-                                                          @NonNull ArgumentCodec<A> codec) {
-        codec.write(buf, codec.getArgumentTypeClass().cast(type));
+                                                          @NonNull ArgumentWriter<A> codec) {
+        codec.write(buf, codec.argumentTypeClass().cast(type));
     }
 }

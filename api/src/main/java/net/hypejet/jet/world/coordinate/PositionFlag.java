@@ -3,6 +3,8 @@ package net.hypejet.jet.world.coordinate;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Set;
+
 /**
  * Represents a flag of a position update of {@linkplain net.hypejet.jet.entity.player.Player a player}.
  *
@@ -25,6 +27,13 @@ public final class PositionFlag {
      * @since 1.0
      */
     public static final PositionFlag HORIZONTAL_COLLISION = new PositionFlag("horizontal collision");
+
+    /**
+     * {@linkplain Set A set} containing all {@linkplain PositionFlag position flags}.
+     *
+     * @since 1.0
+     */
+    public static final Set<PositionFlag> VALUES = Set.of(ON_GROUND, HORIZONTAL_COLLISION);
 
     private final String name;
 

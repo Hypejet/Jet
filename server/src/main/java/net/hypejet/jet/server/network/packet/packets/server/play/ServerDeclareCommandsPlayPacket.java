@@ -3,11 +3,12 @@ package net.hypejet.jet.server.network.packet.packets.server.play;
 import com.mojang.brigadier.arguments.ArgumentType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -36,14 +37,17 @@ public record ServerDeclareCommandsPlayPacket(@NonNull RootNode rootNode) implem
      * @since 1.0
      * @see ServerDeclareCommandsPlayPacket
      */
-    public sealed interface Node {
-        /**
-         * A children of the command node.
-         *
-         * @return the children
-         * @since 1.0
-         */
-        @NonNull Collection<Node> children();
+    public static sealed abstract class Node {
+
+        private final Node redirect;
+        private final boolean executable;
+
+        private @MonotonicNonNull Set<Node> children;
+
+        private Node(@Nullable Node redirect, boolean executable) {
+            this.redirect = redirect;
+            this.executable = executable;
+        }
 
         /**
          * Gets a command node that this node redirects to.
@@ -51,7 +55,9 @@ public record ServerDeclareCommandsPlayPacket(@NonNull RootNode rootNode) implem
          * @return the command node, {@code null} if this node does not redirect to any node
          * @since 1.0
          */
-        @Nullable Node redirect();
+        public final @Nullable Node redirect() {
+            return this.redirect;
+        }
 
         /**
          * Gets whether the node stack to this point constitutes to a valid command.
@@ -59,7 +65,34 @@ public record ServerDeclareCommandsPlayPacket(@NonNull RootNode rootNode) implem
          * @return {@code true} if the node stack constitutes to a valid command, {@code false} otherwise
          * @since 1.0
          */
-        boolean executable();
+        public final boolean executable() {
+            return this.executable;
+        }
+
+        /**
+         * A children of the command node.
+         *
+         * @return the children
+         * @since 1.0
+         */
+        public final @NonNull Set<Node> children() {
+            if (this.children == null)
+                this.initializeChildren(Set.of());
+            return this.children;
+        }
+
+        /**
+         * Initializes children of the command node.
+         *
+         * @param children the children
+         * @since 1.0
+         * @throws IllegalStateException if the children nodes have been already initialized
+         */
+        public final void initializeChildren(@NonNull Collection<Node> children) {
+            if (this.children != null)
+                throw new IllegalStateException("The children nodes have been already initialized");
+            this.children = Set.copyOf(children);
+        }
     }
 
     /**
@@ -68,57 +101,17 @@ public record ServerDeclareCommandsPlayPacket(@NonNull RootNode rootNode) implem
      * @since 1.0
      * @see Node
      */
-    public static final class RootNode implements Node {
-
-        private final Collection<Node> children;
-        private final Node redirect;
-        private final boolean executable;
-
+    public static final class RootNode extends Node {
         /**
          * Constructs the {@linkplain RootNode root node}.
          *
-         * @param children a children of the command node
          * @param redirect a command node that the node should redirect to, {@code null} if this node should not
          *                 redirect to any node
          * @param executable whether the node stack to this point constitutes to a valid command
          * @since 1.0
          */
-        public RootNode(@NonNull Collection<Node> children, @Nullable Node redirect, boolean executable) {
-            this.children = List.copyOf(NullabilityUtil.requireNonNull(children, "children"));
-            this.redirect = NullabilityUtil.requireNonNull(redirect, "redirect");
-            this.executable = executable;
-        }
-
-        /**
-         * Constructs the {@linkplain RootNode root node}.
-         *
-         * @param childrenInitializer an initializer of children of the command node
-         * @param redirect a command node that the node should redirect to, {@code null} if this node should not
-         *                 redirect to any node
-         * @param executable whether the node stack to this point constitutes to a valid command
-         * @since 1.0
-         */
-        public RootNode(@NonNull ChildrenInitializer childrenInitializer, @Nullable Node redirect,
-                        boolean executable) {
-            Collection<Node> children = childrenInitializer.children(this);
-            this.children = List.copyOf(NullabilityUtil.requireNonNull(children, "children"));
-            this.redirect = redirect;
-            this.executable = executable;
-        }
-
-        @Override
-        public @NonNull Collection<Node> children() {
-            return this.children;
-        }
-
-        @Override
-        public @Nullable Node redirect() {
-            return this.redirect;
-        }
-
-        @Override
-        public boolean executable() {
-            return this.executable;
+        public RootNode(@Nullable Node redirect, boolean executable) {
+            super(redirect, executable);
         }
     }
 
@@ -128,63 +121,23 @@ public record ServerDeclareCommandsPlayPacket(@NonNull RootNode rootNode) implem
      * @since 1.0
      * @see Node
      */
-    public static final class LiteralNode implements Node {
+    public static final class LiteralNode extends Node {
 
-        private final Collection<Node> children;
-        private final Node redirect;
-        private final boolean executable;
         private final String name;
 
         /**
          * Constructs the {@linkplain LiteralNode literal node}.
          *
-         * @param children a children of the command node
          * @param redirect a command node that the node should redirect to, {@code null} if this node should
          *                 not redirect to any node
          * @param executable whether the node stack to this point constitutes to a valid command
          * @param name the literal string
          * @since 1.0
          */
-        public LiteralNode(@NonNull Collection<Node> children, @Nullable Node redirect,
-                           boolean executable, @NonNull String name) {
-            this.children = List.copyOf(NullabilityUtil.requireNonNull(children, "children"));
-            this.redirect = redirect;
-            this.executable = executable;
+        public LiteralNode(@Nullable Node redirect, boolean executable, @NonNull String name) {
+
+            super(redirect, executable);
             this.name = NullabilityUtil.requireNonNull(name, "name");
-        }
-
-        /**
-         * Constructs the {@linkplain LiteralNode literal node}.
-         *
-         * @param childrenInitializer an initializer of children of the command node
-         * @param redirect a command node that the node should redirect to, {@code null} if this node should
-         *                 not redirect to any node
-         * @param executable whether the node stack to this point constitutes to a valid command
-         * @param name the literal string
-         * @since 1.0
-         */
-        public LiteralNode(@NonNull ChildrenInitializer childrenInitializer, @Nullable Node redirect,
-                           boolean executable, @NonNull String name) {
-            Collection<Node> children = childrenInitializer.children(this);
-            this.children = List.copyOf(NullabilityUtil.requireNonNull(children, "children"));
-            this.redirect = redirect;
-            this.executable = executable;
-            this.name = NullabilityUtil.requireNonNull(name, "name");
-        }
-
-        @Override
-        public @NonNull Collection<Node> children() {
-            return this.children;
-        }
-
-        @Override
-        public @Nullable Node redirect() {
-            return this.redirect;
-        }
-
-        @Override
-        public boolean executable() {
-            return this.executable;
         }
 
         /**
@@ -203,11 +156,7 @@ public record ServerDeclareCommandsPlayPacket(@NonNull RootNode rootNode) implem
      *
      * @since 1.0
      */
-    public static final class ArgumentNode implements Node {
-
-        private final Collection<Node> children;
-        private final Node redirect;
-        private final boolean executable;
+    public static final class ArgumentNode extends Node {
 
         private final String name;
 
@@ -217,7 +166,6 @@ public record ServerDeclareCommandsPlayPacket(@NonNull RootNode rootNode) implem
         /**
          * Constructs the {@linkplain ArgumentNode argument node}.
          *
-         * @param children a children of the command node
          * @param redirect a command node that the node should redirect to, {@code null} if this node should
          *                 not redirect to any node
          * @param executable whether the node stack to this point constitutes to a valid command
@@ -226,54 +174,12 @@ public record ServerDeclareCommandsPlayPacket(@NonNull RootNode rootNode) implem
          * @param suggestionsType a type of suggesting of the argument
          * @since 1.0
          */
-        public ArgumentNode(@NonNull Collection<Node> children, @Nullable Node redirect, boolean executable,
-                            @NonNull String name, @NonNull ArgumentType<?> argumentType,
-                            @Nullable SuggestionsType suggestionsType) {
-            this.children = List.copyOf(NullabilityUtil.requireNonNull(children, "children"));
-            this.redirect = redirect;
-            this.executable = executable;
+        public ArgumentNode(@Nullable Node redirect, boolean executable, @NonNull String name,
+                            @NonNull ArgumentType<?> argumentType, @Nullable SuggestionsType suggestionsType) {
+            super(redirect, executable);
             this.name = NullabilityUtil.requireNonNull(name, "name");
             this.argumentType = NullabilityUtil.requireNonNull(argumentType, "argument type");
             this.suggestionsType = suggestionsType;
-        }
-
-        /**
-         * Constructs the {@linkplain ArgumentNode argument node}.
-         *
-         * @param childrenInitializer a children of the command node
-         * @param redirect a command node that the node should redirect to, {@code null} if this node should not redirect
-         *                 to any node
-         * @param executable whether the node stack to this point constitutes to a valid command
-         * @param name a name of the argument
-         * @param argumentType a type of the argument
-         * @param suggestionsType a type of suggesting of the argument
-         * @since 1.0
-         */
-        public ArgumentNode(@NonNull ChildrenInitializer childrenInitializer, @Nullable Node redirect,
-                            boolean executable, @NonNull String name, @NonNull ArgumentType<?> argumentType,
-                            @Nullable SuggestionsType suggestionsType) {
-            Collection<Node> children = childrenInitializer.children(this);
-            this.children = List.copyOf(NullabilityUtil.requireNonNull(children, "children"));
-            this.redirect = redirect;
-            this.executable = executable;
-            this.name = NullabilityUtil.requireNonNull(name, "name");
-            this.argumentType = NullabilityUtil.requireNonNull(argumentType, "argument type");
-            this.suggestionsType = suggestionsType;
-        }
-
-        @Override
-        public @NonNull Collection<Node> children() {
-            return this.children;
-        }
-
-        @Override
-        public @Nullable Node redirect() {
-            return this.redirect;
-        }
-
-        @Override
-        public boolean executable() {
-            return this.executable;
         }
 
         /**

@@ -1,5 +1,6 @@
 package net.hypejet.jet.server.util.acquisition;
 
+import net.hypejet.concurrency.Acquisition;
 import net.hypejet.concurrency.object.ObjectAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import org.jetbrains.annotations.NotNull;
@@ -7,34 +8,34 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Function;
 
 /**
- * Represents {@linkplain ObjectAcquisition an object acquisition}, which maps an object of an already existing
- * {@linkplain ObjectAcquisition object acquisition}.
+ * Represents {@linkplain ObjectAcquisition an object acquisition}, which provides a mapped value from
+ * {@linkplain OA an already existing acquisition}.
  *
- * @param <O> a type of object of the original acquisition
+ * @param <OA> a type of the already existing acquisition
  * @param <M> a type that the object should be mapped to
  * @since 1.0
  * @see ObjectAcquisition
  */
-public final class MappedObjectAcquisition<O, M> implements ObjectAcquisition<M> {
+public final class ObjectMappedAcquisition<OA extends Acquisition, M> implements ObjectAcquisition<M> {
 
-    private final ObjectAcquisition<O> originalAcquisition;
-    private final Function<O, M> mapper;
+    private final OA originalAcquisition;
+    private final Function<OA, M> mapper;
 
     /**
-     * Constructs the {@linkplain MappedObjectAcquisition mapped object acquisition}.
+     * Constructs the {@linkplain ObjectMappedAcquisition object mapped acquisition}.
      *
-     * @param originalAcquisition the original acquisition that the object should be mapped from
-     * @param mapper a function that maps the object to another object
+     * @param originalAcquisition the already existing acquisition
+     * @param mapper a function, which maps the value
      * @since 1.0
      */
-    public MappedObjectAcquisition(@NotNull ObjectAcquisition<O> originalAcquisition, @NotNull Function<O, M> mapper) {
+    public ObjectMappedAcquisition(@NotNull OA originalAcquisition, @NotNull Function<OA, M> mapper) {
         this.originalAcquisition = NullabilityUtil.requireNonNull(originalAcquisition, "original acquisition");
         this.mapper = NullabilityUtil.requireNonNull(mapper, "mapper");
     }
 
     @Override
     public @NotNull M get() {
-        return this.mapper.apply(this.originalAcquisition.get());
+        return this.mapper.apply(this.originalAcquisition);
     }
 
     @Override

@@ -1,7 +1,11 @@
 package net.hypejet.jet.server.network.session.task;
 
+import net.hypejet.concurrency.primitive.booleans.BooleanAcquirable;
+import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
+import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket;
 import net.hypejet.jet.server.registry.session.RegistryTagUpdateFunction;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -22,6 +26,7 @@ public final class PlaySessionTask implements SessionTask, RegistryTagUpdateFunc
     );
 
     private final JetPlayer player;
+    private final BooleanAcquirable commandsSent = new BooleanAcquirable();
 
     /**
      * Constructs the {@linkplain PlaySessionTask play session task}.
@@ -35,6 +40,10 @@ public final class PlaySessionTask implements SessionTask, RegistryTagUpdateFunc
 
     @Override
     public void start() {
+        try (WriteBooleanAcquisition commandsSentAcquisition = this.commandsSent.acquireWrite()) {
+            this.player.server().commandManager().sendDeclarationPacket(this.player);
+            commandsSentAcquisition.set(true);
+        }
         this.player.disconnect(NOT_IMPLEMENTED_DISCONNECTION_MESSAGE);
     }
 
@@ -56,5 +65,19 @@ public final class PlaySessionTask implements SessionTask, RegistryTagUpdateFunc
      */
     public @NonNull JetPlayer player() {
         return this.player;
+    }
+
+    /**
+     * Updates commands for {@linkplain JetPlayer a player} that the task is handled for.
+     *
+     * @param packet a packet representing the command update
+     * @since 1.0
+     */
+    public void updateCommands(@NonNull ServerDeclareCommandsPlayPacket packet) {
+        try (BooleanAcquisition commandsSentAcquisition = this.commandsSent.acquireRead()) {
+            // Commands have not been sent yet, so the update will be taken into account when commands are sent
+            if (!commandsSentAcquisition.get()) return;
+            this.player.sendPacket(packet);
+        }
     }
 }

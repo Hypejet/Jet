@@ -1,24 +1,30 @@
-package net.hypejet.jet.server.command.argument.codecs;
+package net.hypejet.jet.server.command.argument.writers;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType.StringType;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.data.codecs.util.mapper.Mapper;
-import net.hypejet.jet.server.command.argument.ArgumentCodec;
+import net.hypejet.jet.server.command.argument.ArgumentWriter;
 import net.hypejet.jet.server.network.codec.mapper.MapperNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a {@linkplain ArgumentCodec argument codec}, which reads and writes a {@linkplain StringArgumentType
- * string argument type}.
+ * Represents {@linkplain ArgumentWriter an argument writer}, which writes
+ * {@linkplain StringArgumentType a string argument type}.
  *
  * @since 1.0
- * @author Codestech
  * @see StringArgumentType
- * @see ArgumentCodec
+ * @see ArgumentWriter
  */
-public final class StringArgumentCodec extends ArgumentCodec<StringArgumentType> {
+public final class StringArgumentWriter extends ArgumentWriter<StringArgumentType> {
+
+    /**
+     * An instance of the {@linkplain StringArgumentWriter string argument writer}.
+     *
+     * @since 1.0
+     */
+    public static final StringArgumentWriter INSTANCE = new StringArgumentWriter();
 
     private static final MapperNetworkCodec<StringType, Integer> STRING_TYPE_CODEC = new MapperNetworkCodec<>(
             Mapper.builder(StringType.class, Integer.class)
@@ -29,22 +35,8 @@ public final class StringArgumentCodec extends ArgumentCodec<StringArgumentType>
             VarIntNetworkCodec.INSTANCE
     );
 
-    /**
-     * Constructs the {@linkplain StringArgumentCodec string argument codec}.
-     *
-     * @since 1.0
-     */
-    public StringArgumentCodec() {
+    private StringArgumentWriter() {
         super(5, StringArgumentType.class);
-    }
-
-    @Override
-    public @NonNull StringArgumentType read(@NonNull ByteBuf buf) {
-        return switch (STRING_TYPE_CODEC.read(buf)) {
-            case SINGLE_WORD -> StringArgumentType.word();
-            case QUOTABLE_PHRASE -> StringArgumentType.string();
-            case GREEDY_PHRASE -> StringArgumentType.greedyString();
-        };
     }
 
     @Override

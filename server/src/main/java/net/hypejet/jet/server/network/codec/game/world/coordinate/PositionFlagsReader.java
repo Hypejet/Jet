@@ -6,8 +6,8 @@ import net.hypejet.jet.world.coordinate.PositionFlag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
-import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Set;
 
 /**
@@ -21,7 +21,7 @@ import java.util.Set;
  */
 public final class PositionFlagsReader implements NetworkReader<Collection<PositionFlag>> {
 
-    private static final EnumMap<PositionFlag, Integer> FLAG_IDS = new EnumMap<>(PositionFlag.class);
+    private static final IdentityHashMap<PositionFlag, Integer> FLAG_IDS = new IdentityHashMap<>();
 
     /**
      * An instance of the {@linkplain PositionFlagsReader position flags reader}.
@@ -42,7 +42,7 @@ public final class PositionFlagsReader implements NetworkReader<Collection<Posit
         short value = buf.readUnsignedByte();
         Set<PositionFlag> flags = new HashSet<>();
 
-        for (PositionFlag flag : PositionFlag.values()) {
+        for (PositionFlag flag : PositionFlag.VALUES) {
             int id = FLAG_IDS.get(flag);
             if ((value & id) != 0)
                 flags.add(flag);

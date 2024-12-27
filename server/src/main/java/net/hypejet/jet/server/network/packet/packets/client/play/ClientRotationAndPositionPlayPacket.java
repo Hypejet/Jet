@@ -6,7 +6,7 @@ import net.hypejet.jet.world.coordinate.PositionFlag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
-import java.util.EnumSet;
+import java.util.Set;
 
 /**
  * Represents {@linkplain ClientPacket a client packet}, which is received when a position and rotation is changed
@@ -35,6 +35,6 @@ public record ClientRotationAndPositionPlayPacket(double x, double feetY, double
      * @since 1.0
      */
     public ClientRotationAndPositionPlayPacket {
-        flags = EnumSet.copyOf(NullabilityUtil.requireNonNull(flags, "flags"));
+        flags = Set.copyOf(NullabilityUtil.requireNonNull(flags, "flags"));
     }
 }

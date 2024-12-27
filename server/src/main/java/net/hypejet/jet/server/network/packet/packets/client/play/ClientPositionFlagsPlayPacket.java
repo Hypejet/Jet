@@ -6,7 +6,7 @@ import net.hypejet.jet.world.coordinate.PositionFlag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
-import java.util.EnumSet;
+import java.util.Set;
 
 /**
  * Represents {@linkplain ClientPacket a client packet}, which is sent by a client when it changes position flags
@@ -25,6 +25,6 @@ public record ClientPositionFlagsPlayPacket(@NonNull Collection<PositionFlag> fl
      * @since 1.0
      */
     public ClientPositionFlagsPlayPacket {
-        flags = EnumSet.copyOf(NullabilityUtil.requireNonNull(flags, "flags"));
+        flags = Set.copyOf(NullabilityUtil.requireNonNull(flags, "flags"));
     }
 }

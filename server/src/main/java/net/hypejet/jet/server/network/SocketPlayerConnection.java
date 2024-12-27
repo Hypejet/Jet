@@ -36,7 +36,7 @@ import net.hypejet.jet.server.network.packet.reader.ClientPacketReader;
 import net.hypejet.jet.server.network.session.Session;
 import net.hypejet.jet.server.network.session.task.HandshakeSessionTask;
 import net.hypejet.jet.server.util.NetworkUtil;
-import net.hypejet.jet.server.util.acquisition.MappedObjectAcquisition;
+import net.hypejet.jet.server.util.acquisition.ObjectMappedAcquisition;
 import net.hypejet.jet.server.util.unit.Unit;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -142,7 +142,10 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
 
     @Override
     public @NonNull ObjectAcquisition<PlayerConnectionState> connectionState() {
-        return new MappedObjectAcquisition<>(this.protocolState(), ProtocolState::toConnectionState);
+        return new ObjectMappedAcquisition<>(
+                this.protocolState(),
+                acquisition -> acquisition.get().toConnectionState()
+        );
     }
 
     @Override
@@ -195,7 +198,10 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
      * @since 1.0
      */
     public @NonNull ObjectAcquisition<ProtocolState> protocolState() {
-        return new MappedObjectAcquisition<>(this.acquireSessionRead(), Session::protocolState);
+        return new ObjectMappedAcquisition<>(
+                this.acquireSessionRead(),
+                acquisition -> acquisition.get().protocolState()
+        );
     }
 
     /**
