@@ -5,8 +5,8 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.hypejet.jet.plugin.metadata.PluginDependency;
-import net.hypejet.jet.plugin.metadata.PluginMetadata;
+import net.hypejet.jet.plugin.dependency.PluginDependency;
+import net.hypejet.jet.server.plugin.metadata.PluginMetadata;
 import net.hypejet.jet.server.util.json.JsonUtil;
 import net.kyori.adventure.key.Key;
 
@@ -17,11 +17,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Represents a {@linkplain JsonDeserializer json deserializer}, which deserializes a {@linkplain PluginMetadata plugin
- * metadata}.
+ * Represents {@linkplain JsonDeserializer a json deserializer}, which deserializes
+ * {@linkplain PluginMetadata a plugin metadata}.
  *
  * @since 1.0
- * @author Codestech
  * @see PluginMetadata
  * @see JsonDeserializer
  */
@@ -49,9 +48,8 @@ public final class PluginMetadataDeserializer implements JsonDeserializer<Plugin
         Set<String> authors = new HashSet<>();
         JsonArray authorsArray = object.getAsJsonArray(AUTHORS);
 
-        if (authorsArray != null) {
+        if (authorsArray != null)
             authorsArray.forEach(element -> authors.add(element.getAsString()));
-        }
 
         Set<PluginDependency> dependencies = new HashSet<>();
         JsonArray dependenciesArray = object.getAsJsonArray(DEPENDENCIES);

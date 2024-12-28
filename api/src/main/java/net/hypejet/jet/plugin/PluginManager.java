@@ -6,15 +6,16 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.Collection;
 
 /**
- * Represents something that manages {@linkplain Plugin plugins} on the server.
+ * Represents something that manages {@linkplain Plugin plugins} of
+ * {@linkplain net.hypejet.jet.MinecraftServer a minecraft server}.
  *
  * @since 1.0
- * @author Codestech
  * @see Plugin
+ * @see net.hypejet.jet.MinecraftServer
  */
 public interface PluginManager {
     /**
-     * Gets a {@linkplain Plugin plugin} by a name of it.
+     * Gets {@linkplain Plugin a plugin} by a name of it.
      *
      * @param name the name
      * @return the plugin, {@code null} if there is no a plugin registered with the name specified
@@ -23,16 +24,16 @@ public interface PluginManager {
     @Nullable Plugin getPlugin(@NonNull String name);
 
     /**
-     * Gets a {@linkplain Plugin plugin} from instance of it.
+     * Gets {@linkplain Plugin a plugin} by a main class instance of it.
      *
-     * @param object the instance
+     * @param instance the instance
      * @return the plugin
      * @since 1.0
      */
-    @Nullable Plugin getPlugin(@NonNull Object object);
+    @Nullable Plugin getPlugin(@NonNull Object instance);
 
     /**
-     * Gets whether a {@linkplain Plugin plugin} with a name specified has been loaded.
+     * Gets whether {@linkplain Plugin a plugin} with a name specified has been loaded.
      *
      * @param name the name
      * @return {@code true} if the plugin has been loaded, {@code false} otherwise
@@ -41,7 +42,7 @@ public interface PluginManager {
     boolean isLoaded(@NonNull String name);
 
     /**
-     * Gets a {@linkplain Collection collection} of {@linkplain Plugin plugins} registered on the server.
+     * Gets {@linkplain Collection a collection} of {@linkplain Plugin plugins} registered on the server.
      *
      * @return the collection
      * @since 1.0
