@@ -15,11 +15,10 @@ import java.util.function.UnaryOperator;
  *
  * @param <V> a type of values of entries in this registry
  * @since 1.0
- * @author Codestech
  */
 public interface MinecraftRegistry<V> {
     /**
-     * Gets a {@linkplain Key key} of this {@linkplain MinecraftRegistry registry}.
+     * Gets {@linkplain Key a key} of this Minecraft registry.
      *
      * @return the key
      * @since 1.0
@@ -27,7 +26,7 @@ public interface MinecraftRegistry<V> {
     @NonNull Key registryKey();
 
     /**
-     * Gets a {@linkplain Class class} of values of entries of this {@linkplain MinecraftRegistry registry}.
+     * Gets {@linkplain Class a class} of values of entries of this Minecraft registry.
      *
      * @return the class
      * @since 1.0
@@ -35,25 +34,25 @@ public interface MinecraftRegistry<V> {
     @NonNull Class<V> entryValueClass();
 
     /**
-     * Gets a registry entry by an identifier of it.
+     * Gets a registry entry by a key of it.
      *
-     * @param identifier the identifier
+     * @param key the key
      * @return the registry entry
      * @since 1.0
      */
-    @Nullable RegistryEntry<V> get(@NonNull Key identifier);
+    @Nullable RegistryEntry<V> get(@NonNull Key key);
 
     /**
      * Gets a registry entry by a numeric identifier of it.
      *
-     * @param numericIdentifier the numeric identifier
+     * @param identifier the numeric identifier
      * @return the registry entry
      * @since 1.0
      */
-    @Nullable RegistryEntry<V> get(int numericIdentifier);
+    @Nullable RegistryEntry<V> get(int identifier);
 
     /**
-     * Gets whether a registry entry specified was registered in this {@linkplain MinecraftRegistry registry}.
+     * Gets whether a registry entry specified was registered in this Minecraft registry.
      *
      * @param entry the registry entry
      * @return {@code true} if the registry entry was registered in this registry, {@code false} otherwise
@@ -62,25 +61,27 @@ public interface MinecraftRegistry<V> {
     boolean isRegistered(@NonNull RegistryEntry<V> entry);
 
     /**
-     * Gets a {@linkplain Key key} of a registry entry registered in this {@linkplain MinecraftRegistry registry}.
+     * Gets {@linkplain Key a key} of a registry entry registered in this Minecraft registry.
      *
      * @param entry the registry entry
-     * @return the identifier
+     * @return the key
+     * @throws IllegalArgumentException if the registry entry specified has not been specified in this registry
      * @since 1.0
      */
     @NonNull Key keyOf(@NonNull RegistryEntry<V> entry);
 
     /**
-     * Gets a numeric identifier of a registry entry registered in this {@link MinecraftRegistry registry}.
+     * Gets a numeric identifier of a registry entry registered in this Minecraft registry.
      *
      * @param entry the registry entry
      * @return a numeric identifier of the registry entry
+     * @throws IllegalArgumentException if the registry entry specified has not been specified in this registry
      * @since 1.0
      */
     int identifierOf(@NonNull RegistryEntry<V> entry);
 
     /**
-     * Gets a {@linkplain List list} of all entries registered in this {@linkplain MinecraftRegistry registry}.
+     * Gets {@linkplain List a list} of all entries registered in this Minecraft registry.
      *
      * <p>The entries are sorted by their numeric identifier.</p>
      *
@@ -91,7 +92,11 @@ public interface MinecraftRegistry<V> {
 
     /**
      * Creates {@linkplain BooleanAcquisition a boolean acquisition} defining whether
-     * a {@linkplain RegistryEntry registry entry} specified has a tag specified attached.
+     * {@linkplain RegistryEntry a registry entry} specified has a tag specified attached.
+     *
+     * <p>The acquisition throws {@linkplain IllegalArgumentException an illegal argument exception} when
+     * {@link CollectionAcquisition#collection()} is called and if the registry entry specified has not been registered
+     * in this registry. </p>
      *
      * @param entry the registry entry
      * @param tag the tag
@@ -102,8 +107,12 @@ public interface MinecraftRegistry<V> {
     @NonNull BooleanAcquisition hasTag(@NonNull RegistryEntry<V> entry, @NonNull Key tag);
 
     /**
-     * Creates {@linkplain CollectionAcquisition a collection acquisition} of a {@linkplain Collection collection} of
+     * Creates {@linkplain CollectionAcquisition a collection acquisition} of {@linkplain Collection a collection} of
      * tags attached to {@linkplain RegistryEntry a registry entry} specified.
+     *
+     * <p>The acquisition throws {@linkplain IllegalArgumentException an illegal argument exception} when
+     * {@link CollectionAcquisition#collection()} is called and if the registry entry specified has not been registered
+     * in this registry. </p>
      *
      * @param entry the registry entry
      * @return the collection
@@ -117,6 +126,7 @@ public interface MinecraftRegistry<V> {
      * @param entry the registry entry
      * @param tagUnaryOperator a unary operator to update the tags with, the provided collection is a collection of
      *                         current tags, the returned collection is a collection of new tags
+     * @throws IllegalArgumentException if the registry entry specified has not been specified in this registry
      * @since 1.0
      */
     void updateTags(@NonNull RegistryEntry<V> entry, @NonNull UnaryOperator<Collection<Key>> tagUnaryOperator);

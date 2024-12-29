@@ -16,7 +16,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *                      enables the entry
  * @param <V> a type of value of the entry
  * @since 1.0
- * @author Codestech
  * @see RegistryEntry
  */
 public record JetRegistryEntry<V>(@NonNull Key key, @NonNull V value, @Nullable PackInfo knownPackInfo)

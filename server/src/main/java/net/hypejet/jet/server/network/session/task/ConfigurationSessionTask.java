@@ -26,7 +26,7 @@ import net.hypejet.jet.server.network.session.keepalive.KeepAliveHandler;
 import net.hypejet.jet.server.network.session.keepalive.KeepAliveResponseHandler;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
 import net.hypejet.jet.server.registry.JetSerializableMinecraftRegistry;
-import net.hypejet.jet.server.registry.session.RegistryTagUpdateFunction;
+import net.hypejet.jet.server.registry.function.RegistryTagUpdateFunction;
 import net.hypejet.jet.server.util.unit.Unit;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTag;
@@ -96,10 +96,10 @@ public final class ConfigurationSessionTask implements SessionTask, KeepAliveRes
     }
 
     @Override
-    public void updateTags(@NonNull Runnable tagUpdateTask) {
+    public void updateTags(@NonNull ServerUpdateTagsPacket packet) {
         try (BooleanAcquisition tagsSentAcquisition = this.tagsSent.acquireWrite()) {
             if (!tagsSentAcquisition.get()) return;
-            tagUpdateTask.run();
+            this.player.sendPacket(packet);
         }
     }
 
@@ -229,7 +229,7 @@ public final class ConfigurationSessionTask implements SessionTask, KeepAliveRes
 
             BinaryTag serializedEntry;
             if (knownPackInfo == null || !dataPackResponse.contains(knownPackInfo))
-                serializedEntry = registry.binaryTagCodec().write(entry.value());
+                serializedEntry = registry.binaryTagWriter().write(entry.value());
             else
                 serializedEntry = null; // The client already knows the value of the entry
 

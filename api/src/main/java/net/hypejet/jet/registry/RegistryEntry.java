@@ -7,16 +7,15 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * Represents an entry of a {@linkplain MinecraftRegistry registry}.
+ * Represents an entry of {@linkplain MinecraftRegistry a Minecraft registry}.
  *
  * @param <V> a type of value of the entry
  * @since 1.0
- * @author Codestech
  * @see MinecraftRegistry
  */
 public interface RegistryEntry<V> extends Keyed {
     /**
-     * Gets a {@linkplain Key key} of the entry.
+     * Gets {@linkplain Key a key} of the registry entry.
      *
      * @return the key
      * @since 1.0
@@ -25,7 +24,7 @@ public interface RegistryEntry<V> extends Keyed {
     @NonNull Key key();
 
     /**
-     * Gets a value of the entry.
+     * Gets a value of the registry entry.
      *
      * @return the value
      * @since 1.0
@@ -33,7 +32,7 @@ public interface RegistryEntry<V> extends Keyed {
     @NonNull V value();
 
     /**
-     * Gets an information of a feature pack, which enables this entry.
+     * Gets an information of a feature pack, which enables this registry entry.
      *
      * @return the feature pack, {@code null} if no feature packs enable the entry
      * @since 1.0

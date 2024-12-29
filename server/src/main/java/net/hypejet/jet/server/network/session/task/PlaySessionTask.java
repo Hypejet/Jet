@@ -5,8 +5,9 @@ import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket;
-import net.hypejet.jet.server.registry.session.RegistryTagUpdateFunction;
+import net.hypejet.jet.server.registry.function.RegistryTagUpdateFunction;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -53,8 +54,8 @@ public final class PlaySessionTask implements SessionTask, RegistryTagUpdateFunc
     }
 
     @Override
-    public void updateTags(@NonNull Runnable tagUpdateTask) {
-        tagUpdateTask.run();
+    public void updateTags(@NonNull ServerUpdateTagsPacket packet) {
+        this.player.sendPacket(packet);
     }
 
     /**
