@@ -3,8 +3,7 @@
 
 <configuration>
     <conversionRule conversionWord="highlight"
-                    converterClass="net.hypejet.jet.server.logback.LogbackHighlightingMessage"/>
-
+                    converterClass="net.hypejet.jet.server.util.logback.LogbackHighlightingMessage"/>
     <conversionRule conversionWord="stacktraceHighlight"
                     converterClass="ch.qos.logback.classic.pattern.ThrowableProxyConverter"/>
 

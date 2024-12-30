@@ -1,6 +1,6 @@
 package net.hypejet.jet.event.events.serverlist;
 
-import net.hypejet.jet.ping.ServerListPing;
+import net.hypejet.jet.util.game.ping.ServerListPing;
 import net.hypejet.jet.network.PlayerConnection;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

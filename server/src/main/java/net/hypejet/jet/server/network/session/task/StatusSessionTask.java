@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.session.task;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.event.events.serverlist.ServerListPingEvent;
-import net.hypejet.jet.ping.ServerListPing;
+import net.hypejet.jet.util.game.ping.ServerListPing;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
@@ -11,6 +11,7 @@ import net.hypejet.jet.server.network.packet.packets.client.status.ClientServerL
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerPingResponsePacket;
 import net.hypejet.jet.server.network.packet.packets.server.status.ServerListResponseStatusPacket;
 import net.hypejet.jet.server.util.unit.Unit;
+import net.hypejet.jet.util.json.UnmodifiableJsonObject;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -133,6 +134,6 @@ public final class StatusSessionTask implements SessionTask {
                 // TODO: An actual list of players online
                 new ServerListPing.Players(configuration.maxPlayers(), 0, List.of()),
                 configuration.serverListDescription(), null, false,
-                /* TODO: An actual property*/ false, /* TODO: An actual property*/ null);
+                /* TODO: An actual property*/ false, (UnmodifiableJsonObject) null);
     }
 }

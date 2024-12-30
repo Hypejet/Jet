@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.packet.packets.client.play;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
-import net.hypejet.jet.signing.SeenMessages;
+import net.hypejet.jet.server.util.game.signing.SeenMessages;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;

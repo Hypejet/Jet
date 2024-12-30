@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.network.packet.packets.client.common;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.pack.ResourcePackState;
+import net.hypejet.jet.util.game.pack.ResourcePackState;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

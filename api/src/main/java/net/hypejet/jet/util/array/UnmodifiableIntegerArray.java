@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * Represents a wrapper of an integer array, which is intended be unmodifiable. In order to ensure that, the array is
+ * Represents a holder of an integer array, which is intended be unmodifiable. In order to ensure that, the array is
  * cloned during construction and every time it is being got a clone is returned.
  *
  * @param array the array

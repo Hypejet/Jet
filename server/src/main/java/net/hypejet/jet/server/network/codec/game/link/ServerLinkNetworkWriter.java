@@ -2,10 +2,10 @@ package net.hypejet.jet.server.network.codec.game.link;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.data.codecs.util.mapper.Mapper;
-import net.hypejet.jet.link.ServerLink;
-import net.hypejet.jet.link.label.BuiltinLabel;
-import net.hypejet.jet.link.label.ComponentLabel;
-import net.hypejet.jet.link.label.ServerLinkLabel;
+import net.hypejet.jet.util.game.link.ServerLink;
+import net.hypejet.jet.util.game.link.label.BuiltinLabel;
+import net.hypejet.jet.util.game.link.label.ComponentLabel;
+import net.hypejet.jet.util.game.link.label.ServerLinkLabel;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.component.ComponentNetworkWriter;
@@ -66,6 +66,7 @@ public final class ServerLinkNetworkWriter implements NetworkWriter<ServerLink> 
         switch (label) {
             case BuiltinLabel builtinLabel -> BUILT_IN_LABEL_CODEC.write(buf, builtinLabel);
             case ComponentLabel (Component component) -> ComponentNetworkWriter.INSTANCE.write(buf, component);
+            default -> throw new IllegalStateException(String.format("Unknown server link label: %s", label));
         }
 
         StringNetworkCodec.INSTANCE.write(buf, object.url());

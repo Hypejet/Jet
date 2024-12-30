@@ -9,10 +9,11 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.ping.ServerListPing;
+import net.hypejet.jet.util.game.ping.ServerListPing;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.status.ServerListResponseStatusPacket;
+import net.hypejet.jet.util.json.UnmodifiableJsonObject;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -101,7 +102,7 @@ public final class ServerListResponseStatusPacketWriter implements NetworkWriter
      */
     private static final class FaviconSerializer implements JsonSerializer<ServerListPing.Favicon> {
 
-        private static final String PREFIX = "data:image/" + ServerListPing.faviconFormatName() + ";base64,";
+        private static final String PREFIX = "data:image/png;base64,";
 
         private FaviconSerializer() {}
 
@@ -208,10 +209,9 @@ public final class ServerListResponseStatusPacketWriter implements NetworkWriter
             object.addProperty(ENFORCES_SECURE_CHAT_FIELD, src.enforcesSecureChat());
             object.addProperty(PREVIEWS_CHAT_FIELD, src.previewsChat());
 
-            JsonObject customData = src.customData();
-
+            UnmodifiableJsonObject customData = src.customData();
             if (customData != null) {
-                for (Map.Entry<String, JsonElement> entry : customData.entrySet()) {
+                for (Map.Entry<String, JsonElement> entry : customData.object().entrySet()) {
                     if (object.has(entry.getKey())) continue;
                     object.add(entry.getKey(), entry.getValue());
                 }

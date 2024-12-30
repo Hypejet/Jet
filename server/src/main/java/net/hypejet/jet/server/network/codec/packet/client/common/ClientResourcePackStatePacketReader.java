@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.codec.packet.client.common;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.data.codecs.util.mapper.Mapper;
-import net.hypejet.jet.pack.ResourcePackState;
+import net.hypejet.jet.util.game.pack.ResourcePackState;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.mapper.MapperNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;

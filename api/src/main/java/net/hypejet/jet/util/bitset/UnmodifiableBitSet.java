@@ -6,7 +6,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.BitSet;
 
 /**
- * Represents a wrapper of {@linkplain BitSet a bitset}, which is intended be unmodifiable. In order to ensure that,
+ * Represents a holder of {@linkplain BitSet a bitset}, which is intended be unmodifiable. In order to ensure that,
  * the bitset is cloned during construction and every time it is being got a clone is returned.
  *
  * @param bitSet the bitset

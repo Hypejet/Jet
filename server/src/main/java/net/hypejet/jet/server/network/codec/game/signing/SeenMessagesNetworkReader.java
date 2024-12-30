@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.aggregate.bitset.FixedBitSetNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
-import net.hypejet.jet.signing.SeenMessages;
+import net.hypejet.jet.server.util.game.signing.SeenMessages;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.BitSet;

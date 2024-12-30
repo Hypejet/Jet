@@ -1,5 +1,7 @@
-package net.hypejet.jet.signing;
+package net.hypejet.jet.server.util.game.signing;
 
+import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.util.bitset.UnmodifiableBitSet;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.BitSet;
@@ -10,33 +12,28 @@ import java.util.BitSet;
  * @param messageCount a count of the messages
  * @param acknowledged a bitset, where each bit represents whether a corresponding message was acknowledged
  * @since 1.0
- * @author Codestech
  */
-public record SeenMessages(int messageCount, @NonNull BitSet acknowledged) {
+public record SeenMessages(int messageCount, @NonNull UnmodifiableBitSet acknowledged) {
     /**
      * Constructs the {@linkplain SeenMessages seen messages}.
      *
-     * <p>The {@code acknowledged} bitset is cloned to prevent mutations on the record.</p>
+     * @param messageCount a count of the messages
+     * @param acknowledged a bitset, where each bit represents whether a corresponding message was acknowledged
+     * @since 1.0
+     */
+    public SeenMessages(int messageCount, @NonNull BitSet acknowledged) {
+        this(messageCount, new UnmodifiableBitSet(acknowledged));
+    }
+
+    /**
+     * Constructs the {@linkplain SeenMessages seen messages}.
      *
      * @param messageCount a count of the messages
      * @param acknowledged a bitset, where each bit represents whether a corresponding message was acknowledged
      * @since 1.0
      */
     public SeenMessages {
-        acknowledged = (BitSet) acknowledged.clone();
-    }
-
-    /**
-     * Gets a {@linkplain BitSet bitset}, where each bit represents whether a corresponding message was acknowledged.
-     *
-     * <p>The {@code acknowledged} bitset is cloned to prevent mutations on the original bitset.</p>
-     *
-     * @return the bitset
-     * @since 1.0
-     */
-    @Override
-    public BitSet acknowledged() {
-        return (BitSet) this.acknowledged.clone();
+        NullabilityUtil.requireNonNull(acknowledged, "acknowledged messages");
     }
 
     /**
@@ -47,6 +44,6 @@ public record SeenMessages(int messageCount, @NonNull BitSet acknowledged) {
      * @since 1.0
      */
     public boolean wasAcknowledged(int message) {
-        return this.acknowledged.get(message);
+        return this.acknowledged.bitSet().get(message);
     }
 }

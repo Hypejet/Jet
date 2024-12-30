@@ -5,7 +5,7 @@ import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkReader;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
-import net.hypejet.jet.signing.SignedArgument;
+import net.hypejet.jet.server.util.game.signing.SignedArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

@@ -1,7 +1,7 @@
 package net.hypejet.jet.event.events.player;
 
 import net.hypejet.jet.entity.player.Player;
-import net.hypejet.jet.pack.ResourcePackState;
+import net.hypejet.jet.util.game.pack.ResourcePackState;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.UUID;

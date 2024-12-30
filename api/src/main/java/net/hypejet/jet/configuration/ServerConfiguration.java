@@ -1,5 +1,6 @@
 package net.hypejet.jet.configuration;
 
+import net.hypejet.jet.util.game.ping.ServerListPing;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -27,11 +28,11 @@ public interface ServerConfiguration {
     @NonNull Component unsupportedVersionMessage();
 
     /**
-     * Gets a message used as a description of a {@linkplain net.hypejet.jet.ping.ServerListPing server list ping}.
+     * Gets a message used as a description of a {@linkplain ServerListPing server list ping}.
      *
      * @return the message
      * @since 1.0
-     * @see net.hypejet.jet.ping.ServerListPing
+     * @see ServerListPing
      */
     @NonNull Component serverListDescription();
 
@@ -42,7 +43,7 @@ public interface ServerConfiguration {
      *
      * @return the amount
      * @since 1.0
-     * @see net.hypejet.jet.ping.ServerListPing
+     * @see ServerListPing
      */
     int maxPlayers();
 }
