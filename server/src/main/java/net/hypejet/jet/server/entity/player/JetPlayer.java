@@ -2,7 +2,10 @@ package net.hypejet.jet.server.entity.player;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.hypejet.concurrency.object.ObjectAcquisition;
+import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
+import net.hypejet.concurrency.object.nullable.NullableObjectAcquirable;
+import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
+import net.hypejet.concurrency.object.nullable.WriteNullableObjectAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.player.PlayerChangeSettingsEvent;
@@ -23,17 +26,14 @@ import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.pointer.Pointers;
 import net.kyori.adventure.text.Component;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 /**
- * Represents an implementation of {@linkplain Player player}.
+ * Represents an implementation of {@linkplain Player a player}.
  *
  * @since 1.0
  * @author Codestech
@@ -45,14 +45,13 @@ public final class JetPlayer extends JetEntity implements Player {
     private static final Key ENTITY_TYPE = Key.key("player");
     private static final Key BRAND_PLUGIN_MESSAGE_IDENTIFIER = Key.key("brand");
 
-    private final String username;
     private final SocketPlayerConnection connection;
 
-    private @MonotonicNonNull Settings settings; // TODO: Thread safety
-    private @MonotonicNonNull String clientBrand; // TODO: Thread safety
+    private final NullableObjectAcquirable<Settings> settings = new NullableObjectAcquirable<>();
+    private final NullableObjectAcquirable<String> clientBrand = new NullableObjectAcquirable<>();
 
     /**
-     * Constructs a {@linkplain JetPlayer player}.
+     * Constructs the {@linkplain JetPlayer player}.
      *
      * @param uniqueId a unique identifier of the player
      * @param username a username of the player
@@ -61,17 +60,15 @@ public final class JetPlayer extends JetEntity implements Player {
      */
     public JetPlayer(@NonNull UUID uniqueId, @NonNull String username, @NonNull SocketPlayerConnection connection) {
         super(ENTITY_TYPE, uniqueId, Pointers.builder()
-                .withStatic(Identity.UUID, uniqueId)
-                .withStatic(Identity.NAME, username)
+                .withStatic(Identity.UUID, NullabilityUtil.requireNonNull(uniqueId, "unique identifier"))
+                .withStatic(Identity.NAME, NullabilityUtil.requireNonNull(username, "username"))
                 .build());
-
-        this.username = username;
-        this.connection = connection;
+        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
     }
 
     @Override
     public @NonNull String username() {
-        return this.username;
+        return this.pointers().get(Identity.NAME).orElseThrow();
     }
 
     @Override
@@ -85,13 +82,13 @@ public final class JetPlayer extends JetEntity implements Player {
     }
 
     @Override
-    public @Nullable Settings settings() {
-        return this.settings;
+    public @NonNull NullableObjectAcquisition<Settings> settings() {
+        return this.settings.acquireRead();
     }
 
     @Override
-    public @Nullable String clientBrand() {
-        return this.clientBrand;
+    public @NonNull NullableObjectAcquisition<String> clientBrand() {
+        return this.clientBrand.acquireRead();
     }
 
     @Override
@@ -104,7 +101,7 @@ public final class JetPlayer extends JetEntity implements Player {
         NullabilityUtil.requireNonNull(identifier, "identifier");
         NullabilityUtil.requireNonNull(data, "data");
 
-        try (ObjectAcquisition<ProtocolState> acquisition = this.connection.protocolState()) {
+        try (NotNullObjectAcquisition<ProtocolState> acquisition = this.connection.protocolState()) {
             if (!ServerPacketRegistry.isSupported(acquisition.get(), ServerPluginMessagePacket.class))
                 throw new IllegalStateException("The operation is not supported at current protocol state");
             this.sendPacket(new ServerPluginMessagePacket(identifier, data));
@@ -136,20 +133,33 @@ public final class JetPlayer extends JetEntity implements Player {
      * @param settings the new settings
      * @since 1.0
      */
-    public void settings(@NonNull Settings settings) {
+    public void setSettings(@NonNull Settings settings) {
         Objects.requireNonNull(settings, "The settings must not be null");
-
-        PlayerChangeSettingsEvent event = new PlayerChangeSettingsEvent(this, settings);
-        this.server().eventNode().call(event);
-        if (event.isCancelled()) return;
-
-        this.settings = settings;
+        try (WriteNullableObjectAcquisition<Settings> acquisition = this.settings.acquireWrite()) {
+            PlayerChangeSettingsEvent event = new PlayerChangeSettingsEvent(this, settings);
+            this.server().eventNode().call(event);
+            if (event.isCancelled()) return;
+            acquisition.set(settings);
+        }
     }
 
     /**
-     * Sends a plugin message to a client containing a server brand.
+     * Updates a brand name of the client.
      *
-     * @param brand the server brand
+     * @param clientBrand the brand name
+     * @since 1.0
+     */
+    public void setClientBrand(@NonNull String clientBrand) {
+        NullabilityUtil.requireNonNull(clientBrand, "client brand");
+        try (WriteNullableObjectAcquisition<String> acquisition = this.clientBrand.acquireWrite()) {
+            acquisition.set(clientBrand);
+        }
+    }
+
+    /**
+     * Sends a plugin message containing brand name of the server to a client of this player.
+     *
+     * @param brand the server brand name
      * @since 1.0
      */
     public void sendServerBrand(@NonNull String brand) {
@@ -163,16 +173,6 @@ public final class JetPlayer extends JetEntity implements Player {
     }
 
     /**
-     * Sets a brand name of the client.
-     *
-     * @param clientBrand the brand name
-     * @since 1.0
-     */
-    public void setClientBrand(@NonNull String clientBrand) {
-        this.clientBrand = NullabilityUtil.requireNonNull(clientBrand, "client brand");
-    }
-
-    /**
      * Sends a packet to a client backed by {@linkplain SocketPlayerConnection a socket player connection} attached
      * to this player.
      *
@@ -182,19 +182,5 @@ public final class JetPlayer extends JetEntity implements Player {
      */
     public void sendPacket(@NonNull ServerPacket packet) {
         this.connection.sendPacket(packet);
-    }
-
-    /**
-     * Sends a packet to a client backed by {@linkplain SocketPlayerConnection a socket player connection} attached
-     * to this player.
-     *
-     * @param packet the server packet
-     * @param resultFuture a completable future that should be completed when a result of the operation is available
-     * @since 1.0
-     * @see SocketPlayerConnection#sendPacket(ServerPacket, CompletableFuture)
-     */
-    public void sendPacket(@NonNull ServerPacket packet,
-                           @Nullable CompletableFuture<SocketPlayerConnection.PacketSendResult> resultFuture) {
-        this.connection.sendPacket(packet, resultFuture);
     }
 }

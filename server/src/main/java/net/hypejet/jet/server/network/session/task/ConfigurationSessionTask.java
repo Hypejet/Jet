@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.network.session.task;
 
-import net.hypejet.concurrency.object.ObjectAcquisition;
 import net.hypejet.concurrency.object.WriteObjectAcquisition;
+import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquirable;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
@@ -174,19 +174,19 @@ public final class ConfigurationSessionTask implements SessionTask, KeepAliveRes
             }
 
             try (WriteBooleanAcquisition tagsSentAcquisition = this.tagsSent.acquireWrite()) {
-                Collection<ObjectAcquisition<TagRegistry>> tagRegistryAcquisitions = new HashSet<>();
+                Collection<NotNullObjectAcquisition<TagRegistry>> tagRegistryAcquisitions = new HashSet<>();
                 try {
                     for (JetMinecraftRegistry<?> registry : registries)
                         tagRegistryAcquisitions.add(registry.createTagRegistry());
 
                     Collection<TagRegistry> tagRegistries = new HashSet<>();
-                    for (ObjectAcquisition<TagRegistry> tagRegistryAcquisition : tagRegistryAcquisitions)
+                    for (NotNullObjectAcquisition<TagRegistry> tagRegistryAcquisition : tagRegistryAcquisitions)
                         tagRegistries.add(tagRegistryAcquisition.get());
 
                     this.player.sendPacket(new ServerUpdateTagsPacket(Set.copyOf(tagRegistries)));
                     tagsSentAcquisition.set(true);
                 } finally {
-                    tagRegistryAcquisitions.forEach(ObjectAcquisition::close);
+                    tagRegistryAcquisitions.forEach(NotNullObjectAcquisition::close);
                 }
             }
 

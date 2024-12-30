@@ -6,7 +6,7 @@ import com.google.gson.JsonElement;
 import net.hypejet.concurrency.collection.CollectionAcquisition;
 import net.hypejet.concurrency.map.MapAcquisition;
 import net.hypejet.concurrency.map.hashmap.HashMapAcquirable;
-import net.hypejet.concurrency.object.ObjectAcquisition;
+import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.jet.data.model.api.pack.PackInfo;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
@@ -24,7 +24,7 @@ import net.hypejet.jet.server.registry.function.RegistryTagUpdateFunction;
 import net.hypejet.jet.server.registry.tags.Tags;
 import net.hypejet.jet.server.util.acquisition.BooleanMappedAcquisition;
 import net.hypejet.jet.server.util.acquisition.CollectionMappedAcquisition;
-import net.hypejet.jet.server.util.acquisition.ObjectMappedAcquisition;
+import net.hypejet.jet.server.util.acquisition.NotNullObjectMappedAcquisition;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -212,7 +212,7 @@ public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
                 for (JetPlayer player : players) {
                     // TODO: Do the session consumption in an another thread to avoid relying on client (HIGH PRIORITY)
                     SocketPlayerConnection connection = player.connection();
-                    try (ObjectAcquisition<Session> sessionAcquisition = connection.acquireSessionRead()) {
+                    try (NotNullObjectAcquisition<Session> sessionAcquisition = connection.acquireSessionRead()) {
                         if (!(sessionAcquisition.get().sessionTask() instanceof RegistryTagUpdateFunction function))
                             continue;
                         function.updateTags(updateTagsPacket);
@@ -223,14 +223,14 @@ public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
     }
 
     /**
-     * Creates {@linkplain ObjectAcquisition an object acquisition} of {@linkplain TagRegistry tag registry} of tags
-     * attached to entries from this registry.
+     * Creates {@linkplain NotNullObjectAcquisition a not-null object acquisition} of
+     * {@linkplain TagRegistry tag registry} of tags attached to entries from this registry.
      *
      * @return the tag registry
      * @since 1.0
      */
-    public @NonNull ObjectAcquisition<TagRegistry> createTagRegistry() {
-        return new ObjectMappedAcquisition<>(
+    public @NonNull NotNullObjectAcquisition<TagRegistry> createTagRegistry() {
+        return new NotNullObjectMappedAcquisition<>(
                 this.tags.acquireRead(),
                 acquisition -> createTagRegistry(acquisition.map())
         );

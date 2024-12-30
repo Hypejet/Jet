@@ -11,8 +11,8 @@ import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
 import net.hypejet.concurrency.collection.CollectionAcquisition;
-import net.hypejet.concurrency.object.ObjectAcquirable;
-import net.hypejet.concurrency.object.ObjectAcquisition;
+import net.hypejet.concurrency.object.notnull.NotNullObjectAcquirable;
+import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.jet.command.CommandManager;
 import net.hypejet.jet.command.CommandSource;
@@ -34,7 +34,7 @@ import net.hypejet.jet.server.network.session.Session;
 import net.hypejet.jet.server.network.session.task.PlaySessionTask;
 import net.hypejet.jet.server.util.acquisition.BooleanMappedAcquisition;
 import net.hypejet.jet.server.util.acquisition.CollectionMappedAcquisition;
-import net.hypejet.jet.server.util.acquisition.ObjectMappedAcquisition;
+import net.hypejet.jet.server.util.acquisition.NotNullObjectMappedAcquisition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +60,7 @@ public final class JetCommandManager implements CommandManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(JetCommandManager.class);
 
     private final JetMinecraftServer server;
-    private final ObjectAcquirable<CommandDispatcher<CommandSource>> dispatcher;
+    private final NotNullObjectAcquirable<CommandDispatcher<CommandSource>> dispatcher;
 
     /**
      * Constructs the {@linkplain JetCommandManager command manager}.
@@ -70,13 +70,13 @@ public final class JetCommandManager implements CommandManager {
      */
     public JetCommandManager(@NonNull JetMinecraftServer server) {
         this.server = NullabilityUtil.requireNonNull(server, "server");
-        this.dispatcher = new ObjectAcquirable<>(new CommandDispatcher<>());
+        this.dispatcher = new NotNullObjectAcquirable<>(new CommandDispatcher<>());
     }
 
     @Override
     public void register(@NonNull LiteralCommandNode<CommandSource> node) {
         try (
-                ObjectAcquisition<CommandDispatcher<CommandSource>>
+                NotNullObjectAcquisition<CommandDispatcher<CommandSource>>
                         dispatcherAcquisition = this.dispatcher.acquireWrite();
                 CollectionAcquisition<JetPlayer, ?> playersAcquisition = this.server.players()
         ) {
@@ -89,7 +89,7 @@ public final class JetCommandManager implements CommandManager {
     @Override
     public void unregister(@NonNull String name) {
         try (
-                ObjectAcquisition<CommandDispatcher<CommandSource>>
+                NotNullObjectAcquisition<CommandDispatcher<CommandSource>>
                         dispatcherAcquisition = this.dispatcher.acquireWrite();
                 CollectionAcquisition<JetPlayer, ?> playersAcquisition = this.server.players()
         ) {
@@ -108,8 +108,8 @@ public final class JetCommandManager implements CommandManager {
     }
 
     @Override
-    public @NonNull ObjectAcquisition<LiteralCommandNode<CommandSource>> get(@NonNull String name) {
-        return new ObjectMappedAcquisition<>(this.dispatcher.acquireRead(), acquisition -> {
+    public @NonNull NotNullObjectAcquisition<LiteralCommandNode<CommandSource>> get(@NonNull String name) {
+        return new NotNullObjectMappedAcquisition<>(this.dispatcher.acquireRead(), acquisition -> {
             RootCommandNode<CommandSource> rootNode = acquisition.get().getRoot();
 
             CommandNode<CommandSource> node = rootNode.getChild(name);
@@ -149,7 +149,7 @@ public final class JetCommandManager implements CommandManager {
      * @since 1.0
      */
     public void execute(@NonNull String input, @NonNull CommandSource source) {
-        try (ObjectAcquisition<CommandDispatcher<CommandSource>> acquisition = this.dispatcher.acquireRead()) {
+        try (NotNullObjectAcquisition<CommandDispatcher<CommandSource>> acquisition = this.dispatcher.acquireRead()) {
             CommandDispatcher<CommandSource> dispatcher = acquisition.get();
             EventNode<Object> eventNode = this.server.eventNode();
 
@@ -190,7 +190,7 @@ public final class JetCommandManager implements CommandManager {
      * @since 1.0
      */
     public @NonNull CompletableFuture<Suggestions> suggest(@NonNull String input, @NonNull CommandSource source) {
-        try (ObjectAcquisition<CommandDispatcher<CommandSource>> acquisition = this.dispatcher.acquireRead()) {
+        try (NotNullObjectAcquisition<CommandDispatcher<CommandSource>> acquisition = this.dispatcher.acquireRead()) {
             StringReader reader = new StringReader(input);
             if (reader.canRead() && reader.peek() == COMMAND_PREFIX)
                 reader.skip();
@@ -210,7 +210,7 @@ public final class JetCommandManager implements CommandManager {
      * @since 1.0
      */
     public void sendDeclarationPacket(@NonNull JetPlayer player) {
-        try (ObjectAcquisition<CommandDispatcher<CommandSource>> acquisition = this.dispatcher.acquireRead()) {
+        try (NotNullObjectAcquisition<CommandDispatcher<CommandSource>> acquisition = this.dispatcher.acquireRead()) {
             player.sendPacket(createDeclarationPacket(acquisition.get()));
         }
     }
@@ -221,7 +221,7 @@ public final class JetCommandManager implements CommandManager {
         ServerDeclareCommandsPlayPacket declarationPacket = createDeclarationPacket(dispatcher);
 
         for (JetPlayer player : playerCollection) {
-            try (ObjectAcquisition<Session> sessionAcquisition = player.connection().acquireSessionRead()) {
+            try (NotNullObjectAcquisition<Session> sessionAcquisition = player.connection().acquireSessionRead()) {
                 if (!(sessionAcquisition.get().sessionTask() instanceof PlaySessionTask playSessionTask)) return;
                 playSessionTask.updateCommands(declarationPacket);
             }

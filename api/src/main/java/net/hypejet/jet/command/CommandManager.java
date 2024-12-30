@@ -2,7 +2,7 @@ package net.hypejet.jet.command;
 
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.hypejet.concurrency.collection.CollectionAcquisition;
-import net.hypejet.concurrency.object.ObjectAcquisition;
+import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -39,11 +39,11 @@ public interface CommandManager {
     @NonNull BooleanAcquisition isRegistered(@NonNull String name);
 
     /**
-     * Creates {@linkplain ObjectAcquisition an object acquisition} holding
+     * Creates {@linkplain NotNullObjectAcquisition an not-null object acquisition} holding
      * {@linkplain LiteralCommandNode a literal command node} representing a command, which was registered in this
      * command manager.
      *
-     * <p>The {@linkplain ObjectAcquisition#get() object acquisition get method} throws
+     * <p>The {@linkplain NotNullObjectAcquisition#get() not-null object acquisition get method} throws
      * {@linkplain IllegalArgumentException an illegal argument exception} if no command with the name specified has
      * been registered.</p>
      *
@@ -51,7 +51,7 @@ public interface CommandManager {
      * @return the object acquisition
      * @since 1.0
      */
-    @NonNull ObjectAcquisition<LiteralCommandNode<CommandSource>> get(@NonNull String name);
+    @NonNull NotNullObjectAcquisition<LiteralCommandNode<CommandSource>> get(@NonNull String name);
 
     /**
      * Creates {@linkplain CollectionAcquisition a collection acquisition} of commands, which have been registered

@@ -25,6 +25,6 @@ public final class ClientInformationPacketHandler extends ClientPacketHandler<Cl
 
     @Override
     public void handle(@NonNull ClientInformationPacket packet, @NonNull Session session) {
-        session.connection().playerOrThrow().settings(packet.settings());
+        session.connection().playerOrThrow().setSettings(packet.settings());
     }
 }

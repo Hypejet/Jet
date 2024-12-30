@@ -1,5 +1,6 @@
 package net.hypejet.jet.server.entity;
 
+import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.Entity;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.key.Key;
@@ -12,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.UnaryOperator;
 
 /**
- * Represents an implementation of {@linkplain Entity entity}.
+ * Represents an implementation of {@linkplain Entity an entity}.
  *
  * @since 1.0
  * @author Codestecj
@@ -29,10 +30,10 @@ public class JetEntity implements Entity {
     private final Pointers pointers;
 
     /**
-     * Constructs an {@linkplain JetEntity entity}.
+     * Constructs the {@linkplain JetEntity entity}.
      *
      * @param entityType an identifier of a type of the entity
-     * @param uniqueId an unique identifier of the entity
+     * @param uniqueId a unique identifier of the entity
      * @since 1.0
      */
     public JetEntity(@NonNull Key entityType, @NonNull UUID uniqueId) {
@@ -45,15 +46,15 @@ public class JetEntity implements Entity {
      * Constructs an {@linkplain JetEntity entity}.
      *
      * @param entityType an identifier of a type of the entity
-     * @param uniqueId an unique identifier of the entity
+     * @param uniqueId a unique identifier of the entity
      * @param pointers a pointers of the entity
      * @since 1.0
      */
     public JetEntity(@NonNull Key entityType, @NonNull UUID uniqueId, @NonNull Pointers pointers) {
-        this.entityType = entityType;
+        this.entityType = NullabilityUtil.requireNonNull(entityType, "entity type");
+        this.identity = Identity.identity(NullabilityUtil.requireNonNull(uniqueId, "unique identifier"));
+        this.pointers = NullabilityUtil.requireNonNull(pointers, "pointers");
         this.entityId = NEXT_ENTITY_ID.getAndIncrement();
-        this.identity = Identity.identity(uniqueId);
-        this.pointers = pointers;
     }
 
     @Override

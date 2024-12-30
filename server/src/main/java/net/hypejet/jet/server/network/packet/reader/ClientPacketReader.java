@@ -2,9 +2,9 @@ package net.hypejet.jet.server.network.packet.reader;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.hypejet.concurrency.object.ObjectAcquirable;
-import net.hypejet.concurrency.object.ObjectAcquisition;
-import net.hypejet.concurrency.object.WriteObjectAcquisition;
+import net.hypejet.concurrency.object.notnull.NotNullObjectAcquirable;
+import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
+import net.hypejet.concurrency.object.notnull.WriteNotNullObjectAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquirable;
 import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
@@ -45,7 +45,7 @@ public final class ClientPacketReader implements NetworkDisconnectionHandler {
     private final Condition resumeCondition = this.paused.newCondition();
 
     // More about existence of this field in a comment in SocketPlayerConnection.SessionAcquisition#onSet
-    private final ObjectAcquirable<Session> sessionAcquirable;
+    private final NotNullObjectAcquirable<Session> sessionAcquirable;
 
     /**
      * Constructs the {@linkplain ClientPacketReader client packet reader}.
@@ -57,7 +57,7 @@ public final class ClientPacketReader implements NetworkDisconnectionHandler {
     public ClientPacketReader(@NonNull SocketPlayerConnection connection, @NonNull Session initialSession) {
         this.connection = NullabilityUtil.requireNonNull(connection, "connection");
         NullabilityUtil.requireNonNull(initialSession, "initial session");
-        this.sessionAcquirable = new ObjectAcquirable<>(initialSession);
+        this.sessionAcquirable = new NotNullObjectAcquirable<>(initialSession);
 
         Thread.ofVirtual()
                 .name("Client packet reader thread")
@@ -107,7 +107,7 @@ public final class ClientPacketReader implements NetworkDisconnectionHandler {
      * @since 1.0
      */
     public void updateSession(@NotNull Session newSession) {
-        try (WriteObjectAcquisition<Session> acquisition = this.sessionAcquirable.acquireWrite()) {
+        try (WriteNotNullObjectAcquisition<Session> acquisition = this.sessionAcquirable.acquireWrite()) {
             acquisition.set(newSession);
         }
     }
@@ -134,7 +134,7 @@ public final class ClientPacketReader implements NetworkDisconnectionHandler {
         RawPacket rawPacket = this.packetQueue.poll();
         if (rawPacket == null) return;
 
-        try (ObjectAcquisition<Session> acquisition = this.sessionAcquirable.acquireRead()) {
+        try (NotNullObjectAcquisition<Session> acquisition = this.sessionAcquirable.acquireRead()) {
             Session session = acquisition.get();
             handlePacket(decodeBody(rawPacket, session.protocolState()), session);
         }

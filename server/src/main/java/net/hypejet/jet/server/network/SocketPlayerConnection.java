@@ -10,9 +10,9 @@ import io.netty.channel.EventLoop;
 import io.netty.channel.SingleThreadEventLoop;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.util.concurrent.Future;
-import net.hypejet.concurrency.object.ObjectAcquirable;
-import net.hypejet.concurrency.object.ObjectAcquisition;
-import net.hypejet.concurrency.object.WriteObjectAcquisition;
+import net.hypejet.concurrency.object.notnull.NotNullObjectAcquirable;
+import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
+import net.hypejet.concurrency.object.notnull.WriteNotNullObjectAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.network.PlayerConnection;
 import net.hypejet.jet.network.PlayerConnectionState;
@@ -36,7 +36,7 @@ import net.hypejet.jet.server.network.packet.reader.ClientPacketReader;
 import net.hypejet.jet.server.network.session.Session;
 import net.hypejet.jet.server.network.session.task.HandshakeSessionTask;
 import net.hypejet.jet.server.util.NetworkUtil;
-import net.hypejet.jet.server.util.acquisition.ObjectMappedAcquisition;
+import net.hypejet.jet.server.util.acquisition.NotNullObjectMappedAcquisition;
 import net.hypejet.jet.server.util.unit.Unit;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -82,7 +82,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     private final ReentrantReadWriteLock playerLock = new ReentrantReadWriteLock();
     private JetPlayer player;
 
-    private final ObjectAcquirable<Session> session;
+    private final NotNullObjectAcquirable<Session> session;
     private final ClientPacketReader clientPacketReader;
 
     /**
@@ -105,7 +105,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
         this.ensureInEventLoop();
 
         Session initialSession = new Session(ProtocolState.HANDSHAKE, this, new HandshakeSessionTask(this));
-        this.session = new ObjectAcquirable<>(initialSession);
+        this.session = new NotNullObjectAcquirable<>(initialSession);
 
         /* We need to update the handlers and initialize the client packet reader after the initial session is set,
            since they are going to be used. The session needs to be started later however, since it might send packets,
@@ -141,8 +141,8 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     }
 
     @Override
-    public @NonNull ObjectAcquisition<PlayerConnectionState> connectionState() {
-        return new ObjectMappedAcquisition<>(
+    public @NonNull NotNullObjectAcquisition<PlayerConnectionState> connectionState() {
+        return new NotNullObjectMappedAcquisition<>(
                 this.protocolState(),
                 acquisition -> acquisition.get().toConnectionState()
         );
@@ -150,7 +150,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
 
     @Override
     public void disconnect(@NonNull Component reason) {
-        try (ObjectAcquisition<ProtocolState> protocolStateAcquisition = this.protocolState()) {
+        try (NotNullObjectAcquisition<ProtocolState> protocolStateAcquisition = this.protocolState()) {
             CompletableFuture<?> disconnectPacketResultFuture;
 
             if (ServerPacketRegistry.isSupported(protocolStateAcquisition.get(), ServerDisconnectPacket.class)) {
@@ -181,7 +181,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     @Override
     public void handleDisconnection() {
         this.ensureInEventLoop();
-        try (ObjectAcquisition<Session> sessionAcquisition = this.acquireSessionRead()) {
+        try (NotNullObjectAcquisition<Session> sessionAcquisition = this.acquireSessionRead()) {
             sessionAcquisition.get().handleDisconnection();
         }
 
@@ -191,38 +191,38 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     }
 
     /**
-     * Creates {@linkplain ObjectAcquisition an object acquisition} of {@linkplain ProtocolState a protocol state} of
-     * this connection.
+     * Creates {@linkplain NotNullObjectAcquisition a not-null object acquisition} of
+     * {@linkplain ProtocolState a protocol state} of this connection.
      *
      * @return the acquisition
      * @since 1.0
      */
-    public @NonNull ObjectAcquisition<ProtocolState> protocolState() {
-        return new ObjectMappedAcquisition<>(
+    public @NonNull NotNullObjectAcquisition<ProtocolState> protocolState() {
+        return new NotNullObjectMappedAcquisition<>(
                 this.acquireSessionRead(),
                 acquisition -> acquisition.get().protocolState()
         );
     }
 
     /**
-     * Creates {@linkplain ObjectAcquisition an object acquisition}, which allows doing read-only operations of
-     * a current {@linkplain Session session} of this connection.
+     * Creates {@linkplain NotNullObjectAcquisition a not-null object acquisition}, which allows doing read-only
+     * operations of a current {@linkplain Session session} of this connection.
      *
      * @return the object acquisition
      * @since 1.0
      */
-    public @NonNull ObjectAcquisition<Session> acquireSessionRead() {
+    public @NonNull NotNullObjectAcquisition<Session> acquireSessionRead() {
         return this.session.acquireRead();
     }
 
     /**
-     * Creates {@linkplain WriteObjectAcquisition a write object acquisition}, which allows doing write operations
-     * of a current {@linkplain Session session} of this connection.
+     * Creates {@linkplain WriteNotNullObjectAcquisition a write not-null object acquisition}, which allows doing write
+     * operations of a current {@linkplain Session session} of this connection.
      *
      * @return the write object acquisition
      * @since 1.0
      */
-    public @NonNull WriteObjectAcquisition<Session> acquireSessionWrite() {
+    public @NonNull WriteNotNullObjectAcquisition<Session> acquireSessionWrite() {
         return new WriteSessionAcquisition(this.session.acquireWrite());
     }
 
@@ -246,7 +246,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
      */
     public void sendPacket(@NonNull ServerPacket packet,
                            @Nullable CompletableFuture<? super PacketSendResult> resultFuture) {
-        try (ObjectAcquisition<ProtocolState> protocolStateAcquisition = this.protocolState()) {
+        try (NotNullObjectAcquisition<ProtocolState> protocolStateAcquisition = this.protocolState()) {
             RawPacket rawPacket = encode(packet, protocolStateAcquisition.get());
 
             ChannelPromise promise = resultFuture == null ? this.channel.voidPromise() : this.channel.newPromise();
@@ -416,14 +416,14 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     }
 
     /**
-     * Represents {@linkplain WriteObjectAcquisition a write object acquisition} of {@linkplain Session a session},
-     * which does essential tasks when a session is being set.
+     * Represents {@linkplain WriteNotNullObjectAcquisition a write not-null object acquisition} of
+     * {@linkplain Session a session}, which does essential tasks when a session is being set.
      *
      * @param originalAcquisition an original session acquisition
      * @since 1.0
      */
-    private record WriteSessionAcquisition(@NonNull WriteObjectAcquisition<Session> originalAcquisition)
-            implements WriteObjectAcquisition<Session> {
+    private record WriteSessionAcquisition(@NonNull WriteNotNullObjectAcquisition<Session> originalAcquisition)
+            implements WriteNotNullObjectAcquisition<Session> {
         /**
          * Constructs the {@linkplain WriteSessionAcquisition write session acquisition}.
          *

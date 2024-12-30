@@ -2,7 +2,6 @@ package net.hypejet.jet.server.util.acquisition;
 
 import net.hypejet.concurrency.Acquisition;
 import net.hypejet.concurrency.collection.CollectionAcquisition;
-import net.hypejet.concurrency.object.ObjectAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +17,6 @@ import java.util.function.Function;
  * @param <CE> a type of elements of collection of the collection acquisition
  * @param <C> a type of collection of the collection acquisition
  * @since 1.0
- * @see ObjectAcquisition
  * @see CollectionAcquisition
  */
 public final class CollectionMappedAcquisition<OA extends Acquisition, CE, C extends Collection<CE>>

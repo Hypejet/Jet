@@ -7,8 +7,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents {@linkplain NetworkReader a network reader}, which reads {@linkplain Collection a collection}
@@ -21,7 +21,15 @@ import java.util.List;
  */
 public final class SkinPartCollectionNetworkReader implements NetworkReader<Collection<Player.SkinPart>> {
 
-    private static final EnumMap<Player.SkinPart, Byte> SKIN_BIT_MASKS = new EnumMap<>(Player.SkinPart.class);
+    private static final Map<Player.SkinPart, Byte> SKIN_BIT_MASKS = Map.ofEntries(
+            Map.entry(Player.SkinPart.CAPE, (byte) 0x01),
+            Map.entry(Player.SkinPart.JACKET, (byte) 0x02),
+            Map.entry(Player.SkinPart.LEFT_SLEEVE, (byte) 0x04),
+            Map.entry(Player.SkinPart.RIGHT_SLEEVE, (byte) 0x08),
+            Map.entry(Player.SkinPart.LEFT_PANTS, (byte) 0x10),
+            Map.entry(Player.SkinPart.RIGHT_PANTS, (byte) 0x20),
+            Map.entry(Player.SkinPart.HAT, (byte) 0x40)
+    );
 
     /**
      * An instance of the {@linkplain SkinPartCollectionNetworkReader skin part collection network reader}.
@@ -30,16 +38,6 @@ public final class SkinPartCollectionNetworkReader implements NetworkReader<Coll
      */
     public static final SkinPartCollectionNetworkReader INSTANCE = new SkinPartCollectionNetworkReader();
 
-    static {
-        SKIN_BIT_MASKS.put(Player.SkinPart.CAPE, (byte) 0x01);
-        SKIN_BIT_MASKS.put(Player.SkinPart.JACKET, (byte) 0x02);
-        SKIN_BIT_MASKS.put(Player.SkinPart.LEFT_SLEEVE, (byte) 0x04);
-        SKIN_BIT_MASKS.put(Player.SkinPart.RIGHT_SLEEVE, (byte) 0x08);
-        SKIN_BIT_MASKS.put(Player.SkinPart.LEFT_PANTS, (byte) 0x10);
-        SKIN_BIT_MASKS.put(Player.SkinPart.RIGHT_PANTS, (byte) 0x20);
-        SKIN_BIT_MASKS.put(Player.SkinPart.HAT, (byte) 0x40);
-    }
-
     private SkinPartCollectionNetworkReader() {}
 
     @Override
@@ -47,7 +45,7 @@ public final class SkinPartCollectionNetworkReader implements NetworkReader<Coll
         byte skinPartsByte = buf.readByte();
         List<Player.SkinPart> skinParts = new ArrayList<>();
 
-        for (Player.SkinPart part : Player.SkinPart.values()) {
+        for (Player.SkinPart part : SKIN_BIT_MASKS.keySet()) {
             if ((skinPartsByte & SKIN_BIT_MASKS.get(part)) != 0) {
                 skinParts.add(part);
             }
