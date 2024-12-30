@@ -12,7 +12,6 @@ import java.util.Objects;
  *
  * @param array the array
  * @since 1.0
- * @author Codestech
  */
 public record UnmodifiableIntegerArray(int @NonNull [] array) {
     /**

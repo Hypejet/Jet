@@ -52,8 +52,10 @@ public final class LongObjectHashMapAcquirable<V> extends MapAcquirable<Long, V,
     }
 
     @Override
-    protected @NotNull LongObjectMap<V> createGuardedView(@NotNull LongObjectMap<V> map,
-                                                          @NotNull MapAcquisition<Long, V, LongObjectMap<V>> acquisition) {
+    protected @NotNull LongObjectMap<V> createGuardedView(
+            @NotNull LongObjectMap<V> map,
+            @NotNull MapAcquisition<Long, V, LongObjectMap<V>> acquisition
+    ) {
         return new GuardedLongObjectMap<>(map, acquisition);
     }
 }

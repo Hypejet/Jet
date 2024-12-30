@@ -132,7 +132,7 @@ public final class StatusSessionTask implements SessionTask {
         return new ServerListPing(new ServerListPing.Version(server.minecraftVersion(), server.protocolVersion()),
                 // TODO: An actual list of players online
                 new ServerListPing.Players(configuration.maxPlayers(), 0, List.of()),
-                configuration.serverListDescription(), server.serverIcon(), false,
+                configuration.serverListDescription(), null, false,
                 /* TODO: An actual property*/ false, /* TODO: An actual property*/ null);
     }
 }

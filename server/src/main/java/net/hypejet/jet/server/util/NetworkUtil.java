@@ -7,10 +7,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * A utility used for deserializing and serializing data from/to a {@linkplain ByteBuf byte buf}.
+ * A utility used for deserializing and serializing data from/to {@linkplain ByteBuf a byte buf}.
  *
  * @since 1.0
- * @author Codestech
  * @see ByteBuf
  */
 public final class NetworkUtil {
@@ -18,7 +17,7 @@ public final class NetworkUtil {
     private NetworkUtil() {}
 
     /**
-     * Reads all remaining bytes from a {@linkplain ByteBuf byte buf}.
+     * Reads all remaining bytes from {@linkplain ByteBuf a byte buf}.
      *
      * @param buf the byte buf
      * @return the remaining bytes
@@ -29,7 +28,7 @@ public final class NetworkUtil {
     }
 
     /**
-     * Reads bytes from a {@linkplain ByteBuf byte buf}.
+     * Reads bytes from {@linkplain ByteBuf a byte buf}.
      *
      * @param buf the byte buf
      * @param length an amount of bytes to read
@@ -43,7 +42,7 @@ public final class NetworkUtil {
     }
 
     /**
-     * Reads an optional value from a {@linkplain ByteBuf byte buf}.
+     * Reads an optional value from {@linkplain ByteBuf a byte buf}.
      *
      * @param reader a network reader, which should read the value
      * @param buf the byte buf
@@ -57,7 +56,7 @@ public final class NetworkUtil {
     }
 
     /**
-     * Writes an optional value to a {@linkplain ByteBuf byte buf}.
+     * Writes an optional value to {@linkplain ByteBuf a byte buf}.
      *
      * @param value the value, {@code null} if not present
      * @param writer a network writer, which should write the value

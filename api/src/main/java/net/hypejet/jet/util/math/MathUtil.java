@@ -4,7 +4,6 @@ package net.hypejet.jet.util.math;
  * Represents a utility providing mathematical operations.
  *
  * @since 1.0
- * @author Codestech
  */
 public final class MathUtil {
 

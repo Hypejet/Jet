@@ -7,7 +7,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Represents a utility for identifying {@linkplain Player.GameMode game modes}.
  *
  * @since 1.0
- * @author Codestech
  * @see Player.GameMode
  */
 public final class GameModeUtil {

@@ -9,10 +9,9 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Represents a {@linkplain ThreadFactory thread factory}, which creates threads with custom name format.
+ * Represents {@linkplain ThreadFactory a thread factory}, which creates threads with custom name format.
  *
  * @since 1.0
- * @author Codestech
  * @see Builder
  * @see ThreadType
  */
@@ -63,7 +62,6 @@ public final class JetThreadFactory implements ThreadFactory {
      * Represents a builder creating the {@linkplain JetThreadFactory Jet thread-factory}.
      *
      * @since 1.0
-     * @author Codestech
      * @see JetThreadFactory
      */
     public static final class Builder {
@@ -79,7 +77,7 @@ public final class JetThreadFactory implements ThreadFactory {
         private Builder() {}
 
         /**
-         * Sets a {@linkplain ThreadType type of threads} that the factory should create.
+         * Sets {@linkplain ThreadType a type of threads} that the factory should create.
          *
          * @param threadType the type of threads
          * @return this builder
@@ -118,7 +116,7 @@ public final class JetThreadFactory implements ThreadFactory {
         }
 
         /**
-         * Sets an {@linkplain Thread.UncaughtExceptionHandler uncaught exception handler} that will be used by threads
+         * Sets {@linkplain Thread.UncaughtExceptionHandler an uncaught exception handler} that will be used by threads
          * created by the thread factory.
          *
          * @param exceptionHandler the uncaught exception handler

@@ -11,7 +11,6 @@ import java.util.BitSet;
  *
  * @param bitSet the bitset
  * @since 1.0
- * @author Codestech
  */
 public record UnmodifiableBitSet(@NonNull BitSet bitSet) {
     /**
