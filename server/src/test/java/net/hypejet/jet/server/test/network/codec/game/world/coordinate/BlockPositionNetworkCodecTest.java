@@ -1,8 +1,8 @@
 package net.hypejet.jet.server.test.network.codec.game.world.coordinate;
 
-import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.hypejet.jet.server.network.codec.game.world.coordinate.BlockPositionNetworkCodec;
 import net.hypejet.jet.server.test.network.codec.NetworkCodecTestUtil;
+import net.hypejet.jet.world.coordinate.BlockPosition;
 import org.junit.jupiter.api.Test;
 
 /**

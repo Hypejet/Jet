@@ -2,16 +2,16 @@ package net.hypejet.jet.server.network.codec.game.link;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.data.codecs.util.mapper.Mapper;
-import net.hypejet.jet.util.game.link.ServerLink;
-import net.hypejet.jet.util.game.link.label.BuiltinLabel;
-import net.hypejet.jet.util.game.link.label.ComponentLabel;
-import net.hypejet.jet.util.game.link.label.ServerLinkLabel;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.component.ComponentNetworkWriter;
 import net.hypejet.jet.server.network.codec.mapper.MapperNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
+import net.hypejet.jet.util.game.link.ServerLink;
+import net.hypejet.jet.util.game.link.label.BuiltinLabel;
+import net.hypejet.jet.util.game.link.label.ComponentLabel;
+import net.hypejet.jet.util.game.link.label.ServerLinkLabel;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

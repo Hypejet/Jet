@@ -16,7 +16,6 @@ import java.util.function.UnaryOperator;
  * Represents an implementation of {@linkplain Entity an entity}.
  *
  * @since 1.0
- * @author Codestecj
  * @see Entity
  */
 public class JetEntity implements Entity {

@@ -4,13 +4,10 @@ import net.hypejet.jet.server.util.CompressionUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 /**
- * Represents a test for methods from {@link CompressionUtil compression util}.
+ * Represents a test of compression using {@link CompressionUtil compression util}.
  *
  * @since 1.0
- * @author Codestech
  * @see CompressionUtil
  */
 public final class CompressionUtilTest {
@@ -29,9 +26,8 @@ public final class CompressionUtilTest {
     }
 
     @Test
-    public void testRandomBytes() {
-        byte[] bytes = new byte[15];
-        ThreadLocalRandom.current().nextBytes(bytes);
+    public void testCompressionAndDecompression() {
+        byte[] bytes = new byte[] { Byte.MIN_VALUE, 23, 4, 126, 3, -23, 90, -13, Byte.MAX_VALUE, 2, -4, 3, -2, 45, 9 };
 
         byte[] compressed = CompressionUtil.compress(bytes);
         byte[] decompressed = CompressionUtil.decompress(compressed);

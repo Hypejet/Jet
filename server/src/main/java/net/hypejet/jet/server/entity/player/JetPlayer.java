@@ -9,17 +9,17 @@ import net.hypejet.concurrency.object.nullable.WriteNullableObjectAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.settings.ChangeSettingsEvent;
+import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.network.ProtocolState;
-import net.hypejet.jet.server.network.packet.packets.server.common.ServerPluginMessagePacket;
+import net.hypejet.jet.server.network.SocketPlayerConnection;
+import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry;
+import net.hypejet.jet.server.network.packet.packets.server.common.ServerPluginMessagePacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerActionBarPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSystemMessagePlayPacket;
-import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.entity.JetEntity;
-import net.hypejet.jet.server.network.SocketPlayerConnection;
-import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
-import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
@@ -36,7 +36,6 @@ import java.util.UUID;
  * Represents an implementation of {@linkplain Player a player}.
  *
  * @since 1.0
- * @author Codestech
  * @see Player
  * @see JetEntity
  */

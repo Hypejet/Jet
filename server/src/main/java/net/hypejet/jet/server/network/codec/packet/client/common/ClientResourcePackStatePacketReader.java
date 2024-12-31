@@ -2,12 +2,12 @@ package net.hypejet.jet.server.network.codec.packet.client.common;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.data.codecs.util.mapper.Mapper;
-import net.hypejet.jet.util.game.pack.ResourcePackState;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.mapper.MapperNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.codec.other.UUIDNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.common.ClientResourcePackStatePacket;
+import net.hypejet.jet.util.game.pack.ResourcePackState;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

@@ -161,10 +161,9 @@ public final class JetThreadFactory implements ThreadFactory {
     }
 
     /**
-     * Represents a type of {@linkplain Thread thread}.
+     * Represents a type of {@linkplain Thread a thread}.
      *
      * @since 1.0
-     * @author Codestech
      */
     public enum ThreadType {
         /**
