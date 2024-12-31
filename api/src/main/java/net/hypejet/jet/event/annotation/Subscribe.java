@@ -1,6 +1,5 @@
 package net.hypejet.jet.event.annotation;
 
-import net.hypejet.jet.event.listener.EventListener;
 import net.hypejet.jet.event.priority.EventPriority;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -10,18 +9,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Represents an annotation, which defines a method as a {@linkplain EventListener event
- * listener} and contains properties for it.
+ * Represents an annotation, which indicates that a method annotated should listen to events with a type specified.
  *
  * @since 1.0
- * @author Codestech
- * @author Window5
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Subscribe {
     /**
-     * Gets an {@linkplain EventPriority event priority} of a listener.
+     * Gets {@linkplain EventPriority an event priority} that the method should listen to events with.
      *
      * @return the event priority
      * @since 1.0

@@ -1,28 +1,25 @@
 package net.hypejet.jet.entity.player;
 
+import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.command.CommandSource;
+import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.Entity;
-import net.hypejet.jet.protocol.connection.PlayerConnection;
-import net.hypejet.jet.protocol.packet.client.configuration.ClientInformationConfigurationPacket;
-import net.hypejet.jet.protocol.packet.server.ServerPacket;
+import net.hypejet.jet.network.PlayerConnection;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Set;
 
 /**
- * Represents an {@linkplain Entity entity}, which is connected via {@linkplain PlayerConnection player connection}.
+ * Represents {@linkplain Entity an entity}, which is connected via {@linkplain PlayerConnection player connection}.
  *
  * @since 1.0
- * @author Codestech
  * @see Entity
  * @see PlayerConnection
- * @see CommandSource
  */
 public interface Player extends Entity, CommandSource {
     /**
@@ -34,21 +31,12 @@ public interface Player extends Entity, CommandSource {
     @NonNull String username();
 
     /**
-     * Gets a {@linkplain PlayerConnection player connection} of the player.
+     * Gets {@linkplain PlayerConnection a player connection} of the player.
      *
      * @return the player connection
-     * @since 1.0-
+     * @since 1.0
      */
     @NonNull PlayerConnection connection();
-
-    /**
-     * A shortcut for {@link PlayerConnection#sendPacket(ServerPacket)}, which is accessed by {@link #connection()}.
-     *
-     * @param packet the packet
-     * @since 1.0
-     * @see PlayerConnection#sendPacket(ServerPacket)
-     */
-    void sendPacket(@NonNull ServerPacket packet);
 
     /**
      * A shortcut for {@link PlayerConnection#disconnect(Component)}, which is accessed by {@link #connection()}.
@@ -60,23 +48,25 @@ public interface Player extends Entity, CommandSource {
     void disconnect(@NonNull Component reason);
 
     /**
-     * Gets a {@linkplain Settings settings} of the player.
+     * Creates {@linkplain NullableObjectAcquisition a nullable object acquisition} holding
+     * {@linkplain Settings settings} of the player.
      *
-     * @return the settings, {@code null} if not initialized yet
+     * @return the acquisition, whose object is {@code null} if the settings were not initialized yet
      * @since 1.0
      */
-    @Nullable Settings settings();
+    @NonNull NullableObjectAcquisition<Settings> settings();
 
     /**
-     * Gets a client brand of the {@linkplain Player player}.
+     * Creates {@linkplain NullableObjectAcquisition a nullable object acquisition} holding client brand of the
+     * {@linkplain Player player}.
      *
-     * @return the client brand, {@code null} if the client did not send it yet
+     * @return the acquisition, whose object is {@code null} if the client did not send it yet
      * @since 1.0
      */
-    @Nullable String clientBrand();
+    @NonNull NullableObjectAcquisition<String> clientBrand();
 
     /**
-     * Gets a {@linkplain MinecraftServer Minecraft server} that the player is connected to.
+     * Gets {@linkplain MinecraftServer a Minecraft server} that the player is connected to.
      *
      * @return the Minecraft server
      * @since 1.0
@@ -93,147 +83,275 @@ public interface Player extends Entity, CommandSource {
     void sendPluginMessage(@NonNull Key identifier, byte @NonNull [] data);
 
     /**
-     * Represents a Minecraft chat mode setting of a {@linkplain Player player}.
+     * Represents a Minecraft chat mode setting of {@linkplain Player a player}.
+     *
+     * <p>This is not an enum, since it depends on Minecraft. Adding an enum entry could break enum switch cases for
+     * example.</p>
      *
      * @since 1.0
-     * @author Codestech
      * @see Player
      */
-    enum ChatMode {
+    final class ChatMode {
         /**
-         * A chat mode used when the player allows all chat messages to be sent.
+         * A chat mode used when a player allows all chat messages to be sent.
          *
          * @since 1.0
          */
-        ENABLED,
+        public static final ChatMode ENABLED = new ChatMode("enabled");
+
         /**
-         * A chat mode used when the player allows only chat messages from commands to be sent.
+         * A chat mode used when a player allows only chat messages from commands to be sent.
          *
          * @since 1.0
          */
-        COMMANDS_ONLY,
+        public static final ChatMode COMMANDS_ONLY = new ChatMode("commands only");
+
         /**
-         * A chat mode used when the does not allow any chat messages to be sent.
+         * A chat mode used when a player does not allow any chat messages to be sent.
          *
          * @since 1.0
          */
-        HIDDEN
+        public static final ChatMode HIDDEN = new ChatMode("hidden");
+
+        private final String name;
+
+        private ChatMode(@NonNull String name) {
+            this.name = NullabilityUtil.requireNonNull(name, "name");
+        }
+
+        /**
+         * Gets a readable lower-case name of this chat mode.
+         *
+         * @return the name
+         * @since 1.0
+         */
+        public @NonNull String name() {
+            return this.name;
+        }
+
+        /* Methods #equals and #hashCode are not implemented, since this class is intended to be identity-compared only
+           since all instances are defined in constants of this class. */
+
+        @Override
+        public String toString() {
+            return "ChatMode{" +
+                    "name='" + this.name + '\'' +
+                    '}';
+        }
     }
 
     /**
-     * Represents a skin part of a {@linkplain Player player}.
+     * Represents skin part of {@linkplain Player a player}.
+     *
+     * <p>This is not an enum, since it depends on Minecraft. Adding an enum entry could break enum switch cases for
+     * example.</p>
      *
      * @since 1.0
-     * @author Codestech
      * @see Player
      */
-    enum SkinPart {
+    final class SkinPart {
         /**
          * A skin part representing a cape.
          *
          * @since 1.0
          */
-        CAPE,
+        public static final SkinPart CAPE = new SkinPart("cape");
+
         /**
          * A skin part representing a jacket.
          *
          * @since 1.0
          */
-        JACKET,
+        public static final SkinPart JACKET = new SkinPart("jacket");
+
         /**
          * A skin part representing a left sleeve.
          *
          * @since 1.0
          */
-        LEFT_SLEEVE,
+        public static final SkinPart LEFT_SLEEVE = new SkinPart("left sleeve");
+
         /**
          * A skin part representing a right sleeve.
          *
          * @since 1.0
          */
-        RIGHT_SLEEVE,
+        public static final SkinPart RIGHT_SLEEVE = new SkinPart("right sleeve");
+
         /**
          * A skin part representing left pants.
          *
          * @since 1.0
          */
-        LEFT_PANTS,
+        public static final SkinPart LEFT_PANTS = new SkinPart("left pants");
+
         /**
          * A skin part representing right pants.
          *
          * @since 1.0
          */
-        RIGHT_PANTS,
+        public static final SkinPart RIGHT_PANTS = new SkinPart("right pants");
+
         /**
          * A skin part representing a hat.
          *
          * @since 1.0
          */
-        HAT
+        public static final SkinPart HAT = new SkinPart("hat");
+
+        private final String name;
+
+        private SkinPart(@NonNull String name) {
+            this.name = NullabilityUtil.requireNonNull(name, "name");
+        }
+
+        /**
+         * Gets a readable lower-case name of this skin part.
+         *
+         * @return the name
+         * @since 1.0
+         */
+        public @NonNull String name() {
+            return this.name;
+        }
+
+        /* Methods #equals and #hashCode are not implemented, since this class is intended to be identity-compared only
+           since all instances are defined in constants of this class. */
+
+        @Override
+        public String toString() {
+            return "SkinPart{" +
+                    "name='" + this.name + '\'' +
+                    '}';
+        }
     }
 
     /**
-     * Represents a Minecraft game mode of a {@linkplain Player player}.
+     * Represents a Minecraft game mode of {@linkplain Player a player}.
+     *
+     * <p>This is not an enum, since it depends on Minecraft. Adding an enum entry could break enum switch cases for
+     * example.</p>
      *
      * @since 1.0
-     * @author Codestech
+     * @see Player
      */
-    enum GameMode {
+    final class GameMode {
         /**
          * A survival game mode.
          *
          * @since 1.0
          */
-        SURVIVAL,
+        public static final GameMode SURVIVAL = new GameMode("survival");
+
         /**
          * A creative game mode.
          *
          * @since 1.0
          */
-        CREATIVE,
+        public static final GameMode CREATIVE = new GameMode("creative");
+
         /**
          * An adventure game mode.
          *
          * @since 1.0
          */
-        ADVENTURE,
+        public static final GameMode ADVENTURE = new GameMode("adventure");
+
         /**
          * A spectator game mode.
          *
          * @since 1.0
          */
-        SPECTATOR
+        public static final GameMode SPECTATOR = new GameMode("spectator");
+
+        private final String name;
+
+        private GameMode(@NonNull String name) {
+            this.name = NullabilityUtil.requireNonNull(name, "name");
+        }
+
+        /**
+         * Gets a readable lower-case name of this game mode.
+         *
+         * @return the name
+         * @since 1.0
+         */
+        public @NonNull String name() {
+            return this.name;
+        }
+
+        /* Methods #equals and #hashCode are not implemented, since this class is intended to be identity-compared only
+           since all instances are defined in constants of this class. */
+
+        @Override
+        public String toString() {
+            return "GameMode{" +
+                    "name='" + this.name + '\'' +
+                    '}';
+        }
     }
 
     /**
-     * Represents a particle settings of a {@linkplain Player player}.
+     * Represents a particle settings of {@linkplain Player a player}.
+     *
+     * <p>This is not an enum, since it depends on Minecraft. Adding an enum entry could break enum switch cases for
+     * example.</p>
      *
      * @since 1.0
-     * @author Codestech
+     * @see Player
      */
-    enum ParticleStatus {
+    final class ParticleStatus {
         /**
          * A particle status indicating that all particles should be shown.
          *
          * @since 1.0
          */
-        ALL,
+        public static final ParticleStatus ALL = new ParticleStatus("all");
+
         /**
          * A particle status indicating that decreased amount of particles should be shown.
          *
          * @since 1.0
          */
-        DECREASED,
+        public static final ParticleStatus DECREASED = new ParticleStatus("decreased");
+
         /**
          * A particle status indicating that minimal amount of particles should be shown.
          *
          * @since 1.0
          */
-        MINIMAL
+        public static final ParticleStatus MINIMAL = new ParticleStatus("minimal");
+
+
+        private final String name;
+
+        private ParticleStatus(@NonNull String name) {
+            this.name = NullabilityUtil.requireNonNull(name, "name");
+        }
+
+        /**
+         * Gets a readable lower-case name of this particle status.
+         *
+         * @return the name
+         * @since 1.0
+         */
+        public @NonNull String name() {
+            return this.name;
+        }
+
+        /* Methods #equals and #hashCode are not implemented, since this class is intended to be identity-compared only
+           since all instances are defined in constants of this class. */
+
+        @Override
+        public String toString() {
+            return "ParticleStatus{" +
+                    "name='" + this.name + '\'' +
+                    '}';
+        }
     }
 
     /**
-     * Represents a settings of a {@linkplain Player player}.
+     * Represents a settings of {@linkplain Player a player}.
      *
      * @param locale a locale of the player
      * @param viewDistance a view distance of the player
@@ -251,7 +369,7 @@ public interface Player extends Entity, CommandSource {
                     Entity.@NonNull Hand mainHand, boolean textFilteringEnabled, boolean allowServerListings,
                     @NonNull ParticleStatus particleStatus) {
         /**
-         * Constructs the {@linkplain ClientInformationConfigurationPacket information configuration packet}.
+         * Constructs the {@linkplain Settings settings}.
          *
          * @param locale a locale of the player
          * @param viewDistance a view distance of the player

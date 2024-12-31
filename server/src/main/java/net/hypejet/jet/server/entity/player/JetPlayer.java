@@ -2,46 +2,38 @@ package net.hypejet.jet.server.entity.player;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.hypejet.jet.acquisition.Acquisition;
+import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
+import net.hypejet.concurrency.object.nullable.NullableObjectAcquirable;
+import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
+import net.hypejet.concurrency.object.nullable.WriteNullableObjectAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.player.Player;
-import net.hypejet.jet.event.events.player.PlayerChangeClientBrandEvent;
-import net.hypejet.jet.event.events.player.PlayerChangeSettingsEvent;
-import net.hypejet.jet.event.events.player.PlayerCookieResponseEvent;
-import net.hypejet.jet.event.events.player.PlayerPluginMessageEvent;
-import net.hypejet.jet.event.events.player.PlayerPongEvent;
-import net.hypejet.jet.event.events.player.PlayerResourcePackResponseEvent;
-import net.hypejet.jet.event.node.EventNode;
-import net.hypejet.jet.pack.ResourcePackResult;
-import net.hypejet.jet.protocol.ProtocolState;
-import net.hypejet.jet.protocol.packet.server.ServerPacket;
-import net.hypejet.jet.protocol.packet.server.configuration.ServerPluginMessageConfigurationPacket;
-import net.hypejet.jet.protocol.packet.server.play.ServerActionBarPlayPacket;
-import net.hypejet.jet.protocol.packet.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
-import net.hypejet.jet.protocol.packet.server.play.ServerPluginMessagePlayPacket;
-import net.hypejet.jet.protocol.packet.server.play.ServerSystemMessagePlayPacket;
+import net.hypejet.jet.event.events.settings.ChangeSettingsEvent;
+import net.hypejet.jet.server.network.ProtocolState;
+import net.hypejet.jet.server.network.packet.packets.server.common.ServerPluginMessagePacket;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerActionBarPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerSystemMessagePlayPacket;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
-import net.hypejet.jet.server.network.connection.SocketPlayerConnection;
-import net.hypejet.jet.server.network.protocol.codecs.other.StringNetworkCodec;
-import net.hypejet.jet.server.network.session.Session;
+import net.hypejet.jet.server.network.SocketPlayerConnection;
+import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.pointer.Pointers;
 import net.kyori.adventure.text.Component;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Represents an implementation of {@linkplain Player player}.
+ * Represents an implementation of {@linkplain Player a player}.
  *
  * @since 1.0
  * @author Codestech
@@ -53,33 +45,30 @@ public final class JetPlayer extends JetEntity implements Player {
     private static final Key ENTITY_TYPE = Key.key("player");
     private static final Key BRAND_PLUGIN_MESSAGE_IDENTIFIER = Key.key("brand");
 
-    private final String username;
     private final SocketPlayerConnection connection;
 
-    private @MonotonicNonNull Settings settings;
-    private @MonotonicNonNull String clientBrand;
+    private final NullableObjectAcquirable<Settings> settings = new NullableObjectAcquirable<>();
+    private final NullableObjectAcquirable<String> clientBrand = new NullableObjectAcquirable<>();
 
     /**
-     * Constructs a {@linkplain JetPlayer player}.
+     * Constructs the {@linkplain JetPlayer player}.
      *
-     * @param uniqueId an unique identifier of the player
+     * @param uniqueId a unique identifier of the player
      * @param username a username of the player
      * @param connection a connection of the player
      * @since 1.0
      */
     public JetPlayer(@NonNull UUID uniqueId, @NonNull String username, @NonNull SocketPlayerConnection connection) {
         super(ENTITY_TYPE, uniqueId, Pointers.builder()
-                .withStatic(Identity.UUID, uniqueId)
-                .withStatic(Identity.NAME, username)
+                .withStatic(Identity.UUID, NullabilityUtil.requireNonNull(uniqueId, "unique identifier"))
+                .withStatic(Identity.NAME, NullabilityUtil.requireNonNull(username, "username"))
                 .build());
-
-        this.username = username;
-        this.connection = connection;
+        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
     }
 
     @Override
     public @NonNull String username() {
-        return this.username;
+        return this.pointers().get(Identity.NAME).orElseThrow();
     }
 
     @Override
@@ -88,23 +77,18 @@ public final class JetPlayer extends JetEntity implements Player {
     }
 
     @Override
-    public void sendPacket(@NonNull ServerPacket packet) {
-        this.connection.sendPacket(packet);
-    }
-
-    @Override
     public void disconnect(@NonNull Component reason) {
         this.connection.disconnect(reason);
     }
 
     @Override
-    public @Nullable Settings settings() {
-        return this.settings;
+    public @NonNull NullableObjectAcquisition<Settings> settings() {
+        return this.settings.acquireRead();
     }
 
     @Override
-    public @Nullable String clientBrand() {
-        return this.clientBrand;
+    public @NonNull NullableObjectAcquisition<String> clientBrand() {
+        return this.clientBrand.acquireRead();
     }
 
     @Override
@@ -117,18 +101,10 @@ public final class JetPlayer extends JetEntity implements Player {
         NullabilityUtil.requireNonNull(identifier, "identifier");
         NullabilityUtil.requireNonNull(data, "data");
 
-        try (Acquisition<Session> sessionAcquisition = this.connection.createOrReuseSessionAcquisition()) {
-            ProtocolState protocolState = sessionAcquisition.get().protocolState();
-
-            // TODO: This can be replaced by an interface that can be implemented by a session task
-            ServerPacket packet = switch (protocolState) {
-                case CONFIGURATION -> new ServerPluginMessageConfigurationPacket(identifier, data);
-                case PLAY -> new ServerPluginMessagePlayPacket(identifier, data);
-                default -> throw new IllegalStateException("You cannot send a plugin message during "
-                        + protocolState + " protocol state");
-            };
-
-            this.sendPacket(packet);
+        try (NotNullObjectAcquisition<ProtocolState> acquisition = this.connection.protocolState()) {
+            if (!ServerPacketRegistry.isSupported(acquisition.get(), ServerPluginMessagePacket.class))
+                throw new IllegalStateException("The operation is not supported at current protocol state");
+            this.sendPacket(new ServerPluginMessagePacket(identifier, data));
         }
     }
 
@@ -157,90 +133,53 @@ public final class JetPlayer extends JetEntity implements Player {
      * @param settings the new settings
      * @since 1.0
      */
-    public void settings(@NonNull Settings settings) {
+    public void setSettings(@NonNull Settings settings) {
         Objects.requireNonNull(settings, "The settings must not be null");
-
-        PlayerChangeSettingsEvent event = new PlayerChangeSettingsEvent(this, settings);
-        this.server().eventNode().call(event);
-        if (event.isCancelled()) return;
-
-        this.settings = settings;
-    }
-
-    /**
-     * Handles a plugin message sent by the player.
-     *
-     * @param identifier an identifier of the plugin message
-     * @param data a data of the plugin message
-     * @since 1.0
-     */
-    public void handlePluginMessage(@NonNull Key identifier, byte @NonNull [] data) {
-        Objects.requireNonNull(identifier, "The identifier must not be null");
-        Objects.requireNonNull(data, "The data must not be null");
-
-        EventNode<Object> eventNode = this.server().eventNode();
-        eventNode.call(new PlayerPluginMessageEvent(this, identifier, data));
-
-        if (identifier.equals(BRAND_PLUGIN_MESSAGE_IDENTIFIER)) {
-            String clientBrand = new String(data, StandardCharsets.UTF_8);
-            eventNode.call(new PlayerChangeClientBrandEvent(this, clientBrand));
-            this.clientBrand = clientBrand;
+        try (WriteNullableObjectAcquisition<Settings> acquisition = this.settings.acquireWrite()) {
+            acquisition.set(settings);
+            ChangeSettingsEvent event = new ChangeSettingsEvent(this, settings);
+            this.server().eventNode().call(event);
         }
     }
 
     /**
-     * Handles a cookie response sent by the player.
+     * Updates a brand name of the client.
      *
-     * @param identifier an identifier of the cookie
-     * @param data a data of the cookie
+     * @param clientBrand the brand name
      * @since 1.0
      */
-    public void handleCookieResponse(@NonNull Key identifier, byte @Nullable [] data) {
-        Objects.requireNonNull(identifier, "The identifier must not be null");
-
-        EventNode<Object> eventNode = this.server().eventNode();
-        eventNode.call(new PlayerCookieResponseEvent(this, identifier, data));
+    public void setClientBrand(@NonNull String clientBrand) {
+        NullabilityUtil.requireNonNull(clientBrand, "client brand");
+        try (WriteNullableObjectAcquisition<String> acquisition = this.clientBrand.acquireWrite()) {
+            acquisition.set(clientBrand);
+        }
     }
 
     /**
-     * Handles a resource pack response.
+     * Sends a plugin message containing brand name of the server to a client of this player.
      *
-     * @param uniqueId an unique identifier of the resource pack
-     * @param result a result of the resource pack
-     * @since 1.0
-     */
-    public void handleResourcePackResponse(@NonNull UUID uniqueId, @NonNull ResourcePackResult result) {
-        Objects.requireNonNull(uniqueId, "The unique identifier must not be null");
-        Objects.requireNonNull(result, "The result must not be null");
-
-        EventNode<Object> eventNode = this.server().eventNode();
-        eventNode.call(new PlayerResourcePackResponseEvent(this, uniqueId, result));
-    }
-
-    /**
-     * Handles a response for a ping packet.
-     *
-     * @param pingIdentifier an identifier of the ping
-     * @since 1.0
-     */
-    public void handlePong(int pingIdentifier) {
-        EventNode<Object> eventNode = this.server().eventNode();
-        eventNode.call(new PlayerPongEvent(this, pingIdentifier));
-    }
-
-    /**
-     * Sends a plugin message to a client containing a server brand.
-     *
-     * @param brand the server brand
+     * @param brand the server brand name
      * @since 1.0
      */
     public void sendServerBrand(@NonNull String brand) {
         ByteBuf buf = Unpooled.buffer();
-        StringNetworkCodec.instance().write(buf, brand);
+        StringNetworkCodec.INSTANCE.write(buf, brand);
 
         byte[] messageData = NetworkUtil.readRemainingBytes(buf);
         this.sendPluginMessage(BRAND_PLUGIN_MESSAGE_IDENTIFIER, messageData);
 
         buf.release();
+    }
+
+    /**
+     * Sends a packet to a client backed by {@linkplain SocketPlayerConnection a socket player connection} attached
+     * to this player.
+     *
+     * @param packet the server packet
+     * @since 1.0
+     * @see SocketPlayerConnection#sendPacket(ServerPacket)
+     */
+    public void sendPacket(@NonNull ServerPacket packet) {
+        this.connection.sendPacket(packet);
     }
 }

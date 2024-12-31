@@ -6,17 +6,16 @@ import io.netty.channel.EventLoopGroup;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
-import net.hypejet.jet.server.network.netty.PlayerChannelInitializer;
-import net.hypejet.jet.server.network.transport.NettyTransportType;
+import net.hypejet.jet.server.network.netty.ConnectionInitializer;
+import net.hypejet.jet.server.network.netty.transport.NettyTransportType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Represents something that manages player connections using netty.
+ * Represents something that manages {@linkplain net.hypejet.jet.network.PlayerConnection player connections}.
  *
  * @since 1.0
- * @author Codestech
  */
 public final class NetworkManager {
 
@@ -42,7 +41,8 @@ public final class NetworkManager {
         if (!transport.isAvailable()) {
             NettyTransportType oldTransport = transport;
             transport = NettyTransportType.select();
-            LOGGER.warn("The netty transport specified - {} - is not available, using {}...", oldTransport, transport);
+            LOGGER.warn("The netty transport specified - {} - is not available, falling back to {}...",
+                    oldTransport, transport);
         }
 
         this.bossGroup = transport.createEventLoop();
@@ -51,7 +51,7 @@ public final class NetworkManager {
         ServerBootstrap bootstrap = new ServerBootstrap()
                 .group(this.bossGroup, this.workerGroup)
                 .channel(transport.getSocketChannel())
-                .childHandler(new PlayerChannelInitializer(server));
+                .childHandler(new ConnectionInitializer(server));
 
         String address = configuration.address();
         int port = configuration.port();
@@ -66,12 +66,8 @@ public final class NetworkManager {
      * @since 1.0
      */
     public void shutdown() {
-        try {
-            this.channel.close().await();
-            this.bossGroup.shutdownGracefully();
-            this.workerGroup.shutdownGracefully();
-        } catch (InterruptedException exception) {
-            throw new RuntimeException(exception);
-        }
+        this.channel.close().awaitUninterruptibly();
+        this.bossGroup.shutdownGracefully();
+        this.workerGroup.shutdownGracefully();
     }
 }

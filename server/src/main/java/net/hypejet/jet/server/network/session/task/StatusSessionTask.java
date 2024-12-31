@@ -1,15 +1,17 @@
 package net.hypejet.jet.server.network.session.task;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.event.events.ping.ServerListPingEvent;
-import net.hypejet.jet.ping.ServerListPing;
-import net.hypejet.jet.protocol.packet.client.status.ClientPingRequestStatusPacket;
-import net.hypejet.jet.protocol.packet.server.status.ServerListResponseStatusPacket;
-import net.hypejet.jet.protocol.packet.server.status.ServerPingResponseStatusPacket;
-import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.event.events.serverlist.ServerListPingEvent;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
-import net.hypejet.jet.server.network.connection.SocketPlayerConnection;
+import net.hypejet.jet.util.game.ping.ServerListPing;
+import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.network.SocketPlayerConnection;
+import net.hypejet.jet.server.network.packet.packets.client.common.ClientPingRequestPacket;
+import net.hypejet.jet.server.network.packet.packets.client.status.ClientServerListRequestStatusPacket;
+import net.hypejet.jet.server.network.packet.packets.server.common.ServerPingResponsePacket;
+import net.hypejet.jet.server.network.packet.packets.server.status.ServerListResponseStatusPacket;
 import net.hypejet.jet.server.util.unit.Unit;
+import net.hypejet.jet.util.json.UnmodifiableJsonObject;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -24,18 +26,18 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * Represents {@linkplain SessionTask a session task}, which handles
- * {@linkplain net.hypejet.jet.protocol.ProtocolState#STATUS a status protocol state}.
+ * {@linkplain net.hypejet.jet.server.network.ProtocolState#STATUS a status protocol state}.
  *
  * @since 1.0
- * @author Codestech
- * @see net.hypejet.jet.protocol.ProtocolState#STATUS
+ * @see net.hypejet.jet.server.network.ProtocolState#STATUS
  * @see SessionTask
  */
-public final class StatusSessionTask implements SessionTask.VirtualThreadTask {
+public final class StatusSessionTask implements SessionTask {
 
     private static final int TIME_OUT_DURATION = 20;
     private static final TimeUnit TIME_OUT_UNIT = TimeUnit.SECONDS;
 
+    private static final String VIRTUAL_THREAD_NAME = "Status session task thread";
     private static final Logger LOGGER = LoggerFactory.getLogger(StatusSessionTask.class);
 
     private final SocketPlayerConnection connection;
@@ -54,20 +56,11 @@ public final class StatusSessionTask implements SessionTask.VirtualThreadTask {
     }
 
     @Override
-    public void runVirtualThreadTask() {
-        try {
-            this.serverListRequestFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
-            this.pingRequestFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
-        } catch (ExecutionException exception) {
-            throw new RuntimeException("An error occurred during a status session task", exception);
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt(); // Restore the interrupted status
-            throw new RuntimeException("The status session task has been interrupted", exception);
-        } catch (TimeoutException exception) {
-            throw new RuntimeException("The status packets have not been sent on time", exception);
-        } catch (CancellationException exception) {
-            // Do nothing, the task has been cancelled due to disconnection
-        }
+    public void start() {
+        Thread.ofVirtual()
+                .name(VIRTUAL_THREAD_NAME)
+                .uncaughtExceptionHandler(connection)
+                .start(this::runVirtualThreadTask);
     }
 
     @Override
@@ -77,14 +70,11 @@ public final class StatusSessionTask implements SessionTask.VirtualThreadTask {
     }
 
     /**
-     * Handles {@linkplain net.hypejet.jet.protocol.packet.client.status.ClientServerListRequestStatusPacket a client
-     * server list request status packet}.
+     * Handles {@linkplain ClientServerListRequestStatusPacket a client server list request status packet}.
      *
      * @since 1.0
      */
     public void handleServerListRequest() {
-        this.connection.ensureInEventLoop();
-
         if (this.serverListRequestFuture.isDone())
             throw new IllegalArgumentException("The server list request packet has been already received");
         this.serverListRequestFuture.complete(Unit.INSTANCE);
@@ -105,14 +95,12 @@ public final class StatusSessionTask implements SessionTask.VirtualThreadTask {
     }
 
     /**
-     * Handles {@linkplain ClientPingRequestStatusPacket a client ping request status packet}.
+     * Handles {@linkplain ClientPingRequestPacket a client ping request status packet}.
      *
      * @param packet the packet
      * @since 1.0
      */
-    public void handlePingRequest(@NonNull ClientPingRequestStatusPacket packet) {
-        this.connection.ensureInEventLoop();
-
+    public void handlePingRequest(@NonNull ClientPingRequestPacket packet) {
         if (!this.serverListRequestFuture.isDone())
             // The client can skip the server list request, it is a natural vanilla behaviour
             this.serverListRequestFuture.complete(Unit.INSTANCE);
@@ -121,16 +109,31 @@ public final class StatusSessionTask implements SessionTask.VirtualThreadTask {
             throw new IllegalArgumentException("The ping request packet has been already received");
         this.pingRequestFuture.complete(Unit.INSTANCE);
 
-        this.connection.sendPacket(new ServerPingResponseStatusPacket(packet.payload()));
+        this.connection.sendPacket(new ServerPingResponsePacket(packet.timestamp()));
         this.connection.close(); // The status session has finished
+    }
+
+    private void runVirtualThreadTask() {
+        try {
+            this.serverListRequestFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
+            this.pingRequestFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
+        } catch (ExecutionException exception) {
+            throw new RuntimeException("An error occurred during a status session task", exception);
+        } catch (TimeoutException exception) {
+            throw new RuntimeException("The status packets have not been sent on time", exception);
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt(); // Restore the interrupted status
+        } catch (CancellationException exception) {
+            // Do nothing, the task has been cancelled due to disconnection
+        }
     }
 
     private static @NotNull ServerListPing createDefaultServerListPing(@NonNull JetMinecraftServer server) {
         JetServerConfiguration configuration = NullabilityUtil.requireNonNull(server, "server").configuration();
         return new ServerListPing(new ServerListPing.Version(server.minecraftVersion(), server.protocolVersion()),
                 // TODO: An actual list of players online
-                new ServerListPing.Players(configuration.maxPlayers(), 0, List.of()),
-                configuration.serverListDescription(), server.serverIcon(), false, /* TODO: An actual property*/ false,
-                /* TODO: An actual property*/ null);
+                new ServerListPing.Players(configuration.maximumPlayers(), 0, List.of()),
+                configuration.serverListDescription(), null, false,
+                /* TODO: An actual property*/ false, (UnmodifiableJsonObject) null);
     }
 }

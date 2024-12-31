@@ -1,43 +1,23 @@
 package net.hypejet.jet.server.network.session.task;
 
-import net.hypejet.jet.server.network.handler.NetworkDisconnectionHandler;
+import net.hypejet.jet.server.network.packet.handler.NetworkDisconnectionHandler;
 
 /**
  * Represents a task of {@linkplain net.hypejet.jet.server.network.session.Session a session}.
  *
+ * <p>Session tasks during construction are not safe for any packet operations. They should be done in {@link #start()}
+ * method instead.</p>
+ *
  * @since 1.0
- * @author Codestech
  */
-public sealed interface SessionTask extends NetworkDisconnectionHandler {
+public interface SessionTask extends NetworkDisconnectionHandler {
     /**
-     * Represents {@linkplain SessionTask a session task}, which is executed in an event loop thread and after
-     * when the session has been.
+     * Starts the session task.
+     *
+     * <p>Called when a session with this session task has been set for
+     * {@linkplain net.hypejet.jet.server.network.SocketPlayerConnection a player connection}.</p>
      *
      * @since 1.0
-     * @see SessionTask
      */
-    non-sealed interface EventLoopTask extends SessionTask {
-        /**
-         * Runs the task.
-         *
-         * @since 1.0
-         */
-        void runEventLoopTask();
-    }
-
-    /**
-     * Represents {@linkplain SessionTask a session task}, which is executed in an external virtual thread, which
-     * is created specifically to execute the task.
-     *
-     * @since 1.0
-     * @see SessionTask
-     */
-    non-sealed interface VirtualThreadTask extends SessionTask {
-        /**
-         * Runs the task.
-         *
-         * @since 1.0
-         */
-        void runVirtualThreadTask();
-    }
+    void start();
 }

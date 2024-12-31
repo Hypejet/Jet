@@ -11,20 +11,19 @@ import net.hypejet.jet.data.model.api.registries.damage.DamageType;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.registries.painting.PaintingVariant;
 import net.hypejet.jet.data.model.api.registries.wolf.WolfVariant;
-import net.hypejet.jet.data.model.server.registry.registries.block.Block;
 import net.hypejet.jet.data.model.server.registry.registries.pack.FeaturePack;
 import net.hypejet.jet.data.model.server.registry.registries.registry.DataRegistryEntry;
 import net.hypejet.jet.registry.RegistryManager;
 import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.registry.codecs.registry.armor.material.ArmorTrimMaterialBinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.registry.armor.pattern.ArmorTrimPatternBinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.registry.banner.BannerPatternBinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.registry.biome.BiomeBinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.registry.chat.ChatTypeBinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.registry.damage.DamageTypeBinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.registry.dimension.DimensionTypeBinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.registry.painting.PaintingVariantBinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.registry.wolf.WolfVariantBinaryTagCodec;
+import net.hypejet.jet.server.registry.writers.registry.armor.material.ArmorTrimMaterialBinaryTagWriter;
+import net.hypejet.jet.server.registry.writers.registry.armor.pattern.ArmorTrimPatternBinaryTagWriter;
+import net.hypejet.jet.server.registry.writers.registry.banner.BannerPatternBinaryTagWriter;
+import net.hypejet.jet.server.registry.writers.registry.biome.BiomeBinaryTagWriter;
+import net.hypejet.jet.server.registry.writers.registry.chat.ChatTypeBinaryTagWriter;
+import net.hypejet.jet.server.registry.writers.registry.damage.DamageTypeBinaryTagWriter;
+import net.hypejet.jet.server.registry.writers.registry.dimension.DimensionTypeBinaryTagWriter;
+import net.hypejet.jet.server.registry.writers.registry.painting.PaintingVariantBinaryTagWriter;
+import net.hypejet.jet.server.registry.writers.registry.wolf.WolfVariantBinaryTagWriter;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -38,10 +37,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Represents an implementation of the {@linkplain RegistryManager registry manager}.
+ * Represents an implementation of {@linkplain RegistryManager a registry manager}.
  *
  * @since 1.0
- * @author Codestech
  * @see RegistryManager
  */
 public final class JetRegistryManager implements RegistryManager {
@@ -86,36 +84,35 @@ public final class JetRegistryManager implements RegistryManager {
         this.enabledFeaturePacks = Set.copyOf(enabledFeaturePacks);
 
         Set<JetMinecraftRegistry<?>> registrySet = Set.of(
-                JetMinecraftRegistry.create(Key.key("block"), Block.class, server, this.enabledFeaturePacks,
-                        JetDataJson.createBlocksGson(), ResourceFileNames.BLOCK_GENERATOR), // TODO: Filter blocks based on required feature flags
+                // TODO: Add block, item and fluid registries
                 JetSerializableMinecraftRegistry.create(Key.key("dimension_type"), DimensionType.class, server,
-                        DimensionTypeBinaryTagCodec.instance(), this.enabledFeaturePacks,
+                        DimensionTypeBinaryTagWriter.INSTANCE, this.enabledFeaturePacks,
                         JetDataJson.createDimensionTypesGson(), ResourceFileNames.DIMENSION_TYPE_GENERATOR),
                 JetSerializableMinecraftRegistry.create(Key.key("chat_type"),
-                        ChatType.class, server, ChatTypeBinaryTagCodec.instance(), this.enabledFeaturePacks,
+                        ChatType.class, server, ChatTypeBinaryTagWriter.INSTANCE, this.enabledFeaturePacks,
                         JetDataJson.createChatTypesGson(), ResourceFileNames.CHAT_TYPE_GENERATOR),
                 JetSerializableMinecraftRegistry.create(Key.key("damage_type"),
-                        DamageType.class, server, DamageTypeBinaryTagCodec.instance(), this.enabledFeaturePacks,
+                        DamageType.class, server, DamageTypeBinaryTagWriter.INSTANCE, this.enabledFeaturePacks,
                         JetDataJson.createDamageTypesGson(), ResourceFileNames.DAMAGE_TYPE_GENERATOR),
                 JetSerializableMinecraftRegistry.create(Key.key("banner_pattern"),
-                        BannerPattern.class, server, BannerPatternBinaryTagCodec.instance(), this.enabledFeaturePacks,
+                        BannerPattern.class, server, BannerPatternBinaryTagWriter.INSTANCE, this.enabledFeaturePacks,
                         JetDataJson.createBannerPatternsGson(), ResourceFileNames.BANNER_PATTERN_GENERATOR),
                 JetSerializableMinecraftRegistry.create(Key.key("wolf_variant"),
-                        WolfVariant.class, server, WolfVariantBinaryTagCodec.instance(), this.enabledFeaturePacks,
+                        WolfVariant.class, server, WolfVariantBinaryTagWriter.INSTANCE, this.enabledFeaturePacks,
                         JetDataJson.createWolfVariantsGson(), ResourceFileNames.WOLF_VARIANT_GENERATOR),
                 JetSerializableMinecraftRegistry.create(Key.key("worldgen/biome"), Biome.class, server,
-                        BiomeBinaryTagCodec.instance(), this.enabledFeaturePacks, JetDataJson.createBiomesGson(),
+                        BiomeBinaryTagWriter.INSTANCE, this.enabledFeaturePacks, JetDataJson.createBiomesGson(),
                         ResourceFileNames.BIOME_GENERATOR),
                 JetSerializableMinecraftRegistry.create(Key.key("painting_variant"),
-                        PaintingVariant.class, server, PaintingVariantBinaryTagCodec.instance(),
+                        PaintingVariant.class, server, PaintingVariantBinaryTagWriter.INSTANCE,
                         this.enabledFeaturePacks, JetDataJson.createPaintingVariantsGson(),
                         ResourceFileNames.PAINTING_VARIANT_GENERATOR),
                 JetSerializableMinecraftRegistry.create(Key.key("trim_material"),
-                        ArmorTrimMaterial.class, server, ArmorTrimMaterialBinaryTagCodec.instance(),
+                        ArmorTrimMaterial.class, server, ArmorTrimMaterialBinaryTagWriter.INSTANCE,
                         this.enabledFeaturePacks, JetDataJson.createTrimMaterialsGson(),
                         ResourceFileNames.ARMOR_TRIM_MATERIAL_GENERATOR),
                 JetSerializableMinecraftRegistry.create(Key.key("trim_pattern"),
-                        ArmorTrimPattern.class, server, ArmorTrimPatternBinaryTagCodec.instance(),
+                        ArmorTrimPattern.class, server, ArmorTrimPatternBinaryTagWriter.INSTANCE,
                         this.enabledFeaturePacks, JetDataJson.createTrimPatternsGson(),
                         ResourceFileNames.ARMOR_TRIM_PATTERN_GENERATOR)
         );
@@ -136,7 +133,7 @@ public final class JetRegistryManager implements RegistryManager {
     }
 
     /**
-     * Gets a {@linkplain Set set} of enabled {@linkplain FeaturePack feature packs}.
+     * Gets {@linkplain Set a set} of enabled {@linkplain FeaturePack feature packs}.
      *
      * @return the set
      * @since 1.0

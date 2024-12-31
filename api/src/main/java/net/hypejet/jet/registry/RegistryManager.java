@@ -10,12 +10,11 @@ import java.util.Map;
  * Represents a manager of {@linkplain MinecraftRegistry Minecraft registries}.
  *
  * @since 1.0
- * @author Codestech
  * @see MinecraftRegistry
  */
 public interface RegistryManager {
     /**
-     * Gets a {@linkplain MinecraftRegistry Minecraft registry} with a {@linkplain Key key} specified.
+     * Gets {@linkplain MinecraftRegistry a Minecraft registry} with {@linkplain Key a key} specified.
      *
      * @param identifier the key
      * @return the registry
@@ -24,7 +23,7 @@ public interface RegistryManager {
     @Nullable MinecraftRegistry<?> getRegistry(@NonNull Key identifier);
 
     /**
-     * Gets a {@linkplain Map map} of {@linkplain MinecraftRegistry registries} registered in
+     * Gets {@linkplain Map a map} of {@linkplain MinecraftRegistry registries} registered in
      * this {@linkplain RegistryManager registry manager}.
      *
      * @return the map

@@ -7,8 +7,10 @@ import net.hypejet.jet.data.model.server.registry.registries.registry.DataRegist
 import net.hypejet.jet.event.events.registry.RegistryInitializeEvent;
 import net.hypejet.jet.registry.MinecraftRegistry;
 import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.nbt.BinaryTagCodec;
+import net.hypejet.jet.server.registry.tags.Tags;
+import net.hypejet.jet.server.util.codec.Writer;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.nbt.BinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.ArrayList;
@@ -19,45 +21,44 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Represents a {@linkplain JetMinecraftRegistry Minecraft registry}, which can be serialized to Minecraft
- * network protocol.
+ * Represents {@linkplain JetMinecraftRegistry a Minecraft registry}, which can be serialized to Minecraft network
+ * protocol.
  *
  * @param <V> a type of values of entries of this registry
  * @since 1.0
- * @author Codesetech
  * @see MinecraftRegistry
  */
 public final class JetSerializableMinecraftRegistry<V> extends JetMinecraftRegistry<V> {
 
-    private final BinaryTagCodec<V> binaryTagCodec;
+    private final Writer<V, ? extends BinaryTag> binaryTagWriter;
 
     private JetSerializableMinecraftRegistry(
             @NonNull Key registryKey, @NonNull Class<V> entryValueClass, @NonNull JetMinecraftServer server,
-            @NonNull BinaryTagCodec<V> binaryTagCodec, @NonNull Set<FeaturePack> enabledFeaturePacks,
+            @NonNull Writer<V, ? extends BinaryTag> binaryTagWriter, @NonNull Set<FeaturePack> enabledFeaturePacks,
             @NonNull List<JetRegistryEntry<V>> entries, @NonNull Map<JetRegistryEntry<V>, Tags> entryToTagsMap
     ) {
         super(registryKey, entryValueClass, server, entries, enabledFeaturePacks, entryToTagsMap);
-        this.binaryTagCodec = NullabilityUtil.requireNonNull(binaryTagCodec, "binary tag codec");
+        this.binaryTagWriter = NullabilityUtil.requireNonNull(binaryTagWriter, "binary tag writer");
     }
 
     /**
-     * Gets a {@linkplain BinaryTagCodec binary tag codec}, which deserializes and serializes entries
-     * of this registry.
+     * Gets {@linkplain Writer a writer}, which serializes entries of this registry into
+     * {@linkplain BinaryTag a binary tag}.
      *
-     * @return the binary tag codec
+     * @return the writer
      * @since 1.0
      */
-    public @NonNull BinaryTagCodec<V> binaryTagCodec() {
-        return this.binaryTagCodec;
+    public @NonNull Writer<V, ? extends BinaryTag> binaryTagWriter() {
+        return this.binaryTagWriter;
     }
 
     /**
-     * Creates a {@linkplain JetSerializableMinecraftRegistry serializable Minecraft registry}.
+     * Creates {@linkplain JetSerializableMinecraftRegistry a serializable Minecraft registry}.
      *
      * @param registryKey a key of the registry
      * @param entryValueClass a class of values of registry entries
      * @param server a server that should own registry
-     * @param binaryTagCodec a binary tag codec, which deserializes and serializes values of the entries to network
+     * @param binaryTagWriter a writer, which serializes values of the entries to a binary tag used by network
      * @param enabledFeaturePacks a set of feature packs, which are enabled on the server
      * @param gson a gson, which deserializes the built-in registry entries from a resource file
      * @param resourceFileName a name of the resource file
@@ -67,7 +68,7 @@ public final class JetSerializableMinecraftRegistry<V> extends JetMinecraftRegis
      */
     public static <V> @NonNull JetSerializableMinecraftRegistry<V> create(
             @NonNull Key registryKey, @NonNull Class<V> entryValueClass, @NonNull JetMinecraftServer server,
-            @NonNull BinaryTagCodec<V> binaryTagCodec, @NonNull Set<FeaturePack> enabledFeaturePacks,
+            @NonNull Writer<V, ? extends BinaryTag> binaryTagWriter, @NonNull Set<FeaturePack> enabledFeaturePacks,
             @NonNull Gson gson, @NonNull String resourceFileName
     ) {
         List<JetRegistryEntry<V>> entries = new ArrayList<>();
@@ -97,7 +98,7 @@ public final class JetSerializableMinecraftRegistry<V> extends JetMinecraftRegis
                 new JetRegistryEntry<>(key, value, null)
         ));
 
-        return new JetSerializableMinecraftRegistry<>(registryKey, entryValueClass, server, binaryTagCodec,
+        return new JetSerializableMinecraftRegistry<>(registryKey, entryValueClass, server, binaryTagWriter,
                 enabledFeaturePacks, List.copyOf(entries), Map.copyOf(entryToTagsMap));
     }
 }

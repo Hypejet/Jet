@@ -1,14 +1,11 @@
 package net.hypejet.jet.event.events;
 
-import net.hypejet.jet.event.annotation.Subscribe;
-
 /**
- * Represents any event that can be cancelled, this can be listened to but should not be used
+ * Represents an event that can be cancelled.
+ *
+ * <p>Cancelled event state informs caller to stop executing the task after when the event is called and handled.</p>
  *
  * @since 1.0
- * @author Window5
- * @author Codestech
- * @see Subscribe
  */
 public abstract class CancellableEvent {
 
@@ -17,7 +14,7 @@ public abstract class CancellableEvent {
     /**
      * Sets whether the event should be cancelled.
      *
-     * @param cancel true if the event should be cancelled, false otherwise
+     * @param cancel {@code} if the event should be cancelled, {@code} otherwise
      * @since 1.0
      */
     public final void setCancelled(boolean cancel) {
@@ -27,7 +24,7 @@ public abstract class CancellableEvent {
     /**
      * Gets whether the event has been cancelled.
      *
-     * @return true if the event was cancelled, false otherwise
+     * @return {@code} if the event was cancelled, {@code} otherwise
      * @since 1.0
      */
     public final boolean isCancelled() {

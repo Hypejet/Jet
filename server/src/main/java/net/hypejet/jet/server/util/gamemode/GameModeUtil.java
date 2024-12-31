@@ -7,7 +7,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Represents a utility for identifying {@linkplain Player.GameMode game modes}.
  *
  * @since 1.0
- * @author Codestech
  * @see Player.GameMode
  */
 public final class GameModeUtil {
@@ -47,12 +46,16 @@ public final class GameModeUtil {
      * @since 1.0
      */
     public static byte gameModeIdentifier(Player.@Nullable GameMode gameMode) {
-        return switch (gameMode) {
-            case SURVIVAL -> SURVIVAL_GAME_MODE;
-            case CREATIVE -> CREATIVE_GAME_MODE;
-            case ADVENTURE -> ADVENTURE_GAME_MODE;
-            case SPECTATOR -> SPECTATOR_GAME_MODE;
-            case null -> NULL_GAME_MODE;
-        };
+        if (gameMode == Player.GameMode.SURVIVAL)
+            return SURVIVAL_GAME_MODE;
+        else if (gameMode == Player.GameMode.CREATIVE)
+            return CREATIVE_GAME_MODE;
+        else if (gameMode == Player.GameMode.ADVENTURE)
+            return ADVENTURE_GAME_MODE;
+        else if (gameMode == Player.GameMode.SPECTATOR)
+            return SPECTATOR_GAME_MODE;
+        else if (gameMode == null)
+            return NULL_GAME_MODE;
+        throw new IllegalArgumentException(String.format("Unknown game mode: %s", gameMode.name()));
     }
 }

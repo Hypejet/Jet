@@ -8,10 +8,9 @@ import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
 /**
- * Represents a utility for easier zlib compression.
+ * Represents a utility for managing Zlib compression.
  *
  * @since 1.0
- * @author Codestech
  * @see Deflater
  * @see Inflater
  */

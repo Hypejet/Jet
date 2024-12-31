@@ -1,5 +1,6 @@
 package net.hypejet.jet.event;
 
+import net.hypejet.concurrency.collection.CollectionAcquisition;
 import net.hypejet.jet.event.annotation.Subscribe;
 import net.hypejet.jet.event.listener.EventListener;
 import net.hypejet.jet.event.node.EventNode;
@@ -9,52 +10,57 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * Represents a test for {@linkplain EventNode event node}.
+ * Represents a test of {@linkplain EventNode an event node}.
  *
  * @since 1.0
- * @author Codestech
  */
 public final class EventNodeTest {
     @Test
     public void testChildren() {
-        EventNode<Object> node = EventNode.create(Object.class);
-        Assertions.assertTrue(node.children().isEmpty());
+        EventNode<Object> node = new EventNode<>(Object.class);
+        try (CollectionAcquisition<EventNode<?>, ?> acquisition = node.children()) {
+            Collection<EventNode<?>> collection = acquisition.collection();
+            Assertions.assertTrue(collection.isEmpty());
 
-        List<EventNode<Object>> children = List.of(EventNode.create(Object.class), EventNode.create(Object.class));
+            List<EventNode<Object>> children = List.of(new EventNode<>(Object.class), new EventNode<>(Object.class));
 
-        children.forEach(node::addChild);
-        Assertions.assertTrue(node.children().containsAll(children));
+            children.forEach(node::addChild);
+            Assertions.assertTrue(collection.containsAll(children));
 
-        children.forEach(node::removeChild);
-        Assertions.assertTrue(node.children().isEmpty());
+            children.forEach(node::removeChild);
+            Assertions.assertTrue(collection.isEmpty());
+        }
     }
 
     @Test
     public void testListeners() {
-        EventNode<Object> node = EventNode.create(Object.class);
-        Assertions.assertTrue(node.listeners().isEmpty());
+        EventNode<Object> node = new EventNode<>(Object.class);
+        try (CollectionAcquisition<EventListener<?>, ?> acquisition = node.listeners()) {
+            Collection<EventListener<?>> collection = acquisition.collection();
+            Assertions.assertTrue(collection.isEmpty());
 
-        List<EventListener<Object>> listeners = new ArrayList<>();
+            List<EventListener<Object>> listeners = new ArrayList<>();
 
-        listeners.add(EventListener.listener(event -> {}, Object.class));
-        listeners.add(EventListener.listener(event -> {}, String.class));
-        listeners.forEach(node::addListener);
+            listeners.add(new EventListener<>(event -> {}, Object.class));
+            listeners.add(new EventListener<>(event -> {}, String.class));
+            listeners.forEach(node::addListener);
 
-        listeners.add(node.addListener(event -> {}, Integer.class));
+            listeners.add(node.addListener(event -> {}, Integer.class));
+            Assertions.assertTrue(collection.containsAll(listeners));
 
-        Assertions.assertTrue(node.listeners().containsAll(listeners));
-
-        listeners.forEach(node::removeListener);
-        Assertions.assertTrue(node.listeners().isEmpty());
+            listeners.forEach(node::removeListener);
+            Assertions.assertTrue(collection.isEmpty());
+        }
     }
 
     @Test
     public void testCalling() {
-        EventNode<Object> node = EventNode.create(Object.class);
+        EventNode<Object> node = new EventNode<>(Object.class);
 
         CountDownLatch latch = new CountDownLatch(4);
         TestClassListener listener = new TestClassListener(latch);
@@ -75,7 +81,7 @@ public final class EventNodeTest {
         EventPriority priority = EventPriority.LATE;
         Class<?> eventClass = Integer.class;
 
-        EventNode<?> node = EventNode.create(eventClass, priority);
+        EventNode<?> node = new EventNode<>(eventClass, priority);
 
         Assertions.assertEquals(priority, node.priority());
         Assertions.assertEquals(eventClass, node.eventClass());
@@ -86,7 +92,6 @@ public final class EventNodeTest {
         public void call(@NonNull Object object) {
             this.latch.countDown();
         }
-
 
         @Subscribe
         public void call2(@NonNull Object object) {

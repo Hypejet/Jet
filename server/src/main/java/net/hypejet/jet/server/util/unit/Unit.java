@@ -6,7 +6,6 @@ package net.hypejet.jet.server.util.unit;
  * <p>An example of usage is {@linkplain java.util.concurrent.Future a future} whose value is unused.</p>
  *
  * @since 1.0
- * @author Codestech
  */
 public final class Unit {
     /**

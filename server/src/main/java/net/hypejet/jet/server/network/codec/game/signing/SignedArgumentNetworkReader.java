@@ -1,0 +1,45 @@
+package net.hypejet.jet.server.network.codec.game.signing;
+
+import io.netty.buffer.ByteBuf;
+import net.hypejet.jet.server.network.codec.NetworkReader;
+import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkReader;
+import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
+import net.hypejet.jet.server.util.NetworkUtil;
+import net.hypejet.jet.server.util.game.signing.SignedArgument;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+/**
+ * Represents {@linkplain NetworkReader a network reader}, which reads {@linkplain SignedArgument a signed argument}.
+ *
+ * @since 1.0
+ * @see SignedArgument
+ * @see NetworkReader
+ */
+public final class SignedArgumentNetworkReader implements NetworkReader<SignedArgument> {
+
+    private static final int ARGUMENT_SIGNATURE_LENGTH = 256;
+
+    /**
+     * An instance of the {@linkplain SignedArgumentNetworkReader signed argument network reader}.
+     *
+     * @since 1.0
+     */
+    public static final SignedArgumentNetworkReader INSTANCE = new SignedArgumentNetworkReader();
+
+    /**
+     * An instance of the {@linkplain CollectionNetworkReader collection network reader}, which reads elements
+     * with a type of {@linkplain SignedArgument signed argument}.
+     */
+    public static final CollectionNetworkReader<SignedArgument> COLLECTION_READER =
+            new CollectionNetworkReader<>(INSTANCE);
+
+    private SignedArgumentNetworkReader() {}
+
+    @Override
+    public @NonNull SignedArgument read(@NonNull ByteBuf buf) {
+        return new SignedArgument(
+                StringNetworkCodec.MAX_16_INSTANCE.read(buf),
+                NetworkUtil.readBytes(buf, ARGUMENT_SIGNATURE_LENGTH)
+        );
+    }
+}

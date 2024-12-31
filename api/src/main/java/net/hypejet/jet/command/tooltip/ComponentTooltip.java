@@ -8,11 +8,11 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Represents a {@linkplain Message message}, which contains a {@linkplain Component component}.
+ * Represents {@linkplain Message a message}, which contains {@linkplain Component a component}.
  *
  * @param component the component
  * @since 1.0
- * @author Codestech
+ * @see ComponentLike
  * @see Message
  */
 public record ComponentTooltip(@NonNull Component component) implements Message, ComponentLike {

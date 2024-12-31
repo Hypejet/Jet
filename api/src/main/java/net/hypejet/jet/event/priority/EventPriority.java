@@ -1,67 +1,43 @@
 package net.hypejet.jet.event.priority;
 
-import net.hypejet.jet.event.annotation.Subscribe;
-
 /**
- * Used to specify which order event listeners should be called, used on {@link Subscribe}
- * <p>
- * {@link EventPriority#FIRST} will be called first, {@link EventPriority#LAST} will be called last.
- * <p>
- * {@link EventPriority#SERVER} should only be used internally by listeners of a Jet server.
- * <p>
- * Note that events on the same priority may not be called in a reliable order
+ * Represents something that specifies in which order
+ * {@linkplain net.hypejet.jet.event.listener.EventListener event listeners} should be called.
+ *
+ * <p>{@link EventPriority#FIRST} will be called first, {@link EventPriority#LAST} will be called last.</p>
+ *
+ * <p>Note that events on the same priority may not be called in a reliable order.</p>
  *
  * @since 1.0
- * @author Window5
- * @author Codestech
- * @see Subscribe
  * @see net.hypejet.jet.event.listener.EventListener
  */
 public enum EventPriority {
     /**
-     * Represents an {@linkplain EventPriority event priority}.
-     *
-     * <p>Listeners of this type are called first.</p>
+     * {@linkplain EventPriority An event priority}, whose listeners are called first.
      *
      * @since 1.0
      */
     FIRST,
     /**
-     * Represents an {@linkplain EventPriority event priority}.
-     *
-     * <p>Listeners of this type are called second.</p>
+     * {@linkplain EventPriority An event priority}, whose listeners are called second.
      *
      * @since 1.0
      */
     EARLY,
     /**
-     * Represents an {@linkplain EventPriority event priority}.
-     *
-     * <p>Listeners of this type are called third.</p>
+     * {@linkplain EventPriority An event priority}, whose listeners are called third.
      *
      * @since 1.0
      */
     NORMAL,
     /**
-     * Represents an {@linkplain EventPriority event priority}.
-     *
-     * <p>Listeners of this type are called fourth.</p>
-     *
-     * @since 1.0
-     */
-    SERVER,
-    /**
-     * Represents an {@linkplain EventPriority event priority}.
-     *
-     * <p>Listeners of this type are called fifth.</p>
+     * {@linkplain EventPriority An event priority}, whose listeners are called fourth.
      *
      * @since 1.0
      */
     LATE,
     /**
-     * Represents an {@linkplain EventPriority event priority}.
-     *
-     * <p>Listeners of this type are called last.</p>
+     * {@linkplain EventPriority An event priority}, whose listeners are called last.
      *
      * @since 1.0
      */

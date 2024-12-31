@@ -1,19 +1,18 @@
 package net.hypejet.jet.server;
 
 /**
- * Represents a main class, which provides an instruction for when the program starts executing.
+ * Represents a main class, which provides an instruction for when the application starts executing.
  *
  * @since 1.0
- * @author Codestech
  */
 public final class JetServerEntrypoint {
 
     private JetServerEntrypoint() {}
 
     /**
-     * Runs the {@linkplain JetMinecraftServer Jet Minecraft server}.
+     * Runs the {@linkplain JetMinecraftServer Minecraft server}.
      *
-     * @param args the program arguments
+     * @param args arguments that the application should start with
      * @since 1.0
      */
     public static void main(String[] args) {

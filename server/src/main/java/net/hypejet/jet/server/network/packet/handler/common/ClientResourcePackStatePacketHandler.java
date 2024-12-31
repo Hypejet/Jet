@@ -1,0 +1,35 @@
+package net.hypejet.jet.server.network.packet.handler.common;
+
+import net.hypejet.jet.event.events.pack.ResourcePackStateEvent;
+import net.hypejet.jet.event.node.EventNode;
+import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.network.packet.handler.ClientPacketHandler;
+import net.hypejet.jet.server.network.packet.packets.client.common.ClientResourcePackStatePacket;
+import net.hypejet.jet.server.network.session.Session;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+/**
+ * Represents {@linkplain ClientPacketHandler a client packet handler}, which handles
+ * {@linkplain ClientResourcePackStatePacket a client resource pack state packet}.
+ *
+ * @since 1.0
+ * @see ClientResourcePackStatePacket
+ * @see ClientPacketHandler
+ */
+public final class ClientResourcePackStatePacketHandler extends ClientPacketHandler<ClientResourcePackStatePacket> {
+    /**
+     * Constructs the {@linkplain ClientResourcePackStatePacketHandler client resource pack state packet handler}.
+     *
+     * @since 1.0
+     */
+    public ClientResourcePackStatePacketHandler() {
+        super(ClientResourcePackStatePacket.class);
+    }
+
+    @Override
+    public void handle(@NonNull ClientResourcePackStatePacket packet, @NonNull Session session) {
+        JetPlayer player = session.connection().playerOrThrow();
+        EventNode<Object> eventNode = player.server().eventNode();
+        eventNode.call(new ResourcePackStateEvent(player, packet.uniqueId(), packet.state()));
+    }
+}
