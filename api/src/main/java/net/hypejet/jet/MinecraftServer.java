@@ -21,7 +21,8 @@ public interface MinecraftServer {
      * @return the event node
      * @since 1.0
      */
-    @NonNull EventNode<Object> eventNode();
+    @NonNull
+    EventNode<Object> eventNode();
 
     /**
      * Gets a version of Minecraft protocol that this server supports.

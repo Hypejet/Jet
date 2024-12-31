@@ -17,7 +17,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param key a key of the cookie
  * @param data a data of the cookie
  * @since 1.0
- * @author Codestech
  */
 public record CookieResponseEvent(@NonNull PlayerConnection playerConnection, @NonNull Key key,
                                   @Nullable UnmodifiableByteArray data) {

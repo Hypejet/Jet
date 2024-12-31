@@ -1,21 +1,21 @@
-package net.hypejet.jet.event.command;
+package net.hypejet.jet.event.events.command;
 
 import com.mojang.brigadier.ParseResults;
 import net.hypejet.jet.command.CommandSource;
+import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.event.events.CancellableEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Objects;
 
 /**
- * Represents a {@linkplain CommandEvent command event}, which is called when a command has been parsed, but not
+ * Represents {@linkplain CommandEvent a command event}, which is called when a command has been parsed, but not
  * executed yet.
  *
  * <p>This is the last event that can cancel the command execution via
  * {@link CancellableEvent#setCancelled(boolean)}.</p>
  *
  * @since 1.0
- * @author Codestech
  * @see CommandEvent
  * @see CancellableEvent
  */
@@ -35,9 +35,9 @@ public final class CommandPreExecuteEvent extends CancellableEvent implements Co
      */
     public CommandPreExecuteEvent(@NonNull CommandSource source, @NonNull String input,
                                   @NonNull ParseResults<CommandSource> parseResults) {
-        this.source = source;
-        this.input = input;
-        this.parseResults = parseResults;
+        this.source = NullabilityUtil.requireNonNull(source, "source");
+        this.input = NullabilityUtil.requireNonNull(input, "input");
+        this.parseResults = NullabilityUtil.requireNonNull(parseResults, "parse results");
     }
 
     /**
@@ -62,7 +62,7 @@ public final class CommandPreExecuteEvent extends CancellableEvent implements Co
     }
 
     /**
-     * Gets a parse results of the command input.
+     * Gets parse results of the command input.
      *
      * @return the parse results
      * @since 1.0
@@ -71,28 +71,20 @@ public final class CommandPreExecuteEvent extends CancellableEvent implements Co
         return this.parseResults;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object object) {
         if (this == object) return true;
-        if (!(object instanceof CommandPreExecuteEvent that)) return false;
-        return Objects.equals(this.source, that.source) && Objects.equals(this.input, that.input)
-                && Objects.equals(this.parseResults, that.parseResults);
+        if (!(object instanceof CommandPreExecuteEvent event)) return false;
+        return Objects.equals(this.source, event.source)
+                && Objects.equals(this.input, event.input)
+                && Objects.equals(this.parseResults, event.parseResults);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return Objects.hash(this.source, this.input, this.parseResults);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return "CommandPreExecuteEvent{" +

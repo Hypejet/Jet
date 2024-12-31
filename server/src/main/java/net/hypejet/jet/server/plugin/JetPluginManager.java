@@ -6,8 +6,6 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.event.events.plugin.PluginLoadEvent;
-import net.hypejet.jet.event.events.plugin.PluginUnloadEvent;
 import net.hypejet.jet.plugin.Plugin;
 import net.hypejet.jet.plugin.PluginManager;
 import net.hypejet.jet.plugin.dependency.PluginDependency;
@@ -131,9 +129,8 @@ public final class JetPluginManager implements PluginManager {
         for (JetPlugin plugin : this.plugins()) {
             try {
                 plugin.classLoader().close();
-                this.server.eventNode().call(new PluginUnloadEvent(plugin));
             } catch (Throwable throwable) {
-                throw new RuntimeException("An error occurred while unloading a plugin", throwable);
+                LOGGER.error("An error occurred while unloading a plugin", throwable);
             }
         }
     }
@@ -187,8 +184,6 @@ public final class JetPluginManager implements PluginManager {
 
             Class<?> mainClass = Class.forName(mainEntrypoint, true, classLoader);
             JetPlugin plugin = new JetPlugin(pluginMetadata, injector.getInstance(mainClass), classLoader);
-
-            this.server.eventNode().call(new PluginLoadEvent(plugin));
 
             Collection<String> authors = pluginMetadata.authors();
             String version = pluginMetadata.version();

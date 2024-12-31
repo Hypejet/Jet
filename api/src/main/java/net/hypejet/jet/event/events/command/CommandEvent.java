@@ -1,4 +1,4 @@
-package net.hypejet.jet.event.command;
+package net.hypejet.jet.event.events.command;
 
 import net.hypejet.jet.command.CommandSource;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -7,7 +7,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Represents an event, which is called when something related to command management happens.
  *
  * @since 1.0
- * @author Codestech
  */
 public interface CommandEvent {
     /**

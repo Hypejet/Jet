@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.handler.common;
 
-import net.hypejet.jet.event.events.player.PlayerChangeClientBrandEvent;
+import net.hypejet.jet.event.events.brand.ChangeClientBrandEvent;
 import net.hypejet.jet.event.events.pluginmessage.PluginMessageEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.server.entity.player.JetPlayer;
@@ -43,7 +43,7 @@ public final class ClientPluginMessagePacketHandler extends ClientPacketHandler<
 
         if (messageKey.equals(BRAND_PLUGIN_MESSAGE_IDENTIFIER)) {
             String clientBrand = new String(data, StandardCharsets.UTF_8);
-            eventNode.call(new PlayerChangeClientBrandEvent(player, clientBrand));
+            eventNode.call(new ChangeClientBrandEvent(player, clientBrand));
             player.setClientBrand(clientBrand);
         }
 

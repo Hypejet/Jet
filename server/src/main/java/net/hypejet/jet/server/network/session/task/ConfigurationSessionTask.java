@@ -8,7 +8,7 @@ import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.data.model.api.pack.PackInfo;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.data.model.server.registry.registries.pack.FeaturePack;
-import net.hypejet.jet.event.events.player.configuration.PlayerConfigurationStartEvent;
+import net.hypejet.jet.event.events.configuration.ConfigurationStartEvent;
 import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.player.JetPlayer;
@@ -145,7 +145,7 @@ public final class ConfigurationSessionTask implements SessionTask, KeepAliveRes
         this.keepAliveHandler.schedule();
 
         JetMinecraftServer server = this.player.server();
-        server.eventNode().call(new PlayerConfigurationStartEvent(this.player));
+        server.eventNode().call(new ConfigurationStartEvent(this.player));
         this.player.sendServerBrand(server.brandName());
 
         Set<FeaturePack> enabledFeaturePacks = this.player.server().registryManager().enabledFeaturePacks();

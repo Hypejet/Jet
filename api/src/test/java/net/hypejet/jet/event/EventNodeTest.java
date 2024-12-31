@@ -1,8 +1,6 @@
 package net.hypejet.jet.event;
 
 import net.hypejet.jet.event.annotation.Subscribe;
-import net.hypejet.jet.event.listener.EventListener;
-import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.event.priority.EventPriority;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.Assertions;
@@ -13,7 +11,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * Represents a test for {@linkplain EventNode event node}.
+ * Represents a test for {@linkplain IEventNode event node}.
  *
  * @since 1.0
  * @author Codestech
@@ -21,10 +19,10 @@ import java.util.concurrent.CountDownLatch;
 public final class EventNodeTest {
     @Test
     public void testChildren() {
-        EventNode<Object> node = EventNode.create(Object.class);
+        IEventNode<Object> node = IEventNode.create(Object.class);
         Assertions.assertTrue(node.children().isEmpty());
 
-        List<EventNode<Object>> children = List.of(EventNode.create(Object.class), EventNode.create(Object.class));
+        List<IEventNode<Object>> children = List.of(IEventNode.create(Object.class), IEventNode.create(Object.class));
 
         children.forEach(node::addChild);
         Assertions.assertTrue(node.children().containsAll(children));
@@ -35,7 +33,7 @@ public final class EventNodeTest {
 
     @Test
     public void testListeners() {
-        EventNode<Object> node = EventNode.create(Object.class);
+        IEventNode<Object> node = IEventNode.create(Object.class);
         Assertions.assertTrue(node.listeners().isEmpty());
 
         List<EventListener<Object>> listeners = new ArrayList<>();
@@ -54,7 +52,7 @@ public final class EventNodeTest {
 
     @Test
     public void testCalling() {
-        EventNode<Object> node = EventNode.create(Object.class);
+        IEventNode<Object> node = IEventNode.create(Object.class);
 
         CountDownLatch latch = new CountDownLatch(4);
         TestClassListener listener = new TestClassListener(latch);
@@ -75,7 +73,7 @@ public final class EventNodeTest {
         EventPriority priority = EventPriority.LATE;
         Class<?> eventClass = Integer.class;
 
-        EventNode<?> node = EventNode.create(eventClass, priority);
+        IEventNode<?> node = IEventNode.create(eventClass, priority);
 
         Assertions.assertEquals(priority, node.priority());
         Assertions.assertEquals(eventClass, node.eventClass());

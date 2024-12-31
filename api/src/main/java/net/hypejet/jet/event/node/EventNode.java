@@ -1,11 +1,21 @@
 package net.hypejet.jet.event.node;
 
+import net.hypejet.concurrency.collection.CollectionAcquirable;
+import net.hypejet.concurrency.collection.CollectionAcquisition;
+import net.hypejet.concurrency.collection.set.HashSetAcquirable;
+import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.event.annotation.Subscribe;
 import net.hypejet.jet.event.listener.EventListener;
 import net.hypejet.jet.event.priority.EventPriority;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.common.returnsreceiver.qual.This;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -13,159 +23,297 @@ import java.util.function.Consumer;
  *
  * @param <E> a type of event that this event node handles
  * @since 1.0
- * @author Codestech
  */
-public interface EventNode<E> extends Comparable<EventNode<?>> {
-    /**
-     * Adds a {@linkplain EventNode event node} as a child of this node.
-     *
-     * @param node the event node
-     * @return this node
-     * @since 1.0
-     * @see EventNode
-     */
-    @This
-    @NonNull EventNode<E> addChild(@NonNull EventNode<? extends E> node);
+public final class EventNode<E> implements Comparable<EventNode<?>> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventNode.class);
+
+    private final Class<E> eventClass;
+    private final EventPriority priority;
+
+    private final CollectionAcquirable<EventListener<? extends E>, ?> listeners = new HashSetAcquirable<>();
+    private final CollectionAcquirable<EventNode<? extends E>, ?> children = new HashSetAcquirable<>();
 
     /**
-     * Removes a {@linkplain EventNode event node} as a child from this node.
+     * Constructs the {@linkplain EventNode event node} with {@linkplain EventPriority#NORMAL a normal event priority}.
      *
-     * @param node the event node
-     * @return this node
+     * @param eventClass a class of an event that the event node should handle
      * @since 1.0
-     * @see EventNode
      */
-    @This
-    @NonNull EventNode<E> removeChild(@NonNull EventNode<? extends E> node);
+    public EventNode(@NonNull Class<E> eventClass) {
+        this(eventClass, EventPriority.NORMAL);
+    }
 
     /**
-     * Adds an {@linkplain EventListener event listener} to this {@linkplain EventNode event node}.
+     * Constructs the {@linkplain EventNode event node}.
+     *
+     * @param eventClass a class of an event that the event node should handle
+     * @param priority an event priority that the event node should have
+     * @since 1.0
+     */
+    public EventNode(@NonNull Class<E> eventClass, @NonNull EventPriority priority) {
+        this.eventClass = NullabilityUtil.requireNonNull(eventClass, "event class");
+        this.priority = NullabilityUtil.requireNonNull(priority, "event priority");
+    }
+
+    /**
+     * Adds {@linkplain EventNode an event node} as a child of this node. Does nothing if this event node already
+     * contains the event node specified as a child.
+     *
+     * @param node the event node
+     * @return this event node
+     * @since 1.0
+     */
+    public @NonNull EventNode<E> addChild(@NonNull EventNode<? extends E> node) {
+        NullabilityUtil.requireNonNull(node, "node");
+        if (!this.eventClass.isAssignableFrom(node.eventClass())) {
+            throw new IllegalArgumentException("You cannot add a child to an event node, whose event class is not" +
+                    " assignable from an event class of the child");
+        }
+
+        if (this == node)
+            throw new IllegalArgumentException("You cannot add an event node as a child of itself");
+
+        try (CollectionAcquisition<EventNode<? extends E>, ?> acquisition = this.children.acquireWrite()) {
+            acquisition.collection().add(node);
+        }
+
+        return this;
+    }
+
+    /**
+     * Removes {@linkplain EventNode an event node} as a child from this node. Does nothing if the event node is not
+     * a child of this node.
+     *
+     * @param node the event node
+     * @return this event node
+     * @since 1.0
+     */
+    public @NonNull EventNode<E> removeChild(@NonNull EventNode<? extends E> node) {
+        NullabilityUtil.requireNonNull(node, "node");
+        try (CollectionAcquisition<EventNode<? extends E>, ?> acquisition = this.children.acquireWrite()) {
+            acquisition.collection().remove(node);
+        }
+        return this;
+    }
+
+    /**
+     * Adds {@linkplain EventListener an event listener} to this event node. Does nothing if this event node already
+     * contains the listener specified as a listener.
      *
      * @param listener the listener
-     * @return this node
+     * @return this event node
      * @since 1.0
      * @see EventListener
      */
-    @This
-    @NonNull EventNode<E> addListener(@NonNull EventListener<? extends E> listener);
+    public @NonNull EventNode<E> addListener(@NonNull EventListener<? extends E> listener) {
+        NullabilityUtil.requireNonNull(listener, "listener");
+
+        if (!this.eventClass.isAssignableFrom(listener.eventClass())) {
+            throw new IllegalArgumentException("You cannot add a listener in an event node, of which an event class" +
+                    " is not assignable from an event class of the listener");
+        }
+
+        try (CollectionAcquisition<EventListener<? extends E>, ?> acquisition = this.listeners.acquireWrite()) {
+            acquisition.collection().add(listener);
+        }
+
+        return this;
+    }
+
 
     /**
-     * Creates and adds an {@linkplain EventListener event listener} to this {@linkplain EventNode event node}.
+     * Creates and adds {@linkplain EventListener an event listener} to this {@linkplain EventNode event node}.
      *
-     * @param eventConsumer a consumer of the event
+     * @param eventConsumer a function that should consume events
      * @param eventClass a class of the event that the listener should listen to
      * @param <T> a type of event that the listener should handle
      * @return the listener created
      * @since 1.0
      * @see EventListener
      */
-    @This
-    <T extends E> @NonNull EventListener<T> addListener(@NonNull Consumer<T> eventConsumer,
-                                                        @NonNull Class<? extends T> eventClass);
+    public <T extends E> @NonNull EventListener<T> addListener(@NonNull Consumer<T> eventConsumer,
+                                                               @NonNull Class<? extends T> eventClass) {
+        NullabilityUtil.requireNonNull(eventConsumer, "event consumer");
+        NullabilityUtil.requireNonNull(eventClass, "event class");
+
+        EventListener<T> listener = new EventListener<>(eventConsumer, eventClass);
+        this.addListener(listener);
+
+        return listener;
+    }
 
     /**
-     * Removes a {@linkplain EventListener event listener} from this {@linkplain EventNode event node}.
+     * Removes {@linkplain EventListener an event listener} from this {@linkplain EventNode event node}.
      *
      * @param listener the listener
-     * @return this node
+     * @return this event node
      * @since 1.0
      */
-    @This
-    @NonNull EventNode<E> removeListener(@NonNull EventListener<? extends E> listener);
+    public @NonNull EventNode<E> removeListener(@NonNull EventListener<? extends E> listener) {
+        try (CollectionAcquisition<EventListener<? extends E>, ?> acquisition = this.listeners.acquireWrite()) {
+            acquisition.collection().remove(NullabilityUtil.requireNonNull(listener, "listener"));
+            return this;
+        }
+    }
 
     /**
-     * Adds an annotation-based listener.
+     * Adds {@linkplain Subscribe a subscribe annotation-based} listener.
      *
      * @param listener the listener
-     * @return this node
+     * @return this event node
      * @since 1.0
      * @see net.hypejet.jet.event.annotation.Subscribe
      */
-    @This
-    @NonNull EventNode<E> addListener(@NonNull Object listener);
+    public @NonNull EventNode<E> addListener(@NonNull Object listener) {
+        Class<?> listenerClass = listener.getClass();
+        String listenerClassName = listenerClass.getSimpleName();
+
+        for (Method method : listenerClass.getDeclaredMethods()) {
+            Subscribe subscription = method.getAnnotation(Subscribe.class);
+            if (subscription == null) continue;
+
+            String methodName = method.getName();
+            Class<?>[] parameters = method.getParameterTypes();
+
+            if (parameters.length != 1) {
+                throw new IllegalArgumentException(String.format(
+                        "Could not register an event with method of \"%s#%s\", because it has more or less arguments" +
+                                " than expected",
+                        listenerClass, methodName
+                ));
+            }
+
+            Class<?> eventType = parameters[0];
+            if (!eventType.isAssignableFrom(this.eventClass) && !this.eventClass.isAssignableFrom(eventType)) {
+                throw new IllegalArgumentException(String.format(
+                        "Could not register an event listener with method of \"%s#%s\", because none of event " +
+                                "classes - \"%s\" and \"%s\" - is assignable from each other",
+                        listenerClassName, methodName, eventType.getSimpleName(), this.eventClass.getSimpleName()
+                ));
+            }
+
+            this.addListener(new EventListener<>(event -> {
+                try {
+                    if (!method.canAccess(listener))
+                        method.setAccessible(true);
+                    if (eventType.isAssignableFrom(event.getClass()))
+                        method.invoke(listener, event);
+                } catch (Throwable throwable) {
+                    LOGGER.error("An error occurred while calling an annotation-based listener", throwable);
+                }
+            }, this.eventClass, subscription.priority()));
+        }
+
+        return this;
+    }
 
     /**
-     * Calls an event.
+     * Calls all {@linkplain EventListener event listeners} including those from
+     * {@linkplain EventNode children event nodes} of this event node with an event specified.
      *
-     * @param event the event
-     * @return this node
+     * @param event the event to pass as an argument of the calls
+     * @return this event node
      * @since 1.0
      */
-    @This
-    @NonNull EventNode<E> call(@NonNull E event);
+    public @NonNull EventNode<E> call(@NonNull E event) {
+        if (!this.eventClass.isAssignableFrom(event.getClass())) {
+            throw new IllegalArgumentException("You cannot call an event in an event node, of which event class is" +
+                    " not assignable from an event class of the event");
+        }
+
+        try (CollectionAcquisition<EventListener<? extends E>, ?> listenersAcquisition = this.listeners.acquireRead();
+             CollectionAcquisition<EventNode<? extends E>, ?> childrenAcquisition = this.children.acquireRead()) {
+            List<EventListener<? extends E>> copiedListeners = new ArrayList<>(listenersAcquisition.collection());
+            Collections.sort(copiedListeners);
+            copiedListeners.forEach(listener -> this.callListener(listener, event));
+
+            List<EventNode<? extends E>> copiedChildren = new ArrayList<>(childrenAcquisition.collection());
+            Collections.sort(copiedChildren);
+            copiedChildren.forEach(node -> this.callChild(node, event));
+        }
+
+        return this;
+    }
 
     /**
-     * Gets listeners that were registered to this {@linkplain EventNode event node}.
+     * Creates {@linkplain CollectionAcquisition a collection acquisition} of listeners that were registered to this
+     * event node.
      *
      * @return the listeners
      * @since 1.0
      */
-    @NonNull Collection<EventListener<? extends E>> listeners();
+    public @NonNull CollectionAcquisition<EventListener<? extends E>, ?> listeners() {
+        return this.listeners.acquireRead();
+    }
 
     /**
-     * Gets children {@linkplain EventNode event nodes} of this node.
+     * Creates {@linkplain CollectionAcquisition a collection acquisition} of child event nodes that were registered
+     * in this event node.
      *
-     * @return the children event nodes
+     * @return the collection acquisition
      * @since 1.0
      */
-    @NonNull Collection<EventNode<? extends E>> children();
+    public @NonNull CollectionAcquisition<EventNode<? extends E>, ?> children() {
+        return this.children.acquireRead();
+    }
 
     /**
-     * Gets a priority of this {@linkplain EventNode event node}.
+     * Gets a priority of this event node.
      *
      * @return the event priority
      * @since 1.0
      */
-    @NonNull EventPriority priority();
+    public @NonNull EventPriority priority() {
+        return this.priority;
+    }
 
     /**
-     * Gets a class of an event that this {@linkplain EventNode event node} handles/
+     * Gets a class of an event that this event node handles.
      *
      * @return the class
      * @since 1.0
      */
-    @NonNull Class<E> eventClass();
+    public @NonNull Class<E> eventClass() {
+        return this.eventClass;
+    }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    default int compareTo(@NonNull EventNode<?> node) {
+    public boolean equals(Object o) {
+        if (!(o instanceof EventNode<?> eventNode)) return false;
+        return Objects.equals(this.eventClass, eventNode.eventClass)
+                && this.priority == eventNode.priority
+                && Objects.equals(this.listeners, eventNode.listeners)
+                && Objects.equals(this.children, eventNode.children);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.eventClass, this.priority, this.listeners, this.children);
+    }
+
+    @Override
+    public int compareTo(@NonNull EventNode<?> node) {
         return Integer.compare(this.priority().ordinal(), node.priority().ordinal());
     }
 
-    /**
-     * Creates an event node with a type of {@link Object} and a priority of {@linkplain EventPriority#NORMAL}.
-     *
-     * @return the event node
-     * @since 1.0
-     */
-    static @NonNull EventNode<Object> create() {
-        return create(Object.class, EventPriority.NORMAL);
+    private <T extends E> void callListener(@NonNull EventListener<T> listener, @NonNull E event) {
+        try {
+            Class<? extends T> listenerEventClass = listener.eventClass();
+            if (!listenerEventClass.isAssignableFrom(event.getClass())) return;
+
+            T castEvent = listenerEventClass.cast(event);
+            if (!listener.isEligible(castEvent)) return;
+
+            listener.call(castEvent);
+        } catch (Throwable throwable) {
+            LOGGER.error("An error occurred while calling an event", throwable);
+        }
     }
 
-    /**
-     * Creates an event node with a priority of {@linkplain EventPriority#NORMAL}.
-     *
-     * @param eventClass a class of an event that the event node should handle
-     * @param <E> a type of event that the event node should handle
-     * @return the event node
-     * @since 1.0
-     */
-    static <E> @NonNull EventNode<E> create(@NonNull Class<E> eventClass) {
-        return create(eventClass, EventPriority.NORMAL);
-    }
-
-    /**
-     * Creates an event node.
-     *
-     * @param eventClass a class of an event that the event node should handle
-     * @param priority an {@linkplain EventPriority event priority} of the event node
-     * @param <E> a type of event that the event node should handle
-     * @return the event node
-     * @since 1.0
-     */
-    static <E> @NonNull EventNode<E> create(@NonNull Class<E> eventClass, @NonNull EventPriority priority) {
-        return new EventNodeImpl<>(eventClass, priority);
+    private <T extends E> void callChild(@NonNull EventNode<T> node, @NonNull E event) {
+        Class<T> nodeEventClass = node.eventClass();
+        if (!nodeEventClass.isAssignableFrom(event.getClass())) return;
+        node.call(nodeEventClass.cast(event));
     }
 }

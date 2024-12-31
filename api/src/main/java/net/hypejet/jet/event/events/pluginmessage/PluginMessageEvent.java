@@ -7,22 +7,22 @@ import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents an event called when a client sends a plugin message, but it was not requested by a server.
+ * Represents an event called when a client sends a message with custom data when {@linkplain Player a player}
+ * associated with the client has been initialized.
  *
- * @param player a player that the client is attached to
- * @param key a key of the plugin message
- * @param data a data of the plugin message
+ * @param player the player
+ * @param key a key to distinguish the custom message
+ * @param data the custom data
  * @since 1.0
- * @author Codestech
  * @see Player
  */
 public record PluginMessageEvent(@NonNull Player player, @NonNull Key key, @NonNull UnmodifiableByteArray data) {
     /**
      * Constructs the {@linkplain PluginMessageEvent plugin message event}.
      *
-     * @param player a player that the client is attached to
-     * @param key a key of the plugin message
-     * @param data a data of the plugin message
+     * @param player the player
+     * @param key a key to distinguish the custom message
+     * @param data the custom data
      * @since 1.0
      */
     public PluginMessageEvent(@NonNull Player player, @NonNull Key key, byte @NonNull [] data) {
@@ -32,9 +32,9 @@ public record PluginMessageEvent(@NonNull Player player, @NonNull Key key, @NonN
     /**
      * Constructs the {@linkplain PluginMessageEvent plugin message event}.
      *
-     * @param player a player that the client is attached to
-     * @param key a key of the plugin message
-     * @param data a data of the plugin message
+     * @param player the player
+     * @param key a key to distinguish the custom message
+     * @param data the custom data
      * @since 1.0
      */
     public PluginMessageEvent {

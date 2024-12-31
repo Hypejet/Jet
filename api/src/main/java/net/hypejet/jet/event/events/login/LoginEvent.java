@@ -8,7 +8,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * connection state}.
  *
  * @since 1.0
- * @author Codestech
  * @see net.hypejet.jet.network.PlayerConnectionState#LOGIN
  */
 public interface LoginEvent {

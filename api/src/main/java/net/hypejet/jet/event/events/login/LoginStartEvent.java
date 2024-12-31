@@ -15,7 +15,6 @@ import java.util.UUID;
  * @param uniqueId a unique identifier received from a client backed by the player connection
  * @param loginManager a login manager of the login state
  * @since 1.0
- * @author Codestech
  * @see LoginEvent
  */
 public record LoginStartEvent(@NonNull String username, @NonNull UUID uniqueId, @NonNull LoginManager loginManager)

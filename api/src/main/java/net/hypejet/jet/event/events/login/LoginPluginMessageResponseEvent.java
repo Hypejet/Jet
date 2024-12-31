@@ -16,7 +16,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param successful whether the client understood the plugin message
  * @param data a data that was sent by the client, {@code null} if none
  * @since 1.0
- * @author Codestech
  */
 public record LoginPluginMessageResponseEvent(@NonNull LoginManager loginManager, int requestIdentifier,
                                               boolean successful, @Nullable UnmodifiableByteArray data)

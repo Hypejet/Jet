@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.handler.common;
 
-import net.hypejet.jet.event.events.player.PlayerResourcePackResponseEvent;
+import net.hypejet.jet.event.events.pack.ResourcePackStateEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.handler.ClientPacketHandler;
@@ -30,6 +30,6 @@ public final class ClientResourcePackStatePacketHandler extends ClientPacketHand
     public void handle(@NonNull ClientResourcePackStatePacket packet, @NonNull Session session) {
         JetPlayer player = session.connection().playerOrThrow();
         EventNode<Object> eventNode = player.server().eventNode();
-        eventNode.call(new PlayerResourcePackResponseEvent(player, packet.uniqueId(), packet.state()));
+        eventNode.call(new ResourcePackStateEvent(player, packet.uniqueId(), packet.state()));
     }
 }

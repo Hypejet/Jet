@@ -1,6 +1,5 @@
 package net.hypejet.jet.event;
 
-import net.hypejet.jet.event.listener.EventListener;
 import net.hypejet.jet.event.priority.EventPriority;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

@@ -8,7 +8,7 @@ import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
 import net.hypejet.concurrency.object.nullable.WriteNullableObjectAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.player.Player;
-import net.hypejet.jet.event.events.player.PlayerChangeSettingsEvent;
+import net.hypejet.jet.event.events.settings.ChangeSettingsEvent;
 import net.hypejet.jet.server.network.ProtocolState;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerPluginMessagePacket;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
@@ -136,10 +136,9 @@ public final class JetPlayer extends JetEntity implements Player {
     public void setSettings(@NonNull Settings settings) {
         Objects.requireNonNull(settings, "The settings must not be null");
         try (WriteNullableObjectAcquisition<Settings> acquisition = this.settings.acquireWrite()) {
-            PlayerChangeSettingsEvent event = new PlayerChangeSettingsEvent(this, settings);
-            this.server().eventNode().call(event);
-            if (event.isCancelled()) return;
             acquisition.set(settings);
+            ChangeSettingsEvent event = new ChangeSettingsEvent(this, settings);
+            this.server().eventNode().call(event);
         }
     }
 

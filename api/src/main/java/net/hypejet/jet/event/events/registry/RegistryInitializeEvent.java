@@ -1,8 +1,10 @@
 package net.hypejet.jet.event.events.registry;
 
+import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -10,37 +12,37 @@ import java.util.Objects;
 /**
  * Represents an event, which is called when a registry is being initialized.
  *
- * @param <E> a type of entries in the registry
+ * @param <E> a type of entries of the registry that is being initialized
  * @since 1.0
- * @author Codestech
  */
 public final class RegistryInitializeEvent<E> {
 
-    private final Key identifier;
+    private final Key key;
     private final Class<E> entryClass;
 
     private final Map<Key, E> entryMap = new HashMap<>();
+    private final Map<Key, E> unmodifiableEntryMapView = Collections.unmodifiableMap(this.entryMap);
 
     /**
      * Constructs the {@linkplain RegistryInitializeEvent registry initialize event}.
      *
-     * @param identifier an identifier of the registry
+     * @param key a key of the registry
      * @param entryClass a class of entries of the registry
      * @since 1.0
      */
-    public RegistryInitializeEvent(@NonNull Key identifier, @NonNull Class<E> entryClass) {
-        this.identifier = identifier;
-        this.entryClass = entryClass;
+    public RegistryInitializeEvent(@NonNull Key key, @NonNull Class<E> entryClass) {
+        this.key = NullabilityUtil.requireNonNull(key, "key");
+        this.entryClass = NullabilityUtil.requireNonNull(entryClass, "entry class");
     }
 
     /**
-     * Gets an {@linkplain Key identifier} of the registry.
+     * Gets {@linkplain Key a key} of the registry.
      *
      * @return the identifier
      * @since 1.0
      */
-    public @NonNull Key identifier() {
-        return this.identifier;
+    public @NonNull Key key() {
+        return this.key;
     }
 
     /**
@@ -54,59 +56,63 @@ public final class RegistryInitializeEvent<E> {
     }
 
     /**
-     * Gets a {@linkplain Map map} of entries, which have been registered during this event.
+     * Gets an unmodifiable view of {@linkplain Map a map} of entries, which have been registered during this event.
      *
      * @return the map
      * @since 1.0
      */
     public @NonNull Map<Key, E> entryMap() {
-        return Map.copyOf(this.entryMap);
+        return this.unmodifiableEntryMapView;
     }
 
     /**
-     * Registers an {@linkplain E entry} to be added to the registry.
+     * Registers {@linkplain E an entry} that should be added to the registry.
      *
-     * @param identifier an identifier of the entry
+     * @param key a key that the entry should be associated with
      * @param entry the entry
-     * @throws IllegalArgumentException if an entry with the same identifier has been already registered or
-     *                                  the {@link #entryClass} is not assignable from a class of the entry specified
+     * @throws IllegalArgumentException if an entry associated with the same key has been already registered or
+     *                                  the {@linkplain #entryClass entry class} is not assignable from a class of
+     *                                  the entry specified
      * @since 1.0
      */
-    public void register(@NonNull Key identifier, @NonNull E entry) {
-        if (this.entryMap.containsKey(identifier))
-            throw new IllegalArgumentException(String.format(
-                    "An entry with identifier %s has been already registered",
-                    identifier
-            ));
+    public void register(@NonNull Key key, @NonNull E entry) {
+        NullabilityUtil.requireNonNull(key, "key");
+        NullabilityUtil.requireNonNull(entry, "entry");
 
-        if (!this.entryClass.isAssignableFrom(entry.getClass()))
+        if (this.entryMap.containsKey(key)) {
             throw new IllegalArgumentException(String.format(
-                    "The entry specified is not a valid entry of \"%s\"",
+                    "An entry with key of %s has been already registered",
+                    key
+            ));
+        }
+
+        if (!this.entryClass.isAssignableFrom(entry.getClass())) {
+            throw new IllegalArgumentException(String.format(
+                    "The entry specified is not an instance of \"%s\"",
                     this.entryClass.getSimpleName()
             ));
+        }
 
-        this.entryMap.put(identifier, entry);
+        this.entryMap.put(key, entry);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        RegistryInitializeEvent<?> that = (RegistryInitializeEvent<?>) o;
-        return Objects.equals(this.identifier, that.identifier)
-                && Objects.equals(this.entryClass, that.entryClass)
-                && Objects.equals(this.entryMap, that.entryMap);
+        if (!(o instanceof RegistryInitializeEvent<?> event)) return false;
+        return Objects.equals(this.key, event.key)
+                && Objects.equals(this.entryClass, event.entryClass)
+                && Objects.equals(this.entryMap, event.entryMap);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.identifier, this.entryClass, this.entryMap);
+        return Objects.hash(this.key, this.entryClass, this.entryMap);
     }
 
     @Override
     public String toString() {
         return "RegistryInitializeEvent{" +
-                "identifier=" + this.identifier +
+                "identifier=" + this.key +
                 ", entryClass=" + this.entryClass +
                 ", entryMap=" + this.entryMap +
                 '}';
