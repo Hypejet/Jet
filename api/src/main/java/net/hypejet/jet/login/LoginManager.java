@@ -8,26 +8,25 @@ import java.util.Collection;
 import java.util.UUID;
 
 /**
- * Represents a something that manages a state, during which {@linkplain PlayerConnection a player connection} is
+ * Represents something that manages a state, during which {@linkplain PlayerConnection a player connection} is
  * authenticated.
  *
  * <p>A {@link #finish(String, UUID, Collection)} method should be called when the state should be finished.</p>
  *
  * @since 1.0
- * @author Codestech
  */
 public interface LoginManager {
     /**
-     * Gets a connection with the player.
+     * Gets the player connection.
      *
-     * @return the connection
+     * @return the player connection
      * @since 1.0
      */
     @NonNull PlayerConnection connection();
 
     /**
      * Finishes the login state and initializes {@linkplain net.hypejet.jet.entity.player.Player a player}
-     * in {@linkplain PlayerConnection a player connection} with no additional properties.
+     * of {@linkplain PlayerConnection a player connection} associated with the state with no additional properties.
      *
      * @param username a username that the player should have
      * @param uniqueId a unique identifier that the player should have
@@ -38,7 +37,7 @@ public interface LoginManager {
 
     /**
      * Finishes the login state and {@linkplain net.hypejet.jet.entity.player.Player a player}
-     * in {@linkplain PlayerConnection a player connection}.
+     * of {@linkplain PlayerConnection a player connection} associated with the state.
      *
      * @param username a username that the player should have
      * @param uniqueId a unique identifier that the player should have

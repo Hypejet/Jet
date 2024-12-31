@@ -11,7 +11,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param value a value of the property
  * @param signature a signature of the property, {@code null} if the property has not been signed
  * @since 1.0
- * @author Codestech
  */
 public record GameProfileProperty(@NonNull String name, @NonNull String value, @Nullable String signature) {
     /**
