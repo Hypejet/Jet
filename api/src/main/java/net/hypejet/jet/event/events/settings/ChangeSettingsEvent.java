@@ -8,6 +8,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Represents an event, which is called when {@linkplain Player.Settings player settings} are changed for
  * {@linkplain Player a player}.
  *
+ * @param player the player, for which the settings are changed
+ * @param settings the new settings
  * @since 1.0
  * @see Player.Settings
  * @see Player
