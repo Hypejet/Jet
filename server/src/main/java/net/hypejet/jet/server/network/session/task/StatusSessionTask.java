@@ -2,9 +2,9 @@ package net.hypejet.jet.server.network.session.task;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.event.events.serverlist.ServerListPingEvent;
+import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.util.game.ping.ServerListPing;
 import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.packet.packets.client.common.ClientPingRequestPacket;
 import net.hypejet.jet.server.network.packet.packets.client.status.ClientServerListRequestStatusPacket;
@@ -132,7 +132,7 @@ public final class StatusSessionTask implements SessionTask {
         JetServerConfiguration configuration = NullabilityUtil.requireNonNull(server, "server").configuration();
         return new ServerListPing(new ServerListPing.Version(server.minecraftVersion(), server.protocolVersion()),
                 // TODO: An actual list of players online
-                new ServerListPing.Players(configuration.maxPlayers(), 0, List.of()),
+                new ServerListPing.Players(configuration.maximumPlayers(), 0, List.of()),
                 configuration.serverListDescription(), null, false,
                 /* TODO: An actual property*/ false, (UnmodifiableJsonObject) null);
     }

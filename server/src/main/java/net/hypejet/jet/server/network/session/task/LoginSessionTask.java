@@ -74,7 +74,7 @@ public final class LoginSessionTask implements SessionTask, LoginManager {
     public void start() {
         if (this.transferring) {
             JetServerConfiguration configuration = this.connection.server().configuration();
-            if (!configuration.areTransfersAllowed()) {
+            if (!configuration.transfersAllowed()) {
                 this.connection.disconnect(configuration.transfersNotAllowedMessage());
                 return;
             }

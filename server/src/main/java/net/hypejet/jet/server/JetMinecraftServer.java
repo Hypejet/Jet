@@ -9,6 +9,7 @@ import net.hypejet.jet.event.events.server.ServerShutdownEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.server.command.JetCommandManager;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
+import net.hypejet.jet.server.configuration.unparsed.UnparsedServerConfiguration;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.NetworkManager;
 import net.hypejet.jet.server.plugin.JetPluginManager;
@@ -45,7 +46,7 @@ public final class JetMinecraftServer implements MinecraftServer {
      * @since 1.0
      */
     JetMinecraftServer() {
-        this.configuration = JetServerConfiguration.create();
+        this.configuration = JetServerConfiguration.parse(this, UnparsedServerConfiguration.create());
         this.commandManager = new JetCommandManager(this);
         this.pluginManager = new JetPluginManager(this);
         this.registryManager = new JetRegistryManager(this);

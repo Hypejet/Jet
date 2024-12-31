@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.configuration.serializer;
+package net.hypejet.jet.server.configuration.unparsed.serializer;
 
 import eu.okaeri.configs.schema.GenericsDeclaration;
 import eu.okaeri.configs.serdes.DeserializationData;
@@ -9,11 +9,10 @@ import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents an {@linkplain ObjectSerializer object serialize}, which deserializes
- * and serializes a {@linkplain Key key}.
+ * Represents {@linkplain ObjectSerializer an object serializer}, which deserializes and serializes
+ * {@linkplain Key a key}.
  *
  * @since 1.0
- * @author Codestech
  * @see Key
  * @see ObjectSerializer
  */
