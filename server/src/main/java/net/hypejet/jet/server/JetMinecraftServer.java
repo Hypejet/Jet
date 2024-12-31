@@ -19,10 +19,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Represents an implementation of {@linkplain MinecraftServer Minecraft server}.
+ * Represents an implementation of the {@linkplain MinecraftServer Minecraft server}.
  *
  * @since 1.0
- * @author Codestech
+ * @see MinecraftServer
  */
 public final class JetMinecraftServer implements MinecraftServer {
 
@@ -41,7 +41,7 @@ public final class JetMinecraftServer implements MinecraftServer {
     private final HashSetAcquirable<JetPlayer> players = new HashSetAcquirable<>();
 
     /**
-     * Constructs the {@linkplain JetMinecraftServer Jet Minecraft server}.
+     * Constructs the {@linkplain JetMinecraftServer Minecraft server}.
      *
      * @since 1.0
      */
