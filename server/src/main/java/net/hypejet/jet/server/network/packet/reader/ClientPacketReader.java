@@ -5,8 +5,6 @@ import io.netty.buffer.Unpooled;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquirable;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.object.notnull.WriteNotNullObjectAcquisition;
-import net.hypejet.concurrency.primitive.booleans.BooleanAcquirable;
-import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.ProtocolState;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
@@ -17,14 +15,16 @@ import net.hypejet.jet.server.network.packet.handler.NetworkDisconnectionHandler
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacketRegistry;
 import net.hypejet.jet.server.network.session.Session;
+import net.hypejet.jet.server.util.unit.Unit;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Queue;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.locks.Condition;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Represents something that decodes {@linkplain RawPacket raw packets} into {@linkplain ClientPacket client packets}
@@ -41,11 +41,11 @@ public final class ClientPacketReader implements NetworkDisconnectionHandler {
     private final SocketPlayerConnection connection;
     private final Queue<RawPacket> packetQueue = new ConcurrentLinkedQueue<>();
 
-    private final BooleanAcquirable paused = new BooleanAcquirable();
-    private final Condition resumeCondition = this.paused.newCondition();
-
     // More about existence of this field in a comment in SocketPlayerConnection.SessionAcquisition#onSet
     private final NotNullObjectAcquirable<Session> sessionAcquirable;
+    private final Thread readerThread;
+
+    private CompletableFuture<Unit> resumeFuture = CompletableFuture.completedFuture(Unit.INSTANCE);
 
     /**
      * Constructs the {@linkplain ClientPacketReader client packet reader}.
@@ -59,11 +59,10 @@ public final class ClientPacketReader implements NetworkDisconnectionHandler {
         NullabilityUtil.requireNonNull(initialSession, "initial session");
         this.sessionAcquirable = new NotNullObjectAcquirable<>(initialSession);
 
-        Thread.ofVirtual()
+        this.readerThread = Thread.ofVirtual()
                 .name("Client packet reader thread")
                 .uncaughtExceptionHandler(connection)
-                .start(this::readPackets)
-                .interrupt();
+                .start(this::readPackets);
     }
 
     /**
@@ -80,11 +79,12 @@ public final class ClientPacketReader implements NetworkDisconnectionHandler {
      * Blocks a thread responsible for decoding and reading packets until {@link #resumePacketReading()} is called.
      *
      * @since 1.0
+     * @throws IllegalStateException if the caller thread is not a client packet reader thread
      */
     public void pausePacketReading() {
-        try (WriteBooleanAcquisition acquisition = this.paused.acquireWrite()) {
-            acquisition.set(true);
-        }
+        if (Thread.currentThread() != this.readerThread)
+            throw new IllegalStateException("Packet reading can be only paused in a client packet reader thread");
+        this.resumeFuture = new CompletableFuture<>();
     }
     /**
      * Unblocks a thread responsible for decoding and reading packets if it was blocked via
@@ -93,10 +93,7 @@ public final class ClientPacketReader implements NetworkDisconnectionHandler {
      * @since 1.0
      */
     public void resumePacketReading() {
-        try (WriteBooleanAcquisition acquisition = this.paused.acquireWrite()) {
-            acquisition.set(false);
-            this.resumeCondition.signalAll();
-        }
+        this.resumeFuture.complete(Unit.INSTANCE);
     }
 
     /**
@@ -120,13 +117,21 @@ public final class ClientPacketReader implements NetworkDisconnectionHandler {
 
     private void readPackets() {
         while (this.connection.isActive()) {
-            try (WriteBooleanAcquisition acquisition = this.paused.acquireWrite()) {
-                if (acquisition.get()) {
-                    this.resumeCondition.awaitUninterruptibly();
-                    continue; // We need to recheck whether the connection is active
+            CompletableFuture<Unit> resumeFuture = this.resumeFuture;
+            if (!resumeFuture.isDone()) {
+                try {
+                    resumeFuture.get();
+                } catch (InterruptedException exception) {
+                    Thread.currentThread().interrupt(); // Restore the interrupted status
+                } catch (ExecutionException exception) {
+                    throw new RuntimeException(
+                            "An error occurred while waiting for the client packet reader to resume",
+                            exception
+                    );
                 }
-                this.readNextPacket();
+                continue; // We need to recheck whether the connection is active
             }
+            this.readNextPacket();
         }
     }
 
