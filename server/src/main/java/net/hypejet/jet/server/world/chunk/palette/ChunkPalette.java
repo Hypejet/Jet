@@ -5,9 +5,10 @@ import net.hypejet.jet.server.util.array.UnmodifiableLongArray;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Represents a data container of part of {@linkplain ??? a chunk}.
+ * Represents a data container of {@linkplain net.hypejet.jet.server.world.chunk.section.ChunkSection a chunk section}.
  *
  * @since 1.0
+ * @see net.hypejet.jet.server.world.chunk.section.ChunkSection
  */
 public sealed abstract class ChunkPalette permits DirectChunkPalette, IndirectChunkPalette, SingleValuedChunkPalette {
 
