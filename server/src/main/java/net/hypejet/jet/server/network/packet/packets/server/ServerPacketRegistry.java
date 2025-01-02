@@ -33,6 +33,7 @@ import net.hypejet.jet.server.network.codec.packet.server.login.ServerLoginSucce
 import net.hypejet.jet.server.network.codec.packet.server.login.ServerPluginMessageRequestLoginPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerActionBarPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerCenterChunkPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerChunkAndLightDataPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerCommandSuggestionsResponsePlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerDeclareCommandsPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerJoinGamePlayPacketWriter;
@@ -65,6 +66,7 @@ import net.hypejet.jet.server.network.packet.packets.server.login.ServerLoginSuc
 import net.hypejet.jet.server.network.packet.packets.server.login.ServerPluginMessageRequestLoginPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerActionBarPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerCenterChunkPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkAndLightDataPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerCommandSuggestionsResponsePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerJoinGamePlayPacket;
@@ -86,8 +88,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Represents a registry of {@linkplain NetworkWriter network writers}, which write {@linkplain ServerPacket server
- * packets}.
+ * Represents a registry of {@linkplain NetworkWriter network writers}, which write
+ * {@linkplain ServerPacket server packets}.
  *
  * @since 1.0
  * @see ServerPacket
@@ -214,6 +216,8 @@ public final class ServerPacketRegistry {
                                 ServerDeclareCommandsPlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.COMMAND_SUGGESTIONS, ServerCommandSuggestionsResponsePlayPacket.class,
                                 ServerCommandSuggestionsResponsePlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.LEVEL_CHUNK_WITH_LIGHT, ServerChunkAndLightDataPlayPacket.class,
+                                ServerChunkAndLightDataPlayPacketWriter.INSTANCE)
                         .build()
         );
 

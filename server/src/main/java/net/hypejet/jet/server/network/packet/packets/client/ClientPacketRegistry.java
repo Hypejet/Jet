@@ -75,8 +75,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Represents a registry of {@linkplain NetworkReader network readers}, which
- * read {@linkplain ClientPacket client packets} and {@linkplain ClientPacketHandler client packet handlers}.
+ * Represents a registry of {@linkplain NetworkReader network readers}, which read
+ * {@linkplain ClientPacket client packets} and {@linkplain ClientPacketHandler client packet handlers}.
  *
  * @since 1.0
  * @see ClientPacket
