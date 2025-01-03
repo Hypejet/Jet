@@ -134,9 +134,9 @@ public sealed abstract class ChunkPalette permits DirectChunkPalette, IndirectCh
      * @since 1.0
      */
     protected static int calculateElementIndex(byte axisLength, byte x, byte y, byte z) {
-        validateValue(axisLength, x, "x");
-        validateValue(axisLength, y, "y");
-        validateValue(axisLength, z, "z");
+        validateValue(x, axisLength, "x");
+        validateValue(y, axisLength, "y");
+        validateValue(z, axisLength, "z");
         return x + (axisLength * z) + (axisLength * axisLength * y);
     }
 

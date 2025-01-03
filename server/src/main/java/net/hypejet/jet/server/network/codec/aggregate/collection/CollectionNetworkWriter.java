@@ -22,8 +22,8 @@ public final class CollectionNetworkWriter<E> extends AggregateNetworkWriter<Col
     private final NetworkWriter<E> elementWriter;
 
     /**
-     * Constructs the {@linkplain CollectionNetworkWriter collection network writer} with a support for lengths
-     * up to {@link Integer#MAX_VALUE}.
+     * Constructs the {@linkplain CollectionNetworkWriter collection network writer}, which allows for lengths
+     * up to {@link Integer#MAX_VALUE} and encodes them.
      *
      * @param elementWriter a network writer to read elements of collections with
      * @since 1.0
@@ -33,14 +33,40 @@ public final class CollectionNetworkWriter<E> extends AggregateNetworkWriter<Col
     }
 
     /**
-     * Constructs the {@linkplain CollectionNetworkWriter collection network writer}.
+     * Constructs the {@linkplain CollectionNetworkWriter collection network writer}, which encodes lengths.
      *
      * @param maxLength a max length that a collection can have
      * @param elementWriter a network writer to read elements of collections with
      * @since 1.0
      */
     public CollectionNetworkWriter(int maxLength, @NonNull NetworkWriter<E> elementWriter) {
-        super(maxLength);
+        super(maxLength, true);
+        this.elementWriter = NullabilityUtil.requireNonNull(elementWriter, "element writer");
+    }
+
+    /**
+     * Constructs the {@linkplain CollectionNetworkWriter collection network writer}, which supports lengths up
+     * to {@link Integer#MAX_VALUE}.
+     *
+     * @param encodeLength whether length of byte arrays should be encoded
+     * @param elementWriter a network writer to read elements of collections with
+     * @since 1.0
+     */
+    public CollectionNetworkWriter(boolean encodeLength, @NonNull NetworkWriter<E> elementWriter) {
+        super(Integer.MAX_VALUE, encodeLength);
+        this.elementWriter = NullabilityUtil.requireNonNull(elementWriter, "element writer");
+    }
+
+    /**
+     * Constructs the {@linkplain CollectionNetworkWriter collection network writer}.
+     *
+     * @param maxLength a max length that a collection can have
+     * @param encodeLength whether length of byte arrays should be encoded
+     * @param elementWriter a network writer to read elements of collections with
+     * @since 1.0
+     */
+    public CollectionNetworkWriter(int maxLength, boolean encodeLength, @NonNull NetworkWriter<E> elementWriter) {
+        super(maxLength, encodeLength);
         this.elementWriter = NullabilityUtil.requireNonNull(elementWriter, "element writer");
     }
 

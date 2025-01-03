@@ -25,7 +25,7 @@ public final class DirectChunkPalette extends ChunkPalette {
      */
     public DirectChunkPalette(byte bitsPerElement, int @NotNull [] elements, byte axisLength) {
         super(bitsPerElement, ChunkPalette.createDataArray(
-                axisLength, NullabilityUtil.requireNonNull(elements, "elements"), bitsPerElement
+                bitsPerElement, NullabilityUtil.requireNonNull(elements, "elements"), axisLength
         ));
 
         this.axisLength = axisLength;

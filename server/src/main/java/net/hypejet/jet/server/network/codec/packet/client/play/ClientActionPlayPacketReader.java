@@ -52,8 +52,13 @@ public final class ClientActionPlayPacketReader implements NetworkReader<ClientA
         Action action = ACTION_CODEC.read(buf);
 
         int jumpBoost = VarIntNetworkCodec.INSTANCE.read(buf);
-        if (jumpBoost > MAX_JUMP_BOOST || jumpBoost < MIN_JUMP_BOOST)
-            throw new IllegalArgumentException("Invalid jump boost");
+        if (jumpBoost > MAX_JUMP_BOOST || jumpBoost < MIN_JUMP_BOOST) {
+            throw new IllegalArgumentException(String.format(
+                    "The jump boost is out of allowed range, got %d while maximum allowed is %d and minimum allowed" +
+                            " is %d",
+                    jumpBoost, MAX_JUMP_BOOST, MIN_JUMP_BOOST
+            ));
+        }
 
         return new ClientActionPlayPacket(entityId, action, jumpBoost);
     }

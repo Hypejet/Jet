@@ -13,21 +13,22 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class ByteArrayNetworkWriter extends AggregateNetworkWriter<byte[]> {
 
     /**
-     * An instance of the {@linkplain ByteArrayNetworkWriter byte array network writer}, which allows lengths
-     * up to {@link Integer#MAX_VALUE}.
+     * An instance of the {@linkplain ByteArrayNetworkWriter byte array network writer}, which allows for lengths
+     * up to {@link Integer#MAX_VALUE} and encodes them.
      *
      * @since 1.0
      */
-    public static final ByteArrayNetworkWriter INSTANCE = new ByteArrayNetworkWriter(Integer.MAX_VALUE);
+    public static final ByteArrayNetworkWriter INSTANCE = new ByteArrayNetworkWriter(Integer.MAX_VALUE, true);
 
     /**
      * Constructs the {@linkplain ByteArrayNetworkWriter byte array network writer}.
      *
      * @param maxLength a max length that a byte array can have
+     * @param encodeLength whether length of byte arrays should be encoded
      * @since 1.0
      */
-    public ByteArrayNetworkWriter(int maxLength) {
-        super(maxLength);
+    public ByteArrayNetworkWriter(int maxLength, boolean encodeLength) {
+        super(maxLength, encodeLength);
     }
 
     @Override

@@ -15,15 +15,18 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public abstract class AggregateNetworkWriter<A> implements NetworkWriter<A> {
 
     private final int maxLength;
+    private final boolean encodeLength;
 
     /**
      * Constructs the {@linkplain AggregateNetworkWriter aggregate network writer}.
      *
      * @param maxLength a max length that an aggregate can have
+     * @param encodeLength whether the length of aggregates should be encoded
      * @since 1.0
      */
-    protected AggregateNetworkWriter(int maxLength) {
+    protected AggregateNetworkWriter(int maxLength, boolean encodeLength) {
         this.maxLength = maxLength;
+        this.encodeLength = encodeLength;
     }
 
     @Override
@@ -37,7 +40,8 @@ public abstract class AggregateNetworkWriter<A> implements NetworkWriter<A> {
             ));
         }
 
-        VarIntNetworkCodec.INSTANCE.write(buf, length);
+        if (this.encodeLength)
+            VarIntNetworkCodec.INSTANCE.write(buf, length);
         this.encodeElements(object, buf);
     }
 

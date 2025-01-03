@@ -1,11 +1,11 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
+import com.google.common.collect.Sets;
 import net.hypejet.jet.data.model.api.coordinate.Vector;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -21,7 +21,7 @@ import java.util.Set;
  */
 public record ServerSynchronizePositionPlayPacket(int teleportId, @NonNull Vector position,
                                                   @NonNull Vector deltaMovement, float yaw, float pitch,
-                                                  @NonNull Collection<RelativeFlag> relativeFlags)
+                                                  @NonNull Set<RelativeFlag> relativeFlags)
         implements ServerPacket {
     /**
      * Constructs the {@linkplain ServerSynchronizePositionPlayPacket server synchronize position play packet}.
@@ -38,7 +38,7 @@ public record ServerSynchronizePositionPlayPacket(int teleportId, @NonNull Vecto
     public ServerSynchronizePositionPlayPacket {
         NullabilityUtil.requireNonNull(position, "position");
         NullabilityUtil.requireNonNull(deltaMovement, "delta movement");
-        relativeFlags = Set.copyOf(NullabilityUtil.requireNonNull(relativeFlags, "relative flags"));
+        relativeFlags = Sets.immutableEnumSet(NullabilityUtil.requireNonNull(relativeFlags, "relative flags"));
     }
 
     /**

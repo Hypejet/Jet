@@ -1,12 +1,14 @@
-package net.hypejet.jet.server.network.codec.chunk;
+package net.hypejet.jet.server.network.codec.game.chunk;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
-import net.hypejet.jet.server.network.codec.chunk.entity.BlockEntityNetworkWriter;
-import net.hypejet.jet.server.network.codec.chunk.light.LightDataNetworkWriter;
-import net.hypejet.jet.server.network.codec.chunk.section.ChunkSectionNetworkWriter;
+import net.hypejet.jet.server.network.codec.game.chunk.entity.BlockEntityNetworkWriter;
+import net.hypejet.jet.server.network.codec.game.chunk.light.LightDataNetworkWriter;
+import net.hypejet.jet.server.network.codec.game.chunk.section.ChunkSectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.miscellaneous.BinaryTagNetworkWriter;
+import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.world.chunk.Chunk;
 import net.hypejet.jet.server.world.chunk.entity.BlockEntity;
 import net.hypejet.jet.server.world.chunk.section.ChunkSection;
@@ -28,7 +30,7 @@ public final class ChunkNetworkWriter implements NetworkWriter<Chunk> {
     public static final ChunkNetworkWriter INSTANCE = new ChunkNetworkWriter();
 
     private static final CollectionNetworkWriter<ChunkSection>
-            SECTIONS_WRITER = new CollectionNetworkWriter<>(ChunkSectionNetworkWriter.INSTANCE);
+            SECTIONS_WRITER = new CollectionNetworkWriter<>(false, ChunkSectionNetworkWriter.INSTANCE);
     private static final CollectionNetworkWriter<BlockEntity>
             BLOCK_ENTITIES_WRITER = new CollectionNetworkWriter<>(BlockEntityNetworkWriter.INSTANCE);
 
@@ -38,9 +40,17 @@ public final class ChunkNetworkWriter implements NetworkWriter<Chunk> {
     public void write(@NonNull ByteBuf buf, @NonNull Chunk object) {
         buf.writeInt(object.chunkX());
         buf.writeInt(object.chunkZ());
-
         BinaryTagNetworkWriter.INSTANCE.write(buf, object.heightmaps());
-        SECTIONS_WRITER.write(buf, object.sections());
+
+        ByteBuf sectionBuf = Unpooled.buffer();
+        try {
+            SECTIONS_WRITER.write(sectionBuf, object.sections());
+            VarIntNetworkCodec.INSTANCE.write(buf, sectionBuf.readableBytes());
+            buf.writeBytes(sectionBuf);
+        } finally {
+            sectionBuf.release();
+        }
+
         BLOCK_ENTITIES_WRITER.write(buf, object.blockEntities());
         LightDataNetworkWriter.INSTANCE.write(buf, object.lightData());
     }

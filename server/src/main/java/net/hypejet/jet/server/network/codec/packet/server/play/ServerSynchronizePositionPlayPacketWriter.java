@@ -1,7 +1,6 @@
 package net.hypejet.jet.server.network.codec.packet.server.play;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.world.coordinate.VectorNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
@@ -11,8 +10,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
 import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Represents {@linkplain NetworkWriter a network writer}, which writes
@@ -34,7 +31,8 @@ public final class ServerSynchronizePositionPlayPacketWriter
     public static final ServerSynchronizePositionPlayPacketWriter
             INSTANCE = new ServerSynchronizePositionPlayPacketWriter();
 
-    private static final RelativeFlagCollectionNetworkCodec FLAG_CODEC = new RelativeFlagCollectionNetworkCodec();
+    private static final RelativeFlagCollectionNetworkWriter
+            RELATIVE_FLAGS_WRITER = new RelativeFlagCollectionNetworkWriter();
 
     private ServerSynchronizePositionPlayPacketWriter() {}
 
@@ -45,19 +43,19 @@ public final class ServerSynchronizePositionPlayPacketWriter
         VectorNetworkCodec.INSTANCE.write(buf, object.deltaMovement());
         buf.writeFloat(object.yaw());
         buf.writeFloat(object.pitch());
-        FLAG_CODEC.write(buf, object.relativeFlags());
+        RELATIVE_FLAGS_WRITER.write(buf, object.relativeFlags());
     }
 
     /**
-     * Represents {@linkplain NetworkCodec a network codec}, which reads and writes
+     * Represents {@linkplain NetworkWriter a network writer}, which reads and writes
      * {@linkplain Collection a collection} of {@linkplain RelativeFlag relative flags}.
      *
      * @since 1.0
      * @see RelativeFlag
      * @see Collection
-     * @see NetworkCodec
+     * @see NetworkWriter
      */
-    private static final class RelativeFlagCollectionNetworkCodec implements NetworkCodec<Collection<RelativeFlag>> {
+    private static final class RelativeFlagCollectionNetworkWriter implements NetworkWriter<Collection<RelativeFlag>> {
 
         private static final EnumMap<RelativeFlag, Integer> FLAG_IDS = new EnumMap<>(RelativeFlag.class);
 
@@ -74,22 +72,8 @@ public final class ServerSynchronizePositionPlayPacketWriter
         }
 
         @Override
-        public @NonNull Collection<RelativeFlag> read(@NonNull ByteBuf buf) {
-            int value = buf.readInt();
-            Set<RelativeFlag> flags = new HashSet<>();
-
-            for (RelativeFlag flag : RelativeFlag.values()) {
-                if ((value & FLAG_IDS.get(flag)) != 0) {
-                    flags.add(flag);
-                }
-            }
-
-            return flags;
-        }
-
-        @Override
         public void write(@NonNull ByteBuf buf, @NonNull Collection<RelativeFlag> object) {
-            byte value = 0;
+            int value = 0;
             for (RelativeFlag flag : object)
                 value |= FLAG_IDS.get(flag);
             buf.writeInt(value);

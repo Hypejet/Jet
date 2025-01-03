@@ -208,7 +208,7 @@ public final class ServerPacketRegistry {
                                 ServerActionBarPlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.TAB_LIST, ServerPlayerListHeaderAndFooterPlayPacket.class,
                                 ServerPlayerListHeaderAndFooterPlayPacketWriter.INSTANCE)
-                        .add(ServerPlayPackets.ENTITY_POSITION_SYNC, ServerSynchronizePositionPlayPacket.class,
+                        .add(ServerPlayPackets.PLAYER_POSITION, ServerSynchronizePositionPlayPacket.class,
                                 ServerSynchronizePositionPlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.SET_CHUNK_CACHE_CENTER, ServerCenterChunkPlayPacket.class,
                                 ServerCenterChunkPlayPacketWriter.INSTANCE)

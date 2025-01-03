@@ -16,21 +16,22 @@ import java.util.BitSet;
  */
 public final class BitSetNetworkWriter extends AggregateNetworkWriter<BitSet> {
     /**
-     * An instance of the {@linkplain BitSetNetworkWriter bit set network writer}, which allows lengths
-     * up to {@link Integer#MAX_VALUE}.
+     * An instance of the {@linkplain BitSetNetworkWriter bit set network writer}, which allows for lengths
+     * up to {@link Integer#MAX_VALUE} and encodes them.
      *
      * @since 1.0
      */
-    public static final BitSetNetworkWriter INSTANCE = new BitSetNetworkWriter(Integer.MAX_VALUE);
+    public static final BitSetNetworkWriter INSTANCE = new BitSetNetworkWriter(Integer.MAX_VALUE, true);
 
     /**
      * Constructs the {@linkplain BitSetNetworkWriter bitset network writer}.
      *
      * @param maxLength a max length that a bitset can have
+     * @param encodeLength whether the length of bitsets should be encoded
      * @since 1.0
      */
-    public BitSetNetworkWriter(int maxLength) {
-        super(maxLength);
+    public BitSetNetworkWriter(int maxLength, boolean encodeLength) {
+        super(maxLength, encodeLength);
     }
 
     @Override

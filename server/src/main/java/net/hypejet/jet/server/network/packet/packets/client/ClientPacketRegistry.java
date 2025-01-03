@@ -35,6 +35,7 @@ import net.hypejet.jet.server.network.codec.packet.client.play.ClientChatSession
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientCommandSuggestionsRequestPlayPacketReader;
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientConfirmTeleportationPlayPacketReader;
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientEndTickPlayPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.play.ClientPlayerInputPlayPacketReader;
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientPositionFlagsPlayPacketReader;
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientPositionPlayPacketReader;
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientQueryBlockEntityTagPacketReader;
@@ -181,6 +182,7 @@ public final class ClientPacketRegistry {
                         .add(ClientPlayPackets.CHAT_SESSION_UPDATE, ClientChatSessionUpdatePlayPacketReader.INSTANCE)
                         .add(ClientPlayPackets.CLIENT_COMMAND, ClientRequestActionPlayPacketReader.INSTANCE)
                         .add(ClientPlayPackets.CLIENT_TICK_END, ClientEndTickPlayPacketReader.INSTANCE)
+                        .add(ClientPlayPackets.PLAYER_INPUT, ClientPlayerInputPlayPacketReader.INSTANCE)
                         .add(ClientPlayPackets.ACCEPT_TELEPORTATION,
                                 ClientConfirmTeleportationPlayPacketReader.INSTANCE)
                         .add(ClientPlayPackets.COMMAND_SUGGESTION,
