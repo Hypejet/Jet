@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Represents part of {@linkplain ??? a world}.
+ * Represents part of {@linkplain net.hypejet.jet.server.world.JetWorld a world}.
  *
  * @param chunkX an {@code X} value of coordinates of the chunk
  * @param chunkZ an {@code Z} value of coordinates of the chunk
@@ -20,7 +20,7 @@ import java.util.Set;
  * @param blockEntities a set of block entities that the chunk should have
  * @param lightData a light data that the chunk should have
  * @since 1.0
- * @see ???
+ * @see net.hypejet.jet.server.world.JetWorld
  */
 public record Chunk(int chunkX, int chunkZ, @NotNull CompoundBinaryTag heightmaps,
                     @NotNull List<ChunkSection> sections, @NotNull Set<BlockEntity> blockEntities,

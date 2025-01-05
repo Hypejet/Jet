@@ -2,6 +2,8 @@ package net.hypejet.jet.server.world.chunk.palette;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.util.array.UnmodifiableLongArray;
+import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
+import net.hypejet.jet.server.world.chunk.palette.usage.ChunkPaletteUsageType;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -15,16 +17,20 @@ public sealed abstract class ChunkPalette permits DirectChunkPalette, IndirectCh
     private final byte bitsPerElement;
     private final UnmodifiableLongArray data;
 
+    private final ChunkPaletteUsageType usageType;
+
     /**
      * Constructs the {@linkplain ChunkPalette chunk palette}.
      *
      * @param bitsPerElement number of bits that each element of the should use
+     * @param usageType a type of usage that the palette is created for
      * @param data the data as a long array, where one long can store multiple elements, number of elements that one
      *             long can have depends on the previous bits-per-element value
      * @since 1.0
      */
-    protected ChunkPalette(byte bitsPerElement, long @NotNull [] data) {
+    protected ChunkPalette(byte bitsPerElement, @NotNull ChunkPaletteUsageType usageType, long @NotNull [] data) {
         this.bitsPerElement = bitsPerElement;
+        this.usageType = NullabilityUtil.requireNonNull(usageType, "usage type");
         this.data = new UnmodifiableLongArray(NullabilityUtil.requireNonNull(data, "data"));
     }
 
@@ -51,6 +57,16 @@ public sealed abstract class ChunkPalette permits DirectChunkPalette, IndirectCh
     }
 
     /**
+     * Gets {@linkplain ChunkPaletteUsageType a usage type} of this chunk palette.
+     *
+     * @return the usage type
+     * @since 1.0
+     */
+    public final @NotNull ChunkPaletteUsageType usageType() {
+        return this.usageType;
+    }
+
+    /**
      * Gets an element of the data at coordinates specified. Note that coordinate values provided on each axis must
      * be relative to beginning of the axles in the chunk palette.
      *
@@ -61,6 +77,33 @@ public sealed abstract class ChunkPalette permits DirectChunkPalette, IndirectCh
      * @since 1.0
      */
     public abstract int getElement(byte x, byte y, byte z);
+
+    /**
+     * Creates a new {@linkplain ChunkPalette chunk palette} with {@linkplain ChunkPaletteUpdate chunk palette updates}
+     * specified.
+     *
+     * @param updates the updates
+     * @return the new chunk palette
+     * @since 1.0
+     */
+    public abstract @NotNull ChunkPalette withUpdates(@NotNull ChunkPaletteUpdate @NotNull ... updates);
+
+    /**
+     * Calculates index of that an element with coordinates specified is stored at.
+     *
+     * @param axisLength a length of each axis of the coordinates
+     * @param x an {@code X} value of the coordinates
+     * @param y an {@code Y} value of the coordinates
+     * @param z an {@code Z} value of the coordinates
+     * @return the index
+     * @since 1.0
+     */
+    public static int calculateElementIndex(byte axisLength, byte x, byte y, byte z) {
+        validateValue(x, axisLength, "x");
+        validateValue(y, axisLength, "y");
+        validateValue(z, axisLength, "z");
+        return x + (axisLength * z) + (axisLength * axisLength * y);
+    }
 
     /**
      * Creates a long array containing elements specified, where one long can store multiple elements. Number of
@@ -121,23 +164,6 @@ public sealed abstract class ChunkPalette permits DirectChunkPalette, IndirectCh
         }
 
         return values;
-    }
-
-    /**
-     * Calculates index of that an element with coordinates specified is stored at.
-     *
-     * @param axisLength a length of each axis of the coordinates
-     * @param x an {@code X} value of the coordinates
-     * @param y an {@code Y} value of the coordinates
-     * @param z an {@code Z} value of the coordinates
-     * @return the index
-     * @since 1.0
-     */
-    protected static int calculateElementIndex(byte axisLength, byte x, byte y, byte z) {
-        validateValue(x, axisLength, "x");
-        validateValue(y, axisLength, "y");
-        validateValue(z, axisLength, "z");
-        return x + (axisLength * z) + (axisLength * axisLength * y);
     }
 
     /**
