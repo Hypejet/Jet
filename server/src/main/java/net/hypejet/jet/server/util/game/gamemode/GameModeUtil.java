@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.util.gamemode;
+package net.hypejet.jet.server.util.game.gamemode;
 
 import net.hypejet.jet.entity.player.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;

@@ -11,10 +11,13 @@ import net.hypejet.jet.data.model.api.registries.damage.DamageType;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.registries.painting.PaintingVariant;
 import net.hypejet.jet.data.model.api.registries.wolf.WolfVariant;
+import net.hypejet.jet.data.model.server.registry.registries.block.Block;
+import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState;
 import net.hypejet.jet.data.model.server.registry.registries.pack.FeaturePack;
 import net.hypejet.jet.data.model.server.registry.registries.registry.DataRegistryEntry;
 import net.hypejet.jet.registry.RegistryManager;
 import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.registry.tags.Tags;
 import net.hypejet.jet.server.registry.writers.registry.armor.material.ArmorTrimMaterialBinaryTagWriter;
 import net.hypejet.jet.server.registry.writers.registry.armor.pattern.ArmorTrimPatternBinaryTagWriter;
 import net.hypejet.jet.server.registry.writers.registry.banner.BannerPatternBinaryTagWriter;
@@ -24,12 +27,17 @@ import net.hypejet.jet.server.registry.writers.registry.damage.DamageTypeBinaryT
 import net.hypejet.jet.server.registry.writers.registry.dimension.DimensionTypeBinaryTagWriter;
 import net.hypejet.jet.server.registry.writers.registry.painting.PaintingVariantBinaryTagWriter;
 import net.hypejet.jet.server.registry.writers.registry.wolf.WolfVariantBinaryTagWriter;
+import net.hypejet.jet.server.util.order.ElementOrder;
+import net.hypejet.jet.server.world.block.JetBlock;
+import net.hypejet.jet.server.world.block.JetBlockState;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -46,6 +54,8 @@ public final class JetRegistryManager implements RegistryManager {
 
     private final Map<Key, JetMinecraftRegistry<?>> registries;
     private final Set<FeaturePack> enabledFeaturePacks;
+
+    private final ElementOrder<JetBlockState> blockStateOrder;
 
     /**
      * Constructs the {@linkplain JetRegistryManager registry manager}.
@@ -83,43 +93,61 @@ public final class JetRegistryManager implements RegistryManager {
 
         this.enabledFeaturePacks = Set.copyOf(enabledFeaturePacks);
 
+        ElementOrder<JetBlockState> blockStateOrder = createBlockStateOrder();
         Set<JetMinecraftRegistry<?>> registrySet = Set.of(
-                // TODO: Add block, item and fluid registries
-                JetSerializableMinecraftRegistry.create(Key.key("dimension_type"), DimensionType.class, server,
+                // TODO: Add item and fluid registries
+                JetSerializableMinecraftRegistry.create(
+                        Key.key("dimension_type"), DimensionType.class, server,
                         DimensionTypeBinaryTagWriter.INSTANCE, this.enabledFeaturePacks,
-                        JetDataJson.createDimensionTypesGson(), ResourceFileNames.DIMENSION_TYPE_GENERATOR),
-                JetSerializableMinecraftRegistry.create(Key.key("chat_type"),
-                        ChatType.class, server, ChatTypeBinaryTagWriter.INSTANCE, this.enabledFeaturePacks,
-                        JetDataJson.createChatTypesGson(), ResourceFileNames.CHAT_TYPE_GENERATOR),
-                JetSerializableMinecraftRegistry.create(Key.key("damage_type"),
-                        DamageType.class, server, DamageTypeBinaryTagWriter.INSTANCE, this.enabledFeaturePacks,
-                        JetDataJson.createDamageTypesGson(), ResourceFileNames.DAMAGE_TYPE_GENERATOR),
-                JetSerializableMinecraftRegistry.create(Key.key("banner_pattern"),
-                        BannerPattern.class, server, BannerPatternBinaryTagWriter.INSTANCE, this.enabledFeaturePacks,
-                        JetDataJson.createBannerPatternsGson(), ResourceFileNames.BANNER_PATTERN_GENERATOR),
-                JetSerializableMinecraftRegistry.create(Key.key("wolf_variant"),
-                        WolfVariant.class, server, WolfVariantBinaryTagWriter.INSTANCE, this.enabledFeaturePacks,
-                        JetDataJson.createWolfVariantsGson(), ResourceFileNames.WOLF_VARIANT_GENERATOR),
-                JetSerializableMinecraftRegistry.create(Key.key("worldgen/biome"), Biome.class, server,
-                        BiomeBinaryTagWriter.INSTANCE, this.enabledFeaturePacks, JetDataJson.createBiomesGson(),
-                        ResourceFileNames.BIOME_GENERATOR),
-                JetSerializableMinecraftRegistry.create(Key.key("painting_variant"),
-                        PaintingVariant.class, server, PaintingVariantBinaryTagWriter.INSTANCE,
-                        this.enabledFeaturePacks, JetDataJson.createPaintingVariantsGson(),
-                        ResourceFileNames.PAINTING_VARIANT_GENERATOR),
-                JetSerializableMinecraftRegistry.create(Key.key("trim_material"),
-                        ArmorTrimMaterial.class, server, ArmorTrimMaterialBinaryTagWriter.INSTANCE,
-                        this.enabledFeaturePacks, JetDataJson.createTrimMaterialsGson(),
-                        ResourceFileNames.ARMOR_TRIM_MATERIAL_GENERATOR),
-                JetSerializableMinecraftRegistry.create(Key.key("trim_pattern"),
-                        ArmorTrimPattern.class, server, ArmorTrimPatternBinaryTagWriter.INSTANCE,
-                        this.enabledFeaturePacks, JetDataJson.createTrimPatternsGson(),
-                        ResourceFileNames.ARMOR_TRIM_PATTERN_GENERATOR)
+                        JetDataJson.createDimensionTypesGson(), ResourceFileNames.DIMENSION_TYPE_GENERATOR
+                ),
+                JetSerializableMinecraftRegistry.create(
+                        Key.key("chat_type"), ChatType.class, server, ChatTypeBinaryTagWriter.INSTANCE,
+                        this.enabledFeaturePacks, JetDataJson.createChatTypesGson(),
+                        ResourceFileNames.CHAT_TYPE_GENERATOR
+                ),
+                JetSerializableMinecraftRegistry.create(
+                        Key.key("damage_type"), DamageType.class, server, DamageTypeBinaryTagWriter.INSTANCE,
+                        this.enabledFeaturePacks, JetDataJson.createDamageTypesGson(),
+                        ResourceFileNames.DAMAGE_TYPE_GENERATOR
+                ),
+                JetSerializableMinecraftRegistry.create(
+                        Key.key("banner_pattern"), BannerPattern.class, server,
+                        BannerPatternBinaryTagWriter.INSTANCE, this.enabledFeaturePacks,
+                        JetDataJson.createBannerPatternsGson(), ResourceFileNames.BANNER_PATTERN_GENERATOR
+                ),
+                JetSerializableMinecraftRegistry.create(
+                        Key.key("wolf_variant"), WolfVariant.class, server, WolfVariantBinaryTagWriter.INSTANCE,
+                        this.enabledFeaturePacks, JetDataJson.createWolfVariantsGson(),
+                        ResourceFileNames.WOLF_VARIANT_GENERATOR
+                ),
+                JetSerializableMinecraftRegistry.create(
+                        Key.key("worldgen/biome"), Biome.class, server, BiomeBinaryTagWriter.INSTANCE,
+                        this.enabledFeaturePacks, JetDataJson.createBiomesGson(), ResourceFileNames.BIOME_GENERATOR
+                ),
+                JetSerializableMinecraftRegistry.create(
+                        Key.key("painting_variant"), PaintingVariant.class, server,
+                        PaintingVariantBinaryTagWriter.INSTANCE, this.enabledFeaturePacks,
+                        JetDataJson.createPaintingVariantsGson(), ResourceFileNames.PAINTING_VARIANT_GENERATOR
+                ),
+                JetSerializableMinecraftRegistry.create(
+                        Key.key("trim_material"), ArmorTrimMaterial.class, server,
+                        ArmorTrimMaterialBinaryTagWriter.INSTANCE, this.enabledFeaturePacks,
+                        JetDataJson.createTrimMaterialsGson(), ResourceFileNames.ARMOR_TRIM_MATERIAL_GENERATOR
+                ),
+                JetSerializableMinecraftRegistry.create(
+                        Key.key("trim_pattern"), ArmorTrimPattern.class, server,
+                        ArmorTrimPatternBinaryTagWriter.INSTANCE, this.enabledFeaturePacks,
+                        JetDataJson.createTrimPatternsGson(), ResourceFileNames.ARMOR_TRIM_PATTERN_GENERATOR
+                ),
+                createBlockRegistry(blockStateOrder, server, enabledFeaturePacks)
         );
 
         Map<Key, JetMinecraftRegistry<?>> registries = new HashMap<>();
         registrySet.forEach(registry -> registries.put(registry.registryKey(), registry));
         this.registries = Map.copyOf(registries);
+
+        this.blockStateOrder = blockStateOrder;
     }
 
     @Override
@@ -140,5 +168,80 @@ public final class JetRegistryManager implements RegistryManager {
      */
     public @NonNull Set<FeaturePack> enabledFeaturePacks() {
         return this.enabledFeaturePacks;
+    }
+
+    /**
+     * Gets {@linkplain ElementOrder an element order} of {@linkplain JetBlockState a block states}.
+     *
+     * @return the element order
+     * @since 1.0
+     */
+    public @NonNull ElementOrder<JetBlockState> blockStateOrder() {
+        return this.blockStateOrder;
+    }
+
+    private static @NonNull ElementOrder<JetBlockState> createBlockStateOrder() {
+        List<DataRegistryEntry<?>> dataEntries = JetMinecraftRegistry.entries(
+                JetDataJson.createBlockStatesGson(),
+                ResourceFileNames.BLOCK_STATE_GENERATOR
+        );
+
+        List<JetBlockState> blockStates = new ArrayList<>();
+        for (DataRegistryEntry<?> blockStateEntry : dataEntries) {
+            if (!(blockStateEntry.value() instanceof BlockState(Map<String, String> properties, boolean isAir)))
+                throw new IllegalArgumentException("The value is not a block state");
+            blockStates.add(new JetBlockState(blockStateEntry.key(), properties, isAir));
+        }
+
+        return new ElementOrder<>(blockStates);
+    }
+
+    private static @NonNull JetMinecraftRegistry<JetBlock> createBlockRegistry(
+            @NonNull ElementOrder<JetBlockState> blockStateOrder,
+            @NonNull JetMinecraftServer server,
+            @NonNull Set<FeaturePack> enabledFeaturePacks
+    ) {
+        List<DataRegistryEntry<?>> dataEntries = JetMinecraftRegistry.entries(
+                JetDataJson.createBlocksGson(),
+                ResourceFileNames.BLOCK_GENERATOR
+        );
+
+        List<JetRegistryEntry<JetBlock>> blockEntries = new ArrayList<>();
+        Map<JetRegistryEntry<JetBlock>, Tags> blockEntryToTagsMap = new HashMap<>();
+
+        for (int index = 0; index < dataEntries.size(); index++) {
+            DataRegistryEntry<?> dataEntry = dataEntries.get(index);
+            JetRegistryEntry<JetBlock> entry = createBlockEntry(blockStateOrder, dataEntry);
+
+            Collection<Key> tagsCollection = dataEntry.tags();
+            if (tagsCollection == null)
+                tagsCollection = Set.of();
+
+            blockEntries.add(index, entry);
+            blockEntryToTagsMap.put(entry, new Tags(tagsCollection));
+        }
+
+        return new JetMinecraftRegistry<>(
+                Key.key("blocks"), JetBlock.class, server,
+                blockEntries, enabledFeaturePacks, blockEntryToTagsMap
+        );
+    }
+
+    private static @NonNull JetRegistryEntry<JetBlock> createBlockEntry(
+            @NonNull ElementOrder<JetBlockState> blockStateOrder,
+            @NonNull DataRegistryEntry<?> dataEntry
+    ) {
+        if (!(dataEntry.value() instanceof Block(Set<Key> requiredFeatureFlags, int defaultBlockStateId)))
+            throw new IllegalArgumentException("The value is not a block");
+
+        JetBlockState blockState = blockStateOrder.get(defaultBlockStateId);
+        if (blockState == null) {
+            throw new IllegalArgumentException(String.format(
+                    "Unknown block state with identifier of %d",
+                    defaultBlockStateId
+            ));
+        }
+
+        return new JetRegistryEntry<>(dataEntry.key(), new JetBlock(requiredFeatureFlags, blockState), null);
     }
 }

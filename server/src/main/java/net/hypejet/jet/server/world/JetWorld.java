@@ -6,14 +6,18 @@ import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.registry.RegistryEntry;
+import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.util.acquirable.map.longs.LongObjectHashMapAcquirable;
 import net.hypejet.jet.server.util.acquisition.NotNullObjectMappedAcquisition;
+import net.hypejet.jet.server.util.order.ElementOrder;
+import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.Chunk;
 import net.hypejet.jet.server.world.chunk.palette.ChunkPalette;
 import net.hypejet.jet.server.world.chunk.section.ChunkSection;
 import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
 import net.hypejet.jet.world.World;
 import net.hypejet.jet.world.coordinate.BlockPosition;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -32,6 +36,7 @@ public final class JetWorld implements World {
 
     private final UUID uniqueId;
     private final RegistryEntry<DimensionType> dimensionType;
+    private final JetMinecraftServer server;
 
     private final LongObjectHashMapAcquirable<Chunk> chunks = new LongObjectHashMapAcquirable<>();
 
@@ -40,11 +45,14 @@ public final class JetWorld implements World {
      *
      * @param uniqueId a unique identifier that the world should have
      * @param dimensionType a dimension type, of which type the world should be
+     * @param server a server that should own the world
      * @since 1.0
      */
-    public JetWorld(@NotNull UUID uniqueId, @NotNull RegistryEntry<DimensionType> dimensionType) {
+    public JetWorld(@NotNull UUID uniqueId, @NotNull RegistryEntry<DimensionType> dimensionType,
+                    @NotNull JetMinecraftServer server) {
         this.uniqueId = NullabilityUtil.requireNonNull(uniqueId, "unique identifier");
         this.dimensionType = NullabilityUtil.requireNonNull(dimensionType, "dimension type");
+        this.server = NullabilityUtil.requireNonNull(server, "server");
     }
 
     @Override
@@ -85,21 +93,13 @@ public final class JetWorld implements World {
             byte sectionY = createSectionRelativeCoordinate(position.blockY());
             byte sectionZ = createSectionRelativeCoordinate(position.blockZ());
 
-            int previousBlockState = blockPalette.getElement(sectionX, sectionY, sectionZ);
-            if (previousBlockState == block) return;
+            int previousBlockStateId = blockPalette.getElement(sectionX, sectionY, sectionZ);
+            if (previousBlockStateId == block) return;
 
             ChunkPaletteUpdate update = new ChunkPaletteUpdate(sectionX, sectionY, sectionZ, block);
             ChunkPalette newPalette = blockPalette.withUpdates(update);
 
-            // TODO: Check for these in a block state registry
-            boolean wasAir = previousBlockState == 0;
-            boolean isAir = block == 0;
-
-            short newBlockCount = chunkSection.blockCount();
-            if (previousBlockState != block && !(wasAir && isAir)) {
-                if (isAir) newBlockCount--;
-                else newBlockCount++;
-            }
+            short newBlockCount = recalculateBlockCount(block, previousBlockStateId, chunkSection);
 
             ChunkSection newChunkSection = new ChunkSection(newBlockCount, newPalette, chunkSection.biomePalette());
             List<ChunkSection> newChunkSections = new ArrayList<>(chunk.sections());
@@ -111,6 +111,36 @@ public final class JetWorld implements World {
                     newChunkSections, chunk.blockEntities(), chunk.lightData());
             chunks.put(packedChunkPosition, newChunk);
         }
+    }
+
+    private short recalculateBlockCount(int blockStateId, int previousBlockStateId,
+                                        @NonNull ChunkSection chunkSection) {
+        ElementOrder<JetBlockState> blockStateOrder = this.server.registryManager().blockStateOrder();
+
+        JetBlockState previousBlockState = blockStateOrder.get(previousBlockStateId);
+        if (previousBlockState == null) {
+            throw new IllegalArgumentException(String.format(
+                    "Could not find a block state with identifier of %d", previousBlockStateId
+            ));
+        }
+
+        JetBlockState blockState = blockStateOrder.get(blockStateId);
+        if (blockState == null) {
+            throw new IllegalArgumentException(String.format(
+                    "Could not find a block state with identifier of %d", previousBlockStateId
+            ));
+        }
+
+        boolean wasAir = previousBlockState.isAir();
+        boolean isAir = blockState.isAir();
+
+        short newBlockCount = chunkSection.blockCount();
+        if (!(wasAir && isAir)) {
+            if (isAir) newBlockCount--;
+            else newBlockCount++;
+        }
+
+        return newBlockCount;
     }
 
     private @NotNull ChunkSection chunkSection(@NotNull Chunk chunk, int blockY) {

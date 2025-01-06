@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.world.event.events;
 
-import net.hypejet.jet.server.util.gamemode.GameModeUtil;
+import net.hypejet.jet.server.util.game.gamemode.GameModeUtil;
 import net.hypejet.jet.server.world.event.WorldEventValueProvider;
 import net.hypejet.jet.world.event.events.ChangeGameModeWorldEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;

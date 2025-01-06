@@ -7,7 +7,7 @@ import net.hypejet.jet.server.network.codec.game.world.coordinate.BlockPositionN
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.server.util.NetworkUtil;
-import net.hypejet.jet.server.util.gamemode.GameModeUtil;
+import net.hypejet.jet.server.util.game.gamemode.GameModeUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
