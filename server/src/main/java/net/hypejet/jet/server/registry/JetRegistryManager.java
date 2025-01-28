@@ -64,8 +64,10 @@ public final class JetRegistryManager implements RegistryManager {
      * @since 1.0
      */
     public JetRegistryManager(@NonNull JetMinecraftServer server) {
-        List<DataRegistryEntry<?>> featurePackEntries = JetMinecraftRegistry.entries(JetDataJson.createPlainGson(),
-                ResourceFileNames.FEATURE_PACK_GENERATOR);
+        List<DataRegistryEntry<?>> featurePackEntries = JetMinecraftRegistry.entries(
+                JetDataJson.createPlainGson(),
+                ResourceFileNames.FEATURE_PACK_GENERATOR
+        );
 
         Logger logger = LoggerFactory.getLogger(JetRegistryManager.class);
         Set<FeaturePack> enabledFeaturePacks = new HashSet<>();

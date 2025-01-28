@@ -1,8 +1,8 @@
 package net.hypejet.jet.server.world.chunk;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.server.world.chunk.light.LightData;
 import net.hypejet.jet.server.world.chunk.entity.BlockEntity;
+import net.hypejet.jet.server.world.chunk.light.LightData;
 import net.hypejet.jet.server.world.chunk.section.ChunkSection;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.jetbrains.annotations.NotNull;

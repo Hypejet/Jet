@@ -3,8 +3,9 @@ package net.hypejet.jet.world;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.registry.RegistryEntry;
+import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.coordinate.BlockPosition;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.UUID;
 
@@ -20,7 +21,7 @@ public interface World {
      * @return the unique identifier
      * @since 1.0
      */
-    @NotNull UUID uniqueId();
+    @NonNull UUID uniqueId();
 
     /**
      * Gets {@linkplain RegistryEntry a registry entry} of {@link DimensionType a dimension type} that this world uses.
@@ -28,24 +29,24 @@ public interface World {
      * @return the registry entry
      * @since 1.0
      */
-    @NotNull RegistryEntry<DimensionType> dimensionType();
+    @NonNull RegistryEntry<DimensionType> dimensionType();
 
     /**
-     * Creates {@linkplain NotNullObjectAcquisition a not-null object acquisition} of {@linkplain ??? a block}
-     * at {@linkplain BlockPosition a block position} specified.
+     * Creates {@linkplain NotNullObjectAcquisition a not-null object acquisition} of
+     * {@linkplain BlockState a block state} at {@linkplain BlockPosition a block position} specified.
      *
      * @param position the block position
      * @return the not-null object acquisition created
      * @since 1.0
      */
-    @NotNull NotNullObjectAcquisition<Integer> getBlock(@NotNull BlockPosition position);
+    @NonNull NotNullObjectAcquisition<? extends BlockState> getBlockState(@NonNull BlockPosition position);
 
     /**
-     * Sets {@linkplain ??? a block} at {@linkplain BlockPosition a block position} specified.
+     * Sets {@linkplain BlockState a block state} at {@linkplain BlockPosition a block position} specified.
      *
      * @param position the block position
-     * @param block a block to replace current block at the position with
+     * @param blockState a bloc state to replace current block state at the position with
      * @since 1.0
      */
-    void setBlock(@NotNull BlockPosition position, int block);
+    void setBlockState(@NonNull BlockPosition position, @NonNull BlockState blockState);
 }

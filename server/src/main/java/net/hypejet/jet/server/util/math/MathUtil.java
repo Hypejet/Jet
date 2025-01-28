@@ -10,6 +10,19 @@ public final class MathUtil {
     private MathUtil() {}
 
     /**
+     * Gets count of bits that an integer specified uses.
+     *
+     * @param value the integer
+     * @return the count of bits
+     * @since 1.0
+     */
+    public static int bitCount(int value) {
+        if (value == 0)
+            return 0; // Logarithmic numbers must be higher than 0
+        return ceilLog2(Math.abs(value)) + 1;
+    }
+
+    /**
      * Calculates an integer-expressed logarithm with base of {@code 2} with a logarithmic number specified. If the
      * result is not an integer, the smallest integer that is bigger than the result is returned.
      *
@@ -47,30 +60,5 @@ public final class MathUtil {
      */
     public static boolean isPowerOf2(int value) {
         return (value & (value - 1)) == 0;
-    }
-
-    /**
-     * Gets a greater value of two values specified.
-     *
-     * @param first the first value
-     * @param second the second value
-     * @return the greater value, if both values are the same, the result is the same as the values
-     * @since 1.0
-     */
-    public static byte max(byte first, byte second) {
-        return (first >= second) ? first : second;
-    }
-
-    /**
-     * Gets whether a value specified is in a range specified.
-     * 
-     * @param value the value
-     * @param minimum the minimum value in the range, inclusive
-     * @param maximum the maximum value in the range, inclusive
-     * @return {@code true} if the value specified is in the range, {@code false} otherwise
-     * @since 1.0
-     */
-    public static boolean isInRange(byte value, byte minimum, byte maximum) {
-        return value >= minimum && value <= maximum;
     }
 }

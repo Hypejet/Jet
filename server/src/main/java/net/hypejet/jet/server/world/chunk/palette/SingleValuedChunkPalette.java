@@ -1,92 +1,65 @@
 package net.hypejet.jet.server.world.chunk.palette;
 
-import net.hypejet.jet.server.util.math.MathUtil;
-import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
-import net.hypejet.jet.server.world.chunk.palette.usage.ChunkPaletteUsageType;
-import org.jetbrains.annotations.NotNull;
+import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.server.util.function.IntResultingFunction;
+import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents {@linkplain ChunkPalette a chunk palette}, which contains the same element at each position.
  *
  * @since 1.0
+ * @param <E> a type of elements that the palette stores
  * @see ChunkPalette
  */
-public final class SingleValuedChunkPalette extends ChunkPalette {
+public final class SingleValuedChunkPalette<E> extends ChunkPalette<E> {
 
     private static final long[] EMPTY_LONG_ARRAY = new long[0];
 
-    private final int element;
+    private final E element;
+    private final int elementIdentifier;
 
     /**
      * Constructs the {@linkplain SingleValuedChunkPalette single-valued chunk palette}.
      *
-     * @param usageType a type of usage that the palette is created for
+     * @param type a type of which the palette should be
      * @param element the element
+     * @param elementToIdentifierFunction a function, which should represent elements of the palette as integers
      * @since 1.0
      */
-    public SingleValuedChunkPalette(@NotNull ChunkPaletteUsageType usageType, int element) {
-        super((byte) 0, usageType, EMPTY_LONG_ARRAY);
-        this.element = element;
+    public SingleValuedChunkPalette(@NonNull ChunkPaletteType type, @NonNull E element,
+                                    @NonNull IntResultingFunction<E> elementToIdentifierFunction) {
+        super((byte) 0, type, EMPTY_LONG_ARRAY, elementToIdentifierFunction);
+        this.element = NullabilityUtil.requireNonNull(element, "element");
+        this.elementIdentifier = elementToIdentifierFunction.apply(element);
     }
 
     @Override
-    public int getElement(byte x, byte y, byte z) {
+    public @NonNull E getElement(byte x, byte y, byte z) {
         return this.element;
     }
 
     @Override
-    public @NotNull ChunkPalette withUpdates(@NotNull ChunkPaletteUpdate @NotNull ... updates) {
-        if (updates.length == 0)
-            return this;
+    protected @NonNull List<E> createElementList() {
+        return Collections.nCopies(this.type().elementCount(), this.element);
+    }
 
-        // TODO: Do the same check with direct and indirect?
-        boolean updateNeeded = false;
-        for (ChunkPaletteUpdate update : updates) {
-            if (update.newElement() != this.element) {
-                updateNeeded = true;
-                break;
-            }
-        }
-
-        if (!updateNeeded)
-            return this;
-
-        ChunkPaletteUsageType usageType = this.usageType();
-        byte axisLength = usageType.axisLength();
-
-        int[] elements = new int[axisLength * axisLength * axisLength];
-        Arrays.fill(elements, this.element);
-
-        byte bitsPerElement = this.bitsPerElement();
-        for (ChunkPaletteUpdate update : updates) {
-            int elementIndex = ChunkPalette.calculateElementIndex(
-                    update.sectionX(), update.sectionY(), update.sectionZ(), axisLength
-            );
-
-            int newElement = update.newElement();
-            elements[elementIndex] = newElement;
-            bitsPerElement = MathUtil.max(bitsPerElement, (byte) MathUtil.ceilLog2(newElement));
-        }
-
-        byte indirectBitsPerElement = (byte) MathUtil.ceilLog2(elements.length);
-        if (MathUtil.isInRange(indirectBitsPerElement,
-                usageType.minimumIndirectBits(),
-                usageType.maximumIndirectBits())) {
-            return IndirectChunkPalette.create(indirectBitsPerElement, usageType, elements);
-        }
-
-        return DirectChunkPalette.create(bitsPerElement, usageType, elements);
+    @Override
+    protected @NonNull Map<E, Integer> createElementCountMap() {
+        return Map.of(this.element, this.type().elementCount());
     }
 
     /**
-     * Gets the element that this chunk palette returns for each position.
+     * Gets an identifier of the element that this chunk palette returns for each position.
      *
-     * @return the element
+     * @return the element identifier
      * @since 1.0
      */
-    public int element() {
-        return this.element;
+    public int elementIdentifier() {
+        return this.elementIdentifier;
     }
 }

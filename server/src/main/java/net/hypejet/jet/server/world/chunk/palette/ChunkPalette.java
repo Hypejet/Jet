@@ -1,37 +1,58 @@
 package net.hypejet.jet.server.world.chunk.palette;
 
+import com.google.common.collect.Iterables;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.util.array.UnmodifiableLongArray;
+import net.hypejet.jet.server.util.function.IntResultingFunction;
+import net.hypejet.jet.server.util.math.MathUtil;
+import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
-import net.hypejet.jet.server.world.chunk.palette.usage.ChunkPaletteUsageType;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiFunction;
 
 /**
  * Represents a data container of {@linkplain net.hypejet.jet.server.world.chunk.section.ChunkSection a chunk section}.
  *
  * @since 1.0
+ * @param <E> a type of elements that the palette stores
  * @see net.hypejet.jet.server.world.chunk.section.ChunkSection
  */
-public sealed abstract class ChunkPalette permits DirectChunkPalette, IndirectChunkPalette, SingleValuedChunkPalette {
+public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, IndirectChunkPalette,
+        SingleValuedChunkPalette {
+
+    private static final BiFunction<Object, ? super Integer, ? extends Integer>
+            COUNT_MAP_INCREMENT_FUNCTION = (ignored, integer) -> integer == null ? 1 : integer + 1;
 
     private final byte bitsPerElement;
     private final UnmodifiableLongArray data;
 
-    private final ChunkPaletteUsageType usageType;
+    private final ChunkPaletteType type;
+    private final IntResultingFunction<E> elementToIdentifierFunction;
 
     /**
      * Constructs the {@linkplain ChunkPalette chunk palette}.
      *
      * @param bitsPerElement number of bits that each element of the should use
-     * @param usageType a type of usage that the palette is created for
+     * @param type a type of which the palette should be
      * @param data the data as a long array, where one long can store multiple elements, number of elements that one
      *             long can have depends on the previous bits-per-element value
+     * @param elementToIdentifierFunction a function, which should represent elements of the palette as integers
      * @since 1.0
      */
-    protected ChunkPalette(byte bitsPerElement, @NotNull ChunkPaletteUsageType usageType, long @NotNull [] data) {
+    protected ChunkPalette(byte bitsPerElement, @NonNull ChunkPaletteType type, long @NonNull [] data,
+                           @NonNull IntResultingFunction<E> elementToIdentifierFunction) {
         this.bitsPerElement = bitsPerElement;
-        this.usageType = NullabilityUtil.requireNonNull(usageType, "usage type");
+        this.type = NullabilityUtil.requireNonNull(type, "type");
         this.data = new UnmodifiableLongArray(NullabilityUtil.requireNonNull(data, "data"));
+        this.elementToIdentifierFunction = NullabilityUtil.requireNonNull(
+                elementToIdentifierFunction,
+                "element to identifier function"
+        );
     }
 
     /**
@@ -52,18 +73,92 @@ public sealed abstract class ChunkPalette permits DirectChunkPalette, IndirectCh
      * @return the data
      * @since 1.0
      */
-    public final long @NotNull [] data() {
+    public final long @NonNull [] data() {
         return this.data.array();
     }
 
     /**
-     * Gets {@linkplain ChunkPaletteUsageType a usage type} of this chunk palette.
+     * Gets {@linkplain ChunkPaletteType a type} of this chunk palette.
      *
-     * @return the usage type
+     * @return the type
      * @since 1.0
      */
-    public final @NotNull ChunkPaletteUsageType usageType() {
-        return this.usageType;
+    public final @NonNull ChunkPaletteType type() {
+        return this.type;
+    }
+
+    /**
+     * Gets a function represents elements of this palette as integers.
+     *
+     * @return the function
+     * @since 1.0
+     */
+    public final @NonNull IntResultingFunction<E> elementToIdentifierFunction() {
+        return this.elementToIdentifierFunction;
+    }
+
+    /**
+     * Creates a new {@linkplain ChunkPalette chunk palette} with {@linkplain ChunkPaletteUpdate chunk palette updates}
+     * specified.
+     *
+     * @param updates the updates
+     * @return the new chunk palette
+     * @since 1.0
+     */
+    @SafeVarargs
+    public final @NonNull ChunkPalette<E> withUpdates(@NonNull ChunkPaletteUpdate<E> @NonNull ... updates) {
+        if (updates.length == 0)
+            return this;
+
+        ChunkPaletteType type = this.type();
+
+        List<E> elements = new ArrayList<>(this.createElementList());
+        Map<E, Integer> elementCountMap = new HashMap<>(this.createElementCountMap());
+
+        boolean paletteChanged = false;
+        for (ChunkPaletteUpdate<E> update : updates) {
+            int elementIndex = calculateElementIndex(
+                    type.axisLength(), update.sectionX(), update.sectionY(), update.sectionZ()
+            );
+
+            E previousElement = elements.get(elementIndex);
+            E newElement = update.newElement();
+
+            if (previousElement == newElement) continue;
+            if (!paletteChanged) paletteChanged = true;
+
+            elements.set(elementIndex, newElement);
+            elementCountMap.compute(newElement, COUNT_MAP_INCREMENT_FUNCTION);
+
+            elementCountMap.compute(previousElement, (ignored, integer) -> {
+                if (integer == null)
+                    return null;
+
+                int decreasedValue = integer - 1;
+                if (decreasedValue <= 0)
+                    return null;
+
+                return decreasedValue;
+            });
+        }
+
+        if (!paletteChanged)
+            return this;
+
+        IntResultingFunction<E> elementToIdentifierFunction = this.elementToIdentifierFunction();
+        if (elementCountMap.size() == 1) {
+            E onlyElement = Iterables.getOnlyElement(elementCountMap.keySet());
+            return new SingleValuedChunkPalette<>(type, onlyElement, elementToIdentifierFunction);
+        }
+
+        IndirectChunkPalette<E> indirectPalette = IndirectChunkPalette.createOrNull(
+                type, elements, elementCountMap,
+                elementToIdentifierFunction
+        );
+
+        if (indirectPalette != null)
+            return indirectPalette;
+        return DirectChunkPalette.create(type, elements, elementToIdentifierFunction, elementCountMap);
     }
 
     /**
@@ -76,17 +171,23 @@ public sealed abstract class ChunkPalette permits DirectChunkPalette, IndirectCh
      * @return the element
      * @since 1.0
      */
-    public abstract int getElement(byte x, byte y, byte z);
+    public abstract @NonNull E getElement(byte x, byte y, byte z);
 
     /**
-     * Creates a new {@linkplain ChunkPalette chunk palette} with {@linkplain ChunkPaletteUpdate chunk palette updates}
-     * specified.
+     * Creates {@linkplain List a list} of elements of this palette.
      *
-     * @param updates the updates
-     * @return the new chunk palette
+     * @return the list
      * @since 1.0
      */
-    public abstract @NotNull ChunkPalette withUpdates(@NotNull ChunkPaletteUpdate @NotNull ... updates);
+    protected abstract @NonNull List<E> createElementList();
+
+    /**
+     * Creates {@linkplain Map a map}, which maps elements to their count in the palette.
+     *
+     * @return the map
+     * @since 1.0
+     */
+    protected abstract @NonNull Map<E, Integer> createElementCountMap();
 
     /**
      * Calculates index of that an element with coordinates specified is stored at.
@@ -111,20 +212,21 @@ public sealed abstract class ChunkPalette permits DirectChunkPalette, IndirectCh
      *
      * @param bitsPerElement the bits-per-element value
      * @param elements the elements
-     * @param axisLength a length of each axis of chunk palette that the data array is created for
+     * @param type a type of chunk palette that the data array is created for
      * @return the long array
      * @since 1.0
      * @throws IllegalArgumentException if the length of elements specified is invalid or count of bits for one of
      *                                  elements specified is higher than bits-per-element value specified
      */
-    protected static long @NotNull [] createDataArray(byte bitsPerElement, int @NotNull [] elements, byte axisLength) {
-        int expectedElementLength = axisLength * axisLength * axisLength;
+    protected static long @NonNull [] createDataArray(byte bitsPerElement, int @NonNull [] elements,
+                                                      @NonNull ChunkPaletteType type) {
+        int expectedElementLength = type.elementCount();
         int elementsLength = elements.length;
 
         if (expectedElementLength != elementsLength) {
             throw new IllegalArgumentException(String.format(
-                    "The length of elements specified (%d) for an axis length specified (%d) must be %d",
-                    elementsLength, axisLength, expectedElementLength
+                    "The length of elements specified (%d) for a chunk palette type specified (%s) must be %d",
+                    elementsLength, type, expectedElementLength
             ));
         }
 
@@ -138,7 +240,7 @@ public sealed abstract class ChunkPalette permits DirectChunkPalette, IndirectCh
 
         for (int index = 0; index < elements.length; index++) {
             int element = elements[index];
-            int elementBits = Integer.SIZE - Integer.numberOfLeadingZeros(element);
+            int elementBits = MathUtil.bitCount(element);
 
             if (elementBits > bitsPerElement) {
                 throw new IllegalArgumentException(String.format(
@@ -167,6 +269,21 @@ public sealed abstract class ChunkPalette permits DirectChunkPalette, IndirectCh
     }
 
     /**
+     * Creates {@linkplain Map a map}, which maps elements to their count in the element list specified.
+     *
+     * @param elements the element list
+     * @return the map
+     * @param <E> a type of elements of the element list
+     * @since 1.0
+     */
+    protected static <E> @NonNull Map<E, Integer> createCountMap(@NonNull List<E> elements) {
+        Map<E, Integer> elementCountMap = new HashMap<>();
+        for (E element : elements)
+            elementCountMap.compute(element, COUNT_MAP_INCREMENT_FUNCTION);
+        return elementCountMap;
+    }
+
+    /**
      * Validates whether a coordinate value specified for an axis length specified is correct.
      *
      * @param coordinateValue the coordinate value
@@ -174,7 +291,7 @@ public sealed abstract class ChunkPalette permits DirectChunkPalette, IndirectCh
      * @param axisName a name of the axis
      * @since 1.0
      */
-    private static void validateValue(byte coordinateValue, byte axisLength, @NotNull String axisName) {
+    private static void validateValue(byte coordinateValue, byte axisLength, @NonNull String axisName) {
         NullabilityUtil.requireNonNull(axisName, "axis name");
         if (coordinateValue >= axisLength) {
             throw new IllegalArgumentException(String.format(

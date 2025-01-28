@@ -18,7 +18,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see ChunkPalette
  * @see NetworkWriter
  */
-public final class ChunkPaletteNetworkWriter implements NetworkWriter<ChunkPalette> {
+public final class ChunkPaletteNetworkWriter implements NetworkWriter<ChunkPalette<?>> {
     /**
      * An instance of the {@linkplain ChunkPaletteNetworkWriter chunk palette network writer}.
      *
@@ -29,15 +29,15 @@ public final class ChunkPaletteNetworkWriter implements NetworkWriter<ChunkPalet
     private ChunkPaletteNetworkWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ChunkPalette object) {
+    public void write(@NonNull ByteBuf buf, @NonNull ChunkPalette<?> object) {
         buf.writeByte(object.bitsPerElement());
 
         switch (object) {
-            case DirectChunkPalette ignoredPalette -> {}
-            case IndirectChunkPalette palette ->
+            case DirectChunkPalette<?> ignoredPalette -> {}
+            case IndirectChunkPalette<?> palette ->
                     VarIntArrayNetworkWriter.INSTANCE.write(buf, palette.registryIndices());
-            case SingleValuedChunkPalette palette ->
-                    VarIntNetworkCodec.INSTANCE.write(buf, palette.element());
+            case SingleValuedChunkPalette<?> palette ->
+                    VarIntNetworkCodec.INSTANCE.write(buf, palette.elementIdentifier());
         }
 
         LongArrayNetworkWriter.INSTANCE.write(buf, object.data());

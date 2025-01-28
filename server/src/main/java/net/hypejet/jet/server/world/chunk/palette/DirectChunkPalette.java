@@ -1,95 +1,135 @@
 package net.hypejet.jet.server.world.chunk.palette;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.server.util.function.IntResultingFunction;
 import net.hypejet.jet.server.util.math.MathUtil;
-import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
-import net.hypejet.jet.server.world.chunk.palette.usage.ChunkPaletteUsageType;
-import net.hypejet.jet.util.array.UnmodifiableIntegerArray;
+import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents {@linkplain ChunkPalette a chunk palette}, which stores all elements directly in the data array.
  *
  * @since 1.0
+ * @param <E> a type of elements that the palette stores
  * @see ChunkPalette
  */
-public final class DirectChunkPalette extends ChunkPalette {
+public final class DirectChunkPalette<E> extends ChunkPalette<E> {
 
-    private static final byte MAXIMUM_BITS_PER_ELEMENT = 31;
+    private static final byte MAXIMUM_BITS_PER_ELEMENT = Integer.SIZE - 1;
 
-    private final UnmodifiableIntegerArray elements;
+    private final List<E> elements;
+    private final Map<E, Integer> elementCountMap;
 
     /**
      * Constructs the {@linkplain DirectChunkPalette direct chunk palette}.
      *
      * @param bitsPerElement number of bits that each element of the data should use
-     * @param usageType a type of usage that the palette is created for
+     * @param type a type of which the palette should be
      * @param elements elements that should be put to the data array
+     * @param elementToIdentifierFunction a function, which should represent elements of the palette as integers
+     * @param elementCountMap a map, which maps elements to their count in the palette
      * @since 1.0
      */
-    private DirectChunkPalette(byte bitsPerElement, @NotNull ChunkPaletteUsageType usageType,
-                               int @NotNull [] elements) {
-        super(bitsPerElement, usageType, ChunkPalette.createDataArray(
+    private DirectChunkPalette(byte bitsPerElement, @NonNull ChunkPaletteType type, @NonNull List<E> elements,
+                               @NonNull IntResultingFunction<E> elementToIdentifierFunction,
+                               @NonNull Map<E, Integer> elementCountMap) {
+        super(bitsPerElement, type, createDataArray(
                 bitsPerElement,
+                type,
                 NullabilityUtil.requireNonNull(elements, "elements"),
-                usageType.axisLength()
-        ));
-        this.elements = new UnmodifiableIntegerArray(elements);
+                NullabilityUtil.requireNonNull(elementToIdentifierFunction, "element to identifier function")
+        ), elementToIdentifierFunction);
+
+        this.elements = List.copyOf(elements);
+        this.elementCountMap = Map.copyOf(elementCountMap);
     }
 
     @Override
-    public int getElement(byte x, byte y, byte z) {
-        return this.elements.array()[ChunkPalette.calculateElementIndex(this.usageType().axisLength(), x, y, z)];
+    public @NonNull E getElement(byte x, byte y, byte z) {
+        int elementIndex = ChunkPalette.calculateElementIndex(this.type().axisLength(), x, y, z);
+
+        E element = this.elements.get(elementIndex);
+        if (element == null)
+            throw new IllegalArgumentException(String.format("Invalid element index: %d", elementIndex));
+
+        return element;
     }
 
     @Override
-    public @NotNull ChunkPalette withUpdates(@NotNull ChunkPaletteUpdate @NotNull ... updates) {
-        if (updates.length == 0)
-            return this;
+    protected @NonNull List<E> createElementList() {
+        return this.elements;
+    }
 
-        int[] elements = this.elements.array();
-
-        ChunkPaletteUsageType usageType = this.usageType();
-        byte bitsPerElement = this.bitsPerElement();
-
-        for (ChunkPaletteUpdate update : updates) {
-            int elementIndex = ChunkPalette.calculateElementIndex(
-                    update.sectionX(), update.sectionY(), update.sectionZ(), usageType.axisLength()
-            );
-
-            int newElement = update.newElement();
-            elements[elementIndex] = newElement;
-            bitsPerElement = MathUtil.max(bitsPerElement, (byte) MathUtil.ceilLog2(newElement));
-        }
-
-        // TODO: Consider downgrading if it is possible
-        return new DirectChunkPalette(bitsPerElement, usageType, elements);
+    @Override
+    protected @NonNull Map<E, Integer> createElementCountMap() {
+        return this.elementCountMap;
     }
 
     /**
-     * Creates the {@linkplain DirectChunkPalette direct chunk palette}.
+     * Creates {@linkplain DirectChunkPalette a direct chunk palette}.
      *
-     * <p>If the bits-per-element value specified is lower than allowed, the minimum allowed number is used.</p>
-     *
-     * @param bitsPerElement number of bits that each element of the data should use
-     * @param usageType a type of usage that the palette is created for
+     * @param type a type of which the palette should be
      * @param elements elements that should be put to the data array
-     * @return the direct chunk palette created
+     * @param elementToIdentifierFunction a function, which should represent elements of the palette as integers
+     * @return the direct chunk palette
      * @since 1.0
-     * @throws IllegalArgumentException if the bits-per-element value specified is higher than maximum allowed
      */
     /* TODO: | Replace the factory method with public constructor when flexible constructors get finally implemented
        TODO: | in Java */
-    public static @NotNull DirectChunkPalette create(byte bitsPerElement, @NotNull ChunkPaletteUsageType usageType,
-                                                     int @NotNull [] elements) {
+    public static <E> @NonNull DirectChunkPalette<E> create(
+            @NonNull ChunkPaletteType type, @NonNull List<E> elements,
+            @NonNull IntResultingFunction<E> elementToIdentifierFunction
+    ) {
+        return create(type, elements, elementToIdentifierFunction, ChunkPalette.createCountMap(elements));
+    }
+
+    /**
+     * Creates {@linkplain DirectChunkPalette a direct chunk palette}.
+     *
+     * @param type a type of which the palette should be
+     * @param elements elements that should be put to the data array
+     * @param elementToIdentifierFunction a function, which should represent elements of the palette as integers
+     * @param elementCountMap a map, which maps elements to their count in the palette
+     * @return the direct chunk palette
+     * @since 1.0
+     */
+    /* TODO: | Replace the factory method with public constructor when flexible constructors get finally implemented
+       TODO: | in Java */
+    static <E> @NonNull DirectChunkPalette<E> create(@NonNull ChunkPaletteType type, @NonNull List<E> elements,
+                                                     @NonNull IntResultingFunction<E> elementToIdentifierFunction,
+                                                     @NonNull Map<E, Integer> elementCountMap) {
+        byte bitsPerElement = type.minimumDirectBits();
+
+        for (E element : elementCountMap.keySet()) {
+            int elementIdentifier = elementToIdentifierFunction.apply(element);
+            if (elementIdentifier == 0) continue;
+            bitsPerElement = (byte) Math.max(MathUtil.bitCount(elementIdentifier), bitsPerElement);
+        }
+
+        return new DirectChunkPalette<>(bitsPerElement, type, elements, elementToIdentifierFunction, elementCountMap);
+    }
+
+    // TODO: Move this to the constructor when flexible constructors get finally implemented in Java
+    private static <E> long @NonNull [] createDataArray(byte bitsPerElement, @NonNull ChunkPaletteType type,
+                                                        @NotNull List<E> elements,
+                                                        @NonNull IntResultingFunction<E> elementToIdentifierFunction) {
         if (bitsPerElement > MAXIMUM_BITS_PER_ELEMENT) {
             throw new IllegalArgumentException(String.format(
-                    "The bits-per-element value specified is higher than maximum allowed (%d>%d)",
+                    "The bits-per-element value specified exceeds the maximum value allowed (%d>%d)",
                     bitsPerElement, MAXIMUM_BITS_PER_ELEMENT
             ));
         }
 
-        bitsPerElement = MathUtil.max(usageType.minimumDirectBits(), bitsPerElement);
-        return new DirectChunkPalette(bitsPerElement, usageType, elements);
+        bitsPerElement = (byte) Math.max(type.minimumDirectBits(), bitsPerElement);
+
+        int[] elementsAsIntegers = new int[elements.size()];
+        for (int index = 0; index < elementsAsIntegers.length; index++)
+            elementsAsIntegers[index] = elementToIdentifierFunction.apply(elements.get(index));
+
+        return ChunkPalette.createDataArray(bitsPerElement, elementsAsIntegers, type);
     }
 }
