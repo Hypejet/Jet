@@ -7,6 +7,8 @@ import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -46,7 +48,9 @@ public final class DirectChunkPalette<E> extends ChunkPalette<E> {
         ), elementToIdentifierFunction);
 
         this.elements = List.copyOf(elements);
-        this.elementCountMap = Map.copyOf(elementCountMap);
+
+        NullabilityUtil.requireNonNull(elementCountMap, "element count map");
+        this.elementCountMap = Collections.unmodifiableMap(new IdentityHashMap<>(elementCountMap));
     }
 
     @Override
@@ -61,13 +65,13 @@ public final class DirectChunkPalette<E> extends ChunkPalette<E> {
     }
 
     @Override
-    protected @NonNull List<E> createElementList() {
-        return this.elements;
+    public @NonNull Map<E, Integer> elementCountMap() {
+        return this.elementCountMap;
     }
 
     @Override
-    protected @NonNull Map<E, Integer> createElementCountMap() {
-        return this.elementCountMap;
+    protected @NonNull List<E> createElementList() {
+        return this.elements;
     }
 
     /**

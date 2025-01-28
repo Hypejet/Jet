@@ -8,7 +8,9 @@ import net.hypejet.jet.util.array.UnmodifiableIntegerArray;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -48,7 +50,9 @@ public final class IndirectChunkPalette<E> extends ChunkPalette<E> {
         super(bitsPerElement, type, data, elementToIdentifierFunction);
 
         this.elements = List.copyOf(NullabilityUtil.requireNonNull(elements, "elements"));
-        this.elementCountMap = Map.copyOf(NullabilityUtil.requireNonNull(elementCountMap, "element count map"));
+
+        NullabilityUtil.requireNonNull(elementCountMap, "element count map");
+        this.elementCountMap = Collections.unmodifiableMap(new IdentityHashMap<>(elementCountMap));
 
         this.registryIndices = new UnmodifiableIntegerArray(NullabilityUtil.requireNonNull(
                 registryIndices, "registry indices"
@@ -67,13 +71,13 @@ public final class IndirectChunkPalette<E> extends ChunkPalette<E> {
     }
 
     @Override
-    protected @NonNull List<E> createElementList() {
-        return this.elements;
+    public @NonNull Map<E, Integer> elementCountMap() {
+        return this.elementCountMap;
     }
 
     @Override
-    protected @NonNull Map<E, Integer> createElementCountMap() {
-        return this.elementCountMap;
+    protected @NonNull List<E> createElementList() {
+        return this.elements;
     }
 
     /**

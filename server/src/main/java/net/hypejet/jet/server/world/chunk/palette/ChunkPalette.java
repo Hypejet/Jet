@@ -10,7 +10,7 @@ import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -113,7 +113,7 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
         ChunkPaletteType type = this.type();
 
         List<E> elements = new ArrayList<>(this.createElementList());
-        Map<E, Integer> elementCountMap = new HashMap<>(this.createElementCountMap());
+        Map<E, Integer> elementCountMap = new IdentityHashMap<>(this.elementCountMap());
 
         boolean paletteChanged = false;
         for (ChunkPaletteUpdate<E> update : updates) {
@@ -174,20 +174,20 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
     public abstract @NonNull E getElement(byte x, byte y, byte z);
 
     /**
+     * Gets {@linkplain Map a map}, which maps elements to their count in the palette.
+     *
+     * @return the map
+     * @since 1.0
+     */
+    public abstract @NonNull Map<E, Integer> elementCountMap();
+
+    /**
      * Creates {@linkplain List a list} of elements of this palette.
      *
      * @return the list
      * @since 1.0
      */
     protected abstract @NonNull List<E> createElementList();
-
-    /**
-     * Creates {@linkplain Map a map}, which maps elements to their count in the palette.
-     *
-     * @return the map
-     * @since 1.0
-     */
-    protected abstract @NonNull Map<E, Integer> createElementCountMap();
 
     /**
      * Calculates index of that an element with coordinates specified is stored at.
@@ -277,7 +277,7 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
      * @since 1.0
      */
     protected static <E> @NonNull Map<E, Integer> createCountMap(@NonNull List<E> elements) {
-        Map<E, Integer> elementCountMap = new HashMap<>();
+        Map<E, Integer> elementCountMap = new IdentityHashMap<>();
         for (E element : elements)
             elementCountMap.compute(element, COUNT_MAP_INCREMENT_FUNCTION);
         return elementCountMap;

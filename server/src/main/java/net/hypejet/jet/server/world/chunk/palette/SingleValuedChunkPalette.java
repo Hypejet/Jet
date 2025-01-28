@@ -6,6 +6,7 @@ import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -24,6 +25,8 @@ public final class SingleValuedChunkPalette<E> extends ChunkPalette<E> {
     private final E element;
     private final int elementIdentifier;
 
+    private final Map<E, Integer> elementCountMap;
+
     /**
      * Constructs the {@linkplain SingleValuedChunkPalette single-valued chunk palette}.
      *
@@ -35,8 +38,13 @@ public final class SingleValuedChunkPalette<E> extends ChunkPalette<E> {
     public SingleValuedChunkPalette(@NonNull ChunkPaletteType type, @NonNull E element,
                                     @NonNull IntResultingFunction<E> elementToIdentifierFunction) {
         super((byte) 0, type, EMPTY_LONG_ARRAY, elementToIdentifierFunction);
+
         this.element = NullabilityUtil.requireNonNull(element, "element");
         this.elementIdentifier = elementToIdentifierFunction.apply(element);
+
+        IdentityHashMap<E, Integer> elementCountMap = new IdentityHashMap<>();
+        elementCountMap.put(element, type.elementCount());
+        this.elementCountMap = Collections.unmodifiableMap(elementCountMap);
     }
 
     @Override
@@ -45,13 +53,13 @@ public final class SingleValuedChunkPalette<E> extends ChunkPalette<E> {
     }
 
     @Override
-    protected @NonNull List<E> createElementList() {
-        return Collections.nCopies(this.type().elementCount(), this.element);
+    public @NonNull Map<E, Integer> elementCountMap() {
+        return this.elementCountMap;
     }
 
     @Override
-    protected @NonNull Map<E, Integer> createElementCountMap() {
-        return Map.of(this.element, this.type().elementCount());
+    protected @NonNull List<E> createElementList() {
+        return Collections.nCopies(this.type().elementCount(), this.element);
     }
 
     /**

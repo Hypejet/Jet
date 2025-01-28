@@ -100,12 +100,10 @@ public final class JetWorld implements World {
             JetBlockState previousBlockState = blockPalette.getElement(sectionX, sectionY, sectionZ);
             if (previousBlockState == validatedBlockState) return;
 
-            ChunkPaletteUpdate<JetBlockState> update = new ChunkPaletteUpdate<>(sectionX, sectionY, sectionZ, validatedBlockState);
-            ChunkPalette<JetBlockState> newPalette = blockPalette.withUpdates(update);
+            ChunkSection newChunkSection = chunkSection.withBlockStatePaletteUpdates(
+                    new ChunkPaletteUpdate<>(sectionX, sectionY, sectionZ, validatedBlockState)
+            );
 
-            short newBlockCount = recalculateBlockCount(validatedBlockState, previousBlockState, chunkSection);
-
-            ChunkSection newChunkSection = new ChunkSection(newBlockCount, newPalette, chunkSection.biomePalette());
             List<ChunkSection> newChunkSections = new ArrayList<>(chunk.sections());
             newChunkSections.set(this.createChunkSectionIndex(position.blockY()), newChunkSection);
 
@@ -118,20 +116,6 @@ public final class JetWorld implements World {
 
             chunks.put(packedChunkPosition, newChunk);
         }
-    }
-
-    private short recalculateBlockCount(@NonNull JetBlockState blockState, @NonNull JetBlockState previousBlockState,
-                                        @NonNull ChunkSection chunkSection) {
-        boolean wasAir = previousBlockState.isAir();
-        boolean isAir = blockState.isAir();
-
-        short newBlockCount = chunkSection.blockCount();
-        if (!(wasAir && isAir)) {
-            if (isAir) newBlockCount--;
-            else newBlockCount++;
-        }
-
-        return newBlockCount;
     }
 
     private @NonNull ChunkSection chunkSection(@NonNull Chunk chunk, int blockY) {

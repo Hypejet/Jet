@@ -25,7 +25,7 @@ public final class ChunkSectionNetworkWriter implements NetworkWriter<ChunkSecti
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ChunkSection object) {
-        buf.writeShort(object.blockCount());
+        buf.writeShort(object.nonAirBlockCount());
         ChunkPaletteNetworkWriter.INSTANCE.write(buf, object.blockStatePalette());
         ChunkPaletteNetworkWriter.INSTANCE.write(buf, object.biomePalette());
     }
