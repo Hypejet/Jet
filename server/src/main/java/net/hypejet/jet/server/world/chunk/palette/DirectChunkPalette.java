@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ChunkPalette a chunk palette}, which stores all elements directly in the data array.
@@ -131,5 +132,23 @@ public final class DirectChunkPalette<E> extends ChunkPalette<E> {
             elementsAsIntegers[index] = elementToIdentifierFunction.apply(elements.get(index));
 
         return ChunkPalette.createDataArray(bitsPerElement, elementsAsIntegers, type);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof DirectChunkPalette<?> otherPalette)) return false;
+        return Objects.equals(this.elements, otherPalette.elements);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.elements);
+    }
+
+    @Override
+    public String toString() {
+        return "DirectChunkPalette{" +
+                "elements=" + this.elements +
+                '}';
     }
 }

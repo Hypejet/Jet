@@ -8,6 +8,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ChunkPalette a chunk palette}, which contains the same element at each position.
@@ -61,5 +62,23 @@ public final class SingleValuedChunkPalette<E> extends ChunkPalette<E> {
      */
     public int elementIdentifier() {
         return this.elementIdentifier;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof SingleValuedChunkPalette<?> otherPalette)) return false;
+        return Objects.equals(this.element, otherPalette.element);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.element);
+    }
+
+    @Override
+    public String toString() {
+        return "SingleValuedChunkPalette{" +
+                "element=" + this.element +
+                '}';
     }
 }

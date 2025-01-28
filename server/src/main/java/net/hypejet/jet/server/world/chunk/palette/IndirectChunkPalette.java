@@ -11,6 +11,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ChunkPalette a chunk palette}, which contains an array of identifiers of elements of registry
@@ -168,5 +169,23 @@ public final class IndirectChunkPalette<E> extends ChunkPalette<E> {
                 ChunkPalette.createDataArray(bitsPerElement, dataElements, type),
                 elements, registryIndices, elementCountMap, elementToIdentifierFunction
         );
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof IndirectChunkPalette<?> otherPalette)) return false;
+        return Objects.equals(this.elements, otherPalette.elements);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.elements);
+    }
+
+    @Override
+    public String toString() {
+        return "IndirectChunkPalette{" +
+                "elements=" + this.elements +
+                '}';
     }
 }
