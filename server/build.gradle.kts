@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     application
     alias(libs.plugins.shadow)
@@ -17,4 +19,11 @@ dependencies {
 
 application {
     mainClass.set("net.hypejet.jet.server.JetServerEntrypoint")
+}
+
+tasks.withType<ShadowJar> {
+    minimize {
+        exclude(project(":api")) // All dependencies of the API may be used by plugins
+        exclude(dependency(libs.logback.get())) // Minimizing logback causes problems with finding an SLF4J provider
+    }
 }
