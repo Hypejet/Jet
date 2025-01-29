@@ -8,6 +8,7 @@ dependencies {
     implementation(project(":api"))
     implementation(libs.netty)
     implementation(libs.logback)
+    implementation(libs.fastutil)
     implementation(libs.bundles.configs)
     implementation(libs.bundles.jetDataServer)
     testImplementation(libs.junit.jupiter)

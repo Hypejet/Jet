@@ -5,8 +5,8 @@ import net.hypejet.concurrency.map.MapAcquisition;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.util.acquirable.map.longs.LongObjectHashMapAcquirable;
 import net.hypejet.jet.server.util.acquisition.NotNullObjectMappedAcquisition;
 import net.hypejet.jet.server.world.block.JetBlockState;
@@ -33,7 +33,7 @@ import java.util.UUID;
 public final class JetWorld implements World {
 
     private final UUID uniqueId;
-    private final RegistryEntry<DimensionType> dimensionType;
+    private final JetRegistryEntry<DimensionType> dimensionType;
     private final JetMinecraftServer server;
 
     private final LongObjectHashMapAcquirable<Chunk> chunks = new LongObjectHashMapAcquirable<>();
@@ -46,7 +46,7 @@ public final class JetWorld implements World {
      * @param server a server that should own the world
      * @since 1.0
      */
-    public JetWorld(@NonNull UUID uniqueId, @NonNull RegistryEntry<DimensionType> dimensionType,
+    public JetWorld(@NonNull UUID uniqueId, @NonNull JetRegistryEntry<DimensionType> dimensionType,
                     @NonNull JetMinecraftServer server) {
         this.uniqueId = NullabilityUtil.requireNonNull(uniqueId, "unique identifier");
         this.dimensionType = NullabilityUtil.requireNonNull(dimensionType, "dimension type");
@@ -59,7 +59,7 @@ public final class JetWorld implements World {
     }
 
     @Override
-    public @NonNull RegistryEntry<DimensionType> dimensionType() {
+    public @NonNull JetRegistryEntry<DimensionType> dimensionType() {
         return this.dimensionType;
     }
 
@@ -111,7 +111,7 @@ public final class JetWorld implements World {
             long packedChunkPosition = createPackedChunkPosition(position);
             Chunk newChunk = new Chunk(
                     chunk.chunkX(), chunk.chunkZ(), chunk.heightmaps(),
-                    newChunkSections, chunk.blockEntities(), chunk.lightData()
+                    newChunkSections, chunk.blockEntities(), chunk.lightSections()
             );
 
             chunks.put(packedChunkPosition, newChunk);
