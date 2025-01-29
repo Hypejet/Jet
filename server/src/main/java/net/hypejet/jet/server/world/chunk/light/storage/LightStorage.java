@@ -31,14 +31,14 @@ public sealed abstract class LightStorage permits DirectLightStorage, EmptyLight
      *
      * @since 1.0
      */
-    protected static final int DATA_VALUE_COUNT = ChunkPaletteType.BLOCK_STATE.elementCount();
+    protected static final short DATA_VALUE_COUNT = ChunkPaletteType.BLOCK_STATE.elementCount();
 
     /**
      * Represents length of a light data array, whose elements represent two light values.
      *
      * @since 1.0
      */
-    protected static final int DATA_ARRAY_LENGTH = (short) Math.ceilDiv(DATA_VALUE_COUNT, 2); // 2 values per element
+    protected static final short DATA_ARRAY_LENGTH = (short) Math.ceilDiv(DATA_VALUE_COUNT, 2); // 2 values per element
 
     /**
      * Creates a new copy of this {@linkplain LightStorage light storage} with
@@ -205,8 +205,6 @@ public sealed abstract class LightStorage permits DirectLightStorage, EmptyLight
     }
 
     private static byte extractValue(byte lightElement, int paletteElementIndex) {
-        // Odd numbers -> right side
-        // Even numbers -> left side
         if (paletteElementIndex % 2 == 0)
             return (byte) (lightElement >> 4);
         return (byte) (lightElement & MAX_VALUE_ALLOWED);

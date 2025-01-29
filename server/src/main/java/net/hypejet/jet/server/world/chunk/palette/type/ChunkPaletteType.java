@@ -45,6 +45,12 @@ public enum ChunkPaletteType {
         this.maximumIndirectBits = maximumIndirectBits;
         this.minimumDirectBits = minimumDirectBits;
         this.axisLength = axisLength;
+
+        /* Element count maps in chunk palettes use shorts to store number of block states, due to this, we need to
+           make sure it is always safe. If Minecraft ever adds a new palette type or changes axis length, we must
+           change map value types of the element count maps. */
+        if (axisLength > 31)
+            throw new IllegalArgumentException("The axis length cannot be higher than 31");
     }
 
     /**
@@ -93,7 +99,7 @@ public enum ChunkPaletteType {
      * @return the count
      * @since 1.0
      */
-    public int elementCount() {
-        return this.axisLength * this.axisLength * this.axisLength;
+    public short elementCount() {
+        return (short) (this.axisLength * this.axisLength * this.axisLength);
     }
 }

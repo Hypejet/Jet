@@ -39,7 +39,7 @@ public final class EmptyLightStorage extends LightStorage {
 
     @Override
     protected @NonNull Byte2ShortMap valueCountMap() {
-        return Byte2ShortMaps.singleton(EMPTY_VALUE, (short) DATA_VALUE_COUNT);
+        return Byte2ShortMaps.singleton(EMPTY_VALUE, DATA_VALUE_COUNT);
     }
 
     @Override

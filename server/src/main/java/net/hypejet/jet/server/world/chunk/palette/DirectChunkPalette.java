@@ -1,16 +1,17 @@
 package net.hypejet.jet.server.world.chunk.palette;
 
+import it.unimi.dsi.fastutil.objects.Object2ShortMap;
+import it.unimi.dsi.fastutil.objects.Object2ShortMaps;
+import it.unimi.dsi.fastutil.objects.Object2ShortOpenCustomHashMap;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.util.function.IntResultingFunction;
+import net.hypejet.jet.server.util.hash.IdentityHashStrategy;
 import net.hypejet.jet.server.util.math.MathUtil;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -25,7 +26,7 @@ public final class DirectChunkPalette<E> extends ChunkPalette<E> {
     private static final byte MAXIMUM_BITS_PER_ELEMENT = Integer.SIZE - 1;
 
     private final List<E> elements;
-    private final Map<E, Integer> elementCountMap;
+    private final Object2ShortMap<E> elementCountMap;
 
     /**
      * Constructs the {@linkplain DirectChunkPalette direct chunk palette}.
@@ -39,7 +40,7 @@ public final class DirectChunkPalette<E> extends ChunkPalette<E> {
      */
     private DirectChunkPalette(byte bitsPerElement, @NonNull ChunkPaletteType type, @NonNull List<E> elements,
                                @NonNull IntResultingFunction<E> elementToIdentifierFunction,
-                               @NonNull Map<E, Integer> elementCountMap) {
+                               @NonNull Object2ShortMap<E> elementCountMap) {
         super(bitsPerElement, type, createDataArray(
                 bitsPerElement,
                 type,
@@ -48,9 +49,12 @@ public final class DirectChunkPalette<E> extends ChunkPalette<E> {
         ), elementToIdentifierFunction);
 
         this.elements = List.copyOf(elements);
-
-        NullabilityUtil.requireNonNull(elementCountMap, "element count map");
-        this.elementCountMap = Collections.unmodifiableMap(new IdentityHashMap<>(elementCountMap));
+        this.elementCountMap = Object2ShortMaps.unmodifiable(
+                new Object2ShortOpenCustomHashMap<>(
+                        NullabilityUtil.requireNonNull(elementCountMap, "element count map"),
+                        IdentityHashStrategy.INSTANCE
+                )
+        );
     }
 
     @Override
@@ -65,7 +69,7 @@ public final class DirectChunkPalette<E> extends ChunkPalette<E> {
     }
 
     @Override
-    public @NonNull Map<E, Integer> elementCountMap() {
+    public @NonNull Object2ShortMap<E> elementCountMap() {
         return this.elementCountMap;
     }
 
@@ -106,7 +110,7 @@ public final class DirectChunkPalette<E> extends ChunkPalette<E> {
        TODO: | in Java */
     static <E> @NonNull DirectChunkPalette<E> create(@NonNull ChunkPaletteType type, @NonNull List<E> elements,
                                                      @NonNull IntResultingFunction<E> elementToIdentifierFunction,
-                                                     @NonNull Map<E, Integer> elementCountMap) {
+                                                     @NonNull Object2ShortMap<E> elementCountMap) {
         byte bitsPerElement = type.minimumDirectBits();
 
         for (E element : elementCountMap.keySet()) {

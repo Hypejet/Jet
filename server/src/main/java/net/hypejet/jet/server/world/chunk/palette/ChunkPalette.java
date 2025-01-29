@@ -1,19 +1,19 @@
 package net.hypejet.jet.server.world.chunk.palette;
 
 import com.google.common.collect.Iterables;
+import it.unimi.dsi.fastutil.objects.Object2ShortMap;
+import it.unimi.dsi.fastutil.objects.Object2ShortOpenCustomHashMap;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.util.array.UnmodifiableLongArray;
 import net.hypejet.jet.server.util.function.IntResultingFunction;
+import net.hypejet.jet.server.util.hash.IdentityHashStrategy;
 import net.hypejet.jet.server.util.math.MathUtil;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.ArrayList;
-import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.BiFunction;
 
 /**
  * Represents a data container of {@linkplain net.hypejet.jet.server.world.chunk.section.ChunkSection a chunk section}.
@@ -24,9 +24,6 @@ import java.util.function.BiFunction;
  */
 public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, IndirectChunkPalette,
         SingleValuedChunkPalette {
-
-    private static final BiFunction<Object, ? super Integer, ? extends Integer>
-            COUNT_MAP_INCREMENT_FUNCTION = (ignored, integer) -> integer == null ? 1 : integer + 1;
 
     private final byte bitsPerElement;
     private final UnmodifiableLongArray data;
@@ -113,7 +110,10 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
         ChunkPaletteType type = this.type();
 
         List<E> elements = new ArrayList<>(this.createElementList());
-        Map<E, Integer> elementCountMap = new IdentityHashMap<>(this.elementCountMap());
+        Object2ShortMap<E> elementCountMap = new Object2ShortOpenCustomHashMap<>(
+                this.elementCountMap(),
+                IdentityHashStrategy.INSTANCE
+        );
 
         boolean paletteChanged = false;
         for (ChunkPaletteUpdate<E> update : updates) {
@@ -128,18 +128,18 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
             if (!paletteChanged) paletteChanged = true;
 
             elements.set(elementIndex, newElement);
-            elementCountMap.compute(newElement, COUNT_MAP_INCREMENT_FUNCTION);
+            incrementValue(elementCountMap, newElement);
 
-            elementCountMap.compute(previousElement, (ignored, integer) -> {
-                if (integer == null)
-                    return null;
+            if (!elementCountMap.containsKey(previousElement))
+                continue;
 
-                int decreasedValue = integer - 1;
-                if (decreasedValue <= 0)
-                    return null;
+            short decreasedValue = (short) (elementCountMap.getShort(previousElement) - 1);
+            if (decreasedValue <= 0) {
+                elementCountMap.removeShort(previousElement);
+                continue;
+            }
 
-                return decreasedValue;
-            });
+            elementCountMap.put(previousElement, decreasedValue);
         }
 
         if (!paletteChanged)
@@ -174,12 +174,12 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
     public abstract @NonNull E getElement(byte x, byte y, byte z);
 
     /**
-     * Gets {@linkplain Map a map}, which maps elements to their count in the palette.
+     * Gets {@linkplain Object2ShortMap a map}, which maps elements to their count in the palette.
      *
      * @return the map
      * @since 1.0
      */
-    public abstract @NonNull Map<E, Integer> elementCountMap();
+    public abstract @NonNull Object2ShortMap<E> elementCountMap();
 
     /**
      * Creates {@linkplain List a list} of elements of this palette.
@@ -269,28 +269,20 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
     }
 
     /**
-     * Creates {@linkplain Map a map}, which maps elements to their count in the element list specified.
+     * Creates {@linkplain Object2ShortMap a map}, which maps elements to their count in the element list specified.
      *
      * @param elements the element list
      * @return the map
      * @param <E> a type of elements of the element list
      * @since 1.0
      */
-    protected static <E> @NonNull Map<E, Integer> createCountMap(@NonNull List<E> elements) {
-        Map<E, Integer> elementCountMap = new IdentityHashMap<>();
+    protected static <E> @NonNull Object2ShortMap<E> createCountMap(@NonNull List<E> elements) {
+        Object2ShortMap<E> elementCountMap = new Object2ShortOpenCustomHashMap<>(IdentityHashStrategy.INSTANCE);
         for (E element : elements)
-            elementCountMap.compute(element, COUNT_MAP_INCREMENT_FUNCTION);
+            incrementValue(elementCountMap, element);
         return elementCountMap;
     }
 
-    /**
-     * Validates whether a coordinate value specified for an axis length specified is correct.
-     *
-     * @param coordinateValue the coordinate value
-     * @param axisLength the axis length
-     * @param axisName a name of the axis
-     * @since 1.0
-     */
     private static void validateValue(byte coordinateValue, byte axisLength, @NonNull String axisName) {
         NullabilityUtil.requireNonNull(axisName, "axis name");
         if (coordinateValue >= axisLength) {
@@ -299,5 +291,12 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
                     axisName, coordinateValue, axisLength
             ));
         }
+    }
+
+    private static <K> void incrementValue(@NonNull Object2ShortMap<K> map, @NonNull K key) {
+        short newCount = 1;
+        if (map.containsKey(key))
+            newCount += map.getShort(key);
+        map.put(key, newCount);
     }
 }

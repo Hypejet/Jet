@@ -1,14 +1,16 @@
 package net.hypejet.jet.server.world.chunk.palette;
 
+import it.unimi.dsi.fastutil.objects.Object2ShortMap;
+import it.unimi.dsi.fastutil.objects.Object2ShortMaps;
+import it.unimi.dsi.fastutil.objects.Object2ShortOpenCustomHashMap;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.util.function.IntResultingFunction;
+import net.hypejet.jet.server.util.hash.IdentityHashStrategy;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -25,7 +27,7 @@ public final class SingleValuedChunkPalette<E> extends ChunkPalette<E> {
     private final E element;
     private final int elementIdentifier;
 
-    private final Map<E, Integer> elementCountMap;
+    private final Object2ShortMap<E> elementCountMap;
 
     /**
      * Constructs the {@linkplain SingleValuedChunkPalette single-valued chunk palette}.
@@ -42,9 +44,9 @@ public final class SingleValuedChunkPalette<E> extends ChunkPalette<E> {
         this.element = NullabilityUtil.requireNonNull(element, "element");
         this.elementIdentifier = elementToIdentifierFunction.apply(element);
 
-        IdentityHashMap<E, Integer> elementCountMap = new IdentityHashMap<>();
+        Object2ShortMap<E> elementCountMap = new Object2ShortOpenCustomHashMap<>(IdentityHashStrategy.INSTANCE);
         elementCountMap.put(element, type.elementCount());
-        this.elementCountMap = Collections.unmodifiableMap(elementCountMap);
+        this.elementCountMap = Object2ShortMaps.unmodifiable(elementCountMap);
     }
 
     @Override
@@ -53,7 +55,7 @@ public final class SingleValuedChunkPalette<E> extends ChunkPalette<E> {
     }
 
     @Override
-    public @NonNull Map<E, Integer> elementCountMap() {
+    public @NonNull Object2ShortMap<E> elementCountMap() {
         return this.elementCountMap;
     }
 

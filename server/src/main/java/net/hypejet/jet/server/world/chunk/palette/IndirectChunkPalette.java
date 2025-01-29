@@ -1,18 +1,20 @@
 package net.hypejet.jet.server.world.chunk.palette;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ShortMap;
+import it.unimi.dsi.fastutil.objects.Object2ShortMaps;
+import it.unimi.dsi.fastutil.objects.Object2ShortOpenCustomHashMap;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.util.function.IntResultingFunction;
+import net.hypejet.jet.server.util.hash.IdentityHashStrategy;
 import net.hypejet.jet.server.util.math.MathUtil;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.util.array.UnmodifiableIntegerArray;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -26,7 +28,7 @@ import java.util.Objects;
 public final class IndirectChunkPalette<E> extends ChunkPalette<E> {
 
     private final List<E> elements;
-    private final Map<E, Integer> elementCountMap;
+    private final Object2ShortMap<E> elementCountMap;
 
     private final UnmodifiableIntegerArray registryIndices;
 
@@ -45,14 +47,17 @@ public final class IndirectChunkPalette<E> extends ChunkPalette<E> {
      */
     private IndirectChunkPalette(byte bitsPerElement, @NonNull ChunkPaletteType type, long @NonNull [] data,
                                  @NonNull List<E> elements, int @NonNull [] registryIndices,
-                                 @NonNull Map<E, Integer> elementCountMap,
+                                 @NonNull Object2ShortMap<E> elementCountMap,
                                  @NonNull IntResultingFunction<E> elementToIdentifierFunction) {
         super(bitsPerElement, type, data, elementToIdentifierFunction);
 
         this.elements = List.copyOf(NullabilityUtil.requireNonNull(elements, "elements"));
-
-        NullabilityUtil.requireNonNull(elementCountMap, "element count map");
-        this.elementCountMap = Collections.unmodifiableMap(new IdentityHashMap<>(elementCountMap));
+        this.elementCountMap = Object2ShortMaps.unmodifiable(
+                new Object2ShortOpenCustomHashMap<>(
+                        NullabilityUtil.requireNonNull(elementCountMap, "element count map"),
+                        IdentityHashStrategy.INSTANCE
+                )
+        );
 
         this.registryIndices = new UnmodifiableIntegerArray(NullabilityUtil.requireNonNull(
                 registryIndices, "registry indices"
@@ -71,7 +76,7 @@ public final class IndirectChunkPalette<E> extends ChunkPalette<E> {
     }
 
     @Override
-    public @NonNull Map<E, Integer> elementCountMap() {
+    public @NonNull Object2ShortMap<E> elementCountMap() {
         return this.elementCountMap;
     }
 
@@ -133,7 +138,7 @@ public final class IndirectChunkPalette<E> extends ChunkPalette<E> {
      */
     static <E> @Nullable IndirectChunkPalette<E> createOrNull(
             @NonNull ChunkPaletteType type, @NonNull List<E> elements,
-            @NonNull Map<E, Integer> elementCountMap, @NonNull IntResultingFunction<E> elementToIdentifierFunction
+            @NonNull Object2ShortMap<E> elementCountMap, @NonNull IntResultingFunction<E> elementToIdentifierFunction
     ) {
         NullabilityUtil.requireNonNull(type, "type");
         NullabilityUtil.requireNonNull(elements, "elements");
@@ -149,14 +154,18 @@ public final class IndirectChunkPalette<E> extends ChunkPalette<E> {
         bitsPerElement = (byte) Math.max(type.minimumIndirectBits(), bitsPerElement);
 
         int nextRegistryIndicesArrayIndex = 0;
-        Map<E, Integer> elementToRegistryIndicesArrayIndexMap = new HashMap<>();
+        Object2IntMap<E> elementToRegistryIndicesArrayIndexMap = new Object2IntOpenCustomHashMap<>(
+                IdentityHashStrategy.INSTANCE
+        );
 
         int[] dataElements = new int[elements.size()];
         for (int index = 0; index < dataElements.length; index++) {
             E element = elements.get(index);
 
-            Integer stateIndex = elementToRegistryIndicesArrayIndexMap.get(element);
-            if (stateIndex == null) {
+            int stateIndex;
+            if (elementToRegistryIndicesArrayIndexMap.containsKey(element)) {
+                stateIndex = elementToRegistryIndicesArrayIndexMap.getInt(element);
+            } else {
                 stateIndex = nextRegistryIndicesArrayIndex++;
                 elementToRegistryIndicesArrayIndexMap.put(element, stateIndex);
             }
@@ -165,8 +174,8 @@ public final class IndirectChunkPalette<E> extends ChunkPalette<E> {
         }
 
         int[] registryIndices = new int[elementToRegistryIndicesArrayIndexMap.size()];
-        for (Map.Entry<E, Integer> entry : elementToRegistryIndicesArrayIndexMap.entrySet())
-            registryIndices[entry.getValue()] = elementToIdentifierFunction.apply(entry.getKey());
+        for (Object2IntMap.Entry<E> entry : elementToRegistryIndicesArrayIndexMap.object2IntEntrySet())
+            registryIndices[entry.getIntValue()] = elementToIdentifierFunction.apply(entry.getKey());
 
         return new IndirectChunkPalette<>(
                 bitsPerElement, type,
