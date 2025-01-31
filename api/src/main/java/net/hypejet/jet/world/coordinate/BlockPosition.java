@@ -1,102 +1,70 @@
 package net.hypejet.jet.world.coordinate;
 
 import net.hypejet.jet.data.model.api.coordinate.Coordinate;
-import net.hypejet.jet.util.math.MathUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Objects;
 
 /**
  * Represents an implementation of {@linkplain Coordinate a coordinate} representing a position of
- * {@linkplain ??? a Minecraft block}.
+ * {@linkplain net.hypejet.jet.world.block.Block a Minecraft block}.
  *
  * @since 1.0
- * @see ???
+ * @see net.hypejet.jet.world.block.Block
  * @see Coordinate
  */
-public final class BlockPosition implements Coordinate<BlockPosition> {
+public record BlockPosition(int blockX, int blockY, int blockZ) implements Coordinate<BlockPosition> {
 
     private static final BlockPosition ZERO = new BlockPosition(0, (short) 0, 0);
 
-    private static final int MIN_X_OR_Z = -33554432;
-    private static final int MAX_X_OR_Z = 33554431;
-
-    private static final short MIN_Y = -2032;
-    private static final short MAX_Y = 2031;
-
-    private final int x;
-    private final short y;
-    private final int z;
-
-    private BlockPosition(int x, short y, int z) {
-        this.x = Math.clamp(x, MIN_X_OR_Z, MAX_X_OR_Z);
-        this.y = MathUtil.clamp(y, MIN_Y, MAX_Y);
-        this.z = Math.clamp(z, MIN_X_OR_Z, MAX_X_OR_Z);
-    }
-
     @Override
     public double x() {
-        return this.x;
+        return this.blockX;
     }
 
     @Override
     public double y() {
-        return this.y;
+        return this.blockY;
     }
 
     @Override
     public double z() {
-        return this.z;
+        return this.blockZ;
     }
 
     @Override
     public @NonNull BlockPosition multiply(double x, double y, double z) {
-        return blockPosition(this.x * x, this.y * y, this.z * z);
+        return blockPosition(this.blockX * x, this.blockY * y, this.blockZ * z);
     }
 
     @Override
     public @NonNull BlockPosition divide(double x, double y, double z) {
-        return blockPosition(this.x / x, this.y / y, this.z / z);
+        return blockPosition(this.blockX / x, this.blockY / y, this.blockZ / z);
     }
 
     @Override
     public @NonNull BlockPosition add(double x, double y, double z) {
-        return blockPosition(this.x + z, this.y + y, this.z + z);
+        return blockPosition(this.blockX + z, this.blockY + y, this.blockZ + z);
     }
 
     @Override
     public @NonNull BlockPosition subtract(double x, double y, double z) {
-        return blockPosition(this.x - z, this.y - y, this.z - z);
+        return blockPosition(this.blockX - z, this.blockY - y, this.blockZ - z);
     }
 
     @Override
     public @NonNull BlockPosition withX(double x) {
-        return blockPosition(Math.floor(x), this.y, this.z);
+        return blockPosition(Math.floor(x), this.blockY, this.blockZ);
     }
 
     @Override
     public @NonNull BlockPosition withY(double y) {
-        return blockPosition(this.x, Math.floor(y), this.z);
+        return blockPosition(this.blockX, Math.floor(y), this.blockZ);
     }
 
     @Override
     public @NonNull BlockPosition withZ(double z) {
-        return blockPosition(this.x, this.y, Math.floor(z));
-    }
-
-    @Override
-    public int blockX() {
-        return this.x;
-    }
-
-    @Override
-    public int blockY() {
-        return this.y;
-    }
-
-    @Override
-    public int blockZ() {
-        return this.z;
+        return blockPosition(this.blockX, this.blockY, Math.floor(z));
     }
 
     /**
@@ -127,29 +95,29 @@ public final class BlockPosition implements Coordinate<BlockPosition> {
      * @param z the {@code Z} value of the position
      * @return the block position, the same instance is always returned when all the values provided are {@code 0}
      */
-    public static @NonNull BlockPosition blockPosition(int x, short y, int z) {
-        if (ZERO.x == x && ZERO.y == y && ZERO.z == z)
+    public static @NonNull BlockPosition blockPosition(int x, int y, int z) {
+        if (ZERO.blockX == x && ZERO.blockY == y && ZERO.blockZ == z)
             return ZERO;
         return new BlockPosition(x, y, z);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof BlockPosition blockPosition)) return false;
-        return this.x == blockPosition.x && this.y == blockPosition.y && this.z == blockPosition.z;
+        if (!(o instanceof BlockPosition(int x, int y, int z))) return false;
+        return this.blockX == x && this.blockY == y && this.blockZ == z;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.x, this.y, this.z);
+        return Objects.hash(this.blockX, this.blockY, this.blockZ);
     }
 
     @Override
     public String toString() {
         return "BlockPosition{" +
-                "x=" + this.x +
-                ", y=" + this.y +
-                ", z=" + this.z +
+                "x=" + this.blockX +
+                ", y=" + this.blockY +
+                ", z=" + this.blockZ +
                 '}';
     }
 }

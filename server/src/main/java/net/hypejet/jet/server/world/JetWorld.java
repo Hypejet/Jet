@@ -130,9 +130,37 @@ public final class JetWorld implements World {
     }
 
     private int createChunkSectionIndex(int blockY) {
+        return createChunkSectionIndex(blockY, this.dimensionType.value());
+    }
+
+    /**
+     * Creates an index of {@linkplain ChunkSection a chunk section} where block with height specified is stored.
+     *
+     * <p>The index can be applied to get the chunk section in any {@linkplain Chunk chunk} that belongs
+     * to {@linkplain JetWorld a world} with {@linkplain DimensionType dimension type} specified.</p>
+     *
+     * @param blockY the block height
+     * @param dimensionType the dimension type
+     * @return the index
+     * @since 1.0
+     */
+    public static int createChunkSectionIndex(int blockY, @NonNull DimensionType dimensionType) {
         byte blockStatePaletteAxisLength = ChunkPaletteType.BLOCK_STATE.axisLength();
-        int minimumSectionY = Math.floorDiv(this.dimensionType.value().minY(), blockStatePaletteAxisLength);
+        int minimumSectionY = Math.floorDiv(dimensionType.minY(), blockStatePaletteAxisLength);
         return Math.floorDiv(blockY, blockStatePaletteAxisLength) - minimumSectionY;
+    }
+
+    /**
+     * Creates a section-relative coordinate value for an absolute block coordinate value specified.
+     *
+     * @param blockCoordinate the absolute block coordinate value
+     * @return the section-relative coordinate value
+     * @since 1.0
+     */
+    public static byte createSectionRelativeCoordinate(int blockCoordinate) {
+        byte axisLength = ChunkPaletteType.BLOCK_STATE.axisLength();
+        byte result = (byte) (blockCoordinate % axisLength);
+        return result < 0 ? (byte) (axisLength + result) : result;
     }
 
     private static @NonNull Chunk chunk(@NonNull LongObjectMap<Chunk> map, @NonNull BlockPosition position) {
@@ -140,10 +168,6 @@ public final class JetWorld implements World {
         if (chunk == null)
             throw new IllegalArgumentException(String.format("No chunk was loaded at block position of %s", position));
         return chunk;
-    }
-
-    private static byte createSectionRelativeCoordinate(int blockCoordinate) {
-        return (byte) (blockCoordinate % ChunkPaletteType.BLOCK_STATE.axisLength());
     }
 
     private static long createPackedChunkPosition(@NonNull BlockPosition position) {

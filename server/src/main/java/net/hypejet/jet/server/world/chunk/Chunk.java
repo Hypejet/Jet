@@ -2,12 +2,15 @@ package net.hypejet.jet.server.world.chunk;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.world.chunk.entity.BlockEntity;
+import net.hypejet.jet.server.world.chunk.heightmap.HeightMap;
+import net.hypejet.jet.server.world.chunk.heightmap.HeightMapType;
 import net.hypejet.jet.server.world.chunk.light.LightSection;
 import net.hypejet.jet.server.world.chunk.section.ChunkSection;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -15,7 +18,7 @@ import java.util.Set;
  *
  * @param chunkX an {@code X} value of coordinates of the chunk
  * @param chunkZ an {@code Z} value of coordinates of the chunk
- * @param heightmaps a compound binary tag that contains heightmaps that the chunk should have
+ * @param heightmaps a set of height maps that the chunk should have
  * @param sections a list of sections that the chunk should have, the list is ordered from lowest to highest section
  * @param blockEntities a set of block entities that the chunk should have
  * @param lightSections a list of light sections that the chunk should have, each chunk section should have a light
@@ -24,7 +27,7 @@ import java.util.Set;
  * @since 1.0
  * @see net.hypejet.jet.server.world.JetWorld
  */
-public record Chunk(int chunkX, int chunkZ, @NotNull CompoundBinaryTag heightmaps,
+public record Chunk(int chunkX, int chunkZ, @NotNull Set<HeightMap> heightmaps,
                     @NotNull List<ChunkSection> sections, @NotNull Set<BlockEntity> blockEntities,
                     @NotNull List<LightSection> lightSections) {
     /**
@@ -32,7 +35,7 @@ public record Chunk(int chunkX, int chunkZ, @NotNull CompoundBinaryTag heightmap
      *
      * @param chunkX an {@code X} value of coordinates of the chunk
      * @param chunkZ an {@code Z} value of coordinates of the chunk
-     * @param heightmaps a compound binary tag that contains heightmaps that the chunk should have
+     * @param heightmaps a set of height maps that the chunk should have
      * @param sections a list of sections that the chunk should have, the list is ordered from lowest to highest
      *                 section
      * @param blockEntities a set of block entities that the chunk should have
@@ -47,6 +50,7 @@ public record Chunk(int chunkX, int chunkZ, @NotNull CompoundBinaryTag heightmap
         NullabilityUtil.requireNonNull(blockEntities, "block entities");
         NullabilityUtil.requireNonNull(lightSections, "light sections");
 
+        heightmaps = Set.copyOf(heightmaps);
         sections = List.copyOf(sections);
         blockEntities = Set.copyOf(blockEntities);
         lightSections = List.copyOf(lightSections);

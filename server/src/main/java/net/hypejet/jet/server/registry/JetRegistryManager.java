@@ -190,9 +190,14 @@ public final class JetRegistryManager implements RegistryManager {
 
         List<JetBlockState> blockStates = new ArrayList<>();
         for (DataRegistryEntry<?> blockStateEntry : dataEntries) {
-            if (!(blockStateEntry.value() instanceof BlockState(Map<String, String> properties, boolean isAir)))
+            if (!(blockStateEntry.value() instanceof BlockState(
+                    Map<String, String> properties, boolean isAir,
+                    boolean hasFluidState, boolean blocksMotion
+            ))) {
                 throw new IllegalArgumentException("The value is not a block state");
-            blockStates.add(new JetBlockState(blockStateEntry.key(), properties, isAir));
+            }
+
+            blockStates.add(new JetBlockState(blockStateEntry.key(), properties, isAir, hasFluidState, blocksMotion));
         }
 
         return new ElementOrder<>(blockStates);
