@@ -121,6 +121,7 @@ public final class BitStorage {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (!(o instanceof BitStorage storage)) return false;
         return this.bitsPerElement == storage.bitsPerElement
                 && this.size == storage.size

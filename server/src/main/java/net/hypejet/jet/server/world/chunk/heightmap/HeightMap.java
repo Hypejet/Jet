@@ -7,8 +7,8 @@ import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.util.math.MathUtil;
 import net.hypejet.jet.server.util.storage.BitStorage;
 import net.hypejet.jet.server.util.storage.BitStorageUpdate;
-import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.server.world.block.JetBlockState;
+import net.hypejet.jet.server.world.chunk.Chunk;
 import net.hypejet.jet.server.world.chunk.palette.ChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.section.ChunkSection;
@@ -16,34 +16,38 @@ import net.hypejet.jet.server.world.chunk.update.BlockStateUpdate;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.Contract;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
 /**
- * Represents a map, which stores highest height for each column of
- * {@linkplain net.hypejet.jet.server.world.chunk.Chunk a chunk}, which is considered
+ * Represents a map, which stores highest height for each column of {@linkplain Chunk a chunk}, which is considered
  * {@linkplain HeightMapType#isOpaque(JetBlockState) opaque} by {@linkplain HeightMapType a type of the height map}.
  *
  * <p>It is used mainly by Minecraft client for client-side optimizations.</p>
  *
  * @since 1.0
- * @see net.hypejet.jet.server.world.chunk.Chunk
+ * @see Chunk
  * @see HeightMapType#isOpaque(JetBlockState)
  * @see HeightMapType
  */
 public final class HeightMap {
 
+    private final DimensionType dimensionType;
     private final HeightMapType type;
+
     private final BitStorage data;
 
     /**
      * Constructs the {@linkplain HeightMap height map}.
      *
+     * @param dimensionType a dimension type of world associated with a chunk that the height map is created for
      * @param type a type of which the height map should be
      * @param data a bit storage containing data that the height map should have
      * @since 1.0
      */
-    private HeightMap(@NonNull HeightMapType type, @NonNull BitStorage data) {
+    private HeightMap(@NonNull DimensionType dimensionType, @NonNull HeightMapType type, @NonNull BitStorage data) {
+        this.dimensionType = NullabilityUtil.requireNonNull(dimensionType, "dimension type");
         this.type = NullabilityUtil.requireNonNull(type, "type");
         this.data = NullabilityUtil.requireNonNull(data, "data");
     }
@@ -91,7 +95,6 @@ public final class HeightMap {
      * Creates a new copy of this {@linkplain HeightMap height map}, which takes into account block state updates
      * specified.
      *
-     * @param dimensionType a dimension type of world associated with a chunk that the height maps are created for
      * @param sections a chunk section list with the updates taken into account, used when a new height needs to be
      *                 found
      * @param updates the block state updates
@@ -99,9 +102,9 @@ public final class HeightMap {
      * @since 1.0
      */
     @Contract(pure = true)
-    public @NonNull HeightMap withUpdates(@NonNull DimensionType dimensionType, @NonNull List<ChunkSection> sections,
-                                          @NonNull BlockStateUpdate @NonNull ... updates) {
-        if (updates.length == 0)
+    public @NonNull HeightMap withUpdates(@NonNull List<ChunkSection> sections,
+                                          @NonNull Collection<BlockStateUpdate> updates) {
+        if (updates.isEmpty())
             return this;
 
         Int2ObjectMap<BitStorageUpdate> dataUpdates = new Int2ObjectOpenHashMap<>();
@@ -109,7 +112,7 @@ public final class HeightMap {
             byte blockX = update.blockX();
             byte blockZ = update.blockZ();
 
-            int previousBlockY = this.getBlockY(blockX, blockZ, dimensionType);
+            int previousBlockY = this.getBlockY(blockX, blockZ, this.dimensionType);
             int newBlockY = update.blockY();
 
             if (previousBlockY > newBlockY)
@@ -117,7 +120,7 @@ public final class HeightMap {
 
             int elementIndex = createElementIndex(blockX, blockZ);
             if (this.type.isOpaque(update.blockState())) {
-                int element = toElement(newBlockY, dimensionType);
+                int element = toElement(newBlockY, this.dimensionType);
                 dataUpdates.put(elementIndex, new BitStorageUpdate(elementIndex, element));
                 continue;
             }
@@ -127,29 +130,36 @@ public final class HeightMap {
 
             dataUpdates.put(elementIndex, new BitStorageUpdate(
                     elementIndex,
-                    findHeightAndCreateElement(newBlockY - 1, sections, dimensionType, blockX, blockZ, this.type)
+                    findHeightAndCreateElement(newBlockY - 1, sections, this.dimensionType, blockX, blockZ, this.type)
             ));
         }
 
+        if (dataUpdates.isEmpty())
+            return this;
+
         BitStorageUpdate[] updateArray = dataUpdates.values().toArray(BitStorageUpdate[]::new);
-        return new HeightMap(this.type, this.data.withUpdates(updateArray));
+        return new HeightMap(this.dimensionType, this.type, this.data.withUpdates(updateArray));
     }
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (!(o instanceof HeightMap otherHeightMap)) return false;
-        return this.type == otherHeightMap.type && Objects.equals(this.data, otherHeightMap.data);
+        return Objects.equals(this.dimensionType, otherHeightMap.dimensionType)
+                && this.type == otherHeightMap.type
+                && Objects.equals(this.data, otherHeightMap.data);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.type, this.data);
+        return Objects.hash(this.dimensionType, this.type, this.data);
     }
 
     @Override
     public String toString() {
         return "HeightMap{" +
-                "type=" + this.type +
+                "dimensionType=" + this.dimensionType +
+                ", type=" + this.type +
                 ", data=" + this.data +
                 '}';
     }
@@ -185,14 +195,14 @@ public final class HeightMap {
         }
 
         byte bitsPerElement = (byte) MathUtil.bitCount(height); // Heightmaps increment each Y coordinate by 1
-        return new HeightMap(type, new BitStorage(bitsPerElement, elements));
+        return new HeightMap(dimensionType, type, new BitStorage(bitsPerElement, elements));
     }
 
     private static int findHeightAndCreateElement(int startingBlockY, @NonNull List<ChunkSection> sections,
                                                   @NonNull DimensionType dimensionType, byte blockX, byte blockZ,
                                                   @NonNull HeightMapType heightMapType) {
         for (int blockY = startingBlockY; blockY >= dimensionType.minY(); blockY--) {
-            int sectionIndex = JetWorld.createChunkSectionIndex(blockY, dimensionType);
+            int sectionIndex = Chunk.createChunkSectionIndex(blockY, dimensionType);
             ChunkSection section = sections.get(sectionIndex);
 
             if (section == null) {
@@ -203,7 +213,7 @@ public final class HeightMap {
             }
 
             ChunkPalette<JetBlockState> blockStatePalette = section.blockStatePalette();
-            byte sectionRelativeY = JetWorld.createSectionRelativeCoordinate(blockY);
+            byte sectionRelativeY = Chunk.createSectionRelativeBlockCoordinate(blockY);
 
             JetBlockState blockState = blockStatePalette.getElement(blockX, sectionRelativeY, blockZ);
             if (heightMapType.isOpaque(blockState))

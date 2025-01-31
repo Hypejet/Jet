@@ -103,6 +103,7 @@ public record BlockPosition(int blockX, int blockY, int blockZ) implements Coord
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (!(o instanceof BlockPosition(int x, int y, int z))) return false;
         return this.blockX == x && this.blockY == y && this.blockZ == z;
     }

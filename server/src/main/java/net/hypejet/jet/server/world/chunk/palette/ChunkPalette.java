@@ -5,7 +5,6 @@ import it.unimi.dsi.fastutil.objects.Object2ShortMap;
 import it.unimi.dsi.fastutil.objects.Object2ShortOpenCustomHashMap;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.util.array.UnmodifiableLongArray;
-import net.hypejet.jet.server.util.function.IntResultingFunction;
 import net.hypejet.jet.server.util.hash.IdentityHashStrategy;
 import net.hypejet.jet.server.util.math.MathUtil;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
@@ -13,7 +12,9 @@ import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.ToIntFunction;
 
 /**
  * Represents a data container of {@linkplain net.hypejet.jet.server.world.chunk.section.ChunkSection a chunk section}.
@@ -29,7 +30,7 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
     private final UnmodifiableLongArray data;
 
     private final ChunkPaletteType type;
-    private final IntResultingFunction<E> elementToIdentifierFunction;
+    private final ToIntFunction<E> elementToIdentifierFunction;
 
     /**
      * Constructs the {@linkplain ChunkPalette chunk palette}.
@@ -42,7 +43,7 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
      * @since 1.0
      */
     protected ChunkPalette(byte bitsPerElement, @NonNull ChunkPaletteType type, long @NonNull [] data,
-                           @NonNull IntResultingFunction<E> elementToIdentifierFunction) {
+                           @NonNull ToIntFunction<E> elementToIdentifierFunction) {
         this.bitsPerElement = bitsPerElement;
         this.type = NullabilityUtil.requireNonNull(type, "type");
         this.data = new UnmodifiableLongArray(NullabilityUtil.requireNonNull(data, "data"));
@@ -90,21 +91,20 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
      * @return the function
      * @since 1.0
      */
-    public final @NonNull IntResultingFunction<E> elementToIdentifierFunction() {
+    public final @NonNull ToIntFunction<E> elementToIdentifierFunction() {
         return this.elementToIdentifierFunction;
     }
 
     /**
-     * Creates a new {@linkplain ChunkPalette chunk palette} with {@linkplain ChunkPaletteUpdate chunk palette updates}
-     * specified.
+     * Creates a copy of this {@linkplain ChunkPalette chunk palette} with
+     * {@linkplain ChunkPaletteUpdate chunk palette updates} specified applied.
      *
      * @param updates the updates
      * @return the new chunk palette
      * @since 1.0
      */
-    @SafeVarargs
-    public final @NonNull ChunkPalette<E> withUpdates(@NonNull ChunkPaletteUpdate<E> @NonNull ... updates) {
-        if (updates.length == 0)
+    public final @NonNull ChunkPalette<E> withUpdates(@NonNull Collection<ChunkPaletteUpdate<E>> updates) {
+        if (updates.isEmpty())
             return this;
 
         ChunkPaletteType type = this.type();
@@ -145,7 +145,7 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
         if (!paletteChanged)
             return this;
 
-        IntResultingFunction<E> elementToIdentifierFunction = this.elementToIdentifierFunction();
+        ToIntFunction<E> elementToIdentifierFunction = this.elementToIdentifierFunction();
         if (elementCountMap.size() == 1) {
             E onlyElement = Iterables.getOnlyElement(elementCountMap.keySet());
             return new SingleValuedChunkPalette<>(type, onlyElement, elementToIdentifierFunction);

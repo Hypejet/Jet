@@ -280,6 +280,7 @@ public final class EventNode<E> implements Comparable<EventNode<?>> {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (!(o instanceof EventNode<?> eventNode)) return false;
         return Objects.equals(this.eventClass, eventNode.eventClass)
                 && this.priority == eventNode.priority

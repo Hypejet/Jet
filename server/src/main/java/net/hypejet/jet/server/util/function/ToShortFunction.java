@@ -3,19 +3,19 @@ package net.hypejet.jet.server.util.function;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a functional interface that returns an integer for a value specified.
+ * Represents a functional interface that returns a short for a value specified.
  *
  * @param <V> a type of the value
  * @since 1.0
  */
 @FunctionalInterface
-public interface IntResultingFunction<V> {
+public interface ToShortFunction<V> {
     /**
-     * Creates an integer result for a value specified.
+     * Creates a short result for a value specified.
      *
      * @param value the value
-     * @return the integer result
+     * @return the short result
      * @since 1.0
      */
-    int apply(@NonNull V value);
+    short apply(@NonNull V value);
 }

@@ -4,7 +4,6 @@ import it.unimi.dsi.fastutil.objects.Object2ShortMap;
 import it.unimi.dsi.fastutil.objects.Object2ShortMaps;
 import it.unimi.dsi.fastutil.objects.Object2ShortOpenCustomHashMap;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.server.util.function.IntResultingFunction;
 import net.hypejet.jet.server.util.hash.IdentityHashStrategy;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -12,6 +11,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.ToIntFunction;
 
 /**
  * Represents {@linkplain ChunkPalette a chunk palette}, which contains the same element at each position.
@@ -38,11 +38,11 @@ public final class SingleValuedChunkPalette<E> extends ChunkPalette<E> {
      * @since 1.0
      */
     public SingleValuedChunkPalette(@NonNull ChunkPaletteType type, @NonNull E element,
-                                    @NonNull IntResultingFunction<E> elementToIdentifierFunction) {
+                                    @NonNull ToIntFunction<E> elementToIdentifierFunction) {
         super((byte) 0, type, EMPTY_LONG_ARRAY, elementToIdentifierFunction);
 
         this.element = NullabilityUtil.requireNonNull(element, "element");
-        this.elementIdentifier = elementToIdentifierFunction.apply(element);
+        this.elementIdentifier = elementToIdentifierFunction.applyAsInt(element);
 
         Object2ShortMap<E> elementCountMap = new Object2ShortOpenCustomHashMap<>(IdentityHashStrategy.INSTANCE);
         elementCountMap.put(element, type.elementCount());
@@ -76,6 +76,7 @@ public final class SingleValuedChunkPalette<E> extends ChunkPalette<E> {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (!(o instanceof SingleValuedChunkPalette<?> otherPalette)) return false;
         return Objects.equals(this.element, otherPalette.element);
     }

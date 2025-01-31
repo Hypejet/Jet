@@ -77,6 +77,7 @@ public final class DirectLightStorage extends LightStorage {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (!(o instanceof DirectLightStorage otherStorage)) return false;
         return Objects.equals(this.data, otherStorage.data);
     }

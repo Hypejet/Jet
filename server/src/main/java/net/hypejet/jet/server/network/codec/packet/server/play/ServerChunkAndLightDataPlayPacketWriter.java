@@ -29,6 +29,8 @@ public final class ServerChunkAndLightDataPlayPacketWriter
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerChunkAndLightDataPlayPacket object) {
+        buf.writeInt(object.chunkX());
+        buf.writeInt(object.chunkZ());
         ChunkNetworkWriter.INSTANCE.write(buf, object.chunk());
     }
 }

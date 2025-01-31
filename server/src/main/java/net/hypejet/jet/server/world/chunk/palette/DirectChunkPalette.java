@@ -4,7 +4,6 @@ import it.unimi.dsi.fastutil.objects.Object2ShortMap;
 import it.unimi.dsi.fastutil.objects.Object2ShortMaps;
 import it.unimi.dsi.fastutil.objects.Object2ShortOpenCustomHashMap;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.server.util.function.IntResultingFunction;
 import net.hypejet.jet.server.util.hash.IdentityHashStrategy;
 import net.hypejet.jet.server.util.math.MathUtil;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
@@ -13,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.ToIntFunction;
 
 /**
  * Represents {@linkplain ChunkPalette a chunk palette}, which stores all elements directly in the data array.
@@ -39,7 +39,7 @@ public final class DirectChunkPalette<E> extends ChunkPalette<E> {
      * @since 1.0
      */
     private DirectChunkPalette(byte bitsPerElement, @NonNull ChunkPaletteType type, @NonNull List<E> elements,
-                               @NonNull IntResultingFunction<E> elementToIdentifierFunction,
+                               @NonNull ToIntFunction<E> elementToIdentifierFunction,
                                @NonNull Object2ShortMap<E> elementCountMap) {
         super(bitsPerElement, type, createDataArray(
                 bitsPerElement,
@@ -91,7 +91,7 @@ public final class DirectChunkPalette<E> extends ChunkPalette<E> {
        TODO: | in Java */
     public static <E> @NonNull DirectChunkPalette<E> create(
             @NonNull ChunkPaletteType type, @NonNull List<E> elements,
-            @NonNull IntResultingFunction<E> elementToIdentifierFunction
+            @NonNull ToIntFunction<E> elementToIdentifierFunction
     ) {
         return create(type, elements, elementToIdentifierFunction, ChunkPalette.createCountMap(elements));
     }
@@ -109,12 +109,12 @@ public final class DirectChunkPalette<E> extends ChunkPalette<E> {
     /* TODO: | Replace the factory method with public constructor when flexible constructors get finally implemented
        TODO: | in Java */
     static <E> @NonNull DirectChunkPalette<E> create(@NonNull ChunkPaletteType type, @NonNull List<E> elements,
-                                                     @NonNull IntResultingFunction<E> elementToIdentifierFunction,
+                                                     @NonNull ToIntFunction<E> elementToIdentifierFunction,
                                                      @NonNull Object2ShortMap<E> elementCountMap) {
         byte bitsPerElement = type.minimumDirectBits();
 
         for (E element : elementCountMap.keySet()) {
-            int elementIdentifier = elementToIdentifierFunction.apply(element);
+            int elementIdentifier = elementToIdentifierFunction.applyAsInt(element);
             if (elementIdentifier == 0) continue;
             bitsPerElement = (byte) Math.max(MathUtil.bitCount(elementIdentifier), bitsPerElement);
         }
@@ -125,7 +125,7 @@ public final class DirectChunkPalette<E> extends ChunkPalette<E> {
     // TODO: Move this to the constructor when flexible constructors get finally implemented in Java
     private static <E> long @NonNull [] createDataArray(byte bitsPerElement, @NonNull ChunkPaletteType type,
                                                         @NotNull List<E> elements,
-                                                        @NonNull IntResultingFunction<E> elementToIdentifierFunction) {
+                                                        @NonNull ToIntFunction<E> elementToIdentifierFunction) {
         if (bitsPerElement > MAXIMUM_BITS_PER_ELEMENT) {
             throw new IllegalArgumentException(String.format(
                     "The bits-per-element value specified exceeds the maximum value allowed (%d>%d)",
@@ -137,13 +137,14 @@ public final class DirectChunkPalette<E> extends ChunkPalette<E> {
 
         int[] elementsAsIntegers = new int[elements.size()];
         for (int index = 0; index < elementsAsIntegers.length; index++)
-            elementsAsIntegers[index] = elementToIdentifierFunction.apply(elements.get(index));
+            elementsAsIntegers[index] = elementToIdentifierFunction.applyAsInt(elements.get(index));
 
         return ChunkPalette.createDataArray(bitsPerElement, elementsAsIntegers, type);
     }
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (!(o instanceof DirectChunkPalette<?> otherPalette)) return false;
         return Objects.equals(this.elements, otherPalette.elements);
     }

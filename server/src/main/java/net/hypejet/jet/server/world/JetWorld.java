@@ -11,17 +11,14 @@ import net.hypejet.jet.server.util.acquirable.map.longs.LongObjectHashMapAcquira
 import net.hypejet.jet.server.util.acquisition.NotNullObjectMappedAcquisition;
 import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.Chunk;
-import net.hypejet.jet.server.world.chunk.palette.ChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
-import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
-import net.hypejet.jet.server.world.chunk.section.ChunkSection;
+import net.hypejet.jet.server.world.chunk.update.BlockStateUpdate;
 import net.hypejet.jet.world.World;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -65,15 +62,11 @@ public final class JetWorld implements World {
 
     @Override
     public @NonNull NotNullObjectAcquisition<JetBlockState> getBlockState(@NonNull BlockPosition position) {
-        // TODO: Replace integer with a block object
         return new NotNullObjectMappedAcquisition<>(this.chunks.acquireRead(), acquisition -> {
             Chunk chunk = chunk(acquisition.map(), position);
-            ChunkSection chunkSection = this.chunkSection(chunk, position.blockY());
-            return chunkSection.blockStatePalette().getElement(
-                    createSectionRelativeCoordinate(position.blockX()),
-                    createSectionRelativeCoordinate(position.blockY()),
-                    createSectionRelativeCoordinate(position.blockZ())
-            );
+            byte sectionRelativeX = Chunk.createSectionRelativeBiomeCoordinate(position.blockX());
+            byte sectionRelativeZ = Chunk.createSectionRelativeBiomeCoordinate(position.blockZ());
+            return chunk.getBlockState(sectionRelativeX, (short) position.blockY(), sectionRelativeZ);
         });
     }
 
@@ -85,82 +78,25 @@ public final class JetWorld implements World {
         if (!(blockState instanceof JetBlockState validatedBlockState))
             throw new IllegalArgumentException("The block state specified is not a valid block state");
 
-        // TODO: Replace integer with a block object
         try (MapAcquisition<?, ?, LongObjectMap<Chunk>> acquisition = this.chunks.acquireWrite()) {
             LongObjectMap<Chunk> chunks = acquisition.map();
             Chunk chunk = chunk(chunks, position);
 
-            ChunkSection chunkSection = this.chunkSection(chunk, position.blockY());
-            ChunkPalette<JetBlockState> blockPalette = chunkSection.blockStatePalette();
+            byte sectionRelativeX = Chunk.createSectionRelativeBiomeCoordinate(position.blockX());
+            byte sectionRelativeZ = Chunk.createSectionRelativeBlockCoordinate(position.blockZ());
 
-            byte sectionX = createSectionRelativeCoordinate(position.blockX());
-            byte sectionY = createSectionRelativeCoordinate(position.blockY());
-            byte sectionZ = createSectionRelativeCoordinate(position.blockZ());
-
-            JetBlockState previousBlockState = blockPalette.getElement(sectionX, sectionY, sectionZ);
-            if (previousBlockState == validatedBlockState) return;
-
-            ChunkSection newChunkSection = chunkSection.withBlockStatePaletteUpdates(
-                    new ChunkPaletteUpdate<>(sectionX, sectionY, sectionZ, validatedBlockState)
+            Chunk newChunk = chunk.withUpdates(
+                    Set.of(new BlockStateUpdate(
+                            sectionRelativeX, (short) position.blockY(),
+                            sectionRelativeZ, validatedBlockState
+                    )), Set.of(), Set.of()
             );
 
-            List<ChunkSection> newChunkSections = new ArrayList<>(chunk.sections());
-            newChunkSections.set(this.createChunkSectionIndex(position.blockY()), newChunkSection);
+            if (chunk.equals(newChunk)) return;
 
-            // TODO: Create new heightmaps and block entities
             long packedChunkPosition = createPackedChunkPosition(position);
-            Chunk newChunk = new Chunk(
-                    chunk.chunkX(), chunk.chunkZ(), chunk.heightmaps(),
-                    newChunkSections, chunk.blockEntities(), chunk.lightSections()
-            );
-
             chunks.put(packedChunkPosition, newChunk);
         }
-    }
-
-    private @NonNull ChunkSection chunkSection(@NonNull Chunk chunk, int blockY) {
-        ChunkSection section = chunk.sections().get(this.createChunkSectionIndex(blockY));
-        if (section == null) {
-            throw new IllegalArgumentException(String.format(
-                    "Could not find a chunk section at block height of %d",
-                    blockY
-            ));
-        }
-        return section;
-    }
-
-    private int createChunkSectionIndex(int blockY) {
-        return createChunkSectionIndex(blockY, this.dimensionType.value());
-    }
-
-    /**
-     * Creates an index of {@linkplain ChunkSection a chunk section} where block with height specified is stored.
-     *
-     * <p>The index can be applied to get the chunk section in any {@linkplain Chunk chunk} that belongs
-     * to {@linkplain JetWorld a world} with {@linkplain DimensionType dimension type} specified.</p>
-     *
-     * @param blockY the block height
-     * @param dimensionType the dimension type
-     * @return the index
-     * @since 1.0
-     */
-    public static int createChunkSectionIndex(int blockY, @NonNull DimensionType dimensionType) {
-        byte blockStatePaletteAxisLength = ChunkPaletteType.BLOCK_STATE.axisLength();
-        int minimumSectionY = Math.floorDiv(dimensionType.minY(), blockStatePaletteAxisLength);
-        return Math.floorDiv(blockY, blockStatePaletteAxisLength) - minimumSectionY;
-    }
-
-    /**
-     * Creates a section-relative coordinate value for an absolute block coordinate value specified.
-     *
-     * @param blockCoordinate the absolute block coordinate value
-     * @return the section-relative coordinate value
-     * @since 1.0
-     */
-    public static byte createSectionRelativeCoordinate(int blockCoordinate) {
-        byte axisLength = ChunkPaletteType.BLOCK_STATE.axisLength();
-        byte result = (byte) (blockCoordinate % axisLength);
-        return result < 0 ? (byte) (axisLength + result) : result;
     }
 
     private static @NonNull Chunk chunk(@NonNull LongObjectMap<Chunk> map, @NonNull BlockPosition position) {

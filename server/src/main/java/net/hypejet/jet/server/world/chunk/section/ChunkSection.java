@@ -9,6 +9,7 @@ import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -93,60 +94,35 @@ public final class ChunkSection {
 
     /**
      * Creates a new {@linkplain ChunkSection chunk section}, which is a copy of this chunk section, which uses a new
-     * block state chunk palette, which was created by applying updates specified.
+     * block state chunk palette and a new biome chunk palette, which were created by applying updates specified.
      *
-     * @param updates the updates
+     * @param blockStateUpdates updates that should be applied to the block state chunk palette
+     * @param biomeUpdates updates that should be applied to the biome chunk palette
      * @return the chunk section
      * @since 1.0
      */
-    @SafeVarargs
-    public final @NonNull ChunkSection withBlockStatePaletteUpdates(
-            @NonNull ChunkPaletteUpdate<JetBlockState> @NonNull ... updates
+    public @NonNull ChunkSection withUpdates(
+            @NonNull Collection<ChunkPaletteUpdate<JetBlockState>> blockStateUpdates,
+            @NonNull Collection<ChunkPaletteUpdate<JetRegistryEntry<Biome>>> biomeUpdates
     ) {
-        return this.withReplacedBlockStatePalette(this.blockStatePalette.withUpdates(updates));
-    }
+        if (blockStateUpdates.isEmpty() && biomeUpdates.isEmpty())
+            return this;
 
-    /**
-     * Creates a new {@linkplain ChunkSection chunk section}, which is a copy of this chunk section, which uses
-     * a block state chunk palette specified.
-     *
-     * @param palette the block state chunk palette
-     * @return the chunk section
-     * @since 1.0
-     */
-    public @NonNull ChunkSection withReplacedBlockStatePalette(@NonNull ChunkPalette<JetBlockState> palette) {
-        return new ChunkSection(palette, this.biomePalette);
-    }
+        ChunkPalette<JetBlockState> blockStatePalette = this.blockStatePalette.withUpdates(blockStateUpdates);
+        ChunkPalette<JetRegistryEntry<Biome>> biomePalette = this.biomePalette.withUpdates(biomeUpdates);
 
-    /**
-     * Creates a new {@linkplain ChunkSection chunk section}, which is a copy of this chunk section, which uses a new
-     * biome palette, which was created by applying updates specified.
-     *
-     * @param updates the updates
-     * @return the chunk section
-     * @since 1.0
-     */
-    @SafeVarargs
-    public final @NonNull ChunkSection withBiomePaletteUpdates(
-            @NonNull ChunkPaletteUpdate<JetRegistryEntry<Biome>> @NonNull ... updates
-    ) {
-        return this.withReplacedBiomePalette(this.biomePalette.withUpdates(updates));
-    }
+        boolean blockStatePaletteUnchanged = this.blockStatePalette.equals(blockStatePalette);
+        if (blockStatePaletteUnchanged && this.biomePalette.equals(biomePalette))
+            return this;
 
-    /**
-     * Creates a new {@linkplain ChunkSection chunk section}, which is a copy of this chunk section, which uses
-     * a biome chunk palette specified.
-     *
-     * @param palette the biome chunk palette
-     * @return the chunk section
-     * @since 1.0
-     */
-    public @NonNull ChunkSection withReplacedBiomePalette(@NonNull ChunkPalette<JetRegistryEntry<Biome>> palette) {
-        return new ChunkSection(this.nonAirBlockCount, this.blockStatePalette, palette);
+        if (blockStatePaletteUnchanged)
+            return new ChunkSection(this.nonAirBlockCount, blockStatePalette, biomePalette);
+        return new ChunkSection(blockStatePalette, biomePalette);
     }
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (!(o instanceof ChunkSection otherSection)) return false;
         return this.nonAirBlockCount == otherSection.nonAirBlockCount
                 && Objects.equals(this.blockStatePalette, otherSection.blockStatePalette)

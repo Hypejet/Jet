@@ -39,10 +39,7 @@ public final class ChunkNetworkWriter implements NetworkWriter<Chunk> {
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull Chunk object) {
-        buf.writeInt(object.chunkX());
-        buf.writeInt(object.chunkZ());
-
-        HeightMapCollectionNetworkWriter.INSTANCE.write(buf, object.heightmaps());
+        HeightMapCollectionNetworkWriter.INSTANCE.write(buf, object.heightMaps());
 
         ByteBuf sectionBuf = Unpooled.buffer();
         try {
