@@ -1,23 +1,24 @@
 package net.hypejet.jet.server.world;
 
-import io.netty.util.collection.LongObjectMap;
+import net.hypejet.concurrency.map.MapAcquirable;
 import net.hypejet.concurrency.map.MapAcquisition;
+import net.hypejet.concurrency.map.hashmap.HashMapAcquirable;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.registry.JetRegistryEntry;
-import net.hypejet.jet.server.util.acquirable.map.longs.LongObjectHashMapAcquirable;
 import net.hypejet.jet.server.util.acquisition.NotNullObjectMappedAcquisition;
 import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.Chunk;
-import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.update.BlockStateUpdate;
+import net.hypejet.jet.server.world.coordinate.ChunkPosition;
 import net.hypejet.jet.world.World;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -33,7 +34,7 @@ public final class JetWorld implements World {
     private final JetRegistryEntry<DimensionType> dimensionType;
     private final JetMinecraftServer server;
 
-    private final LongObjectHashMapAcquirable<Chunk> chunks = new LongObjectHashMapAcquirable<>();
+    private final MapAcquirable<ChunkPosition, Chunk, ?> chunks = new HashMapAcquirable<>();
 
     /**
      * Constructs the {@linkplain JetWorld world}.
@@ -78,8 +79,8 @@ public final class JetWorld implements World {
         if (!(blockState instanceof JetBlockState validatedBlockState))
             throw new IllegalArgumentException("The block state specified is not a valid block state");
 
-        try (MapAcquisition<?, ?, LongObjectMap<Chunk>> acquisition = this.chunks.acquireWrite()) {
-            LongObjectMap<Chunk> chunks = acquisition.map();
+        try (MapAcquisition<ChunkPosition, Chunk, ?> acquisition = this.chunks.acquireWrite()) {
+            Map<ChunkPosition, Chunk> chunks = acquisition.map();
             Chunk chunk = chunk(chunks, position);
 
             byte sectionRelativeX = Chunk.createSectionRelativeBiomeCoordinate(position.blockX());
@@ -93,30 +94,14 @@ public final class JetWorld implements World {
             );
 
             if (chunk.equals(newChunk)) return;
-
-            long packedChunkPosition = createPackedChunkPosition(position);
-            chunks.put(packedChunkPosition, newChunk);
+            chunks.put(ChunkPosition.fromBlockPosition(position), newChunk);
         }
     }
 
-    private static @NonNull Chunk chunk(@NonNull LongObjectMap<Chunk> map, @NonNull BlockPosition position) {
-        Chunk chunk = map.get(createPackedChunkPosition(position));
+    private static @NonNull Chunk chunk(@NonNull Map<ChunkPosition, Chunk> map, @NonNull BlockPosition position) {
+        Chunk chunk = map.get(ChunkPosition.fromBlockPosition(position));
         if (chunk == null)
             throw new IllegalArgumentException(String.format("No chunk was loaded at block position of %s", position));
         return chunk;
-    }
-
-    private static long createPackedChunkPosition(@NonNull BlockPosition position) {
-        int chunkX = blockToChunkCoordinate(position.blockX());
-        int chunkZ = blockToChunkCoordinate(position.blockZ());
-        return createPackedChunkPosition(chunkX, chunkZ);
-    }
-
-    private static int blockToChunkCoordinate(int blockCoordinate) {
-        return Math.floorDiv(blockCoordinate, ChunkPaletteType.BLOCK_STATE.axisLength());
-    }
-
-    private static long createPackedChunkPosition(int chunkX, int chunkZ) {
-        return ((long) chunkX << Integer.SIZE) | chunkZ;
     }
 }
