@@ -3,9 +3,9 @@ package net.hypejet.jet.server.world.chunk.light.storage;
 import it.unimi.dsi.fastutil.bytes.Byte2ShortMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ShortOpenHashMap;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.server.world.chunk.light.update.LightStorageUpdate;
 import net.hypejet.jet.server.world.chunk.palette.ChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
-import net.hypejet.jet.server.world.chunk.light.update.LightStorageUpdate;
 import net.hypejet.jet.server.world.coordinate.relative.ChunkPaletteRelativePosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

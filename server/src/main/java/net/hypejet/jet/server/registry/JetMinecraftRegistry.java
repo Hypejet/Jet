@@ -49,7 +49,7 @@ import java.util.function.UnaryOperator;
  * @since 1.0
  * @see ElementOrder
  */
-public class JetMinecraftRegistry<V> extends ElementOrder<JetRegistryEntry<V>> implements MinecraftRegistry<V> {
+public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
 
     private static final IllegalArgumentException NOT_REGISTERED_EXCEPTION
             = new IllegalArgumentException("The registry entry specified has not been registered in the registry");
@@ -63,6 +63,7 @@ public class JetMinecraftRegistry<V> extends ElementOrder<JetRegistryEntry<V>> i
     private final Map<JetRegistryEntry<V>, Key> registryEntryToKeyMap;
 
     private final HashMapAcquirable<JetRegistryEntry<V>, Tags> tags;
+    private final ElementOrder<JetRegistryEntry<V>> elementOrder;
 
     /**
      * Constructs the {@linkplain JetSerializableMinecraftRegistry Minecraft registry}.
@@ -79,7 +80,6 @@ public class JetMinecraftRegistry<V> extends ElementOrder<JetRegistryEntry<V>> i
                                 @NonNull JetMinecraftServer server, @NonNull List<JetRegistryEntry<V>> entries,
                                 @NonNull Set<FeaturePack> enabledFeaturePacks,
                                 @NonNull Map<JetRegistryEntry<V>, Tags> entryToTagsMap) {
-        super(entries);
         NullabilityUtil.requireNonNull(enabledFeaturePacks, "enabled feature packs");
         NullabilityUtil.requireNonNull(entryToTagsMap, "entry to tags map");
 
@@ -113,6 +113,7 @@ public class JetMinecraftRegistry<V> extends ElementOrder<JetRegistryEntry<V>> i
 
         this.registryEntryToKeyMap = Map.copyOf(registryEntryToKeyMap);
         this.tags = new HashMapAcquirable<>(tags);
+        this.elementOrder = new ElementOrder<>(entries);
     }
 
     @Override
@@ -131,6 +132,11 @@ public class JetMinecraftRegistry<V> extends ElementOrder<JetRegistryEntry<V>> i
     }
 
     @Override
+    public final @Nullable JetRegistryEntry<V> get(int identifier) {
+        return this.elementOrder.get(identifier);
+    }
+
+    @Override
     public final boolean isRegistered(@NonNull RegistryEntry<V> entry) {
         return this.registryEntryToKeyMap.containsKey(validateEntry(entry));
     }
@@ -145,12 +151,12 @@ public class JetMinecraftRegistry<V> extends ElementOrder<JetRegistryEntry<V>> i
 
     @Override
     public final int identifierOf(@NonNull RegistryEntry<V> entry) {
-        return this.identifierOf(validateEntry(entry));
+        return this.elementOrder.identifierOf(validateEntry(entry));
     }
 
     @Override
     public final @NonNull List<? extends RegistryEntry<V>> entries() {
-        return this.elements();
+        return this.elementOrder.elements();
     }
 
     @Override
@@ -217,6 +223,17 @@ public class JetMinecraftRegistry<V> extends ElementOrder<JetRegistryEntry<V>> i
                 this.tags.acquireRead(),
                 acquisition -> createTagRegistry(acquisition.map())
         );
+    }
+
+    /**
+     * Represents {@linkplain ElementOrder an element order} of elements stored
+     * in this {@linkplain JetMinecraftRegistry Minecraft registry}.
+     *
+     * @return the element order
+     * @since 1.0
+     */
+    public @NonNull ElementOrder<JetRegistryEntry<V>> elementOrder() {
+        return this.elementOrder;
     }
 
     private @NonNull TagRegistry createTagRegistry(@NonNull Map<JetRegistryEntry<V>, Tags> tags) {

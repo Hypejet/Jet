@@ -136,7 +136,7 @@ public final class JetWorld implements World {
                     Chunk.Builder builder = new Chunk.Builder(
                             this.dimensionType.value(),
                             registryManager.blockStateOrder(),
-                            registryManager.biomeRegistry()
+                            registryManager.biomeRegistry().elementOrder()
                     );
 
                     this.chunkLoader.provide(builder, position.chunkX(), position.chunkZ(), this);

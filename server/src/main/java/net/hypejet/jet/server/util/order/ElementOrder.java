@@ -18,7 +18,7 @@ import java.util.Map;
  * @param <E> the type of elements
  * @since 1.0
  */
-public class ElementOrder<E> {
+public final class ElementOrder<E> {
 
     private final List<E> sortedElements;
     private final Object2IntMap<E> elementToIdentifierMap;
@@ -47,7 +47,7 @@ public class ElementOrder<E> {
      * @return the list
      * @since 1.0
      */
-    public final @NonNull List<E> elements() {
+    public @NonNull List<E> elements() {
         return this.sortedElements;
     }
 
@@ -59,7 +59,7 @@ public class ElementOrder<E> {
      * @since 1.0
      * @throws IllegalArgumentException if the element could not be found
      */
-    public final @NonNull E getOrThrow(int identifier) {
+    public @NonNull E getOrThrow(int identifier) {
         E element = this.get(identifier);
         if (element == null) {
             throw new IllegalArgumentException(String.format(
@@ -77,7 +77,7 @@ public class ElementOrder<E> {
      * @return the element, {@code null} if no element with the identifier specified exists
      * @since 1.0
      */
-    public final @Nullable E get(int identifier) {
+    public @Nullable E get(int identifier) {
         return this.sortedElements.get(identifier);
     }
 
@@ -89,7 +89,7 @@ public class ElementOrder<E> {
      * @since 1.0
      * @throws IllegalArgumentException if the element has not been registered in this element order
      */
-    public final @IntRange(from = 0, to = Integer.MAX_VALUE) int identifierOf(@NonNull E element) {
+    public @IntRange(from = 0, to = Integer.MAX_VALUE) int identifierOf(@NonNull E element) {
         NullabilityUtil.requireNonNull(element, "element");
         if (!this.elementToIdentifierMap.containsKey(element))
             throw new IllegalArgumentException("The element specified has not been registered in this element order");
