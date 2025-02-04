@@ -3,11 +3,13 @@ package net.hypejet.jet.server.network.session.task;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquirable;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
+import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket;
 import net.hypejet.jet.server.registry.function.RegistryTagUpdateFunction;
+import net.hypejet.jet.world.World;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -27,16 +29,25 @@ public final class PlaySessionTask implements SessionTask, RegistryTagUpdateFunc
     );
 
     private final JetPlayer player;
+
+    private final World spawningWorld;
+    private final Position spawningPosition;
+
     private final BooleanAcquirable commandsSent = new BooleanAcquirable();
 
     /**
      * Constructs the {@linkplain PlaySessionTask play session task}.
      *
      * @param player a player that the session task should be handled for
+     * @param spawningWorld a world that the player should spawn in
+     * @param spawningPosition a position where the player should spawn at
      * @since 1.0
      */
-    public PlaySessionTask(@NonNull JetPlayer player) {
+    public PlaySessionTask(@NonNull JetPlayer player, @NonNull World spawningWorld,
+                           @NonNull Position spawningPosition) {
         this.player = NullabilityUtil.requireNonNull(player, "player");
+        this.spawningWorld = NullabilityUtil.requireNonNull(spawningWorld, "spawning world");
+        this.spawningPosition = NullabilityUtil.requireNonNull(spawningPosition, "spawning position");
     }
 
     @Override

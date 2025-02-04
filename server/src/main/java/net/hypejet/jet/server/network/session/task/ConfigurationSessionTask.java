@@ -5,6 +5,7 @@ import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquirable;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
+import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.data.model.api.pack.PackInfo;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.data.model.server.registry.registries.pack.FeaturePack;
@@ -28,6 +29,7 @@ import net.hypejet.jet.server.registry.JetMinecraftRegistry;
 import net.hypejet.jet.server.registry.JetSerializableMinecraftRegistry;
 import net.hypejet.jet.server.registry.function.RegistryTagUpdateFunction;
 import net.hypejet.jet.server.util.unit.Unit;
+import net.hypejet.jet.world.World;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -143,9 +145,19 @@ public final class ConfigurationSessionTask implements SessionTask, KeepAliveRes
 
     private void runVirtualThreadTask() {
         this.keepAliveHandler.schedule();
-
         JetMinecraftServer server = this.player.server();
-        server.eventNode().call(new ConfigurationStartEvent(this.player));
+
+        ConfigurationStartEvent startEvent = new ConfigurationStartEvent(this.player);
+        server.eventNode().call(startEvent);
+
+        World spawningWorld = startEvent.getSpawningWorld();
+        if (spawningWorld == null)
+            throw new IllegalStateException("The spawning world has not been set");
+
+        Position spawningPosition = startEvent.getSpawningPosition();
+        if (spawningPosition == null)
+            throw new IllegalStateException("The spawning position has not been set");
+
         this.player.sendServerBrand(server.brandName());
 
         Set<FeaturePack> enabledFeaturePacks = this.player.server().registryManager().enabledFeaturePacks();
@@ -200,7 +212,9 @@ public final class ConfigurationSessionTask implements SessionTask, KeepAliveRes
                 connection.sendPacket(new ServerFinishConfigurationPacket());
                 this.acknowledgeFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
 
-                sessionAcquisition.set(new Session(ProtocolState.PLAY, connection, new PlaySessionTask(this.player)));
+                PlaySessionTask sessionTask = new PlaySessionTask(this.player, spawningWorld, spawningPosition);
+                sessionAcquisition.set(new Session(ProtocolState.PLAY, connection, sessionTask));
+
                 connection.clientPacketReader().resumePacketReading();
             } catch (TimeoutException exception) {
                 throw new RuntimeException(
