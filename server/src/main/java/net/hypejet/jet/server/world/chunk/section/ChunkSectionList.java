@@ -246,8 +246,12 @@ public final class ChunkSectionList {
     public static final class Builder {
 
         private final DimensionType dimensionType;
+
         private final ElementOrder<JetBlockState> blockStateOrder;
         private final ElementOrder<JetRegistryEntry<Biome>> biomeOrder;
+
+        private final JetBlockState defaultBlockState;
+        private final JetRegistryEntry<Biome> defaultBiome;
 
         private final IntObjectMap<ChunkSection.Builder> chunkSectionBuilders = new IntObjectHashMap<>();
         private final int chunkSectionCount;
@@ -259,13 +263,22 @@ public final class ChunkSectionList {
          * @param blockStateOrder an element order of block states that should be used for creation
          *                        of block state palettes
          * @param biomeOrder an element order of biomes that should be used for creation of biome palettes
+         * @param defaultBlockState a default block state that should be used in places where a block state
+         *                          has not been set
+         * @param defaultBiome a registry entry of a biome that should be used where a biome has not been set
          * @since 1.0
          */
         public Builder(@NonNull DimensionType dimensionType, @NonNull ElementOrder<JetBlockState> blockStateOrder,
-                       @NonNull ElementOrder<JetRegistryEntry<Biome>> biomeOrder) {
+                       @NonNull ElementOrder<JetRegistryEntry<Biome>> biomeOrder,
+                       @NonNull JetBlockState defaultBlockState, JetRegistryEntry<Biome> defaultBiome) {
             this.dimensionType = NullabilityUtil.requireNonNull(dimensionType, "dimension type");
+
             this.blockStateOrder = NullabilityUtil.requireNonNull(blockStateOrder, "block state order");
             this.biomeOrder = NullabilityUtil.requireNonNull(biomeOrder, "biome order");
+
+            this.defaultBlockState = NullabilityUtil.requireNonNull(defaultBlockState, "default block state");
+            this.defaultBiome = NullabilityUtil.requireNonNull(defaultBiome, "default biome");
+
             this.chunkSectionCount = createSectionCount(dimensionType);
         }
 
@@ -328,8 +341,10 @@ public final class ChunkSectionList {
                 if (builder != null) {
                     chunkSection = builder.build(this.blockStateOrder, this.biomeOrder);
                 } else {
-                    if (emptyChunkSection == null)
-                        emptyChunkSection = new ChunkSection.Builder().build(this.blockStateOrder, this.biomeOrder);
+                    if (emptyChunkSection == null) {
+                        emptyChunkSection = new ChunkSection.Builder(this.defaultBlockState, this.defaultBiome)
+                                .build(this.blockStateOrder, this.biomeOrder);
+                    }
                     chunkSection = emptyChunkSection;
                 }
 
@@ -340,7 +355,10 @@ public final class ChunkSectionList {
         }
 
         private ChunkSection.@NonNull Builder findOrCreateChunkSectionBuilder(int sectionIndex) {
-            return this.chunkSectionBuilders.computeIfAbsent(sectionIndex, ignored -> new ChunkSection.Builder());
+            return this.chunkSectionBuilders.computeIfAbsent(
+                    sectionIndex,
+                    ignored -> new ChunkSection.Builder(this.defaultBlockState, this.defaultBiome)
+            );
         }
     }
 }

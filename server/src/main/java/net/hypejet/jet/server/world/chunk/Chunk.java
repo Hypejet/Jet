@@ -182,16 +182,24 @@ public final class Chunk {
          * @param blockStateOrder an element order of block states that should be used for creation
          *                        of block state palettes
          * @param biomeOrder an element order of biomes that should be used for creation of biome palettes
+         * @param defaultBlockState a default block state that should be used in places where a block state
+         *                          has not been set
+         * @param defaultBiome a registry entry of a biome that should be used where a biome has not been set
          * @since 1.0
          */
         public Builder(@NonNull DimensionType dimensionType, @NonNull ElementOrder<JetBlockState> blockStateOrder,
-                       @NonNull ElementOrder<JetRegistryEntry<Biome>> biomeOrder) {
+                       @NonNull ElementOrder<JetRegistryEntry<Biome>> biomeOrder,
+                       @NonNull JetBlockState defaultBlockState, @NonNull JetRegistryEntry<Biome> defaultBiome) {
             this.dimensionType = NullabilityUtil.requireNonNull(dimensionType, "dimension type");
 
             NullabilityUtil.requireNonNull(blockStateOrder, "block state order");
             NullabilityUtil.requireNonNull(biomeOrder, "biome order");
 
-            this.chunkSectionListBuilder = new ChunkSectionList.Builder(dimensionType, blockStateOrder, biomeOrder);
+            this.chunkSectionListBuilder = new ChunkSectionList.Builder(
+                    dimensionType, blockStateOrder, biomeOrder,
+                    defaultBlockState, defaultBiome
+            );
+
             this.lightSectionListBuilder = new LightSectionList.Builder(dimensionType);
         }
 

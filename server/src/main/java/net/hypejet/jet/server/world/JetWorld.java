@@ -5,8 +5,10 @@ import net.hypejet.concurrency.map.MapAcquisition;
 import net.hypejet.concurrency.map.hashmap.HashMapAcquirable;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
+import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.registry.JetRegistryManager;
@@ -38,7 +40,7 @@ public final class JetWorld implements World {
     private final UUID uniqueId;
     private final JetRegistryEntry<DimensionType> dimensionType;
 
-    private final ChunkProvider chunkLoader;
+    private final ChunkProvider chunkProvider;
     private final JetMinecraftServer server;
 
     private final MapAcquirable<ChunkPosition, Chunk, ?> chunks = new HashMapAcquirable<>();
@@ -56,7 +58,7 @@ public final class JetWorld implements World {
                     @NonNull ChunkProvider chunkProvider, @NonNull JetMinecraftServer server) {
         this.uniqueId = NullabilityUtil.requireNonNull(uniqueId, "unique identifier");
         this.dimensionType = NullabilityUtil.requireNonNull(dimensionType, "dimension type");
-        this.chunkLoader = NullabilityUtil.requireNonNull(chunkProvider, "chunk provider");
+        this.chunkProvider = NullabilityUtil.requireNonNull(chunkProvider, "chunk provider");
         this.server = NullabilityUtil.requireNonNull(server, "server");
     }
 
@@ -133,13 +135,29 @@ public final class JetWorld implements World {
                 acquisition -> acquisition.map().computeIfAbsent(position, ignored -> {
                     JetRegistryManager registryManager = this.server.registryManager();
 
+                    int chunkX = position.chunkX();
+                    int chunkZ = position.chunkZ();
+
+                    BlockState defaultBlockState = this.chunkProvider.defaultBlockState(chunkX, chunkZ);
+                    if (!(defaultBlockState instanceof JetBlockState validatedBlockState)) {
+                        throw new IllegalArgumentException("The default block state" +
+                                " specified is not a valid block state");
+                    }
+
+                    RegistryEntry<Biome> defaultBiome = this.chunkProvider.defaultBiome(chunkX, chunkZ);
+                    if (!(defaultBiome instanceof JetRegistryEntry<Biome> validatedBiome)) {
+                        throw new IllegalArgumentException("The registry entry of a default" +
+                                " biome specified is not a valid registry entry");
+                    }
+
                     Chunk.Builder builder = new Chunk.Builder(
                             this.dimensionType.value(),
                             registryManager.blockStateOrder(),
-                            registryManager.biomeRegistry().elementOrder()
+                            registryManager.biomeRegistry().elementOrder(),
+                            validatedBlockState, validatedBiome
                     );
 
-                    this.chunkLoader.provide(builder, position.chunkX(), position.chunkZ(), this);
+                    this.chunkProvider.provide(builder, position.chunkX(), position.chunkZ(), this);
                     return builder.build();
                 })
         );

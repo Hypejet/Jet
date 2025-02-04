@@ -20,7 +20,7 @@ import java.util.function.UnaryOperator;
  */
 public class JetEntity implements Entity {
 
-    private static final AtomicInteger NEXT_ENTITY_ID = new AtomicInteger(); // FIXME: Not the best solution, de
+    private static final AtomicInteger NEXT_ENTITY_ID = new AtomicInteger(); // FIXME: Not the best solution
 
     private final Key entityType;
     private final int entityId;

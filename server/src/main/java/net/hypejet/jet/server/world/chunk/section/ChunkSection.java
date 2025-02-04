@@ -13,6 +13,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -170,8 +171,19 @@ public final class ChunkSection {
         private final List<JetBlockState> blockStates = new ArrayList<>(ChunkPaletteType.BLOCK_STATE.elementCount());
         private final List<JetRegistryEntry<Biome>> biomes = new ArrayList<>(ChunkPaletteType.BIOME.elementCount());
 
-        public Builder() {
-            // TODO: Fill the lists initially to avoid null elements
+        /**
+         * Constructs the {@linkplain Builder chunk section builder}.
+         *
+         * @param defaultBlockState a default block state that should be used in places where a block state
+         *                          has not been set
+         * @param defaultBiome a registry entry of a biome that should be used where a biome has not been set
+         * @since 1.0
+         */
+        public Builder(@NonNull JetBlockState defaultBlockState, @NonNull JetRegistryEntry<Biome> defaultBiome) {
+            NullabilityUtil.requireNonNull(defaultBlockState, "default block state");
+            NullabilityUtil.requireNonNull(defaultBiome, "default biome");
+            Collections.fill(this.blockStates, defaultBlockState);
+            Collections.fill(this.biomes, defaultBiome);
         }
 
         /**
