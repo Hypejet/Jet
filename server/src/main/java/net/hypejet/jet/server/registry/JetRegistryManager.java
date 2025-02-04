@@ -15,7 +15,6 @@ import net.hypejet.jet.data.model.server.registry.registries.block.Block;
 import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState;
 import net.hypejet.jet.data.model.server.registry.registries.pack.FeaturePack;
 import net.hypejet.jet.data.model.server.registry.registries.registry.DataRegistryEntry;
-import net.hypejet.jet.registry.MinecraftRegistry;
 import net.hypejet.jet.registry.RegistryManager;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.registry.tags.Tags;
@@ -33,7 +32,6 @@ import net.hypejet.jet.server.world.block.JetBlock;
 import net.hypejet.jet.server.world.block.JetBlockState;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -303,15 +301,7 @@ public final class JetRegistryManager implements RegistryManager {
     ) {
         if (!(dataEntry.value() instanceof Block(Set<Key> requiredFeatureFlags, int defaultBlockStateId)))
             throw new IllegalArgumentException("The value is not a block");
-
-        JetBlockState blockState = blockStateOrder.get(defaultBlockStateId);
-        if (blockState == null) {
-            throw new IllegalArgumentException(String.format(
-                    "Unknown block state with identifier of %d",
-                    defaultBlockStateId
-            ));
-        }
-
+        JetBlockState blockState = blockStateOrder.getOrThrow(defaultBlockStateId);
         return new JetRegistryEntry<>(dataEntry.key(), new JetBlock(requiredFeatureFlags, blockState), null);
     }
 }

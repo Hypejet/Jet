@@ -6,12 +6,12 @@ import it.unimi.dsi.fastutil.objects.Object2ShortOpenCustomHashMap;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.util.hash.IdentityHashStrategy;
 import net.hypejet.jet.server.util.order.ElementOrder;
+import net.hypejet.jet.server.util.storage.BitStorage;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.coordinate.relative.ChunkPaletteRelativePosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -23,7 +23,8 @@ import java.util.Objects;
  */
 public final class SingleValuedChunkPalette<E> extends ChunkPalette<E> {
 
-    private static final long[] EMPTY_LONG_ARRAY = new long[0];
+    private static final byte BITS_PER_ELEMENT = 0;
+    private static final BitStorage EMPTY_BIT_STORAGE = new BitStorage(BITS_PER_ELEMENT, new int[0]);
 
     private final E element;
     private final int elementIdentifier;
@@ -40,7 +41,7 @@ public final class SingleValuedChunkPalette<E> extends ChunkPalette<E> {
      */
     SingleValuedChunkPalette(@NonNull ChunkPaletteType type, @NonNull E element,
                              @NonNull ElementOrder<E> elementOrder) {
-        super((byte) 0, type, EMPTY_LONG_ARRAY, elementOrder);
+        super(BITS_PER_ELEMENT, type, EMPTY_BIT_STORAGE, elementOrder);
 
         this.element = NullabilityUtil.requireNonNull(element, "element");
         this.elementIdentifier = elementOrder.identifierOf(element);
@@ -61,8 +62,10 @@ public final class SingleValuedChunkPalette<E> extends ChunkPalette<E> {
     }
 
     @Override
-    protected @NonNull List<E> createElementList() {
-        return Collections.nCopies(this.type().elementCount(), this.element);
+    protected int @NonNull [] createElementArray() {
+        int[] elements = new int[this.type().elementCount()];
+        Arrays.fill(elements, this.elementIdentifier);
+        return elements;
     }
 
     /**
@@ -77,14 +80,14 @@ public final class SingleValuedChunkPalette<E> extends ChunkPalette<E> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (!(o instanceof SingleValuedChunkPalette<?> otherPalette)) return false;
-        return Objects.equals(this.element, otherPalette.element);
+        if (!super.equals(o)) return false;
+        return this.elementIdentifier == otherPalette.elementIdentifier;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(this.element);
+        return Objects.hash(super.hashCode(), this.elementIdentifier);
     }
 
     @Override

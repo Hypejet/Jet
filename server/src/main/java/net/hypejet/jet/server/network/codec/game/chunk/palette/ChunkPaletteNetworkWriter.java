@@ -40,6 +40,6 @@ public final class ChunkPaletteNetworkWriter implements NetworkWriter<ChunkPalet
                     VarIntNetworkCodec.INSTANCE.write(buf, palette.elementIdentifier());
         }
 
-        LongArrayNetworkWriter.INSTANCE.write(buf, object.data());
+        LongArrayNetworkWriter.INSTANCE.write(buf, object.data().data());
     }
 }

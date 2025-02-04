@@ -34,7 +34,7 @@ public final class BitStorage {
     public BitStorage(byte bitsPerElement, int @NonNull [] elements) {
         NullabilityUtil.requireNonNull(elements, "elements");
 
-        if (bitsPerElement <= 0)
+        if (bitsPerElement < 0)
             throw new IllegalArgumentException("The bit-per-element value cannot be negative");
 
         if (bitsPerElement > Long.SIZE) {
@@ -117,6 +117,20 @@ public final class BitStorage {
         for (BitStorageUpdate update : updates)
             setValue(data, update.elementIndex(), update.newElement());
         return new BitStorage(this.bitsPerElement, this.elementsPerDataValue, this.size, this.maxValue, data);
+    }
+
+    /**
+     * Creates an array, which contains all elements of this bit storage directly in their original order.
+     *
+     * @return the array
+     * @since 1.0
+     */
+    @Contract(pure = true)
+    public int @NonNull [] unpack() {
+        int[] unpackedData = new int[this.size];
+        for (int index = 0; index < unpackedData.length; index++)
+            unpackedData[index] = this.getElement(index);
+        return unpackedData;
     }
 
     @Override

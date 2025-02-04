@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.common.value.qual.IntRange;
 
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,25 @@ public class ElementOrder<E> {
     }
 
     /**
+     * Gets an element with an identifier specified. Throws an exception if the element could not be found.
+     *
+     * @param identifier the identifier
+     * @return the element
+     * @since 1.0
+     * @throws IllegalArgumentException if the element could not be found
+     */
+    public final @NonNull E getOrThrow(int identifier) {
+        E element = this.get(identifier);
+        if (element == null) {
+            throw new IllegalArgumentException(String.format(
+                    "Could not find an element with identifier of %d",
+                    identifier
+            ));
+        }
+        return element;
+    }
+
+    /**
      * Gets an element with an identifier specified.
      *
      * @param identifier the identifier
@@ -67,11 +87,12 @@ public class ElementOrder<E> {
      * @param element the element
      * @return the identifier
      * @since 1.0
+     * @throws IllegalArgumentException if the element has not been registered in this element order
      */
-    public final int identifierOf(@NonNull E element) {
-        Integer identifier = this.elementToIdentifierMap.get(element);
-        if (identifier == null)
+    public final @IntRange(from = 0, to = Integer.MAX_VALUE) int identifierOf(@NonNull E element) {
+        NullabilityUtil.requireNonNull(element, "element");
+        if (!this.elementToIdentifierMap.containsKey(element))
             throw new IllegalArgumentException("The element specified has not been registered in this element order");
-        return identifier;
+        return this.elementToIdentifierMap.getInt(element);
     }
 }
