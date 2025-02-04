@@ -6,6 +6,7 @@ import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.world.chunk.palette.ChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.light.update.LightStorageUpdate;
+import net.hypejet.jet.server.world.coordinate.relative.ChunkPaletteRelativePosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -72,14 +73,7 @@ public sealed abstract class LightStorage permits DirectLightStorage, EmptyLight
         boolean lightChanged = false;
 
         for (LightStorageUpdate update : updates) {
-            byte x = update.x();
-            byte y = update.y();
-            byte z = update.z();
-
-            int paletteElementIndex = ChunkPalette.calculateElementIndex(
-                    ChunkPaletteType.BLOCK_STATE.axisLength(),
-                    x, y, z
-            );
+            int paletteElementIndex = ChunkPalette.calculateElementIndex(update.position());
 
             int dataIndex = createDataArrayElementIndex(paletteElementIndex);
             byte dataElement = data[dataIndex];
@@ -109,22 +103,18 @@ public sealed abstract class LightStorage permits DirectLightStorage, EmptyLight
 
         if (!lightChanged)
             return this;
-        if (valueCountMap.size() == 1 && valueCountMap.containsKey((byte) 0))
-            return EmptyLightStorage.INSTANCE;
-
-        return new DirectLightStorage(data, valueCountMap);
+        return create(valueCountMap, data);
     }
 
     /**
-     * Gets a light value for a block state at a section-relative coordinate specified.
+     * Gets a light value for a block state
+     * at {@linkplain ChunkPaletteRelativePosition a chunk-palette-relative position} specified.
      *
-     * @param x an {@code X} value of the coordinate
-     * @param y an {@code Y} value of the coordinate
-     * @param z an {@code Z} value of the coordinate
+     * @param position the position
      * @return the light value
      * @since 1.0
      */
-    public abstract byte getValue(byte x, byte y, byte z);
+    public abstract byte getValue(@NonNull ChunkPaletteRelativePosition position);
 
     /**
      * Gets an array, which stores all light values of this storage, where one byte stores two values.
@@ -143,30 +133,13 @@ public sealed abstract class LightStorage permits DirectLightStorage, EmptyLight
     protected abstract @NonNull Byte2ShortMap valueCountMap();
 
     /**
-     * Gets a light value for a block state with a palette element index specified from a data array specified.
+     * Creates {@linkplain LightStorage a light storage} for light values specified.
      *
-     * <p>The data array must contain two values per element.</p>
-     *
-     * @param data the data array
-     * @param paletteElementIndex the
-     * @return the light value
+     * @param values the light values
+     * @return the light storage
      * @since 1.0
      */
-    protected static byte getValue(byte @NonNull [] data, int paletteElementIndex) {
-        int valueArrayElementIndex = createDataArrayElementIndex(paletteElementIndex);
-        return extractValue(data[valueArrayElementIndex], paletteElementIndex);
-    }
-
-    /**
-     * Creates {@linkplain DirectLightStorage a direct light storage} with a light value array specified. The array
-     * should store light value for each block state index of a chunk section.
-     *
-     * @param values the values
-     * @return the direct light storage
-     * @since 1.0
-     * @throws IllegalArgumentException if length of the value array specified is invalid
-     */
-    protected static @NonNull DirectLightStorage createDirectStorage(byte @NonNull [] values) {
+    public static @NonNull LightStorage create(byte @NonNull [] values) {
         NullabilityUtil.requireNonNull(values, "values");
 
         int length = values.length;
@@ -191,6 +164,27 @@ public sealed abstract class LightStorage permits DirectLightStorage, EmptyLight
             valueCountMap.put(value, valueCount);
         }
 
+        return create(valueCountMap, data);
+    }
+
+    /**
+     * Gets a light value for a block state with a palette element index specified from a data array specified.
+     *
+     * <p>The data array must contain two values per element.</p>
+     *
+     * @param data the data array
+     * @param paletteElementIndex the
+     * @return the light value
+     * @since 1.0
+     */
+    protected static byte getValue(byte @NonNull [] data, int paletteElementIndex) {
+        int valueArrayElementIndex = createDataArrayElementIndex(paletteElementIndex);
+        return extractValue(data[valueArrayElementIndex], paletteElementIndex);
+    }
+
+    private static @NonNull LightStorage create(@NonNull Byte2ShortMap valueCountMap, byte @NonNull [] data) {
+        if (valueCountMap.size() == 1 && valueCountMap.containsKey((byte) 0))
+            return EmptyLightStorage.INSTANCE;
         return new DirectLightStorage(data, valueCountMap);
     }
 

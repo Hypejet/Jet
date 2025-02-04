@@ -8,14 +8,15 @@ import it.unimi.dsi.fastutil.objects.Object2ShortOpenCustomHashMap;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.util.hash.IdentityHashStrategy;
 import net.hypejet.jet.server.util.math.MathUtil;
+import net.hypejet.jet.server.util.order.ElementOrder;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
+import net.hypejet.jet.server.world.coordinate.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.util.array.UnmodifiableIntegerArray;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.function.ToIntFunction;
 
 /**
  * Represents {@linkplain ChunkPalette a chunk palette}, which contains an array of identifiers of elements of registry
@@ -42,14 +43,14 @@ public final class IndirectChunkPalette<E> extends ChunkPalette<E> {
      * @param registryIndices the array of identifiers of registry associated with this palette, which are used
      *                        in the data
      * @param elementCountMap a map, which maps elements to their count in the palette
-     * @param elementToIdentifierFunction a function, which should represent elements of the palette as integers
+     * @param elementOrder an element order, from which identifiers of elements of the palette should be retrieved
      * @since 1.0
      */
     private IndirectChunkPalette(byte bitsPerElement, @NonNull ChunkPaletteType type, long @NonNull [] data,
                                  @NonNull List<E> elements, int @NonNull [] registryIndices,
                                  @NonNull Object2ShortMap<E> elementCountMap,
-                                 @NonNull ToIntFunction<E> elementToIdentifierFunction) {
-        super(bitsPerElement, type, data, elementToIdentifierFunction);
+                                 @NonNull ElementOrder<E> elementOrder) {
+        super(bitsPerElement, type, data, elementOrder);
 
         this.elements = List.copyOf(NullabilityUtil.requireNonNull(elements, "elements"));
         this.elementCountMap = Object2ShortMaps.unmodifiable(
@@ -65,8 +66,19 @@ public final class IndirectChunkPalette<E> extends ChunkPalette<E> {
     }
 
     @Override
-    public @NonNull E getElement(byte x, byte y, byte z) {
-        int elementIndex = ChunkPalette.calculateElementIndex(this.type().axisLength(), x, y, z);
+    public @NonNull E getElement(@NonNull ChunkPaletteRelativePosition position) {
+        ChunkPaletteType positionPaletteType = position.paletteType();
+        ChunkPaletteType expectedPaletteType = this.type();
+
+        if (positionPaletteType != expectedPaletteType) {
+            throw new IllegalArgumentException(String.format(
+                    "The chunk-palette-relative position specified has been created for chunk palettes with" +
+                            " type of %s, not %s",
+                    positionPaletteType, expectedPaletteType
+            ));
+        }
+
+        int elementIndex = ChunkPalette.calculateElementIndex(position);
 
         E element = this.elements.get(elementIndex);
         if (element == null)
@@ -100,50 +112,20 @@ public final class IndirectChunkPalette<E> extends ChunkPalette<E> {
      *
      * @param type a type of which the palette should be
      * @param elements elements that should be put to the data array
-     * @param elementToIdentifierFunction a function, which should represent elements of the palette as integers
-     * @return the indirect chunk palette
-     * @since 1.0
-     * @throws IllegalArgumentException if the bits-per-element value calculated exceeds the maximum allowed value for
-     *                                  an indirect palette
-     */
-    public static <E> @NonNull IndirectChunkPalette<E> create(
-            @NonNull ChunkPaletteType type, @NonNull List<E> elements,
-            @NonNull ToIntFunction<E> elementToIdentifierFunction
-    ) {
-        IndirectChunkPalette<E> palette = createOrNull(
-                type, elements, ChunkPalette.createCountMap(elements),
-                elementToIdentifierFunction
-        );
-
-        if (palette == null) {
-            throw new IllegalArgumentException(
-                    "The indirect palette is not eligible for the element list specified, since the bits-per-element" +
-                            " value calculated exceeds the maximum allowed value for an indirect palette"
-            );
-        }
-
-        return palette;
-    }
-
-    /**
-     * Creates {@linkplain IndirectChunkPalette an indirect chunk palette}.
-     *
-     * @param type a type of which the palette should be
-     * @param elements elements that should be put to the data array
      * @param elementCountMap a map, which maps elements to their count in the palette
-     * @param elementToIdentifierFunction a function, which should represent elements of the palette as integers
+     * @param elementOrder an element order, from which identifiers of elements of the palette should be retrieved
      * @return the indirect chunk palette, {@code null} if the bits-per-element value calculated exceeds the maximum
      *         allowed value for an indirect palette
      * @since 1.0
      */
     static <E> @Nullable IndirectChunkPalette<E> createOrNull(
             @NonNull ChunkPaletteType type, @NonNull List<E> elements,
-            @NonNull Object2ShortMap<E> elementCountMap, @NonNull ToIntFunction<E> elementToIdentifierFunction
+            @NonNull Object2ShortMap<E> elementCountMap, @NonNull ElementOrder<E> elementOrder
     ) {
         NullabilityUtil.requireNonNull(type, "type");
         NullabilityUtil.requireNonNull(elements, "elements");
         NullabilityUtil.requireNonNull(elementCountMap, "element count map");
-        NullabilityUtil.requireNonNull(elementToIdentifierFunction, "element to identifier function");
+        NullabilityUtil.requireNonNull(elementOrder, "element order");
 
         /* Maximum bit count used by any element of indirect chunk palette is a bit count of the last index of
            the registry indices array. */
@@ -175,12 +157,12 @@ public final class IndirectChunkPalette<E> extends ChunkPalette<E> {
 
         int[] registryIndices = new int[elementToRegistryIndicesArrayIndexMap.size()];
         for (Object2IntMap.Entry<E> entry : elementToRegistryIndicesArrayIndexMap.object2IntEntrySet())
-            registryIndices[entry.getIntValue()] = elementToIdentifierFunction.applyAsInt(entry.getKey());
+            registryIndices[entry.getIntValue()] = elementOrder.identifierOf(entry.getKey());
 
         return new IndirectChunkPalette<>(
                 bitsPerElement, type,
                 ChunkPalette.createDataArray(bitsPerElement, dataElements, type),
-                elements, registryIndices, elementCountMap, elementToIdentifierFunction
+                elements, registryIndices, elementCountMap, elementOrder
         );
     }
 

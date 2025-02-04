@@ -102,4 +102,21 @@ public enum ChunkPaletteType {
     public short elementCount() {
         return (short) (this.axisLength * this.axisLength * this.axisLength);
     }
+
+    /**
+     * Validates whether a value specified is valid for a coordinate relative
+     * to {@linkplain net.hypejet.jet.server.world.chunk.palette.ChunkPalette a chunk palette} of this type.
+     *
+     * @param value the value
+     * @since 1.0
+     * @throws IllegalArgumentException if the value is not valid for the chunk-palette-relative coordinate
+     */
+    public void validateCoordinateValue(byte value) {
+        if (value >= this.axisLength || value < 0) {
+            throw new IllegalArgumentException(String.format(
+                    "Value %d is not a valid coordinate value for a chunk palette of type %s",
+                    value, this
+            ));
+        }
+    }
 }

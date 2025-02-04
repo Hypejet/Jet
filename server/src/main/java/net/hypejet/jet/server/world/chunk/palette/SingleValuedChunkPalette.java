@@ -5,13 +5,14 @@ import it.unimi.dsi.fastutil.objects.Object2ShortMaps;
 import it.unimi.dsi.fastutil.objects.Object2ShortOpenCustomHashMap;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.util.hash.IdentityHashStrategy;
+import net.hypejet.jet.server.util.order.ElementOrder;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
+import net.hypejet.jet.server.world.coordinate.relative.ChunkPaletteRelativePosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.ToIntFunction;
 
 /**
  * Represents {@linkplain ChunkPalette a chunk palette}, which contains the same element at each position.
@@ -34,15 +35,15 @@ public final class SingleValuedChunkPalette<E> extends ChunkPalette<E> {
      *
      * @param type a type of which the palette should be
      * @param element the element
-     * @param elementToIdentifierFunction a function, which should represent elements of the palette as integers
+     * @param elementOrder an element order, from which identifiers of elements of the palette should be retrieved
      * @since 1.0
      */
-    public SingleValuedChunkPalette(@NonNull ChunkPaletteType type, @NonNull E element,
-                                    @NonNull ToIntFunction<E> elementToIdentifierFunction) {
-        super((byte) 0, type, EMPTY_LONG_ARRAY, elementToIdentifierFunction);
+    SingleValuedChunkPalette(@NonNull ChunkPaletteType type, @NonNull E element,
+                             @NonNull ElementOrder<E> elementOrder) {
+        super((byte) 0, type, EMPTY_LONG_ARRAY, elementOrder);
 
         this.element = NullabilityUtil.requireNonNull(element, "element");
-        this.elementIdentifier = elementToIdentifierFunction.applyAsInt(element);
+        this.elementIdentifier = elementOrder.identifierOf(element);
 
         Object2ShortMap<E> elementCountMap = new Object2ShortOpenCustomHashMap<>(IdentityHashStrategy.INSTANCE);
         elementCountMap.put(element, type.elementCount());
@@ -50,7 +51,7 @@ public final class SingleValuedChunkPalette<E> extends ChunkPalette<E> {
     }
 
     @Override
-    public @NonNull E getElement(byte x, byte y, byte z) {
+    public @NonNull E getElement(@NonNull ChunkPaletteRelativePosition position) {
         return this.element;
     }
 

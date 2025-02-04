@@ -9,7 +9,6 @@ import net.hypejet.jet.server.network.codec.game.chunk.heightmap.HeightMapCollec
 import net.hypejet.jet.server.network.codec.game.chunk.light.LightSerializationDataNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.chunk.section.ChunkSectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
-import net.hypejet.jet.server.network.model.light.LightSerializationData;
 import net.hypejet.jet.server.world.chunk.Chunk;
 import net.hypejet.jet.server.world.chunk.entity.BlockEntity;
 import net.hypejet.jet.server.world.chunk.section.ChunkSection;
@@ -43,7 +42,7 @@ public final class ChunkNetworkWriter implements NetworkWriter<Chunk> {
 
         ByteBuf sectionBuf = Unpooled.buffer();
         try {
-            SECTIONS_WRITER.write(sectionBuf, object.sections());
+            SECTIONS_WRITER.write(sectionBuf, object.chunkSectionList().sections());
             VarIntNetworkCodec.INSTANCE.write(buf, sectionBuf.readableBytes());
             buf.writeBytes(sectionBuf);
         } finally {
@@ -51,6 +50,6 @@ public final class ChunkNetworkWriter implements NetworkWriter<Chunk> {
         }
 
         BLOCK_ENTITIES_WRITER.write(buf, object.blockEntities());
-        LightSerializationDataNetworkWriter.INSTANCE.write(buf, LightSerializationData.create(object.lightSections()));
+        LightSerializationDataNetworkWriter.INSTANCE.write(buf, object.lightSectionList().serializationData());
     }
 }

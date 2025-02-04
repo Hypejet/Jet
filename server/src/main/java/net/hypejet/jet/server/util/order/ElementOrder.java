@@ -1,10 +1,12 @@
 package net.hypejet.jet.server.util.order;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMaps;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +20,7 @@ import java.util.Map;
 public class ElementOrder<E> {
 
     private final List<E> sortedElements;
-    private final Map<E, Integer> elementToIdentifierMap;
+    private final Object2IntMap<E> elementToIdentifierMap;
 
     /**
      * Constructs the {@linkplain ElementOrder element order}.
@@ -29,13 +31,13 @@ public class ElementOrder<E> {
     public ElementOrder(@NonNull List<E> sortedElements) {
         this.sortedElements = List.copyOf(NullabilityUtil.requireNonNull(sortedElements, "sorted elements"));
 
-        Map<E, Integer> elementToIdentifierMap = new HashMap<>();
+        Object2IntMap<E> elementToIdentifierMap = new Object2IntOpenHashMap<>();
         for (int index = 0; index < this.sortedElements.size(); index++) {
             E element = this.sortedElements.get(index);
             elementToIdentifierMap.put(element, index);
         }
 
-        this.elementToIdentifierMap = Map.copyOf(elementToIdentifierMap);
+        this.elementToIdentifierMap = Object2IntMaps.unmodifiable(elementToIdentifierMap);
     }
 
     /**

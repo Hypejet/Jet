@@ -4,17 +4,22 @@ import net.hypejet.concurrency.map.MapAcquirable;
 import net.hypejet.concurrency.map.MapAcquisition;
 import net.hypejet.concurrency.map.hashmap.HashMapAcquirable;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
+import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.registry.JetRegistryEntry;
+import net.hypejet.jet.server.registry.JetRegistryManager;
+import net.hypejet.jet.server.util.acquisition.BooleanMappedAcquisition;
 import net.hypejet.jet.server.util.acquisition.NotNullObjectMappedAcquisition;
 import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.Chunk;
 import net.hypejet.jet.server.world.chunk.update.BlockStateUpdate;
 import net.hypejet.jet.server.world.coordinate.ChunkPosition;
+import net.hypejet.jet.server.world.coordinate.relative.ChunkRelativePosition;
 import net.hypejet.jet.world.World;
 import net.hypejet.jet.world.block.BlockState;
+import net.hypejet.jet.world.chunk.ChunkProvider;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -32,6 +37,8 @@ public final class JetWorld implements World {
 
     private final UUID uniqueId;
     private final JetRegistryEntry<DimensionType> dimensionType;
+
+    private final ChunkProvider chunkLoader;
     private final JetMinecraftServer server;
 
     private final MapAcquirable<ChunkPosition, Chunk, ?> chunks = new HashMapAcquirable<>();
@@ -41,14 +48,16 @@ public final class JetWorld implements World {
      *
      * @param uniqueId a unique identifier that the world should have
      * @param dimensionType a dimension type, of which type the world should be
+     * @param chunkProvider a chunk provider that should be used for loading chunks of the world
      * @param server a server that should own the world
      * @since 1.0
      */
     public JetWorld(@NonNull UUID uniqueId, @NonNull JetRegistryEntry<DimensionType> dimensionType,
-                    @NonNull JetMinecraftServer server) {
+                    @NonNull ChunkProvider chunkProvider, @NonNull JetMinecraftServer server) {
         this.uniqueId = NullabilityUtil.requireNonNull(uniqueId, "unique identifier");
         this.dimensionType = NullabilityUtil.requireNonNull(dimensionType, "dimension type");
-        this.server = NullabilityUtil.requireNonNull(server, "server"); // TODO: Remove me?
+        this.chunkLoader = NullabilityUtil.requireNonNull(chunkProvider, "chunk provider");
+        this.server = NullabilityUtil.requireNonNull(server, "server");
     }
 
     @Override
@@ -63,12 +72,10 @@ public final class JetWorld implements World {
 
     @Override
     public @NonNull NotNullObjectAcquisition<JetBlockState> getBlockState(@NonNull BlockPosition position) {
-        return new NotNullObjectMappedAcquisition<>(this.chunks.acquireRead(), acquisition -> {
-            Chunk chunk = chunk(acquisition.map(), position);
-            byte sectionRelativeX = Chunk.createSectionRelativeBiomeCoordinate(position.blockX());
-            byte sectionRelativeZ = Chunk.createSectionRelativeBiomeCoordinate(position.blockZ());
-            return chunk.getBlockState(sectionRelativeX, (short) position.blockY(), sectionRelativeZ);
-        });
+        return new NotNullObjectMappedAcquisition<>(
+                this.loadChunk(position),
+                acquisition -> acquisition.get().chunkSectionList().getBlockState(ChunkRelativePosition.from(position))
+        );
     }
 
     @Override
@@ -79,18 +86,16 @@ public final class JetWorld implements World {
         if (!(blockState instanceof JetBlockState validatedBlockState))
             throw new IllegalArgumentException("The block state specified is not a valid block state");
 
-        try (MapAcquisition<ChunkPosition, Chunk, ?> acquisition = this.chunks.acquireWrite()) {
-            Map<ChunkPosition, Chunk> chunks = acquisition.map();
-            Chunk chunk = chunk(chunks, position);
-
-            byte sectionRelativeX = Chunk.createSectionRelativeBiomeCoordinate(position.blockX());
-            byte sectionRelativeZ = Chunk.createSectionRelativeBlockCoordinate(position.blockZ());
+        try (
+                MapAcquisition<ChunkPosition, Chunk, ?> mapAcquisition = this.chunks.acquireWrite();
+                NotNullObjectAcquisition<Chunk> chunkAcquisition = this.loadChunk(position)
+        ) {
+            Map<ChunkPosition, Chunk> chunks = mapAcquisition.map();
+            Chunk chunk = chunkAcquisition.get();
 
             Chunk newChunk = chunk.withUpdates(
-                    Set.of(new BlockStateUpdate(
-                            sectionRelativeX, (short) position.blockY(),
-                            sectionRelativeZ, validatedBlockState
-                    )), Set.of(), Set.of()
+                    Set.of(new BlockStateUpdate(ChunkRelativePosition.from(position), validatedBlockState)),
+                    Set.of(), Set.of()
             );
 
             if (chunk.equals(newChunk)) return;
@@ -98,10 +103,101 @@ public final class JetWorld implements World {
         }
     }
 
-    private static @NonNull Chunk chunk(@NonNull Map<ChunkPosition, Chunk> map, @NonNull BlockPosition position) {
-        Chunk chunk = map.get(ChunkPosition.fromBlockPosition(position));
-        if (chunk == null)
-            throw new IllegalArgumentException(String.format("No chunk was loaded at block position of %s", position));
-        return chunk;
+    /**
+     * Creates {@linkplain NotNullObjectAcquisition not-null object acquisition} of {@linkplain Chunk a chunk}
+     * that {@linkplain BlockPosition a block position} specified belong to. If the chunk has not been loaded it is
+     * loaded with {@linkplain ChunkProvider a chunk provider} of this world.
+     *
+     * @param position the block position
+     * @return the acquisition of the chunk
+     * @since 1.0
+     */
+    public @NonNull NotNullObjectAcquisition<Chunk> loadChunk(@NonNull BlockPosition position) {
+        NullabilityUtil.requireNonNull(position, "position");
+        return this.loadChunk(ChunkPosition.fromBlockPosition(position));
+    }
+
+    /**
+     * Creates {@linkplain NotNullObjectAcquisition not-null object acquisition} of {@linkplain Chunk a chunk}
+     * at {@linkplain ChunkPosition a chunk position} specified. If the chunk has not been loaded it is loaded
+     * with {@linkplain ChunkProvider a chunk provider} of this world.
+     *
+     * @param position the chunk position
+     * @return the acquisition of the chunk
+     * @since 1.0
+     */
+    public @NonNull NotNullObjectAcquisition<Chunk> loadChunk(@NonNull ChunkPosition position) {
+        NullabilityUtil.requireNonNull(position, "position");
+        return new NotNullObjectMappedAcquisition<>(
+                this.chunks.acquireRead(),
+                acquisition -> acquisition.map().computeIfAbsent(position, ignored -> {
+                    JetRegistryManager registryManager = this.server.registryManager();
+
+                    Chunk.Builder builder = new Chunk.Builder(
+                            this.dimensionType.value(),
+                            registryManager.blockStateOrder(),
+                            registryManager.biomeRegistry()
+                    );
+
+                    this.chunkLoader.provide(builder, position.chunkX(), position.chunkZ(), this);
+                    return builder.build();
+                })
+        );
+    }
+
+    /**
+     * Unloads {@linkplain Chunk a chunk} that owns {@linkplain BlockPosition a block position} specified.
+     *
+     * @param position the block position
+     * @return {@code true} if the chunk has been unloaded, {@code false} otherwise
+     * @since 1.0
+     */
+    public boolean unloadChunk(@NonNull BlockPosition position) {
+        NullabilityUtil.requireNonNull(position, "position");
+        return this.unloadChunk(ChunkPosition.fromBlockPosition(position));
+    }
+
+    /**
+     * Unloads {@linkplain Chunk a chunk} at {@linkplain ChunkPosition a chunk position} specified.
+     *
+     * @param position the chunk position
+     * @return {@code true} if the chunk has been unloaded, {@code false} otherwise
+     * @since 1.0
+     */
+    public boolean unloadChunk(@NonNull ChunkPosition position) {
+        NullabilityUtil.requireNonNull(position, "position");
+        try (MapAcquisition<ChunkPosition, Chunk, ?> mapAcquisition = this.chunks.acquireWrite()) {
+            // TODO: Do entity safety checks
+            return mapAcquisition.map().remove(position) != null;
+        }
+    }
+
+    /**
+     * Creates {@linkplain BooleanAcquisition a boolean acquisition}, whose value represents whether
+     * {@linkplain Chunk a chunk} that a {@linkplain BlockPosition a block position} specified belongs to is loaded.
+     *
+     * @param position the block position
+     * @return the boolean acquisition, whose value is {@code true} if the chunk is loaded, or {@code false} otherwise
+     * @since 1.0
+     */
+    public @NonNull BooleanAcquisition isChunkLoaded(@NonNull BlockPosition position) {
+        NullabilityUtil.requireNonNull(position, "position");
+        return this.isChunkLoaded(ChunkPosition.fromBlockPosition(position));
+    }
+
+    /**
+     * Creates {@linkplain BooleanAcquisition a boolean acquisition}, whose value represents whether
+     * {@linkplain Chunk a chunk} at {@linkplain ChunkPosition a chunk position} specified is loaded.
+     *
+     * @param position the chunk position
+     * @return the boolean acquisition, whose value is {@code true} if the chunk is loaded, or {@code false} otherwise
+     * @since 1.0
+     */
+    public @NonNull BooleanAcquisition isChunkLoaded(@NonNull ChunkPosition position) {
+        NullabilityUtil.requireNonNull(position, "position");
+        return new BooleanMappedAcquisition<>(
+                this.chunks.acquireRead(),
+                acquisition -> acquisition.map().containsKey(position)
+        );
     }
 }

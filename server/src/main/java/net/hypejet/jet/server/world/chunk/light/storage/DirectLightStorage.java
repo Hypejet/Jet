@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.bytes.Byte2ShortOpenHashMap;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.world.chunk.palette.ChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
+import net.hypejet.jet.server.world.coordinate.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -45,11 +46,15 @@ public final class DirectLightStorage extends LightStorage {
     }
 
     @Override
-    public byte getValue(byte x, byte y, byte z) {
-        return LightStorage.getValue(
-                this.data.array(),
-                ChunkPalette.calculateElementIndex(ChunkPaletteType.BLOCK_STATE.axisLength(), x, y, z)
-        );
+    public byte getValue(@NonNull ChunkPaletteRelativePosition position) {
+        ChunkPaletteType positionPaletteType = position.paletteType();
+        if (positionPaletteType != ChunkPaletteType.BLOCK_STATE) {
+            throw new IllegalArgumentException(
+                    "The chunk-palette-relative position specified has not been created for block state chunk palettes"
+            );
+        }
+
+        return LightStorage.getValue(this.data.array(), ChunkPalette.calculateElementIndex(position));
     }
 
     @Override
@@ -60,19 +65,6 @@ public final class DirectLightStorage extends LightStorage {
     @Override
     protected @NonNull Byte2ShortMap valueCountMap() {
         return this.valueCountMap;
-    }
-
-    /**
-     * Creates {@linkplain DirectLightStorage a direct light storage} with a light value array specified. The array
-     * should store light value for each block state index of a chunk section.
-     *
-     * @param values the values
-     * @return the direct light storage
-     * @since 1.0
-     * @throws IllegalArgumentException if length of the value array specified is invalid
-     */
-    public static @NonNull DirectLightStorage create(byte @NonNull [] values) {
-        return LightStorage.createDirectStorage(values);
     }
 
     @Override

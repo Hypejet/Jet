@@ -3,13 +3,17 @@ package net.hypejet.jet.server.world.chunk.section;
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.registry.JetRegistryEntry;
+import net.hypejet.jet.server.util.order.ElementOrder;
 import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.palette.ChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
+import net.hypejet.jet.server.world.coordinate.relative.ChunkPaletteRelativePosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -33,8 +37,8 @@ public final class ChunkSection {
      * @since 1.0
      * @throws IllegalArgumentException if usage types of palettes specified are invalid
      */
-    public ChunkSection(@NonNull ChunkPalette<JetBlockState> blockStatePalette,
-                        @NonNull ChunkPalette<JetRegistryEntry<Biome>> biomePalette) {
+    private ChunkSection(@NonNull ChunkPalette<JetBlockState> blockStatePalette,
+                         @NonNull ChunkPalette<JetRegistryEntry<Biome>> biomePalette) {
         this(calculateNonAirBlockCount(blockStatePalette), blockStatePalette, biomePalette);
     }
 
@@ -153,5 +157,75 @@ public final class ChunkSection {
         }
 
         return nonAirBlockCount;
+    }
+
+    /**
+     * Represents a builder of {@linkplain ChunkSection a chunk section}.
+     *
+     * @since 1.0
+     * @see ChunkSection
+     */
+    public static final class Builder {
+
+        private final List<JetBlockState> blockStates = new ArrayList<>(ChunkPaletteType.BLOCK_STATE.elementCount());
+        private final List<JetRegistryEntry<Biome>> biomes = new ArrayList<>(ChunkPaletteType.BIOME.elementCount());
+
+        public Builder() {
+            // TODO: Fill the lists initially to avoid null elements
+        }
+
+        /**
+         * Sets {@linkplain JetBlockState a block state} specified at a position specified.
+         *
+         * @param position the position
+         * @param blockState the block state to set
+         * @since 1.0
+         */
+        public void setBlockState(@NonNull ChunkPaletteRelativePosition position, @NonNull JetBlockState blockState) {
+            NullabilityUtil.requireNonNull(position, "position");
+            NullabilityUtil.requireNonNull(blockState, "block state");
+
+            if (position.paletteType() != ChunkPaletteType.BLOCK_STATE) {
+                throw new IllegalArgumentException("The chunk-relative position specified" +
+                        " is not a position created for block state chunk palettes");
+            }
+
+            this.blockStates.set(ChunkPalette.calculateElementIndex(position), blockState);
+        }
+
+        /**
+         * Sets {@linkplain JetBlockState a block state} specified at a position specified.
+         *
+         * @param position the position
+         * @param biome the biome to set
+         * @since 1.0
+         */
+        public void setBiome(@NonNull ChunkPaletteRelativePosition position, @NonNull JetRegistryEntry<Biome> biome) {
+            NullabilityUtil.requireNonNull(position, "position");
+            NullabilityUtil.requireNonNull(biome, "biome");
+
+            if (position.paletteType() != ChunkPaletteType.BIOME) {
+                throw new IllegalArgumentException("The chunk-relative position specified" +
+                        " is not a position created for biome chunk palettes");
+            }
+
+            this.biomes.set(ChunkPalette.calculateElementIndex(position), biome);
+        }
+
+        /**
+         * Builds {@linkplain ChunkSection a chunk section} with data set in this builder.
+         *
+         * @param blockStateOrder an element order of block states that should be used for the block state palette
+         * @param biomeOrder an element order of biomes that should be used for the biome palette
+         * @return the chunk section
+         * @since 1.0
+         */
+        public @NonNull ChunkSection build(@NonNull ElementOrder<JetBlockState> blockStateOrder,
+                                           @NonNull ElementOrder<JetRegistryEntry<Biome>> biomeOrder) {
+            return new ChunkSection(
+                    ChunkPalette.create(ChunkPaletteType.BLOCK_STATE, blockStateOrder, this.blockStates),
+                    ChunkPalette.create(ChunkPaletteType.BIOME, biomeOrder, this.biomes)
+            );
+        }
     }
 }

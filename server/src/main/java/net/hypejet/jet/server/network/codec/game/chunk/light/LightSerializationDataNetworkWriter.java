@@ -6,7 +6,7 @@ import net.hypejet.jet.server.network.codec.aggregate.array.bytes.ByteArrayNetwo
 import net.hypejet.jet.server.network.codec.aggregate.bitset.BitSetNetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.mapped.MappedValueNetworkWriter;
-import net.hypejet.jet.server.network.model.light.LightSerializationData;
+import net.hypejet.jet.server.world.chunk.light.LightSerializationData;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

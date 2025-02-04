@@ -7,14 +7,15 @@ import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.util.array.UnmodifiableLongArray;
 import net.hypejet.jet.server.util.hash.IdentityHashStrategy;
 import net.hypejet.jet.server.util.math.MathUtil;
+import net.hypejet.jet.server.util.order.ElementOrder;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
+import net.hypejet.jet.server.world.coordinate.relative.ChunkPaletteRelativePosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.ToIntFunction;
 
 /**
  * Represents a data container of {@linkplain net.hypejet.jet.server.world.chunk.section.ChunkSection a chunk section}.
@@ -30,7 +31,7 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
     private final UnmodifiableLongArray data;
 
     private final ChunkPaletteType type;
-    private final ToIntFunction<E> elementToIdentifierFunction;
+    private final ElementOrder<E> elementOrder;
 
     /**
      * Constructs the {@linkplain ChunkPalette chunk palette}.
@@ -39,18 +40,15 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
      * @param type a type of which the palette should be
      * @param data the data as a long array, where one long can store multiple elements, number of elements that one
      *             long can have depends on the previous bits-per-element value
-     * @param elementToIdentifierFunction a function, which should represent elements of the palette as integers
+     * @param elementOrder an element order, from which identifiers of elements of the palette should be retrieved
      * @since 1.0
      */
     protected ChunkPalette(byte bitsPerElement, @NonNull ChunkPaletteType type, long @NonNull [] data,
-                           @NonNull ToIntFunction<E> elementToIdentifierFunction) {
+                           @NonNull ElementOrder<E> elementOrder) {
         this.bitsPerElement = bitsPerElement;
         this.type = NullabilityUtil.requireNonNull(type, "type");
         this.data = new UnmodifiableLongArray(NullabilityUtil.requireNonNull(data, "data"));
-        this.elementToIdentifierFunction = NullabilityUtil.requireNonNull(
-                elementToIdentifierFunction,
-                "element to identifier function"
-        );
+        this.elementOrder = NullabilityUtil.requireNonNull(elementOrder, "element order");
     }
 
     /**
@@ -86,13 +84,14 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
     }
 
     /**
-     * Gets a function represents elements of this palette as integers.
+     * Gets {@linkplain ElementOrder an element order}, from which identifiers of elements of this palette
+     * are retrieved.
      *
-     * @return the function
+     * @return the element order
      * @since 1.0
      */
-    public final @NonNull ToIntFunction<E> elementToIdentifierFunction() {
-        return this.elementToIdentifierFunction;
+    public final @NonNull ElementOrder<E> elementToIdentifierFunction() {
+        return this.elementOrder;
     }
 
     /**
@@ -117,9 +116,7 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
 
         boolean paletteChanged = false;
         for (ChunkPaletteUpdate<E> update : updates) {
-            int elementIndex = calculateElementIndex(
-                    type.axisLength(), update.sectionX(), update.sectionY(), update.sectionZ()
-            );
+            int elementIndex = calculateElementIndex(update.position());
 
             E previousElement = elements.get(elementIndex);
             E newElement = update.newElement();
@@ -145,33 +142,18 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
         if (!paletteChanged)
             return this;
 
-        ToIntFunction<E> elementToIdentifierFunction = this.elementToIdentifierFunction();
-        if (elementCountMap.size() == 1) {
-            E onlyElement = Iterables.getOnlyElement(elementCountMap.keySet());
-            return new SingleValuedChunkPalette<>(type, onlyElement, elementToIdentifierFunction);
-        }
-
-        IndirectChunkPalette<E> indirectPalette = IndirectChunkPalette.createOrNull(
-                type, elements, elementCountMap,
-                elementToIdentifierFunction
-        );
-
-        if (indirectPalette != null)
-            return indirectPalette;
-        return DirectChunkPalette.create(type, elements, elementToIdentifierFunction, elementCountMap);
+        return create(type, this.elementOrder, elementCountMap, elements);
     }
 
     /**
-     * Gets an element of the data at coordinates specified. Note that coordinate values provided on each axis must
-     * be relative to beginning of the axles in the chunk palette.
+     * Gets an element of the palette, which is present
+     * at {@linkplain ChunkPaletteRelativePosition a chunk-palette-relative position} specified.
      *
-     * @param x an {@code X} value of the coordinates
-     * @param y an {@code Y} value of the coordinates
-     * @param z an {@code Z} value of the coordinates
+     * @param position the chunk-palette-relative position
      * @return the element
      * @since 1.0
      */
-    public abstract @NonNull E getElement(byte x, byte y, byte z);
+    public abstract @NonNull E getElement(@NonNull ChunkPaletteRelativePosition position);
 
     /**
      * Gets {@linkplain Object2ShortMap a map}, which maps elements to their count in the palette.
@@ -190,20 +172,32 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
     protected abstract @NonNull List<E> createElementList();
 
     /**
-     * Calculates index of that an element with coordinates specified is stored at.
+     * Creates {@linkplain ChunkPalette a chunk palette} for elements specified.
      *
-     * @param axisLength a length of each axis of the coordinates
-     * @param x an {@code X} value of the coordinates
-     * @param y an {@code Y} value of the coordinates
-     * @param z an {@code Z} value of the coordinates
+     * @param type a type of which the chunk palette should have
+     * @param elementOrder an element order, from which identifiers of elements of the palette should be retrieved
+     * @param elements elements that the chunk palette should have
+     * @return the chunk palette
+     * @param <E> a type of the elements
+     * @since 1.0
+     */
+    public static <E> @NonNull ChunkPalette<E> create(@NonNull ChunkPaletteType type,
+                                                      @NonNull ElementOrder<E> elementOrder,
+                                                      @NonNull List<E> elements) {
+        return create(type, elementOrder, createCountMap(elements), elements);
+    }
+
+    /**
+     * Calculates index of that an element
+     * with {@linkplain ChunkPaletteRelativePosition a chunk-palette-relative position} specified is stored at.
+     *
+     * @param position the position
      * @return the index
      * @since 1.0
      */
-    public static int calculateElementIndex(byte axisLength, byte x, byte y, byte z) {
-        validateValue(x, axisLength, "x");
-        validateValue(y, axisLength, "y");
-        validateValue(z, axisLength, "z");
-        return x + (axisLength * z) + (axisLength * axisLength * y);
+    public static int calculateElementIndex(@NonNull ChunkPaletteRelativePosition position) {
+        byte axisLength = position.paletteType().axisLength();
+        return position.x() + (axisLength * position.z()) + (axisLength * axisLength * position.y());
     }
 
     /**
@@ -283,14 +277,23 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
         return elementCountMap;
     }
 
-    private static void validateValue(byte coordinateValue, byte axisLength, @NonNull String axisName) {
-        NullabilityUtil.requireNonNull(axisName, "axis name");
-        if (coordinateValue >= axisLength) {
-            throw new IllegalArgumentException(String.format(
-                    "Coordinate value of axis \"%s\" is higher than or the same as length of the axis (%s>=%s)",
-                    axisName, coordinateValue, axisLength
-            ));
+    private static <E> @NonNull ChunkPalette<E> create(@NonNull ChunkPaletteType type,
+                                                       @NonNull ElementOrder<E> elementOrder,
+                                                       @NonNull Object2ShortMap<E> elementCountMap,
+                                                       @NonNull List<E> elements) {
+        if (elementCountMap.size() == 1) {
+            E onlyElement = Iterables.getOnlyElement(elementCountMap.keySet());
+            return new SingleValuedChunkPalette<>(type, onlyElement, elementOrder);
         }
+
+        IndirectChunkPalette<E> indirectPalette = IndirectChunkPalette.createOrNull(
+                type, elements, elementCountMap,
+                elementOrder
+        );
+
+        if (indirectPalette != null)
+            return indirectPalette;
+        return DirectChunkPalette.create(type, elements, elementOrder, elementCountMap);
     }
 
     private static <K> void incrementValue(@NonNull Object2ShortMap<K> map, @NonNull K key) {

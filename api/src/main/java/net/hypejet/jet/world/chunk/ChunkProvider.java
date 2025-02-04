@@ -9,15 +9,15 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 1.0
  */
 @FunctionalInterface
-public interface ChunkLoader {
+public interface ChunkProvider {
     /**
      * Creates a chunk.
      *
      * @param builder a builder of the chunk
-     * @param chunkX a {@code X} value of coordinate of the chunk
-     * @param chunkZ a {@code Z} value of coordinate of the chunk
+     * @param chunkX an {@code X} value of coordinate of the chunk
+     * @param chunkZ an {@code Z} value of coordinate of the chunk
      * @param world a world that the chunk is created for
      * @since 1.0
      */
-    void load(@NonNull ChunkBuilder builder, int chunkX, int chunkZ, @NonNull World world);
+    void provide(@NonNull ChunkBuilder builder, int chunkX, int chunkZ, @NonNull World world);
 }

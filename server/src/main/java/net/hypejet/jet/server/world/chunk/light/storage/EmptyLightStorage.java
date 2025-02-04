@@ -2,7 +2,10 @@ package net.hypejet.jet.server.world.chunk.light.storage;
 
 import it.unimi.dsi.fastutil.bytes.Byte2ShortMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ShortMaps;
+import net.hypejet.jet.server.world.coordinate.relative.ChunkPaletteRelativePosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain LightStorage a light storage}, which does not store light values directly and returns
@@ -28,7 +31,7 @@ public final class EmptyLightStorage extends LightStorage {
     private EmptyLightStorage() {}
 
     @Override
-    public byte getValue(byte x, byte y, byte z) {
+    public byte getValue(@NonNull ChunkPaletteRelativePosition position) {
         return EMPTY_VALUE;
     }
 
@@ -44,7 +47,7 @@ public final class EmptyLightStorage extends LightStorage {
 
     @Override
     public int hashCode() {
-        return 1;
+        return Objects.hash();
     }
 
     @Override

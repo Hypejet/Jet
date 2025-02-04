@@ -167,7 +167,7 @@ public final class ConfigurationSessionTask implements SessionTask, KeepAliveRes
                 throw new RuntimeException("The known packs packet has not been sent on time", exception);
             }
 
-            Collection<JetMinecraftRegistry<?>> registries = server.registryManager().getRegistries().values();
+            Collection<JetMinecraftRegistry<?>> registries = server.registryManager().registries();
             for (JetMinecraftRegistry<?> registry : registries) {
                 if (!(registry instanceof JetSerializableMinecraftRegistry<?> serializableRegistry)) continue;
                 sendRegistry(this.player, serializableRegistry, packet.featurePacks());
