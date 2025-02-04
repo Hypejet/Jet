@@ -157,7 +157,7 @@ public final class JetWorld implements World {
                             validatedBlockState, validatedBiome
                     );
 
-                    this.chunkProvider.provide(builder, position.chunkX(), position.chunkZ(), this);
+                    this.chunkProvider.provide(builder, chunkX, chunkZ, this);
                     return builder.build();
                 })
         );
