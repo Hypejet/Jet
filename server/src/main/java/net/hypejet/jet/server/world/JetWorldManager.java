@@ -1,5 +1,6 @@
 package net.hypejet.jet.server.world;
 
+import net.hypejet.concurrency.collection.CollectionAcquisition;
 import net.hypejet.concurrency.map.MapAcquirable;
 import net.hypejet.concurrency.map.MapAcquisition;
 import net.hypejet.concurrency.map.hashmap.HashMapAcquirable;
@@ -9,12 +10,15 @@ import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.registry.JetRegistryEntry;
+import net.hypejet.jet.server.util.acquisition.CollectionMappedAcquisition;
 import net.hypejet.jet.server.util.acquisition.NullableObjectMappedAcquisition;
 import net.hypejet.jet.util.exception.AlreadyExistsException;
+import net.hypejet.jet.world.World;
 import net.hypejet.jet.world.WorldManager;
 import net.hypejet.jet.world.chunk.ChunkProvider;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
@@ -75,5 +79,13 @@ public final class JetWorldManager implements WorldManager {
         try (MapAcquisition<UUID, JetWorld, ?> acquisition = this.worldAcquirable.acquireWrite()) {
             acquisition.map().remove(uniqueId); // TODO: Safety checks
         }
+    }
+
+    @Override
+    public @NonNull CollectionAcquisition<? extends World, ?> worlds() {
+        return new CollectionMappedAcquisition<>(
+                this.worldAcquirable.acquireRead(),
+                acquisition -> Collections.unmodifiableCollection(acquisition.map().values())
+        );
     }
 }

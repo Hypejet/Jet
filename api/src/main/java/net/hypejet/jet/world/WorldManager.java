@@ -1,5 +1,6 @@
 package net.hypejet.jet.world;
 
+import net.hypejet.concurrency.collection.CollectionAcquisition;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.registry.RegistryEntry;
@@ -48,4 +49,13 @@ public interface WorldManager {
      * @since 1.0
      */
     void unregisterWorld(@NonNull UUID uniqueId);
+
+    /**
+     * Creates {@linkplain CollectionAcquisition a collection acquisition} of {@linkplain World worlds} registered
+     * in this {@linkplain WorldManager world manager}.
+     *
+     * @return the collection acquisition
+     * @since 1.0
+     */
+    @NonNull CollectionAcquisition<? extends World, ?> worlds();
 }
