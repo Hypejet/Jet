@@ -108,8 +108,8 @@ public enum ChunkPaletteType {
      * to {@linkplain net.hypejet.jet.server.world.chunk.palette.ChunkPalette a chunk palette} of this type.
      *
      * @param value the value
-     * @since 1.0
      * @throws IllegalArgumentException if the value is not valid for the chunk-palette-relative coordinate
+     * @since 1.0
      */
     public void validateCoordinateValue(byte value) {
         if (value >= this.axisLength || value < 0) {

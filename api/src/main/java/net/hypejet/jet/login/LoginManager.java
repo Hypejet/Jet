@@ -30,8 +30,8 @@ public interface LoginManager {
      *
      * @param username a username that the player should have
      * @param uniqueId a unique identifier that the player should have
-     * @since 1.0
      * @throws IllegalStateException if the session has been already finished
+     * @since 1.0
      */
     void finish(@NonNull String username, @NonNull UUID uniqueId);
 
@@ -42,8 +42,8 @@ public interface LoginManager {
      * @param username a username that the player should have
      * @param uniqueId a unique identifier that the player should have
      * @param properties additional properties of the player should have
-     * @since 1.0
      * @throws IllegalStateException if the session has been already finished
+     * @since 1.0
      */
     void finish(@NonNull String username, @NonNull UUID uniqueId, @NonNull Collection<GameProfileProperty> properties);
 }

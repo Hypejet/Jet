@@ -304,8 +304,8 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
      * Initializes the {@linkplain JetPlayer player} of this connection.
      *
      * @param player the player
-     * @since 1.0
      * @throws IllegalArgumentException if the player was already initialized
+     * @since 1.0
      */
     public void initializePlayer(@NonNull JetPlayer player) {
         this.playerLock.writeLock().lock();
@@ -322,8 +322,8 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     /**
      * Ensures that the caller thread is {@linkplain EventLoop an event loop} thread.
      *
-     * @since 1.0
      * @throws IllegalStateException if the caller thread is not an event loop thread
+     * @since 1.0
      */
     public void ensureInEventLoop() {
         if (!this.channel.eventLoop().inEventLoop())

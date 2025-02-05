@@ -9,7 +9,6 @@ import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.registry.RegistryEntry;
-import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.acquisition.BooleanMappedAcquisition;
@@ -41,7 +40,7 @@ public final class JetWorld implements World {
     private final JetRegistryEntry<DimensionType> dimensionType;
 
     private final ChunkProvider chunkProvider;
-    private final JetMinecraftServer server;
+    private final JetWorldManager worldManager;
 
     private final MapAcquirable<ChunkPosition, Chunk, ?> chunks = new HashMapAcquirable<>();
 
@@ -51,15 +50,15 @@ public final class JetWorld implements World {
      * @param uniqueId a unique identifier that the world should have
      * @param dimensionType a dimension type, of which type the world should be
      * @param chunkProvider a chunk provider that should be used for loading chunks of the world
-     * @param server a server that should own the world
+     * @param worldManager a world manager that should own the world
      * @since 1.0
      */
     public JetWorld(@NonNull UUID uniqueId, @NonNull JetRegistryEntry<DimensionType> dimensionType,
-                    @NonNull ChunkProvider chunkProvider, @NonNull JetMinecraftServer server) {
+                    @NonNull ChunkProvider chunkProvider, @NonNull JetWorldManager worldManager) {
         this.uniqueId = NullabilityUtil.requireNonNull(uniqueId, "unique identifier");
         this.dimensionType = NullabilityUtil.requireNonNull(dimensionType, "dimension type");
         this.chunkProvider = NullabilityUtil.requireNonNull(chunkProvider, "chunk provider");
-        this.server = NullabilityUtil.requireNonNull(server, "server");
+        this.worldManager = NullabilityUtil.requireNonNull(worldManager, "world manager");
     }
 
     @Override
@@ -133,7 +132,7 @@ public final class JetWorld implements World {
         return new NotNullObjectMappedAcquisition<>(
                 this.chunks.acquireRead(),
                 acquisition -> acquisition.map().computeIfAbsent(position, ignored -> {
-                    JetRegistryManager registryManager = this.server.registryManager();
+                    JetRegistryManager registryManager = this.worldManager.server().registryManager();
 
                     int chunkX = position.chunkX();
                     int chunkZ = position.chunkZ();

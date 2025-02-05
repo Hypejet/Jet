@@ -29,8 +29,8 @@ public record PluginMetadata(@NonNull String name, @NonNull String version, @Non
      * @param entrypoints entrypoints of the plugin, the values must be valid class paths
      * @param authors authors of the plugin
      * @param dependencies dependencies of the plugin
-     * @since 1.0
      * @throws IllegalArgumentException if the name or version is empty
+     * @since 1.0
      */
     public PluginMetadata {
         NullabilityUtil.requireNonNull(name, "name");

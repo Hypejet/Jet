@@ -52,15 +52,34 @@ public final class JetWorldManager implements WorldManager {
     }
 
     @Override
-    public @NonNull JetWorld createWorld(@NonNull UUID uniqueId, @NonNull RegistryEntry<DimensionType> dimensionType,
-                                         @NonNull ChunkProvider chunkProvider) {
+    public @NonNull JetWorld createAndRegisterWorld(@NonNull UUID uniqueId,
+                                                    @NonNull RegistryEntry<DimensionType> dimensionType,
+                                                    @NonNull ChunkProvider chunkProvider) {
+        JetWorld world = this.createUnregisteredWorld(uniqueId, dimensionType, chunkProvider);
+        this.registerWorld(world);
+        return world;
+    }
+
+    @Override
+    public @NonNull JetWorld createUnregisteredWorld(@NonNull UUID uniqueId,
+                                                     @NonNull RegistryEntry<DimensionType> dimensionType,
+                                                     @NonNull ChunkProvider chunkProvider) {
         if (!(dimensionType instanceof JetRegistryEntry<DimensionType> validatedDimensionType)) {
             throw new IllegalArgumentException("The dimension type registry entry" +
                     " specified is not a valid registry entry");
         }
+        return new JetWorld(uniqueId, validatedDimensionType, chunkProvider, this);
+    }
 
+    @Override
+    public void registerWorld(@NonNull World world) {
+        if (!(world instanceof JetWorld validatedWorld))
+            throw new IllegalArgumentException("The world specified is not a valid world");
+        
         try (MapAcquisition<UUID, JetWorld, ?> acquisition = this.worldAcquirable.acquireWrite()) {
+            UUID uniqueId = world.uniqueId();
             Map<UUID, JetWorld> map = acquisition.map();
+            
             if (map.containsKey(uniqueId)) {
                 throw new AlreadyExistsException(String.format(
                         "A world with unique identifier of %s already exists",
@@ -68,9 +87,7 @@ public final class JetWorldManager implements WorldManager {
                 ));
             }
 
-            JetWorld world = new JetWorld(uniqueId, validatedDimensionType, chunkProvider, this.server);
-            map.put(uniqueId, world);
-            return world;
+            map.put(uniqueId, validatedWorld);
         }
     }
 
@@ -87,5 +104,16 @@ public final class JetWorldManager implements WorldManager {
                 this.worldAcquirable.acquireRead(),
                 acquisition -> Collections.unmodifiableCollection(acquisition.map().values())
         );
+    }
+
+    /**
+     * Gets {@linkplain JetMinecraftServer a Minecraft server} that owns
+     * this {@linkplain JetWorldManager world manager}.
+     *
+     * @return the Minecraft server
+     * @since 1.0
+     */
+    public @NonNull JetMinecraftServer server() {
+        return this.server;
     }
 }

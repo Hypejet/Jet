@@ -92,8 +92,8 @@ public final class KeepAliveHandler implements NetworkDisconnectionHandler, Keep
     /**
      * Schedules a task requesting the keep alive packets.
      *
-     * @since 1.0
      * @throws IllegalStateException if the task has been already scheduled
+     * @since 1.0
      */
     public void schedule() {
         try (WriteBooleanAcquisition acquisition = this.scheduled.acquireWrite()) {
@@ -111,6 +111,7 @@ public final class KeepAliveHandler implements NetworkDisconnectionHandler, Keep
      * @param timeUnit a time unit of the duration
      * @return {@code true} if the executor terminated before the duration specified, {@code false} otherwise
      * @throws InterruptedException when the thread is interrupted during awaiting
+     * @since 1.0
      */
     public boolean stopAndAwaitTermination(long duration, @NonNull TimeUnit timeUnit) throws InterruptedException {
         this.executorService.shutdown();

@@ -61,8 +61,8 @@ public enum ProtocolState {
      * {@linkplain ProtocolState protocol state}.
      *
      * @return the player connection state representation
-     * @since 1.0
      * @throws IllegalStateException if the player connection state representation could not be found
+     * @since 1.0
      */
     public @NonNull PlayerConnectionState toConnectionState() {
         PlayerConnectionState state = STATE_MAPPER.write(this);

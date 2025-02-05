@@ -34,12 +34,34 @@ public interface WorldManager {
      * @param dimensionType a registry entry of a dimension type that the world type should have
      * @param chunkProvider a chunk provider that the world should use for chunk loading
      * @return the world
-     * @since 1.0
      * @throws net.hypejet.jet.util.exception.AlreadyExistsException if a world with the unique identifier specified
-     *                                                               already exists
+     *                                                               has been already registered
+     * @since 1.0
      */
-    @NonNull World createWorld(@NonNull UUID uniqueId, @NonNull RegistryEntry<DimensionType> dimensionType,
-                               @NonNull ChunkProvider chunkProvider);
+    @NonNull World createAndRegisterWorld(@NonNull UUID uniqueId, @NonNull RegistryEntry<DimensionType> dimensionType,
+                                          @NonNull ChunkProvider chunkProvider);
+
+    /**
+     * Creates {@linkplain World a world} with {@linkplain UUID an unique identifier} specified without registering it.
+     *
+     * @param uniqueId the unique identifier
+     * @param dimensionType a registry entry of a dimension type that the world type should have
+     * @param chunkProvider a chunk provider that the world should use for chunk loading
+     * @return the world
+     * @since 1.0
+     */
+    @NonNull World createUnregisteredWorld(@NonNull UUID uniqueId, @NonNull RegistryEntry<DimensionType> dimensionType,
+                                           @NonNull ChunkProvider chunkProvider);
+
+    /**
+     * Registers {@linkplain World a world} specified in this {@linkplain WorldManager world manager}.
+     *
+     * @param world the world
+     * @throws net.hypejet.jet.util.exception.AlreadyExistsException if a world with a unique identifier of the world
+     *                                                               specified already exists
+     * @since 1.0
+     */
+    void registerWorld(@NonNull World world);
 
     /**
      * Unregisters {@linkplain World a world} with {@linkplain UUID an unique identifier} specified. Does nothing

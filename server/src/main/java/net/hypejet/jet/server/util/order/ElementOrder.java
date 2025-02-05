@@ -56,8 +56,8 @@ public final class ElementOrder<E> {
      *
      * @param identifier the identifier
      * @return the element
-     * @since 1.0
      * @throws IllegalArgumentException if the element could not be found
+     * @since 1.0
      */
     public @NonNull E getOrThrow(int identifier) {
         E element = this.get(identifier);
@@ -86,8 +86,8 @@ public final class ElementOrder<E> {
      *
      * @param element the element
      * @return the identifier
-     * @since 1.0
      * @throws IllegalArgumentException if the element has not been registered in this element order
+     * @since 1.0
      */
     public @IntRange(from = 0, to = Integer.MAX_VALUE) int identifierOf(@NonNull E element) {
         NullabilityUtil.requireNonNull(element, "element");

@@ -35,8 +35,8 @@ public final class ChunkSection {
      *
      * @param blockStatePalette a chunk palette of block states of the chunk section
      * @param biomePalette a chunk palette of biomes of the chunk section
-     * @since 1.0
      * @throws IllegalArgumentException if usage types of palettes specified are invalid
+     * @since 1.0
      */
     private ChunkSection(@NonNull ChunkPalette<JetBlockState> blockStatePalette,
                          @NonNull ChunkPalette<JetRegistryEntry<Biome>> biomePalette) {
@@ -49,8 +49,8 @@ public final class ChunkSection {
      * @param nonAirBlockStateCount a count of non-air block states of the chunk section
      * @param blockStatePalette a chunk palette of block states of the chunk section
      * @param biomePalette a chunk palette of biomes of the chunk section
-     * @since 1.0
      * @throws IllegalArgumentException if usage types of palettes specified are invalid
+     * @since 1.0
      */
     private ChunkSection(short nonAirBlockStateCount, @NonNull ChunkPalette<JetBlockState> blockStatePalette,
                          @NonNull ChunkPalette<JetRegistryEntry<Biome>> biomePalette) {

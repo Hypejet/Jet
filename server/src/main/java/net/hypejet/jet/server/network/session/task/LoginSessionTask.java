@@ -62,6 +62,7 @@ public final class LoginSessionTask implements SessionTask, LoginManager {
      * @param clientProtocolVersion a protocol version of the client trying to connect
      * @param transferring whether the client is joining due to transferring from another server
      * @throws IllegalStateException if the caller thread is not an event loop thread
+     * @since 1.0
      */
     public LoginSessionTask(@NonNull SocketPlayerConnection connection,
                             int clientProtocolVersion, boolean transferring) {
@@ -127,8 +128,8 @@ public final class LoginSessionTask implements SessionTask, LoginManager {
      * Handles a login request from a client.
      *
      * @param packet a packet of the login request
-     * @since 1.0
      * @throws IllegalArgumentException if the client has already sent a login request
+     * @since 1.0
      */
     public void handleLoginRequest(@NonNull ClientLoginRequestLoginPacket packet) {
         if (this.requestFuture.isDone())
@@ -139,8 +140,8 @@ public final class LoginSessionTask implements SessionTask, LoginManager {
     /**
      * Handles an acknowledgement to the login finish from a client.
      *
-     * @since 1.0
      * @throws IllegalArgumentException if the client has already sent an acknowledgement
+     * @since 1.0
      */
     public void acknowledgeFinishLogin() {
         if (this.acknowledgeFuture.isDone())
