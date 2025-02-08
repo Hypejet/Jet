@@ -3,6 +3,7 @@ package net.hypejet.jet.server.world.chunk.section;
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.registry.JetRegistryEntry;
+import net.hypejet.jet.server.util.collection.ListUtil;
 import net.hypejet.jet.server.util.order.ElementOrder;
 import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.palette.ChunkPalette;
@@ -10,10 +11,9 @@ import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
 import net.hypejet.jet.server.world.coordinate.relative.ChunkPaletteRelativePosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.Contract;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -73,6 +73,7 @@ public final class ChunkSection {
      * @return the count
      * @since 1.0
      */
+    @Contract(pure = true)
     public short nonAirBlockCount() {
         return this.nonAirBlockCount;
     }
@@ -83,6 +84,7 @@ public final class ChunkSection {
      * @return the chunk palette
      * @since 1.0
      */
+    @Contract(pure = true)
     public @NonNull ChunkPalette<JetBlockState> blockStatePalette() {
         return this.blockStatePalette;
     }
@@ -93,6 +95,7 @@ public final class ChunkSection {
      * @return the chunk palette
      * @since 1.0
      */
+    @Contract(pure = true)
     public @NonNull ChunkPalette<JetRegistryEntry<Biome>> biomePalette() {
         return this.biomePalette;
     }
@@ -168,8 +171,8 @@ public final class ChunkSection {
      */
     public static final class Builder {
 
-        private final List<JetBlockState> blockStates = new ArrayList<>(ChunkPaletteType.BLOCK_STATE.elementCount());
-        private final List<JetRegistryEntry<Biome>> biomes = new ArrayList<>(ChunkPaletteType.BIOME.elementCount());
+        private final List<JetBlockState> blockStates;
+        private final List<JetRegistryEntry<Biome>> biomes;
 
         /**
          * Constructs the {@linkplain Builder chunk section builder}.
@@ -182,8 +185,12 @@ public final class ChunkSection {
         public Builder(@NonNull JetBlockState defaultBlockState, @NonNull JetRegistryEntry<Biome> defaultBiome) {
             NullabilityUtil.requireNonNull(defaultBlockState, "default block state");
             NullabilityUtil.requireNonNull(defaultBiome, "default biome");
-            Collections.fill(this.blockStates, defaultBlockState);
-            Collections.fill(this.biomes, defaultBiome);
+
+            int blockStateListElementCount = ChunkPaletteType.BLOCK_STATE.elementCount();
+            this.blockStates = ListUtil.filledArrayList(defaultBlockState, blockStateListElementCount);
+
+            int biomeListElementCount = ChunkPaletteType.BIOME.elementCount();
+            this.biomes = ListUtil.filledArrayList(defaultBiome, biomeListElementCount);
         }
 
         /**

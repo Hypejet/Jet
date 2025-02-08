@@ -165,15 +165,12 @@ public final class ChunkSectionList {
     public static int createSectionIndex(@NonNull ChunkRelativePosition position,
                                          @NonNull DimensionType dimensionType) {
         int axisLength = position.paletteType().axisLength();
-        int blockStateAxisLength = ChunkPaletteType.BLOCK_STATE.axisLength();
+        byte blockStateAxisLength = ChunkPaletteType.BLOCK_STATE.axisLength();
 
         int positionToBlockYMultiplier = blockStateAxisLength / axisLength;
         int blockY = position.absoluteY() * positionToBlockYMultiplier;
 
-        byte blockStatePaletteAxisLength = ChunkPaletteType.BLOCK_STATE.axisLength();
-        int minimumSectionY = Math.floorDiv(dimensionType.minY(), blockStatePaletteAxisLength);
-
-        return Math.floorDiv(blockY, blockStatePaletteAxisLength) - minimumSectionY;
+        return Math.floorDiv(blockY - dimensionType.minY(), blockStateAxisLength);
     }
 
     /**
@@ -185,7 +182,7 @@ public final class ChunkSectionList {
      * @since 1.0
      */
     public static int createSectionCount(@NonNull DimensionType dimensionType) {
-        return Math.ceilDiv(dimensionType.minY() + dimensionType.height(), ChunkPaletteType.BLOCK_STATE.axisLength());
+        return Math.ceilDiv(dimensionType.height(), ChunkPaletteType.BLOCK_STATE.axisLength());
     }
 
     private static <E, U> @NonNull IntObjectMap<List<ChunkPaletteUpdate<E>>> createChunkSectionPaletteUpdateMap(
@@ -348,7 +345,7 @@ public final class ChunkSectionList {
                     chunkSection = emptyChunkSection;
                 }
 
-                chunkSections.set(index, chunkSection);
+                chunkSections.add(index, chunkSection);
             }
 
             return new ChunkSectionList(this.dimensionType, chunkSections);

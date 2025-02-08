@@ -3,9 +3,11 @@ package net.hypejet.jet.entity.player;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.command.CommandSource;
+import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.network.PlayerConnection;
+import net.hypejet.jet.world.World;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -81,6 +83,36 @@ public interface Player extends Entity, CommandSource {
      * @since 1.0
      */
     void sendPluginMessage(@NonNull Key identifier, byte @NonNull [] data);
+
+    /**
+     * Creates {@linkplain NullableObjectAcquisition a nullable object acquisition} of {@linkplain World a world}
+     * that this {@linkplain Player player} is currently in.
+     *
+     * @return the nullable object acquisition, which holds the world or {@code null} if the world has not been set yet
+     * @since 1.0
+     */
+    @NonNull NullableObjectAcquisition<? extends World> getWorld();
+
+    /**
+     * Changes {@linkplain World a world} that this {@linkplain Player player} is in.
+     *
+     * <p>
+     *     Note that the world change can be <strong>cancelled</strong> and the world
+     *     the player gets finally teleported to can be <strong>changed</strong> in
+     *     {@linkplain net.hypejet.jet.event.events.world.PreWorldSwitchEvent a pre-world-switch event}.
+     * </p>
+     *
+     * <p>
+     *     If a check for these changed is needed, it can be done by {@linkplain #getWorld() read-acquiring} a world
+     *     that the player is in before setting the world and then getting and comparing it just after the change.
+     * </p>
+     *
+     * @param world the world
+     * @param position an initial position that the player should be teleported to
+     * @throws IllegalArgumentException if the player is already in the world specified
+     * @since 1.0
+     */
+    void setWorld(@NonNull World world, @NonNull Position position);
 
     /**
      * Represents a Minecraft chat mode setting of {@linkplain Player a player}.

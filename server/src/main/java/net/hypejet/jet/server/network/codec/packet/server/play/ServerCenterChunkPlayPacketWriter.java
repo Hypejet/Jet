@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerCenterChunkPlayPacket;
+import net.hypejet.jet.server.world.coordinate.ChunkPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -27,7 +28,9 @@ public final class ServerCenterChunkPlayPacketWriter implements NetworkWriter<Se
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerCenterChunkPlayPacket object) {
-        VarIntNetworkCodec.INSTANCE.write(buf, object.chunkX());
-        VarIntNetworkCodec.INSTANCE.write(buf, object.chunkZ());
+        // Chunk position in this packet is encoded differently
+        ChunkPosition chunkPosition = object.chunkPosition();
+        VarIntNetworkCodec.INSTANCE.write(buf, chunkPosition.chunkX());
+        VarIntNetworkCodec.INSTANCE.write(buf, chunkPosition.chunkZ());
     }
 }

@@ -82,6 +82,10 @@ public final class UnparsedServerConfiguration extends OkaeriConfig {
     @CustomKey("transfers-not-allowed-message")
     private @MonotonicNonNull String transfersNotAllowedMessage = createTransfersNotAllowedMessage();
 
+    @Comment("A maximum chunk view distance that a player can have")
+    @CustomKey("maximum-view-distance")
+    private byte maximumViewDistance = 10;
+
     private UnparsedServerConfiguration() {}
 
     /**
@@ -208,6 +212,16 @@ public final class UnparsedServerConfiguration extends OkaeriConfig {
         if (this.transfersNotAllowedMessage == null)
             this.transfersNotAllowedMessage = createTransfersNotAllowedMessage();
         return this.transfersNotAllowedMessage;
+    }
+
+    /**
+     * Gets a maximum chunk view distance that a player can have.
+     *
+     * @return the maximum view distance
+     * @since 1.0
+     */
+    public byte maximumViewDistance() {
+        return this.maximumViewDistance;
     }
 
     /**

@@ -1,8 +1,8 @@
-package net.hypejet.jet.server.network.codec.game.chunk.section;
+package net.hypejet.jet.server.network.codec.game.world.chunk.section;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
-import net.hypejet.jet.server.network.codec.game.chunk.palette.ChunkPaletteNetworkWriter;
+import net.hypejet.jet.server.network.codec.game.world.chunk.palette.ChunkPaletteNetworkWriter;
 import net.hypejet.jet.server.world.chunk.section.ChunkSection;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

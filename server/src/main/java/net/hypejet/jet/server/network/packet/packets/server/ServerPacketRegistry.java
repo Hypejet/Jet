@@ -34,8 +34,10 @@ import net.hypejet.jet.server.network.codec.packet.server.login.ServerPluginMess
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerActionBarPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerCenterChunkPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerChunkAndLightDataPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerChunkBatchFinishedPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerCommandSuggestionsResponsePlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerDeclareCommandsPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerInvalidateChunkPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerJoinGamePlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerPlayerListHeaderAndFooterPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizePositionPlayPacketWriter;
@@ -67,8 +69,11 @@ import net.hypejet.jet.server.network.packet.packets.server.login.ServerPluginMe
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerActionBarPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerCenterChunkPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkAndLightDataPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkBatchFinishedPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkBatchStartPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerCommandSuggestionsResponsePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerInvalidateChunkPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket;
@@ -218,6 +223,12 @@ public final class ServerPacketRegistry {
                                 ServerCommandSuggestionsResponsePlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.LEVEL_CHUNK_WITH_LIGHT, ServerChunkAndLightDataPlayPacket.class,
                                 ServerChunkAndLightDataPlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.FORGET_LEVEL_CHUNK, ServerInvalidateChunkPlayPacket.class,
+                                ServerInvalidateChunkPlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.CHUNK_BATCH_FINISHED, ServerChunkBatchFinishedPlayPacket.class,
+                                ServerChunkBatchFinishedPlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.CHUNK_BATCH_START, ServerChunkBatchStartPlayPacket.class,
+                                (buf, object) -> {})
                         .build()
         );
 

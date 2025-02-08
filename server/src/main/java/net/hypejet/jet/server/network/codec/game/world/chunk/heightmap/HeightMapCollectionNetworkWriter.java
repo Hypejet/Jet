@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.network.codec.game.chunk.heightmap;
+package net.hypejet.jet.server.network.codec.game.world.chunk.heightmap;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;

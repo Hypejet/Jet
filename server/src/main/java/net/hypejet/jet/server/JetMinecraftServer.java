@@ -35,10 +35,10 @@ public final class JetMinecraftServer implements MinecraftServer {
 
     private final NetworkManager networkManager;
 
-    private final JetPluginManager pluginManager;
     private final JetCommandManager commandManager;
     private final JetRegistryManager registryManager;
     private final JetWorldManager worldManager;
+    private final JetPluginManager pluginManager;
 
     private final HashSetAcquirable<JetPlayer> players = new HashSetAcquirable<>();
 
@@ -50,10 +50,10 @@ public final class JetMinecraftServer implements MinecraftServer {
     JetMinecraftServer() {
         this.configuration = JetServerConfiguration.parse(this, UnparsedServerConfiguration.create());
         this.commandManager = new JetCommandManager(this);
-        this.pluginManager = new JetPluginManager(this);
         this.registryManager = new JetRegistryManager(this);
-        this.networkManager = new NetworkManager(this);
         this.worldManager = new JetWorldManager(this);
+        this.pluginManager = new JetPluginManager(this);
+        this.networkManager = new NetworkManager(this);
         this.eventNode.call(new ServerReadyEvent());
     }
 

@@ -1,13 +1,13 @@
-package net.hypejet.jet.server.network.codec.game.chunk;
+package net.hypejet.jet.server.network.codec.game.world.chunk;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
-import net.hypejet.jet.server.network.codec.game.chunk.entity.BlockEntityNetworkWriter;
-import net.hypejet.jet.server.network.codec.game.chunk.heightmap.HeightMapCollectionNetworkWriter;
-import net.hypejet.jet.server.network.codec.game.chunk.light.LightSerializationDataNetworkWriter;
-import net.hypejet.jet.server.network.codec.game.chunk.section.ChunkSectionNetworkWriter;
+import net.hypejet.jet.server.network.codec.game.world.chunk.entity.BlockEntityNetworkWriter;
+import net.hypejet.jet.server.network.codec.game.world.chunk.heightmap.HeightMapCollectionNetworkWriter;
+import net.hypejet.jet.server.network.codec.game.world.chunk.light.LightSerializationDataNetworkWriter;
+import net.hypejet.jet.server.network.codec.game.world.chunk.section.ChunkSectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.world.chunk.Chunk;
 import net.hypejet.jet.server.world.chunk.entity.BlockEntity;

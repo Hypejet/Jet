@@ -5,11 +5,13 @@ import net.hypejet.concurrency.map.MapAcquirable;
 import net.hypejet.concurrency.map.MapAcquisition;
 import net.hypejet.concurrency.map.hashmap.HashMapAcquirable;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
+import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.registry.JetRegistryEntry;
+import net.hypejet.jet.server.util.acquisition.BooleanMappedAcquisition;
 import net.hypejet.jet.server.util.acquisition.CollectionMappedAcquisition;
 import net.hypejet.jet.server.util.acquisition.NullableObjectMappedAcquisition;
 import net.hypejet.jet.util.exception.AlreadyExistsException;
@@ -20,6 +22,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -73,9 +76,7 @@ public final class JetWorldManager implements WorldManager {
 
     @Override
     public void registerWorld(@NonNull World world) {
-        if (!(world instanceof JetWorld validatedWorld))
-            throw new IllegalArgumentException("The world specified is not a valid world");
-        
+        JetWorld validatedWorld = validateWorld(world);
         try (MapAcquisition<UUID, JetWorld, ?> acquisition = this.worldAcquirable.acquireWrite()) {
             UUID uniqueId = world.uniqueId();
             Map<UUID, JetWorld> map = acquisition.map();
@@ -106,6 +107,15 @@ public final class JetWorldManager implements WorldManager {
         );
     }
 
+    @Override
+    public @NonNull BooleanAcquisition isRegistered(@NonNull World world) {
+        validateWorld(world);
+        return new BooleanMappedAcquisition<>(
+                this.worldAcquirable.acquireRead(),
+                acquisition -> Objects.equals(world, acquisition.map().get(world.uniqueId()))
+        );
+    }
+
     /**
      * Gets {@linkplain JetMinecraftServer a Minecraft server} that owns
      * this {@linkplain JetWorldManager world manager}.
@@ -115,5 +125,12 @@ public final class JetWorldManager implements WorldManager {
      */
     public @NonNull JetMinecraftServer server() {
         return this.server;
+    }
+
+    private static @NonNull JetWorld validateWorld(@NonNull World world) {
+        NullabilityUtil.requireNonNull(world, "world");
+        if (!(world instanceof JetWorld validatedWorld))
+            throw new IllegalArgumentException("The world specified is not a valid world");
+        return validatedWorld;
     }
 }

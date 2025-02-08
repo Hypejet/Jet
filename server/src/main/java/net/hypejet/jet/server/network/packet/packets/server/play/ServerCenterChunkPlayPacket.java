@@ -1,13 +1,27 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
+import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
+import net.hypejet.jet.server.world.coordinate.ChunkPosition;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents {@linkplain ServerPacket a server packet}, which sets the center chunk position of a chunk
- * loading area of a client.
+ * Represents {@linkplain ServerPacket a server packet}, which sets {@linkplain ChunkPosition a chunk position}
+ * of a center {@linkplain net.hypejet.jet.server.world.chunk.Chunk chunk} of a client chunk loading area.
  *
- * @param chunkX an {@code X} value of the position
- * @param chunkZ an {@code Z} value of the position
+ * @param chunkPosition the center chunk position
  * @since 1.0
+ * @see ChunkPosition
+ * @see net.hypejet.jet.server.world.chunk.Chunk
  */
-public record ServerCenterChunkPlayPacket(int chunkX, int chunkZ) implements ServerPacket {}
+public record ServerCenterChunkPlayPacket(@NonNull ChunkPosition chunkPosition) implements ServerPacket {
+    /**
+     * Constructs the {@linkplain ServerCenterChunkPlayPacket server center chunk play packet}.
+     *
+     * @param chunkPosition the center chunk position
+     * @since 1.0
+     */
+    public ServerCenterChunkPlayPacket {
+        NullabilityUtil.requireNonNull(chunkPosition, "chunk position");
+    }
+}

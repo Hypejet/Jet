@@ -2,6 +2,7 @@ package net.hypejet.jet.world;
 
 import net.hypejet.concurrency.collection.CollectionAcquisition;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
+import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.world.chunk.ChunkProvider;
@@ -80,4 +81,15 @@ public interface WorldManager {
      * @since 1.0
      */
     @NonNull CollectionAcquisition<? extends World, ?> worlds();
+
+    /**
+     * Creates {@linkplain BooleanAcquisition a boolean acquisition}, whose value represents
+     * whether {@linkplain World a world} specified is registered in this {@linkplain WorldManager world manager}.
+     *
+     * @param world the world
+     * @return the boolean acquisition with value of {@code true} if the world specified has been registered in this
+     *         world manager or {@code false} otherwise
+     * @since 1.0
+     */
+    @NonNull BooleanAcquisition isRegistered(@NonNull World world);
 }

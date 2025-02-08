@@ -32,6 +32,7 @@ import net.hypejet.jet.server.network.codec.packet.client.play.ClientActionPlayP
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientChangeDifficultyPlayPacketReader;
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientChatCommandPlayPacketReader;
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientChatSessionUpdatePlayPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.play.ClientChunkBatchReceivedPlayPacketReader;
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientCommandSuggestionsRequestPlayPacketReader;
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientConfirmTeleportationPlayPacketReader;
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientEndTickPlayPacketReader;
@@ -60,6 +61,7 @@ import net.hypejet.jet.server.network.packet.handler.login.ClientLoginAcknowledg
 import net.hypejet.jet.server.network.packet.handler.login.ClientLoginRequestLoginPacketHandler;
 import net.hypejet.jet.server.network.packet.handler.login.ClientPluginMessageResponseLoginPacketHandler;
 import net.hypejet.jet.server.network.packet.handler.play.ClientChatCommandPlayPacketHandler;
+import net.hypejet.jet.server.network.packet.handler.play.ClientChunkBatchReceivedPlayPacketHandler;
 import net.hypejet.jet.server.network.packet.handler.play.ClientCommandSuggestionsRequestPlayPacketHandler;
 import net.hypejet.jet.server.network.packet.handler.status.ClientPingRequestStatusPacketHandler;
 import net.hypejet.jet.server.network.packet.handler.status.ClientServerListRequestStatusPacketHandler;
@@ -103,6 +105,7 @@ public final class ClientPacketRegistry {
             // Play packets
             .add(new ClientChatCommandPlayPacketHandler())
             .add(new ClientCommandSuggestionsRequestPlayPacketHandler())
+            .add(new ClientChunkBatchReceivedPlayPacketHandler())
             // Common packets
             .add(new ClientCookieResponsePacketHandler())
             .add(new ClientInformationPacketHandler())
@@ -183,6 +186,7 @@ public final class ClientPacketRegistry {
                         .add(ClientPlayPackets.CLIENT_COMMAND, ClientRequestActionPlayPacketReader.INSTANCE)
                         .add(ClientPlayPackets.CLIENT_TICK_END, ClientEndTickPlayPacketReader.INSTANCE)
                         .add(ClientPlayPackets.PLAYER_INPUT, ClientPlayerInputPlayPacketReader.INSTANCE)
+                        .add(ClientPlayPackets.CHUNK_BATCH_RECEIVED, ClientChunkBatchReceivedPlayPacketReader.INSTANCE)
                         .add(ClientPlayPackets.ACCEPT_TELEPORTATION,
                                 ClientConfirmTeleportationPlayPacketReader.INSTANCE)
                         .add(ClientPlayPackets.COMMAND_SUGGESTION,

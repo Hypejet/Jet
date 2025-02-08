@@ -1,5 +1,8 @@
 package net.hypejet.jet.server.world;
 
+import net.hypejet.concurrency.collection.CollectionAcquirable;
+import net.hypejet.concurrency.collection.CollectionAcquisition;
+import net.hypejet.concurrency.collection.set.HashSetAcquirable;
 import net.hypejet.concurrency.map.MapAcquirable;
 import net.hypejet.concurrency.map.MapAcquisition;
 import net.hypejet.concurrency.map.hashmap.HashMapAcquirable;
@@ -9,6 +12,8 @@ import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.registry.RegistryEntry;
+import net.hypejet.jet.server.entity.JetEntity;
+import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.acquisition.BooleanMappedAcquisition;
@@ -43,6 +48,7 @@ public final class JetWorld implements World {
     private final JetWorldManager worldManager;
 
     private final MapAcquirable<ChunkPosition, Chunk, ?> chunks = new HashMapAcquirable<>();
+    private final CollectionAcquirable<?, Set<JetEntity>> entities = new HashSetAcquirable<>();
 
     /**
      * Constructs the {@linkplain JetWorld world}.
@@ -100,7 +106,7 @@ public final class JetWorld implements World {
             );
 
             if (chunk.equals(newChunk)) return;
-            chunks.put(ChunkPosition.fromBlockPosition(position), newChunk);
+            chunks.put(ChunkPosition.fromCoordinate(position), newChunk);
         }
     }
 
@@ -115,7 +121,7 @@ public final class JetWorld implements World {
      */
     public @NonNull NotNullObjectAcquisition<Chunk> loadChunk(@NonNull BlockPosition position) {
         NullabilityUtil.requireNonNull(position, "position");
-        return this.loadChunk(ChunkPosition.fromBlockPosition(position));
+        return this.loadChunk(ChunkPosition.fromCoordinate(position));
     }
 
     /**
@@ -131,34 +137,45 @@ public final class JetWorld implements World {
         NullabilityUtil.requireNonNull(position, "position");
         return new NotNullObjectMappedAcquisition<>(
                 this.chunks.acquireRead(),
-                acquisition -> acquisition.map().computeIfAbsent(position, ignored -> {
-                    JetRegistryManager registryManager = this.worldManager.server().registryManager();
+                readAcquisition -> {
+                    Map<ChunkPosition, Chunk> chunks = readAcquisition.map();
+                    if (chunks.containsKey(position))
+                        return chunks.get(position);
 
-                    int chunkX = position.chunkX();
-                    int chunkZ = position.chunkZ();
+                    try (MapAcquisition<ChunkPosition, Chunk, ?> writeAcquisition = this.chunks.acquireWrite()) {
+                        /* Ensure that the chunk has not been created while waiting for the write lock using
+                           compute-if-absent to avoid re-creating chunk in case when multiple read locks were
+                           requesting this operation. */
+                        return writeAcquisition.map().computeIfAbsent(position, acquisition -> {
+                            JetRegistryManager registryManager = this.worldManager.server().registryManager();
 
-                    BlockState defaultBlockState = this.chunkProvider.defaultBlockState(chunkX, chunkZ);
-                    if (!(defaultBlockState instanceof JetBlockState validatedBlockState)) {
-                        throw new IllegalArgumentException("The default block state" +
-                                " specified is not a valid block state");
+                            int chunkX = position.chunkX();
+                            int chunkZ = position.chunkZ();
+
+                            BlockState defaultBlockState = this.chunkProvider.defaultBlockState(chunkX, chunkZ);
+                            if (!(defaultBlockState instanceof JetBlockState validatedBlockState)) {
+                                throw new IllegalArgumentException("The default block state" +
+                                        " specified is not a valid block state");
+                            }
+
+                            RegistryEntry<Biome> defaultBiome = this.chunkProvider.defaultBiome(chunkX, chunkZ);
+                            if (!(defaultBiome instanceof JetRegistryEntry<Biome> validatedBiome)) {
+                                throw new IllegalArgumentException("The registry entry of a default" +
+                                        " biome specified is not a valid registry entry");
+                            }
+
+                            Chunk.Builder builder = new Chunk.Builder(
+                                    this.dimensionType.value(),
+                                    registryManager.blockStateOrder(),
+                                    registryManager.biomeRegistry().elementOrder(),
+                                    validatedBlockState, validatedBiome
+                            );
+
+                            this.chunkProvider.provide(builder, chunkX, chunkZ, this);
+                            return builder.build();
+                        });
                     }
-
-                    RegistryEntry<Biome> defaultBiome = this.chunkProvider.defaultBiome(chunkX, chunkZ);
-                    if (!(defaultBiome instanceof JetRegistryEntry<Biome> validatedBiome)) {
-                        throw new IllegalArgumentException("The registry entry of a default" +
-                                " biome specified is not a valid registry entry");
-                    }
-
-                    Chunk.Builder builder = new Chunk.Builder(
-                            this.dimensionType.value(),
-                            registryManager.blockStateOrder(),
-                            registryManager.biomeRegistry().elementOrder(),
-                            validatedBlockState, validatedBiome
-                    );
-
-                    this.chunkProvider.provide(builder, chunkX, chunkZ, this);
-                    return builder.build();
-                })
+                }
         );
     }
 
@@ -171,7 +188,7 @@ public final class JetWorld implements World {
      */
     public boolean unloadChunk(@NonNull BlockPosition position) {
         NullabilityUtil.requireNonNull(position, "position");
-        return this.unloadChunk(ChunkPosition.fromBlockPosition(position));
+        return this.unloadChunk(ChunkPosition.fromCoordinate(position));
     }
 
     /**
@@ -199,7 +216,7 @@ public final class JetWorld implements World {
      */
     public @NonNull BooleanAcquisition isChunkLoaded(@NonNull BlockPosition position) {
         NullabilityUtil.requireNonNull(position, "position");
-        return this.isChunkLoaded(ChunkPosition.fromBlockPosition(position));
+        return this.isChunkLoaded(ChunkPosition.fromCoordinate(position));
     }
 
     /**
@@ -216,5 +233,36 @@ public final class JetWorld implements World {
                 this.chunks.acquireRead(),
                 acquisition -> acquisition.map().containsKey(position)
         );
+    }
+
+    /**
+     * Adds {@linkplain JetPlayer a player} specified into this {@linkplain JetWorld world}.
+     *
+     * @param player the player
+     * @since 1.0
+     */
+    public void addPlayer(@NonNull JetPlayer player) {
+        NullabilityUtil.requireNonNull(player, "player");
+        try (CollectionAcquisition<?, Set<JetEntity>> entitiesAcquisition = this.entities.acquireWrite()) {
+            Set<JetEntity> entities = entitiesAcquisition.collection();
+            if (!entities.add(player))
+                throw new IllegalArgumentException("The player specified has been already initialized in this world");
+            // TODO: Send world data packets
+        }
+    }
+
+    /**
+     * Removes {@linkplain JetPlayer a player} specified from this {@linkplain JetWorld world}.
+     *
+     * @param player the player
+     * @since 1.0
+     */
+    public void removePlayer(@NonNull JetPlayer player) {
+        NullabilityUtil.requireNonNull(player, "player");
+        try (CollectionAcquisition<?, Set<JetEntity>> entitiesAcquisition = this.entities.acquireWrite()) {
+            Set<JetEntity> entities = entitiesAcquisition.collection();
+            if (!entities.remove(player))
+                throw new IllegalArgumentException("The player specified has not been initialized in this world");
+        }
     }
 }

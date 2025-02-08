@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.network.codec.game.chunk.palette;
+package net.hypejet.jet.server.network.codec.game.world.chunk.palette;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;

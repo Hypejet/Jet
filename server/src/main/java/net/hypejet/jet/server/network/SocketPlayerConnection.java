@@ -185,8 +185,11 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
             sessionAcquisition.get().handleDisconnection();
         }
 
-        if (this.player != null)
+        if (this.player != null) {
+            this.player.handleDisconnection();
             this.server.unregisterPlayer(this.player);
+        }
+
         this.clientPacketReader.handleDisconnection();
     }
 

@@ -29,6 +29,7 @@ import net.hypejet.jet.server.registry.JetMinecraftRegistry;
 import net.hypejet.jet.server.registry.JetSerializableMinecraftRegistry;
 import net.hypejet.jet.server.registry.function.RegistryTagUpdateFunction;
 import net.hypejet.jet.server.util.unit.Unit;
+import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.world.World;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTag;
@@ -154,6 +155,9 @@ public final class ConfigurationSessionTask implements SessionTask, KeepAliveRes
         if (spawningWorld == null)
             throw new IllegalStateException("The spawning world has not been set");
 
+        if (!(spawningWorld instanceof JetWorld validatedSpawningWorld))
+            throw new IllegalArgumentException("The spawning world is not a valid world");
+
         Position spawningPosition = startEvent.getSpawningPosition();
         if (spawningPosition == null)
             throw new IllegalStateException("The spawning position has not been set");
@@ -212,8 +216,10 @@ public final class ConfigurationSessionTask implements SessionTask, KeepAliveRes
                 connection.sendPacket(new ServerFinishConfigurationPacket());
                 this.acknowledgeFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
 
-                PlaySessionTask sessionTask = new PlaySessionTask(this.player, spawningWorld, spawningPosition);
-                sessionAcquisition.set(new Session(ProtocolState.PLAY, connection, sessionTask));
+                sessionAcquisition.set(new Session(
+                        ProtocolState.PLAY, connection,
+                        new PlaySessionTask(this.player, validatedSpawningWorld, spawningPosition)
+                ));
 
                 connection.clientPacketReader().resumePacketReading();
             } catch (TimeoutException exception) {

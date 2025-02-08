@@ -2,6 +2,8 @@ package net.hypejet.jet.server.world.chunk.light;
 
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
+import net.hypejet.concurrency.empty.EmptyAcquirable;
+import net.hypejet.concurrency.empty.EmptyAcquisition;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.world.chunk.light.update.LightStorageUpdate;
@@ -17,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.locks.StampedLock;
 
 /**
  * Represents a storage of {@linkplain LightSection light sections}
@@ -35,7 +36,7 @@ public final class LightSectionList {
     private final List<LightSection> sections;
 
     private @MonotonicNonNull @GuardedBy("serializationDataLock") LightSerializationData serializationData;
-    private final StampedLock serializationDataLock = new StampedLock();
+    private final EmptyAcquirable serializationDataLock = new EmptyAcquirable();
 
     /**
      * Constructs the {@linkplain LightSectionList light section list}.
@@ -68,15 +69,10 @@ public final class LightSectionList {
      * @since 1.0
      */
     public @NonNull LightSerializationData serializationData() {
-        long lockStamp = this.serializationDataLock.readLock();
-        try {
-            if (this.serializationData == null) {
-                lockStamp = this.serializationDataLock.tryConvertToWriteLock(lockStamp);
+        try (EmptyAcquisition ignoredAcquisition = this.serializationDataLock.acquireWrite()) {
+            if (this.serializationData == null)
                 this.serializationData = LightSerializationData.create(this);
-            }
             return this.serializationData;
-        } finally {
-            this.serializationDataLock.unlock(lockStamp);
         }
     }
 
@@ -241,7 +237,7 @@ public final class LightSectionList {
                 if (builder == null) lightSection = EMPTY_LIGHT_SECTION;
                 else lightSection = builder.build();
 
-                lightSections.set(index, lightSection);
+                lightSections.add(index, lightSection);
             }
 
             return new LightSectionList(this.dimensionType, lightSections);

@@ -9,9 +9,8 @@ import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket;
 import net.hypejet.jet.server.registry.function.RegistryTagUpdateFunction;
+import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.world.World;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -24,12 +23,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class PlaySessionTask implements SessionTask, RegistryTagUpdateFunction {
 
-    private static final Component NOT_IMPLEMENTED_DISCONNECTION_MESSAGE = Component.text(
-            "The play session has been not implemented yet.", NamedTextColor.RED
-    );
-
     private final JetPlayer player;
-
     private final World spawningWorld;
     private final Position spawningPosition;
 
@@ -43,7 +37,7 @@ public final class PlaySessionTask implements SessionTask, RegistryTagUpdateFunc
      * @param spawningPosition a position where the player should spawn at
      * @since 1.0
      */
-    public PlaySessionTask(@NonNull JetPlayer player, @NonNull World spawningWorld,
+    public PlaySessionTask(@NonNull JetPlayer player, @NonNull JetWorld spawningWorld,
                            @NonNull Position spawningPosition) {
         this.player = NullabilityUtil.requireNonNull(player, "player");
         this.spawningWorld = NullabilityUtil.requireNonNull(spawningWorld, "spawning world");
@@ -56,7 +50,8 @@ public final class PlaySessionTask implements SessionTask, RegistryTagUpdateFunc
             this.player.server().commandManager().sendDeclarationPacket(this.player);
             commandsSentAcquisition.set(true);
         }
-        this.player.disconnect(NOT_IMPLEMENTED_DISCONNECTION_MESSAGE);
+
+        this.player.setWorld(this.spawningWorld, this.spawningPosition);
     }
 
     @Override

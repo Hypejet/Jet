@@ -160,11 +160,10 @@ public final class JetRegistryManager implements RegistryManager {
         this.blockStateOrder = createBlockStateOrder();
 
         this.registries = Set.of(
-                // TODO: Add item and fluid registries
+                // TODO: Add block, item, fluid and game event registries
                 this.dimensionTypeRegistry, this.chatTypeRegistry, this.damageTypeRegistry, this.bannerPatternRegistry,
                 this.wolfVariantRegistry, this.biomeRegistry, this.paintingVariantRegistry,
-                this.armorTrimMaterialRegistry, this.armorTrimPatternRegistry,
-                createBlockRegistry(this.blockStateOrder, server, enabledFeaturePacks)
+                this.armorTrimMaterialRegistry, this.armorTrimPatternRegistry
         );
     }
 

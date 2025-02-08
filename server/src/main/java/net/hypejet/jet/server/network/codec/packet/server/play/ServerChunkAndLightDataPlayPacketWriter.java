@@ -2,7 +2,8 @@ package net.hypejet.jet.server.network.codec.packet.server.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
-import net.hypejet.jet.server.network.codec.game.chunk.ChunkNetworkWriter;
+import net.hypejet.jet.server.network.codec.game.world.chunk.ChunkNetworkWriter;
+import net.hypejet.jet.server.network.codec.game.world.coordinate.ChunkPositionNetworkWriter;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkAndLightDataPlayPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -29,8 +30,7 @@ public final class ServerChunkAndLightDataPlayPacketWriter
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerChunkAndLightDataPlayPacket object) {
-        buf.writeInt(object.chunkX());
-        buf.writeInt(object.chunkZ());
+        ChunkPositionNetworkWriter.INSTANCE.write(buf, object.chunkPosition());
         ChunkNetworkWriter.INSTANCE.write(buf, object.chunk());
     }
 }

@@ -138,7 +138,7 @@ public final class LightSerializationData {
      * Gets {@linkplain List a list} containing an array with block-light data for each section of the chunk with
      * a bit set in the block-light mask, starting with the lowest value, half a byte per light value is used.
      *
-     * @return the lsit
+     * @return the list
      * @since 1.0
      */
     public @NonNull List<UnmodifiableByteArray> blockLightData() {
@@ -213,8 +213,6 @@ public final class LightSerializationData {
         List<UnmodifiableByteArray> skyLightData = new ArrayList<>();
         List<UnmodifiableByteArray> blockLightData = new ArrayList<>();
 
-        int nextDataIndex = 0;
-
         List<LightSection> lightSections = lightSectionList.sections();
         for (int index = 0; index < lightSections.size(); index++) {
             LightSection section = lightSections.get(index);
@@ -228,12 +226,10 @@ public final class LightSerializationData {
                 previousBlockLightStorage = previousSection.blockLightStorage();
             }
 
-            int dataIndex = nextDataIndex++;
-
-            apply(previousSkyLightStorage, section.skyLightStorage(), index,
-                    dataIndex, skyLightMask, emptySkyLightMask, skyLightData);
-            apply(previousBlockLightStorage, section.blockLightStorage(), index,
-                    dataIndex, blockLightMask, emptyBlockLightMask, blockLightData);
+            add(previousSkyLightStorage, section.skyLightStorage(), index, skyLightMask, emptySkyLightMask,
+                    skyLightData);
+            add(previousBlockLightStorage, section.blockLightStorage(), index, blockLightMask, emptyBlockLightMask,
+                    blockLightData);
         }
 
         return new LightSerializationData(
@@ -243,16 +239,16 @@ public final class LightSerializationData {
         );
     }
 
-    private static void apply(@Nullable LightStorage previousLightStorage, @NonNull LightStorage storage, int bitIndex,
-                              int dataIndex, @NonNull BitSet lightMask, @NonNull BitSet emptyLightMask,
-                              @NonNull List<UnmodifiableByteArray> lightData) {
+    private static void add(@Nullable LightStorage previousLightStorage, @NonNull LightStorage storage, int bitIndex,
+                            @NonNull BitSet lightMask, @NonNull BitSet emptyLightMask,
+                            @NonNull List<UnmodifiableByteArray> lightData) {
         if (storage.equals(previousLightStorage))
             return;
 
         switch (storage) {
             case DirectLightStorage direct -> {
                 lightMask.set(bitIndex);
-                lightData.add(dataIndex, new UnmodifiableByteArray(direct.data()));
+                lightData.add(new UnmodifiableByteArray(direct.data()));
             }
             case EmptyLightStorage ignored -> emptyLightMask.set(bitIndex);
         }

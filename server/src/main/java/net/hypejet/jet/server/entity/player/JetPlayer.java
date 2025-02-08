@@ -6,14 +6,21 @@ import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquirable;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
 import net.hypejet.concurrency.object.nullable.WriteNullableObjectAcquisition;
+import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
+import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.settings.ChangeSettingsEvent;
+import net.hypejet.jet.event.events.world.InitialSpawnEvent;
+import net.hypejet.jet.event.events.world.PreWorldSwitchEvent;
+import net.hypejet.jet.event.events.world.WorldSwitchEvent;
+import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.network.ProtocolState;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
+import net.hypejet.jet.server.network.packet.handler.NetworkDisconnectionHandler;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerPluginMessagePacket;
@@ -21,13 +28,20 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerActionBar
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSystemMessagePlayPacket;
 import net.hypejet.jet.server.util.NetworkUtil;
+import net.hypejet.jet.server.world.JetWorld;
+import net.hypejet.jet.server.world.JetWorldManager;
+import net.hypejet.jet.server.world.handler.ChunkBatchHandler;
+import net.hypejet.jet.world.World;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.pointer.Pointers;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -39,15 +53,20 @@ import java.util.UUID;
  * @see Player
  * @see JetEntity
  */
-public final class JetPlayer extends JetEntity implements Player {
+public final class JetPlayer extends JetEntity implements Player, NetworkDisconnectionHandler {
 
     private static final Key ENTITY_TYPE = Key.key("player");
     private static final Key BRAND_PLUGIN_MESSAGE_IDENTIFIER = Key.key("brand");
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JetPlayer.class);
 
     private final SocketPlayerConnection connection;
 
     private final NullableObjectAcquirable<Settings> settings = new NullableObjectAcquirable<>();
     private final NullableObjectAcquirable<String> clientBrand = new NullableObjectAcquirable<>();
+    private final NullableObjectAcquirable<JetWorld> world = new NullableObjectAcquirable<>();
+
+    private final ChunkBatchHandler chunkBatchHandler = new ChunkBatchHandler(this);
 
     /**
      * Constructs the {@linkplain JetPlayer player}.
@@ -108,6 +127,18 @@ public final class JetPlayer extends JetEntity implements Player {
     }
 
     @Override
+    public @NonNull NullableObjectAcquisition<? extends World> getWorld() {
+        return this.world.acquireRead();
+    }
+
+    @Override
+    public void setWorld(@NonNull World world, @NonNull Position position) {
+        if (!(world instanceof JetWorld validatedWorld))
+            throw new IllegalArgumentException("The world specified is not a valid world");
+        this.setWorld(validatedWorld, position);
+    }
+
+    @Override
     public void sendMessage(@NotNull Identity source, @NotNull Component message, @NotNull MessageType type) {
         ServerPacket packet = switch (type) {
             case CHAT -> throw new IllegalArgumentException("Non-system messages are not supported yet");
@@ -126,6 +157,23 @@ public final class JetPlayer extends JetEntity implements Player {
         this.sendPacket(new ServerPlayerListHeaderAndFooterPlayPacket(header, footer));
     }
 
+    @Override
+    public void handleDisconnection() {
+        this.chunkBatchHandler.handleDisconnection();
+    }
+
+    /**
+     * Gets {@linkplain ChunkBatchHandler a chunk batch handler}, which sends
+     * {@linkplain net.hypejet.jet.server.world.chunk.Chunk chunks} to this {@linkplain JetPlayer player}.
+     *
+     * @return the chunk batch handler
+     * @since 1.0
+     */
+    @Contract(pure = true)
+    public @NonNull ChunkBatchHandler chunkBatchHandler() {
+        return this.chunkBatchHandler;
+    }
+
     /**
      * Updates {@linkplain Settings settings} of the player.
      *
@@ -135,9 +183,15 @@ public final class JetPlayer extends JetEntity implements Player {
     public void setSettings(@NonNull Settings settings) {
         Objects.requireNonNull(settings, "The settings must not be null");
         try (WriteNullableObjectAcquisition<Settings> acquisition = this.settings.acquireWrite()) {
+            Settings previousSettings = acquisition.get();
             acquisition.set(settings);
+
             ChangeSettingsEvent event = new ChangeSettingsEvent(this, settings);
             this.server().eventNode().call(event);
+
+            byte viewDistance = settings.viewDistance();
+            if (previousSettings == null || previousSettings.viewDistance() != viewDistance)
+                this.chunkBatchHandler.handleViewDistanceUpdate(viewDistance);
         }
     }
 
@@ -180,5 +234,70 @@ public final class JetPlayer extends JetEntity implements Player {
      */
     public void sendPacket(@NonNull ServerPacket packet) {
         this.connection.sendPacket(packet);
+    }
+
+    private void setWorld(@NonNull JetWorld world, @NonNull Position position) {
+        JetWorldManager worldManager = this.server().worldManager();
+        BooleanAcquisition newWorldRegisteredAcquisition = null;
+
+        try (
+                BooleanAcquisition worldRegisteredAcquisition = worldManager.isRegistered(world);
+                BooleanAcquisition chunkBatchTaskRunningAcquisition = this.chunkBatchHandler.isTaskRunning();
+                WriteNullableObjectAcquisition<JetWorld> worldAcquisition = this.world.acquireWrite()
+        ) {
+            if (!worldRegisteredAcquisition.get())
+                throw new IllegalArgumentException("The world specified has not been registered in the world manager");
+
+            if (chunkBatchTaskRunningAcquisition.get())
+                this.chunkBatchHandler.cancelTask();
+
+            JetWorld previousWorld = worldAcquisition.get();
+            EventNode<Object> eventNode = this.server().eventNode();
+
+            if (previousWorld != null) {
+                previousWorld.removePlayer(this);
+
+                PreWorldSwitchEvent event = new PreWorldSwitchEvent(this, previousWorld, world, position);
+                eventNode.call(event);
+
+                if (event.isCancelled())
+                    return;
+
+                World newWorld = event.getNewWorld();
+                if (newWorld != world) {
+                    if (newWorld instanceof JetWorld validatedNewWorld) {
+                        newWorldRegisteredAcquisition = worldManager.isRegistered(newWorld);
+
+                        if (newWorldRegisteredAcquisition.get()) {
+                            world = validatedNewWorld;
+                        } else {
+                            LOGGER.warn("The new world specified in the pre-world-switch event has not been" +
+                                    " registered in the world manager, switching back to the world specified" +
+                                    " as an argument in the method");
+                        }
+                    } else {
+                        LOGGER.warn("The new world specified in the pre-world-switch event is not a valid world," +
+                                " switching back to the world specified as an argument in the method");
+                    }
+                }
+
+                position = event.getStartingPosition();
+            }
+
+            worldAcquisition.set(world);
+            world.addPlayer(this);
+
+            // TODO: Set position
+
+            this.chunkBatchHandler.scheduleTask(world, position);
+
+            Object postEvent = previousWorld == null
+                    ? new InitialSpawnEvent(this, world, position)
+                    : new WorldSwitchEvent(this, previousWorld, world, position);
+            eventNode.call(postEvent);
+        } finally {
+            if (newWorldRegisteredAcquisition != null)
+                newWorldRegisteredAcquisition.close();
+        }
     }
 }
