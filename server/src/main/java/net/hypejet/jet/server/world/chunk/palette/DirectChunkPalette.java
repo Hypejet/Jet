@@ -21,6 +21,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class DirectChunkPalette<E> extends ChunkPalette<E> {
 
+    private final BitStorage storage;
     private final Object2ShortMap<E> elementCountMap;
 
     /**
@@ -28,16 +29,15 @@ public final class DirectChunkPalette<E> extends ChunkPalette<E> {
      *
      * @param bitsPerElement number of bits that each element of the data should use
      * @param type a type of which the palette should be
-     * @param elements identifiers of elements that the chunk palette should contain
+     * @param storage a bit storage that stores identifiers of elements that the chunk palette should contain
      * @param elementOrder an element order, from which identifiers of elements of the palette should be retrieved
      * @param elementCountMap a map, which maps elements to their count in the palette
      * @since 1.0
      */
-    private DirectChunkPalette(byte bitsPerElement, @NonNull ChunkPaletteType type, int @NonNull [] elements,
+    private DirectChunkPalette(byte bitsPerElement, @NonNull ChunkPaletteType type, @NonNull BitStorage storage,
                                @NonNull ElementOrder<E> elementOrder, @NonNull Object2ShortMap<E> elementCountMap) {
-        super(bitsPerElement, type,
-                new BitStorage(bitsPerElement, NullabilityUtil.requireNonNull(elements, "elements")),
-                elementOrder);
+        super(bitsPerElement, type, NullabilityUtil.requireNonNull(storage, "storage").data(), elementOrder);
+        this.storage = storage;
 
         this.elementCountMap = Object2ShortMaps.unmodifiable(
                 new Object2ShortOpenCustomHashMap<>(
@@ -61,7 +61,7 @@ public final class DirectChunkPalette<E> extends ChunkPalette<E> {
         }
 
         int elementIndex = ChunkPalette.calculateElementIndex(position);
-        int elementIdentifier = this.data().getElement(elementIndex);
+        int elementIdentifier = this.storage.getElement(elementIndex);
         return this.elementOrder().getOrThrow(elementIdentifier);
     }
 
@@ -72,7 +72,7 @@ public final class DirectChunkPalette<E> extends ChunkPalette<E> {
 
     @Override
     protected int @NonNull [] createElementArray() {
-        return this.data().unpack();
+        return this.storage.unpack();
     }
 
     /**
@@ -96,7 +96,8 @@ public final class DirectChunkPalette<E> extends ChunkPalette<E> {
             bitsPerElement = (byte) Math.max(MathUtil.bitCount(elementIdentifier), bitsPerElement);
         }
 
-        return new DirectChunkPalette<>(bitsPerElement, type, elements, elementOrder, elementCountMap);
+        BitStorage storage = new BitStorage(bitsPerElement, elements);
+        return new DirectChunkPalette<>(bitsPerElement, type, storage, elementOrder, elementCountMap);
     }
 
     @Override

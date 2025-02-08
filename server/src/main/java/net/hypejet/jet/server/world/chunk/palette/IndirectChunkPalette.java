@@ -28,6 +28,8 @@ import java.util.Objects;
  */
 public final class IndirectChunkPalette<E> extends ChunkPalette<E> {
 
+    private final BitStorage storage;
+
     private final Object2ShortMap<E> elementCountMap;
     private final UnmodifiableIntegerArray registryIndices;
 
@@ -36,17 +38,18 @@ public final class IndirectChunkPalette<E> extends ChunkPalette<E> {
      *
      * @param bitsPerElement number of bits that each element of the data should use
      * @param type a type of which the palette should be
-     * @param data data that the chunk palette should have
+     * @param storage a bit storage that stores identifiers of elements that the chunk palette should contain
      * @param registryIndices the array of identifiers of registry associated with this palette, which are used
      *                        in the data
      * @param elementCountMap a map, which maps elements to their count in the palette
      * @param elementOrder an element order, from which identifiers of elements of the palette should be retrieved
      * @since 1.0
      */
-    private IndirectChunkPalette(byte bitsPerElement, @NonNull ChunkPaletteType type, @NonNull BitStorage data,
+    private IndirectChunkPalette(byte bitsPerElement, @NonNull ChunkPaletteType type, @NonNull BitStorage storage,
                                  int @NonNull [] registryIndices, @NonNull Object2ShortMap<E> elementCountMap,
                                  @NonNull ElementOrder<E> elementOrder) {
-        super(bitsPerElement, type, data, elementOrder);
+        super(bitsPerElement, type, NullabilityUtil.requireNonNull(storage, "storage").data(), elementOrder);
+        this.storage = storage;
 
         this.elementCountMap = Object2ShortMaps.unmodifiable(
                 new Object2ShortOpenCustomHashMap<>(
@@ -74,7 +77,7 @@ public final class IndirectChunkPalette<E> extends ChunkPalette<E> {
         }
 
         int elementIndex = ChunkPalette.calculateElementIndex(position);
-        int elementIdentifier = this.registryIndices.array()[this.data().getElement(elementIndex)];
+        int elementIdentifier = this.registryIndices.array()[this.storage.getElement(elementIndex)];
 
         return this.elementOrder().getOrThrow(elementIdentifier);
     }
@@ -86,7 +89,7 @@ public final class IndirectChunkPalette<E> extends ChunkPalette<E> {
 
     @Override
     protected int @NonNull [] createElementArray() {
-        int[] unpackedData = this.data().unpack();
+        int[] unpackedData = this.storage.unpack();
         int[] registryIndices = this.registryIndices.array();
 
         int[] elements = new int[unpackedData.length];

@@ -12,6 +12,7 @@ import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
 import net.hypejet.jet.server.world.coordinate.relative.ChunkPaletteRelativePosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -27,7 +28,7 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
         SingleValuedChunkPalette {
 
     private final byte bitsPerElement;
-    private final BitStorage data;
+    private final long[] data;
 
     private final ChunkPaletteType type;
     private final ElementOrder<E> elementOrder;
@@ -37,11 +38,11 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
      *
      * @param bitsPerElement number of bits that each element of the should use
      * @param type a type of which the palette should be
-     * @param data a bit storage of data that the chunk palette should have
+     * @param data an array of a bit storage of data that the chunk palette should have
      * @param elementOrder an element order, from which identifiers of elements of the palette should be retrieved
      * @since 1.0
      */
-    protected ChunkPalette(byte bitsPerElement, @NonNull ChunkPaletteType type, @NonNull BitStorage data,
+    protected ChunkPalette(byte bitsPerElement, @NonNull ChunkPaletteType type, long @NonNull [] data,
                            @NonNull ElementOrder<E> elementOrder) {
         this.bitsPerElement = bitsPerElement;
         this.type = NullabilityUtil.requireNonNull(type, "type");
@@ -60,12 +61,12 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
     }
 
     /**
-     * Gets a data of this {@linkplain ChunkPalette chunk palette} as {@linkplain BitStorage a bit storage}.
+     * Gets an array of {@linkplain BitStorage bit storage} of data of this {@linkplain ChunkPalette chunk palette}.
      *
      * @return the bit storage
      * @since 1.0
      */
-    public @NonNull BitStorage data() {
+    public long @NonNull [] data() {
         return this.data;
     }
 
@@ -174,14 +175,14 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
         if (this == o) return true;
         if (!(o instanceof ChunkPalette<?> otherPalette)) return false;
         return Objects.equals(this.bitsPerElement, otherPalette.bitsPerElement)
-                && Objects.equals(this.data, otherPalette.data)
+                && Arrays.equals(this.data, otherPalette.data)
                 && this.type == otherPalette.type
                 && Objects.equals(this.elementOrder, otherPalette.elementOrder);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.bitsPerElement, this.data, this.type, this.elementOrder);
+        return Objects.hash(this.bitsPerElement, Arrays.hashCode(this.data), this.type, this.elementOrder);
     }
 
     @Override

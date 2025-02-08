@@ -6,7 +6,6 @@ import it.unimi.dsi.fastutil.objects.Object2ShortOpenCustomHashMap;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.util.hash.IdentityHashStrategy;
 import net.hypejet.jet.server.util.order.ElementOrder;
-import net.hypejet.jet.server.util.storage.BitStorage;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.coordinate.relative.ChunkPaletteRelativePosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -24,7 +23,7 @@ import java.util.Objects;
 public final class SingleValuedChunkPalette<E> extends ChunkPalette<E> {
 
     private static final byte BITS_PER_ELEMENT = 0;
-    private static final BitStorage EMPTY_BIT_STORAGE = new BitStorage(BITS_PER_ELEMENT, new int[0]);
+    private static final long[] EMPTY_DATA = new long[0];
 
     private final E element;
     private final int elementIdentifier;
@@ -41,7 +40,7 @@ public final class SingleValuedChunkPalette<E> extends ChunkPalette<E> {
      */
     SingleValuedChunkPalette(@NonNull ChunkPaletteType type, @NonNull E element,
                              @NonNull ElementOrder<E> elementOrder) {
-        super(BITS_PER_ELEMENT, type, EMPTY_BIT_STORAGE, elementOrder);
+        super(BITS_PER_ELEMENT, type, EMPTY_DATA, elementOrder);
 
         this.element = NullabilityUtil.requireNonNull(element, "element");
         this.elementIdentifier = elementOrder.identifierOf(element);

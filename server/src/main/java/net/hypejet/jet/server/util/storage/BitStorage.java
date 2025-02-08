@@ -34,8 +34,8 @@ public final class BitStorage {
     public BitStorage(byte bitsPerElement, int @NonNull [] elements) {
         NullabilityUtil.requireNonNull(elements, "elements");
 
-        if (bitsPerElement < 0)
-            throw new IllegalArgumentException("The bit-per-element value cannot be negative");
+        if (bitsPerElement <= 0)
+            throw new IllegalArgumentException("The bit-per-element value cannot be negative or zero");
 
         if (bitsPerElement > Long.SIZE) {
             throw new IllegalArgumentException(String.format(
