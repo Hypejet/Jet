@@ -8,6 +8,7 @@ import net.hypejet.jet.server.world.chunk.palette.ChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.coordinate.relative.ChunkPaletteRelativePosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.Contract;
 
 import java.util.Collection;
 
@@ -49,22 +50,11 @@ public sealed abstract class LightStorage permits DirectLightStorage, EmptyLight
      * @return the copy
      * @since 1.0
      */
+    @Contract(pure = true)
     public final @NonNull LightStorage withUpdates(@NonNull Collection<LightStorageUpdate> updates) {
-        return this.withUpdates(updates.toArray(LightStorageUpdate[]::new));
-    }
-
-    /**
-     * Creates a new copy of this {@linkplain LightStorage light storage} with
-     * {@linkplain LightStorageUpdate light updates} specified applied.
-     *
-     * @param updates the light updates
-     * @return the copy
-     * @since 1.0
-     */
-    public final @NonNull LightStorage withUpdates(@NonNull LightStorageUpdate @NonNull ... updates) {
         NullabilityUtil.requireNonNull(updates, "updates");
 
-        if (updates.length == 0)
+        if (updates.isEmpty())
             return this;
 
         byte[] data = this.data();
@@ -122,6 +112,7 @@ public sealed abstract class LightStorage permits DirectLightStorage, EmptyLight
      * @return the array
      * @since 1.0
      */
+    @Contract(pure = true)
     protected abstract byte @NonNull [] data();
 
     /**
@@ -130,6 +121,7 @@ public sealed abstract class LightStorage permits DirectLightStorage, EmptyLight
      * @return the map
      * @since 1.0
      */
+    @Contract(pure = true)
     protected abstract @NonNull Byte2ShortMap valueCountMap();
 
     /**

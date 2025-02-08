@@ -59,7 +59,6 @@ public final class HeightMap {
      * @return the height map type
      * @since 1.0
      */
-    @Contract(pure = true)
     public @NonNull HeightMapType type() {
         return this.type;
     }
@@ -70,7 +69,6 @@ public final class HeightMap {
      * @return the bit storage
      * @since 1.0
      */
-    @Contract(pure = true)
     public @NonNull BitStorage data() {
         return this.data;
     }

@@ -98,7 +98,6 @@ public final class BitStorage {
      * @return the long array
      * @since 1.0
      */
-    @Contract(pure = true)
     public long @NonNull [] data() {
         return this.data.clone();
     }
@@ -125,7 +124,6 @@ public final class BitStorage {
      * @return the array
      * @since 1.0
      */
-    @Contract(pure = true)
     public int @NonNull [] unpack() {
         int[] unpackedData = new int[this.size];
         for (int index = 0; index < unpackedData.length; index++)

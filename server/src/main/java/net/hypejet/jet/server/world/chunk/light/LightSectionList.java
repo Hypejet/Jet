@@ -13,6 +13,7 @@ import net.hypejet.jet.server.world.chunk.update.LightUpdate;
 import net.hypejet.jet.server.world.coordinate.relative.ChunkRelativePosition;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.Contract;
 
 import javax.annotation.concurrent.GuardedBy;
 import java.util.ArrayList;
@@ -83,6 +84,7 @@ public final class LightSectionList {
      * @return the copy
      * @since 1.0
      */
+    @Contract(pure = true)
     public @NonNull LightSectionList withUpdates(@NonNull Collection<LightUpdate> updates) {
         if (updates.isEmpty())
             return this;
@@ -227,6 +229,7 @@ public final class LightSectionList {
          * @return the light section list
          * @since 1.0
          */
+        @Contract(pure = true)
         public @NonNull LightSectionList build() {
             List<LightSection> lightSections = new ArrayList<>(this.lightSectionCount);
 

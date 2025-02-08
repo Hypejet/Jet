@@ -11,6 +11,7 @@ import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
 import net.hypejet.jet.server.world.coordinate.relative.ChunkPaletteRelativePosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.Contract;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -99,6 +100,7 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
      * @return the new chunk palette
      * @since 1.0
      */
+    @Contract(pure = true)
     public final @NonNull ChunkPalette<E> withUpdates(@NonNull Collection<ChunkPaletteUpdate<E>> updates) {
         if (updates.isEmpty())
             return this;
@@ -205,6 +207,7 @@ public sealed abstract class ChunkPalette<E> permits DirectChunkPalette, Indirec
      * @param <E> a type of the elements
      * @since 1.0
      */
+    @Contract(pure = true)
     public static <E> @NonNull ChunkPalette<E> create(@NonNull ChunkPaletteType type,
                                                       @NonNull ElementOrder<E> elementOrder,
                                                       @NonNull List<E> elements) {

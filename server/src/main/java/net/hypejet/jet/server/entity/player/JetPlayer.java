@@ -38,7 +38,6 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.pointer.Pointers;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -169,7 +168,6 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
      * @return the chunk batch handler
      * @since 1.0
      */
-    @Contract(pure = true)
     public @NonNull ChunkBatchHandler chunkBatchHandler() {
         return this.chunkBatchHandler;
     }

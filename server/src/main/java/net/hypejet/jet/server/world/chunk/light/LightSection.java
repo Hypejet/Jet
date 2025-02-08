@@ -7,10 +7,10 @@ import net.hypejet.jet.server.world.chunk.palette.ChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.coordinate.relative.ChunkPaletteRelativePosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.Contract;
 
 import java.util.Collection;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * Represents light data of block states stored in an associated
@@ -58,30 +58,6 @@ public final class LightSection {
 
     /**
      * Creates a new {@linkplain LightSection light section} with updates specified that should be applied to
-     * the skylight storage.
-     *
-     * @param updates the updates
-     * @return the new light section
-     * @since 1.0
-     */
-    public @NonNull LightSection withSkyLightUpdates(@NonNull LightStorageUpdate @NonNull ... updates) {
-        return this.withUpdates(Set.of(updates), Set.of());
-    }
-
-    /**
-     * Creates a new {@linkplain LightSection light section} with updates specified that should be applied to
-     * the block light storage.
-     *
-     * @param updates the updates
-     * @return the new light section
-     * @since 1.0
-     */
-    public @NonNull LightSection withBlockLightUpdates(@NonNull LightStorageUpdate @NonNull ... updates) {
-        return this.withUpdates(Set.of(), Set.of(updates));
-    }
-
-    /**
-     * Creates a new {@linkplain LightSection light section} with updates specified that should be applied to
      * the skylight storage and to the block light storage.
      *
      * @param skyLightStorageUpdates updates that should be applied to the skylight storage
@@ -89,6 +65,7 @@ public final class LightSection {
      * @return the new light section
      * @since 1.0
      */
+    @Contract(pure = true)
     public @NonNull LightSection withUpdates(@NonNull Collection<LightStorageUpdate> skyLightStorageUpdates,
                                              @NonNull Collection<LightStorageUpdate> blockLightStorageUpdates) {
         NullabilityUtil.requireNonNull(skyLightStorageUpdates, "sky light storage updates");
@@ -166,6 +143,7 @@ public final class LightSection {
          * @return the light section
          * @since 1.0
          */
+        @Contract(pure = true)
         public @NonNull LightSection build() {
             return new LightSection(
                     LightStorage.create(this.skyLightValues),

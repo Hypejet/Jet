@@ -15,6 +15,7 @@ import net.hypejet.jet.server.world.chunk.update.BlockStateUpdate;
 import net.hypejet.jet.server.world.coordinate.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.server.world.coordinate.relative.ChunkRelativePosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.Contract;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -102,6 +103,7 @@ public final class ChunkSectionList {
      * @return the copy
      * @since 1.0
      */
+    @Contract(pure = true)
     public @NonNull ChunkSectionList withUpdates(
             @NonNull Collection<BlockStateUpdate> blockStateUpdates,
             @NonNull Collection<BiomeUpdate> biomeUpdates
@@ -327,6 +329,7 @@ public final class ChunkSectionList {
          * @return the chunk section list
          * @since 1.0
          */
+        @Contract(pure = true)
         public @NonNull ChunkSectionList build() {
             List<ChunkSection> chunkSections = new ArrayList<>(this.chunkSectionCount);
             ChunkSection emptyChunkSection = null;

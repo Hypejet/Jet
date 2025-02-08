@@ -73,7 +73,6 @@ public final class ChunkSection {
      * @return the count
      * @since 1.0
      */
-    @Contract(pure = true)
     public short nonAirBlockCount() {
         return this.nonAirBlockCount;
     }
@@ -84,7 +83,6 @@ public final class ChunkSection {
      * @return the chunk palette
      * @since 1.0
      */
-    @Contract(pure = true)
     public @NonNull ChunkPalette<JetBlockState> blockStatePalette() {
         return this.blockStatePalette;
     }
@@ -95,7 +93,6 @@ public final class ChunkSection {
      * @return the chunk palette
      * @since 1.0
      */
-    @Contract(pure = true)
     public @NonNull ChunkPalette<JetRegistryEntry<Biome>> biomePalette() {
         return this.biomePalette;
     }
@@ -109,6 +106,7 @@ public final class ChunkSection {
      * @return the chunk section
      * @since 1.0
      */
+    @Contract(pure = true)
     public @NonNull ChunkSection withUpdates(
             @NonNull Collection<ChunkPaletteUpdate<JetBlockState>> blockStateUpdates,
             @NonNull Collection<ChunkPaletteUpdate<JetRegistryEntry<Biome>>> biomeUpdates
@@ -239,6 +237,7 @@ public final class ChunkSection {
          * @return the chunk section
          * @since 1.0
          */
+        @Contract(pure = true)
         public @NonNull ChunkSection build(@NonNull ElementOrder<JetBlockState> blockStateOrder,
                                            @NonNull ElementOrder<JetRegistryEntry<Biome>> biomeOrder) {
             return new ChunkSection(

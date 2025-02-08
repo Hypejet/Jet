@@ -30,7 +30,6 @@ import net.hypejet.jet.server.world.chunk.view.ChunkView;
 import net.hypejet.jet.server.world.coordinate.ChunkPosition;
 import net.hypejet.jet.world.event.events.StartWaitingForWorldChunksWorldEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.jetbrains.annotations.Contract;
 
 import java.util.Comparator;
 import java.util.List;
