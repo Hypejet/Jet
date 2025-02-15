@@ -18,6 +18,7 @@ import net.hypejet.jet.util.exception.AlreadyExistsException;
 import net.hypejet.jet.world.World;
 import net.hypejet.jet.world.WorldManager;
 import net.hypejet.jet.world.chunk.ChunkProvider;
+import net.hypejet.jet.world.data.WorldData;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collections;
@@ -57,8 +58,9 @@ public final class JetWorldManager implements WorldManager {
     @Override
     public @NonNull JetWorld createAndRegisterWorld(@NonNull UUID uniqueId,
                                                     @NonNull RegistryEntry<DimensionType> dimensionType,
+                                                    @NonNull WorldData worldData,
                                                     @NonNull ChunkProvider chunkProvider) {
-        JetWorld world = this.createUnregisteredWorld(uniqueId, dimensionType, chunkProvider);
+        JetWorld world = this.createUnregisteredWorld(uniqueId, dimensionType, worldData, chunkProvider);
         this.registerWorld(world);
         return world;
     }
@@ -66,12 +68,13 @@ public final class JetWorldManager implements WorldManager {
     @Override
     public @NonNull JetWorld createUnregisteredWorld(@NonNull UUID uniqueId,
                                                      @NonNull RegistryEntry<DimensionType> dimensionType,
+                                                     @NonNull WorldData worldData,
                                                      @NonNull ChunkProvider chunkProvider) {
         if (!(dimensionType instanceof JetRegistryEntry<DimensionType> validatedDimensionType)) {
             throw new IllegalArgumentException("The dimension type registry entry" +
                     " specified is not a valid registry entry");
         }
-        return new JetWorld(uniqueId, validatedDimensionType, chunkProvider, this);
+        return new JetWorld(uniqueId, validatedDimensionType, worldData, chunkProvider, this);
     }
 
     @Override

@@ -32,6 +32,12 @@ import java.util.Set;
  * @param transfersNotAllowedMessage a message to disconnect a client that is trying to join the server due to a server
  *                                   transfer when it is not allowed
  * @param maximumViewDistance a maximum chunk view distance that a player can have
+ * @param simulationDistance a chunk distance within the server and clients should process entities
+ * @param hardcore whether the server should be in hardcore more
+ * @param reducedDebugInfo whether information displayed on the debug screen of clients should be reduced
+ * @param enforceSecureProfile whether only clients with signed public key from Mojang should be able to join
+ *                             the server
+ * @param showUnlockedRecipesOnly whether players can only see recipes that they unlocked
  * @since 1.0
  * @see ServerConfiguration
  */
@@ -39,7 +45,8 @@ public record JetServerConfiguration(
         @NonNull String address, int port, int compressionThreshold, @NonNull NettyTransportSelector transportSelector,
         @NonNull Component unsupportedVersionMessage, @NonNull Component serverListDescription, int maximumPlayers,
         @NonNull Set<Key> enabledFeaturePacks, boolean transfersAllowed, @NonNull Component transfersNotAllowedMessage,
-        @IntRange(from = ChunkBatchHandler.MINIMUM_VIEW_DISTANCE) byte maximumViewDistance
+        @IntRange(from = ChunkBatchHandler.MINIMUM_VIEW_DISTANCE) byte maximumViewDistance, byte simulationDistance,
+        boolean hardcore, boolean reducedDebugInfo, boolean enforceSecureProfile, boolean showUnlockedRecipesOnly
 ) implements ServerConfiguration {
     /**
      * Constructs the {@linkplain JetServerConfiguration server configuration}.
@@ -59,6 +66,12 @@ public record JetServerConfiguration(
      * @param transfersNotAllowedMessage a message to disconnect a client that is trying to join the server due to
      *                                   a server transfer when it is not allowed
      * @param maximumViewDistance a maximum chunk view distance that a player can have
+     * @param simulationDistance a chunk distance within the server and clients should process entities
+     * @param hardcore whether the server should be in hardcore more
+     * @param reducedDebugInfo whether information displayed on the debug screen of clients should be reduced
+     * @param enforceSecureProfile whether only clients with signed public key from Mojang should be able to join
+     *                             the server
+     * @param showUnlockedRecipesOnly whether players can only see recipes that they unlocked
      * @since 1.0
      */
     public JetServerConfiguration {
@@ -97,7 +110,8 @@ public record JetServerConfiguration(
                 deserialize(unparsed.serverListDescription(), tagResolvers), unparsed.maximumPlayers(),
                 Set.copyOf(unparsed.enabledFeaturePacks()), unparsed.areTransfersAllowed(),
                 deserialize(unparsed.transfersNotAllowedMessage(), tagResolvers),
-                unparsed.maximumViewDistance()
+                unparsed.maximumViewDistance(), unparsed.simulationDistance(), unparsed.isHardcore(),
+                unparsed.reducedDebugInfo(), unparsed.enforceSecureProfile(), unparsed.unlockedRecipesOnly()
         );
     }
 

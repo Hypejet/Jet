@@ -218,7 +218,11 @@ public final class ConfigurationSessionTask implements SessionTask, KeepAliveRes
 
                 sessionAcquisition.set(new Session(
                         ProtocolState.PLAY, connection,
-                        new PlaySessionTask(this.player, validatedSpawningWorld, spawningPosition)
+                        new PlaySessionTask(
+                                this.player, validatedSpawningWorld, spawningPosition,
+                                startEvent.getPreviousGameMode(), startEvent.getGameMode(),
+                                startEvent.shouldEnableRespawnScreen()
+                        )
                 ));
 
                 connection.clientPacketReader().resumePacketReading();

@@ -6,6 +6,7 @@ import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.world.chunk.ChunkProvider;
+import net.hypejet.jet.world.data.WorldData;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.UUID;
@@ -33,6 +34,7 @@ public interface WorldManager {
      *
      * @param uniqueId the unique identifier
      * @param dimensionType a registry entry of a dimension type that the world type should have
+     * @param worldData an additional world data that the world should have
      * @param chunkProvider a chunk provider that the world should use for chunk loading
      * @return the world
      * @throws net.hypejet.jet.util.exception.AlreadyExistsException if a world with the unique identifier specified
@@ -40,19 +42,20 @@ public interface WorldManager {
      * @since 1.0
      */
     @NonNull World createAndRegisterWorld(@NonNull UUID uniqueId, @NonNull RegistryEntry<DimensionType> dimensionType,
-                                          @NonNull ChunkProvider chunkProvider);
+                                          @NonNull WorldData worldData, @NonNull ChunkProvider chunkProvider);
 
     /**
      * Creates {@linkplain World a world} with {@linkplain UUID an unique identifier} specified without registering it.
      *
      * @param uniqueId the unique identifier
      * @param dimensionType a registry entry of a dimension type that the world type should have
+     * @param worldData an additional world data that the world should have
      * @param chunkProvider a chunk provider that the world should use for chunk loading
      * @return the world
      * @since 1.0
      */
     @NonNull World createUnregisteredWorld(@NonNull UUID uniqueId, @NonNull RegistryEntry<DimensionType> dimensionType,
-                                           @NonNull ChunkProvider chunkProvider);
+                                           @NonNull WorldData worldData, @NonNull ChunkProvider chunkProvider);
 
     /**
      * Registers {@linkplain World a world} specified in this {@linkplain WorldManager world manager}.

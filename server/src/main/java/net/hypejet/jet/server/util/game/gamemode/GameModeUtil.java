@@ -1,6 +1,8 @@
 package net.hypejet.jet.server.util.game.gamemode;
 
+import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.player.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -21,31 +23,27 @@ public final class GameModeUtil {
     private GameModeUtil() {}
 
     /**
-     * Gets a {@linkplain Player.GameMode game mode} from an identifier.
-     *
-     * @param identifier an identifier of the game mode
-     * @return the game mode
-     * @since 1.0
-     */
-    public static Player.@Nullable GameMode gameMode(byte identifier) {
-        return switch (identifier) {
-            case SURVIVAL_GAME_MODE -> Player.GameMode.SURVIVAL;
-            case CREATIVE_GAME_MODE -> Player.GameMode.CREATIVE;
-            case ADVENTURE_GAME_MODE -> Player.GameMode.ADVENTURE;
-            case SPECTATOR_GAME_MODE -> Player.GameMode.SPECTATOR;
-            case NULL_GAME_MODE -> null;
-            default -> throw new IllegalStateException("Unknown game mode with identifier of: " + identifier);
-        };
-    }
-
-    /**
-     * Gets an identifier of a {@linkplain Player.GameMode game mode}.
+     * Gets an identifier of {@linkplain Player.GameMode a game mode} specified, which may be null.
      *
      * @param gameMode the game mode
      * @return the identifier
      * @since 1.0
      */
-    public static byte gameModeIdentifier(Player.@Nullable GameMode gameMode) {
+    public static byte nullableIdentifierOf(Player.@Nullable GameMode gameMode) {
+        if (gameMode == null)
+            return NULL_GAME_MODE;
+        return identifierOf(gameMode);
+    }
+
+    /**
+     * Gets an identifier of {@linkplain Player.GameMode a game mode} specified.
+     *
+     * @param gameMode the game mode
+     * @return the identifier
+     * @since 1.0
+     */
+    public static byte identifierOf(Player.@NonNull GameMode gameMode) {
+        NullabilityUtil.requireNonNull(gameMode, "game mode");
         if (gameMode == Player.GameMode.SURVIVAL)
             return SURVIVAL_GAME_MODE;
         else if (gameMode == Player.GameMode.CREATIVE)
@@ -54,8 +52,6 @@ public final class GameModeUtil {
             return ADVENTURE_GAME_MODE;
         else if (gameMode == Player.GameMode.SPECTATOR)
             return SPECTATOR_GAME_MODE;
-        else if (gameMode == null)
-            return NULL_GAME_MODE;
         throw new IllegalArgumentException(String.format("Unknown game mode: %s", gameMode.name()));
     }
 }

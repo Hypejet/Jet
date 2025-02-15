@@ -25,6 +25,6 @@ public final class ChangeGameModeWorldEventValueProvider extends WorldEventValue
 
     @Override
     public float value(@NonNull ChangeGameModeWorldEvent worldEvent) {
-        return GameModeUtil.gameModeIdentifier(worldEvent.gameMode());
+        return GameModeUtil.identifierOf(worldEvent.gameMode());
     }
 }

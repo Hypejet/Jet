@@ -29,4 +29,23 @@ public interface ServerConfiguration {
      * @see ServerListPing
      */
     int maximumPlayers();
+
+    /**
+     * Gets whether the server is in hardcore mode.
+     *
+     * @return {@code true} if the server is in hardcore mode, {@code false} otherwise
+     * @since 1.0
+     */
+    boolean hardcore();
+
+    /**
+     * Gets whether players can only see recipes that they unlocked.
+     *
+     * <p>This field has no default functionality, it exists only as an information sent to client, however plugins
+     * are expected to use this field when implementing functionality depending on it.</p>
+     *
+     * @return {@code true} if the players can only see recipes that they unlocked, {@code false} otherwise
+     * @since 1.0
+     */
+    boolean showUnlockedRecipesOnly();
 }

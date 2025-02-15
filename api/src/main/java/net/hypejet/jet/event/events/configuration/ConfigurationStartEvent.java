@@ -27,6 +27,11 @@ public final class ConfigurationStartEvent {
     private @MonotonicNonNull World spawningWorld;
     private @MonotonicNonNull Position spawningPosition;
 
+    private Player.@Nullable GameMode previousGameMode;
+    private Player.GameMode gameMode = Player.GameMode.SURVIVAL;
+
+    private boolean enableRespawnScreen = true;
+
     /**
      * Constructs the {@linkplain ConfigurationStartEvent player configuration start event}.
      *
@@ -85,6 +90,66 @@ public final class ConfigurationStartEvent {
      */
     public void setSpawningPosition(@NonNull Position position) {
         this.spawningPosition = NullabilityUtil.requireNonNull(position, "position");
+    }
+
+    /**
+     * Gets {@linkplain Player.GameMode a game mode} that the {@linkplain Player player} had before joining the server.
+     *
+     * @return the game mode, {@code null} if none
+     * @since 1.0
+     */
+    public Player.@Nullable GameMode getPreviousGameMode() {
+        return this.previousGameMode;
+    }
+
+    /**
+     * Sets {@linkplain Player.GameMode a game mode} that the {@linkplain Player player} had before joining the server.
+     *
+     * @param previousGameMode the game mode that the player had, {@code null} if none
+     * @since 1.0
+     */
+    public void setPreviousGameMode(Player.@Nullable GameMode previousGameMode) {
+        this.previousGameMode = NullabilityUtil.requireNonNull(previousGameMode, "previous game mode");
+    }
+
+    /**
+     * Gets an initial {@linkplain Player.GameMode game mode} that the {@linkplain Player player} should have.
+     *
+     * @return the game mode
+     * @since 1.0
+     */
+    public Player.@NonNull GameMode getGameMode() {
+        return this.gameMode;
+    }
+
+    /**
+     * Sets an initial {@linkplain Player.GameMode game mode} that the {@linkplain Player player} should have.
+     *
+     * @param gameMode the game mode that the player should have
+     * @since 1.0
+     */
+    public void setGameMode(Player.@NonNull GameMode gameMode) {
+        this.gameMode = NullabilityUtil.requireNonNull(gameMode, "game mode");
+    }
+
+    /**
+     * Gets whether a respawn screen for the {@linkplain Player player} should be enabled.
+     *
+     * @return {@code true} if the respawn screen should be enabled, {@code false} otherwise
+     * @since 1.0
+     */
+    public boolean shouldEnableRespawnScreen() {
+        return this.enableRespawnScreen;
+    }
+
+    /**
+     * Sets whether a respawn screen for the {@linkplain Player player} should be enabled.
+     *
+     * @param enableRespawnScreen {@code true} if the respawn screen should be enabled, {@code false} otherwise
+     * @since 1.0
+     */
+    public void setEnableRespawnScreen(boolean enableRespawnScreen) {
+        this.enableRespawnScreen = enableRespawnScreen;
     }
 
     @Override

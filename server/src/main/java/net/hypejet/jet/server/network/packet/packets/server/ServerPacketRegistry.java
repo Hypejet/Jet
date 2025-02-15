@@ -40,6 +40,7 @@ import net.hypejet.jet.server.network.codec.packet.server.play.ServerDeclareComm
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerInvalidateChunkPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerJoinGamePlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerPlayerListHeaderAndFooterPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerRespawnPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizePositionPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSystemMessagePlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerWorldEventPlayPacketWriter;
@@ -76,6 +77,7 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCo
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerInvalidateChunkPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerRespawnPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSystemMessagePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerWorldEventPlayPacket;
@@ -227,6 +229,8 @@ public final class ServerPacketRegistry {
                                 ServerInvalidateChunkPlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.CHUNK_BATCH_FINISHED, ServerChunkBatchFinishedPlayPacket.class,
                                 ServerChunkBatchFinishedPlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.RESPAWN, ServerRespawnPlayPacket.class,
+                                ServerRespawnPlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.CHUNK_BATCH_START, ServerChunkBatchStartPlayPacket.class,
                                 (buf, object) -> {})
                         .build()

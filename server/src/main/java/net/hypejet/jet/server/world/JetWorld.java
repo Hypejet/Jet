@@ -27,6 +27,7 @@ import net.hypejet.jet.world.World;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.chunk.ChunkProvider;
 import net.hypejet.jet.world.coordinate.BlockPosition;
+import net.hypejet.jet.world.data.WorldData;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Map;
@@ -43,6 +44,7 @@ public final class JetWorld implements World {
 
     private final UUID uniqueId;
     private final JetRegistryEntry<DimensionType> dimensionType;
+    private final WorldData worldData;
 
     private final ChunkProvider chunkProvider;
     private final JetWorldManager worldManager;
@@ -55,14 +57,17 @@ public final class JetWorld implements World {
      *
      * @param uniqueId a unique identifier that the world should have
      * @param dimensionType a dimension type, of which type the world should be
+     * @param worldData an additional world data that the world should have
      * @param chunkProvider a chunk provider that should be used for loading chunks of the world
      * @param worldManager a world manager that should own the world
      * @since 1.0
      */
     public JetWorld(@NonNull UUID uniqueId, @NonNull JetRegistryEntry<DimensionType> dimensionType,
-                    @NonNull ChunkProvider chunkProvider, @NonNull JetWorldManager worldManager) {
+                    @NonNull WorldData worldData, @NonNull ChunkProvider chunkProvider,
+                    @NonNull JetWorldManager worldManager) {
         this.uniqueId = NullabilityUtil.requireNonNull(uniqueId, "unique identifier");
         this.dimensionType = NullabilityUtil.requireNonNull(dimensionType, "dimension type");
+        this.worldData = NullabilityUtil.requireNonNull(worldData, "world data");
         this.chunkProvider = NullabilityUtil.requireNonNull(chunkProvider, "chunk provider");
         this.worldManager = NullabilityUtil.requireNonNull(worldManager, "world manager");
     }
@@ -75,6 +80,11 @@ public final class JetWorld implements World {
     @Override
     public @NonNull JetRegistryEntry<DimensionType> dimensionType() {
         return this.dimensionType;
+    }
+
+    @Override
+    public @NonNull WorldData worldData() {
+        return this.worldData;
     }
 
     @Override

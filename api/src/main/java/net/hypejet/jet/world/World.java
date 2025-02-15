@@ -5,6 +5,7 @@ import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.coordinate.BlockPosition;
+import net.hypejet.jet.world.data.WorldData;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.UUID;
@@ -30,6 +31,14 @@ public interface World {
      * @since 1.0
      */
     @NonNull RegistryEntry<DimensionType> dimensionType();
+
+    /**
+     * Gets an additional {@linkplain WorldData world data} of this world.
+     *
+     * @return the world data
+     * @since 1.0
+     */
+    @NonNull WorldData worldData();
 
     /**
      * Creates {@linkplain NotNullObjectAcquisition a not-null object acquisition} of

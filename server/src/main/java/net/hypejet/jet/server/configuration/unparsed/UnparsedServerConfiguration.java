@@ -86,6 +86,37 @@ public final class UnparsedServerConfiguration extends OkaeriConfig {
     @CustomKey("maximum-view-distance")
     private byte maximumViewDistance = 10;
 
+    @Comment("A chunk distance within the server and clients should process entities")
+    @CustomKey("maximum-view-distance")
+    private byte simulationDistance = 10;
+
+    @Comments({
+            @Comment("Whether the server should be in hardcore mode."),
+            @Comment,
+            @Comment("This has no effect by default and exists only for sending server data to client,"),
+            @Comment("however plugins are expected to use this field instead of creating a new one if they want"),
+            @Comment("to use hardcore mode.")
+    })
+    private boolean hardcore;
+
+    @Comment("Whether information displayed on the debug screen (also known as an F3 screen) of clients" +
+            " should be reduced")
+    @CustomKey("reduced-debug-info")
+    private boolean reducedDebugInfo = true;
+
+    @Comment("Whether only clients with signed public key from Mojang should be able to join the server")
+    @CustomKey("enforce-secure-profile")
+    private boolean enforceSecureProfile;
+
+    @Comments({
+            @Comment("Whether players only should be able to see recipes that they unlocked."),
+            @Comment,
+            @Comment("This field has no default functionality, it exists only as an information sent to client,"),
+            @Comment("however plugins are expected to use this field when implementing functionality depending on it.")
+    })
+    @CustomKey("unlocked-recipes-only")
+    private boolean unlockedRecipesOnly = false;
+
     private UnparsedServerConfiguration() {}
 
     /**
@@ -222,6 +253,55 @@ public final class UnparsedServerConfiguration extends OkaeriConfig {
      */
     public byte maximumViewDistance() {
         return this.maximumViewDistance;
+    }
+
+    /**
+     * Gets a chunk distance within the server and clients should process entities.
+     *
+     * @return the distance
+     * @since 1.0
+     */
+    public byte simulationDistance() {
+        return this.simulationDistance;
+    }
+
+    /**
+     * Gets whether the server should be in hardcore mode.
+     *
+     * @return {@code true} if the server should be in hardcore mode, {@code false} otherwise
+     * @since 1.0
+     */
+    public boolean isHardcore() {
+        return this.hardcore;
+    }
+
+    /**
+     * Gets whether information displayed on the debug screen of clients should be reduced.
+     *
+     * @return {@code true} if the information should be reduced, {@code false} otherwise
+     * @since 1.0
+     */
+    public boolean reducedDebugInfo() {
+        return this.reducedDebugInfo;
+    }
+
+    /**
+     * Gets whether only clients with signed public key from Mojang should be able to join the server.
+     *
+     * @return {@code true} if only clients with the key should be able to join the server, {@code false} otherwise
+     * @since 1.0
+     */
+    public boolean enforceSecureProfile() {
+        return this.enforceSecureProfile;
+    }
+
+    /**
+     * Gets whether players should be only able to see recipes that they unlocked.
+     *
+     * @return {@code true} if players should be only able to see recipes that they unlocked, {@code false} otherwise
+     */
+    public boolean unlockedRecipesOnly() {
+        return this.unlockedRecipesOnly;
     }
 
     /**
