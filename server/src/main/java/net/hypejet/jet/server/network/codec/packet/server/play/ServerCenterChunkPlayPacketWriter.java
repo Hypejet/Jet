@@ -9,14 +9,13 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Represents {@linkplain NetworkWriter a network writer}, which writes
- * {@linkplain ServerCenterChunkPlayPacket a center chunk play packet}.
+ * {@linkplain ServerCenterChunkPlayPacket a server center chunk play packet}.
  *
  * @since 1.0
  * @see ServerCenterChunkPlayPacket
  * @see NetworkWriter
  */
 public final class ServerCenterChunkPlayPacketWriter implements NetworkWriter<ServerCenterChunkPlayPacket> {
-
     /**
      * An instance of the {@linkplain ServerCenterChunkPlayPacketWriter server center chunk play packet writer}.
      *
@@ -28,7 +27,6 @@ public final class ServerCenterChunkPlayPacketWriter implements NetworkWriter<Se
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerCenterChunkPlayPacket object) {
-        // Chunk position in this packet is encoded differently
         ChunkPosition chunkPosition = object.chunkPosition();
         VarIntNetworkCodec.INSTANCE.write(buf, chunkPosition.chunkX());
         VarIntNetworkCodec.INSTANCE.write(buf, chunkPosition.chunkZ());

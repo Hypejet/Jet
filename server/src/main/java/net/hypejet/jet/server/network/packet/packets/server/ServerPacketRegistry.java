@@ -42,6 +42,7 @@ import net.hypejet.jet.server.network.codec.packet.server.play.ServerJoinGamePla
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerPlayerListHeaderAndFooterPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerRespawnPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizePositionPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizeRotationPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSystemMessagePlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerWorldEventPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.status.ServerListResponseStatusPacketWriter;
@@ -79,6 +80,7 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerJoinGameP
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerRespawnPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizeRotationPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSystemMessagePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerWorldEventPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.status.ServerListResponseStatusPacket;
@@ -231,6 +233,8 @@ public final class ServerPacketRegistry {
                                 ServerChunkBatchFinishedPlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.RESPAWN, ServerRespawnPlayPacket.class,
                                 ServerRespawnPlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.PLAYER_ROTATION, ServerSynchronizeRotationPlayPacket.class,
+                                ServerSynchronizeRotationPlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.CHUNK_BATCH_START, ServerChunkBatchStartPlayPacket.class,
                                 (buf, object) -> {})
                         .build()

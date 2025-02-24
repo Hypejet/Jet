@@ -1,5 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.client.play;
 
+import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import net.hypejet.jet.world.coordinate.PositionFlag;
@@ -9,32 +10,26 @@ import java.util.Collection;
 import java.util.Set;
 
 /**
- * Represents {@linkplain ClientPacket a client packet}, which is received when a position and rotation is changed
- * on a client.
+ * Represents {@linkplain ClientPacket a client packet}, which is sent by a client when
+ * {@linkplain net.hypejet.jet.server.entity.player.JetPlayer a player} associated with it move
+ * and change their rotation.
  *
- * @param x an absolute {@code X} value of the new position
- * @param feetY an absolute {@code feet Y} value of the new position
- * @param z an absolute {@code Z} value of the new position
- * @param yaw an absolute rotation on the {@code X} axis, in degrees
- * @param pitch an absolute rotation on the {@code Y} axis, in degrees
+ * @param position a new position that a player associated with the client should have
  * @param flags flags of the new position
  * @since 1.0
  * @see ClientPacket
  */
-public record ClientRotationAndPositionPlayPacket(double x, double feetY, double z, float yaw, float pitch,
-                                                  @NonNull Collection<PositionFlag> flags) implements ClientPacket {
+public record ClientRotationAndPositionPlayPacket(@NonNull Position position, @NonNull Collection<PositionFlag> flags)
+        implements ClientPacket {
     /**
      * Constructs the {@linkplain ClientRotationAndPositionPlayPacket rotation and position play packet}.
      *
-     * @param x an absolute {@code X} value of the position
-     * @param feetY an absolute {@code feet Y} value of the new position
-     * @param z an absolute {@code Z} value of the position
-     * @param yaw an absolute rotation on the {@code X} axis, in degrees
-     * @param pitch an absolute rotation on the {@code Y} axis, in degrees
+     * @param position a new position that a player associated with the client should have
      * @param flags flags of the new position
      * @since 1.0
      */
     public ClientRotationAndPositionPlayPacket {
+        NullabilityUtil.requireNonNull(position, "position");
         flags = Set.copyOf(NullabilityUtil.requireNonNull(flags, "flags"));
     }
 }

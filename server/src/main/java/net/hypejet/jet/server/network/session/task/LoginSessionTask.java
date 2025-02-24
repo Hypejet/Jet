@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.session.task;
 import net.hypejet.concurrency.object.WriteObjectAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquirable;
 import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
+import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.event.events.login.LoginStartEvent;
 import net.hypejet.jet.login.LoginManager;
@@ -119,7 +120,8 @@ public final class LoginSessionTask implements SessionTask, LoginManager {
                 throw new IllegalArgumentException("The session has been already finished");
             finishedAcquisition.set(true);
             // TODO: Handle properties
-            this.connection.initializePlayer(new JetPlayer(uniqueId, username, this.connection));
+            this.connection.initializePlayer(new JetPlayer(uniqueId, username, this.connection,
+                    new Position(0, 0, 0, 0f, 0f) /* TODO: remove this */));
             this.pluginFuture.complete(Unit.INSTANCE);
         }
     }

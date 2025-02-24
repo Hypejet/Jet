@@ -63,7 +63,7 @@ public record ChunkPosition(int chunkX, int chunkZ) {
     public static @NonNull ChunkPosition fromCoordinate(@NonNull Coordinate<?> coordinate) {
         return new ChunkPosition(
                 toChunkCoordinate(coordinate.blockX(), CHUNK_AXIS_BLOCK_LENGTH),
-                toChunkCoordinate(coordinate.blockZ(), CHUNK_AXIS_BIOME_LENGTH)
+                toChunkCoordinate(coordinate.blockZ(), CHUNK_AXIS_BLOCK_LENGTH)
         );
     }
 

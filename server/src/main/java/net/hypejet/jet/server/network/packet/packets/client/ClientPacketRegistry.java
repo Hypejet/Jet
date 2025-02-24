@@ -34,7 +34,7 @@ import net.hypejet.jet.server.network.codec.packet.client.play.ClientChatCommand
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientChatSessionUpdatePlayPacketReader;
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientChunkBatchReceivedPlayPacketReader;
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientCommandSuggestionsRequestPlayPacketReader;
-import net.hypejet.jet.server.network.codec.packet.client.play.ClientConfirmTeleportationPlayPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.play.ClientConfirmMovementSynchronizationPlayPacketReader;
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientEndTickPlayPacketReader;
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientPlayerInputPlayPacketReader;
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientPositionFlagsPlayPacketReader;
@@ -63,6 +63,10 @@ import net.hypejet.jet.server.network.packet.handler.login.ClientPluginMessageRe
 import net.hypejet.jet.server.network.packet.handler.play.ClientChatCommandPlayPacketHandler;
 import net.hypejet.jet.server.network.packet.handler.play.ClientChunkBatchReceivedPlayPacketHandler;
 import net.hypejet.jet.server.network.packet.handler.play.ClientCommandSuggestionsRequestPlayPacketHandler;
+import net.hypejet.jet.server.network.packet.handler.play.ClientConfirmMovementSynchronizationPlayPacketHandler;
+import net.hypejet.jet.server.network.packet.handler.play.ClientPositionPlayPacketHandler;
+import net.hypejet.jet.server.network.packet.handler.play.ClientRotationAndPositionPlayPacketHandler;
+import net.hypejet.jet.server.network.packet.handler.play.ClientRotationPlayPacketHandler;
 import net.hypejet.jet.server.network.packet.handler.status.ClientPingRequestStatusPacketHandler;
 import net.hypejet.jet.server.network.packet.handler.status.ClientServerListRequestStatusPacketHandler;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
@@ -106,6 +110,10 @@ public final class ClientPacketRegistry {
             .add(new ClientChatCommandPlayPacketHandler())
             .add(new ClientCommandSuggestionsRequestPlayPacketHandler())
             .add(new ClientChunkBatchReceivedPlayPacketHandler())
+            .add(new ClientConfirmMovementSynchronizationPlayPacketHandler())
+            .add(new ClientPositionPlayPacketHandler())
+            .add(new ClientRotationAndPositionPlayPacketHandler())
+            .add(new ClientRotationPlayPacketHandler())
             // Common packets
             .add(new ClientCookieResponsePacketHandler())
             .add(new ClientInformationPacketHandler())
@@ -188,7 +196,7 @@ public final class ClientPacketRegistry {
                         .add(ClientPlayPackets.PLAYER_INPUT, ClientPlayerInputPlayPacketReader.INSTANCE)
                         .add(ClientPlayPackets.CHUNK_BATCH_RECEIVED, ClientChunkBatchReceivedPlayPacketReader.INSTANCE)
                         .add(ClientPlayPackets.ACCEPT_TELEPORTATION,
-                                ClientConfirmTeleportationPlayPacketReader.INSTANCE)
+                                ClientConfirmMovementSynchronizationPlayPacketReader.INSTANCE)
                         .add(ClientPlayPackets.COMMAND_SUGGESTION,
                                 ClientCommandSuggestionsRequestPlayPacketReader.INSTANCE)
                         .build()

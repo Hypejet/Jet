@@ -255,44 +255,36 @@ public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnect
                 WriteNullableObjectAcquisition<ChunkView> chunkViewAcquisition = this.chunkView.acquireWrite();
                 CollectionAcquisition<?, Set<ChunkPosition>> chunksAcquisition = this.chunksScheduled.acquireWrite()
         ) {
-            ChunkView previousChunkView = chunkViewAcquisition.get();
-            if (!allowNotRunning && previousChunkView == null) return; // The task is not running
+            ChunkView previousView = chunkViewAcquisition.get();
+            boolean previousChunkViewPresent = previousView != null;
 
-            ChunkView chunkView = chunkViewUnaryOperator.apply(previousChunkView);
+            if (!allowNotRunning && !previousChunkViewPresent) return; // The task is not running
+            ChunkView chunkView = chunkViewUnaryOperator.apply(previousView);
+
+            if (previousChunkViewPresent && chunkView.equals(previousView)) return;
             chunkViewAcquisition.set(chunkView);
 
             ChunkPosition centerChunkPosition = chunkView.centerChunk();
-
-            boolean previousChunkViewPresent = previousChunkView != null;
-            if (!previousChunkViewPresent || !centerChunkPosition.equals(previousChunkView.centerChunk()))
+            if (!previousChunkViewPresent || !centerChunkPosition.equals(previousView.centerChunk()))
                 this.player.sendPacket(new ServerCenterChunkPlayPacket(centerChunkPosition));
 
-            int minimumChunkX = chunkView.minimumChunkX();
-            int maximumChunkX = chunkView.maximumChunkX();
-
-            int minimumChunkZ = chunkView.minimumChunkZ();
-            int maximumChunkZ = chunkView.maximumChunkZ();
-
-            if (previousChunkViewPresent) {
-                minimumChunkX = Math.min(minimumChunkX, previousChunkView.minimumChunkX());
-                maximumChunkX = Math.max(maximumChunkX, previousChunkView.maximumChunkX());
-
-                minimumChunkZ = Math.min(minimumChunkZ, previousChunkView.minimumChunkZ());
-                maximumChunkZ = Math.max(maximumChunkZ, previousChunkView.maximumChunkZ());
+            Set<ChunkPosition> chunksScheduled = chunksAcquisition.collection();
+            for (int chunkX = chunkView.minimumChunkX(); chunkX <= chunkView.maximumChunkX(); chunkX++) {
+                for (int chunkZ = chunkView.minimumChunkZ(); chunkZ <= chunkView.maximumChunkZ(); chunkZ++) {
+                    ChunkPosition chunkPosition = new ChunkPosition(chunkX, chunkZ);
+                    if (previousChunkViewPresent && previousView.isInView(chunkPosition))
+                        continue;
+                    chunksScheduled.add(chunkPosition);
+                }
             }
 
-            Set<ChunkPosition> chunksScheduled = chunksAcquisition.collection();
-            for (int chunkX = minimumChunkX; chunkX < maximumChunkX; chunkX++) {
-                for (int chunkZ = minimumChunkZ; chunkZ < maximumChunkZ; chunkZ++) {
+            if (!previousChunkViewPresent) return;
+            for (int chunkX = previousView.minimumChunkX(); chunkX <= previousView.maximumChunkX(); chunkX++) {
+                for (int chunkZ = previousView.minimumChunkZ(); chunkZ <= previousView.maximumChunkZ(); chunkZ++) {
                     ChunkPosition chunkPosition = new ChunkPosition(chunkX, chunkZ);
-
-                    if (previousChunkViewPresent && previousChunkView.isInView(chunkPosition)) {
-                        if (!chunkView.isInView(chunkPosition) && !chunksScheduled.remove(chunkPosition))
-                            this.player.sendPacket(new ServerInvalidateChunkPlayPacket(chunkPosition));
+                    if (chunkView.isInView(chunkPosition) || chunksScheduled.remove(chunkPosition))
                         continue;
-                    }
-
-                    chunksScheduled.add(chunkPosition);
+                    this.player.sendPacket(new ServerInvalidateChunkPlayPacket(chunkPosition));
                 }
             }
         }
@@ -315,19 +307,19 @@ public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnect
             ));
 
             if (chunksToSendAcquisition.get() >= 1f)
-                this.sendChunks();
+                chunksToSendAcquisition.set(this.sendChunks(chunksToSendAcquisition.get()));
         }
     }
 
-    private void sendChunks() {
+    private float sendChunks(float chunksToSend) {
         try (
                 NullableObjectAcquisition<ChunkView> chunkViewAcquisition = this.chunkView.acquireRead();
                 NullableObjectAcquisition<JetWorld> worldAcquisition = this.world.acquireRead();
-                CollectionAcquisition<?, Set<ChunkPosition>> chunksAcquisition = this.chunksScheduled.acquireWrite();
-                WriteFloatAcquisition chunksToSendAcquisition = this.chunksToSend.acquireWrite()
+                CollectionAcquisition<?, Set<ChunkPosition>> chunksAcquisition = this.chunksScheduled.acquireWrite()
         ) {
             Set<ChunkPosition> chunkPositions = chunksAcquisition.collection();
-            if (chunkPositions.isEmpty()) return;
+            if (chunkPositions.isEmpty())
+                return chunksToSend;
 
             ChunkView chunkView = chunkViewAcquisition.get();
             if (chunkView == null)
@@ -340,7 +332,7 @@ public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnect
             ChunkPosition centerChunkPosition = chunkView.centerChunk();
             Comparator<ChunkPosition> comparator = Comparator.comparingInt(centerChunkPosition::distanceSquared);
 
-            int chunkCount = (int) Math.floor(chunksToSendAcquisition.get());
+            int chunkCount = (int) Math.floor(chunksToSend);
             List<ChunkPosition> chunksToSendPositions = Ordering.from(comparator).leastOf(chunkPositions, chunkCount);
 
             this.player.sendPacket(new ServerChunkBatchStartPlayPacket());
@@ -355,7 +347,7 @@ public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnect
 
             int batchSize = chunksToSendPositions.size();
             this.player.sendPacket(new ServerChunkBatchFinishedPlayPacket(batchSize));
-            chunksToSendAcquisition.set(chunksToSendAcquisition.get() - batchSize);
+            return chunksToSend - batchSize;
         }
     }
 

@@ -87,7 +87,7 @@ public final class UnparsedServerConfiguration extends OkaeriConfig {
     private byte maximumViewDistance = 10;
 
     @Comment("A chunk distance within the server and clients should process entities")
-    @CustomKey("maximum-view-distance")
+    @CustomKey("simulation-distance")
     private byte simulationDistance = 10;
 
     @Comments({

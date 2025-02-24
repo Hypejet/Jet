@@ -53,18 +53,8 @@ public record BlockPosition(int blockX, int blockY, int blockZ) implements Coord
     }
 
     @Override
-    public @NonNull BlockPosition withX(double x) {
-        return blockPosition(Math.floor(x), this.blockY, this.blockZ);
-    }
-
-    @Override
-    public @NonNull BlockPosition withY(double y) {
-        return blockPosition(this.blockX, Math.floor(y), this.blockZ);
-    }
-
-    @Override
-    public @NonNull BlockPosition withZ(double z) {
-        return blockPosition(this.blockX, this.blockY, Math.floor(z));
+    public @NonNull BlockPosition withValues(double x, double y, double z) {
+        return blockPosition(x, y, z);
     }
 
     /**

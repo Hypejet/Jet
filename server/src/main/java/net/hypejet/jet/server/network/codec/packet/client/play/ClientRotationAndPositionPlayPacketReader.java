@@ -2,7 +2,8 @@ package net.hypejet.jet.server.network.codec.packet.client.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
-import net.hypejet.jet.server.network.codec.game.world.coordinate.PositionFlagsReader;
+import net.hypejet.jet.server.network.codec.game.world.coordinate.PositionFlagsNetworkReader;
+import net.hypejet.jet.server.network.codec.game.world.coordinate.PositionNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientRotationAndPositionPlayPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -31,8 +32,8 @@ public final class ClientRotationAndPositionPlayPacketReader
     @Override
     public @NonNull ClientRotationAndPositionPlayPacket read(@NonNull ByteBuf buf) {
         return new ClientRotationAndPositionPlayPacket(
-                buf.readDouble(), buf.readDouble(), buf.readDouble(),
-                buf.readFloat(), buf.readFloat(), PositionFlagsReader.INSTANCE.read(buf)
+                PositionNetworkCodec.INSTANCE.read(buf),
+                PositionFlagsNetworkReader.INSTANCE.read(buf)
         );
     }
 }

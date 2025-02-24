@@ -9,7 +9,6 @@ import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket;
-import net.hypejet.jet.server.network.packet.packets.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.server.registry.function.RegistryTagUpdateFunction;
 import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.world.World;

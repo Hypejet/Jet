@@ -19,23 +19,23 @@ import java.util.Set;
  * @see Collection
  * @see NetworkReader
  */
-public final class PositionFlagsReader implements NetworkReader<Collection<PositionFlag>> {
+public final class PositionFlagsNetworkReader implements NetworkReader<Collection<PositionFlag>> {
 
     private static final IdentityHashMap<PositionFlag, Integer> FLAG_IDS = new IdentityHashMap<>();
 
     /**
-     * An instance of the {@linkplain PositionFlagsReader position flags reader}.
+     * An instance of the {@linkplain PositionFlagsNetworkReader position flags network reader}.
      *
      * @since 1.0
      */
-    public static final PositionFlagsReader INSTANCE = new PositionFlagsReader();
+    public static final PositionFlagsNetworkReader INSTANCE = new PositionFlagsNetworkReader();
 
     static {
         FLAG_IDS.put(PositionFlag.ON_GROUND, 1);
         FLAG_IDS.put(PositionFlag.HORIZONTAL_COLLISION, 2);
     }
 
-    private PositionFlagsReader() {}
+    private PositionFlagsNetworkReader() {}
 
     @Override
     public @NonNull Collection<PositionFlag> read(@NonNull ByteBuf buf) {

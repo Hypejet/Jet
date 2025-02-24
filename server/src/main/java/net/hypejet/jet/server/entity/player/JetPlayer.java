@@ -12,6 +12,7 @@ import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.entity.movement.acquisition.MovementAcquisition;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.settings.ChangeSettingsEvent;
 import net.hypejet.jet.event.events.world.InitialSpawnEvent;
@@ -21,6 +22,7 @@ import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.entity.JetEntity;
+import net.hypejet.jet.server.entity.player.movement.PlayerMovementHandler;
 import net.hypejet.jet.server.entity.player.spawn.DeathLocation;
 import net.hypejet.jet.server.entity.player.spawn.PlayerSpawnInfo;
 import net.hypejet.jet.server.network.ProtocolState;
@@ -76,7 +78,9 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     private static final Logger LOGGER = LoggerFactory.getLogger(JetPlayer.class);
 
     private final SocketPlayerConnection connection;
+
     private final ChunkBatchHandler chunkBatchHandler = new ChunkBatchHandler(this);
+    private final PlayerMovementHandler movementHandler = new PlayerMovementHandler(this);
 
     private final NullableObjectAcquirable<Settings> settings = new NullableObjectAcquirable<>();
     private final NullableObjectAcquirable<String> clientBrand = new NullableObjectAcquirable<>();
@@ -95,13 +99,15 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
      * @param uniqueId a unique identifier of the player
      * @param username a username of the player
      * @param connection a connection of the player
+     * @param initialPosition an initial position that the player should be at
      * @since 1.0
      */
-    public JetPlayer(@NonNull UUID uniqueId, @NonNull String username, @NonNull SocketPlayerConnection connection) {
+    public JetPlayer(@NonNull UUID uniqueId, @NonNull String username, @NonNull SocketPlayerConnection connection,
+                     @NonNull Position initialPosition) {
         super(ENTITY_TYPE, uniqueId, Pointers.builder()
                 .withStatic(Identity.UUID, NullabilityUtil.requireNonNull(uniqueId, "unique identifier"))
                 .withStatic(Identity.NAME, NullabilityUtil.requireNonNull(username, "username"))
-                .build());
+                .build(), NullabilityUtil.requireNonNull(initialPosition, "initial position"));
         this.connection = NullabilityUtil.requireNonNull(connection, "connection");
     }
 
@@ -231,6 +237,16 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
      */
     public @NonNull ChunkBatchHandler chunkBatchHandler() {
         return this.chunkBatchHandler;
+    }
+
+    /**
+     * Gets {@linkplain PlayerMovementHandler a player movement handler} of this {@linkplain JetPlayer player}.
+     *
+     * @return the player movement handler
+     * @since 1.0
+     */
+    public @NonNull PlayerMovementHandler movementHandler() {
+        return this.movementHandler;
     }
 
     /**
@@ -388,7 +404,9 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
 
             world.addPlayer(this);
 
-            // TODO: Set position
+            try (MovementAcquisition acquisition = this.acquireMovementRead()) {
+                this.movementHandler.synchronize(acquisition.position(), acquisition.deltaMovement(), Set.of());
+            }
 
             this.chunkBatchHandler.scheduleTask(world, position);
 

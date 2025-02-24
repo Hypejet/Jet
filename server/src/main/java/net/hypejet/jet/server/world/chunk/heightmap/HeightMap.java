@@ -185,19 +185,18 @@ public final class HeightMap {
         byte axisLength = ChunkPaletteType.BLOCK_STATE.axisLength();
         int[] elements = new int[axisLength * axisLength];
 
-        int minY = dimensionType.minY();
         int height = dimensionType.height();
-
         for (byte blockX = 0; blockX < axisLength; blockX++) {
             for (byte blockZ = 0; blockZ < axisLength; blockZ++) {
                 elements[createElementIndex(blockX, blockZ)] = findHeightAndCreateElement(
-                        height + minY - 1, chunkSectionList,
+                        dimensionType.minY() + height - 1, chunkSectionList,
                         dimensionType, blockX, blockZ, type
                 );
             }
         }
 
-        byte bitsPerElement = (byte) MathUtil.bitCount(height); // Heightmaps increment each Y coordinate by 1
+        // Heightmaps increment each Y coordinate by 1, so the highest count of bits used is height of the world
+        byte bitsPerElement = (byte) MathUtil.bitCount(height);
         return new HeightMap(dimensionType, type, new BitStorage(bitsPerElement, elements));
     }
 

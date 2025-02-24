@@ -9,8 +9,8 @@ import java.util.Collection;
 import java.util.Set;
 
 /**
- * Represents {@linkplain ClientPacket a client packet}, which is received when a rotation is changed on a client
- * on client.
+ * Represents {@linkplain ClientPacket a client packet}, which is sent by a client when
+ * {@linkplain net.hypejet.jet.server.entity.player.JetPlayer a player} associated with it change their rotation.
  *
  * @param yaw an absolute rotation on the {@code X} axis, in degrees
  * @param pitch an absolute rotation on the {@code Y} axis, in degrees
