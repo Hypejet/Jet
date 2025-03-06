@@ -9,7 +9,7 @@ import java.util.Collection;
 
 /**
  * Represents {@linkplain MovementAcquisition a movement acquisition}, which allows changing
- * the {@linkplain Position position} and delta movement.
+ * the {@linkplain Position position} and the delta movement.
  *
  * @since 1.0
  * @see MovementAcquisition

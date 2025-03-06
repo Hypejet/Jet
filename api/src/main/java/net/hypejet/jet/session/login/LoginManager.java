@@ -1,7 +1,8 @@
-package net.hypejet.jet.login;
+package net.hypejet.jet.session.login;
 
-import net.hypejet.jet.login.profile.GameProfileProperty;
+import net.hypejet.jet.session.login.profile.GameProfileProperty;
 import net.hypejet.jet.network.PlayerConnection;
+import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -46,4 +47,13 @@ public interface LoginManager {
      * @since 1.0
      */
     void finish(@NonNull String username, @NonNull UUID uniqueId, @NonNull Collection<GameProfileProperty> properties);
+
+    /**
+     * Requests a client associated with {@linkplain PlayerConnection a player connection} of this manager
+     * to send data of a cookie with {@linkplain Key a key} specified, which is stored on the client.
+     *
+     * @param key the key
+     * @since 1.0
+     */
+    void requestCookie(@NonNull Key key);
 }

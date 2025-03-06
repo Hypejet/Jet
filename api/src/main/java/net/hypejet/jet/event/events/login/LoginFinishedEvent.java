@@ -1,42 +1,43 @@
 package net.hypejet.jet.event.events.login;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.entity.player.Player;
+import net.hypejet.jet.network.PlayerConnection;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Objects;
+
 /**
- * Represents an event called when {@linkplain net.hypejet.jet.network.PlayerConnectionState#LOGIN a login connection
- * state} is being finished and {@linkplain Player a player} has been created.
+ * Represents an event called when a login state
+ * of {@linkplain net.hypejet.jet.network.PlayerConnection a player connection} is being finished.
  *
  * @since 1.0
- * @see Player
- * @see net.hypejet.jet.network.PlayerConnectionState#LOGIN
+ * @see net.hypejet.jet.network.PlayerConnection
  */
 public final class LoginFinishedEvent {
 
-    private final Player player;
+    private final PlayerConnection connection;
 
     private Result result = Result.success();
 
     /**
      * Constructs the {@linkplain LoginFinishedEvent player login event}.
      *
-     * @param player a {@linkplain Player player} that is logging into the server
+     * @param connection a player connection that the login state is being finished for
      * @since 1.0
      */
-    public LoginFinishedEvent(@NonNull Player player) {
-        this.player = NullabilityUtil.requireNonNull(player, "player");
+    public LoginFinishedEvent(@NonNull PlayerConnection connection) {
+        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
     }
 
     /**
-     * Gets {@linkplain Player a player} that is logging into the server.
+     * Gets {@linkplain PlayerConnection a player connection} that the login state is being finished for.
      *
-     * @return the player
+     * @return the player connection
      * @since 1.0
      */
-    public @NonNull Player player() {
-        return this.player;
+    public @NonNull PlayerConnection connection() {
+        return this.connection;
     }
 
     /**
@@ -59,12 +60,31 @@ public final class LoginFinishedEvent {
         this.result = NullabilityUtil.requireNonNull(result, "result");
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof LoginFinishedEvent that)) return false;
+        return Objects.equals(this.result, that.result);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.connection, result);
+    }
+
+    @Override
+    public String toString() {
+        return "LoginFinishedEvent{" +
+                "result=" + this.result +
+                '}';
+    }
+
+
     /**
-     * Represents a result of {@linkplain net.hypejet.jet.network.PlayerConnectionState#LOGIN a login connection
-     * state}.
+     * Represents a result of a login state
+     * of {@linkplain net.hypejet.jet.network.PlayerConnection a player connection}.
      *
      * @since 1.0
-     * @see net.hypejet.jet.network.PlayerConnectionState#LOGIN
+     * @see net.hypejet.jet.network.PlayerConnection
      */
     public sealed interface Result {
         /**

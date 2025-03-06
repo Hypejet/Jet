@@ -22,8 +22,7 @@ public interface MinecraftServer {
      * @return the event node
      * @since 1.0
      */
-    @NonNull
-    EventNode<Object> eventNode();
+    @NonNull EventNode<Object> eventNode();
 
     /**
      * Gets a version of Minecraft protocol that this server supports.
@@ -67,9 +66,6 @@ public interface MinecraftServer {
     /**
      * Creates {@linkplain CollectionAcquisition a collection acquisition} of all players, which are connected to the
      * server.
-     *
-     * <p>Note that all players are returned, even those, which are not in
-     * {@linkplain net.hypejet.jet.network.PlayerConnectionState#PLAY play protocol state} yet.</p>
      *
      * @return the acquisition
      * @since 1.0

@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.packet.handler.common;
 
 import net.hypejet.jet.event.events.ping.PongEvent;
 import net.hypejet.jet.event.node.EventNode;
-import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.packet.handler.ClientPacketHandler;
 import net.hypejet.jet.server.network.packet.packets.client.common.ClientPongPacket;
 import net.hypejet.jet.server.network.session.Session;
@@ -27,9 +27,9 @@ public final class ClientPongPacketHandler extends ClientPacketHandler<ClientPon
     }
 
     @Override
-    public void handle(@NonNull ClientPongPacket packet, @NonNull Session session){
-        JetPlayer player = session.connection().playerOrThrow();
-        EventNode<Object> eventNode = player.server().eventNode();
-        eventNode.call(new PongEvent(player.connection(), packet.pingIdentifier()));
+    public void handle(@NonNull ClientPongPacket packet, @NonNull Session session) {
+        SocketPlayerConnection connection = session.connection();
+        EventNode<Object> eventNode = connection.server().eventNode();
+        eventNode.call(new PongEvent(connection, packet.pingIdentifier()));
     }
 }

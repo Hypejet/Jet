@@ -25,6 +25,7 @@ import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.command.exceptions.CommandParseException;
 import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.ArgumentNode;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.LiteralNode;
@@ -204,14 +205,14 @@ public final class JetCommandManager implements CommandManager {
 
     /**
      * Creates and sends {@linkplain ServerDeclareCommandsPlayPacket a server declare commands play packet}
-     * to a player specified.
+     * to a player associated with {@linkplain SocketPlayerConnection a player connection} specified.
      *
-     * @param player the player to send the packet to
+     * @param connection the player connection
      * @since 1.0
      */
-    public void sendDeclarationPacket(@NonNull JetPlayer player) {
+    public void sendDeclarationPacket(@NonNull SocketPlayerConnection connection) {
         try (NotNullObjectAcquisition<CommandDispatcher<CommandSource>> acquisition = this.dispatcher.acquireRead()) {
-            player.sendPacket(createDeclarationPacket(acquisition.get()));
+            connection.sendPacket(createDeclarationPacket(acquisition.get()));
         }
     }
 

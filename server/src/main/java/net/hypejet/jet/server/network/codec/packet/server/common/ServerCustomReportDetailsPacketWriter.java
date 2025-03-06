@@ -5,7 +5,7 @@ import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerCustomReportDetailsPacket;
-import net.hypejet.jet.server.network.packet.packets.server.common.ServerCustomReportDetailsPacket.Details;
+import net.hypejet.jet.util.game.crash.CrashReportDetails;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -26,7 +26,7 @@ public final class ServerCustomReportDetailsPacketWriter implements NetworkWrite
      */
     public static final ServerCustomReportDetailsPacketWriter INSTANCE = new ServerCustomReportDetailsPacketWriter();
 
-    private static final CollectionNetworkWriter<Details> DETAILS_COLLECTION_WRITER
+    private static final CollectionNetworkWriter<CrashReportDetails> DETAILS_COLLECTION_WRITER
             = new CollectionNetworkWriter<>(new CustomReportDetailsNetworkWriter());
 
     private ServerCustomReportDetailsPacketWriter() {}
@@ -37,14 +37,14 @@ public final class ServerCustomReportDetailsPacketWriter implements NetworkWrite
     }
 
     /**
-     * Represents {@linkplain NetworkWriter a network writer}, which writes {@linkplain Details crash report details}.
+     * Represents {@linkplain NetworkWriter a network writer}, which writes
+     * {@linkplain CrashReportDetails crash report details}.
      *
      * @since 1.0
-     * @see ServerCustomReportDetailsPacketWriter
-     * @see ServerCustomReportDetailsPacket
+     * @see CrashReportDetails
      * @see NetworkWriter
      */
-    private static final class CustomReportDetailsNetworkWriter implements NetworkWriter<Details> {
+    private static final class CustomReportDetailsNetworkWriter implements NetworkWriter<CrashReportDetails> {
 
         private static final StringNetworkCodec TITLE_CODEC = StringNetworkCodec.create(128);
         private static final StringNetworkCodec DESCRIPTION_CODEC = StringNetworkCodec.create(4096);
@@ -52,7 +52,7 @@ public final class ServerCustomReportDetailsPacketWriter implements NetworkWrite
         private CustomReportDetailsNetworkWriter() {}
 
         @Override
-        public void write(@NonNull ByteBuf buf, @NonNull Details object) {
+        public void write(@NonNull ByteBuf buf, @NonNull CrashReportDetails object) {
             TITLE_CODEC.write(buf, object.title());
             DESCRIPTION_CODEC.write(buf, object.description());
         }

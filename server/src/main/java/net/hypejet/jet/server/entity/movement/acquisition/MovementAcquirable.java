@@ -91,7 +91,7 @@ public final class MovementAcquirable extends Acquirable<MovementAcquisition, In
      * and {@linkplain MovementAcquisition a movement acquisition}.
      *
      * @since 1.0
-     * @see net.hypejet.concurrency.Acquirable.AbstractAcquisition
+     * @see AbstractAcquisition
      * @see MovementAcquisition
      */
     private static class MovementAcquisitionImpl extends AbstractAcquisition<MovementAcquisition, MovementAcquirable>
@@ -233,13 +233,13 @@ public final class MovementAcquirable extends Acquirable<MovementAcquisition, In
 
         @Override
         public void update(@NonNull Position position, @NonNull Vector deltaMovement,
-                           @NonNull RelativeFlag @NonNull ... flags) {
+                                   @NonNull RelativeFlag @NonNull ... flags) {
             this.originalAcquisition.update(position, deltaMovement, flags);
         }
 
         @Override
         public void update(@NonNull Position position, @NonNull Vector deltaMovement,
-                           @NonNull Collection<RelativeFlag> flags) {
+                                   @NonNull Collection<RelativeFlag> flags) {
             this.originalAcquisition.update(position, deltaMovement, flags);
         }
 
@@ -308,29 +308,36 @@ public final class MovementAcquirable extends Acquirable<MovementAcquisition, In
         @Override
         default void update(@NonNull Position position, @NonNull Vector deltaMovement,
                             @NonNull Collection<RelativeFlag> flags) {
-            this.ensurePermittedAndLocked();
-            this.setPosition(position);
-
-            MovementAcquirable acquirable = this.acquirable();
-            acquirable.deltaMovement = NullabilityUtil.requireNonNull(deltaMovement, "delta movement");
-
-            if (acquirable.entity instanceof JetPlayer player)
-                // We get the position instead of using the variable, since we are sure that it has been clamped
-                player.movementHandler().synchronize(this.position(), deltaMovement, flags);
+            this.update(position, deltaMovement, flags, true);
         }
 
         @Override
         default void setPosition(@NonNull Position position) {
-            NullabilityUtil.requireNonNull(position, "position");
-            this.ensurePermittedAndLocked();
+            this.update(position, Vector.zero(), SetUtil.subtract(RelativeFlag.ALL, RelativeFlag.POSITION), false);
+        }
 
+        private void update(@NonNull Position position, @NonNull Vector deltaMovement,
+                            @NonNull Collection<RelativeFlag> flags, boolean synchronize) {
+            NullabilityUtil.requireNonNull(position, "position");
+            NullabilityUtil.requireNonNull(deltaMovement, "delta movement");
+            NullabilityUtil.requireNonNull(flags, "flags");
+
+            this.ensurePermittedAndLocked();
             MovementAcquirable acquirable = this.acquirable();
-            acquirable.position = clampPosition(position);
+
+            position = clampPosition(position);
+            if (position.equals(acquirable.position) && deltaMovement.equals(acquirable.deltaMovement)) return;
+
+            acquirable.position = position;
+            acquirable.deltaMovement = deltaMovement;
 
             // TODO: Send updates to viewers
 
-            if (acquirable.entity instanceof JetPlayer player)
+            if (acquirable.entity instanceof JetPlayer player) {
                 player.chunkBatchHandler().handlePositionUpdate(position);
+                if (!synchronize) return;
+                player.movementHandler().synchronize(this.position(), deltaMovement, flags);
+            }
         }
 
         private static @NonNull Position clampPosition(@NonNull Position position) {

@@ -23,6 +23,17 @@ public record ServerStoreCookiePacket(@NonNull Key key, @NonNull UnmodifiableByt
      * @param data a data of the cookie
      * @since 1.0
      */
+    public ServerStoreCookiePacket(@NonNull Key key, byte @NonNull [] data) {
+        this(key, new UnmodifiableByteArray(data));
+    }
+
+    /**
+     * Constructs the {@linkplain ServerStoreCookiePacket store cookie configuration packet}.
+     *
+     * @param key a key of the cookie
+     * @param data a data of the cookie
+     * @since 1.0
+     */
     public ServerStoreCookiePacket {
         NullabilityUtil.requireNonNull(key, "key");
         NullabilityUtil.requireNonNull(data, "data");

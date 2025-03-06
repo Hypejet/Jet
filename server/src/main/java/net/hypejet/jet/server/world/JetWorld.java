@@ -6,8 +6,11 @@ import net.hypejet.concurrency.collection.set.HashSetAcquirable;
 import net.hypejet.concurrency.map.MapAcquirable;
 import net.hypejet.concurrency.map.MapAcquisition;
 import net.hypejet.concurrency.map.hashmap.HashMapAcquirable;
+import net.hypejet.concurrency.object.notnull.NotNullObjectAcquirable;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
+import net.hypejet.concurrency.object.notnull.WriteNotNullObjectAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
+import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
@@ -49,6 +52,8 @@ public final class JetWorld implements World {
     private final ChunkProvider chunkProvider;
     private final JetWorldManager worldManager;
 
+    private final NotNullObjectAcquirable<Position> defaultSpawnPosition;
+
     private final MapAcquirable<ChunkPosition, Chunk, ?> chunks = new HashMapAcquirable<>();
     private final CollectionAcquirable<?, Set<JetEntity>> entities = new HashSetAcquirable<>();
 
@@ -70,6 +75,7 @@ public final class JetWorld implements World {
         this.worldData = NullabilityUtil.requireNonNull(worldData, "world data");
         this.chunkProvider = NullabilityUtil.requireNonNull(chunkProvider, "chunk provider");
         this.worldManager = NullabilityUtil.requireNonNull(worldManager, "world manager");
+        this.defaultSpawnPosition = new NotNullObjectAcquirable<>(new Position(0, 0, 0, 0f, 0f));
     }
 
     @Override
@@ -85,6 +91,16 @@ public final class JetWorld implements World {
     @Override
     public @NonNull WorldData worldData() {
         return this.worldData;
+    }
+
+    @Override
+    public @NonNull NotNullObjectAcquisition<Position> acquireDefaultSpawnPositionRead() {
+        return this.defaultSpawnPosition.acquireRead();
+    }
+
+    @Override
+    public @NonNull WriteNotNullObjectAcquisition<Position> acquireDefaultSpawnPositionWrite() {
+        return this.defaultSpawnPosition.acquireWrite();
     }
 
     @Override

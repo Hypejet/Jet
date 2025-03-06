@@ -7,7 +7,7 @@ import net.hypejet.jet.server.network.codec.mapper.MapperNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.codec.other.UUIDNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.common.ClientResourcePackStatePacket;
-import net.hypejet.jet.util.game.pack.ResourcePackState;
+import net.kyori.adventure.resource.ResourcePackStatus;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -27,16 +27,16 @@ public final class ClientResourcePackStatePacketReader implements NetworkReader<
      */
     public static final ClientResourcePackStatePacketReader INSTANCE = new ClientResourcePackStatePacketReader();
 
-    private static final MapperNetworkCodec<ResourcePackState, Integer> STATE_CODEC = new MapperNetworkCodec<>(
-            Mapper.builder(ResourcePackState.class, int.class)
-                    .register(ResourcePackState.SUCCESS, 0)
-                    .register(ResourcePackState.DECLINED, 1)
-                    .register(ResourcePackState.FAILED_TO_DOWNLOAD, 2)
-                    .register(ResourcePackState.ACCEPTED, 3)
-                    .register(ResourcePackState.DOWNLOADED, 4)
-                    .register(ResourcePackState.INVALID_URL, 5)
-                    .register(ResourcePackState.FAILED_TO_RELOAD, 6)
-                    .register(ResourcePackState.DISCARDED, 7)
+    private static final MapperNetworkCodec<ResourcePackStatus, Integer> STATE_CODEC = new MapperNetworkCodec<>(
+            Mapper.builder(ResourcePackStatus.class, int.class)
+                    .register(ResourcePackStatus.SUCCESSFULLY_LOADED, 0)
+                    .register(ResourcePackStatus.DECLINED, 1)
+                    .register(ResourcePackStatus.FAILED_DOWNLOAD, 2)
+                    .register(ResourcePackStatus.ACCEPTED, 3)
+                    .register(ResourcePackStatus.DOWNLOADED, 4)
+                    .register(ResourcePackStatus.INVALID_URL, 5)
+                    .register(ResourcePackStatus.FAILED_RELOAD, 6)
+                    .register(ResourcePackStatus.DISCARDED, 7)
                     .build(),
             VarIntNetworkCodec.INSTANCE
     );

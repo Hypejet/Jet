@@ -98,6 +98,14 @@ public final class RelativeFlag {
     public static final Set<RelativeFlag> VIEW = Set.of(YAW, PITCH);
 
     /**
+     * {@linkplain Set A set} of {@linkplain RelativeFlag relative flags} that make anything related
+     * to {@linkplain Position a position} relative.
+     *
+     * @since 1.0
+     */
+    public static final Set<RelativeFlag> POSITION = Set.of(X, Y, Z, YAW, PITCH);
+
+    /**
      * {@linkplain Set A set} of all {@linkplain RelativeFlag relative flags}.
      *
      * @since 1.0

@@ -2,6 +2,7 @@ package net.hypejet.jet.server.network.packet.packets.server.common;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
+import net.hypejet.jet.util.game.crash.CrashReportDetails;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -13,10 +14,11 @@ import java.util.List;
  *
  * @param details the details
  * @since 1.0
- * @see Details
+ * @see CrashReportDetails
  * @see ServerPacket
  */
-public record ServerCustomReportDetailsPacket(@NonNull Collection<Details> details) implements ServerPacket {
+public record ServerCustomReportDetailsPacket(@NonNull Collection<CrashReportDetails> details)
+        implements ServerPacket {
     /**
      * Constructs the {@linkplain ServerCustomReportDetailsPacket custom report details configuration packet}.
      *
@@ -25,27 +27,5 @@ public record ServerCustomReportDetailsPacket(@NonNull Collection<Details> detai
      */
     public ServerCustomReportDetailsPacket {
         details = List.copyOf(NullabilityUtil.requireNonNull(details, "details"));
-    }
-
-    /**
-     * Represents details of a crash report.
-     *
-     * @param title a title of the details
-     * @param description a description of the details
-     * @since 1.0
-     * @see ServerCustomReportDetailsPacket
-     */
-    public record Details(@NonNull String title, @NonNull String description) {
-        /**
-         * Constructs the {@linkplain Details details}.
-         *
-         * @param title a title of the details
-         * @param description a description of the details
-         * @since 1.0
-         */
-        public Details {
-            NullabilityUtil.requireNonNull(title, "title");
-            NullabilityUtil.requireNonNull(description, "description");
-        }
     }
 }

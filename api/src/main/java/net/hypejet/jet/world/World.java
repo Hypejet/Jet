@@ -1,6 +1,8 @@
 package net.hypejet.jet.world;
 
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
+import net.hypejet.concurrency.object.notnull.WriteNotNullObjectAcquisition;
+import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.world.block.BlockState;
@@ -39,6 +41,26 @@ public interface World {
      * @since 1.0
      */
     @NonNull WorldData worldData();
+
+    /**
+     * Creates {@linkplain NotNullObjectAcquisition a not-null object acquisition} of {@linkplain Position a position}
+     * that {@linkplain net.hypejet.jet.entity.Entity entities} spawning in this world without a spawn position
+     * specified should spawn at.
+     *
+     * @return the not-null object acquisition
+     * @since 1.0
+     */
+    @NonNull NotNullObjectAcquisition<Position> acquireDefaultSpawnPositionRead();
+
+    /**
+     * Creates {@linkplain WriteNotNullObjectAcquisition a write not-null object acquisition}
+     * of {@linkplain Position a position} that {@linkplain net.hypejet.jet.entity.Entity entities} spawning
+     * in this world without a spawn position specified should spawn at.
+     *
+     * @return the not-null object acquisition
+     * @since 1.0
+     */
+    @NonNull WriteNotNullObjectAcquisition<Position> acquireDefaultSpawnPositionWrite();
 
     /**
      * Creates {@linkplain NotNullObjectAcquisition a not-null object acquisition} of

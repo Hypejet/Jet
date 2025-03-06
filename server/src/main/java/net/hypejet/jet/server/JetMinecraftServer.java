@@ -124,7 +124,7 @@ public final class JetMinecraftServer implements MinecraftServer {
      */
     public void registerPlayer(@NonNull JetPlayer player) {
         try (CollectionAcquisition<JetPlayer, ?> acquisition = this.players.acquireWrite()) {
-            /* A call outside event loop is safe in this case, when a player gets disconnected the unregister method
+            /* A call outside event loop is safe in this case, when a player gets disconnected, the unregister method
                is going to be called, and that method also creates a write acquisition, so no race conditions should
                happen. */
             if (player.connection().isActive())

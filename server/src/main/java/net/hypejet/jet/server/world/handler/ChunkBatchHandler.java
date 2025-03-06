@@ -8,7 +8,6 @@ import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquirable;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
 import net.hypejet.concurrency.object.nullable.WriteNullableObjectAcquisition;
-import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.concurrency.primitive.floats.FloatAcquirable;
 import net.hypejet.concurrency.primitive.floats.FloatAcquisition;
 import net.hypejet.concurrency.primitive.floats.WriteFloatAcquisition;
@@ -23,7 +22,6 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkBatc
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkBatchStartPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerInvalidateChunkPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerWorldEventPlayPacket;
-import net.hypejet.jet.server.util.acquisition.BooleanMappedAcquisition;
 import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.server.world.chunk.Chunk;
 import net.hypejet.jet.server.world.chunk.view.ChunkView;
@@ -90,17 +88,6 @@ public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnect
     }
 
     /**
-     * Creates {@linkplain BooleanAcquisition a boolean acquisition}, whose value defines whether a task sending
-     * chunks to the player is running.
-     *
-     * @return the boolean acquisition
-     * @since 1.0
-     */
-    public @NonNull BooleanAcquisition isTaskRunning() {
-        return new BooleanMappedAcquisition<>(this.future.acquireRead(), acquisition -> acquisition.get() != null);
-    }
-
-    /**
      * Schedules a task, which sends chunks to the player.
      *
      * @param world a world, from which the chunks should be retrieved
@@ -118,16 +105,12 @@ public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnect
 
             try (
                     WriteNullableObjectAcquisition<JetWorld> worldAcquisition = this.world.acquireWrite();
-                    NullableObjectAcquisition<Player.Settings> settingsAcquisition = this.player.settings()
+                    NotNullObjectAcquisition<Player.Settings> settingsAcquisition = this.player.settings()
             ) {
-                Player.Settings settings = settingsAcquisition.get();
-                if (settings == null)
-                    throw new IllegalStateException("Settings of the player have not been set");
-
                 worldAcquisition.set(world);
 
                 ChunkPosition centerChunkPosition = ChunkPosition.fromCoordinate(startingPosition);
-                byte viewDistance = this.createViewDistance(settings.viewDistance());
+                byte viewDistance = this.createViewDistance(settingsAcquisition.get().viewDistance());
 
                 this.player.sendPacket(new ServerWorldEventPlayPacket(StartWaitingForWorldChunksWorldEvent.INSTANCE));
                 this.updateChunkView(true, view -> new ChunkView(centerChunkPosition, viewDistance));
@@ -143,18 +126,16 @@ public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnect
 
     /**
      * Stops a task, which sends chunks to the player, then awaits for when the task is fully stopped. Finally, all
-     * chunks are removed from {@linkplain java.util.Collection collection} of scheduled chunks.
+     * chunks are removed from {@linkplain java.util.Collection collection} of scheduled chunks. Does nothing
+     * if the task has not been scheduled.
      *
-     * @throws IllegalStateException if the task has not been scheduled or a future handling the task
-     *                               has been completed successfully
+     * @throws IllegalStateException if a future handling the task has been completed successfully
      * @since 1.0
      */
     public void cancelTask() {
         try (WriteNullableObjectAcquisition<ScheduledFuture<?>> futureAcquisition = this.future.acquireWrite()) {
-            if (futureAcquisition.get() == null)
-                throw new IllegalStateException("The task has not been scheduled");
-
             ScheduledFuture<?> future = futureAcquisition.get();
+            if (future == null) return;
             future.cancel(false);
 
             try {

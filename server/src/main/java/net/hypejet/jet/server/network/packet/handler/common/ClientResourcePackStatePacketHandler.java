@@ -1,11 +1,9 @@
 package net.hypejet.jet.server.network.packet.handler.common;
 
-import net.hypejet.jet.event.events.pack.ResourcePackStateEvent;
-import net.hypejet.jet.event.node.EventNode;
-import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.handler.ClientPacketHandler;
 import net.hypejet.jet.server.network.packet.packets.client.common.ClientResourcePackStatePacket;
 import net.hypejet.jet.server.network.session.Session;
+import net.hypejet.jet.server.network.session.common.CommonSessionPacketHandler;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -28,8 +26,8 @@ public final class ClientResourcePackStatePacketHandler extends ClientPacketHand
 
     @Override
     public void handle(@NonNull ClientResourcePackStatePacket packet, @NonNull Session session) {
-        JetPlayer player = session.connection().playerOrThrow();
-        EventNode<Object> eventNode = player.server().eventNode();
-        eventNode.call(new ResourcePackStateEvent(player, packet.uniqueId(), packet.state()));
+        if (!(session.sessionTask() instanceof CommonSessionPacketHandler handler))
+            throw new IllegalArgumentException("The session task does not implement a common session packet handler");
+        handler.handleResourcePackStatus(packet.uniqueId(), packet.status());
     }
 }

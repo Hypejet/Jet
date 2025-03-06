@@ -1,4 +1,4 @@
-package net.hypejet.jet.login.profile;
+package net.hypejet.jet.session.login.profile;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;

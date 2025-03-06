@@ -1,33 +1,32 @@
 package net.hypejet.jet.server.entity.player;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
+import net.hypejet.concurrency.object.notnull.NotNullObjectAcquirable;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
+import net.hypejet.concurrency.object.notnull.WriteNotNullObjectAcquisition;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquirable;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
-import net.hypejet.concurrency.object.nullable.WriteNullableObjectAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquirable;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.data.model.api.coordinate.Position;
+import net.hypejet.jet.data.model.api.coordinate.Vector;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.entity.movement.acquisition.MovementAcquisition;
+import net.hypejet.jet.entity.acquisition.gamemode.GameModeAcquisition;
+import net.hypejet.jet.entity.acquisition.gamemode.WriteGameModeAcquisition;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.settings.ChangeSettingsEvent;
 import net.hypejet.jet.event.events.world.InitialSpawnEvent;
-import net.hypejet.jet.event.events.world.PreWorldSwitchEvent;
-import net.hypejet.jet.event.events.world.WorldSwitchEvent;
-import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.entity.JetEntity;
+import net.hypejet.jet.server.entity.acquisition.gamemode.GameModeAcquirable;
+import net.hypejet.jet.server.entity.acquisition.respawn.WriteRespawnScreenEnabledAcquisition;
 import net.hypejet.jet.server.entity.player.movement.PlayerMovementHandler;
 import net.hypejet.jet.server.entity.player.spawn.DeathLocation;
 import net.hypejet.jet.server.entity.player.spawn.PlayerSpawnInfo;
 import net.hypejet.jet.server.network.ProtocolState;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
-import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.packet.handler.NetworkDisconnectionHandler;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry;
@@ -37,28 +36,27 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerJoinGameP
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerRespawnPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSystemMessagePlayPacket;
-import net.hypejet.jet.server.network.packet.packets.server.play.ServerWorldEventPlayPacket;
+import net.hypejet.jet.server.network.session.data.ConfigurationData;
+import net.hypejet.jet.server.network.session.data.LoginData;
+import net.hypejet.jet.server.network.session.pack.ResourcePackHandler;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
 import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.registry.JetRegistryManager;
-import net.hypejet.jet.server.util.NetworkUtil;
+import net.hypejet.jet.server.util.game.audience.PacketReceivingCommonAudience;
 import net.hypejet.jet.server.world.JetWorld;
-import net.hypejet.jet.server.world.JetWorldManager;
 import net.hypejet.jet.server.world.handler.ChunkBatchHandler;
-import net.hypejet.jet.world.World;
-import net.hypejet.jet.world.event.events.ChangeGameModeWorldEvent;
-import net.hypejet.jet.world.event.events.EnableRespawnScreenWorldEvent;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.pointer.Pointers;
+import net.kyori.adventure.resource.ResourcePackRequest;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -70,45 +68,66 @@ import java.util.UUID;
  * @see Player
  * @see JetEntity
  */
-public final class JetPlayer extends JetEntity implements Player, NetworkDisconnectionHandler {
+public final class JetPlayer extends JetEntity implements Player, NetworkDisconnectionHandler,
+        PacketReceivingCommonAudience {
 
     private static final Key ENTITY_TYPE = Key.key("player");
-    private static final Key BRAND_PLUGIN_MESSAGE_IDENTIFIER = Key.key("brand");
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(JetPlayer.class);
 
     private final SocketPlayerConnection connection;
 
     private final ChunkBatchHandler chunkBatchHandler = new ChunkBatchHandler(this);
     private final PlayerMovementHandler movementHandler = new PlayerMovementHandler(this);
 
-    private final NullableObjectAcquirable<Settings> settings = new NullableObjectAcquirable<>();
-    private final NullableObjectAcquirable<String> clientBrand = new NullableObjectAcquirable<>();
-    private final NullableObjectAcquirable<JetWorld> world = new NullableObjectAcquirable<>();
+    private final NotNullObjectAcquirable<Settings> settings;
+    private final NotNullObjectAcquirable<String> clientBrand;
+
+    private final GameModeAcquirable gameMode;
+    private final BooleanAcquirable respawnScreenEnabled;
 
     private final NullableObjectAcquirable<DeathLocation> lastDeathLocation = new NullableObjectAcquirable<>(); // TODO: Updating
-
-    private final NullableObjectAcquirable<GameMode> gameMode = new NullableObjectAcquirable<>();
-    private final NullableObjectAcquirable<GameMode> previousGameMode = new NullableObjectAcquirable<>();
-
-    private final BooleanAcquirable respawnScreenEnabled = new BooleanAcquirable(true);
 
     /**
      * Constructs the {@linkplain JetPlayer player}.
      *
-     * @param uniqueId a unique identifier of the player
-     * @param username a username of the player
-     * @param connection a connection of the player
-     * @param initialPosition an initial position that the player should be at
+     * @param uniqueId an unique identifier that the player should have
+     * @param username a username that the player should have
+     * @param connection a player connection that the player should be associated with
+     * @param world an initial world that the player should spawn in
+     * @param position an initial position that the player should spawn at
+     * @param enableRespawnScreen whether respawn screen should be initially enabled for the player
+     * @param previousGameMode a game mode that the player had before joining the server, {@code null} if none
+     * @param gameMode an initial game mode that the player should have
+     * @param settings initial settings of a client associated with the connection
+     * @param clientBrand a brand name of a client associated with the player
      * @since 1.0
      */
-    public JetPlayer(@NonNull UUID uniqueId, @NonNull String username, @NonNull SocketPlayerConnection connection,
-                     @NonNull Position initialPosition) {
+    private JetPlayer(@NonNull UUID uniqueId, @NonNull String username, @NonNull SocketPlayerConnection connection,
+                      @NonNull JetWorld world, @NonNull Position position, boolean enableRespawnScreen,
+                      Player.@Nullable GameMode previousGameMode, Player.@NonNull GameMode gameMode,
+                      Player.@NonNull Settings settings, @NonNull String clientBrand) {
         super(ENTITY_TYPE, uniqueId, Pointers.builder()
                 .withStatic(Identity.UUID, NullabilityUtil.requireNonNull(uniqueId, "unique identifier"))
                 .withStatic(Identity.NAME, NullabilityUtil.requireNonNull(username, "username"))
-                .build(), NullabilityUtil.requireNonNull(initialPosition, "initial position"));
+                .build(), position, world);
+
         this.connection = NullabilityUtil.requireNonNull(connection, "connection");
+
+        this.settings = new NotNullObjectAcquirable<>(NullabilityUtil.requireNonNull(settings, "settings"));
+        this.clientBrand = new NotNullObjectAcquirable<>(NullabilityUtil.requireNonNull(clientBrand, "client brand"));
+
+        this.gameMode = new GameModeAcquirable(this, gameMode, previousGameMode);
+        this.respawnScreenEnabled = new BooleanAcquirable(enableRespawnScreen);
+
+        connection.initializePlayer(this);
+        this.server().registerPlayer(this);
+
+        this.sendJoinGamePacket(world);
+        world.addPlayer(this);
+
+        this.chunkBatchHandler.scheduleTask(world, position);
+        this.sendSpawnPackets(world, position);
+
+        this.server().eventNode().call(new InitialSpawnEvent(this, world, position));
     }
 
     @Override
@@ -127,12 +146,12 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     }
 
     @Override
-    public @NonNull NullableObjectAcquisition<Settings> settings() {
+    public @NonNull NotNullObjectAcquisition<Settings> settings() {
         return this.settings.acquireRead();
     }
 
     @Override
-    public @NonNull NullableObjectAcquisition<String> clientBrand() {
+    public @NonNull NotNullObjectAcquisition<String> clientBrand() {
         return this.clientBrand.acquireRead();
     }
 
@@ -154,54 +173,28 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     }
 
     @Override
-    public @NonNull NullableObjectAcquisition<? extends World> getWorld() {
-        return this.world.acquireRead();
+    public @NonNull ResourcePackHandler resourcePackHandler() {
+        return this.connection.resourcePackHandler();
     }
 
     @Override
-    public void setWorld(@NonNull World world, @NonNull Position position) {
-        this.setWorld(world, position, true, true);
-    }
-
-    @Override
-    public void setWorld(@NonNull World world, @NonNull Position position,
-                         boolean keepAttributes, boolean keepMetadata) {
-        if (!(world instanceof JetWorld validatedWorld))
-            throw new IllegalArgumentException("The world specified is not a valid world");
-        this.setWorld(validatedWorld, position, keepAttributes, keepMetadata);
-    }
-
-    @Override
-    public @NonNull NullableObjectAcquisition<Player.GameMode> getGameMode() {
+    public @NonNull GameModeAcquisition acquireGameModeRead() {
         return this.gameMode.acquireRead();
     }
 
     @Override
-    public void setGameMode(Player.@NonNull GameMode gameMode) {
-        try (
-                WriteNullableObjectAcquisition<GameMode> previousAcquisition = this.previousGameMode.acquireWrite();
-                WriteNullableObjectAcquisition<GameMode> gameModeAcquisition = this.gameMode.acquireWrite()
-        ) {
-            GameMode previousGameMode = gameModeAcquisition.get();
-            gameModeAcquisition.set(gameMode);
-            previousAcquisition.set(previousGameMode);
-            this.sendPacket(new ServerWorldEventPlayPacket(new ChangeGameModeWorldEvent(gameMode)));
-            // TODO: Update abilities
-        }
+    public @NonNull WriteGameModeAcquisition acquireGameModeWrite() {
+        return this.gameMode.acquireWrite();
     }
 
     @Override
-    public @NonNull BooleanAcquisition respawnScreenEnabled() {
+    public @NonNull BooleanAcquisition acquireRespawnScreenEnabledRead() {
         return this.respawnScreenEnabled.acquireRead();
     }
 
     @Override
-    public void setRespawnScreenEnabled(boolean enabled) {
-        try (WriteBooleanAcquisition acquisition = this.respawnScreenEnabled.acquireWrite()) {
-            if (acquisition.get() == enabled) return;
-            acquisition.set(enabled);
-            this.sendPacket(new ServerWorldEventPlayPacket(new EnableRespawnScreenWorldEvent(enabled)));
-        }
+    public @NonNull WriteBooleanAcquisition acquireRespawnScreenEnabledWrite() {
+        return new WriteRespawnScreenEnabledAcquisition(this, this.respawnScreenEnabled.acquireWrite());
     }
 
     @Override
@@ -226,6 +219,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     @Override
     public void handleDisconnection() {
         this.chunkBatchHandler.handleDisconnection();
+        this.server().unregisterPlayer(this);
     }
 
     /**
@@ -257,7 +251,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
      */
     public void setSettings(@NonNull Settings settings) {
         Objects.requireNonNull(settings, "The settings must not be null");
-        try (WriteNullableObjectAcquisition<Settings> acquisition = this.settings.acquireWrite()) {
+        try (WriteNotNullObjectAcquisition<Settings> acquisition = this.settings.acquireWrite()) {
             Settings previousSettings = acquisition.get();
             acquisition.set(settings);
 
@@ -265,7 +259,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
             this.server().eventNode().call(event);
 
             byte viewDistance = settings.viewDistance();
-            if (previousSettings == null || previousSettings.viewDistance() != viewDistance)
+            if (previousSettings.viewDistance() != viewDistance)
                 this.chunkBatchHandler.handleViewDistanceUpdate(viewDistance);
         }
     }
@@ -278,25 +272,9 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
      */
     public void setClientBrand(@NonNull String clientBrand) {
         NullabilityUtil.requireNonNull(clientBrand, "client brand");
-        try (WriteNullableObjectAcquisition<String> acquisition = this.clientBrand.acquireWrite()) {
+        try (WriteNotNullObjectAcquisition<String> acquisition = this.clientBrand.acquireWrite()) {
             acquisition.set(clientBrand);
         }
-    }
-
-    /**
-     * Sends a plugin message containing brand name of the server to a client of this player.
-     *
-     * @param brand the server brand name
-     * @since 1.0
-     */
-    public void sendServerBrand(@NonNull String brand) {
-        ByteBuf buf = Unpooled.buffer();
-        StringNetworkCodec.INSTANCE.write(buf, brand);
-
-        byte[] messageData = NetworkUtil.readRemainingBytes(buf);
-        this.sendPluginMessage(BRAND_PLUGIN_MESSAGE_IDENTIFIER, messageData);
-
-        buf.release();
     }
 
     /**
@@ -312,120 +290,72 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     }
 
     /**
-     * Initializes {@linkplain GameMode a game mode} of this {@linkplain Player player}.
+     * Sends {@linkplain ServerRespawnPlayPacket a respawn play packet} to a client associated
+     * with this {@linkplain JetPlayer player}.
      *
-     * @param previousGameMode a previous game mode that the player had
-     * @param gameMode a game mode that the player should have now
+     * @param world a world that the player should respawn in
+     * @param keepAttributes whether attributes of the player should be kept after the respawn
+     * @param keepMetadata whether metadata of the player should be kept after the respawn
      * @since 1.0
      */
-    public void initializeGameMode(@Nullable GameMode previousGameMode, @NonNull GameMode gameMode) {
-        NullabilityUtil.requireNonNull(gameMode, "game mode");
+    public void sendRespawnPacket(@NonNull JetWorld world, boolean keepAttributes, boolean keepMetadata) {
         try (
-                WriteNullableObjectAcquisition<GameMode> previousAcquisition = this.previousGameMode.acquireWrite();
-                WriteNullableObjectAcquisition<GameMode> gameModeAcquisition = this.gameMode.acquireWrite()
+                GameModeAcquisition gameModeAcquisition = this.acquireGameModeRead();
+                NullableObjectAcquisition<DeathLocation> lastDeathLocation = this.lastDeathLocation.acquireRead()
         ) {
-            previousAcquisition.set(previousGameMode);
-            gameModeAcquisition.set(gameMode);
+            this.sendPacket(new ServerRespawnPlayPacket(
+                    this.createSpawnInfo(
+                            world, gameModeAcquisition.get(),
+                            gameModeAcquisition.previous(),
+                            lastDeathLocation.get()
+                    ),
+                    keepAttributes, keepMetadata
+            ));
         }
     }
 
     /**
-     * Initializes whether a respawn screen should be enabled for this {@linkplain Player player}.
+     * Sends additional packets about {@linkplain JetWorld world}, {@linkplain Position position} and a server
+     * that this {@linkplain JetPlayer player} should spawn in.
      *
-     * @param enableRespawnScreen {@code true} if the respawn screen should be enabled, {@code false} otherwise
+     * @param world the world
+     * @param position the position
      * @since 1.0
      */
-    public void initializeRespawnScreenEnabled(boolean enableRespawnScreen) {
-        try (WriteBooleanAcquisition acquisition = this.respawnScreenEnabled.acquireWrite()) {
-            acquisition.set(enableRespawnScreen);
-        }
+    public void sendSpawnPackets(@NonNull JetWorld world, @NonNull Position position) {
+        // TODO
+        this.movementHandler.synchronize(position, Vector.zero(), Set.of());
     }
 
-    private void setWorld(@NonNull JetWorld world, @NonNull Position position,
-                          boolean keepAttributes, boolean keepMetadata) {
-        JetWorldManager worldManager = this.server().worldManager();
-        BooleanAcquisition newWorldRegisteredAcquisition = null;
+    /**
+     * Creates {@linkplain JetPlayer a player} with {@linkplain SocketPlayerConnection a player connection}
+     * and {@linkplain ConfigurationData a configuration data} specified.
+     *
+     * @param connection the player connection
+     * @param configurationData the configuration data
+     * @return the player
+     * @since 1.0
+     */
+    public static @NonNull JetPlayer create(@NonNull SocketPlayerConnection connection,
+                                            @NonNull ConfigurationData configurationData) {
+        NullabilityUtil.requireNonNull(connection, "connection");
+        NullabilityUtil.requireNonNull(configurationData, "configuration data");
 
-        try (
-                BooleanAcquisition worldRegisteredAcquisition = worldManager.isRegistered(world);
-                BooleanAcquisition chunkBatchTaskRunningAcquisition = this.chunkBatchHandler.isTaskRunning();
-                WriteNullableObjectAcquisition<JetWorld> worldAcquisition = this.world.acquireWrite()
-        ) {
-            if (!worldRegisteredAcquisition.get())
-                throw new IllegalArgumentException("The world specified has not been registered in the world manager");
+        LoginData loginData = configurationData.loginData();
 
-            if (chunkBatchTaskRunningAcquisition.get())
-                this.chunkBatchHandler.cancelTask();
-
-            JetWorld previousWorld = worldAcquisition.get();
-            EventNode<Object> eventNode = this.server().eventNode();
-
-            boolean firstSpawn = previousWorld == null;
-            if (!firstSpawn) {
-                previousWorld.removePlayer(this);
-
-                PreWorldSwitchEvent event = new PreWorldSwitchEvent(this, previousWorld, world, position);
-                eventNode.call(event);
-
-                if (event.isCancelled())
-                    return;
-
-                World newWorld = event.getNewWorld();
-                if (newWorld != world) {
-                    if (newWorld instanceof JetWorld validatedNewWorld) {
-                        newWorldRegisteredAcquisition = worldManager.isRegistered(newWorld);
-
-                        if (newWorldRegisteredAcquisition.get()) {
-                            world = validatedNewWorld;
-                        } else {
-                            LOGGER.warn("The new world specified in the pre-world-switch event has not been" +
-                                    " registered in the world manager, switching back to the world specified" +
-                                    " as an argument in the method");
-                        }
-                    } else {
-                        LOGGER.warn("The new world specified in the pre-world-switch event is not a valid world," +
-                                " switching back to the world specified as an argument in the method");
-                    }
-                }
-
-                position = event.getStartingPosition();
-            }
-
-            worldAcquisition.set(world);
-
-            if (firstSpawn) {
-                this.sendJoinGamePacket(world);
-                // TODO: Send initial recipes packets, etc.
-            } else {
-                this.sendRespawnPacket(world, keepAttributes, keepMetadata);
-            }
-
-            // TODO: Difficulty packets, etc.
-
-            world.addPlayer(this);
-
-            try (MovementAcquisition acquisition = this.acquireMovementRead()) {
-                this.movementHandler.synchronize(acquisition.position(), acquisition.deltaMovement(), Set.of());
-            }
-
-            this.chunkBatchHandler.scheduleTask(world, position);
-
-            Object postEvent = previousWorld == null
-                    ? new InitialSpawnEvent(this, world, position)
-                    : new WorldSwitchEvent(this, previousWorld, world, position);
-            eventNode.call(postEvent);
-        } finally {
-            if (newWorldRegisteredAcquisition != null)
-                newWorldRegisteredAcquisition.close();
-        }
+        return new JetPlayer(
+                loginData.uniqueId(), loginData.username(), connection, configurationData.world(),
+                configurationData.position(), configurationData.enableRespawnScreen(),
+                configurationData.previousGameMode(), configurationData.gameMode(), configurationData.settings(),
+                configurationData.clientBrand()
+        );
     }
 
     private void sendJoinGamePacket(@NonNull JetWorld world) {
         JetServerConfiguration configuration = this.server().configuration();
         try (
-                BooleanAcquisition enableRespawnScreenAcquisition = this.respawnScreenEnabled.acquireRead();
-                NullableObjectAcquisition<GameMode> gameModeAcquisition = this.gameMode.acquireRead();
-                NullableObjectAcquisition<GameMode> previousGameModeAcquisition = this.previousGameMode.acquireRead();
+                BooleanAcquisition enableRespawnScreenAcquisition = this.acquireRespawnScreenEnabledRead();
+                GameModeAcquisition gameModeAcquisition = this.gameMode.acquireRead();
                 NullableObjectAcquisition<DeathLocation> lastDeathLocation = this.lastDeathLocation.acquireRead()
         ) {
             this.sendPacket(new ServerJoinGamePlayPacket(
@@ -435,29 +365,13 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
                     enableRespawnScreenAcquisition.get(), configuration.showUnlockedRecipesOnly(),
                     this.createSpawnInfo(
                             world, gameModeAcquisition.get(),
-                            previousGameModeAcquisition.get(),
+                            gameModeAcquisition.previous(),
                             lastDeathLocation.get()
                     ),
                     configuration.enforceSecureProfile()
             ));
         }
 
-    }
-
-    private void sendRespawnPacket(@NonNull JetWorld world, boolean keepAttributes, boolean keepMetadata) {
-        try (
-                NullableObjectAcquisition<GameMode> gameModeAcquisition = this.gameMode.acquireRead();
-                NullableObjectAcquisition<GameMode> previousGameModeAcquisition = this.previousGameMode.acquireRead();
-                NullableObjectAcquisition<DeathLocation> lastDeathLocation = this.lastDeathLocation.acquireRead()
-        ) {
-            this.sendPacket(new ServerRespawnPlayPacket(
-                    this.createSpawnInfo(
-                            world, gameModeAcquisition.get(),
-                            previousGameModeAcquisition.get(), lastDeathLocation.get()
-                    ),
-                    keepAttributes, keepMetadata
-            ));
-        }
     }
 
     private @NotNull PlayerSpawnInfo createSpawnInfo(@NotNull JetWorld world, @Nullable GameMode gameMode,

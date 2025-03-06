@@ -1,16 +1,16 @@
 package net.hypejet.jet.entity.player;
 
-import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
+import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
+import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.command.CommandSource;
-import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.Entity;
+import net.hypejet.jet.entity.acquisition.gamemode.GameModeAcquisition;
+import net.hypejet.jet.entity.acquisition.gamemode.WriteGameModeAcquisition;
 import net.hypejet.jet.network.PlayerConnection;
-import net.hypejet.jet.world.World;
-import net.kyori.adventure.key.Key;
-import net.kyori.adventure.text.Component;
+import net.hypejet.jet.util.game.audience.CommonAudience;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -24,7 +24,7 @@ import java.util.Set;
  * @see Entity
  * @see PlayerConnection
  */
-public interface Player extends Entity, CommandSource {
+public interface Player extends Entity, CommandSource, CommonAudience {
     /**
      * Gets a username of the player.
      *
@@ -42,31 +42,22 @@ public interface Player extends Entity, CommandSource {
     @NonNull PlayerConnection connection();
 
     /**
-     * A shortcut for {@link PlayerConnection#disconnect(Component)}, which is accessed by {@link #connection()}.
-     *
-     * @param reason the reason of disconnection
-     * @since 1.0
-     * @see PlayerConnection#disconnect(Component)
-     */
-    void disconnect(@NonNull Component reason);
-
-    /**
-     * Creates {@linkplain NullableObjectAcquisition a nullable object acquisition} holding
+     * Creates {@linkplain NotNullObjectAcquisition a not-null object acquisition} of clientside
      * {@linkplain Settings settings} of the player.
      *
-     * @return the acquisition, whose object is {@code null} if the settings were not initialized yet
+     * @return the not-null object acquisition
      * @since 1.0
      */
-    @NonNull NullableObjectAcquisition<Settings> settings();
+    @NonNull NotNullObjectAcquisition<Settings> settings();
 
     /**
-     * Creates {@linkplain NullableObjectAcquisition a nullable object acquisition} holding client brand of the
-     * {@linkplain Player player}.
+     * Creates {@linkplain NotNullObjectAcquisition a not-null object acquisition} of a brand name of a client
+     * associated with this {@linkplain Player player}.
      *
-     * @return the acquisition, whose object is {@code null} if the client did not send it yet
+     * @return the not-null object acquisition
      * @since 1.0
      */
-    @NonNull NullableObjectAcquisition<String> clientBrand();
+    @NonNull NotNullObjectAcquisition<String> clientBrand();
 
     /**
      * Gets {@linkplain MinecraftServer a Minecraft server} that the player is connected to.
@@ -77,75 +68,22 @@ public interface Player extends Entity, CommandSource {
     @NonNull MinecraftServer server();
 
     /**
-     * Sends a plugin message to the player.
+     * Creates {@linkplain GameModeAcquisition a game mode acquisition} of {@linkplain GameMode a game mode}
+     * of this {@linkplain Player player}.
      *
-     * @param identifier an identifier of the plugin message
-     * @param data a data of the plugin message
+     * @return the game mode acquisition
      * @since 1.0
      */
-    void sendPluginMessage(@NonNull Key identifier, byte @NonNull [] data);
+    @NonNull GameModeAcquisition acquireGameModeRead();
 
     /**
-     * Creates {@linkplain NullableObjectAcquisition a nullable object acquisition} of {@linkplain World a world}
-     * that this {@linkplain Player player} is currently in.
-     *
-     * @return the nullable object acquisition, which holds the world or {@code null} if the world has not been set yet
-     * @since 1.0
-     */
-    @NonNull NullableObjectAcquisition<? extends World> getWorld();
-
-    /**
-     * Changes {@linkplain World a world} that this {@linkplain Player player} is in and keeps attributes and entity
-     * metadata of the player after the change.
-     *
-     * @param world the world
-     * @param position an initial position that the player should be teleported to
-     * @throws IllegalArgumentException if the player is already in the world specified
-     * @since 1.0
-     * @see #setWorld(World, Position, boolean, boolean)
-     */
-    void setWorld(@NonNull World world, @NonNull Position position);
-
-    /**
-     * Changes {@linkplain World a world} that this {@linkplain Player player} is in.
-     *
-     * <p>
-     *     Note that the world change can be <strong>cancelled</strong> and the world
-     *     the player gets finally teleported to can be <strong>changed</strong> in
-     *     {@linkplain net.hypejet.jet.event.events.world.PreWorldSwitchEvent a pre-world-switch event}.
-     * </p>
-     *
-     * <p>
-     *     If a check for these changed is needed, it can be done by {@linkplain #getWorld() read-acquiring} a world
-     *     that the player is in before setting the world and then getting and comparing it just after the change.
-     * </p>
-     *
-     * @param world the world
-     * @param position an initial position that the player should be teleported to
-     * @param keepAttributes whether attributes of the player should be kept after the change
-     * @param keepMetadata whether entity metadata of the player should be kept after the change
-     * @throws IllegalArgumentException if the player is already in the world specified
-     * @since 1.0
-     */
-    void setWorld(@NonNull World world, @NonNull Position position, boolean keepAttributes, boolean keepMetadata);
-
-    /**
-     * Creates {@linkplain NullableObjectAcquisition a nullable object acquisition}
+     * Creates {@linkplain WriteGameModeAcquisition a write game mode acquisition}
      * of {@linkplain GameMode a game mode} of this {@linkplain Player player}.
      *
-     * @return the nullable object acquisition, which holds the game mode or {@code null}, if the game mode
-     *         has not been set yet
+     * @return the write game mode acquisition
      * @since 1.0
      */
-    @NonNull NullableObjectAcquisition<GameMode> getGameMode();
-
-    /**
-     * Sets {@linkplain GameMode a game mode} for this {@linkplain Player player}.
-     *
-     * @param gameMode a game mode that the player should have
-     * @since 1.0
-     */
-    void setGameMode(@NonNull GameMode gameMode);
+    @NonNull WriteGameModeAcquisition acquireGameModeWrite();
 
     /**
      * Creates {@linkplain BooleanAcquisition a boolean acquisition}, which holds a value defining whether a respawn
@@ -154,15 +92,16 @@ public interface Player extends Entity, CommandSource {
      * @return the boolean acquisition
      * @since 1.0
      */
-    @NonNull BooleanAcquisition respawnScreenEnabled();
+    @NonNull BooleanAcquisition acquireRespawnScreenEnabledRead();
 
     /**
-     * Sets whether a respawn screen should be enabled for this {@linkplain Player player}.
+     * Creates {@linkplain WriteBooleanAcquisition a write boolean acquisition}, which holds a value defining
+     * whether a respawn screen is enabled for this {@linkplain Player player}.
      *
-     * @param enabled {@code true} if the respawn screen should be enabled, {@code false} otherwise
+     * @return the boolean acquisition
      * @since 1.0
      */
-    void setRespawnScreenEnabled(boolean enabled);
+    @NonNull WriteBooleanAcquisition acquireRespawnScreenEnabledWrite();
 
     /**
      * Represents a Minecraft chat mode setting of {@linkplain Player a player}.

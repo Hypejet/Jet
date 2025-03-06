@@ -1,9 +1,6 @@
 package net.hypejet.jet.server.network;
 
-import net.hypejet.jet.data.codecs.util.mapper.Mapper;
 import net.hypejet.jet.network.PlayerConnection;
-import net.hypejet.jet.network.PlayerConnectionState;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Represents a state of a Minecraft protocol.
@@ -45,33 +42,5 @@ public enum ProtocolState {
      *
      * @since 1.0
      */
-    HANDSHAKE;
-
-    private static final Mapper<ProtocolState, PlayerConnectionState> STATE_MAPPER =
-            Mapper.builder(ProtocolState.class, PlayerConnectionState.class)
-                    .register(ProtocolState.PLAY, PlayerConnectionState.PLAY)
-                    .register(ProtocolState.CONFIGURATION, PlayerConnectionState.CONFIGURATION)
-                    .register(ProtocolState.LOGIN, PlayerConnectionState.LOGIN)
-                    .register(ProtocolState.STATUS, PlayerConnectionState.STATUS)
-                    .register(ProtocolState.HANDSHAKE, PlayerConnectionState.HANDSHAKE)
-                    .build();
-
-    /**
-     * Gets {@linkplain PlayerConnectionState a player connection state} representation of this
-     * {@linkplain ProtocolState protocol state}.
-     *
-     * @return the player connection state representation
-     * @throws IllegalStateException if the player connection state representation could not be found
-     * @since 1.0
-     */
-    public @NonNull PlayerConnectionState toConnectionState() {
-        PlayerConnectionState state = STATE_MAPPER.write(this);
-        if (state == null) {
-            throw new IllegalStateException(String.format(
-                    "Could not find a player connection state representation for protocol state with name of %s",
-                    this.name()
-            ));
-        }
-        return state;
-    }
+    HANDSHAKE
 }

@@ -19,7 +19,7 @@ public interface ChunkBuilder {
      * @param y an absolute {@code Y} value of the coordinate
      * @param z a chunk-relative {@code Z} value of the coordinate
      * @param blockState a block state that should be set at the coordinate specified
-     * @see 1.0
+     * @since 1.0
      */
     void setBlockState(byte x, short y, byte z, @NonNull BlockState blockState);
 
@@ -30,7 +30,7 @@ public interface ChunkBuilder {
      * @param y an absolute {@code Y} value of the coordinate
      * @param z a chunk-relative {@code Z} value of the coordinate
      * @param biome a registry entry of a biome that should be set at the coordinate specified
-     * @see 1.0
+     * @since 1.0
      */
     void setBiome(byte x, short y, byte z, @NonNull RegistryEntry<Biome> biome);
 

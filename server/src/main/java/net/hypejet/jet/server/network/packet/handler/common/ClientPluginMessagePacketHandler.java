@@ -4,9 +4,12 @@ import net.hypejet.jet.event.events.brand.ChangeClientBrandEvent;
 import net.hypejet.jet.event.events.pluginmessage.PluginMessageEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.packet.handler.ClientPacketHandler;
 import net.hypejet.jet.server.network.packet.packets.client.common.ClientPluginMessagePacket;
 import net.hypejet.jet.server.network.session.Session;
+import net.hypejet.jet.server.network.session.common.CommonSessionPacketHandler;
+import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -22,7 +25,7 @@ import java.nio.charset.StandardCharsets;
  */
 public final class ClientPluginMessagePacketHandler extends ClientPacketHandler<ClientPluginMessagePacket> {
 
-    private static final Key BRAND_PLUGIN_MESSAGE_IDENTIFIER = Key.key("brand");
+    private static final Key CLIENT_BRAND_PLUGIN_MESSAGE_KEY = Key.key("brand");
 
     /**
      * Constructs the {@linkplain ClientPluginMessagePacketHandler client plugin message packet handler}.
@@ -35,18 +38,21 @@ public final class ClientPluginMessagePacketHandler extends ClientPacketHandler<
 
     @Override
     public void handle(@NonNull ClientPluginMessagePacket packet, @NonNull Session session) {
-        JetPlayer player = session.connection().playerOrThrow();
-        EventNode<Object> eventNode = player.server().eventNode();
+        if (!(session.sessionTask() instanceof CommonSessionPacketHandler handler))
+            throw new IllegalArgumentException("The session task does not implement a common session packet handler");
 
         Key messageKey = packet.key();
-        byte[] data = packet.data().array();
+        UnmodifiableByteArray data = packet.data();
 
-        if (messageKey.equals(BRAND_PLUGIN_MESSAGE_IDENTIFIER)) {
-            String clientBrand = new String(data, StandardCharsets.UTF_8);
-            eventNode.call(new ChangeClientBrandEvent(player, clientBrand));
-            player.setClientBrand(clientBrand);
+        SocketPlayerConnection connection = session.connection();
+        EventNode<Object> eventNode = connection.server().eventNode();
+
+        if (messageKey.equals(CLIENT_BRAND_PLUGIN_MESSAGE_KEY)) {
+            String clientBrand = new String(data.array(), StandardCharsets.UTF_8);
+            eventNode.call(new ChangeClientBrandEvent(connection, clientBrand));
+            handler.handleClientBrand(clientBrand);
         }
 
-        eventNode.call(new PluginMessageEvent(player, messageKey, data));
+        eventNode.call(new PluginMessageEvent(connection, messageKey, data));
     }
 }
