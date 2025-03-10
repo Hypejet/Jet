@@ -10,7 +10,7 @@ public enum ChunkPaletteType {
     /**
      * {@linkplain ChunkPaletteType A chunk palette type} used when
      * {@linkplain net.hypejet.jet.server.world.chunk.palette.ChunkPalette a chunk palette} stores
-     * {@linkplain net.hypejet.jet.server.world.block.JetBlockState block states}.
+     * {@linkplain net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState block states}.
      *
      * @since 1.0
      */

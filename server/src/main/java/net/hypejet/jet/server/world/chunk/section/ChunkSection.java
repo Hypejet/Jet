@@ -2,10 +2,10 @@ package net.hypejet.jet.server.world.chunk.section;
 
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState;
 import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.util.collection.ListUtil;
 import net.hypejet.jet.server.util.order.ElementOrder;
-import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.palette.ChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
@@ -27,7 +27,7 @@ public final class ChunkSection {
 
     private final short nonAirBlockCount;
 
-    private final ChunkPalette<JetBlockState> blockStatePalette;
+    private final ChunkPalette<BlockState> blockStatePalette;
     private final ChunkPalette<JetRegistryEntry<Biome>> biomePalette;
 
     /**
@@ -38,7 +38,7 @@ public final class ChunkSection {
      * @throws IllegalArgumentException if usage types of palettes specified are invalid
      * @since 1.0
      */
-    private ChunkSection(@NonNull ChunkPalette<JetBlockState> blockStatePalette,
+    private ChunkSection(@NonNull ChunkPalette<BlockState> blockStatePalette,
                          @NonNull ChunkPalette<JetRegistryEntry<Biome>> biomePalette) {
         this(calculateNonAirBlockCount(blockStatePalette), blockStatePalette, biomePalette);
     }
@@ -52,7 +52,7 @@ public final class ChunkSection {
      * @throws IllegalArgumentException if usage types of palettes specified are invalid
      * @since 1.0
      */
-    private ChunkSection(short nonAirBlockStateCount, @NonNull ChunkPalette<JetBlockState> blockStatePalette,
+    private ChunkSection(short nonAirBlockStateCount, @NonNull ChunkPalette<BlockState> blockStatePalette,
                          @NonNull ChunkPalette<JetRegistryEntry<Biome>> biomePalette) {
         NullabilityUtil.requireNonNull(blockStatePalette, "block state palette");
         NullabilityUtil.requireNonNull(biomePalette, "biome palette");
@@ -83,7 +83,7 @@ public final class ChunkSection {
      * @return the chunk palette
      * @since 1.0
      */
-    public @NonNull ChunkPalette<JetBlockState> blockStatePalette() {
+    public @NonNull ChunkPalette<BlockState> blockStatePalette() {
         return this.blockStatePalette;
     }
 
@@ -108,13 +108,13 @@ public final class ChunkSection {
      */
     @Contract(pure = true)
     public @NonNull ChunkSection withUpdates(
-            @NonNull Collection<ChunkPaletteUpdate<JetBlockState>> blockStateUpdates,
+            @NonNull Collection<ChunkPaletteUpdate<BlockState>> blockStateUpdates,
             @NonNull Collection<ChunkPaletteUpdate<JetRegistryEntry<Biome>>> biomeUpdates
     ) {
         if (blockStateUpdates.isEmpty() && biomeUpdates.isEmpty())
             return this;
 
-        ChunkPalette<JetBlockState> blockStatePalette = this.blockStatePalette.withUpdates(blockStateUpdates);
+        ChunkPalette<BlockState> blockStatePalette = this.blockStatePalette.withUpdates(blockStateUpdates);
         ChunkPalette<JetRegistryEntry<Biome>> biomePalette = this.biomePalette.withUpdates(biomeUpdates);
 
         boolean blockStatePaletteUnchanged = this.blockStatePalette.equals(blockStatePalette);
@@ -149,11 +149,11 @@ public final class ChunkSection {
                 '}';
     }
 
-    private static short calculateNonAirBlockCount(@NonNull ChunkPalette<JetBlockState> blockStatePalette) {
+    private static short calculateNonAirBlockCount(@NonNull ChunkPalette<BlockState> blockStatePalette) {
         NullabilityUtil.requireNonNull(blockStatePalette, "block state palette");
         short nonAirBlockCount = 0;
 
-        for (JetBlockState blockState : blockStatePalette.elementCountMap().keySet()) {
+        for (BlockState blockState : blockStatePalette.elementCountMap().keySet()) {
             if (blockState.isAir()) continue;
             nonAirBlockCount++;
         }
@@ -169,7 +169,7 @@ public final class ChunkSection {
      */
     public static final class Builder {
 
-        private final List<JetBlockState> blockStates;
+        private final List<BlockState> blockStates;
         private final List<JetRegistryEntry<Biome>> biomes;
 
         /**
@@ -180,7 +180,7 @@ public final class ChunkSection {
          * @param defaultBiome a registry entry of a biome that should be used where a biome has not been set
          * @since 1.0
          */
-        public Builder(@NonNull JetBlockState defaultBlockState, @NonNull JetRegistryEntry<Biome> defaultBiome) {
+        public Builder(@NonNull BlockState defaultBlockState, @NonNull JetRegistryEntry<Biome> defaultBiome) {
             NullabilityUtil.requireNonNull(defaultBlockState, "default block state");
             NullabilityUtil.requireNonNull(defaultBiome, "default biome");
 
@@ -192,13 +192,13 @@ public final class ChunkSection {
         }
 
         /**
-         * Sets {@linkplain JetBlockState a block state} specified at a position specified.
+         * Sets {@linkplain BlockState a block state} specified at a position specified.
          *
          * @param position the position
          * @param blockState the block state to set
          * @since 1.0
          */
-        public void setBlockState(@NonNull ChunkPaletteRelativePosition position, @NonNull JetBlockState blockState) {
+        public void setBlockState(@NonNull ChunkPaletteRelativePosition position, @NonNull BlockState blockState) {
             NullabilityUtil.requireNonNull(position, "position");
             NullabilityUtil.requireNonNull(blockState, "block state");
 
@@ -211,7 +211,7 @@ public final class ChunkSection {
         }
 
         /**
-         * Sets {@linkplain JetBlockState a block state} specified at a position specified.
+         * Sets {@linkplain BlockState a block state} specified at a position specified.
          *
          * @param position the position
          * @param biome the biome to set
@@ -238,7 +238,7 @@ public final class ChunkSection {
          * @since 1.0
          */
         @Contract(pure = true)
-        public @NonNull ChunkSection build(@NonNull ElementOrder<JetBlockState> blockStateOrder,
+        public @NonNull ChunkSection build(@NonNull ElementOrder<BlockState> blockStateOrder,
                                            @NonNull ElementOrder<JetRegistryEntry<Biome>> biomeOrder) {
             return new ChunkSection(
                     ChunkPalette.create(ChunkPaletteType.BLOCK_STATE, blockStateOrder, this.blockStates),

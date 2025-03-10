@@ -2,8 +2,9 @@ package net.hypejet.jet.server.util.order;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.server.util.hash.IdentityHashStrategy;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.value.qual.IntRange;
@@ -14,6 +15,9 @@ import java.util.Map;
 /**
  * Represents an order of elements, which was specified with {@linkplain List a list}. An index of elements is stored
  * in {@linkplain Map a map}, allowing for fast index getting.
+ *
+ * <p>Note that the map stores elements by their {@linkplain System#identityHashCode(Object) identity hash code},
+ * so the list cannot contain multiple elements with the same memory reference, but they can be equal to others.</p>
  *
  * @param <E> the type of elements
  * @since 1.0
@@ -32,9 +36,15 @@ public final class ElementOrder<E> {
     public ElementOrder(@NonNull List<E> sortedElements) {
         this.sortedElements = List.copyOf(NullabilityUtil.requireNonNull(sortedElements, "sorted elements"));
 
-        Object2IntMap<E> elementToIdentifierMap = new Object2IntOpenHashMap<>();
+        Object2IntMap<E> elementToIdentifierMap = new Object2IntOpenCustomHashMap<>(IdentityHashStrategy.INSTANCE);
         for (int index = 0; index < this.sortedElements.size(); index++) {
             E element = this.sortedElements.get(index);
+            if (elementToIdentifierMap.containsKey(element)) {
+                throw new IllegalArgumentException(String.format(
+                        "Element %s has been already specified in the list",
+                        element
+                ));
+            }
             elementToIdentifierMap.put(element, index);
         }
 
@@ -94,5 +104,16 @@ public final class ElementOrder<E> {
         if (!this.elementToIdentifierMap.containsKey(element))
             throw new IllegalArgumentException("The element specified has not been registered in this element order");
         return this.elementToIdentifierMap.getInt(element);
+    }
+
+    /**
+     * Gets whether an element specified has been registered in this element order.
+     *
+     * @param element the element
+     * @return {@code true} if the element has been registered in this element order, {@code false} otherwise
+     * @since 1.0
+     */
+    public boolean contains(@NonNull E element) {
+        return this.elementToIdentifierMap.containsKey(element);
     }
 }

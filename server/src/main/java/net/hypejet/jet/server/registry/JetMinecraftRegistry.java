@@ -60,7 +60,6 @@ public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
     private final Class<V> entryValueClass;
 
     private final Map<Key, JetRegistryEntry<V>> keyToRegistryEntryMap;
-    private final Map<JetRegistryEntry<V>, Key> registryEntryToKeyMap;
 
     private final HashMapAcquirable<JetRegistryEntry<V>, Tags> tags;
     private final ElementOrder<JetRegistryEntry<V>> elementOrder;
@@ -95,23 +94,15 @@ public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
         Map<JetRegistryEntry<V>, Tags> tags = new HashMap<>();
 
         for (JetRegistryEntry<V> entry : entries) {
-            Key key = entry.key();
-            V value = entry.value();
-
             PackInfo knownPackInfo = entry.knownPackInfo();
             if (knownPackInfo != null && !enabledFeaturePackInfos.contains(knownPackInfo)) continue;
 
-            keyToRegistryEntryMap.put(entry.key(), new JetRegistryEntry<>(key, value, knownPackInfo));
+            keyToRegistryEntryMap.put(entry.key(), entry);
             tags.put(entry, entryToTagsMap.get(entry));
         }
 
         this.keyToRegistryEntryMap = Map.copyOf(keyToRegistryEntryMap);
 
-        Map<JetRegistryEntry<V>, Key> registryEntryToKeyMap = new HashMap<>();
-        for (Map.Entry<Key, JetRegistryEntry<V>> entry : keyToRegistryEntryMap.entrySet())
-            registryEntryToKeyMap.put(entry.getValue(), entry.getKey());
-
-        this.registryEntryToKeyMap = Map.copyOf(registryEntryToKeyMap);
         this.tags = new HashMapAcquirable<>(tags);
         this.elementOrder = new ElementOrder<>(entries);
     }
@@ -138,15 +129,7 @@ public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
 
     @Override
     public final boolean isRegistered(@NonNull RegistryEntry<V> entry) {
-        return this.registryEntryToKeyMap.containsKey(validateEntry(entry));
-    }
-
-    @Override
-    public final @NonNull Key keyOf(@NonNull RegistryEntry<V> entry) {
-        Key key = this.registryEntryToKeyMap.get(validateEntry(entry));
-        if (key == null)
-            throw NOT_REGISTERED_EXCEPTION;
-        return key;
+        return this.elementOrder.contains(validateEntry(entry));
     }
 
     @Override

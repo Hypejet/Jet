@@ -5,9 +5,9 @@ import io.netty.util.collection.IntObjectMap;
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState;
 import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.util.order.ElementOrder;
-import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
 import net.hypejet.jet.server.world.chunk.update.BiomeUpdate;
@@ -60,14 +60,14 @@ public final class ChunkSectionList {
     }
 
     /**
-     * Gets {@linkplain JetBlockState a block state}, which is present
+     * Gets {@linkplain BlockState a block state}, which is present
      * at {@linkplain ChunkRelativePosition a chunk-relative position} specified.
      *
      * @param position the chunk-relative position
      * @return the block state
      * @since 1.0
      */
-    public @NonNull JetBlockState getBlockState(@NonNull ChunkRelativePosition position) {
+    public @NonNull BlockState getBlockState(@NonNull ChunkRelativePosition position) {
         return this.sectionFor(position).blockStatePalette().getElement(position.toChunkPaletteRelative());
     }
 
@@ -113,7 +113,7 @@ public final class ChunkSectionList {
 
         List<ChunkSection> sections = new ArrayList<>(this.sections);
 
-        IntObjectMap<List<ChunkPaletteUpdate<JetBlockState>>> blockStatePaletteUpdates;
+        IntObjectMap<List<ChunkPaletteUpdate<BlockState>>> blockStatePaletteUpdates;
         IntObjectMap<List<ChunkPaletteUpdate<JetRegistryEntry<Biome>>>> biomePaletteUpdates;
 
         blockStatePaletteUpdates = createChunkSectionPaletteUpdateMap(
@@ -128,7 +128,7 @@ public final class ChunkSectionList {
 
         boolean sectionListUpdated = false;
         for (int index = 0; index < sections.size(); index++) {
-            List<ChunkPaletteUpdate<JetBlockState>> blockStateUpdateList = blockStatePaletteUpdates.get(index);
+            List<ChunkPaletteUpdate<BlockState>> blockStateUpdateList = blockStatePaletteUpdates.get(index);
             List<ChunkPaletteUpdate<JetRegistryEntry<Biome>>> biomeUpdateList = biomePaletteUpdates.get(index);
 
             if (blockStateUpdateList == null && biomeUpdateList == null)
@@ -246,10 +246,10 @@ public final class ChunkSectionList {
 
         private final DimensionType dimensionType;
 
-        private final ElementOrder<JetBlockState> blockStateOrder;
+        private final ElementOrder<BlockState> blockStateOrder;
         private final ElementOrder<JetRegistryEntry<Biome>> biomeOrder;
 
-        private final JetBlockState defaultBlockState;
+        private final BlockState defaultBlockState;
         private final JetRegistryEntry<Biome> defaultBiome;
 
         private final IntObjectMap<ChunkSection.Builder> chunkSectionBuilders = new IntObjectHashMap<>();
@@ -267,12 +267,17 @@ public final class ChunkSectionList {
          * @param defaultBiome a registry entry of a biome that should be used where a biome has not been set
          * @since 1.0
          */
-        public Builder(@NonNull DimensionType dimensionType, @NonNull ElementOrder<JetBlockState> blockStateOrder,
+        public Builder(@NonNull DimensionType dimensionType,
+                       @NonNull ElementOrder<BlockState> blockStateOrder,
                        @NonNull ElementOrder<JetRegistryEntry<Biome>> biomeOrder,
-                       @NonNull JetBlockState defaultBlockState, JetRegistryEntry<Biome> defaultBiome) {
+                       @NonNull BlockState defaultBlockState, JetRegistryEntry<Biome> defaultBiome) {
             this.dimensionType = NullabilityUtil.requireNonNull(dimensionType, "dimension type");
 
-            this.blockStateOrder = NullabilityUtil.requireNonNull(blockStateOrder, "block state order");
+            this.blockStateOrder = NullabilityUtil.requireNonNull(
+                    blockStateOrder,
+                    "block state order"
+            );
+
             this.biomeOrder = NullabilityUtil.requireNonNull(biomeOrder, "biome order");
 
             this.defaultBlockState = NullabilityUtil.requireNonNull(defaultBlockState, "default block state");
@@ -282,14 +287,14 @@ public final class ChunkSectionList {
         }
 
         /**
-         * Sets {@linkplain JetBlockState a block state} that should be present
+         * Sets {@linkplain BlockState a block state} that should be present
          * at {@linkplain ChunkRelativePosition a chunk-relative position} specified.
          *
          * @param position the chunk-relative position
          * @param blockState the block state
          * @since 1.0
          */
-        public void setBlockState(@NonNull ChunkRelativePosition position, @NonNull JetBlockState blockState) {
+        public void setBlockState(@NonNull ChunkRelativePosition position, @NonNull BlockState blockState) {
             int sectionIndex = createSectionIndex(position, this.dimensionType);
             if (sectionIndex >= this.chunkSectionCount || sectionIndex < 0) {
                 throw new IndexOutOfBoundsException(String.format(

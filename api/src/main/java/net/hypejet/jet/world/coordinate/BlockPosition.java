@@ -6,14 +6,12 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.Objects;
 
 /**
- * Represents an implementation of {@linkplain Coordinate a coordinate} representing a position of
- * {@linkplain net.hypejet.jet.world.block.Block a Minecraft block}.
+ * Represents an implementation of {@linkplain Coordinate a coordinate} representing a position of a Minecraft block.
  *
  * @param blockX an {@code X} value of the position
  * @param blockY an {@code Y} value of the position
  * @param blockZ an {@code Z} value of the position
  * @since 1.0
- * @see net.hypejet.jet.world.block.Block
  * @see Coordinate
  */
 public record BlockPosition(int blockX, int blockY, int blockZ) implements Coordinate<BlockPosition> {

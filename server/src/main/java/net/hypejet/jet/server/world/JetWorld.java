@@ -21,13 +21,9 @@ import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.acquisition.BooleanMappedAcquisition;
 import net.hypejet.jet.server.util.acquisition.NotNullObjectMappedAcquisition;
-import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.Chunk;
-import net.hypejet.jet.server.world.chunk.update.BlockStateUpdate;
 import net.hypejet.jet.server.world.coordinate.ChunkPosition;
-import net.hypejet.jet.server.world.coordinate.relative.ChunkRelativePosition;
 import net.hypejet.jet.world.World;
-import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.chunk.ChunkProvider;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.hypejet.jet.world.data.WorldData;
@@ -103,37 +99,14 @@ public final class JetWorld implements World {
         return this.defaultSpawnPosition.acquireWrite();
     }
 
-    @Override
-    public @NonNull NotNullObjectAcquisition<JetBlockState> getBlockState(@NonNull BlockPosition position) {
-        return new NotNullObjectMappedAcquisition<>(
-                this.loadChunk(position),
-                acquisition -> acquisition.get().chunkSectionList().getBlockState(ChunkRelativePosition.from(position))
-        );
-    }
-
-    @Override
-    public void setBlockState(@NonNull BlockPosition position, @NonNull BlockState blockState) {
-        NullabilityUtil.requireNonNull(position, "position");
-        NullabilityUtil.requireNonNull(blockState, "block state");
-
-        if (!(blockState instanceof JetBlockState validatedBlockState))
-            throw new IllegalArgumentException("The block state specified is not a valid block state");
-
-        try (
-                MapAcquisition<ChunkPosition, Chunk, ?> mapAcquisition = this.chunks.acquireWrite();
-                NotNullObjectAcquisition<Chunk> chunkAcquisition = this.loadChunk(position)
-        ) {
-            Map<ChunkPosition, Chunk> chunks = mapAcquisition.map();
-            Chunk chunk = chunkAcquisition.get();
-
-            Chunk newChunk = chunk.withUpdates(
-                    Set.of(new BlockStateUpdate(ChunkRelativePosition.from(position), validatedBlockState)),
-                    Set.of(), Set.of()
-            );
-
-            if (chunk.equals(newChunk)) return;
-            chunks.put(ChunkPosition.fromCoordinate(position), newChunk);
-        }
+    /**
+     * Gets {@linkplain JetWorldManager a world manager}, which created this world.
+     *
+     * @return the world manager
+     * @since 1.0
+     */
+    public @NonNull JetWorldManager worldManager() {
+        return this.worldManager;
     }
 
     /**
@@ -178,25 +151,13 @@ public final class JetWorld implements World {
                             int chunkX = position.chunkX();
                             int chunkZ = position.chunkZ();
 
-                            BlockState defaultBlockState = this.chunkProvider.defaultBlockState(chunkX, chunkZ);
-                            if (!(defaultBlockState instanceof JetBlockState validatedBlockState)) {
-                                throw new IllegalArgumentException("The default block state" +
-                                        " specified is not a valid block state");
-                            }
-
                             RegistryEntry<Biome> defaultBiome = this.chunkProvider.defaultBiome(chunkX, chunkZ);
                             if (!(defaultBiome instanceof JetRegistryEntry<Biome> validatedBiome)) {
                                 throw new IllegalArgumentException("The registry entry of a default" +
                                         " biome specified is not a valid registry entry");
                             }
 
-                            Chunk.Builder builder = new Chunk.Builder(
-                                    this.dimensionType.value(),
-                                    registryManager.blockStateOrder(),
-                                    registryManager.biomeRegistry().elementOrder(),
-                                    validatedBlockState, validatedBiome
-                            );
-
+                            Chunk.Builder builder = new Chunk.Builder(this, validatedBiome);
                             this.chunkProvider.provide(builder, chunkX, chunkZ, this);
                             return builder.build();
                         });

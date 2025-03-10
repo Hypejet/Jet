@@ -4,10 +4,10 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState;
 import net.hypejet.jet.server.util.math.MathUtil;
 import net.hypejet.jet.server.util.storage.BitStorage;
 import net.hypejet.jet.server.util.storage.BitStorageUpdate;
-import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.Chunk;
 import net.hypejet.jet.server.world.chunk.palette.ChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
@@ -23,13 +23,13 @@ import java.util.Objects;
 
 /**
  * Represents a map, which stores highest height for each column of {@linkplain Chunk a chunk}, which is considered
- * {@linkplain HeightMapType#isOpaque(JetBlockState) opaque} by {@linkplain HeightMapType a type of the height map}.
+ * {@linkplain HeightMapType#isOpaque(BlockState) opaque} by {@linkplain HeightMapType a type of the height map}.
  *
  * <p>It is used mainly by Minecraft client for client-side optimizations.</p>
  *
  * @since 1.0
  * @see Chunk
- * @see HeightMapType#isOpaque(JetBlockState)
+ * @see HeightMapType#isOpaque(BlockState)
  * @see HeightMapType
  */
 public final class HeightMap {
@@ -210,14 +210,14 @@ public final class HeightMap {
             );
 
             ChunkSection section = chunkSectionList.sectionFor(position);
-            ChunkPalette<JetBlockState> blockStatePalette = section.blockStatePalette();
+            ChunkPalette<BlockState> blockStatePalette = section.blockStatePalette();
 
-            JetBlockState blockState = blockStatePalette.getElement(position.toChunkPaletteRelative());
+            BlockState blockState = blockStatePalette.getElement(position.toChunkPaletteRelative());
             if (heightMapType.isOpaque(blockState))
                 return toElement(blockY, dimensionType);
         }
 
-        return 0;
+        return 0; // 0 indicates that there is no block state in a column that satisfies the opaque check
     }
 
     private static int createElementIndex(byte blockX, byte blockZ) {
