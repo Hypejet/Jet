@@ -25,7 +25,7 @@ import java.util.Map;
 public final class ElementOrder<E> {
 
     private final List<E> sortedElements;
-    private final Object2IntMap<E> elementToIdentifierMap;
+    private final Object2IntMap<Object> elementToIdentifierMap;
 
     /**
      * Constructs the {@linkplain ElementOrder element order}.
@@ -99,7 +99,7 @@ public final class ElementOrder<E> {
      * @throws IllegalArgumentException if the element has not been registered in this element order
      * @since 1.0
      */
-    public @IntRange(from = 0, to = Integer.MAX_VALUE) int identifierOf(@NonNull E element) {
+    public @IntRange(from = 0, to = Integer.MAX_VALUE) int identifierOf(@NonNull Object element) {
         NullabilityUtil.requireNonNull(element, "element");
         if (!this.elementToIdentifierMap.containsKey(element))
             throw new IllegalArgumentException("The element specified has not been registered in this element order");

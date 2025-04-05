@@ -44,6 +44,11 @@ import net.hypejet.jet.server.network.codec.packet.server.play.ServerRespawnPlay
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizePositionPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizeRotationPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSystemMessagePlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerUpdateBiomesPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerUpdateBlockEntityPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerUpdateBlockStatePlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerUpdateChunkSectionBlockStatesPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerUpdateLightPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerWorldEventPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.status.ServerListResponseStatusPacketWriter;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerAddResourcePackPacket;
@@ -82,6 +87,11 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerRespawnPl
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizeRotationPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSystemMessagePlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateBiomesPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateBlockEntityPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateBlockStatePlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateChunkSectionBlockStatesPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateLightPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerWorldEventPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.status.ServerListResponseStatusPacket;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
@@ -235,6 +245,17 @@ public final class ServerPacketRegistry {
                                 ServerRespawnPlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.PLAYER_ROTATION, ServerSynchronizeRotationPlayPacket.class,
                                 ServerSynchronizeRotationPlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.BLOCK_UPDATE, ServerUpdateBlockStatePlayPacket.class,
+                                ServerUpdateBlockStatePlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.BLOCK_ENTITY_DATA, ServerUpdateBlockEntityPlayPacket.class,
+                                ServerUpdateBlockEntityPlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.CHUNKS_BIOMES, ServerUpdateBiomesPlayPacket.class,
+                                ServerUpdateBiomesPlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.LIGHT_UPDATE, ServerUpdateLightPlayPacket.class,
+                                ServerUpdateLightPlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.SECTION_BLOCKS_UPDATE,
+                                ServerUpdateChunkSectionBlockStatesPlayPacket.class,
+                                ServerUpdateChunkSectionBlockStatesPlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.CHUNK_BATCH_START, ServerChunkBatchStartPlayPacket.class,
                                 (buf, object) -> {})
                         .build()

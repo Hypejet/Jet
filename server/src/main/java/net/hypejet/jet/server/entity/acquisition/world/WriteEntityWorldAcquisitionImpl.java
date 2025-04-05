@@ -93,7 +93,7 @@ public final class WriteEntityWorldAcquisitionImpl
 
             player.sendRespawnPacket(validatedWorld, keepAttributes, keepMetadata);
             validatedWorld.addPlayer(player);
-            chunkBatchHandler.scheduleTask(validatedWorld, position);
+            chunkBatchHandler.scheduleTask();
         }
 
         /* We are going to synchronize the position manually using

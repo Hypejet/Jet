@@ -1,30 +1,29 @@
 package net.hypejet.jet.server.world;
 
-import net.hypejet.concurrency.collection.CollectionAcquisition;
-import net.hypejet.concurrency.map.MapAcquirable;
-import net.hypejet.concurrency.map.MapAcquisition;
-import net.hypejet.concurrency.map.hashmap.HashMapAcquirable;
-import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
-import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
+import net.hypejet.jet.MinecraftServer;
+import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState;
 import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.registry.JetRegistryEntry;
-import net.hypejet.jet.server.util.acquisition.BooleanMappedAcquisition;
-import net.hypejet.jet.server.util.acquisition.CollectionMappedAcquisition;
-import net.hypejet.jet.server.util.acquisition.NullableObjectMappedAcquisition;
-import net.hypejet.jet.util.exception.AlreadyExistsException;
-import net.hypejet.jet.world.World;
+import net.hypejet.jet.server.world.chunk.factory.JetChunkFactory;
+import net.hypejet.jet.server.world.chunk.factory.light.JetLightStorageFactory;
+import net.hypejet.jet.server.world.chunk.factory.palette.BiomeChunkPaletteFactory;
+import net.hypejet.jet.server.world.chunk.factory.palette.JetBlockStateChunkPaletteFactory;
+import net.hypejet.jet.server.world.chunk.factory.section.JetChunkSectionFactory;
+import net.hypejet.jet.server.world.chunk.light.JetLightSection;
+import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.world.WorldManager;
-import net.hypejet.jet.world.chunk.ChunkProvider;
+import net.hypejet.jet.world.chunk.ChunkLoader;
+import net.hypejet.jet.world.chunk.factory.ChunkFactory;
+import net.hypejet.jet.world.chunk.factory.light.LightStorageFactory;
+import net.hypejet.jet.world.chunk.factory.palette.BlockStateChunkPaletteFactory;
+import net.hypejet.jet.world.chunk.factory.palette.ChunkPaletteFactory;
+import net.hypejet.jet.world.chunk.factory.section.ChunkSectionFactory;
 import net.hypejet.jet.world.data.WorldData;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
 
 /**
  * Represents an implementation of {@linkplain WorldManager a world manager}.
@@ -32,108 +31,69 @@ import java.util.UUID;
  * @since 1.0
  * @see WorldManager
  */
-public final class JetWorldManager implements WorldManager {
+public final class JetWorldManager implements WorldManager<JetChunkSection, JetLightSection, BlockState> {
 
     private final JetMinecraftServer server;
-    private final MapAcquirable<UUID, JetWorld, ?> worldAcquirable = new HashMapAcquirable<>();
+
+    private final BlockStateChunkPaletteFactory<BlockState> blockStateChunkPaletteFactory;
+    private final ChunkPaletteFactory<RegistryEntry<Biome>> biomeChunkPaletteFactory;
+
+    private final ChunkSectionFactory<JetChunkSection, JetLightSection, BlockState> chunkSectionFactory;
+    private final ChunkFactory<JetChunkSection, JetLightSection, BlockState> chunkFactory;
 
     /**
-     * Constructs the {@linkplain JetWorldManager world manager}.
+     * Constructs the {@linkplain JetWorldManager world manager implementation}.
      *
-     * @param server a server that the world management should be done for
+     * @param server a server that should own the world manager
      * @since 1.0
      */
     public JetWorldManager(@NonNull JetMinecraftServer server) {
         this.server = NullabilityUtil.requireNonNull(server, "server");
+
+        this.blockStateChunkPaletteFactory = new JetBlockStateChunkPaletteFactory(server);
+        this.biomeChunkPaletteFactory = new BiomeChunkPaletteFactory(server);
+
+        this.chunkSectionFactory = new JetChunkSectionFactory(server);
+        this.chunkFactory = new JetChunkFactory(server);
     }
 
     @Override
-    public @NonNull NullableObjectAcquisition<JetWorld> getWorld(@NonNull UUID uniqueId) {
-        return new NullableObjectMappedAcquisition<>(
-                this.worldAcquirable.acquireRead(),
-                acquisition -> acquisition.map().get(uniqueId)
-        );
-    }
-
-    @Override
-    public @NonNull JetWorld createAndRegisterWorld(@NonNull UUID uniqueId,
-                                                    @NonNull RegistryEntry<DimensionType> dimensionType,
-                                                    @NonNull WorldData worldData,
-                                                    @NonNull ChunkProvider chunkProvider) {
-        JetWorld world = this.createUnregisteredWorld(uniqueId, dimensionType, worldData, chunkProvider);
-        this.registerWorld(world);
-        return world;
-    }
-
-    @Override
-    public @NonNull JetWorld createUnregisteredWorld(@NonNull UUID uniqueId,
-                                                     @NonNull RegistryEntry<DimensionType> dimensionType,
-                                                     @NonNull WorldData worldData,
-                                                     @NonNull ChunkProvider chunkProvider) {
+    public @NonNull JetWorld createWorld(@NonNull RegistryEntry<DimensionType> dimensionType,
+                                         @NonNull WorldData worldData, @NonNull ChunkLoader<BlockState> chunkLoader) {
         if (!(dimensionType instanceof JetRegistryEntry<DimensionType> validatedDimensionType)) {
-            throw new IllegalArgumentException("The dimension type registry entry" +
+            throw new IllegalArgumentException("A dimension type registry entry" +
                     " specified is not a valid registry entry");
         }
-        return new JetWorld(uniqueId, validatedDimensionType, worldData, chunkProvider, this);
+        return new JetWorld(validatedDimensionType, worldData, chunkLoader, this.server);
     }
 
     @Override
-    public void registerWorld(@NonNull World world) {
-        JetWorld validatedWorld = validateWorld(world);
-        try (MapAcquisition<UUID, JetWorld, ?> acquisition = this.worldAcquirable.acquireWrite()) {
-            UUID uniqueId = world.uniqueId();
-            Map<UUID, JetWorld> map = acquisition.map();
-            
-            if (map.containsKey(uniqueId)) {
-                throw new AlreadyExistsException(String.format(
-                        "A world with unique identifier of %s already exists",
-                        uniqueId
-                ));
-            }
-
-            map.put(uniqueId, validatedWorld);
-        }
+    public @NonNull BlockStateChunkPaletteFactory<BlockState> blockStateChunkPaletteFactory() {
+        return this.blockStateChunkPaletteFactory;
     }
 
     @Override
-    public void unregisterWorld(@NonNull UUID uniqueId) {
-        try (MapAcquisition<UUID, JetWorld, ?> acquisition = this.worldAcquirable.acquireWrite()) {
-            acquisition.map().remove(uniqueId); // TODO: Safety checks
-        }
+    public @NonNull ChunkPaletteFactory<RegistryEntry<Biome>> biomeChunkPaletteFactory() {
+        return this.biomeChunkPaletteFactory;
     }
 
     @Override
-    public @NonNull CollectionAcquisition<? extends World, ?> worlds() {
-        return new CollectionMappedAcquisition<>(
-                this.worldAcquirable.acquireRead(),
-                acquisition -> Collections.unmodifiableCollection(acquisition.map().values())
-        );
+    public @NonNull LightStorageFactory lightStorageFactory() {
+        return JetLightStorageFactory.INSTANCE;
     }
 
     @Override
-    public @NonNull BooleanAcquisition isRegistered(@NonNull World world) {
-        validateWorld(world);
-        return new BooleanMappedAcquisition<>(
-                this.worldAcquirable.acquireRead(),
-                acquisition -> Objects.equals(world, acquisition.map().get(world.uniqueId()))
-        );
+    public @NonNull ChunkSectionFactory<JetChunkSection, JetLightSection, BlockState> chunkSectionFactory() {
+        return this.chunkSectionFactory;
     }
 
-    /**
-     * Gets {@linkplain JetMinecraftServer a Minecraft server} that owns
-     * this {@linkplain JetWorldManager world manager}.
-     *
-     * @return the Minecraft server
-     * @since 1.0
-     */
-    public @NonNull JetMinecraftServer server() {
+    @Override
+    public @NonNull ChunkFactory<JetChunkSection, JetLightSection, BlockState> chunkFactory() {
+        return this.chunkFactory;
+    }
+
+    @Override
+    public @NonNull MinecraftServer server() {
         return this.server;
-    }
-
-    private static @NonNull JetWorld validateWorld(@NonNull World world) {
-        NullabilityUtil.requireNonNull(world, "world");
-        if (!(world instanceof JetWorld validatedWorld))
-            throw new IllegalArgumentException("The world specified is not a valid world");
-        return validatedWorld;
     }
 }

@@ -5,6 +5,7 @@ import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockSt
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -62,6 +63,17 @@ public final class BlockType {
      */
     public @NonNull Set<Key> requiredFeatureFlags() {
         return this.requiredFeatureFlags;
+    }
+
+    /**
+     * Gets {@linkplain Collection a collection} of {@linkplain BlockState block states} that blocks of this block type
+     * should be able to use.
+     *
+     * @return the collection
+     * @since 1.0
+     */
+    public @NonNull Collection<BlockState> possibleStates() {
+        return this.possibleStates.values();
     }
 
     /**

@@ -6,11 +6,13 @@ import net.hypejet.concurrency.empty.EmptyAcquirable;
 import net.hypejet.concurrency.empty.EmptyAcquisition;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.light.update.LightStorageUpdate;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.section.ChunkSectionList;
 import net.hypejet.jet.server.world.chunk.update.LightUpdate;
-import net.hypejet.jet.server.world.coordinate.relative.ChunkRelativePosition;
+import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
+import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.Contract;
@@ -22,19 +24,16 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Represents a storage of {@linkplain LightSection light sections}
- * for a {@linkplain net.hypejet.jet.server.world.chunk.Chunk chunk}.
+ * Represents a storage of {@linkplain JetLightSection light sections} of {@linkplain JetChunk a chunk}.
  *
  * @since 1.0
- * @see LightSection
- * @see net.hypejet.jet.server.world.chunk.Chunk
+ * @see JetLightSection
+ * @see JetChunk
  */
 public final class LightSectionList {
 
-    private static final LightSection EMPTY_LIGHT_SECTION = new LightSection.Builder().build();
-
     private final DimensionType dimensionType;
-    private final List<LightSection> sections;
+    private final List<JetLightSection> sections;
 
     private @MonotonicNonNull @GuardedBy("serializationDataLock") LightSerializationData serializationData;
     private final EmptyAcquirable serializationDataLock = new EmptyAcquirable();
@@ -46,20 +45,68 @@ public final class LightSectionList {
      * @param sections a list of sections that the light section list should have
      * @since 1.0
      */
-    private LightSectionList(@NonNull DimensionType dimensionType, @NonNull List<LightSection> sections) {
+    public LightSectionList(@NonNull DimensionType dimensionType, @NonNull List<JetLightSection> sections) {
         this.dimensionType = NullabilityUtil.requireNonNull(dimensionType, "dimension type");
         this.sections = List.copyOf(NullabilityUtil.requireNonNull(sections, "sections"));
+
+        /* There is always one light section above the highest chunk section
+           and one light section below the lowest chunk section. */
+        int expectedSectionCount = ChunkSectionList.createSectionCount(dimensionType) + 2;
+        int actualSectionCount = this.sections.size();
+
+        if (actualSectionCount != expectedSectionCount) {
+            throw new IllegalArgumentException(String.format(
+                    "Number of light sections specified (%d) is invalid, expected (%d)",
+                    actualSectionCount, expectedSectionCount
+            ));
+        }
     }
 
     /**
-     * Gets {@linkplain List a list} of {@linkplain LightSection light sections}
+     * Gets {@linkplain List a list} of {@linkplain JetLightSection light sections}
      * that this {@linkplain LightSectionList light section list} stores.
      *
      * @return the list
      * @since 1.0
      */
-    public @NonNull List<LightSection> sections() {
+    public @NonNull List<JetLightSection> sections() {
         return this.sections;
+    }
+
+    /**
+     * Gets {@linkplain JetLightSection a light section} that
+     * {@linkplain ChunkRelativeBlockPosition a chunk-relative block position} specified belongs to.
+     *
+     * @param position the chunk-relative block position
+     * @return the light section
+     * @since 1.0
+     */
+    public @NonNull JetLightSection sectionFor(@NonNull ChunkRelativeBlockPosition position) {
+        return this.section(ChunkSectionList.createSectionY(position.absoluteY(), ChunkPaletteType.BLOCK_STATE));
+    }
+
+    /**
+     * Gets {@linkplain JetLightSection a light section} at a section-Y coordinate specified.
+     *
+     * @param sectionY the coordinate
+     * @return the light section
+     * @throws IndexOutOfBoundsException if the section-Y specified is invalid for this light section list
+     * @since 1.0
+     */
+    public @NonNull JetLightSection section(int sectionY) {
+        int sectionIndex = createSectionIndex(sectionY, this.dimensionType);
+        if (sectionIndex <= 0 || sectionIndex >= this.sections.size())
+            throw new IndexOutOfBoundsException("Section-Y specified is invalid for this light section list");
+
+        JetLightSection section = this.sections.get(sectionIndex);
+        if (section == null) {
+            throw new IllegalArgumentException(String.format(
+                    "Could not find a light section for a section-Y specified (%d)",
+                    sectionY
+            ));
+        }
+
+        return section;
     }
 
     /**
@@ -78,7 +125,7 @@ public final class LightSectionList {
     }
 
     /**
-     * Creates a copy of this {@linkplain LightSectionList light section list} with updates specified appplied.
+     * Creates a copy of this {@linkplain LightSectionList light section list} with updates specified applied.
      *
      * @param updates the updates
      * @return the copy
@@ -89,14 +136,16 @@ public final class LightSectionList {
         if (updates.isEmpty())
             return this;
 
-        List<LightSection> sections = new ArrayList<>(this.sections);
+        List<JetLightSection> sections = new ArrayList<>(this.sections);
 
         IntObjectMap<List<LightStorageUpdate>> indexToSkyLightUpdateMap = new IntObjectHashMap<>();
         IntObjectMap<List<LightStorageUpdate>> indexToBlockLightUpdateMap = new IntObjectHashMap<>();
 
         for (LightUpdate update : updates) {
-            ChunkRelativePosition position = update.position();
-            int sectionIndex = createSectionIndex(position, this.dimensionType);
+            ChunkRelativeBlockPosition position = update.position();
+
+            int sectionY = ChunkSectionList.createSectionY(position.absoluteY(), ChunkPaletteType.BLOCK_STATE);
+            int sectionIndex = createSectionIndex(sectionY, this.dimensionType);
 
             IntObjectMap<List<LightStorageUpdate>> indexToLightUpdateMap = switch (update.lightType()) {
                 case SKY -> indexToSkyLightUpdateMap;
@@ -111,7 +160,8 @@ public final class LightSectionList {
                 indexToLightUpdateMap.put(sectionIndex, lightStorageUpdates);
             }
 
-            lightStorageUpdates.add(new LightStorageUpdate(position.toChunkPaletteRelative(), update.lightValue()));
+            ChunkPaletteRelativePosition paletteRelativePosition = ChunkPaletteRelativePosition.from(position);
+            lightStorageUpdates.add(new LightStorageUpdate(paletteRelativePosition, update.lightValue()));
         }
 
         boolean sectionListUpdated = false;
@@ -127,15 +177,15 @@ public final class LightSectionList {
             if (blockLightUpdates == null)
                 blockLightUpdates = List.of();
 
-            LightSection section = sections.get(index);
-            LightSection updatedSection = section.withUpdates(skyLightUpdates, blockLightUpdates);
+            JetLightSection section = sections.get(index);
+            JetLightSection updatedSection = section.withUpdates(skyLightUpdates, blockLightUpdates);
 
             if (section.equals(updatedSection))
                 continue;
             if (!sectionListUpdated)
                 sectionListUpdated = true;
 
-            sections.set(index, section);
+            sections.set(index, updatedSection);
         }
 
         if (!sectionListUpdated)
@@ -164,103 +214,18 @@ public final class LightSectionList {
                 '}';
     }
 
-    private static int createSectionIndex(@NonNull ChunkRelativePosition position,
-                                          @NonNull DimensionType dimensionType) {
+    /**
+     * Creates an index of {@linkplain net.hypejet.jet.world.chunk.light.LightSection a light section}
+     * at a section-Y specified in {@linkplain DimensionType a dimension type} specified.
+     *
+     * @param sectionY the section-Y
+     * @param dimensionType the dimension type
+     * @return the index
+     * @since 1.0
+     */
+    public static int createSectionIndex(int sectionY, @NonNull DimensionType dimensionType) {
         /* The result is a sum of chunk section index with 1, since there is one light section that is present
            below lowest chunk section and one light section that is present above highest chunk section. */
-        return ChunkSectionList.createSectionIndex(position, dimensionType) + 1;
-    }
-
-    /**
-     * Represents a builder of {@linkplain LightSectionList a light section list}.
-     *
-     * @since 1.0
-     * @see LightSectionList
-     */
-    public static final class Builder {
-
-        private final DimensionType dimensionType;
-        private final int lightSectionCount;
-
-        private final IntObjectMap<LightSection.Builder> sectionBuilders = new IntObjectHashMap<>();
-
-        /**
-         * Constructs the {@linkplain Builder light section list builder}.
-         *
-         * @param dimensionType a dimension type of world of a chunk that the light section list is created for
-         * @since 1.0
-         */
-        public Builder(@NonNull DimensionType dimensionType) {
-            this.dimensionType = NullabilityUtil.requireNonNull(dimensionType, "dimension type");
-            /* The result is a sum of chunk section count with 2, since there is one light section that is present
-               below lowest chunk section and one light section that is present above highest chunk section. */
-            this.lightSectionCount = ChunkSectionList.createSectionCount(dimensionType) + 2;
-        }
-
-        /**
-         * Sets a skylight value that should be set for a block
-         * at {@linkplain ChunkRelativePosition a chunk-relative position} specified.
-         *
-         * @param position the chunk-relative position
-         * @param value the skylight value
-         * @since 1.0
-         */
-        public void setSkyLight(@NonNull ChunkRelativePosition position, byte value) {
-            NullabilityUtil.requireNonNull(position, "position");
-            this.getOrCreateBuilder(position).setSkyLight(position.toChunkPaletteRelative(), value);
-        }
-
-        /**
-         * Sets a block light value that should be set for a block
-         * at {@linkplain ChunkRelativePosition a chunk-relative position} specified.
-         *
-         * @param position the chunk-relative position
-         * @param value the block light value
-         * @since 1.0
-         */
-        public void setBlockLight(@NonNull ChunkRelativePosition position, byte value) {
-            NullabilityUtil.requireNonNull(position, "position");
-            this.getOrCreateBuilder(position).setBlockLight(position.toChunkPaletteRelative(), value);
-        }
-
-        /**
-         * Builds {@linkplain LightSectionList a light section list} with data set in this builder.
-         *
-         * @return the light section list
-         * @since 1.0
-         */
-        @Contract(pure = true)
-        public @NonNull LightSectionList build() {
-            List<LightSection> lightSections = new ArrayList<>(this.lightSectionCount);
-
-            for (int index = 0; index < this.lightSectionCount; index++) {
-                LightSection lightSection;
-
-                LightSection.Builder builder = this.sectionBuilders.get(index);
-                if (builder == null) lightSection = EMPTY_LIGHT_SECTION;
-                else lightSection = builder.build();
-
-                lightSections.add(index, lightSection);
-            }
-
-            return new LightSectionList(this.dimensionType, lightSections);
-        }
-
-        private LightSection.@NonNull Builder getOrCreateBuilder(@NonNull ChunkRelativePosition position) {
-            if (position.paletteType() != ChunkPaletteType.BLOCK_STATE) {
-                throw new IllegalArgumentException("The chunk-relative position specified" +
-                        " must be a position created for block state chunk palettes");
-            }
-
-            int sectionIndex = createSectionIndex(position, this.dimensionType);
-            if (sectionIndex >= this.lightSectionCount || sectionIndex < 0) {
-                throw new IndexOutOfBoundsException(String.format(
-                        "Could not create a valid section index for a chunk-relative position specified (%s)",
-                        position
-                ));
-            }
-
-            return this.sectionBuilders.computeIfAbsent(sectionIndex, ignored -> new LightSection.Builder());
-        }
+        return ChunkSectionList.createSectionIndex(sectionY, dimensionType) + 1;
     }
 }

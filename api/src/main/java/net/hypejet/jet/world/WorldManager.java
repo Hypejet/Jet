@@ -1,98 +1,96 @@
 package net.hypejet.jet.world;
 
-import net.hypejet.concurrency.collection.CollectionAcquisition;
-import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
-import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
+import net.hypejet.jet.MinecraftServer;
+import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.registry.RegistryEntry;
-import net.hypejet.jet.world.chunk.ChunkProvider;
+import net.hypejet.jet.world.chunk.ChunkLoader;
+import net.hypejet.jet.world.chunk.factory.ChunkFactory;
+import net.hypejet.jet.world.chunk.factory.light.LightStorageFactory;
+import net.hypejet.jet.world.chunk.factory.palette.BlockStateChunkPaletteFactory;
+import net.hypejet.jet.world.chunk.factory.palette.ChunkPaletteFactory;
+import net.hypejet.jet.world.chunk.factory.section.ChunkSectionFactory;
+import net.hypejet.jet.world.chunk.light.LightSection;
+import net.hypejet.jet.world.chunk.section.ChunkSection;
 import net.hypejet.jet.world.data.WorldData;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.util.UUID;
-
 /**
- * Represents something that manages {@linkplain World worlds}.
+ * Represents something that manages creation of {@linkplain World worlds} of {@linkplain MinecraftServer a server}.
  *
+ * @param <CS> a type of chunk section implementation that the server uses
+ * @param <LS> a type of light section implementation that the server uses
+ * @param <BS> a type of block state implementation that the server uses
  * @since 1.0
  * @see World
+ * @see MinecraftServer
  */
-public interface WorldManager {
+public interface WorldManager<CS extends ChunkSection<BS>, LS extends LightSection, BS> {
     /**
-     * Creates {@linkplain NullableObjectAcquisition a nullable object acquisition}
-     * of {@linkplain World a world} with {@linkplain UUID an unique identifier} specified.
+     * Creates {@linkplain World a world}.
      *
-     * @param uniqueId the unique identifier
-     * @return the nullable object acquisition, which contains the world or {@code null} if a world with the unique
-     *         identifier specified does not exist
-     * @since 1.0
-     */
-    @NonNull NullableObjectAcquisition<? extends World> getWorld(@NonNull UUID uniqueId);
-
-    /**
-     * Creates and registers {@linkplain World a world} with {@linkplain UUID an unique identifier} specified.
-     *
-     * @param uniqueId the unique identifier
-     * @param dimensionType a registry entry of a dimension type that the world type should have
+     * @param dimensionType a dimension type, of which type the world should be
      * @param worldData an additional world data that the world should have
-     * @param chunkProvider a chunk provider that the world should use for chunk loading
-     * @return the world
-     * @throws net.hypejet.jet.util.exception.AlreadyExistsException if a world with the unique identifier specified
-     *                                                               has been already registered
-     * @since 1.0
-     */
-    @NonNull World createAndRegisterWorld(@NonNull UUID uniqueId, @NonNull RegistryEntry<DimensionType> dimensionType,
-                                          @NonNull WorldData worldData, @NonNull ChunkProvider chunkProvider);
-
-    /**
-     * Creates {@linkplain World a world} with {@linkplain UUID an unique identifier} specified without registering it.
-     *
-     * @param uniqueId the unique identifier
-     * @param dimensionType a registry entry of a dimension type that the world type should have
-     * @param worldData an additional world data that the world should have
-     * @param chunkProvider a chunk provider that the world should use for chunk loading
+     * @param chunkLoader a chunk loader that should be used for loading and saving chunks of the world
      * @return the world
      * @since 1.0
      */
-    @NonNull World createUnregisteredWorld(@NonNull UUID uniqueId, @NonNull RegistryEntry<DimensionType> dimensionType,
-                                           @NonNull WorldData worldData, @NonNull ChunkProvider chunkProvider);
+    @NonNull World createWorld(@NonNull RegistryEntry<DimensionType> dimensionType,
+                               @NonNull WorldData worldData, @NonNull ChunkLoader<BS> chunkLoader);
 
     /**
-     * Registers {@linkplain World a world} specified in this {@linkplain WorldManager world manager}.
+     * Gets {@linkplain BlockStateChunkPaletteFactory a block-state chunk palette factory}, which should be used
+     * for creating block-state {@linkplain net.hypejet.jet.world.chunk.section.ChunkPalette chunk palettes}
+     * for a server associated with this world manager.
      *
-     * @param world the world
-     * @throws net.hypejet.jet.util.exception.AlreadyExistsException if a world with a unique identifier of the world
-     *                                                               specified already exists
+     * @return the block-state chunk palette factory
      * @since 1.0
      */
-    void registerWorld(@NonNull World world);
+    @NonNull BlockStateChunkPaletteFactory<BS> blockStateChunkPaletteFactory();
 
     /**
-     * Unregisters {@linkplain World a world} with {@linkplain UUID an unique identifier} specified. Does nothing
-     * if a world with the unique identifier specified does not exist.
+     * Gets {@linkplain ChunkPaletteFactory a chunk palette factory}, which should be used for creating
+     * {@linkplain Biome biome} {@linkplain net.hypejet.jet.world.chunk.section.ChunkPalette chunk palettes}
+     * for a server associated with this world manager.
      *
-     * @param uniqueId the unique identifier
+     * @return the biome chunk palette factory
      * @since 1.0
      */
-    void unregisterWorld(@NonNull UUID uniqueId);
+    @NonNull ChunkPaletteFactory<RegistryEntry<Biome>> biomeChunkPaletteFactory();
 
     /**
-     * Creates {@linkplain CollectionAcquisition a collection acquisition} of {@linkplain World worlds} registered
-     * in this {@linkplain WorldManager world manager}.
+     * Gets {@linkplain LightStorageFactory a light storage factory}, which should be used for creating
+     * {@linkplain net.hypejet.jet.world.chunk.light.LightStorage light storages} for a server associated
+     * with this world manager.
      *
-     * @return the collection acquisition
+     * @return the light storage factory
      * @since 1.0
      */
-    @NonNull CollectionAcquisition<? extends World, ?> worlds();
+    @NonNull LightStorageFactory lightStorageFactory();
 
     /**
-     * Creates {@linkplain BooleanAcquisition a boolean acquisition}, whose value represents
-     * whether {@linkplain World a world} specified is registered in this {@linkplain WorldManager world manager}.
+     * Gets {@linkplain ChunkSectionFactory a chunk section factory}, which should be used for creating
+     * {@linkplain ChunkSection chunk sections} for a server associated with this world manager.
      *
-     * @param world the world
-     * @return the boolean acquisition with value of {@code true} if the world specified has been registered in this
-     *         world manager or {@code false} otherwise
+     * @return the chunk section factory
      * @since 1.0
      */
-    @NonNull BooleanAcquisition isRegistered(@NonNull World world);
+    @NonNull ChunkSectionFactory<CS, LS, BS> chunkSectionFactory();
+
+    /**
+     * Gets {@linkplain ChunkFactory a chunk factory}, which should be used for creating
+     * {@linkplain net.hypejet.jet.world.chunk.Chunk chunks} for a server associated with this world manager.
+     *
+     * @return the chunk factory
+     * @since 1.0
+     */
+    @NonNull ChunkFactory<CS, LS, BS> chunkFactory();
+
+    /**
+     * Gets {@linkplain MinecraftServer a server} that this world manager was created for.
+     *
+     * @return the server
+     * @since 1.0
+     */
+    @NonNull MinecraftServer server();
 }

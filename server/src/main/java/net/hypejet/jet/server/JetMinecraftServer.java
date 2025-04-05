@@ -37,8 +37,8 @@ public final class JetMinecraftServer implements MinecraftServer {
 
     private final JetCommandManager commandManager;
     private final JetRegistryManager registryManager;
-    private final JetWorldManager worldManager;
     private final JetPluginManager pluginManager;
+    private final JetWorldManager worldManager;
 
     private final HashSetAcquirable<JetPlayer> players = new HashSetAcquirable<>();
 

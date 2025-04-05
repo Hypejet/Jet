@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.world.chunk.view;
 
-import net.hypejet.jet.server.world.coordinate.ChunkPosition;
+import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

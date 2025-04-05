@@ -1,24 +1,34 @@
 package net.hypejet.jet.server.world.chunk.light;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
+import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.light.storage.DirectLightStorage;
 import net.hypejet.jet.server.world.chunk.light.storage.EmptyLightStorage;
-import net.hypejet.jet.server.world.chunk.light.storage.LightStorage;
+import net.hypejet.jet.server.world.chunk.light.storage.AbstractLightStorage;
+import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
+import net.hypejet.jet.server.world.chunk.section.ChunkSectionList;
+import net.hypejet.jet.server.world.chunk.update.LightUpdate;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import net.hypejet.jet.util.bitset.UnmodifiableBitSet;
+import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
 /**
- * Represents a packet serialization data of light of {@linkplain net.hypejet.jet.server.world.chunk.Chunk a chunk}.
+ * Represents a packet serialization data of light of {@linkplain JetChunk a chunk}.
  *
  * @since 1.0
- * @see net.hypejet.jet.server.world.chunk.Chunk
+ * @see JetChunk
  */
 public final class LightSerializationData {
 
@@ -184,26 +194,43 @@ public final class LightSerializationData {
      * @since 1.0
      */
     public static @NonNull LightSerializationData create(@NonNull LightSectionList lightSectionList) {
-        return create(null, lightSectionList);
+        NullabilityUtil.requireNonNull(lightSectionList, "light section list");
+
+        Int2ObjectMap<JetLightSection> indexToSectionMap = new Int2ObjectOpenHashMap<>();
+        List<JetLightSection> lightSections = lightSectionList.sections();
+
+        for (int index = 0; index < lightSections.size(); index++)
+            indexToSectionMap.put(index, lightSections.get(index));
+        return create(indexToSectionMap);
     }
 
     /**
-     * Creates {@linkplain LightSerializationData a light serialization data}
-     * for {@linkplain LightSectionList a light section list} specified.
+     * Creates {@linkplain LightSerializationData a light serialization data} containing
+     * {@linkplain LightUpdate light updates} specified.
      *
-     * <p>If a previous {@linkplain LightSectionList light section list} is also specified, the serialization data
-     * contains only data that changed. It means that bits in present and empty bitmasks are set to {@code 0} for
-     * data of the light sections in common.</p>
-     *
-     * @param previousLightSectionList the previous light section list, {@code null} if none
-     * @param lightSectionList the light section list
+     * @param lightUpdates the light updates
+     * @param updatedChunkSectionList a light section list with light updates specified performed
+     * @param dimensionType a dimension type of world of a chunk that the light serialization data is created for
      * @return the light serialization data
      * @since 1.0
      */
-    public static @NonNull LightSerializationData create(@Nullable LightSectionList previousLightSectionList,
-                                                         @NonNull LightSectionList lightSectionList) {
-        NullabilityUtil.requireNonNull(lightSectionList, "light section list");
+    public static @NonNull LightSerializationData create(@NonNull Collection<LightUpdate> lightUpdates,
+                                                         @NonNull LightSectionList updatedChunkSectionList,
+                                                         @NonNull DimensionType dimensionType) {
+        Int2ObjectMap<JetLightSection> indexToSectionMap = new Int2ObjectOpenHashMap<>();
+        for (LightUpdate lightUpdate : lightUpdates) {
+            ChunkRelativeBlockPosition position = lightUpdate.position();
 
+            int sectionY = ChunkSectionList.createSectionY(position.absoluteY(), ChunkPaletteType.BLOCK_STATE);
+            int index = LightSectionList.createSectionIndex(sectionY, dimensionType);
+
+            if (indexToSectionMap.containsKey(index)) continue;
+            indexToSectionMap.put(index, updatedChunkSectionList.section(sectionY));
+        }
+        return create(indexToSectionMap);
+    }
+
+    private static @NonNull LightSerializationData create(@NonNull Int2ObjectMap<JetLightSection> indexToSectionMap) {
         BitSet skyLightMask = new BitSet();
         BitSet blockLightMask = new BitSet();
 
@@ -213,23 +240,15 @@ public final class LightSerializationData {
         List<UnmodifiableByteArray> skyLightData = new ArrayList<>();
         List<UnmodifiableByteArray> blockLightData = new ArrayList<>();
 
-        List<LightSection> lightSections = lightSectionList.sections();
-        for (int index = 0; index < lightSections.size(); index++) {
-            LightSection section = lightSections.get(index);
+        IntList keyList = new IntArrayList(indexToSectionMap.keySet());
+        keyList.sort(Integer::compare);
 
-            LightStorage previousSkyLightStorage = null;
-            LightStorage previousBlockLightStorage = null;
+        for (int keyIndex = 0; keyIndex < keyList.size(); keyIndex++) {
+            int sectionIndex = keyList.getInt(keyIndex);
+            JetLightSection section = indexToSectionMap.get(sectionIndex);
 
-            if (previousLightSectionList != null) {
-                LightSection previousSection = previousLightSectionList.sections().get(index);
-                previousSkyLightStorage = previousSection.skyLightStorage();
-                previousBlockLightStorage = previousSection.blockLightStorage();
-            }
-
-            add(previousSkyLightStorage, section.skyLightStorage(), index, skyLightMask, emptySkyLightMask,
-                    skyLightData);
-            add(previousBlockLightStorage, section.blockLightStorage(), index, blockLightMask, emptyBlockLightMask,
-                    blockLightData);
+            add(section.blockLightStorage(), sectionIndex, blockLightMask, emptyBlockLightMask, blockLightData);
+            add(section.skyLightStorage(), sectionIndex, skyLightMask, emptySkyLightMask, skyLightData);
         }
 
         return new LightSerializationData(
@@ -239,16 +258,12 @@ public final class LightSerializationData {
         );
     }
 
-    private static void add(@Nullable LightStorage previousLightStorage, @NonNull LightStorage storage, int bitIndex,
-                            @NonNull BitSet lightMask, @NonNull BitSet emptyLightMask,
-                            @NonNull List<UnmodifiableByteArray> lightData) {
-        if (storage.equals(previousLightStorage))
-            return;
-
+    private static void add(@NonNull AbstractLightStorage storage, int bitIndex, @NonNull BitSet lightMask,
+                            @NonNull BitSet emptyLightMask, @NonNull List<UnmodifiableByteArray> lightData) {
         switch (storage) {
             case DirectLightStorage direct -> {
                 lightMask.set(bitIndex);
-                lightData.add(new UnmodifiableByteArray(direct.data()));
+                lightData.add(direct.unmodifiableData());
             }
             case EmptyLightStorage ignored -> emptyLightMask.set(bitIndex);
         }

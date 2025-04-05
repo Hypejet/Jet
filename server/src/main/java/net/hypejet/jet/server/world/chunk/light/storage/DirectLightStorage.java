@@ -4,21 +4,22 @@ import it.unimi.dsi.fastutil.bytes.Byte2ShortMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ShortMaps;
 import it.unimi.dsi.fastutil.bytes.Byte2ShortOpenHashMap;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.server.world.chunk.palette.ChunkPalette;
+import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
-import net.hypejet.jet.server.world.coordinate.relative.ChunkPaletteRelativePosition;
+import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Objects;
 
 /**
- * Represents {@linkplain LightStorage a light storage}, which stores all light values directly in a data array.
+ * Represents {@linkplain AbstractLightStorage a light storage}, which stores all light values
+ * directly in a data array.
  *
  * @since 1.0
- * @see LightStorage
+ * @see AbstractLightStorage
  */
-public final class DirectLightStorage extends LightStorage {
+public final class DirectLightStorage extends AbstractLightStorage {
 
     private final UnmodifiableByteArray data;
     private final Byte2ShortMap valueCountMap;
@@ -54,12 +55,12 @@ public final class DirectLightStorage extends LightStorage {
             );
         }
 
-        return LightStorage.getValue(this.data.array(), ChunkPalette.calculateElementIndex(position));
+        return AbstractLightStorage.getValue(this.data.array(), AbstractChunkPalette.calculateElementIndex(position));
     }
 
     @Override
-    public byte @NonNull [] data() {
-        return this.data.array();
+    public @NonNull UnmodifiableByteArray unmodifiableData() {
+        return this.data;
     }
 
     @Override

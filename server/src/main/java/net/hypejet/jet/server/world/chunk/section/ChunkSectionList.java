@@ -6,14 +6,15 @@ import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState;
-import net.hypejet.jet.server.registry.JetRegistryEntry;
-import net.hypejet.jet.server.util.order.ElementOrder;
+import net.hypejet.jet.registry.RegistryEntry;
+import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
 import net.hypejet.jet.server.world.chunk.update.BiomeUpdate;
-import net.hypejet.jet.server.world.chunk.update.BlockStateUpdate;
-import net.hypejet.jet.server.world.coordinate.relative.ChunkPaletteRelativePosition;
-import net.hypejet.jet.server.world.coordinate.relative.ChunkRelativePosition;
+import net.hypejet.jet.server.world.chunk.update.BlockUpdate;
+import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
+import net.hypejet.jet.server.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
+import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.Contract;
 
@@ -22,19 +23,19 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.ToIntFunction;
 
 /**
- * Represents a storage of {@linkplain ChunkSection chunk sections}
- * for {@linkplain net.hypejet.jet.server.world.chunk.Chunk a chunk}.
+ * Represents a storage of {@linkplain JetChunkSection chunk sections} of {@linkplain JetChunk a chunk}.
  *
  * @since 1.0
- * @see ChunkSection
- * @see net.hypejet.jet.server.world.chunk.Chunk
+ * @see JetChunkSection
+ * @see JetChunk
  */
 public final class ChunkSectionList {
 
     private final DimensionType dimensionType;
-    private final List<ChunkSection> sections;
+    private final List<JetChunkSection> sections;
 
     /**
      * Constructs the {@linkplain ChunkSectionList chunk section list}.
@@ -43,50 +44,74 @@ public final class ChunkSectionList {
      * @param sections a list of sections that the chunk section list should have
      * @since 1.0
      */
-    private ChunkSectionList(@NonNull DimensionType dimensionType, @NonNull List<ChunkSection> sections) {
+    public ChunkSectionList(@NonNull DimensionType dimensionType, @NonNull List<JetChunkSection> sections) {
         this.dimensionType = NullabilityUtil.requireNonNull(dimensionType, "dimension type");
         this.sections = List.copyOf(NullabilityUtil.requireNonNull(sections, "sections"));
+
+        int expectedSectionCount = createSectionCount(dimensionType);
+        int actualSectionCount = this.sections.size();
+
+        if (actualSectionCount != expectedSectionCount) {
+            throw new IllegalArgumentException(String.format(
+                    "Number of chunk sections specified (%d) is invalid, expected (%d)",
+                    actualSectionCount, expectedSectionCount
+            ));
+        }
     }
 
     /**
-     * Gets {@linkplain List a list} of {@linkplain ChunkSection chunk sections}
+     * Gets {@linkplain List a list} of {@linkplain JetChunkSection chunk sections}
      * that this {@linkplain ChunkSectionList chunk section list} stores.
      *
      * @return the list
      * @since 1.0
      */
-    public @NonNull List<ChunkSection> sections() {
+    public @NonNull List<JetChunkSection> sections() {
         return this.sections;
     }
 
     /**
-     * Gets {@linkplain BlockState a block state}, which is present
-     * at {@linkplain ChunkRelativePosition a chunk-relative position} specified.
+     * Gets {@linkplain JetChunkSection a chunk section} that
+     * {@linkplain ChunkRelativeBlockPosition a chunk-relative block position} specified belongs to.
      *
-     * @param position the chunk-relative position
-     * @return the block state
-     * @since 1.0
-     */
-    public @NonNull BlockState getBlockState(@NonNull ChunkRelativePosition position) {
-        return this.sectionFor(position).blockStatePalette().getElement(position.toChunkPaletteRelative());
-    }
-
-    /**
-     * Gets {@linkplain ChunkSection a chunk section}, which owns
-     * {@linkplain ChunkRelativePosition a chunk-relative position} specified.
-     *
-     * @param position the chunk-relative position
+     * @param position the chunk-relative block position
      * @return the chunk section
      * @since 1.0
      */
-    public @NonNull ChunkSection sectionFor(@NonNull ChunkRelativePosition position) {
-        int sectionIndex = createSectionIndex(position, this.dimensionType);
+    public @NonNull JetChunkSection sectionFor(@NonNull ChunkRelativeBlockPosition position) {
+        return this.section(createSectionY(position.absoluteY(), ChunkPaletteType.BLOCK_STATE));
+    }
 
-        ChunkSection section = this.sections.get(sectionIndex);
+    /**
+     * Gets {@linkplain JetChunkSection a chunk section} that
+     * {@linkplain ChunkRelativeBiomePosition a chunk-relative biome position} specified belongs to.
+     *
+     * @param position the chunk-relative biome position
+     * @return the chunk section
+     * @since 1.0
+     */
+    public @NonNull JetChunkSection sectionFor(@NonNull ChunkRelativeBiomePosition position) {
+        return this.section(createSectionY(position.absoluteY(), ChunkPaletteType.BIOME));
+    }
+
+    /**
+     * Gets {@linkplain JetChunkSection a chunk section} at a section-Y coordinate specified.
+     *
+     * @param sectionY the coordinate
+     * @return the chunk section
+     * @throws IndexOutOfBoundsException if the section-Y specified is invalid for this chunk section list
+     * @since 1.0
+     */
+    public @NonNull JetChunkSection section(int sectionY) {
+        int sectionIndex = createSectionIndex(sectionY, this.dimensionType);
+        if (sectionIndex <= 0 || sectionIndex >= this.sections.size())
+            throw new IndexOutOfBoundsException("Section-Y specified is invalid for this chunk section list");
+
+        JetChunkSection section = this.sections.get(sectionIndex);
         if (section == null) {
             throw new IllegalArgumentException(String.format(
-                    "Could not find a chunk section for a chunk-relative position specified (%s)",
-                    position
+                    "Could not find a chunk section for a section-Y specified (%d)",
+                    sectionY
             ));
         }
 
@@ -95,41 +120,45 @@ public final class ChunkSectionList {
 
     /**
      * Creates a copy of this {@linkplain ChunkSectionList chunk section list}
-     * with {@linkplain BlockStateUpdate block state updates} and {@linkplain BiomeUpdate biome updates}
+     * with {@linkplain BlockUpdate block state updates} and {@linkplain BiomeUpdate biome updates}
      * specified applied.
      *
-     * @param blockStateUpdates the block state updates
+     * @param blockUpdates the block state updates
      * @param biomeUpdates the biome updates
      * @return the copy
      * @since 1.0
      */
     @Contract(pure = true)
     public @NonNull ChunkSectionList withUpdates(
-            @NonNull Collection<BlockStateUpdate> blockStateUpdates,
+            @NonNull Collection<BlockUpdate> blockUpdates,
             @NonNull Collection<BiomeUpdate> biomeUpdates
     ) {
-        if (blockStateUpdates.isEmpty() && biomeUpdates.isEmpty())
+        if (blockUpdates.isEmpty() && biomeUpdates.isEmpty())
             return this;
 
-        List<ChunkSection> sections = new ArrayList<>(this.sections);
+        List<JetChunkSection> sections = new ArrayList<>(this.sections);
 
         IntObjectMap<List<ChunkPaletteUpdate<BlockState>>> blockStatePaletteUpdates;
-        IntObjectMap<List<ChunkPaletteUpdate<JetRegistryEntry<Biome>>>> biomePaletteUpdates;
+        IntObjectMap<List<ChunkPaletteUpdate<RegistryEntry<Biome>>>> biomePaletteUpdates;
 
         blockStatePaletteUpdates = createChunkSectionPaletteUpdateMap(
-                blockStateUpdates, this.dimensionType,
-                BlockStateUpdate::position, BlockStateUpdate::blockState
+                blockUpdates, this.dimensionType,
+                update -> update.position().absoluteY(),
+                update -> ChunkPaletteRelativePosition.from(update.position()),
+                BlockUpdate::blockState, ChunkPaletteType.BLOCK_STATE
         );
 
         biomePaletteUpdates = createChunkSectionPaletteUpdateMap(
                 biomeUpdates, this.dimensionType,
-                BiomeUpdate::position, BiomeUpdate::biome
+                update -> update.position().absoluteY(),
+                update -> ChunkPaletteRelativePosition.from(update.position()),
+                BiomeUpdate::biome, ChunkPaletteType.BIOME
         );
 
         boolean sectionListUpdated = false;
         for (int index = 0; index < sections.size(); index++) {
             List<ChunkPaletteUpdate<BlockState>> blockStateUpdateList = blockStatePaletteUpdates.get(index);
-            List<ChunkPaletteUpdate<JetRegistryEntry<Biome>>> biomeUpdateList = biomePaletteUpdates.get(index);
+            List<ChunkPaletteUpdate<RegistryEntry<Biome>>> biomeUpdateList = biomePaletteUpdates.get(index);
 
             if (blockStateUpdateList == null && biomeUpdateList == null)
                 continue;
@@ -139,8 +168,8 @@ public final class ChunkSectionList {
             if (biomeUpdateList == null)
                 biomeUpdateList = List.of();
 
-            ChunkSection section = sections.get(index);
-            ChunkSection updatedSection = section.withUpdates(blockStateUpdateList, biomeUpdateList);
+            JetChunkSection section = sections.get(index);
+            JetChunkSection updatedSection = section.withUpdates(blockStateUpdateList, biomeUpdateList);
 
             if (section.equals(updatedSection))
                 continue;
@@ -156,27 +185,7 @@ public final class ChunkSectionList {
     }
 
     /**
-     * Creates an index of {@linkplain ChunkSection a chunk section}, which owns
-     * {@linkplain ChunkRelativePosition a chunk-relative position} specified.
-     *
-     * @param position the chunk-relative position
-     * @param dimensionType a dimension type of world of the chunk section
-     * @return the chunk section
-     * @since 1.0
-     */
-    public static int createSectionIndex(@NonNull ChunkRelativePosition position,
-                                         @NonNull DimensionType dimensionType) {
-        int axisLength = position.paletteType().axisLength();
-        byte blockStateAxisLength = ChunkPaletteType.BLOCK_STATE.axisLength();
-
-        int positionToBlockYMultiplier = blockStateAxisLength / axisLength;
-        int blockY = position.absoluteY() * positionToBlockYMultiplier;
-
-        return Math.floorDiv(blockY - dimensionType.minY(), blockStateAxisLength);
-    }
-
-    /**
-     * Creates a number, which is a count of {@linkplain ChunkSection chunk sections} that worlds
+     * Creates a number, which is a count of {@linkplain JetChunkSection chunk sections} that worlds
      * with {@linkplain DimensionType a dimension type} specified have.
      *
      * @param dimensionType the dimension type
@@ -187,16 +196,47 @@ public final class ChunkSectionList {
         return Math.ceilDiv(dimensionType.height(), ChunkPaletteType.BLOCK_STATE.axisLength());
     }
 
+    /**
+     * Creates an index of {@linkplain JetChunkSection a chunk section} at a section-Y coordinate specified.
+     *
+     * @param sectionY the section-Y coordinate
+     * @param dimensionType a dimension type of world that the chunk section belongs to
+     * @return the chunk section
+     * @since 1.0
+     */
+    public static int createSectionIndex(int sectionY, @NonNull DimensionType dimensionType) {
+        int minimumSectionY = createSectionY(dimensionType.minY(), ChunkPaletteType.BLOCK_STATE);
+        return sectionY - minimumSectionY;
+    }
+
+    /**
+     * Creates a section-Y coordinate of {@linkplain JetChunkSection a chunk section} that an {@code Y} value
+     * of an absolute coordinate with {@linkplain ChunkPaletteType chunk palette type} specified belongs to.
+     *
+     * @param y the Y value
+     * @param type the chunk palette type
+     * @return the section-Y coordinate
+     * @since 1.0
+     */
+    public static int createSectionY(int y, @NonNull ChunkPaletteType type) {
+        int blockStatePaletteAxisLength = ChunkPaletteType.BLOCK_STATE.axisLength();
+        int coordinateMultiplier = blockStatePaletteAxisLength / type.axisLength();
+        return Math.floorDiv(coordinateMultiplier * y, blockStatePaletteAxisLength);
+    }
+
     private static <E, U> @NonNull IntObjectMap<List<ChunkPaletteUpdate<E>>> createChunkSectionPaletteUpdateMap(
             @NonNull Collection<U> updates, @NonNull DimensionType dimensionType,
-            @NonNull Function<U, ChunkRelativePosition> updateToPositionFunction,
-            @NonNull Function<U, E> elementFunction
+            @NonNull ToIntFunction<U> updateToAbsoluteYFunction,
+            @NonNull Function<U, ChunkPaletteRelativePosition> updateToPaletteRelativePosition,
+            @NonNull Function<U, E> elementFunction, @NonNull ChunkPaletteType paletteType
     ) {
         IntObjectMap<List<ChunkPaletteUpdate<E>>> map = new IntObjectHashMap<>();
 
         for (U update : updates) {
-            ChunkRelativePosition position = updateToPositionFunction.apply(update);
-            int sectionIndex = createSectionIndex(position, dimensionType);
+            int absoluteY = updateToAbsoluteYFunction.applyAsInt(update);
+
+            int sectionY = createSectionY(absoluteY, paletteType);
+            int sectionIndex = createSectionIndex(sectionY, dimensionType);
 
             List<ChunkPaletteUpdate<E>> paletteUpdates;
             if (map.containsKey(sectionIndex)) {
@@ -207,7 +247,7 @@ public final class ChunkSectionList {
             }
 
             paletteUpdates.add(new ChunkPaletteUpdate<>(
-                    position.toChunkPaletteRelative(),
+                    updateToPaletteRelativePosition.apply(update),
                     elementFunction.apply(update)
             ));
         }
@@ -234,136 +274,5 @@ public final class ChunkSectionList {
                 "dimensionType=" + this.dimensionType +
                 ", sections=" + this.sections +
                 '}';
-    }
-
-    /**
-     * Represents a builder of {@linkplain ChunkSectionList a chunk section list}.
-     *
-     * @since 1.0
-     * @see ChunkSectionList
-     */
-    public static final class Builder {
-
-        private final DimensionType dimensionType;
-
-        private final ElementOrder<BlockState> blockStateOrder;
-        private final ElementOrder<JetRegistryEntry<Biome>> biomeOrder;
-
-        private final BlockState defaultBlockState;
-        private final JetRegistryEntry<Biome> defaultBiome;
-
-        private final IntObjectMap<ChunkSection.Builder> chunkSectionBuilders = new IntObjectHashMap<>();
-        private final int chunkSectionCount;
-
-        /**
-         * Constructs the {@linkplain Builder chunk section list builder}.
-         *
-         * @param dimensionType a dimension type of world of a chunk that the chunk section list is created for
-         * @param blockStateOrder an element order of block states that should be used for creation
-         *                        of block state palettes
-         * @param biomeOrder an element order of biomes that should be used for creation of biome palettes
-         * @param defaultBlockState a default block state that should be used in places where a block state
-         *                          has not been set
-         * @param defaultBiome a registry entry of a biome that should be used where a biome has not been set
-         * @since 1.0
-         */
-        public Builder(@NonNull DimensionType dimensionType,
-                       @NonNull ElementOrder<BlockState> blockStateOrder,
-                       @NonNull ElementOrder<JetRegistryEntry<Biome>> biomeOrder,
-                       @NonNull BlockState defaultBlockState, JetRegistryEntry<Biome> defaultBiome) {
-            this.dimensionType = NullabilityUtil.requireNonNull(dimensionType, "dimension type");
-
-            this.blockStateOrder = NullabilityUtil.requireNonNull(
-                    blockStateOrder,
-                    "block state order"
-            );
-
-            this.biomeOrder = NullabilityUtil.requireNonNull(biomeOrder, "biome order");
-
-            this.defaultBlockState = NullabilityUtil.requireNonNull(defaultBlockState, "default block state");
-            this.defaultBiome = NullabilityUtil.requireNonNull(defaultBiome, "default biome");
-
-            this.chunkSectionCount = createSectionCount(dimensionType);
-        }
-
-        /**
-         * Sets {@linkplain BlockState a block state} that should be present
-         * at {@linkplain ChunkRelativePosition a chunk-relative position} specified.
-         *
-         * @param position the chunk-relative position
-         * @param blockState the block state
-         * @since 1.0
-         */
-        public void setBlockState(@NonNull ChunkRelativePosition position, @NonNull BlockState blockState) {
-            int sectionIndex = createSectionIndex(position, this.dimensionType);
-            if (sectionIndex >= this.chunkSectionCount || sectionIndex < 0) {
-                throw new IndexOutOfBoundsException(String.format(
-                        "Could not create a valid section index for a chunk-relative position specified (%s)",
-                        position
-                ));
-            }
-
-            ChunkPaletteRelativePosition relativePosition = position.toChunkPaletteRelative();
-            this.findOrCreateChunkSectionBuilder(sectionIndex).setBlockState(relativePosition, blockState);
-        }
-
-        /**
-         * Sets {@linkplain Biome a biome} that should be present
-         * at {@linkplain ChunkRelativePosition a chunk-relative position} specified.
-         *
-         * @param position the chunk-relative position
-         * @param biome a registry entry of the biome
-         * @since 1.0
-         */
-        public void setBiome(@NonNull ChunkRelativePosition position, @NonNull JetRegistryEntry<Biome> biome) {
-            int sectionIndex = createSectionIndex(position, this.dimensionType);
-            if (sectionIndex >= this.chunkSectionCount || sectionIndex < 0) {
-                throw new IndexOutOfBoundsException(String.format(
-                        "Could not create a valid section index for a chunk-relative position specified (%s)",
-                        position
-                ));
-            }
-
-            ChunkPaletteRelativePosition relativePosition = position.toChunkPaletteRelative();
-            this.findOrCreateChunkSectionBuilder(sectionIndex).setBiome(relativePosition, biome);
-        }
-
-        /**
-         * Builds {@linkplain ChunkSectionList a chunk section list} with data set in this builder.
-         *
-         * @return the chunk section list
-         * @since 1.0
-         */
-        @Contract(pure = true)
-        public @NonNull ChunkSectionList build() {
-            List<ChunkSection> chunkSections = new ArrayList<>(this.chunkSectionCount);
-            ChunkSection emptyChunkSection = null;
-
-            for (int index = 0; index < this.chunkSectionCount; index++) {
-                ChunkSection chunkSection;
-
-                ChunkSection.Builder builder = this.chunkSectionBuilders.get(index);
-                if (builder != null) {
-                    chunkSection = builder.build(this.blockStateOrder, this.biomeOrder);
-                } else {
-                    if (emptyChunkSection == null) {
-                        emptyChunkSection = new ChunkSection.Builder(this.defaultBlockState, this.defaultBiome)
-                                .build(this.blockStateOrder, this.biomeOrder);
-                    }
-                    chunkSection = emptyChunkSection;
-                }
-
-                chunkSections.add(index, chunkSection);
-            }
-
-            return new ChunkSectionList(this.dimensionType, chunkSections);
-        }
-
-        private ChunkSection.@NonNull Builder findOrCreateChunkSectionBuilder(int sectionIndex) {
-            return this.chunkSectionBuilders.computeIfAbsent(
-                    sectionIndex,
-                    ignored -> new ChunkSection.Builder(this.defaultBlockState, this.defaultBiome)
-            );
-        }
     }
 }

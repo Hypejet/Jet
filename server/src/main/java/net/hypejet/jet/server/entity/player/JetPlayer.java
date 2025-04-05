@@ -44,19 +44,17 @@ import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.game.audience.PacketReceivingCommonAudience;
 import net.hypejet.jet.server.world.JetWorld;
+import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.handler.ChunkBatchHandler;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.pointer.Pointers;
-import net.kyori.adventure.resource.ResourcePackRequest;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -75,7 +73,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
 
     private final SocketPlayerConnection connection;
 
-    private final ChunkBatchHandler chunkBatchHandler = new ChunkBatchHandler(this);
+    private final ChunkBatchHandler chunkBatchHandler;
     private final PlayerMovementHandler movementHandler = new PlayerMovementHandler(this);
 
     private final NotNullObjectAcquirable<Settings> settings;
@@ -89,7 +87,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     /**
      * Constructs the {@linkplain JetPlayer player}.
      *
-     * @param uniqueId an unique identifier that the player should have
+     * @param uniqueId a unique identifier that the player should have
      * @param username a username that the player should have
      * @param connection a player connection that the player should be associated with
      * @param world an initial world that the player should spawn in
@@ -124,9 +122,10 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
         this.sendJoinGamePacket(world);
         world.addPlayer(this);
 
-        this.chunkBatchHandler.scheduleTask(world, position);
-        this.sendSpawnPackets(world, position);
+        this.chunkBatchHandler = new ChunkBatchHandler(this, world, position);
+        this.chunkBatchHandler.scheduleTask();
 
+        this.sendSpawnPackets(world, position);
         this.server().eventNode().call(new InitialSpawnEvent(this, world, position));
     }
 
@@ -224,7 +223,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
 
     /**
      * Gets {@linkplain ChunkBatchHandler a chunk batch handler}, which sends
-     * {@linkplain net.hypejet.jet.server.world.chunk.Chunk chunks} to this {@linkplain JetPlayer player}.
+     * {@linkplain JetChunk chunks} to this {@linkplain JetPlayer player}.
      *
      * @return the chunk batch handler
      * @since 1.0

@@ -138,7 +138,7 @@ public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
     }
 
     @Override
-    public final @NonNull List<? extends RegistryEntry<V>> entries() {
+    public final @NonNull List<JetRegistryEntry<V>> entries() {
         return this.elementOrder.elements();
     }
 

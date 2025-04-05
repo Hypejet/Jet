@@ -11,7 +11,7 @@ import net.hypejet.jet.server.util.math.MathUtil;
 import net.hypejet.jet.server.util.order.ElementOrder;
 import net.hypejet.jet.server.util.storage.BitStorage;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
-import net.hypejet.jet.server.world.coordinate.relative.ChunkPaletteRelativePosition;
+import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.util.array.UnmodifiableIntegerArray;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -19,14 +19,14 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.Objects;
 
 /**
- * Represents {@linkplain ChunkPalette a chunk palette}, which contains an array of identifiers of elements of registry
- * associated with the palette and whose data is indices into that array.
+ * Represents {@linkplain AbstractChunkPalette a chunk palette}, which contains an array of identifiers of elements
+ * of registry associated with the palette and whose data is indices into that array.
  *
  * @since 1.0
  * @param <E> a type of elements that the palette stores
- * @see ChunkPalette
+ * @see AbstractChunkPalette
  */
-public final class IndirectChunkPalette<E> extends ChunkPalette<E> {
+public final class IndirectChunkPalette<E> extends AbstractChunkPalette<E> {
 
     private final BitStorage storage;
 
@@ -47,7 +47,7 @@ public final class IndirectChunkPalette<E> extends ChunkPalette<E> {
      */
     private IndirectChunkPalette(byte bitsPerElement, @NonNull ChunkPaletteType type, @NonNull BitStorage storage,
                                  int @NonNull [] registryIndices, @NonNull Object2ShortMap<E> elementCountMap,
-                                 @NonNull ElementOrder<E> elementOrder) {
+                                 @NonNull ElementOrder<? extends E> elementOrder) {
         super(bitsPerElement, type, NullabilityUtil.requireNonNull(storage, "storage").data(), elementOrder);
         this.storage = storage;
 
@@ -76,7 +76,7 @@ public final class IndirectChunkPalette<E> extends ChunkPalette<E> {
             ));
         }
 
-        int elementIndex = ChunkPalette.calculateElementIndex(position);
+        int elementIndex = AbstractChunkPalette.calculateElementIndex(position);
         int elementIdentifier = this.registryIndices.array()[this.storage.getElement(elementIndex)];
 
         return this.elementOrder().getOrThrow(elementIdentifier);
@@ -124,7 +124,7 @@ public final class IndirectChunkPalette<E> extends ChunkPalette<E> {
      */
     static <E> @Nullable IndirectChunkPalette<E> createOrNull(
             @NonNull ChunkPaletteType type, int @NonNull [] elements,
-            @NonNull Object2ShortMap<E> elementCountMap, @NonNull ElementOrder<E> elementOrder
+            @NonNull Object2ShortMap<E> elementCountMap, @NonNull ElementOrder<? extends E> elementOrder
     ) {
         NullabilityUtil.requireNonNull(type, "type");
         NullabilityUtil.requireNonNull(elements, "elements");

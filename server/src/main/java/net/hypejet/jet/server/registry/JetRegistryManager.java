@@ -19,6 +19,7 @@ import net.hypejet.jet.data.model.server.registry.registries.pack.FeaturePack;
 import net.hypejet.jet.data.model.server.registry.registries.registry.DataRegistryEntry;
 import net.hypejet.jet.registry.RegistryManager;
 import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.registry.blockstate.BlockStateRegistry;
 import net.hypejet.jet.server.registry.tags.Tags;
 import net.hypejet.jet.server.registry.writers.registry.armor.material.ArmorTrimMaterialBinaryTagWriter;
 import net.hypejet.jet.server.registry.writers.registry.armor.pattern.ArmorTrimPatternBinaryTagWriter;
@@ -68,7 +69,7 @@ public final class JetRegistryManager implements RegistryManager {
     private final JetMinecraftRegistry<BlockEntityType> blockEntityTypeRegistry;
     private final JetMinecraftRegistry<BlockType> blockTypeRegistry;
 
-    private final ElementOrder<BlockState> blockStateOrder;
+    private final BlockStateRegistry blockStateRegistry;
 
     /**
      * Constructs the {@linkplain JetRegistryManager registry manager}.
@@ -167,8 +168,9 @@ public final class JetRegistryManager implements RegistryManager {
                 ResourceFileNames.BLOCK_ENTITY_TYPE_GENERATOR
         );
 
-        this.blockStateOrder = createBlockStateOrder();
-        this.blockTypeRegistry = createBlockTypeRegistry(this.blockStateOrder, server, enabledFeaturePacks);
+        ElementOrder<BlockState> blockStateOrder = createBlockStateOrder();
+        this.blockTypeRegistry = createBlockTypeRegistry(blockStateOrder, server, enabledFeaturePacks);
+        this.blockStateRegistry = new BlockStateRegistry(blockStateOrder, this.blockTypeRegistry);
 
         this.registries = Set.of(
                 // TODO: Add block, item, fluid and game event registries
@@ -254,13 +256,15 @@ public final class JetRegistryManager implements RegistryManager {
     }
 
     /**
-     * Gets {@linkplain ElementOrder an element order} of {@linkplain BlockState block states}.
+     * Gets {@linkplain BlockStateRegistry a block state registry} containing all possible
+     * {@linkplain BlockState block states} that can be used on {@linkplain net.hypejet.jet.MinecraftServer a server}
+     * associated with this registry manager.
      *
-     * @return the element order
+     * @return the block state registry
      * @since 1.0
      */
-    public @NonNull ElementOrder<BlockState> blockStateOrder() {
-        return this.blockStateOrder;
+    public @NonNull BlockStateRegistry blockStateRegistry() {
+        return this.blockStateRegistry;
     }
 
     private static @NonNull ElementOrder<BlockState> createBlockStateOrder() {

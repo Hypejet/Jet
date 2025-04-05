@@ -7,20 +7,20 @@ import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.util.hash.IdentityHashStrategy;
 import net.hypejet.jet.server.util.order.ElementOrder;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
-import net.hypejet.jet.server.world.coordinate.relative.ChunkPaletteRelativePosition;
+import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * Represents {@linkplain ChunkPalette a chunk palette}, which contains the same element at each position.
+ * Represents {@linkplain AbstractChunkPalette a chunk palette}, which contains the same element at each position.
  *
  * @since 1.0
  * @param <E> a type of elements that the palette stores
- * @see ChunkPalette
+ * @see AbstractChunkPalette
  */
-public final class SingleValuedChunkPalette<E> extends ChunkPalette<E> {
+public final class SingleValuedChunkPalette<E> extends AbstractChunkPalette<E> {
 
     private static final byte BITS_PER_ELEMENT = 0;
     private static final long[] EMPTY_DATA = new long[0];
@@ -38,8 +38,8 @@ public final class SingleValuedChunkPalette<E> extends ChunkPalette<E> {
      * @param elementOrder an element order, from which identifiers of elements of the palette should be retrieved
      * @since 1.0
      */
-    SingleValuedChunkPalette(@NonNull ChunkPaletteType type, @NonNull E element,
-                             @NonNull ElementOrder<E> elementOrder) {
+    public SingleValuedChunkPalette(@NonNull ChunkPaletteType type, @NonNull E element,
+                                    @NonNull ElementOrder<? extends E> elementOrder) {
         super(BITS_PER_ELEMENT, type, EMPTY_DATA, elementOrder);
 
         this.element = NullabilityUtil.requireNonNull(element, "element");

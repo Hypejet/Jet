@@ -8,13 +8,14 @@ import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockSt
 import net.hypejet.jet.server.util.math.MathUtil;
 import net.hypejet.jet.server.util.storage.BitStorage;
 import net.hypejet.jet.server.util.storage.BitStorageUpdate;
-import net.hypejet.jet.server.world.chunk.Chunk;
-import net.hypejet.jet.server.world.chunk.palette.ChunkPalette;
+import net.hypejet.jet.server.world.chunk.JetChunk;
+import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
-import net.hypejet.jet.server.world.chunk.section.ChunkSection;
+import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.server.world.chunk.section.ChunkSectionList;
-import net.hypejet.jet.server.world.chunk.update.BlockStateUpdate;
-import net.hypejet.jet.server.world.coordinate.relative.ChunkRelativePosition;
+import net.hypejet.jet.server.world.chunk.update.BlockUpdate;
+import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
+import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.Contract;
 
@@ -22,13 +23,13 @@ import java.util.Collection;
 import java.util.Objects;
 
 /**
- * Represents a map, which stores highest height for each column of {@linkplain Chunk a chunk}, which is considered
+ * Represents a map, which stores highest height for each column of {@linkplain JetChunk a chunk}, which is considered
  * {@linkplain HeightMapType#isOpaque(BlockState) opaque} by {@linkplain HeightMapType a type of the height map}.
  *
  * <p>It is used mainly by Minecraft client for client-side optimizations.</p>
  *
  * @since 1.0
- * @see Chunk
+ * @see JetChunk
  * @see HeightMapType#isOpaque(BlockState)
  * @see HeightMapType
  */
@@ -102,16 +103,16 @@ public final class HeightMap {
      */
     @Contract(pure = true)
     public @NonNull HeightMap withUpdates(@NonNull ChunkSectionList chunkSectionList,
-                                          @NonNull Collection<BlockStateUpdate> updates) {
+                                          @NonNull Collection<BlockUpdate> updates) {
         if (updates.isEmpty())
             return this;
 
         Int2ObjectMap<BitStorageUpdate> dataUpdates = new Int2ObjectOpenHashMap<>();
-        for (BlockStateUpdate update : updates) {
-            ChunkRelativePosition position = update.position();
+        for (BlockUpdate update : updates) {
+            ChunkRelativeBlockPosition position = update.position();
 
-            byte blockX = position.paletteRelativeX();
-            byte blockZ = position.paletteRelativeZ();
+            byte blockX = position.relativeX();
+            byte blockZ = position.relativeZ();
 
             int previousBlockY = this.getBlockY(blockX, blockZ, this.dimensionType);
             int newBlockY = position.absoluteY();
@@ -170,7 +171,7 @@ public final class HeightMap {
 
     /**
      * Creates {@linkplain HeightMap a height map} for {@linkplain ChunkSectionList a chunk section list}
-     * specified of {@linkplain net.hypejet.jet.server.world.chunk.Chunk a chunk}
+     * specified of {@linkplain JetChunk a chunk}
      * with {@linkplain DimensionType a dimension type} specified.
      *
      * @param type a type that the height map should have
@@ -204,15 +205,12 @@ public final class HeightMap {
                                                   @NonNull DimensionType dimensionType, byte blockX, byte blockZ,
                                                   @NonNull HeightMapType heightMapType) {
         for (int blockY = startingBlockY; blockY >= dimensionType.minY(); blockY--) {
-            ChunkRelativePosition position = new ChunkRelativePosition(
-                    blockX, blockY, blockZ,
-                    ChunkPaletteType.BLOCK_STATE
-            );
+            ChunkRelativeBlockPosition position = new ChunkRelativeBlockPosition(blockX, blockY, blockZ);
 
-            ChunkSection section = chunkSectionList.sectionFor(position);
-            ChunkPalette<BlockState> blockStatePalette = section.blockStatePalette();
+            JetChunkSection section = chunkSectionList.sectionFor(position);
+            AbstractChunkPalette<BlockState> blockStatePalette = section.blockStatePalette();
 
-            BlockState blockState = blockStatePalette.getElement(position.toChunkPaletteRelative());
+            BlockState blockState = blockStatePalette.getElement(ChunkPaletteRelativePosition.from(position));
             if (heightMapType.isOpaque(blockState))
                 return toElement(blockY, dimensionType);
         }

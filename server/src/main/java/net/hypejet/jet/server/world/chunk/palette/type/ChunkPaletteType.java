@@ -1,15 +1,17 @@
 package net.hypejet.jet.server.world.chunk.palette.type;
 
+import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
+
 /**
- * Represents a type of {@linkplain net.hypejet.jet.server.world.chunk.palette.ChunkPalette a chunk palette}.
+ * Represents a type of {@linkplain AbstractChunkPalette a chunk palette}.
  *
  * @since 1.0
- * @see net.hypejet.jet.server.world.chunk.palette.ChunkPalette
+ * @see AbstractChunkPalette
  */
 public enum ChunkPaletteType {
     /**
      * {@linkplain ChunkPaletteType A chunk palette type} used when
-     * {@linkplain net.hypejet.jet.server.world.chunk.palette.ChunkPalette a chunk palette} stores
+     * {@linkplain AbstractChunkPalette a chunk palette} stores
      * {@linkplain net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState block states}.
      *
      * @since 1.0
@@ -18,7 +20,7 @@ public enum ChunkPaletteType {
 
     /**
      * {@linkplain ChunkPaletteType A chunk palette type} used when
-     * {@linkplain net.hypejet.jet.server.world.chunk.palette.ChunkPalette a chunk palette} stores
+     * {@linkplain AbstractChunkPalette a chunk palette} stores
      * {@linkplain net.hypejet.jet.data.model.api.registries.biome.Biome biomes}.
      *
      * @since 1.0
@@ -44,13 +46,13 @@ public enum ChunkPaletteType {
         this.minimumIndirectBits = minimumIndirectBits;
         this.maximumIndirectBits = maximumIndirectBits;
         this.minimumDirectBits = minimumDirectBits;
-        this.axisLength = axisLength;
 
         /* Element count maps in chunk palettes use shorts to store number of block states, due to this, we need to
            make sure it is always safe. If Minecraft ever adds a new palette type or changes axis length, we must
            change map value types of the element count maps. */
         if (axisLength > 31)
             throw new IllegalArgumentException("The axis length cannot be higher than 31");
+        this.axisLength = axisLength;
     }
 
     /**
@@ -94,9 +96,19 @@ public enum ChunkPaletteType {
     }
 
     /**
-     * Gets a count of elements that palettes of this type store.
+     * Gets a maximum value that coordinate values of positions relative to chunk palettes of this type can use.
      *
-     * @return the count
+     * @return the maximum value
+     * @since 1.0
+     */
+    public byte maximumCoordinateValue() {
+        return (byte) (this.axisLength - 1);
+    }
+
+    /**
+     * Gets a number of elements that palettes of this type store.
+     *
+     * @return the number
      * @since 1.0
      */
     public short elementCount() {
@@ -105,7 +117,7 @@ public enum ChunkPaletteType {
 
     /**
      * Validates whether a value specified is valid for a coordinate relative
-     * to {@linkplain net.hypejet.jet.server.world.chunk.palette.ChunkPalette a chunk palette} of this type.
+     * to {@linkplain AbstractChunkPalette a chunk palette} of this type.
      *
      * @param value the value
      * @throws IllegalArgumentException if the value is not valid for the chunk-palette-relative coordinate

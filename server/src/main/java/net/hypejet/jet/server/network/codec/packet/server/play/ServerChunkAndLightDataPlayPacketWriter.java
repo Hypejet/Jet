@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.world.chunk.ChunkNetworkWriter;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkAndLightDataPlayPacket;
-import net.hypejet.jet.server.world.coordinate.ChunkPosition;
+import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -30,6 +30,7 @@ public final class ServerChunkAndLightDataPlayPacketWriter
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerChunkAndLightDataPlayPacket object) {
+        // Chunk positions in this packet are encoded differently
         ChunkPosition position = object.chunkPosition();
         buf.writeInt(position.chunkX());
         buf.writeInt(position.chunkZ());

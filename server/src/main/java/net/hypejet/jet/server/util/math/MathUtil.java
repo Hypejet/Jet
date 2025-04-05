@@ -19,4 +19,23 @@ public final class MathUtil {
     public static int bitCount(int value) {
         return Integer.SIZE - Integer.numberOfLeadingZeros(value);
     }
+
+    /**
+     * Raises a number specified to a power exponent specified.
+     *
+     * @param number the number
+     * @param exponent the power exponent
+     * @return result of the operation
+     * @since 1.0
+     */
+    public static int power(int number, int exponent) {
+        if (exponent < 0)
+            return 1 / power(number, -exponent);
+
+        int result = 1;
+        for (int i = 0; i < exponent; i++)
+            result *= number;
+
+        return result;
+    }
 }

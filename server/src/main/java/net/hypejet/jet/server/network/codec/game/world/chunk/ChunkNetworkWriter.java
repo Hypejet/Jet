@@ -10,14 +10,14 @@ import net.hypejet.jet.server.network.codec.game.miscellaneous.BinaryTagNetworkW
 import net.hypejet.jet.server.network.codec.game.world.chunk.heightmap.HeightMapCollectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.world.chunk.light.LightSerializationDataNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.world.chunk.section.ChunkSectionNetworkWriter;
-import net.hypejet.jet.server.network.codec.game.world.coordinate.ChunkRelativePositionNetworkWriter;
+import net.hypejet.jet.server.network.codec.game.world.coordinate.relative.ChunkRelativeBlockPositionNetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
 import net.hypejet.jet.server.registry.JetRegistryManager;
-import net.hypejet.jet.server.world.chunk.Chunk;
-import net.hypejet.jet.server.world.chunk.section.ChunkSection;
-import net.hypejet.jet.server.world.coordinate.relative.ChunkRelativePosition;
+import net.hypejet.jet.server.world.chunk.JetChunk;
+import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.world.block.entity.BlockEntity;
+import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -26,13 +26,13 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Represents {@linkplain NetworkWriter a network writer}, which writes {@linkplain Chunk a chunk}.
+ * Represents {@linkplain NetworkWriter a network writer}, which writes {@linkplain JetChunk a chunk}.
  *
  * @since 1.0
- * @see Chunk
+ * @see JetChunk
  * @see NetworkWriter
  */
-public final class ChunkNetworkWriter implements NetworkWriter<Chunk> {
+public final class ChunkNetworkWriter implements NetworkWriter<JetChunk> {
     /**
      * An instance of the {@linkplain ChunkNetworkWriter chunk network writer}.
      *
@@ -40,7 +40,7 @@ public final class ChunkNetworkWriter implements NetworkWriter<Chunk> {
      */
     public static final ChunkNetworkWriter INSTANCE = new ChunkNetworkWriter();
 
-    private static final CollectionNetworkWriter<ChunkSection>
+    private static final CollectionNetworkWriter<JetChunkSection>
             SECTIONS_WRITER = new CollectionNetworkWriter<>(false, ChunkSectionNetworkWriter.INSTANCE);
     private static final CollectionNetworkWriter<BlockEntityEntry>
             BLOCK_ENTITY_ENTRIES_WRITER = new CollectionNetworkWriter<>(new BlockEntityEntryNetworkWriter());
@@ -48,41 +48,41 @@ public final class ChunkNetworkWriter implements NetworkWriter<Chunk> {
     private ChunkNetworkWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull Chunk object) {
+    public void write(@NonNull ByteBuf buf, @NonNull JetChunk object) {
         HeightMapCollectionNetworkWriter.INSTANCE.write(buf, object.heightMaps());
 
         ByteBuf sectionBuf = Unpooled.buffer();
         try {
-            SECTIONS_WRITER.write(sectionBuf, object.chunkSectionList().sections());
+            SECTIONS_WRITER.write(sectionBuf, object.sections());
             VarIntNetworkCodec.INSTANCE.write(buf, sectionBuf.readableBytes());
             buf.writeBytes(sectionBuf);
         } finally {
             sectionBuf.release();
         }
 
-        JetRegistryManager registryManager = object.world().worldManager().server().registryManager();
+        JetRegistryManager registryManager = object.server().registryManager();
         JetMinecraftRegistry<BlockEntityType> blockEntityTypeRegistry = registryManager.blockEntityTypeRegistry();
 
         Set<BlockEntityEntry> entries = new HashSet<>();
-        for (Map.Entry<ChunkRelativePosition, BlockEntity> entry : object.blockEntities().entrySet()) {
+        for (Map.Entry<ChunkRelativeBlockPosition, BlockEntity> entry : object.blockEntities().entrySet()) {
             BlockEntity blockEntity = entry.getValue();
             int blockEntityTypeIdentifier = blockEntityTypeRegistry.identifierOf(blockEntity.type());
             entries.add(new BlockEntityEntry(entry.getKey(), blockEntityTypeIdentifier, blockEntity.data()));
         }
 
         BLOCK_ENTITY_ENTRIES_WRITER.write(buf, entries);
-        LightSerializationDataNetworkWriter.INSTANCE.write(buf, object.lightSectionList().serializationData());
+        LightSerializationDataNetworkWriter.INSTANCE.write(buf, object.lightSerializationData());
     }
 
     /**
      * Represents a serialization entry of {@linkplain BlockEntity a block entity}.
      *
-     * @param position a chunk-relative position of a block that the block entity is associated with
+     * @param position a chunk-relative block position of a block that the block entity is associated with
      * @param typeIdentifier an identifier of a type of the block entity
      * @param data data of the block entity
      * @since 1.0
      */
-    private record BlockEntityEntry(@NonNull ChunkRelativePosition position, int typeIdentifier,
+    private record BlockEntityEntry(@NonNull ChunkRelativeBlockPosition position, int typeIdentifier,
                                     @NonNull CompoundBinaryTag data) {
         /**
          * Constructs the {@linkplain BlockEntityEntry block entity entry}.
@@ -109,7 +109,7 @@ public final class ChunkNetworkWriter implements NetworkWriter<Chunk> {
     private static final class BlockEntityEntryNetworkWriter implements NetworkWriter<BlockEntityEntry> {
         @Override
         public void write(@NonNull ByteBuf buf, @NonNull BlockEntityEntry object) {
-            ChunkRelativePositionNetworkWriter.INSTANCE.write(buf, object.position());
+            ChunkRelativeBlockPositionNetworkWriter.INSTANCE.write(buf, object.position());
             VarIntNetworkCodec.INSTANCE.write(buf, object.typeIdentifier());
             BinaryTagNetworkWriter.INSTANCE.write(buf, object.data());
         }
