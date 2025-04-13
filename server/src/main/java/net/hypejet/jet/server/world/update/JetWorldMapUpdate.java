@@ -40,7 +40,7 @@ import net.hypejet.jet.server.world.chunk.update.BlockUpdate;
 import net.hypejet.jet.server.world.chunk.update.LightUpdate;
 import net.hypejet.jet.server.world.chunk.view.ChunkView;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
-import net.hypejet.jet.server.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
+import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
 import net.hypejet.jet.server.world.coordinate.chunk.section.ChunkSectionPosition;
 import net.hypejet.jet.server.world.handler.ChunkBatchHandler;
 import net.hypejet.jet.world.block.entity.BlockEntity;

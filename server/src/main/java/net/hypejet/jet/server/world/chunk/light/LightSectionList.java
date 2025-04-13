@@ -49,9 +49,7 @@ public final class LightSectionList {
         this.dimensionType = NullabilityUtil.requireNonNull(dimensionType, "dimension type");
         this.sections = List.copyOf(NullabilityUtil.requireNonNull(sections, "sections"));
 
-        /* There is always one light section above the highest chunk section
-           and one light section below the lowest chunk section. */
-        int expectedSectionCount = ChunkSectionList.createSectionCount(dimensionType) + 2;
+        int expectedSectionCount = createSectionCount(dimensionType);
         int actualSectionCount = this.sections.size();
 
         if (actualSectionCount != expectedSectionCount) {
@@ -212,6 +210,20 @@ public final class LightSectionList {
                 "dimensionType=" + this.dimensionType +
                 ", sections=" + this.sections +
                 '}';
+    }
+
+    /**
+     * Creates a number, which is a count of {@linkplain JetLightSection light sections} that worlds
+     * with {@linkplain DimensionType a dimension type} specified have.
+     *
+     * @param dimensionType the dimension type
+     * @return the number
+     * @since 1.0
+     */
+    public static int createSectionCount(@NonNull DimensionType dimensionType) {
+        /* There is always one light section above the highest chunk section
+           and one light section below the lowest chunk section. */
+        return ChunkSectionList.createSectionCount(dimensionType) + 2;
     }
 
     /**

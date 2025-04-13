@@ -17,7 +17,7 @@ import net.hypejet.jet.server.world.chunk.light.LightType;
 import net.hypejet.jet.server.world.chunk.light.storage.AbstractLightStorage;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
-import net.hypejet.jet.server.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
+import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
 import net.hypejet.jet.world.acquisition.worldmap.WorldMapAcquisition;
 import net.hypejet.jet.world.block.entity.BlockEntity;
 import net.hypejet.jet.world.coordinate.BiomePosition;

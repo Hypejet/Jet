@@ -4,7 +4,7 @@ import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.world.chunk.JetChunk;
-import net.hypejet.jet.server.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
+import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

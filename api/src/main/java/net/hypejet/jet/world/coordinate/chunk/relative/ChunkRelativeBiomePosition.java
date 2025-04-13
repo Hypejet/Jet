@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.world.coordinate.chunk.relative;
+package net.hypejet.jet.world.coordinate.chunk.relative;
 
 /**
  * Represents a position of {@linkplain net.hypejet.jet.data.model.api.registries.biome.Biome a biome}, which
