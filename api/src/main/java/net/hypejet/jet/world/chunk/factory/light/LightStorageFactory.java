@@ -1,5 +1,6 @@
 package net.hypejet.jet.world.chunk.factory.light;
 
+import net.hypejet.jet.util.array.NibbleArray;
 import net.hypejet.jet.world.chunk.light.LightStorage;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -11,17 +12,20 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public interface LightStorageFactory {
     /**
-     * Creates {@linkplain LightStorage a light storage} for an array specified. The array must use a light-value
-     * array format, specified in a header javadoc of {@linkplain LightStorage a light storage} class.
+     * Creates {@linkplain LightStorage a light storage} for {@linkplain NibbleArray a nibble array} of light-level
+     * values specified.
      *
-     * @param lightValues the array
+     * <p>Indices of the nibble array correspond to light-level values of blocks with the same indices in block-state
+     * {@linkplain net.hypejet.jet.world.chunk.section.ChunkPalette chunk palettes}.</p>
+     *
+     * @param array the array
      * @return the light storage
      * @since 1.0
      */
-    @NonNull LightStorage createDirect(byte @NonNull [] lightValues);
+    @NonNull LightStorage createDirect(@NonNull NibbleArray array);
 
     /**
-     * Gets an instance of {@linkplain LightStorage a light storage} with all values set to {@code 0}.
+     * Gets an instance of {@linkplain LightStorage a light storage} with all light-level values set to {@code 0}.
      *
      * @return the instance
      * @since 1.0

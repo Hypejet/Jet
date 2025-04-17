@@ -13,7 +13,7 @@ import net.hypejet.jet.server.world.chunk.light.storage.AbstractLightStorage;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.section.ChunkSectionList;
 import net.hypejet.jet.server.world.chunk.update.LightUpdate;
-import net.hypejet.jet.util.array.UnmodifiableByteArray;
+import net.hypejet.jet.util.array.NibbleArray;
 import net.hypejet.jet.util.bitset.UnmodifiableBitSet;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -38,8 +38,8 @@ public final class LightSerializationData {
     private final UnmodifiableBitSet emptySkyLightMask;
     private final UnmodifiableBitSet emptyBlockLightMask;
 
-    private final List<UnmodifiableByteArray> skyLightData;
-    private final List<UnmodifiableByteArray> blockLightData;
+    private final List<NibbleArray> skyLightData;
+    private final List<NibbleArray> blockLightData;
 
     /**
      * Constructs the {@linkplain LightSerializationData light serialization data}.
@@ -72,7 +72,7 @@ public final class LightSerializationData {
     private LightSerializationData(
             @NonNull UnmodifiableBitSet skyLightMask, @NonNull UnmodifiableBitSet blockLightMask,
             @NonNull UnmodifiableBitSet emptySkyLightMask, @NonNull UnmodifiableBitSet emptyBlockLightMask,
-            @NonNull List<UnmodifiableByteArray> skyLightData, @NonNull List<UnmodifiableByteArray> blockLightData
+            @NonNull List<NibbleArray> skyLightData, @NonNull List<NibbleArray> blockLightData
     ) {
         this.skyLightMask = NullabilityUtil.requireNonNull(skyLightMask, "skylight mask");
         this.blockLightMask = NullabilityUtil.requireNonNull(blockLightMask, "block light mask");
@@ -140,7 +140,7 @@ public final class LightSerializationData {
      * @return the list
      * @since 1.0
      */
-    public @NonNull List<UnmodifiableByteArray> skyLightData() {
+    public @NonNull List<NibbleArray> skyLightData() {
         return this.skyLightData;
     }
 
@@ -151,7 +151,7 @@ public final class LightSerializationData {
      * @return the list
      * @since 1.0
      */
-    public @NonNull List<UnmodifiableByteArray> blockLightData() {
+    public @NonNull List<NibbleArray> blockLightData() {
         return this.blockLightData;
     }
 
@@ -237,8 +237,8 @@ public final class LightSerializationData {
         BitSet emptySkyLightMask = new BitSet();
         BitSet emptyBlockLightMask = new BitSet();
 
-        List<UnmodifiableByteArray> skyLightData = new ArrayList<>();
-        List<UnmodifiableByteArray> blockLightData = new ArrayList<>();
+        List<NibbleArray> skyLightData = new ArrayList<>();
+        List<NibbleArray> blockLightData = new ArrayList<>();
 
         IntList keyList = new IntArrayList(indexToSectionMap.keySet());
         keyList.sort(Integer::compare);
@@ -259,11 +259,11 @@ public final class LightSerializationData {
     }
 
     private static void add(@NonNull AbstractLightStorage storage, int bitIndex, @NonNull BitSet lightMask,
-                            @NonNull BitSet emptyLightMask, @NonNull List<UnmodifiableByteArray> lightData) {
+                            @NonNull BitSet emptyLightMask, @NonNull List<NibbleArray> lightData) {
         switch (storage) {
             case DirectLightStorage direct -> {
                 lightMask.set(bitIndex);
-                lightData.add(direct.unmodifiableData());
+                lightData.add(direct.data());
             }
             case EmptyLightStorage ignored -> emptyLightMask.set(bitIndex);
         }

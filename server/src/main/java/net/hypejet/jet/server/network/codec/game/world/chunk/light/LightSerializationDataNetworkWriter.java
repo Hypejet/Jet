@@ -7,7 +7,7 @@ import net.hypejet.jet.server.network.codec.aggregate.bitset.BitSetNetworkWriter
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.mapped.MappedValueNetworkWriter;
 import net.hypejet.jet.server.world.chunk.light.LightSerializationData;
-import net.hypejet.jet.util.array.UnmodifiableByteArray;
+import net.hypejet.jet.util.array.NibbleArray;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -26,9 +26,9 @@ public final class LightSerializationDataNetworkWriter implements NetworkWriter<
      */
     public static final LightSerializationDataNetworkWriter INSTANCE = new LightSerializationDataNetworkWriter();
 
-    private static final CollectionNetworkWriter<UnmodifiableByteArray> LIGHT_DATA_WRITER =
+    private static final CollectionNetworkWriter<NibbleArray> LIGHT_DATA_WRITER =
             new CollectionNetworkWriter<>(
-                    new MappedValueNetworkWriter<>(UnmodifiableByteArray::array, ByteArrayNetworkWriter.INSTANCE)
+                    new MappedValueNetworkWriter<>(NibbleArray::packedArray, ByteArrayNetworkWriter.INSTANCE)
             );
 
     private LightSerializationDataNetworkWriter() {}

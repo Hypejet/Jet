@@ -3,14 +3,14 @@ package net.hypejet.jet.server.world.chunk.light.storage;
 import it.unimi.dsi.fastutil.bytes.Byte2ShortMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ShortMaps;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
-import net.hypejet.jet.util.array.UnmodifiableByteArray;
+import net.hypejet.jet.util.array.NibbleArray;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Objects;
 
 /**
- * Represents {@linkplain AbstractLightStorage a light storage}, which does not store light values directly and returns
- * {@code 0} in all cases a light value is being got.
+ * Represents {@linkplain AbstractLightStorage a light storage}, which does not store light-level values directly
+ * and returns {@code 0} in all cases a light-level value is being got.
  *
  * @since 1.0
  * @see AbstractLightStorage
@@ -18,7 +18,7 @@ import java.util.Objects;
 public final class EmptyLightStorage extends AbstractLightStorage {
 
     private static final byte EMPTY_VALUE = 0;
-    private static final UnmodifiableByteArray EMPTY_ARRAY = new UnmodifiableByteArray(new byte[DATA_ARRAY_LENGTH]);
+    private static final NibbleArray EMPTY_DATA = new NibbleArray.Builder(DATA_VALUE_COUNT).build();
 
     /**
      * An instance of the {@linkplain EmptyLightStorage empty light storage}.
@@ -30,13 +30,13 @@ public final class EmptyLightStorage extends AbstractLightStorage {
     private EmptyLightStorage() {}
 
     @Override
-    public byte getValue(@NonNull ChunkPaletteRelativePosition position) {
-        return EMPTY_VALUE;
+    public @NonNull NibbleArray data() {
+        return EMPTY_DATA;
     }
 
     @Override
-    public @NonNull UnmodifiableByteArray unmodifiableData() {
-        return EMPTY_ARRAY;
+    public byte getValue(@NonNull ChunkPaletteRelativePosition position) {
+        return EMPTY_VALUE;
     }
 
     @Override
