@@ -1,9 +1,12 @@
 package net.hypejet.jet.server.world.block;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.data.model.server.registry.registries.block.entity.BlockEntityType;
 import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState;
+import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -21,6 +24,7 @@ public final class BlockType {
     private final BlockState defaultState;
     private final Set<Key> requiredFeatureFlags;
     private final Map<Map<String, String>, BlockState> possibleStates;
+    private final JetRegistryEntry<BlockEntityType> blockEntityType;
 
     /**
      * Constructs the {@linkplain BlockType block type}.
@@ -28,13 +32,17 @@ public final class BlockType {
      * @param defaultBlockState a default block state that blocks of the block type should have
      * @param requiredFeatureFlags required feature flags that are required to enable the block type
      * @param possibleBlockStates blocks states that blocks of the block type should be able to use
+     * @param blockEntityType a registry entry of a block entity type that blocks of the block type should use
+     *                        for their block entities
      * @since 1.0
      */
     public BlockType(@NonNull BlockState defaultBlockState, @NonNull Set<Key> requiredFeatureFlags,
-                     @NonNull Set<BlockState> possibleBlockStates) {
+                     @NonNull Set<BlockState> possibleBlockStates,
+                     @Nullable JetRegistryEntry<BlockEntityType> blockEntityType) {
         NullabilityUtil.requireNonNull(defaultBlockState, "default block state");
         NullabilityUtil.requireNonNull(requiredFeatureFlags, "required feature flags");
         NullabilityUtil.requireNonNull(possibleBlockStates, "possible state entries");
+        NullabilityUtil.requireNonNull(blockEntityType, "block entity type");
 
         Map<Map<String, String>, BlockState> possibleStates = new HashMap<>();
         for (BlockState state : possibleBlockStates)
@@ -43,6 +51,7 @@ public final class BlockType {
         this.defaultState = defaultBlockState;
         this.requiredFeatureFlags = Set.copyOf(requiredFeatureFlags);
         this.possibleStates = Map.copyOf(possibleStates);
+        this.blockEntityType = blockEntityType;
     }
 
     /**
@@ -74,6 +83,17 @@ public final class BlockType {
      */
     public @NonNull Collection<BlockState> possibleStates() {
         return this.possibleStates.values();
+    }
+
+    /**
+     * Gets {@linkplain JetRegistryEntry a registry entry} of {@linkplain BlockEntityType a block entity type}
+     * that blocks of this {@linkplain BlockType block type} should use for their block entities.
+     *
+     * @return the registry entry
+     * @since 1.0
+     */
+    public @Nullable JetRegistryEntry<BlockEntityType> blockEntityType() {
+        return this.blockEntityType;
     }
 
     /**

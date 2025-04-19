@@ -13,7 +13,7 @@ import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.server.world.chunk.section.ChunkSectionList;
-import net.hypejet.jet.server.world.chunk.update.BlockUpdate;
+import net.hypejet.jet.server.world.chunk.update.BlockStateUpdate;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -92,8 +92,8 @@ public final class HeightMap {
     }
 
     /**
-     * Creates a new copy of this {@linkplain HeightMap height map}, which takes into account block state updates
-     * specified.
+     * Creates a new copy of this {@linkplain HeightMap height map}, which takes into account
+     * {@linkplain BlockStateUpdate block state updates} specified.
      *
      * @param chunkSectionList a chunk section list with the updates taken into account, used when a new height
      *                         needs to be found
@@ -103,12 +103,12 @@ public final class HeightMap {
      */
     @Contract(pure = true)
     public @NonNull HeightMap withUpdates(@NonNull ChunkSectionList chunkSectionList,
-                                          @NonNull Collection<BlockUpdate> updates) {
+                                          @NonNull Collection<BlockStateUpdate> updates) {
         if (updates.isEmpty())
             return this;
 
         Int2ObjectMap<BitStorageUpdate> dataUpdates = new Int2ObjectOpenHashMap<>();
-        for (BlockUpdate update : updates) {
+        for (BlockStateUpdate update : updates) {
             ChunkRelativeBlockPosition position = update.position();
 
             byte blockX = position.relativeX();

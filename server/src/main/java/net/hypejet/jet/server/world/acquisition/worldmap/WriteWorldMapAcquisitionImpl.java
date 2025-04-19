@@ -9,11 +9,11 @@ import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.light.LightType;
 import net.hypejet.jet.server.world.update.JetWorldMapUpdate;
 import net.hypejet.jet.world.acquisition.worldmap.WriteWorldMapAcquisition;
-import net.hypejet.jet.world.block.entity.BlockEntity;
 import net.hypejet.jet.world.coordinate.BiomePosition;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
 import net.hypejet.jet.world.update.WorldMapUpdate;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -57,7 +57,7 @@ public final class WriteWorldMapAcquisitionImpl extends WorldMapAcquisitionImpl 
     }
 
     @Override
-    public @Nullable BlockEntity getBlockEntity(@NonNull BlockPosition position) {
+    public @Nullable CompoundBinaryTag getBlockEntity(@NonNull BlockPosition position) {
         JetChunk chunk = this.getChunk(ChunkPositionUtil.fromCoordinate(position));
         return blockEntity(position, chunk);
     }

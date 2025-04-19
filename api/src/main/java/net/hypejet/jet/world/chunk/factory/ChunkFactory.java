@@ -3,13 +3,13 @@ package net.hypejet.jet.world.chunk.factory;
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.registry.RegistryEntry;
-import net.hypejet.jet.world.block.entity.BlockEntity;
 import net.hypejet.jet.world.chunk.Chunk;
 import net.hypejet.jet.world.chunk.builder.ChunkBuilder;
 import net.hypejet.jet.world.chunk.section.ChunkSection;
 import net.hypejet.jet.world.chunk.light.LightSection;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -34,14 +34,14 @@ public interface ChunkFactory<CS extends ChunkSection<BS>, LS extends LightSecti
      *                      section and the highest index is the highest section
      * @param lightSections a list of light sections that the chunk should have, where the lowest index is the lowest
      *                      section and the highest index is the highest section
-     * @param blockEntities a map, which maps chunk-relative block positions of blocks to block entities that
+     * @param blockEntities a map, which maps chunk-relative block positions of blocks to data of block entities that
      *                      the blocks should have
      * @return the chunk
      * @since 1.0
      */
     @NonNull Chunk<BS> createChunk(@NonNull DimensionType dimensionType,
                                    @NonNull List<CS> chunkSections, @NonNull List<LS> lightSections,
-                                   @NonNull Map<ChunkRelativeBlockPosition, BlockEntity> blockEntities);
+                                   @NonNull Map<ChunkRelativeBlockPosition, CompoundBinaryTag> blockEntities);
 
     /**
      * Creates {@linkplain ChunkBuilder a chunk builder}, which is initially filled with an air block with default
@@ -61,15 +61,15 @@ public interface ChunkFactory<CS extends ChunkSection<BS>, LS extends LightSecti
      * @param defaultBlockTypeKey a key of a block type that the block should have
      * @param properties a properties that the block should have, {@code null} if default properties
      *                   of the block type should be used
-     * @param defaultBlockEntity a block entity that the block should have, {@code null} if the block should not have
-     *                           a block entity
+     * @param defaultBlockEntity a data of a block entity that the block should have, {@code null} if the block
+     *                           should not have a block entity
      * @param defaultBiome a registry entry of the biome
      * @return the chunk builder
      * @since 1.0
      */
     @NonNull ChunkBuilder<BS> createChunkBuilder(
             @NonNull DimensionType dimensionType, @NonNull Key defaultBlockTypeKey,
-            @Nullable Map<String, String> properties, @Nullable BlockEntity defaultBlockEntity,
+            @Nullable Map<String, String> properties, @Nullable CompoundBinaryTag defaultBlockEntity,
             @NonNull RegistryEntry<Biome> defaultBiome
     );
 }

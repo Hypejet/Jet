@@ -244,7 +244,7 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
                 throw new RuntimeException("The known packs packet has not been sent on time", exception);
             }
 
-            Collection<JetMinecraftRegistry<?>> registries = server.registryManager().registries();
+            Collection<JetMinecraftRegistry<?>> registries = server.registryManager().networkRegistries();
             for (JetMinecraftRegistry<?> registry : registries) {
                 if (!(registry instanceof JetSerializableMinecraftRegistry<?> serializableRegistry)) continue;
                 sendRegistry(this.connection, serializableRegistry, packet.featurePacks());

@@ -11,7 +11,7 @@ import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
 import net.hypejet.jet.server.world.chunk.update.BiomeUpdate;
-import net.hypejet.jet.server.world.chunk.update.BlockUpdate;
+import net.hypejet.jet.server.world.chunk.update.BlockStateUpdate;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
@@ -120,20 +120,20 @@ public final class ChunkSectionList {
 
     /**
      * Creates a copy of this {@linkplain ChunkSectionList chunk section list}
-     * with {@linkplain BlockUpdate block state updates} and {@linkplain BiomeUpdate biome updates}
+     * with {@linkplain BlockStateUpdate block state updates} and {@linkplain BiomeUpdate biome updates}
      * specified applied.
      *
-     * @param blockUpdates the block state updates
+     * @param blockStateUpdates the block state updates
      * @param biomeUpdates the biome updates
      * @return the copy
      * @since 1.0
      */
     @Contract(pure = true)
     public @NonNull ChunkSectionList withUpdates(
-            @NonNull Collection<BlockUpdate> blockUpdates,
+            @NonNull Collection<BlockStateUpdate> blockStateUpdates,
             @NonNull Collection<BiomeUpdate> biomeUpdates
     ) {
-        if (blockUpdates.isEmpty() && biomeUpdates.isEmpty())
+        if (blockStateUpdates.isEmpty() && biomeUpdates.isEmpty())
             return this;
 
         List<JetChunkSection> sections = new ArrayList<>(this.sections);
@@ -142,10 +142,10 @@ public final class ChunkSectionList {
         IntObjectMap<List<ChunkPaletteUpdate<RegistryEntry<Biome>>>> biomePaletteUpdates;
 
         blockStatePaletteUpdates = createChunkSectionPaletteUpdateMap(
-                blockUpdates, this.dimensionType,
+                blockStateUpdates, this.dimensionType,
                 update -> update.position().absoluteY(),
                 update -> ChunkPaletteRelativePosition.from(update.position()),
-                BlockUpdate::blockState, ChunkPaletteType.BLOCK_STATE
+                BlockStateUpdate::blockState, ChunkPaletteType.BLOCK_STATE
         );
 
         biomePaletteUpdates = createChunkSectionPaletteUpdateMap(

@@ -2,10 +2,10 @@ package net.hypejet.jet.world.update;
 
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.registry.RegistryEntry;
-import net.hypejet.jet.world.block.entity.BlockEntity;
 import net.hypejet.jet.world.coordinate.BiomePosition;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -20,8 +20,7 @@ import java.util.Map;
 public interface WorldMapUpdate {
     /**
      * Sets a block at {@linkplain BlockPosition a block position} specified to be updated with a default block data
-     * of a block type with {@linkplain Key a key} specified. The block will not have
-     * {@linkplain BlockEntity a block entity}.
+     * of a block type with {@linkplain Key a key} specified.
      *
      * @param position the block position
      * @param blockTypeKey the block type key
@@ -31,23 +30,8 @@ public interface WorldMapUpdate {
     @NonNull WorldMapUpdate updateBlock(@NonNull BlockPosition position, @NonNull Key blockTypeKey);
 
     /**
-     * Sets a block at {@linkplain BlockPosition a block position} specified to be updated with a default block data
-     * of a block type with {@linkplain Key a key} specified. The block is also going to have
-     * {@linkplain BlockEntity a block entity} specified.
-     *
-     * @param position the block position
-     * @param blockTypeKey the block type key
-     * @param blockEntity the block entity, {@code null} if none
-     * @return this builder
-     * @since 1.0
-     */
-    @NonNull WorldMapUpdate updateBlock(@NonNull BlockPosition position, @NonNull Key blockTypeKey,
-                                        @Nullable BlockEntity blockEntity);
-
-    /**
      * Sets a block at {@linkplain BlockPosition a block position} specified to be updated with a block data
-     * with block properties specified and a block type with {@linkplain Key a key} specified. The block will not have
-     * {@linkplain BlockEntity a block entity}.
+     * with block properties specified and a block type with {@linkplain Key a key} specified.
      *
      * @param position the block position
      * @param blockTypeKey the block type key
@@ -59,30 +43,16 @@ public interface WorldMapUpdate {
                                         @Nullable Map<String, String> properties);
 
     /**
-     * Sets a block at {@linkplain BlockPosition a block position} specified to be updated with a block data
-     * with block properties specified and a block type with {@linkplain Key a key} specified. The block is also going
-     * to have {@linkplain BlockEntity a block entity} specified.
+     * Sets block entity data of a block at {@linkplain BlockPosition a block position} specified to be updated
+     * with a value specified.
      *
      * @param position the block position
-     * @param blockTypeKey the block type key
-     * @param properties the properties, {@code null} to use default properties of the block type
-     * @param blockEntity the block entity, {@code null} if none
+     * @param blockEntityData the value
      * @return this builder
      * @since 1.0
      */
-    @NonNull WorldMapUpdate updateBlock(@NonNull BlockPosition position, @NonNull Key blockTypeKey,
-                                        @Nullable Map<String, String> properties, @Nullable BlockEntity blockEntity);
-
-    /**
-     * Sets {@linkplain BlockEntity a block entity} at {@linkplain BlockPosition a block position} specified
-     * to be updated with a value specified.
-     *
-     * @param position the block position
-     * @param blockEntity the value
-     * @return this builder
-     * @since 1.0
-     */
-    @NonNull WorldMapUpdate updateBlockEntity(@NonNull BlockPosition position, @Nullable BlockEntity blockEntity);
+    @NonNull WorldMapUpdate updateBlockEntity(@NonNull BlockPosition position,
+                                              @NonNull CompoundBinaryTag blockEntityData);
 
     /**
      * Sets {@linkplain Biome a biome} at {@linkplain BiomePosition a biome position} specified to be updated

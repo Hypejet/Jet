@@ -1,10 +1,10 @@
 package net.hypejet.jet.world.chunk;
 
 import net.hypejet.jet.world.World;
-import net.hypejet.jet.world.block.entity.BlockEntity;
 import net.hypejet.jet.world.chunk.section.ChunkSection;
 import net.hypejet.jet.world.chunk.light.LightSection;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
@@ -40,10 +40,10 @@ public interface Chunk<BS> {
 
     /**
      * Gets {@linkplain Map a map}, which maps {@linkplain ChunkRelativeBlockPosition chunk-relative block positions}
-     * of blocks to {@linkplain BlockEntity block entities} of them.
+     * of blocks to data of their block entities.
      *
      * @return the map
      * @since 1.0
      */
-    @NonNull Map<ChunkRelativeBlockPosition, BlockEntity> blockEntities();
+    @NonNull Map<ChunkRelativeBlockPosition, CompoundBinaryTag> blockEntities();
 }

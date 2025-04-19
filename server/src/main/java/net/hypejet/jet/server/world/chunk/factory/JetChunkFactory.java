@@ -15,10 +15,10 @@ import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.builder.JetChunkBuilder;
 import net.hypejet.jet.server.world.chunk.light.JetLightSection;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
-import net.hypejet.jet.world.block.entity.BlockEntity;
 import net.hypejet.jet.world.chunk.factory.ChunkFactory;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -49,7 +49,7 @@ public final class JetChunkFactory implements ChunkFactory<JetChunkSection, JetL
     public @NonNull JetChunk createChunk(@NonNull DimensionType dimensionType,
                                          @NonNull List<JetChunkSection> chunkSections,
                                          @NonNull List<JetLightSection> lightSections,
-                                         @NonNull Map<ChunkRelativeBlockPosition, BlockEntity> blockEntities) {
+                                         @NonNull Map<ChunkRelativeBlockPosition, CompoundBinaryTag> blockEntities) {
         return JetChunk.create(this.server, dimensionType, chunkSections, lightSections, blockEntities);
     }
 
@@ -64,7 +64,7 @@ public final class JetChunkFactory implements ChunkFactory<JetChunkSection, JetL
     @Override
     public @NonNull JetChunkBuilder createChunkBuilder(
             @NonNull DimensionType dimensionType, @NonNull Key defaultBlockTypeKey,
-            @Nullable Map<String, String> properties, @Nullable BlockEntity defaultBlockEntity,
+            @Nullable Map<String, String> properties, @Nullable CompoundBinaryTag defaultBlockEntity,
             @NonNull RegistryEntry<Biome> defaultBiome
     ) {
         if (!(defaultBiome instanceof JetRegistryEntry<Biome> validatedBiome))

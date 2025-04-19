@@ -2,8 +2,9 @@ package net.hypejet.jet.server.network.codec.game.world.chunk;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.hypejet.jet.data.model.api.block.entity.BlockEntityType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.data.model.server.registry.registries.block.entity.BlockEntityType;
+import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.miscellaneous.BinaryTagNetworkWriter;
@@ -13,10 +14,12 @@ import net.hypejet.jet.server.network.codec.game.world.chunk.section.ChunkSectio
 import net.hypejet.jet.server.network.codec.game.world.coordinate.relative.ChunkRelativeBlockPositionNetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
+import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.registry.JetRegistryManager;
+import net.hypejet.jet.server.registry.blockstate.BlockStateRegistry;
+import net.hypejet.jet.server.world.block.BlockType;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
-import net.hypejet.jet.world.block.entity.BlockEntity;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -61,13 +64,27 @@ public final class ChunkNetworkWriter implements NetworkWriter<JetChunk> {
         }
 
         JetRegistryManager registryManager = object.server().registryManager();
+        BlockStateRegistry blockStateRegistry = registryManager.blockStateRegistry();
         JetMinecraftRegistry<BlockEntityType> blockEntityTypeRegistry = registryManager.blockEntityTypeRegistry();
 
         Set<BlockEntityEntry> entries = new HashSet<>();
-        for (Map.Entry<ChunkRelativeBlockPosition, BlockEntity> entry : object.blockEntities().entrySet()) {
-            BlockEntity blockEntity = entry.getValue();
-            int blockEntityTypeIdentifier = blockEntityTypeRegistry.identifierOf(blockEntity.type());
-            entries.add(new BlockEntityEntry(entry.getKey(), blockEntityTypeIdentifier, blockEntity.data()));
+        for (Map.Entry<ChunkRelativeBlockPosition, CompoundBinaryTag> entry : object.blockEntities().entrySet()) {
+            ChunkRelativeBlockPosition position = entry.getKey();
+
+            BlockState blockState = object.blockState(position);
+            JetRegistryEntry<BlockType> blockType = blockStateRegistry.blockType(blockState);
+            JetRegistryEntry<BlockEntityType> blockEntityType = blockType.value().blockEntityType();
+
+            if (blockEntityType == null) {
+                throw new IllegalArgumentException(String.format(
+                        "Block type with key of %s cannot have a block entity",
+                        blockType.key()
+                ));
+            }
+
+            CompoundBinaryTag blockEntityData = entry.getValue();
+            int blockEntityTypeIdentifier = blockEntityTypeRegistry.identifierOf(blockEntityType);
+            entries.add(new BlockEntityEntry(position, blockEntityTypeIdentifier, blockEntityData));
         }
 
         BLOCK_ENTITY_ENTRIES_WRITER.write(buf, entries);
@@ -75,7 +92,7 @@ public final class ChunkNetworkWriter implements NetworkWriter<JetChunk> {
     }
 
     /**
-     * Represents a serialization entry of {@linkplain BlockEntity a block entity}.
+     * Represents a serialization entry of a Minecraft block entity.
      *
      * @param position a chunk-relative block position of a block that the block entity is associated with
      * @param typeIdentifier an identifier of a type of the block entity

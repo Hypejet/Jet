@@ -1,6 +1,5 @@
 package net.hypejet.jet.server.world.chunk;
 
-import net.hypejet.jet.data.model.api.block.entity.BlockEntityType;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState;
@@ -13,20 +12,20 @@ import net.hypejet.jet.server.world.chunk.heightmap.HeightMapType;
 import net.hypejet.jet.server.world.chunk.light.JetLightSection;
 import net.hypejet.jet.server.world.chunk.light.LightSectionList;
 import net.hypejet.jet.server.world.chunk.light.LightSerializationData;
-import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.server.world.chunk.section.ChunkSectionList;
 import net.hypejet.jet.server.world.chunk.update.BiomeUpdate;
-import net.hypejet.jet.server.world.chunk.update.BlockUpdate;
+import net.hypejet.jet.server.world.chunk.update.BlockEntityUpdate;
+import net.hypejet.jet.server.world.chunk.update.BlockStateUpdate;
 import net.hypejet.jet.server.world.chunk.update.LightUpdate;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
-import net.hypejet.jet.world.block.entity.BlockEntity;
 import net.hypejet.jet.world.chunk.Chunk;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
-import net.kyori.adventure.key.Key;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +46,7 @@ public final class JetChunk implements Chunk<BlockState> {
     private final LightSectionList lightSectionList;
 
     private final Set<HeightMap> heightMaps;
-    private final Map<ChunkRelativeBlockPosition, BlockEntity> blockEntities;
+    private final Map<ChunkRelativeBlockPosition, CompoundBinaryTag> blockEntities;
 
     /**
      * Constructs the {@linkplain JetChunk chunk implementation}.
@@ -57,12 +56,12 @@ public final class JetChunk implements Chunk<BlockState> {
      * @param lightSectionList a light section list, which contains all light sections that the chunk should have
      * @param heightMaps a set of height maps that the chunk should have
      * @param blockEntities a map, which maps chunk-relative block positions of blocks that the chunk should have
-     *                      to block entities associated with them
+     *                      to data of block entities associated with them
      * @since 1.0
      */
     private JetChunk(@NonNull JetMinecraftServer server, @NonNull ChunkSectionList chunkSectionList,
                      @NonNull LightSectionList lightSectionList, @NonNull Set<HeightMap> heightMaps,
-                     @NonNull Map<ChunkRelativeBlockPosition, BlockEntity> blockEntities) {
+                     @NonNull Map<ChunkRelativeBlockPosition, CompoundBinaryTag> blockEntities) {
         this.server = NullabilityUtil.requireNonNull(server, "server");
 
         this.chunkSectionList = NullabilityUtil.requireNonNull(chunkSectionList, "chunk section list");
@@ -70,36 +69,6 @@ public final class JetChunk implements Chunk<BlockState> {
 
         this.heightMaps = Set.copyOf(NullabilityUtil.requireNonNull(heightMaps, "height maps"));
         this.blockEntities = Map.copyOf(NullabilityUtil.requireNonNull(blockEntities, "block entities"));
-
-        BlockStateRegistry blockStateRegistry = server.registryManager().blockStateRegistry();
-        for (Map.Entry<ChunkRelativeBlockPosition, BlockEntity> entry : blockEntities.entrySet()) {
-            ChunkRelativeBlockPosition position = entry.getKey();
-            BlockEntity blockEntity = entry.getValue();
-
-            int sectionY = ChunkSectionList.createSectionY(position.absoluteY(), ChunkPaletteType.BLOCK_STATE);
-
-            JetChunkSection chunkSection = chunkSectionList.section(sectionY);
-            ChunkPaletteRelativePosition palettePosition = ChunkPaletteRelativePosition.from(position);
-
-            if (!(blockEntity.type() instanceof JetRegistryEntry<BlockEntityType> validatedRegistryEntry)) {
-                throw new IllegalArgumentException(
-                        "A registry entry of a type of block entity specified is not a valid registry entry"
-                );
-            }
-
-            BlockState blockState = chunkSection.blockStatePalette().getElement(palettePosition);
-            JetRegistryEntry<BlockType> blockType = blockStateRegistry.blockType(blockState);
-
-            Key blockTypeKey = blockType.key();
-            Key blockEntityTypeKey = validatedRegistryEntry.key();
-
-            if (!validatedRegistryEntry.value().validBlocks().contains(blockTypeKey)) {
-                throw new IllegalArgumentException(String.format(
-                        "Block with type of %s is not allowed for a %s block entity",
-                        blockTypeKey, blockEntityTypeKey
-                ));
-            }
-        }
     }
 
     @Override
@@ -113,7 +82,7 @@ public final class JetChunk implements Chunk<BlockState> {
     }
 
     @Override
-    public @NonNull Map<ChunkRelativeBlockPosition, BlockEntity> blockEntities() {
+    public @NonNull Map<ChunkRelativeBlockPosition, CompoundBinaryTag> blockEntities() {
         return this.blockEntities;
     }
 
@@ -172,26 +141,57 @@ public final class JetChunk implements Chunk<BlockState> {
     /**
      * Creates {@linkplain JetChunk a chunk}, which is a copy of this chunk with updates specified applied.
      *
-     * @param blockUpdates updates that should be applied to block states
+     * @param blockStateUpdates updates that should be applied to block states
+     * @param blockEntityUpdates updates that should be applied to block entities
      * @param biomeUpdates updates that should be applied to biomes
      * @param lightUpdates updates that should be applied to light
      * @return the chunk created
      * @since 1.0
      */
-    public @NonNull JetChunk withUpdates(@NonNull Collection<BlockUpdate> blockUpdates,
+    public @NonNull JetChunk withUpdates(@NonNull Collection<BlockStateUpdate> blockStateUpdates,
+                                         @NonNull Collection<BlockEntityUpdate> blockEntityUpdates,
                                          @NonNull Collection<BiomeUpdate> biomeUpdates,
-                                         @NonNull Collection<LightUpdate> lightUpdates) {
-        // TODO: Block entity updating
-
-        ChunkSectionList chunkSectionList = this.chunkSectionList.withUpdates(blockUpdates, biomeUpdates);
+                                         @NonNull Collection<LightUpdate> lightUpdates) { // TODO: Replace collections with maps
+        ChunkSectionList chunkSectionList = this.chunkSectionList.withUpdates(blockStateUpdates, biomeUpdates);
         LightSectionList lightSectionList = this.lightSectionList.withUpdates(lightUpdates);
 
         Set<HeightMap> heightMaps = new HashSet<>();
         for (HeightMap heightMap : this.heightMaps)
-            heightMaps.add(heightMap.withUpdates(chunkSectionList, blockUpdates));
+            heightMaps.add(heightMap.withUpdates(chunkSectionList, blockStateUpdates));
 
-        // TODO: Handle block entity updates
-        return new JetChunk(this.server, chunkSectionList, lightSectionList, heightMaps, this.blockEntities);
+        Map<ChunkRelativeBlockPosition, CompoundBinaryTag> blockEntityDataMap = new HashMap<>(this.blockEntities);
+        for (BlockStateUpdate update : blockStateUpdates) {
+            ChunkRelativeBlockPosition position = update.position();
+            BlockState blockState = update.blockState();
+
+            BlockStateRegistry blockStateRegistry = this.server.registryManager().blockStateRegistry();
+            JetRegistryEntry<BlockType> blockTypeEntry = blockStateRegistry.blockType(blockState);
+
+            BlockState previousBlockState = this.blockState(position);
+            JetRegistryEntry<BlockType> previousBlockTypeEntry = blockStateRegistry.blockType(previousBlockState);
+
+            if (blockTypeEntry != previousBlockTypeEntry)
+                blockEntityDataMap.remove(position);
+        }
+
+        for (BlockEntityUpdate update : blockEntityUpdates)
+            blockEntityDataMap.put(update.position(), update.blockEntity());
+
+        return new JetChunk(this.server, chunkSectionList, lightSectionList, heightMaps, blockEntityDataMap);
+    }
+
+    /**
+     * Gets {@linkplain BlockState a block state} of a block, which is in this {@linkplain JetChunk chunk}
+     * at {@linkplain ChunkRelativeBlockPosition a chunk-relative block position} specified.
+     *
+     * @param position the chunk-relative block position
+     * @return the block state
+     * @since 1.0
+     */
+    public @NonNull BlockState blockState(@NonNull ChunkRelativeBlockPosition position) {
+        JetChunkSection chunkSection = this.chunkSectionList.sectionFor(position);
+        ChunkPaletteRelativePosition palettePosition = ChunkPaletteRelativePosition.from(position);
+        return chunkSection.blockStatePalette().getElement(palettePosition);
     }
 
     @Override
@@ -228,7 +228,7 @@ public final class JetChunk implements Chunk<BlockState> {
      *                      section and the highest index is the highest section
      * @param lightSections a list of light sections that the chunk should have, where the lowest index is the lowest
      *                      section and the highest index is the highest section
-     * @param blockEntities a map, which maps chunk-relative block positions of blocks to block entities that
+     * @param blockEntities a map, which maps chunk-relative block positions of blocks to data of block entities that
      *                      the blocks should have
      * @return the chunk
      * @since 1.0
@@ -236,7 +236,7 @@ public final class JetChunk implements Chunk<BlockState> {
     public static @NonNull JetChunk create(
             @NonNull JetMinecraftServer server, @NonNull DimensionType dimensionType,
             @NonNull List<JetChunkSection> chunkSections, @NonNull List<JetLightSection> lightSections,
-            @NonNull Map<ChunkRelativeBlockPosition, BlockEntity> blockEntities
+            @NonNull Map<ChunkRelativeBlockPosition, CompoundBinaryTag> blockEntities
     ) {
         NullabilityUtil.requireNonNull(server, "server");
         NullabilityUtil.requireNonNull(dimensionType, "dimension type");

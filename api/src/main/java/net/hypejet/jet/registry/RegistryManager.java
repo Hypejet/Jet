@@ -1,6 +1,5 @@
 package net.hypejet.jet.registry;
 
-import net.hypejet.jet.data.model.api.block.entity.BlockEntityType;
 import net.hypejet.jet.data.model.api.registries.armor.material.ArmorTrimMaterial;
 import net.hypejet.jet.data.model.api.registries.armor.pattern.ArmorTrimPattern;
 import net.hypejet.jet.data.model.api.registries.banner.BannerPattern;
@@ -98,12 +97,4 @@ public interface RegistryManager {
      * @since 1.0
      */
     @NonNull MinecraftRegistry<?> blockTypeRegistry();
-
-    /**
-     * Gets {@linkplain MinecraftRegistry a registry} of {@linkplain BlockEntityType block entity types}.
-     *
-     * @return the registry
-     * @since 1.0
-     */
-    @NonNull MinecraftRegistry<BlockEntityType> blockEntityTypeRegistry();
 }

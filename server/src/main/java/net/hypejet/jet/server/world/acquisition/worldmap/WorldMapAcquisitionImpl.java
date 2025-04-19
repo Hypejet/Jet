@@ -19,11 +19,11 @@ import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
 import net.hypejet.jet.world.acquisition.worldmap.WorldMapAcquisition;
-import net.hypejet.jet.world.block.entity.BlockEntity;
 import net.hypejet.jet.world.coordinate.BiomePosition;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
@@ -79,7 +79,7 @@ public class WorldMapAcquisitionImpl implements WorldMapAcquisition {
     }
 
     @Override
-    public @Nullable BlockEntity getOptionalBlockEntity(@NonNull BlockPosition position) {
+    public @Nullable CompoundBinaryTag getOptionalBlockEntity(@NonNull BlockPosition position) {
         JetChunk chunk = this.chunkOrNull(ChunkPositionUtil.fromCoordinate(position));
         if (chunk == null)
             return null;
@@ -170,15 +170,16 @@ public class WorldMapAcquisitionImpl implements WorldMapAcquisition {
     }
 
     /**
-     * Gets {@linkplain BlockEntity a block entity} of a block at {@linkplain BlockPosition a block position}
+     * Gets data of a block entity of a block at {@linkplain BlockPosition a block position}
      * specified in {@linkplain JetChunk a chunk} specified.
      *
      * @param position the block position
      * @param chunk the chunk
-     * @return the block entity, {@code null} if the block does not have a block entity
+     * @return the block entity data, {@code null} if the block does not have a block entity
      * @since 1.0
      */
-    protected static @Nullable BlockEntity blockEntity(@NonNull BlockPosition position, @NonNull JetChunk chunk) {
+    protected static @Nullable CompoundBinaryTag blockEntity(@NonNull BlockPosition position,
+                                                             @NonNull JetChunk chunk) {
         ChunkRelativeBlockPosition chunkRelativePosition = ChunkRelativePositionUtil.from(position);
         return chunk.blockEntities().get(chunkRelativePosition);
     }
@@ -224,9 +225,6 @@ public class WorldMapAcquisitionImpl implements WorldMapAcquisition {
     }
 
     private static @NonNull BlockState blockState(@NonNull BlockPosition position, @NonNull JetChunk chunk) {
-        ChunkRelativeBlockPosition chunkRelativePosition = ChunkRelativePositionUtil.from(position);
-        ChunkPaletteRelativePosition palettePosition = ChunkPaletteRelativePosition.from(chunkRelativePosition);
-        JetChunkSection chunkSection = chunk.chunkSectionList().sectionFor(chunkRelativePosition);
-        return chunkSection.blockStatePalette().getElement(palettePosition);
+        return chunk.blockState(ChunkRelativePositionUtil.from(position));
     }
 }
