@@ -16,12 +16,13 @@ import net.hypejet.jet.server.world.block.BlockType;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.light.JetLightSection;
 import net.hypejet.jet.server.world.chunk.light.LightSectionList;
-import net.hypejet.jet.server.world.chunk.light.storage.EmptyLightStorage;
+import net.hypejet.jet.server.world.chunk.light.storage.AbstractLightStorage;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.section.ChunkSectionList;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
+import net.hypejet.jet.util.array.NibbleArray;
 import net.hypejet.jet.world.chunk.builder.ChunkBuilder;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
@@ -363,6 +364,21 @@ public final class JetChunkBuilder implements ChunkBuilder<BlockState> {
      * @see JetLightSection
      */
     private static final class LightSectionBuilder {
+
+        private final NibbleArray.Builder skyLightArrayBuilder;
+        private final NibbleArray.Builder blockLightArrayBuilder;
+
+        /**
+         * Constructs the {@linkplain LightSectionBuilder light section builder}.
+         *
+         * @since 1.0
+         */
+        private LightSectionBuilder() {
+            short length = ChunkPaletteType.BLOCK_STATE.elementCount();
+            this.skyLightArrayBuilder = new NibbleArray.Builder(length);
+            this.blockLightArrayBuilder = new NibbleArray.Builder(length);
+        }
+
         /**
          * Sets a skylight level specified to be set
          * at {@linkplain ChunkPaletteRelativePosition a chunk-palette-relative position} specified.
@@ -372,7 +388,7 @@ public final class JetChunkBuilder implements ChunkBuilder<BlockState> {
          * @since 1.0
          */
         private void setSkyLight(@NonNull ChunkPaletteRelativePosition position, byte level) {
-            // TODO
+            this.skyLightArrayBuilder.set(AbstractChunkPalette.calculateElementIndex(position), level);
         }
 
         /**
@@ -384,7 +400,7 @@ public final class JetChunkBuilder implements ChunkBuilder<BlockState> {
          * @since 1.0
          */
         private void setBlockLight(@NonNull ChunkPaletteRelativePosition position, byte level) {
-            // TODO
+            this.blockLightArrayBuilder.set(AbstractChunkPalette.calculateElementIndex(position), level);
         }
 
         /**
@@ -394,8 +410,10 @@ public final class JetChunkBuilder implements ChunkBuilder<BlockState> {
          * @since 1.0
          */
         private @NonNull JetLightSection build() {
-            // TODO
-            return new JetLightSection(EmptyLightStorage.INSTANCE, EmptyLightStorage.INSTANCE);
+            return new JetLightSection(
+                    AbstractLightStorage.create(this.skyLightArrayBuilder.build()),
+                    AbstractLightStorage.create(this.blockLightArrayBuilder.build())
+            );
         }
     }
 }
