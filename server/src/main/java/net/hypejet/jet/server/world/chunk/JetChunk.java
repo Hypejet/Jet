@@ -1,8 +1,11 @@
 package net.hypejet.jet.server.world.chunk;
 
+import it.unimi.dsi.fastutil.objects.Object2ByteMap;
+import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState;
+import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.registry.blockstate.BlockStateRegistry;
@@ -14,17 +17,13 @@ import net.hypejet.jet.server.world.chunk.light.LightSectionList;
 import net.hypejet.jet.server.world.chunk.light.LightSerializationData;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.server.world.chunk.section.ChunkSectionList;
-import net.hypejet.jet.server.world.chunk.update.BiomeUpdate;
-import net.hypejet.jet.server.world.chunk.update.BlockEntityUpdate;
-import net.hypejet.jet.server.world.chunk.update.BlockStateUpdate;
-import net.hypejet.jet.server.world.chunk.update.LightUpdate;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.world.chunk.Chunk;
+import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -141,28 +140,37 @@ public final class JetChunk implements Chunk<BlockState> {
     /**
      * Creates {@linkplain JetChunk a chunk}, which is a copy of this chunk with updates specified applied.
      *
-     * @param blockStateUpdates updates that should be applied to block states
-     * @param blockEntityUpdates updates that should be applied to block entities
-     * @param biomeUpdates updates that should be applied to biomes
-     * @param lightUpdates updates that should be applied to light
+     * @param blockStateUpdates a map which maps chunk-relative block positions to new block states
+     *                          that should be present there
+     * @param blockEntityUpdates a map which maps chunk-relative block positions to new block entities that blocks
+     *                           at these block positions should have
+     * @param biomeUpdates a map which maps chunk-relative biome positions to registry entries of new biomes
+     *                     that should be present there
+     * @param skyLightUpdates a map which maps chunk-relative block positions to new skylight level values that blocks
+     *                        at these block positions should have
+     * @param blockLightUpdates a map which maps chunk-relative block positions to new block-light level values
+     *                          that blocks at these block positions should have
      * @return the chunk created
      * @since 1.0
      */
-    public @NonNull JetChunk withUpdates(@NonNull Collection<BlockStateUpdate> blockStateUpdates,
-                                         @NonNull Collection<BlockEntityUpdate> blockEntityUpdates,
-                                         @NonNull Collection<BiomeUpdate> biomeUpdates,
-                                         @NonNull Collection<LightUpdate> lightUpdates) { // TODO: Replace collections with maps
+    public @NonNull JetChunk withUpdates(
+            @NonNull Map<ChunkRelativeBlockPosition, BlockState> blockStateUpdates,
+            @NonNull Map<ChunkRelativeBlockPosition, CompoundBinaryTag> blockEntityUpdates,
+            @NonNull Map<ChunkRelativeBiomePosition, RegistryEntry<Biome>> biomeUpdates,
+            @NonNull Object2ByteMap<ChunkRelativeBlockPosition> skyLightUpdates,
+            @NonNull Object2ByteMap<ChunkRelativeBlockPosition> blockLightUpdates
+    ) {
         ChunkSectionList chunkSectionList = this.chunkSectionList.withUpdates(blockStateUpdates, biomeUpdates);
-        LightSectionList lightSectionList = this.lightSectionList.withUpdates(lightUpdates);
+        LightSectionList lightSectionList = this.lightSectionList.withUpdates(skyLightUpdates, blockLightUpdates);
 
         Set<HeightMap> heightMaps = new HashSet<>();
         for (HeightMap heightMap : this.heightMaps)
             heightMaps.add(heightMap.withUpdates(chunkSectionList, blockStateUpdates));
 
         Map<ChunkRelativeBlockPosition, CompoundBinaryTag> blockEntityDataMap = new HashMap<>(this.blockEntities);
-        for (BlockStateUpdate update : blockStateUpdates) {
-            ChunkRelativeBlockPosition position = update.position();
-            BlockState blockState = update.blockState();
+        for (Map.Entry<ChunkRelativeBlockPosition, BlockState> update : blockStateUpdates.entrySet()) {
+            ChunkRelativeBlockPosition position = update.getKey();
+            BlockState blockState = update.getValue();
 
             BlockStateRegistry blockStateRegistry = this.server.registryManager().blockStateRegistry();
             JetRegistryEntry<BlockType> blockTypeEntry = blockStateRegistry.blockType(blockState);
@@ -174,9 +182,7 @@ public final class JetChunk implements Chunk<BlockState> {
                 blockEntityDataMap.remove(position);
         }
 
-        for (BlockEntityUpdate update : blockEntityUpdates)
-            blockEntityDataMap.put(update.position(), update.blockEntity());
-
+        blockEntityDataMap.putAll(blockEntityUpdates);
         return new JetChunk(this.server, chunkSectionList, lightSectionList, heightMaps, blockEntityDataMap);
     }
 

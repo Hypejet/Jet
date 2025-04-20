@@ -1,8 +1,10 @@
 package net.hypejet.jet.server.world.update;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
+import it.unimi.dsi.fastutil.objects.Object2ByteMap;
+import it.unimi.dsi.fastutil.objects.Object2ByteOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.hypejet.concurrency.collection.CollectionAcquisition;
@@ -34,14 +36,9 @@ import net.hypejet.jet.server.world.block.BlockType;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.light.LightSectionList;
 import net.hypejet.jet.server.world.chunk.light.LightSerializationData;
-import net.hypejet.jet.server.world.chunk.light.LightType;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
-import net.hypejet.jet.server.world.chunk.update.BiomeUpdate;
-import net.hypejet.jet.server.world.chunk.update.BlockEntityUpdate;
-import net.hypejet.jet.server.world.chunk.update.BlockStateUpdate;
-import net.hypejet.jet.server.world.chunk.update.LightUpdate;
 import net.hypejet.jet.server.world.chunk.view.ChunkView;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
@@ -58,7 +55,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -73,14 +69,7 @@ import java.util.Set;
  */
 public final class JetWorldMapUpdate implements WorldMapUpdate {
 
-    private final Map<ChunkPosition, Map<ChunkRelativeBlockPosition, BlockStateUpdate>>
-            blockStateUpdates = new HashMap<>();
-    private final Map<ChunkPosition, Map<ChunkRelativeBlockPosition, BlockEntityUpdate>>
-            blockEntityUpdates = new HashMap<>();
-
-    private final Map<ChunkPosition, Map<ChunkRelativeBlockPosition, LightUpdate>> lightUpdates = new HashMap<>();
-    private final Map<ChunkPosition, Map<ChunkRelativeBiomePosition, BiomeUpdate>> biomeUpdates = new HashMap<>();
-
+    private final Map<ChunkPosition, ChunkUpdateBuilder> updateBuilders = new HashMap<>();
     private final WriteWorldMapAcquisitionImpl acquisition;
 
     /**
@@ -101,29 +90,13 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
     @Override
     public @NonNull WorldMapUpdate updateBlock(@NonNull BlockPosition position, @NonNull Key blockTypeKey,
                                                @Nullable Map<String, String> properties) {
-        JetRegistryManager registryManager = this.acquisition.world().server().registryManager();
-        JetRegistryEntry<BlockType> blockTypeEntry = registryManager.blockTypeRegistry().get(blockTypeKey);
+        NullabilityUtil.requireNonNull(position, "position");
+        NullabilityUtil.requireNonNull(blockTypeKey, "block type key");
 
-        if (blockTypeEntry == null) {
-            throw new IllegalArgumentException(String.format(
-                    "Could not find a block type with key of %s",
-                    blockTypeKey
-            ));
-        }
-
-        BlockType blockType = blockTypeEntry.value();
-        BlockState blockState;
-
-        if (properties == null) blockState = blockType.defaultState();
-        else blockState = blockType.state(properties);
-
-        ChunkRelativeBlockPosition chunkRelativePosition = ChunkRelativePositionUtil.from(position);
         ChunkPosition chunkPosition = ChunkPositionUtil.fromCoordinate(position);
+        ChunkRelativeBlockPosition relativePosition = ChunkRelativePositionUtil.from(position);
 
-        this.blockStateUpdates
-                .computeIfAbsent(chunkPosition, ignored -> new HashMap<>())
-                .put(chunkRelativePosition, new BlockStateUpdate(chunkRelativePosition, blockState));
-
+        this.updateBuilder(chunkPosition).updateBlockState(relativePosition, blockTypeKey, properties);
         return this;
     }
 
@@ -134,67 +107,56 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
         NullabilityUtil.requireNonNull(blockEntityData, "block entity data");
 
         ChunkPosition chunkPosition = ChunkPositionUtil.fromCoordinate(position);
-        ChunkRelativeBlockPosition chunkRelativePosition = ChunkRelativePositionUtil.from(position);
+        ChunkRelativeBlockPosition relativePosition = ChunkRelativePositionUtil.from(position);
 
-        this.blockEntityUpdates
-                .computeIfAbsent(chunkPosition, ignored -> new HashMap<>())
-                .put(chunkRelativePosition, new BlockEntityUpdate(chunkRelativePosition, blockEntityData));
-
+        this.updateBuilder(chunkPosition).updateBlockEntity(relativePosition, blockEntityData);
         return this;
     }
 
     @Override
     public @NonNull WorldMapUpdate updateBiome(@NonNull BiomePosition position,
                                                @NonNull RegistryEntry<Biome> biome) {
-        if (!(biome instanceof JetRegistryEntry<Biome> validatedBiome))
-            throw new IllegalArgumentException("The biome registry entry specified is not a valid registry entry");
+        NullabilityUtil.requireNonNull(position, "position");
+        NullabilityUtil.requireNonNull(biome, "biome");
 
         ChunkPosition chunkPosition = ChunkPositionUtil.fromBiomePosition(position);
-        ChunkRelativeBiomePosition chunkRelativePosition = ChunkRelativePositionUtil.from(position);
+        ChunkRelativeBiomePosition relativePosition = ChunkRelativePositionUtil.from(position);
 
-        this.biomeUpdates
-                .computeIfAbsent(chunkPosition, ignored -> new HashMap<>())
-                .put(chunkRelativePosition, new BiomeUpdate(chunkRelativePosition, validatedBiome));
-
+        this.updateBuilder(chunkPosition).updateBiome(relativePosition, biome);
         return this;
     }
 
     @Override
     public @NonNull WorldMapUpdate updateSkyLightLevel(@NonNull BlockPosition position, byte level) {
-        return this.updateLightLevel(position, level, LightType.SKY);
+        NullabilityUtil.requireNonNull(position, "position");
+
+        ChunkPosition chunkPosition = ChunkPositionUtil.fromCoordinate(position);
+        ChunkRelativeBlockPosition relativePosition = ChunkRelativePositionUtil.from(position);
+
+        this.updateBuilder(chunkPosition).updateSkyLightLevel(relativePosition, level);
+        return this;
     }
 
     @Override
     public @NonNull WorldMapUpdate updateBlockLightLevel(@NonNull BlockPosition position, byte level) {
-        return this.updateLightLevel(position, level, LightType.BLOCK);
+        NullabilityUtil.requireNonNull(position, "position");
+
+        ChunkPosition chunkPosition = ChunkPositionUtil.fromCoordinate(position);
+        ChunkRelativeBlockPosition relativePosition = ChunkRelativePositionUtil.from(position);
+
+        this.updateBuilder(chunkPosition).updateBlockLightLevel(relativePosition, level);
+        return this;
     }
 
     @Override
     public void update() {
-        Set<ChunkPosition> chunkPositions = new HashSet<>();
-
-        chunkPositions.addAll(this.blockStateUpdates.keySet());
-        chunkPositions.addAll(this.blockEntityUpdates.keySet());
-        chunkPositions.addAll(this.biomeUpdates.keySet());
-        chunkPositions.addAll(this.lightUpdates.keySet());
-
-        for (ChunkPosition chunkPosition : chunkPositions) {
-            JetChunk chunk = this.acquisition.getChunk(chunkPosition);
-
-            Collection<BlockStateUpdate> blockStateUpdates = values(this.blockStateUpdates, chunkPosition);
-            Collection<BlockEntityUpdate> blockEntityUpdates = values(this.blockEntityUpdates, chunkPosition);
-            Collection<BiomeUpdate> biomeUpdates = values(this.biomeUpdates, chunkPosition);
-            Collection<LightUpdate> lightUpdates = values(this.lightUpdates, chunkPosition);
-
-            // TODO: Remove updates that do not change anything
-
-            chunk = chunk.withUpdates(blockStateUpdates, blockEntityUpdates, biomeUpdates, lightUpdates);
-            this.acquisition.setChunk(chunkPosition, chunk);
-        }
+        // TODO: Remove updates that do not change anything
+        for (ChunkUpdateBuilder updateBuilder : this.updateBuilders.values())
+            this.acquisition.setChunk(updateBuilder.chunkPosition, updateBuilder.createUpdatedChunk());
 
         try (CollectionAcquisition<JetEntity, ?> entitiesAcquisition = this.acquisition.world().entities()) {
             Map<ChunkView, ServerUpdateBiomesPlayPacket> biomeUpdatePackets = new HashMap<>(); // TODO: Frame
-            Multimap<ChunkPosition, ServerPacket> updatePackets = ArrayListMultimap.create(); // TODO: Frame
+            Multimap<ChunkPosition, ServerPacket> blockAndLightUpdatePackets = ArrayListMultimap.create(); // TODO: Frame
 
             for (JetEntity entity : entitiesAcquisition.collection()) {
                 if (!(entity instanceof JetPlayer player)) continue;
@@ -205,10 +167,15 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
                     for (int chunkX = chunkView.minimumChunkX(); chunkX <= chunkView.maximumChunkX(); chunkX++) {
                         for (int chunkZ = chunkView.minimumChunkZ(); chunkZ <= chunkView.maximumChunkZ(); chunkZ++) {
                             ChunkPosition chunkPosition = new ChunkPosition(chunkX, chunkZ);
-                            if (!updatePackets.containsKey(chunkPosition))
-                                updatePackets.putAll(chunkPosition, this.createUpdatePackets(chunkPosition));
+                            if (!blockAndLightUpdatePackets.containsKey(chunkPosition)) {
+                                blockAndLightUpdatePackets.putAll(
+                                        chunkPosition,
+                                        this.updateBuilder(chunkPosition).createBlockAndLightUpdatePackets()
+                                );
+                            }
+
                             // TODO: Do not send packets for chunks that have not been sent yet
-                            updatePackets.get(chunkPosition).forEach(player::sendPacket);
+                            blockAndLightUpdatePackets.get(chunkPosition).forEach(player::sendPacket);
                         }
                     }
 
@@ -224,120 +191,260 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
         }
     }
 
-    private @NonNull List<ServerPacket> createUpdatePackets(@NonNull ChunkPosition chunkPosition) {
-        Collection<BlockStateUpdate> blockUpdates = values(this.blockStateUpdates, chunkPosition);
-        Collection<LightUpdate> lightUpdates = values(this.lightUpdates, chunkPosition);
-
-        if (blockUpdates.isEmpty() && lightUpdates.isEmpty())
-            return List.of();
-
-        List<ServerPacket> updatePackets = new ArrayList<>();
-
-        JetRegistryManager registryManager = this.acquisition.world().server().registryManager();
-        BlockStateRegistry blockStateRegistry = registryManager.blockStateRegistry();
-        JetMinecraftRegistry<BlockEntityType> blockEntityTypeRegistry = registryManager.blockEntityTypeRegistry();
-
-        Multimap<ChunkSectionPosition, BlockStateUpdate> sectionToBlockUpdateMap = HashMultimap.create();
-        for (BlockStateUpdate blockUpdate : blockUpdates) {
-            sectionToBlockUpdateMap.put(
-                    ChunkSectionPosition.from(
-                            chunkPosition,
-                            blockUpdate.position().absoluteY(),
-                            ChunkPaletteType.BLOCK_STATE
-                    ),
-                    blockUpdate
-            );
-        }
-
-        ElementOrder<BlockState> blockStateOrder = blockStateRegistry.order();
-        for (ChunkSectionPosition sectionPosition : sectionToBlockUpdateMap.keySet()) {
-            Collection<BlockStateUpdate> updates = sectionToBlockUpdateMap.get(sectionPosition);
-            if (updates.size() == 1) {
-                BlockStateUpdate update = updates.iterator().next();
-
-                BlockPosition blockPosition = AbsolutePositionUtil.from(update.position(), chunkPosition);
-                int blockStateIdentifier = blockStateOrder.identifierOf(update.blockState());
-
-                updatePackets.add(new ServerUpdateBlockStatePlayPacket(blockPosition, blockStateIdentifier));
-                continue;
-            }
-
-            Object2IntMap<ChunkPaletteRelativePosition> updateMap = new Object2IntOpenHashMap<>();
-            for (BlockStateUpdate update : updates) {
-                ChunkRelativeBlockPosition position = update.position();
-                ChunkPaletteRelativePosition palettePosition = ChunkPaletteRelativePosition.from(position);
-                updateMap.put(palettePosition, blockStateOrder.identifierOf(update.blockState()));
-            }
-
-            if (updateMap.isEmpty()) continue;
-            updatePackets.add(new ServerUpdateChunkSectionBlockStatesPlayPacket(sectionPosition, updateMap));
-        }
-
-        for (BlockEntityUpdate update : values(this.blockEntityUpdates, chunkPosition)) {
-            CompoundBinaryTag blockEntityData = update.blockEntity();
-
-            ChunkRelativeBlockPosition position = update.position();
-            JetChunk chunk = this.acquisition.getChunk(chunkPosition);
-            BlockState blockState = chunk.blockState(position);
-
-            JetRegistryEntry<BlockType> blockType = blockStateRegistry.blockType(blockState);
-            JetRegistryEntry<BlockEntityType> blockEntityType = blockType.value().blockEntityType();
-
-            if (blockEntityType == null) {
-                throw new IllegalArgumentException(String.format(
-                        "Block type with key of %s cannot have a block entity",
-                        blockType.key()
-                ));
-            }
-
-            updatePackets.add(new ServerUpdateBlockEntityPlayPacket(
-                    AbsolutePositionUtil.from(position, chunkPosition),
-                    blockEntityTypeRegistry.identifierOf(blockEntityType),
-                    blockEntityData
-            ));
-        }
-
-        if (!lightUpdates.isEmpty()) {
-            DimensionType dimensionType = this.acquisition.world().dimensionType().value();
-            LightSectionList sectionList = this.acquisition.getChunk(chunkPosition).lightSectionList();
-            LightSerializationData data = LightSerializationData.create(lightUpdates, sectionList, dimensionType);
-            updatePackets.add(new ServerUpdateLightPlayPacket(chunkPosition, data));
-        }
-
-        return updatePackets;
-    }
-
     private @Nullable ServerUpdateBiomesPlayPacket createBiomeUpdatePacket(@NonNull ChunkView chunkView) {
         Set<ServerUpdateBiomesPlayPacket.BiomeData> biomeData = new HashSet<>();
-        for (ChunkPosition chunkPosition : this.biomeUpdates.keySet()) {
-            if (!chunkView.isInView(chunkPosition)) continue;
-            JetChunk chunk = this.acquisition.getChunk(chunkPosition);
 
-            List<AbstractChunkPalette<RegistryEntry<Biome>>> palettes = new ArrayList<>();
-            for (JetChunkSection section : chunk.sections())
-                palettes.add(section.biomePalette());
+        for (int chunkX = chunkView.minimumChunkX(); chunkX <= chunkView.maximumChunkX(); chunkX++) {
+            for (int chunkZ = chunkView.minimumChunkZ(); chunkZ <= chunkView.maximumChunkZ(); chunkZ++) {
+                ChunkPosition chunkPosition = new ChunkPosition(chunkX, chunkZ);
+                ChunkUpdateBuilder updateBuilder = this.updateBuilders.get(chunkPosition);
 
-            biomeData.add(new ServerUpdateBiomesPlayPacket.BiomeData(chunkPosition, palettes));
+                if (updateBuilder == null) continue;
+                if (updateBuilder.biomeUpdates.isEmpty()) continue;
+
+                JetChunk chunk = this.acquisition.getChunk(chunkPosition);
+                List<AbstractChunkPalette<RegistryEntry<Biome>>> palettes = new ArrayList<>();
+
+                for (JetChunkSection section : chunk.sections())
+                    palettes.add(section.biomePalette());
+                biomeData.add(new ServerUpdateBiomesPlayPacket.BiomeData(chunkPosition, palettes));
+            }
         }
 
         if (biomeData.isEmpty()) return null;
         return new ServerUpdateBiomesPlayPacket(biomeData);
     }
 
-    private @NonNull WorldMapUpdate updateLightLevel(@NonNull BlockPosition position, byte level,
-                                                     @NonNull LightType lightType) {
-        ChunkPosition chunkPosition = ChunkPositionUtil.fromCoordinate(position);
-        ChunkRelativeBlockPosition chunkRelativePosition = ChunkRelativePositionUtil.from(position);
-
-        this.lightUpdates
-                .computeIfAbsent(chunkPosition, ignored -> new HashMap<>())
-                .put(chunkRelativePosition, new LightUpdate(chunkRelativePosition, level, lightType));
-
-        return this;
+    private @NonNull ChunkUpdateBuilder updateBuilder(@NonNull ChunkPosition chunkPosition) {
+        return this.updateBuilders.computeIfAbsent(
+                chunkPosition,
+                ignored -> new ChunkUpdateBuilder(chunkPosition, this.acquisition)
+        );
     }
 
-    private static <K1, K2, V> @NonNull Collection<V> values(@NonNull Map<K1, Map<K2, V>> map, @NonNull K1 key) {
-        Map<K2, V> internalMap = map.get(key);
-        return internalMap == null ? Set.of() : internalMap.values();
+    /**
+     * Represents builder of an update of {@linkplain JetChunk a chunk}.
+     *
+     * @since 1.0
+     * @see JetChunk
+     */
+    private static final class ChunkUpdateBuilder {
+
+        private final ChunkPosition chunkPosition;
+        private final WriteWorldMapAcquisitionImpl acquisition;
+
+        private final Map<ChunkRelativeBlockPosition, BlockState> blockStateUpdates = new HashMap<>();
+        private final Map<ChunkRelativeBlockPosition, CompoundBinaryTag> blockEntityUpdates = new HashMap<>();
+        private final Map<ChunkRelativeBiomePosition, RegistryEntry<Biome>> biomeUpdates = new HashMap<>();
+
+        private final Object2ByteMap<ChunkRelativeBlockPosition> skyLightUpdates = new Object2ByteOpenHashMap<>();
+        private final Object2ByteMap<ChunkRelativeBlockPosition> blockLightUpdates = new Object2ByteOpenHashMap<>();
+
+        /**
+         * Constructs the {@linkplain ChunkUpdateBuilder chunk update builder}.
+         *
+         * @param chunkPosition a chunk position of the chunk that is being updated
+         * @param acquisition a write acquisition of a world map that the chunk belongs to
+         * @since 1.0
+         */
+        private ChunkUpdateBuilder(@NonNull ChunkPosition chunkPosition,
+                                   @NonNull WriteWorldMapAcquisitionImpl acquisition) {
+            this.chunkPosition = NullabilityUtil.requireNonNull(chunkPosition, "chunk position");
+            this.acquisition = NullabilityUtil.requireNonNull(acquisition, "acquisition");
+        }
+
+        /**
+         * Sets {@linkplain BlockState a block state}
+         * at {@linkplain ChunkRelativeBlockPosition a chunk-relative block position} specified to be updated
+         * with {@linkplain BlockState a block state} with values specified.
+         *
+         * @param position the chunk-relative block positions
+         * @param blockTypeKey a block type of the block state
+         * @param properties properties of the block state, {@code null} is a default block state of the block type
+         *                   should be used
+         * @since 1.0
+         */
+        private void updateBlockState(@NonNull ChunkRelativeBlockPosition position, @NonNull Key blockTypeKey,
+                                      @Nullable Map<String, String> properties) {
+            JetRegistryManager registryManager = this.acquisition.world().server().registryManager();
+            JetMinecraftRegistry<BlockType> blockTypeRegistry = registryManager.blockTypeRegistry();
+
+            JetRegistryEntry<BlockType> blockTypeEntry = blockTypeRegistry.get(blockTypeKey);
+            if (blockTypeEntry == null) {
+                throw new IllegalArgumentException(String.format(
+                        "Could not find a block type with key of %s",
+                        blockTypeKey
+                ));
+            }
+
+            BlockType blockType = blockTypeEntry.value();
+            BlockState blockState = properties == null ? blockType.defaultState() : blockType.state(properties);
+            this.blockStateUpdates.put(position, blockState);
+        }
+
+        /**
+         * Sets block entity of a block at {@linkplain ChunkRelativeBlockPosition a chunk-relative block position}
+         * specified to be updated with a block entity data specified.
+         *
+         * @param position the chunk-relative block position
+         * @param blockEntityData the block entity data
+         * @since 1.0
+         */
+        private void updateBlockEntity(@NonNull ChunkRelativeBlockPosition position,
+                                       @NonNull CompoundBinaryTag blockEntityData) {
+            this.blockEntityUpdates.put(position, blockEntityData);
+        }
+
+        /**
+         * Sets {@linkplain Biome a biome} at {@linkplain ChunkRelativeBiomePosition a chunk-relative biome position}
+         * specified to be updated with a value specified.
+         *
+         * @param position the chunk-relative biome position
+         * @param biome a registry entry of a biome that the biome should be replaced with
+         * @since 1.0
+         */
+        private void updateBiome(@NonNull ChunkRelativeBiomePosition position, @NonNull RegistryEntry<Biome> biome) {
+            if (!(biome instanceof JetRegistryEntry<Biome>))
+                throw new IllegalArgumentException("The biome registry entry specified is not a valid registry entry");
+            this.biomeUpdates.put(position, biome);
+        }
+
+        /**
+         * Sets a skylight level value of a block
+         * at {@linkplain ChunkRelativeBlockPosition a chunk-relative block position} specified to be updated
+         * with a value specified.
+         *
+         * @param position the chunk-relative block position
+         * @param level the value
+         * @since 1.0
+         */
+        private void updateSkyLightLevel(@NonNull ChunkRelativeBlockPosition position, byte level) {
+            this.skyLightUpdates.put(position, level);
+        }
+
+        /**
+         * Sets a block light level value of a block
+         * at {@linkplain ChunkRelativeBlockPosition a chunk-relative block position} specified to be updated
+         * with a value specified.
+         *
+         * @param position the chunk-relative block position
+         * @param level the value
+         * @since 1.0
+         */
+        private void updateBlockLightLevel(@NonNull ChunkRelativeBlockPosition position, byte level) {
+            this.blockLightUpdates.put(position, level);
+        }
+
+        /**
+         * Creates an updated {@linkplain JetChunk chunk} with updates specified
+         * in this {@linkplain ChunkUpdateBuilder chunk update builder}.
+         *
+         * @return the chunk
+         * @since 1.0
+         */
+        private @NonNull JetChunk createUpdatedChunk() {
+            return this.acquisition.getChunk(this.chunkPosition).withUpdates(
+                    this.blockStateUpdates, this.blockEntityUpdates, this.biomeUpdates,
+                    this.skyLightUpdates, this.blockLightUpdates
+            );
+        }
+
+        /**
+         * Creates {@linkplain List a list} of {@linkplain ServerPacket server packets} which request
+         * clients to perform updates specified in this {@linkplain ChunkUpdateBuilder chunk update builder}.
+         *
+         * @return the list
+         * @since 1.0
+         */
+        private @NonNull List<ServerPacket> createBlockAndLightUpdatePackets() {
+            List<ServerPacket> packets = new ArrayList<>();
+
+            if (
+                    this.blockStateUpdates.isEmpty() && this.blockEntityUpdates.isEmpty()
+                    && this.skyLightUpdates.isEmpty() && this.blockLightUpdates.isEmpty()
+            ) {
+                return List.of();
+            }
+
+            JetRegistryManager registryManager = this.acquisition.world().server().registryManager();
+            BlockStateRegistry blockStateRegistry = registryManager.blockStateRegistry();
+            JetMinecraftRegistry<BlockEntityType> blockEntityTypeRegistry = registryManager.blockEntityTypeRegistry();
+
+            Map<ChunkSectionPosition, Map<ChunkRelativeBlockPosition, BlockState>> sectionUpdates = new HashMap<>();
+            for (Map.Entry<ChunkRelativeBlockPosition, BlockState> blockUpdate : this.blockStateUpdates.entrySet()) {
+                ChunkSectionPosition chunkSectionPosition = ChunkSectionPosition.from(
+                        this.chunkPosition,
+                        blockUpdate.getKey().absoluteY(),
+                        ChunkPaletteType.BLOCK_STATE
+                );
+
+                sectionUpdates.computeIfAbsent(chunkSectionPosition, ignored -> new HashMap<>()).put(
+                        blockUpdate.getKey(),
+                        blockUpdate.getValue()
+                );
+            }
+
+            ElementOrder<BlockState> blockStateOrder = blockStateRegistry.order();
+            for (ChunkSectionPosition sectionPosition : sectionUpdates.keySet()) {
+                Map<ChunkRelativeBlockPosition, BlockState> updates = sectionUpdates.get(sectionPosition);
+                if (updates.size() == 1) {
+                    Map.Entry<ChunkRelativeBlockPosition, BlockState> update = updates.entrySet().iterator().next();
+
+                    BlockPosition blockPosition = AbsolutePositionUtil.from(update.getKey(), this.chunkPosition);
+                    int blockStateIdentifier = blockStateOrder.identifierOf(update.getValue());
+
+                    packets.add(new ServerUpdateBlockStatePlayPacket(blockPosition, blockStateIdentifier));
+                    continue;
+                }
+
+                Object2IntMap<ChunkPaletteRelativePosition> updateMap = new Object2IntOpenHashMap<>();
+                for (Map.Entry<ChunkRelativeBlockPosition, BlockState> entry : updates.entrySet()) {
+                    ChunkRelativeBlockPosition position = entry.getKey();
+                    ChunkPaletteRelativePosition palettePosition = ChunkPaletteRelativePosition.from(position);
+                    updateMap.put(palettePosition, blockStateOrder.identifierOf(entry.getValue()));
+                }
+
+                if (updateMap.isEmpty()) continue;
+                packets.add(new ServerUpdateChunkSectionBlockStatesPlayPacket(sectionPosition, updateMap));
+            }
+
+            for (Map.Entry<ChunkRelativeBlockPosition, CompoundBinaryTag> update : blockEntityUpdates.entrySet()) {
+                ChunkRelativeBlockPosition position = update.getKey();
+                CompoundBinaryTag blockEntityData = update.getValue();
+
+                JetChunk chunk = this.acquisition.getChunk(this.chunkPosition);
+                BlockState blockState = chunk.blockState(position);
+
+                JetRegistryEntry<BlockType> blockType = blockStateRegistry.blockType(blockState);
+                JetRegistryEntry<BlockEntityType> blockEntityType = blockType.value().blockEntityType();
+
+                if (blockEntityType == null) {
+                    throw new IllegalArgumentException(String.format(
+                            "Block type with key of %s cannot have a block entity",
+                            blockType.key()
+                    ));
+                }
+
+                packets.add(new ServerUpdateBlockEntityPlayPacket(
+                        AbsolutePositionUtil.from(position, this.chunkPosition),
+                        blockEntityTypeRegistry.identifierOf(blockEntityType),
+                        blockEntityData
+                ));
+            }
+
+            if (!this.skyLightUpdates.isEmpty() || !this.blockLightUpdates.isEmpty()) {
+                DimensionType dimensionType = this.acquisition.world().dimensionType().value();
+                LightSectionList sectionList = this.acquisition.getChunk(this.chunkPosition).lightSectionList();
+
+                LightSerializationData data = LightSerializationData.create(
+                        Sets.union(this.skyLightUpdates.keySet(), this.blockLightUpdates.keySet()),
+                        sectionList, dimensionType
+                );
+
+                packets.add(new ServerUpdateLightPlayPacket(this.chunkPosition, data));
+            }
+
+            return packets;
+        }
     }
 }

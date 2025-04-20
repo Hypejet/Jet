@@ -10,8 +10,6 @@ import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
-import net.hypejet.jet.server.world.chunk.update.BiomeUpdate;
-import net.hypejet.jet.server.world.chunk.update.BlockStateUpdate;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
@@ -19,8 +17,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.Contract;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
@@ -119,19 +117,20 @@ public final class ChunkSectionList {
     }
 
     /**
-     * Creates a copy of this {@linkplain ChunkSectionList chunk section list}
-     * with {@linkplain BlockStateUpdate block state updates} and {@linkplain BiomeUpdate biome updates}
+     * Creates a copy of this {@linkplain ChunkSectionList chunk section list} with block state and biome updates
      * specified applied.
      *
-     * @param blockStateUpdates the block state updates
-     * @param biomeUpdates the biome updates
+     * @param blockStateUpdates a map which maps chunk-relative block positions to new block states
+     *                          that should be present there
+     * @param biomeUpdates a map which maps chunk-relative biome positions to registry entries of new biomes
+     *                     that should be present there
      * @return the copy
      * @since 1.0
      */
     @Contract(pure = true)
     public @NonNull ChunkSectionList withUpdates(
-            @NonNull Collection<BlockStateUpdate> blockStateUpdates,
-            @NonNull Collection<BiomeUpdate> biomeUpdates
+            @NonNull Map<ChunkRelativeBlockPosition, BlockState> blockStateUpdates,
+            @NonNull Map<ChunkRelativeBiomePosition, RegistryEntry<Biome>> biomeUpdates
     ) {
         if (blockStateUpdates.isEmpty() && biomeUpdates.isEmpty())
             return this;
@@ -142,17 +141,13 @@ public final class ChunkSectionList {
         IntObjectMap<List<ChunkPaletteUpdate<RegistryEntry<Biome>>>> biomePaletteUpdates;
 
         blockStatePaletteUpdates = createChunkSectionPaletteUpdateMap(
-                blockStateUpdates, this.dimensionType,
-                update -> update.position().absoluteY(),
-                update -> ChunkPaletteRelativePosition.from(update.position()),
-                BlockStateUpdate::blockState, ChunkPaletteType.BLOCK_STATE
+                blockStateUpdates, this.dimensionType, ChunkRelativeBlockPosition::absoluteY,
+                ChunkPaletteRelativePosition::from, ChunkPaletteType.BLOCK_STATE
         );
 
         biomePaletteUpdates = createChunkSectionPaletteUpdateMap(
-                biomeUpdates, this.dimensionType,
-                update -> update.position().absoluteY(),
-                update -> ChunkPaletteRelativePosition.from(update.position()),
-                BiomeUpdate::biome, ChunkPaletteType.BIOME
+                biomeUpdates, this.dimensionType, ChunkRelativeBiomePosition::absoluteY,
+                ChunkPaletteRelativePosition::from, ChunkPaletteType.BIOME
         );
 
         boolean sectionListUpdated = false;
@@ -224,16 +219,19 @@ public final class ChunkSectionList {
         return Math.floorDiv(coordinateMultiplier * y, blockStatePaletteAxisLength);
     }
 
-    private static <E, U> @NonNull IntObjectMap<List<ChunkPaletteUpdate<E>>> createChunkSectionPaletteUpdateMap(
-            @NonNull Collection<U> updates, @NonNull DimensionType dimensionType,
-            @NonNull ToIntFunction<U> updateToAbsoluteYFunction,
-            @NonNull Function<U, ChunkPaletteRelativePosition> updateToPaletteRelativePosition,
-            @NonNull Function<U, E> elementFunction, @NonNull ChunkPaletteType paletteType
+    private static <E, P> @NonNull IntObjectMap<List<ChunkPaletteUpdate<E>>> createChunkSectionPaletteUpdateMap(
+            @NonNull Map<P, E> updates, @NonNull DimensionType dimensionType,
+            @NonNull ToIntFunction<P> positionToAbsoluteYFunction,
+            @NonNull Function<P, ChunkPaletteRelativePosition> positionToPaletteRelativePosition,
+            @NonNull ChunkPaletteType paletteType
     ) {
         IntObjectMap<List<ChunkPaletteUpdate<E>>> map = new IntObjectHashMap<>();
 
-        for (U update : updates) {
-            int absoluteY = updateToAbsoluteYFunction.applyAsInt(update);
+        for (Map.Entry<P, E> update : updates.entrySet()) {
+            P position = update.getKey();
+            E element = update.getValue();
+
+            int absoluteY = positionToAbsoluteYFunction.applyAsInt(position);
 
             int sectionY = createSectionY(absoluteY, paletteType);
             int sectionIndex = createSectionIndex(sectionY, dimensionType);
@@ -247,8 +245,8 @@ public final class ChunkSectionList {
             }
 
             paletteUpdates.add(new ChunkPaletteUpdate<>(
-                    updateToPaletteRelativePosition.apply(update),
-                    elementFunction.apply(update)
+                    positionToPaletteRelativePosition.apply(position),
+                    element
             ));
         }
 

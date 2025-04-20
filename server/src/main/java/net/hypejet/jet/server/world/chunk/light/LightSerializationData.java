@@ -12,7 +12,6 @@ import net.hypejet.jet.server.world.chunk.light.storage.EmptyLightStorage;
 import net.hypejet.jet.server.world.chunk.light.storage.AbstractLightStorage;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.section.ChunkSectionList;
-import net.hypejet.jet.server.world.chunk.update.LightUpdate;
 import net.hypejet.jet.util.array.NibbleArray;
 import net.hypejet.jet.util.bitset.UnmodifiableBitSet;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
@@ -20,9 +19,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Represents a packet serialization data of light of {@linkplain JetChunk a chunk}.
@@ -205,22 +204,21 @@ public final class LightSerializationData {
     }
 
     /**
-     * Creates {@linkplain LightSerializationData a light serialization data} containing
-     * {@linkplain LightUpdate light updates} specified.
+     * Creates {@linkplain LightSerializationData a light serialization data} acknowledging light updates of blocks
+     * with {@linkplain ChunkRelativeBlockPosition chunk-relative block positions} specified.
      *
-     * @param lightUpdates the light updates
-     * @param updatedChunkSectionList a light section list with light updates specified performed
+     * @param affectedBlockPositions the chunk-relative block positions
+     * @param updatedChunkSectionList a light section list with the light updates specified performed
      * @param dimensionType a dimension type of world of a chunk that the light serialization data is created for
      * @return the light serialization data
      * @since 1.0
      */
-    public static @NonNull LightSerializationData create(@NonNull Collection<LightUpdate> lightUpdates,
-                                                         @NonNull LightSectionList updatedChunkSectionList,
-                                                         @NonNull DimensionType dimensionType) {
+    public static @NonNull LightSerializationData create(
+            @NonNull Set<ChunkRelativeBlockPosition> affectedBlockPositions,
+            @NonNull LightSectionList updatedChunkSectionList, @NonNull DimensionType dimensionType
+    ) {
         Int2ObjectMap<JetLightSection> indexToSectionMap = new Int2ObjectOpenHashMap<>();
-        for (LightUpdate lightUpdate : lightUpdates) {
-            ChunkRelativeBlockPosition position = lightUpdate.position();
-
+        for (ChunkRelativeBlockPosition position : affectedBlockPositions) {
             int sectionY = ChunkSectionList.createSectionY(position.absoluteY(), ChunkPaletteType.BLOCK_STATE);
             int index = LightSectionList.createSectionIndex(sectionY, dimensionType);
 

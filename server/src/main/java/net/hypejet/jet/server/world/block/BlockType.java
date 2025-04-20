@@ -42,7 +42,6 @@ public final class BlockType {
         NullabilityUtil.requireNonNull(defaultBlockState, "default block state");
         NullabilityUtil.requireNonNull(requiredFeatureFlags, "required feature flags");
         NullabilityUtil.requireNonNull(possibleBlockStates, "possible state entries");
-        NullabilityUtil.requireNonNull(blockEntityType, "block entity type");
 
         Map<Map<String, String>, BlockState> possibleStates = new HashMap<>();
         for (BlockState state : possibleBlockStates)

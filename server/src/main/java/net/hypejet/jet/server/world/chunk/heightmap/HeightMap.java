@@ -13,13 +13,12 @@ import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.server.world.chunk.section.ChunkSectionList;
-import net.hypejet.jet.server.world.chunk.update.BlockStateUpdate;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.Contract;
 
-import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -92,24 +91,24 @@ public final class HeightMap {
     }
 
     /**
-     * Creates a new copy of this {@linkplain HeightMap height map}, which takes into account
-     * {@linkplain BlockStateUpdate block state updates} specified.
+     * Creates a new copy of this {@linkplain HeightMap height map}, which takes into account block state updates
+     * specified.
      *
      * @param chunkSectionList a chunk section list with the updates taken into account, used when a new height
      *                         needs to be found
-     * @param updates the block state updates
+     * @param updates a map which maps chunk-relative block positions to new block states that should be present there
      * @return the new height map
      * @since 1.0
      */
     @Contract(pure = true)
     public @NonNull HeightMap withUpdates(@NonNull ChunkSectionList chunkSectionList,
-                                          @NonNull Collection<BlockStateUpdate> updates) {
+                                          @NonNull Map<ChunkRelativeBlockPosition, BlockState> updates) {
         if (updates.isEmpty())
             return this;
 
         Int2ObjectMap<BitStorageUpdate> dataUpdates = new Int2ObjectOpenHashMap<>();
-        for (BlockStateUpdate update : updates) {
-            ChunkRelativeBlockPosition position = update.position();
+        for (Map.Entry<ChunkRelativeBlockPosition, BlockState> update : updates.entrySet()) {
+            ChunkRelativeBlockPosition position = update.getKey();
 
             byte blockX = position.relativeX();
             byte blockZ = position.relativeZ();
@@ -121,7 +120,7 @@ public final class HeightMap {
                 continue;
 
             int elementIndex = createElementIndex(blockX, blockZ);
-            if (this.type.isOpaque(update.blockState())) {
+            if (this.type.isOpaque(update.getValue())) {
                 int element = toElement(newBlockY, this.dimensionType);
                 dataUpdates.put(elementIndex, new BitStorageUpdate(elementIndex, element));
                 continue;

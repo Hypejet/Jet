@@ -2,6 +2,7 @@ package net.hypejet.jet.server.world.chunk.light;
 
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ByteMap;
 import net.hypejet.concurrency.empty.EmptyAcquirable;
 import net.hypejet.concurrency.empty.EmptyAcquisition;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
@@ -10,7 +11,6 @@ import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.light.update.LightStorageUpdate;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.section.ChunkSectionList;
-import net.hypejet.jet.server.world.chunk.update.LightUpdate;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
@@ -19,9 +19,10 @@ import org.jetbrains.annotations.Contract;
 
 import javax.annotation.concurrent.GuardedBy;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Represents a storage of {@linkplain JetLightSection light sections} of {@linkplain JetChunk a chunk}.
@@ -125,58 +126,41 @@ public final class LightSectionList {
     /**
      * Creates a copy of this {@linkplain LightSectionList light section list} with updates specified applied.
      *
-     * @param updates the updates
+     * @param skyLightUpdates a map which maps chunk-relative block positions to skylight level values that blocks
+     *                        located at these positions should have
+     * @param blockLightUpdates a map which maps chunk-relative block positions to block light level values that blocks
+     *                          located at these positions should have
      * @return the copy
      * @since 1.0
      */
     @Contract(pure = true)
-    public @NonNull LightSectionList withUpdates(@NonNull Collection<LightUpdate> updates) {
-        if (updates.isEmpty())
+    public @NonNull LightSectionList withUpdates(
+            @NonNull Object2ByteMap<ChunkRelativeBlockPosition> skyLightUpdates,
+            @NonNull Object2ByteMap<ChunkRelativeBlockPosition> blockLightUpdates
+    ) {
+        if (skyLightUpdates.isEmpty() && blockLightUpdates.isEmpty())
             return this;
 
         List<JetLightSection> sections = new ArrayList<>(this.sections);
 
-        IntObjectMap<List<LightStorageUpdate>> indexToSkyLightUpdateMap = new IntObjectHashMap<>();
-        IntObjectMap<List<LightStorageUpdate>> indexToBlockLightUpdateMap = new IntObjectHashMap<>();
-
-        for (LightUpdate update : updates) {
-            ChunkRelativeBlockPosition position = update.position();
-
-            int sectionY = ChunkSectionList.createSectionY(position.absoluteY(), ChunkPaletteType.BLOCK_STATE);
-            int sectionIndex = createSectionIndex(sectionY, this.dimensionType);
-
-            IntObjectMap<List<LightStorageUpdate>> indexToLightUpdateMap = switch (update.lightType()) {
-                case SKY -> indexToSkyLightUpdateMap;
-                case BLOCK -> indexToBlockLightUpdateMap;
-            };
-
-            List<LightStorageUpdate> lightStorageUpdates;
-            if (indexToLightUpdateMap.containsKey(sectionIndex)) {
-                lightStorageUpdates = indexToLightUpdateMap.get(sectionIndex);
-            } else {
-                lightStorageUpdates = new ArrayList<>();
-                indexToLightUpdateMap.put(sectionIndex, lightStorageUpdates);
-            }
-
-            ChunkPaletteRelativePosition paletteRelativePosition = ChunkPaletteRelativePosition.from(position);
-            lightStorageUpdates.add(new LightStorageUpdate(paletteRelativePosition, update.lightValue()));
-        }
+        IntObjectMap<Set<LightStorageUpdate>> skyLightUpdatesMap = createIndexToLightUpdatesMap(skyLightUpdates);
+        IntObjectMap<Set<LightStorageUpdate>> blockLightUpdatesMap = createIndexToLightUpdatesMap(blockLightUpdates);
 
         boolean sectionListUpdated = false;
         for (int index = 0; index < sections.size(); index++) {
-            List<LightStorageUpdate> skyLightUpdates = indexToSkyLightUpdateMap.get(index);
-            List<LightStorageUpdate> blockLightUpdates = indexToBlockLightUpdateMap.get(index);
+            Set<LightStorageUpdate> skyLightStorageUpdates = skyLightUpdatesMap.get(index);
+            Set<LightStorageUpdate> blockLightStorageUpdates = blockLightUpdatesMap.get(index);
 
-            if (skyLightUpdates == null && blockLightUpdates == null)
+            if (skyLightStorageUpdates == null && blockLightStorageUpdates == null)
                 continue;
 
-            if (skyLightUpdates == null)
-                skyLightUpdates = List.of();
-            if (blockLightUpdates == null)
-                blockLightUpdates = List.of();
+            if (skyLightStorageUpdates == null)
+                skyLightStorageUpdates = Set.of();
+            if (blockLightStorageUpdates == null)
+                blockLightStorageUpdates = Set.of();
 
             JetLightSection section = sections.get(index);
-            JetLightSection updatedSection = section.withUpdates(skyLightUpdates, blockLightUpdates);
+            JetLightSection updatedSection = section.withUpdates(skyLightStorageUpdates, blockLightStorageUpdates);
 
             if (section.equals(updatedSection))
                 continue;
@@ -239,5 +223,27 @@ public final class LightSectionList {
         /* The result is a sum of chunk section index with 1, since there is one light section that is present
            below lowest chunk section and one light section that is present above highest chunk section. */
         return ChunkSectionList.createSectionIndex(sectionY, dimensionType) + 1;
+    }
+
+    private @NonNull IntObjectMap<Set<LightStorageUpdate>> createIndexToLightUpdatesMap(
+            @NonNull Object2ByteMap<ChunkRelativeBlockPosition> updates
+    ) {
+        IntObjectMap<Set<LightStorageUpdate>> indexToLightUpdatesMap = new IntObjectHashMap<>();
+        for (Object2ByteMap.Entry<ChunkRelativeBlockPosition> entry : updates.object2ByteEntrySet()) {
+            ChunkRelativeBlockPosition position = entry.getKey();
+
+            int sectionY = ChunkSectionList.createSectionY(position.absoluteY(), ChunkPaletteType.BLOCK_STATE);
+            int sectionIndex = createSectionIndex(sectionY, this.dimensionType);
+
+            Set<LightStorageUpdate> storageUpdates = indexToLightUpdatesMap.get(sectionIndex);
+            if (storageUpdates == null) {
+                storageUpdates = new HashSet<>();
+                indexToLightUpdatesMap.put(sectionIndex, storageUpdates);
+            }
+
+            ChunkPaletteRelativePosition palettePosition = ChunkPaletteRelativePosition.from(position);
+            storageUpdates.add(new LightStorageUpdate(palettePosition, entry.getByteValue()));
+        }
+        return indexToLightUpdatesMap;
     }
 }
