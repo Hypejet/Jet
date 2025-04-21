@@ -23,6 +23,7 @@ import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBiomePositio
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -200,6 +201,59 @@ public final class JetChunk implements Chunk<BlockState> {
         return chunkSection.blockStatePalette().getElement(palettePosition);
     }
 
+    /**
+     * Gets {@linkplain RegistryEntry a registry entry} of {@linkplain Biome a biome} which is in this
+     * {@linkplain JetChunk chunk} at {@linkplain ChunkRelativeBiomePosition a chunk-relative biome position}
+     * specified.
+     *
+     * @param position the chunk-relative biome position
+     * @return the registry entry
+     * @since 1.0
+     */
+    public @NonNull RegistryEntry<Biome> biome(@NonNull ChunkRelativeBiomePosition position) {
+        JetChunkSection chunkSection = this.chunkSectionList.sectionFor(position);
+        ChunkPaletteRelativePosition palettePosition = ChunkPaletteRelativePosition.from(position);
+        return chunkSection.biomePalette().getElement(palettePosition);
+    }
+
+    /**
+     * Gets data of a block entity of a block which is in this {@linkplain JetChunk chunk}
+     * at {@linkplain ChunkRelativeBlockPosition a chunk-relative block position} specified.
+     *
+     * @param position the chunk-relative block position
+     * @return the block entity data
+     * @since 1.0
+     */
+    public @Nullable CompoundBinaryTag blockEntityData(@NonNull ChunkRelativeBlockPosition position) {
+        return this.blockEntities.get(position);
+    }
+
+    /**
+     * Gets a value specifying a skylight level of a block which is in this {@linkplain JetChunk chunk}
+     * at {@linkplain ChunkRelativeBlockPosition a chunk-relative block position} specified.
+     *
+     * @param position the chunk-relative block position
+     * @return the value
+     * @since 1.0
+     */
+    public byte skyLightLevel(@NonNull ChunkRelativeBlockPosition position) {
+        ChunkPaletteRelativePosition palettePosition = ChunkPaletteRelativePosition.from(position);
+        return this.lightSection(position).skyLightStorage().getValue(palettePosition);
+    }
+
+    /**
+     * Gets a value specifying a block light level of a block which is in this {@linkplain JetChunk chunk}
+     * at {@linkplain ChunkRelativeBlockPosition a chunk-relative block position} specified.
+     *
+     * @param position the chunk-relative block position
+     * @return the value
+     * @since 1.0
+     */
+    public byte blockLightLevel(@NonNull ChunkRelativeBlockPosition position) {
+        ChunkPaletteRelativePosition palettePosition = ChunkPaletteRelativePosition.from(position);
+        return this.lightSection(position).skyLightStorage().getValue(palettePosition);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -223,6 +277,19 @@ public final class JetChunk implements Chunk<BlockState> {
                 ", heightMaps=" + this.heightMaps +
                 ", blockEntities=" + this.blockEntities +
                 '}';
+    }
+
+    /**
+     * Gets {@linkplain JetLightSection a light section}, which owns a value specifying light level of a block
+     * which is in this {@linkplain JetChunk chunk}
+     * at {@linkplain ChunkRelativeBlockPosition a chunk-relative block position} specified.
+     *
+     * @param position the chunk-relaitve block position
+     * @return the light section
+     * @since 1.0
+     */
+    private @NonNull JetLightSection lightSection(@NonNull ChunkRelativeBlockPosition position) {
+        return this.lightSectionList.sectionFor(position);
     }
 
     /**

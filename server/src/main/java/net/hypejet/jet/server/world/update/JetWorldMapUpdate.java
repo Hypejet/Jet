@@ -59,6 +59,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -150,7 +151,6 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
 
     @Override
     public void update() {
-        // TODO: Remove updates that do not change anything
         for (ChunkUpdateBuilder updateBuilder : this.updateBuilders.values())
             this.acquisition.setChunk(updateBuilder.chunkPosition, updateBuilder.createUpdatedChunk());
 
@@ -277,6 +277,15 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
                 ));
             }
 
+            BlockState currentBlockState = this.chunk().blockState(position);
+            BlockStateRegistry blockStateRegistry = registryManager.blockStateRegistry();
+
+            JetRegistryEntry<BlockType> currentBlockTypeEntry = blockStateRegistry.blockType(currentBlockState);
+            if (blockTypeEntry == currentBlockTypeEntry) {
+                this.blockStateUpdates.remove(position);
+                return;
+            }
+
             BlockType blockType = blockTypeEntry.value();
             BlockState blockState = properties == null ? blockType.defaultState() : blockType.state(properties);
             this.blockStateUpdates.put(position, blockState);
@@ -292,6 +301,10 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
          */
         private void updateBlockEntity(@NonNull ChunkRelativeBlockPosition position,
                                        @NonNull CompoundBinaryTag blockEntityData) {
+            if (Objects.equals(this.chunk().blockEntityData(position), blockEntityData)) {
+                this.blockEntityUpdates.remove(position);
+                return;
+            }
             this.blockEntityUpdates.put(position, blockEntityData);
         }
 
@@ -306,6 +319,12 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
         private void updateBiome(@NonNull ChunkRelativeBiomePosition position, @NonNull RegistryEntry<Biome> biome) {
             if (!(biome instanceof JetRegistryEntry<Biome>))
                 throw new IllegalArgumentException("The biome registry entry specified is not a valid registry entry");
+
+            if (this.chunk().biome(position) == biome) {
+                this.biomeUpdates.remove(position);
+                return;
+            }
+
             this.biomeUpdates.put(position, biome);
         }
 
@@ -319,6 +338,10 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
          * @since 1.0
          */
         private void updateSkyLightLevel(@NonNull ChunkRelativeBlockPosition position, byte level) {
+            if (this.chunk().skyLightLevel(position) == level) {
+                this.skyLightUpdates.removeByte(position);
+                return;
+            }
             this.skyLightUpdates.put(position, level);
         }
 
@@ -332,6 +355,10 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
          * @since 1.0
          */
         private void updateBlockLightLevel(@NonNull ChunkRelativeBlockPosition position, byte level) {
+            if (this.chunk().blockLightLevel(position) == level) {
+                this.blockLightUpdates.removeByte(position);
+                return;
+            }
             this.blockLightUpdates.put(position, level);
         }
 
@@ -343,7 +370,7 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
          * @since 1.0
          */
         private @NonNull JetChunk createUpdatedChunk() {
-            return this.acquisition.getChunk(this.chunkPosition).withUpdates(
+            return this.chunk().withUpdates(
                     this.blockStateUpdates, this.blockEntityUpdates, this.biomeUpdates,
                     this.skyLightUpdates, this.blockLightUpdates
             );
@@ -445,6 +472,16 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
             }
 
             return packets;
+        }
+
+        /**
+         * Gets a current state of {@linkplain JetChunk a chunk} that the update is being built for.
+         *
+         * @return the current state of the chunk
+         * @since 1.0
+         */
+        private @NonNull JetChunk chunk() {
+            return this.acquisition.getChunk(this.chunkPosition);
         }
     }
 }
