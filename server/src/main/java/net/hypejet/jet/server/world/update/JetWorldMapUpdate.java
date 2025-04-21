@@ -83,13 +83,13 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
     }
 
     @Override
-    public @NonNull WorldMapUpdate updateBlock(@NonNull BlockPosition position, @NonNull Key blockTypeKey) {
-        return this.updateBlock(position, blockTypeKey, null);
+    public @NonNull WorldMapUpdate updateBlockState(@NonNull BlockPosition position, @NonNull Key blockTypeKey) {
+        return this.updateBlockState(position, blockTypeKey, null);
     }
 
     @Override
-    public @NonNull WorldMapUpdate updateBlock(@NonNull BlockPosition position, @NonNull Key blockTypeKey,
-                                               @Nullable Map<String, String> properties) {
+    public @NonNull WorldMapUpdate updateBlockState(@NonNull BlockPosition position, @NonNull Key blockTypeKey,
+                                                    @Nullable Map<String, String> properties) {
         NullabilityUtil.requireNonNull(position, "position");
         NullabilityUtil.requireNonNull(blockTypeKey, "block type key");
 

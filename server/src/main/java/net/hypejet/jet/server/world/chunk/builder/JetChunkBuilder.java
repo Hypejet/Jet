@@ -90,13 +90,15 @@ public final class JetChunkBuilder implements ChunkBuilder<BlockState> {
     }
 
     @Override
-    public @NonNull JetChunkBuilder setBlock(@NonNull ChunkRelativeBlockPosition position, @NonNull Key blockTypeKey) {
-        return this.setBlock(position, blockTypeKey, null);
+    public @NonNull JetChunkBuilder setBlockState(@NonNull ChunkRelativeBlockPosition position,
+                                                  @NonNull Key blockTypeKey) {
+        return this.setBlockState(position, blockTypeKey, null);
     }
 
     @Override
-    public @NonNull JetChunkBuilder setBlock(@NonNull ChunkRelativeBlockPosition position, @NonNull Key blockTypeKey,
-                                             @Nullable Map<String, String> properties) {
+    public @NonNull JetChunkBuilder setBlockState(@NonNull ChunkRelativeBlockPosition position,
+                                                  @NonNull Key blockTypeKey,
+                                                  @Nullable Map<String, String> properties) {
         JetRegistryManager registryManager = this.server.registryManager();
 
         JetMinecraftRegistry<BlockType> blockTypeRegistry = registryManager.blockTypeRegistry();

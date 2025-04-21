@@ -22,18 +22,18 @@ import java.util.Map;
 public interface ChunkBuilder<BS> {
     /**
      * Sets a block at {@linkplain ChunkRelativeBlockPosition a chunk-relative block position} specified to have
-     * default block data of a block type with {@linkplain Key a key} specified.
+     * a default block state of a block type with {@linkplain Key a key} specified.
      *
      * @param position the chunk-relative block position
      * @param blockTypeKey the key
      * @return this builder
      * @since 1.0
      */
-    @NonNull ChunkBuilder<BS> setBlock(@NonNull ChunkRelativeBlockPosition position, @NonNull Key blockTypeKey);
+    @NonNull ChunkBuilder<BS> setBlockState(@NonNull ChunkRelativeBlockPosition position, @NonNull Key blockTypeKey);
 
     /**
      * Sets a block at {@linkplain ChunkRelativeBlockPosition a chunk-relative block position} specified to have
-     * a block data with block properties specified and a block type with {@linkplain Key a key} specified.
+     * a block state with block properties specified and a block type with {@linkplain Key a key} specified.
      *
      * @param position the chunk-relative block position
      * @param blockTypeKey the key
@@ -41,8 +41,8 @@ public interface ChunkBuilder<BS> {
      * @return this builder
      * @since 1.0
      */
-    @NonNull ChunkBuilder<BS> setBlock(@NonNull ChunkRelativeBlockPosition position, @NonNull Key blockTypeKey,
-                                       @Nullable Map<String, String> properties);
+    @NonNull ChunkBuilder<BS> setBlockState(@NonNull ChunkRelativeBlockPosition position, @NonNull Key blockTypeKey,
+                                            @Nullable Map<String, String> properties);
 
     /**
      * Sets a block at {@linkplain ChunkRelativeBlockPosition a chunk-relative block position} specified to have

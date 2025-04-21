@@ -19,19 +19,19 @@ import java.util.Map;
  */
 public interface WorldMapUpdate {
     /**
-     * Sets a block at {@linkplain BlockPosition a block position} specified to be updated with a default block data
-     * of a block type with {@linkplain Key a key} specified.
+     * Sets block state of a block at {@linkplain BlockPosition a block position} specified to be updated with
+     * a default block state of a block type with {@linkplain Key a key} specified.
      *
      * @param position the block position
      * @param blockTypeKey the block type key
      * @return this builder
      * @since 1.0
      */
-    @NonNull WorldMapUpdate updateBlock(@NonNull BlockPosition position, @NonNull Key blockTypeKey);
+    @NonNull WorldMapUpdate updateBlockState(@NonNull BlockPosition position, @NonNull Key blockTypeKey);
 
     /**
-     * Sets a block at {@linkplain BlockPosition a block position} specified to be updated with a block data
-     * with block properties specified and a block type with {@linkplain Key a key} specified.
+     * Sets block state of a block at {@linkplain BlockPosition a block position} specified to be updated with
+     * a block state with block properties specified and a block type with {@linkplain Key a key} specified.
      *
      * @param position the block position
      * @param blockTypeKey the block type key
@@ -39,8 +39,8 @@ public interface WorldMapUpdate {
      * @return this builder
      * @since 1.0
      */
-    @NonNull WorldMapUpdate updateBlock(@NonNull BlockPosition position, @NonNull Key blockTypeKey,
-                                        @Nullable Map<String, String> properties);
+    @NonNull WorldMapUpdate updateBlockState(@NonNull BlockPosition position, @NonNull Key blockTypeKey,
+                                             @Nullable Map<String, String> properties);
 
     /**
      * Sets block entity data of a block at {@linkplain BlockPosition a block position} specified to be updated
