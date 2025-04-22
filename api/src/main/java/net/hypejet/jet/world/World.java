@@ -65,22 +65,20 @@ public interface World {
     @NonNull WriteNotNullObjectAcquisition<Position> acquireDefaultSpawnPositionWrite();
 
     /**
-     * Creates {@linkplain WorldMapAcquisition a chunk-map acquisition}
-     * of {@linkplain net.hypejet.jet.world.chunk.Chunk chunks} of this world.
+     * Creates {@linkplain WorldMapAcquisition a world-map acquisition} of contents this world.
      *
-     * @return the chunk-map acquisition
+     * @return the world-map acquisition
      * @since 1.0
      */
-    @NonNull WorldMapAcquisition acquireChunkMapRead();
+    @NonNull WorldMapAcquisition acquireWorldMapRead();
 
     /**
-     * Creates {@linkplain WriteWorldMapAcquisition a write chunk-map acquisition}
-     * of {@linkplain net.hypejet.jet.world.chunk.Chunk chunks} of this world.
+     * Creates {@linkplain WriteWorldMapAcquisition a write world-map acquisition} of contents of this world.
      *
-     * @return the write chunk-map acquisition
+     * @return the write world-map acquisition
      * @since 1.0
      */
-    @NonNull WriteWorldMapAcquisition acquireChunkMapWrite();
+    @NonNull WriteWorldMapAcquisition acquireWorldMapWrite();
 
     /**
      * Gets {@linkplain MinecraftServer a server} that this world belongs to.

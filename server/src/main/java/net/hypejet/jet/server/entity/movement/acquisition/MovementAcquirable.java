@@ -233,13 +233,13 @@ public final class MovementAcquirable extends Acquirable<MovementAcquisition, In
 
         @Override
         public void update(@NonNull Position position, @NonNull Vector deltaMovement,
-                                   @NonNull RelativeFlag @NonNull ... flags) {
+                           @NonNull RelativeFlag @NonNull ... flags) {
             this.originalAcquisition.update(position, deltaMovement, flags);
         }
 
         @Override
         public void update(@NonNull Position position, @NonNull Vector deltaMovement,
-                                   @NonNull Collection<RelativeFlag> flags) {
+                           @NonNull Collection<RelativeFlag> flags) {
             this.originalAcquisition.update(position, deltaMovement, flags);
         }
 

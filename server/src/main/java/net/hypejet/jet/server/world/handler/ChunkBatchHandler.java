@@ -15,6 +15,7 @@ import net.hypejet.concurrency.primitive.floats.WriteFloatAcquisition;
 import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.player.Player;
+import net.hypejet.jet.server.entity.acquisition.world.EntityWorldAcquisition;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.handler.NetworkDisconnectionHandler;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerCenterChunkPlayPacket;
@@ -24,7 +25,6 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkBatc
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerInvalidateChunkPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerWorldEventPlayPacket;
 import net.hypejet.jet.server.util.coordinate.ChunkPositionUtil;
-import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.server.world.acquisition.worldmap.WriteWorldMapAcquisitionImpl;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.view.ChunkView;
@@ -67,8 +67,6 @@ public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnect
     private static final TimeUnit SHUTDOWN_TIMEOUT_UNIT = TimeUnit.SECONDS;
 
     private final JetPlayer player;
-
-    private final NotNullObjectAcquirable<JetWorld> world;
     private final NotNullObjectAcquirable<ChunkView> chunkView;
 
     private final NullableObjectAcquirable<ScheduledFuture<?>> future = new NullableObjectAcquirable<>();
@@ -86,16 +84,12 @@ public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnect
      * Constructs the {@linkplain ChunkBatchHandler chunk batch handler}.
      *
      * @param player a player that the chunks should be sent to
-     * @param world an initial world of the player, from which the chunks should be retrieved
      * @param position an initial position of the player
      * @since 1.0
      */
-    public ChunkBatchHandler(@NonNull JetPlayer player, @NonNull JetWorld world, @NonNull Position position) {
+    public ChunkBatchHandler(@NonNull JetPlayer player, @NonNull Position position) {
         this.player = NullabilityUtil.requireNonNull(player, "player");
-        NullabilityUtil.requireNonNull(world, "world");
         NullabilityUtil.requireNonNull(position, "position");
-
-        this.world = new NotNullObjectAcquirable<>(world);
 
         try (NotNullObjectAcquisition<Player.Settings> settingsAcquisition = this.player.settings()) {
             ChunkPosition centerChunkPosition = ChunkPositionUtil.fromCoordinate(position);
@@ -305,8 +299,13 @@ public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnect
 
     private float sendChunks(float chunksToSend) {
         try (
+                EntityWorldAcquisition<?> worldAcquisition = this.player.acquireWorldRead();
+                WriteWorldMapAcquisitionImpl worldMapAcquisition = worldAcquisition.get().acquireWorldMapWrite();
+                /* The chunk view must be acquired after the world-map, because write world-map acquisitions
+                   during a world-map update acquire chunk-views of all players that are connected to the server.
+                   It may also negatively affect chunk-view updating inside the write world-map acquisition. These
+                   cases lead to a deadlock. */
                 NotNullObjectAcquisition<ChunkView> chunkViewAcquisition = this.chunkView.acquireRead();
-                NotNullObjectAcquisition<JetWorld> worldAcquisition = this.world.acquireRead();
                 CollectionAcquisition<?, Set<ChunkPosition>> chunksAcquisition = this.chunksScheduled.acquireWrite()
         ) {
             Set<ChunkPosition> chunkPositions = chunksAcquisition.collection();
@@ -321,12 +320,10 @@ public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnect
 
             this.player.sendPacket(new ServerChunkBatchStartPlayPacket());
 
-            try (WriteWorldMapAcquisitionImpl chunkMapAcquisition = worldAcquisition.get().acquireChunkMapWrite()) {
-                for (ChunkPosition chunkPosition : chunksToSendPositions) {
-                    JetChunk chunk = chunkMapAcquisition.getChunk(chunkPosition);
-                    this.player.sendPacket(new ServerChunkAndLightDataPlayPacket(chunkPosition, chunk));
-                    chunkPositions.remove(chunkPosition);
-                }
+            for (ChunkPosition chunkPosition : chunksToSendPositions) {
+                JetChunk chunk = worldMapAcquisition.getChunk(chunkPosition);
+                this.player.sendPacket(new ServerChunkAndLightDataPlayPacket(chunkPosition, chunk));
+                chunkPositions.remove(chunkPosition);
             }
 
             int batchSize = chunksToSendPositions.size();

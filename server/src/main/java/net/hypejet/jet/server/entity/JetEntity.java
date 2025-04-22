@@ -112,7 +112,9 @@ public class JetEntity implements Entity {
 
     @Override
     public @NonNull WriteEntityWorldAcquisition acquireWorldWrite() {
-        return new WriteEntityWorldAcquisitionImpl(this.world.acquireWrite(), this.movement.acquireWrite(), this);
+        return new WriteEntityWorldAcquisitionImpl(
+                this.world.acquireWrite(), this.movement.acquireWrite(), this
+        );
     }
 
     @Override

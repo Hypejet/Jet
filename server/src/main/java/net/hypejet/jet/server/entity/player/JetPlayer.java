@@ -122,7 +122,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
         this.sendJoinGamePacket(world);
         world.addPlayer(this);
 
-        this.chunkBatchHandler = new ChunkBatchHandler(this, world, position);
+        this.chunkBatchHandler = new ChunkBatchHandler(this, position);
         this.chunkBatchHandler.scheduleTask();
 
         this.sendSpawnPackets(world, position);

@@ -90,12 +90,12 @@ public final class JetWorld implements World {
     }
 
     @Override
-    public @NonNull WorldMapAcquisitionImpl acquireChunkMapRead() {
+    public @NonNull WorldMapAcquisitionImpl acquireWorldMapRead() {
         return new WorldMapAcquisitionImpl(this, this.chunks.acquireRead());
     }
 
     @Override
-    public @NonNull WriteWorldMapAcquisitionImpl acquireChunkMapWrite() {
+    public @NonNull WriteWorldMapAcquisitionImpl acquireWorldMapWrite() {
         return new WriteWorldMapAcquisitionImpl(this, this.chunks.acquireWrite());
     }
 
