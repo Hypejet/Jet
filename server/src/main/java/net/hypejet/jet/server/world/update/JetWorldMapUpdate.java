@@ -8,7 +8,6 @@ import it.unimi.dsi.fastutil.objects.Object2ByteOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.hypejet.concurrency.collection.CollectionAcquisition;
-import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
@@ -43,7 +42,6 @@ import net.hypejet.jet.server.world.chunk.view.ChunkView;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
 import net.hypejet.jet.server.world.coordinate.chunk.section.ChunkSectionPosition;
-import net.hypejet.jet.server.world.handler.ChunkBatchHandler;
 import net.hypejet.jet.world.coordinate.BiomePosition;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
@@ -160,13 +158,12 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
 
             for (JetEntity entity : entitiesAcquisition.collection()) {
                 if (!(entity instanceof JetPlayer player)) continue;
-                ChunkBatchHandler chunkBatchHandler = player.chunkBatchHandler();
-
-                try (NotNullObjectAcquisition<ChunkView> chunkViewAcquisition = chunkBatchHandler.chunkView()) {
-                    ChunkView chunkView = chunkViewAcquisition.get();
+                player.chunkBatchHandler().consumeChunkData((chunkView, scheduledChunks) -> {
                     for (int chunkX = chunkView.minimumChunkX(); chunkX <= chunkView.maximumChunkX(); chunkX++) {
                         for (int chunkZ = chunkView.minimumChunkZ(); chunkZ <= chunkView.maximumChunkZ(); chunkZ++) {
                             ChunkPosition chunkPosition = new ChunkPosition(chunkX, chunkZ);
+                            if (scheduledChunks.contains(chunkPosition)) continue;
+
                             if (!blockAndLightUpdatePackets.containsKey(chunkPosition)) {
                                 blockAndLightUpdatePackets.putAll(
                                         chunkPosition,
@@ -174,7 +171,6 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
                                 );
                             }
 
-                            // TODO: Do not send packets for chunks that have not been sent yet
                             blockAndLightUpdatePackets.get(chunkPosition).forEach(player::sendPacket);
                         }
                     }
@@ -184,9 +180,9 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
                             this::createBiomeUpdatePacket
                     );
 
-                    if (packet == null) continue;
+                    if (packet == null) return;
                     player.sendPacket(packet);
-                }
+                });
             }
         }
     }
