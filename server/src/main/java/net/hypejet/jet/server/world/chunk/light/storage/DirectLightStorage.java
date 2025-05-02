@@ -53,8 +53,7 @@ public final class DirectLightStorage extends AbstractLightStorage {
 
     @Override
     public byte getValue(@NonNull ChunkPaletteRelativePosition position) {
-        ChunkPaletteType positionPaletteType = position.paletteType();
-        if (positionPaletteType != ChunkPaletteType.BLOCK_STATE) {
+        if (position.paletteType() != ChunkPaletteType.BLOCK_STATE) {
             throw new IllegalArgumentException(
                     "The chunk-palette-relative position specified has not been created for block state chunk palettes"
             );

@@ -243,7 +243,7 @@ public sealed abstract class AbstractChunkPalette<E> implements ChunkPalette<E>
     }
 
     /**
-     * Calculates index of that an element
+     * Calculates index that an element
      * with {@linkplain ChunkPaletteRelativePosition a chunk-palette-relative position} specified is stored at.
      *
      * @param position the position

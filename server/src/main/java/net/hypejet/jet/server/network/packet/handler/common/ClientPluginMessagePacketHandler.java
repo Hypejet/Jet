@@ -3,7 +3,6 @@ package net.hypejet.jet.server.network.packet.handler.common;
 import net.hypejet.jet.event.events.brand.ChangeClientBrandEvent;
 import net.hypejet.jet.event.events.pluginmessage.PluginMessageEvent;
 import net.hypejet.jet.event.node.EventNode;
-import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.packet.handler.ClientPacketHandler;
 import net.hypejet.jet.server.network.packet.packets.client.common.ClientPluginMessagePacket;

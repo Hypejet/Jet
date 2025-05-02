@@ -2,7 +2,6 @@ package net.hypejet.jet.server.world.update;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.objects.Object2ByteMap;
 import it.unimi.dsi.fastutil.objects.Object2ByteOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -431,7 +430,10 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
                 packets.add(new ServerUpdateChunkSectionBlockStatesPlayPacket(sectionPosition, updateMap));
             }
 
-            for (Map.Entry<ChunkRelativeBlockPosition, CompoundBinaryTag> update : blockEntityUpdates.entrySet()) {
+            for (
+                    Map.Entry<ChunkRelativeBlockPosition, CompoundBinaryTag> update
+                    : this.blockEntityUpdates.entrySet()
+            ) {
                 ChunkRelativeBlockPosition position = update.getKey();
                 CompoundBinaryTag blockEntityData = update.getValue();
 
@@ -460,7 +462,7 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
                 LightSectionList sectionList = this.acquisition.getChunk(this.chunkPosition).lightSectionList();
 
                 LightSerializationData data = LightSerializationData.create(
-                        Sets.union(this.skyLightUpdates.keySet(), this.blockLightUpdates.keySet()),
+                        this.skyLightUpdates.keySet(), this.blockLightUpdates.keySet(),
                         sectionList, dimensionType
                 );
 

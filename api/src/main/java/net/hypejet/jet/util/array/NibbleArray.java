@@ -58,7 +58,7 @@ public final class NibbleArray {
     public @IntRange(from = 0, to = MAX_VALUE) byte get(@IntRange(from = 0, to = MAXIMUM_INDEX) long index) {
         byte actualArrayValue = this.packedArray[createdPackedArrayIndex(index)];
         byte bitShiftCount = createBitShiftCount(index);
-        return (byte) ((actualArrayValue & MAX_VALUE << bitShiftCount) >>> bitShiftCount);
+        return (byte) (actualArrayValue >>> bitShiftCount & MAX_VALUE);
     }
 
     /**
@@ -203,7 +203,7 @@ public final class NibbleArray {
          */
         private Builder(@NonNull NibbleArray array) {
             this.actualLength = array.actualLength;
-            this.packedArray = array.packedArray;
+            this.packedArray = array.packedArray.clone();
         }
 
         /**

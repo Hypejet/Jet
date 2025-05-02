@@ -251,7 +251,7 @@ public final class JetChunk implements Chunk<BlockState> {
      */
     public byte blockLightLevel(@NonNull ChunkRelativeBlockPosition position) {
         ChunkPaletteRelativePosition palettePosition = ChunkPaletteRelativePosition.from(position);
-        return this.lightSection(position).skyLightStorage().getValue(palettePosition);
+        return this.lightSection(position).blockLightStorage().getValue(palettePosition);
     }
 
     @Override

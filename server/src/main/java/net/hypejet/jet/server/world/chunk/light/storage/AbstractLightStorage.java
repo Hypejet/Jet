@@ -57,17 +57,16 @@ public sealed abstract class AbstractLightStorage implements LightStorage
         Byte2ShortMap valueCountMap = new Byte2ShortOpenHashMap(this.valueCountMap());
 
         boolean lightChanged = false;
-
         for (LightStorageUpdate update : updates) {
-            int paletteElementIndex = AbstractChunkPalette.calculateElementIndex(update.position());
+            ChunkPaletteRelativePosition position = update.position();
 
-            byte previousValue = this.data().get(paletteElementIndex);
+            byte previousValue = this.getValue(position);
             byte newValue = update.value();
 
             if (previousValue == newValue) continue;
             if (!lightChanged) lightChanged = true;
 
-            arrayBuilder.set(paletteElementIndex, newValue);
+            arrayBuilder.set(AbstractChunkPalette.calculateElementIndex(position), newValue);
 
             short newValueCount = valueCountMap.containsKey(newValue) ? (short) (valueCountMap.get(newValue) + 1) : 1;
             valueCountMap.put(newValue, newValueCount);
