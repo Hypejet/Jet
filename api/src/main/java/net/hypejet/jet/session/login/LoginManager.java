@@ -1,7 +1,7 @@
 package net.hypejet.jet.session.login;
 
-import net.hypejet.jet.session.login.profile.GameProfileProperty;
 import net.hypejet.jet.network.PlayerConnection;
+import net.hypejet.jet.session.login.profile.GameProfileProperty;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
