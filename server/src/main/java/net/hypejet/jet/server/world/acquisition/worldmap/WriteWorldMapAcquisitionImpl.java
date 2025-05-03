@@ -9,6 +9,7 @@ import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.light.LightType;
 import net.hypejet.jet.server.world.update.JetWorldMapUpdate;
 import net.hypejet.jet.world.acquisition.worldmap.WriteWorldMapAcquisition;
+import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.coordinate.BiomePosition;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
@@ -16,8 +17,6 @@ import net.hypejet.jet.world.update.WorldMapUpdate;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.util.Map;
 
 /**
  * Represents an implementation of {@linkplain WriteWorldMapAcquisition a write world-map acquisition}.
@@ -39,15 +38,9 @@ public final class WriteWorldMapAcquisitionImpl extends WorldMapAcquisitionImpl 
     }
 
     @Override
-    public @NonNull RegistryEntry<?> getBlockType(@NonNull BlockPosition position) {
+    public @NonNull BlockState getBlockState(@NonNull BlockPosition position) {
         JetChunk chunk = this.getChunk(ChunkPositionUtil.fromCoordinate(position));
-        return blockType(position, chunk, this.world.server());
-    }
-
-    @Override
-    public @NonNull Map<String, String> getBlockProperties(@NonNull BlockPosition position) {
-        JetChunk chunk = this.getChunk(ChunkPositionUtil.fromCoordinate(position));
-        return blockProperties(position, chunk);
+        return blockState(position, chunk);
     }
 
     @Override

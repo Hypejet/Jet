@@ -7,11 +7,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Represents something that manages loading and saving of {@linkplain Chunk chunks}.
  *
- * @param <BS> a type of block states that block state palettes of chunk sections contain
  * @since 1.0
  * @see Chunk
  */
-public interface ChunkLoader<BS> {
+public interface ChunkLoader {
     /**
      * Creates {@linkplain Chunk a chunk} that should be present at {@linkplain ChunkPosition a chunk position}
      * specified in {@linkplain World a world specified}.
@@ -21,7 +20,7 @@ public interface ChunkLoader<BS> {
      * @return the chunk
      * @since 1.0
      */
-    @NonNull Chunk<BS> load(@NonNull ChunkPosition position, @NonNull World world);
+    @NonNull Chunk load(@NonNull ChunkPosition position, @NonNull World world);
 
     /**
      * Saves data of {@linkplain Chunk a chunk} specified, which is at {@linkplain ChunkPosition a chunk position}
@@ -32,5 +31,5 @@ public interface ChunkLoader<BS> {
      * @param chunk the chunk
      * @since 1.0
      */
-    void save(@NonNull ChunkPosition position, @NonNull World world, @NonNull Chunk<BS> chunk);
+    void save(@NonNull ChunkPosition position, @NonNull World world, @NonNull Chunk chunk);
 }

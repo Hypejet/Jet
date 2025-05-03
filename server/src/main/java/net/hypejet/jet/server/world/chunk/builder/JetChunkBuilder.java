@@ -5,14 +5,11 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState;
 import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.registry.JetMinecraftRegistry;
 import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.registry.JetRegistryManager;
-import net.hypejet.jet.server.registry.blockstate.BlockStateRegistry;
-import net.hypejet.jet.server.world.block.BlockType;
+import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.light.JetLightSection;
 import net.hypejet.jet.server.world.chunk.light.LightSectionList;
@@ -23,10 +20,10 @@ import net.hypejet.jet.server.world.chunk.section.ChunkSectionList;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.util.array.NibbleArray;
+import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.chunk.builder.ChunkBuilder;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -42,7 +39,7 @@ import java.util.Map;
  * @since 1.0
  * @see ChunkBuilder
  */
-public final class JetChunkBuilder implements ChunkBuilder<BlockState> {
+public final class JetChunkBuilder implements ChunkBuilder {
 
     private final Int2ObjectMap<ChunkSectionBuilder> chunkSectionBuilders = new Int2ObjectOpenHashMap<>();
     private final Int2ObjectMap<LightSectionBuilder> lightSectionBuilders = new Int2ObjectOpenHashMap<>();
@@ -52,7 +49,7 @@ public final class JetChunkBuilder implements ChunkBuilder<BlockState> {
     private final DimensionType dimensionType;
     private final JetMinecraftServer server;
 
-    private final BlockState defaultBlockState;
+    private final JetBlockState defaultBlockState;
     private final JetRegistryEntry<Biome> defaultBiome;
 
     /**
@@ -69,7 +66,7 @@ public final class JetChunkBuilder implements ChunkBuilder<BlockState> {
      * @since 1.0
      */
     public JetChunkBuilder(@NonNull DimensionType dimensionType, @NonNull JetMinecraftServer server,
-                           @NonNull BlockState defaultBlockState, @NonNull JetRegistryEntry<Biome> defaultBiome,
+                           @NonNull JetBlockState defaultBlockState, @NonNull JetRegistryEntry<Biome> defaultBiome,
                            @Nullable CompoundBinaryTag defaultBlockEntity) {
         this.dimensionType = NullabilityUtil.requireNonNull(dimensionType, "dimension type");
         this.server = NullabilityUtil.requireNonNull(server, "server");
@@ -91,29 +88,12 @@ public final class JetChunkBuilder implements ChunkBuilder<BlockState> {
 
     @Override
     public @NonNull JetChunkBuilder setBlockState(@NonNull ChunkRelativeBlockPosition position,
-                                                  @NonNull Key blockTypeKey) {
-        return this.setBlockState(position, blockTypeKey, null);
-    }
+                                                  @NonNull BlockState blockState) {
+        NullabilityUtil.requireNonNull(position, "position");
+        NullabilityUtil.requireNonNull(blockState, "block state");
 
-    @Override
-    public @NonNull JetChunkBuilder setBlockState(@NonNull ChunkRelativeBlockPosition position,
-                                                  @NonNull Key blockTypeKey,
-                                                  @Nullable Map<String, String> properties) {
-        JetRegistryManager registryManager = this.server.registryManager();
-
-        JetMinecraftRegistry<BlockType> blockTypeRegistry = registryManager.blockTypeRegistry();
-        BlockStateRegistry blockStateRegistry = registryManager.blockStateRegistry();
-
-        JetRegistryEntry<BlockType> blockTypeEntry = blockTypeRegistry.get(blockTypeKey);
-        if (blockTypeEntry == null) {
-            throw new IllegalArgumentException(String.format(
-                    "Could not find a block type with ket of %s",
-                    blockTypeKey
-            ));
-        }
-
-        BlockType blockType = blockTypeEntry.value();
-        BlockState blockState = properties == null ? blockType.defaultState() : blockType.state(properties);
+        if (!(blockState instanceof JetBlockState validatedBlockState))
+            throw new IllegalArgumentException("The block state specified is not a valid block state");
 
         int sectionY = ChunkSectionList.createSectionY(position.absoluteY(), ChunkPaletteType.BLOCK_STATE);
         int sectionIndex = ChunkSectionList.createSectionIndex(sectionY, this.dimensionType);
@@ -122,16 +102,18 @@ public final class JetChunkBuilder implements ChunkBuilder<BlockState> {
         ChunkSectionBuilder chunkSectionBuilder = this.chunkSectionBuilder(sectionIndex);
 
         BlockState previousBlockState = chunkSectionBuilder.getBlockState(paletteRelativePosition);
-        if (blockStateRegistry.blockType(previousBlockState) != blockTypeEntry)
+        if (previousBlockState.blockType() != validatedBlockState.blockType())
             this.blockEntities.remove(position);
 
-        chunkSectionBuilder.setBlockState(paletteRelativePosition, blockState);
+        chunkSectionBuilder.setBlockState(paletteRelativePosition, validatedBlockState);
         return this;
     }
 
     @Override
-    public @NonNull ChunkBuilder<BlockState> setBlockEntity(@NonNull ChunkRelativeBlockPosition position,
-                                                            @NonNull CompoundBinaryTag blockEntityData) {
+    public @NonNull ChunkBuilder setBlockEntity(@NonNull ChunkRelativeBlockPosition position,
+                                                @NonNull CompoundBinaryTag blockEntityData) {
+        NullabilityUtil.requireNonNull(position, "position");
+        NullabilityUtil.requireNonNull(blockEntityData, "block entity data");
         this.blockEntities.put(position, blockEntityData);
         return this;
     }
@@ -139,6 +121,9 @@ public final class JetChunkBuilder implements ChunkBuilder<BlockState> {
     @Override
     public @NonNull JetChunkBuilder setBiome(@NonNull ChunkRelativeBiomePosition position,
                                              @NonNull RegistryEntry<Biome> biome) {
+        NullabilityUtil.requireNonNull(position, "position");
+        NullabilityUtil.requireNonNull(biome, "biome");
+
         int sectionY = ChunkSectionList.createSectionY(position.absoluteY(), ChunkPaletteType.BIOME);
         int sectionIndex = ChunkSectionList.createSectionIndex(sectionY, this.dimensionType);
 
@@ -150,6 +135,7 @@ public final class JetChunkBuilder implements ChunkBuilder<BlockState> {
 
     @Override
     public @NonNull JetChunkBuilder setSkyLightLevel(@NonNull ChunkRelativeBlockPosition position, byte level) {
+        NullabilityUtil.requireNonNull(position, "position");
         ChunkPaletteRelativePosition paletteRelativePosition = ChunkPaletteRelativePosition.from(position);
         this.lightSectionBuilder(position).setSkyLight(paletteRelativePosition, level);
         return this;
@@ -157,6 +143,7 @@ public final class JetChunkBuilder implements ChunkBuilder<BlockState> {
 
     @Override
     public @NonNull JetChunkBuilder setBlockLightLevel(@NonNull ChunkRelativeBlockPosition position, byte level) {
+        NullabilityUtil.requireNonNull(position, "position");
         ChunkPaletteRelativePosition paletteRelativePosition = ChunkPaletteRelativePosition.from(position);
         this.lightSectionBuilder(position).setBlockLight(paletteRelativePosition, level);
         return this;
@@ -263,7 +250,7 @@ public final class JetChunkBuilder implements ChunkBuilder<BlockState> {
          * @param defaultBiome a registry entry of a default biome that the biome list should be initially filled with
          * @since 1.0
          */
-        private ChunkSectionBuilder(@NonNull JetMinecraftServer server, @NonNull BlockState defaultBlockState,
+        private ChunkSectionBuilder(@NonNull JetMinecraftServer server, @NonNull JetBlockState defaultBlockState,
                                     @NonNull JetRegistryEntry<Biome> defaultBiome) {
             int blockStateCount = ChunkPaletteType.BLOCK_STATE.elementCount();
             this.blockStates = new ArrayList<>(blockStateCount);
@@ -288,7 +275,7 @@ public final class JetChunkBuilder implements ChunkBuilder<BlockState> {
          * @param blockState the block state
          * @since 1.0
          */
-        private void setBlockState(@NonNull ChunkPaletteRelativePosition position, @NonNull BlockState blockState) {
+        private void setBlockState(@NonNull ChunkPaletteRelativePosition position, @NonNull JetBlockState blockState) {
             if (position.paletteType() != ChunkPaletteType.BLOCK_STATE) {
                 throw new IllegalArgumentException(
                         "The position specified has not been created for a block state chunk palette"

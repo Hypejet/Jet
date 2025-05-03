@@ -4,23 +4,20 @@ import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState;
 import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.registry.JetRegistryEntry;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.world.chunk.factory.JetChunkFactory;
 import net.hypejet.jet.server.world.chunk.factory.light.JetLightStorageFactory;
-import net.hypejet.jet.server.world.chunk.factory.palette.BiomeChunkPaletteFactory;
-import net.hypejet.jet.server.world.chunk.factory.palette.JetBlockStateChunkPaletteFactory;
+import net.hypejet.jet.server.world.chunk.factory.palette.JetChunkPaletteFactory;
 import net.hypejet.jet.server.world.chunk.factory.section.JetChunkSectionFactory;
-import net.hypejet.jet.server.world.chunk.light.JetLightSection;
-import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
+import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.world.WorldManager;
+import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.chunk.ChunkLoader;
 import net.hypejet.jet.world.chunk.factory.ChunkFactory;
 import net.hypejet.jet.world.chunk.factory.light.LightStorageFactory;
-import net.hypejet.jet.world.chunk.factory.palette.BlockStateChunkPaletteFactory;
-import net.hypejet.jet.world.chunk.factory.palette.ChunkPaletteFactory;
 import net.hypejet.jet.world.chunk.factory.section.ChunkSectionFactory;
 import net.hypejet.jet.world.data.WorldData;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -31,15 +28,15 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 1.0
  * @see WorldManager
  */
-public final class JetWorldManager implements WorldManager<JetChunkSection, JetLightSection, BlockState> {
+public final class JetWorldManager implements WorldManager {
 
     private final JetMinecraftServer server;
 
-    private final BlockStateChunkPaletteFactory<BlockState> blockStateChunkPaletteFactory;
-    private final ChunkPaletteFactory<RegistryEntry<Biome>> biomeChunkPaletteFactory;
+    private final JetChunkPaletteFactory<BlockState> blockStateChunkPaletteFactory;
+    private final JetChunkPaletteFactory<RegistryEntry<Biome>> biomeChunkPaletteFactory;
 
-    private final ChunkSectionFactory<JetChunkSection, JetLightSection, BlockState> chunkSectionFactory;
-    private final ChunkFactory<JetChunkSection, JetLightSection, BlockState> chunkFactory;
+    private final ChunkSectionFactory chunkSectionFactory;
+    private final ChunkFactory chunkFactory;
 
     /**
      * Constructs the {@linkplain JetWorldManager world manager implementation}.
@@ -49,9 +46,17 @@ public final class JetWorldManager implements WorldManager<JetChunkSection, JetL
      */
     public JetWorldManager(@NonNull JetMinecraftServer server) {
         this.server = NullabilityUtil.requireNonNull(server, "server");
+        JetRegistryManager registryManager = server.registryManager();
 
-        this.blockStateChunkPaletteFactory = new JetBlockStateChunkPaletteFactory(server);
-        this.biomeChunkPaletteFactory = new BiomeChunkPaletteFactory(server);
+        this.blockStateChunkPaletteFactory = new JetChunkPaletteFactory<>(
+                ChunkPaletteType.BLOCK_STATE,
+                registryManager.blockStateRegistry().order()
+        );
+
+        this.biomeChunkPaletteFactory = new JetChunkPaletteFactory<>(
+                ChunkPaletteType.BIOME,
+                registryManager.biomeRegistry().elementOrder()
+        );
 
         this.chunkSectionFactory = new JetChunkSectionFactory(server);
         this.chunkFactory = new JetChunkFactory(server);
@@ -59,7 +64,7 @@ public final class JetWorldManager implements WorldManager<JetChunkSection, JetL
 
     @Override
     public @NonNull JetWorld createWorld(@NonNull RegistryEntry<DimensionType> dimensionType,
-                                         @NonNull WorldData worldData, @NonNull ChunkLoader<BlockState> chunkLoader) {
+                                         @NonNull WorldData worldData, @NonNull ChunkLoader chunkLoader) {
         if (!(dimensionType instanceof JetRegistryEntry<DimensionType> validatedDimensionType)) {
             throw new IllegalArgumentException("A dimension type registry entry" +
                     " specified is not a valid registry entry");
@@ -68,12 +73,12 @@ public final class JetWorldManager implements WorldManager<JetChunkSection, JetL
     }
 
     @Override
-    public @NonNull BlockStateChunkPaletteFactory<BlockState> blockStateChunkPaletteFactory() {
+    public @NonNull JetChunkPaletteFactory<BlockState> blockStateChunkPaletteFactory() {
         return this.blockStateChunkPaletteFactory;
     }
 
     @Override
-    public @NonNull ChunkPaletteFactory<RegistryEntry<Biome>> biomeChunkPaletteFactory() {
+    public @NonNull JetChunkPaletteFactory<RegistryEntry<Biome>> biomeChunkPaletteFactory() {
         return this.biomeChunkPaletteFactory;
     }
 
@@ -83,12 +88,12 @@ public final class JetWorldManager implements WorldManager<JetChunkSection, JetL
     }
 
     @Override
-    public @NonNull ChunkSectionFactory<JetChunkSection, JetLightSection, BlockState> chunkSectionFactory() {
+    public @NonNull ChunkSectionFactory chunkSectionFactory() {
         return this.chunkSectionFactory;
     }
 
     @Override
-    public @NonNull ChunkFactory<JetChunkSection, JetLightSection, BlockState> chunkFactory() {
+    public @NonNull ChunkFactory chunkFactory() {
         return this.chunkFactory;
     }
 

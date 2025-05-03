@@ -2,13 +2,13 @@ package net.hypejet.jet.server.world.chunk.factory.section;
 
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState;
 import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.world.chunk.light.JetLightSection;
 import net.hypejet.jet.server.world.chunk.light.storage.AbstractLightStorage;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
+import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.chunk.factory.section.ChunkSectionFactory;
 import net.hypejet.jet.world.chunk.light.LightStorage;
 import net.hypejet.jet.world.chunk.section.ChunkPalette;
@@ -20,8 +20,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 1.0
  * @see ChunkSectionFactory
  */
-public final class JetChunkSectionFactory
-        implements ChunkSectionFactory<JetChunkSection, JetLightSection, BlockState> {
+public final class JetChunkSectionFactory implements ChunkSectionFactory {
 
     private final JetMinecraftServer server;
 

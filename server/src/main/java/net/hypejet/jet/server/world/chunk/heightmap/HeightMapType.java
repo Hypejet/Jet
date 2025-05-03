@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.world.chunk.heightmap;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState;
+import net.hypejet.jet.server.world.block.JetBlockState;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -12,26 +12,26 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public enum HeightMapType {
     /**
      * {@linkplain HeightMapType A height map type} whose heightmaps store the highest height, at which
-     * {@linkplain BlockState a block state} is not an air.
+     * {@linkplain JetBlockState a block state} is not an air.
      *
      * @since 1.0
      */
     WORLD_SURFACE("WORLD_SURFACE") {
         @Override
-        public boolean isOpaque(@NonNull BlockState state) {
+        public boolean isOpaque(@NonNull JetBlockState state) {
             return !state.isAir();
         }
     },
 
     /**
      * {@linkplain HeightMapType A height map type} whose heightmaps store the highest height, at which
-     * {@linkplain BlockState a block state} either is a fluid or blocks motion.
+     * {@linkplain JetBlockState a block state} either is a fluid or blocks motion.
      *
      * @since 1.0
      */
     MOTION_BLOCKING("MOTION_BLOCKING") {
         @Override
-        public boolean isOpaque(@NonNull BlockState state) {
+        public boolean isOpaque(@NonNull JetBlockState state) {
             return state.hasFluidState() || state.blocksMotion();
         }
     };
@@ -60,7 +60,7 @@ public enum HeightMapType {
     }
 
     /**
-     * Gets whether {@linkplain BlockState a block state} specified can be used to be stored
+     * Gets whether {@linkplain JetBlockState a block state} specified can be used to be stored
      * in {@linkplain HeightMap a height map} with this type.
      *
      * @param state the block state
@@ -68,5 +68,5 @@ public enum HeightMapType {
      *         {@code false} otherwise
      * @since 1.0
      */
-    public abstract boolean isOpaque(@NonNull BlockState state);
+    public abstract boolean isOpaque(@NonNull JetBlockState state);
 }

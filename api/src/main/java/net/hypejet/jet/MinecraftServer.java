@@ -102,5 +102,5 @@ public interface MinecraftServer {
      * @return the world manager
      * @since 1.0
      */
-    @NonNull WorldManager<?, ?, ?> worldManager();
+    @NonNull WorldManager worldManager();
 }

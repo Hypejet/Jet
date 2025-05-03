@@ -2,6 +2,7 @@ package net.hypejet.jet.world.chunk.factory.section;
 
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.registry.RegistryEntry;
+import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.chunk.light.LightSection;
 import net.hypejet.jet.world.chunk.light.LightStorage;
 import net.hypejet.jet.world.chunk.section.ChunkPalette;
@@ -11,14 +12,11 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Represents a factory of {@linkplain ChunkSection chunk sections} and {@linkplain LightSection light sections}.
  *
- * @param <CS> a type of chunk sections that the factory creates
- * @param <LS> a type of light sections that the factory creates
- * @param <BS> a type of block states that block state palettes of chunk sections contain
  * @since 1.0
  * @see ChunkSection
  * @see LightSection
  */
-public interface ChunkSectionFactory<CS extends ChunkSection<BS>, LS extends LightSection, BS> {
+public interface ChunkSectionFactory {
     /**
      * Creates {@linkplain ChunkSection a chunk section} with {@linkplain ChunkPalette chunk palettes} specified
      * of block states and biomes.
@@ -28,8 +26,8 @@ public interface ChunkSectionFactory<CS extends ChunkSection<BS>, LS extends Lig
      * @return the chunk section
      * @since 1.0
      */
-    @NonNull CS createChunkSection(@NonNull ChunkPalette<BS> blockStatePalette,
-                                   @NonNull ChunkPalette<RegistryEntry<Biome>> biomePalette);
+    @NonNull ChunkSection createChunkSection(@NonNull ChunkPalette<BlockState> blockStatePalette,
+                                             @NonNull ChunkPalette<RegistryEntry<Biome>> biomePalette);
 
     /**
      * Creates {@linkplain LightSection a light section} with {@linkplain LightStorage light storages} specified
@@ -40,5 +38,6 @@ public interface ChunkSectionFactory<CS extends ChunkSection<BS>, LS extends Lig
      * @return the light section
      * @since 1.0
      */
-    @NonNull LS createLightSection(@NonNull LightStorage skyLightStorage, @NonNull LightStorage blockLightStorage);
+    @NonNull LightSection createLightSection(@NonNull LightStorage skyLightStorage,
+                                             @NonNull LightStorage blockLightStorage);
 }

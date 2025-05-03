@@ -11,7 +11,6 @@ import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.data.model.server.registry.registries.block.entity.BlockEntityType;
-import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState;
 import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.player.JetPlayer;
@@ -24,13 +23,14 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateLig
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
 import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.registry.JetRegistryManager;
-import net.hypejet.jet.server.registry.blockstate.BlockStateRegistry;
+import net.hypejet.jet.server.registry.blockstate.JetBlockStateRegistry;
 import net.hypejet.jet.server.util.coordinate.AbsolutePositionUtil;
 import net.hypejet.jet.server.util.coordinate.ChunkPositionUtil;
 import net.hypejet.jet.server.util.coordinate.ChunkRelativePositionUtil;
 import net.hypejet.jet.server.util.order.ElementOrder;
 import net.hypejet.jet.server.world.acquisition.worldmap.WriteWorldMapAcquisitionImpl;
-import net.hypejet.jet.server.world.block.BlockType;
+import net.hypejet.jet.server.world.block.JetBlockState;
+import net.hypejet.jet.server.world.block.JetBlockType;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.light.LightSectionList;
 import net.hypejet.jet.server.world.chunk.light.LightSerializationData;
@@ -40,13 +40,13 @@ import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.server.world.chunk.view.ChunkView;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.server.world.coordinate.chunk.section.ChunkSectionPosition;
+import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.coordinate.BiomePosition;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
 import net.hypejet.jet.world.update.WorldMapUpdate;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -81,20 +81,14 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
     }
 
     @Override
-    public @NonNull WorldMapUpdate updateBlockState(@NonNull BlockPosition position, @NonNull Key blockTypeKey) {
-        return this.updateBlockState(position, blockTypeKey, null);
-    }
-
-    @Override
-    public @NonNull WorldMapUpdate updateBlockState(@NonNull BlockPosition position, @NonNull Key blockTypeKey,
-                                                    @Nullable Map<String, String> properties) {
+    public @NonNull WorldMapUpdate updateBlockState(@NonNull BlockPosition position, @NonNull BlockState blockState) {
         NullabilityUtil.requireNonNull(position, "position");
-        NullabilityUtil.requireNonNull(blockTypeKey, "block type key");
+        NullabilityUtil.requireNonNull(blockState, "block state");
 
         ChunkPosition chunkPosition = ChunkPositionUtil.fromCoordinate(position);
         ChunkRelativeBlockPosition relativePosition = ChunkRelativePositionUtil.from(position);
 
-        this.updateBuilder(chunkPosition).updateBlockState(relativePosition, blockTypeKey, properties);
+        this.updateBuilder(chunkPosition).updateBlockState(relativePosition, blockState);
         return this;
     }
 
@@ -228,7 +222,7 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
         private final ChunkPosition chunkPosition;
         private final WriteWorldMapAcquisitionImpl acquisition;
 
-        private final Map<ChunkRelativeBlockPosition, BlockState> blockStateUpdates = new HashMap<>();
+        private final Map<ChunkRelativeBlockPosition, JetBlockState> blockStateUpdates = new HashMap<>();
         private final Map<ChunkRelativeBlockPosition, CompoundBinaryTag> blockEntityUpdates = new HashMap<>();
         private final Map<ChunkRelativeBiomePosition, RegistryEntry<Biome>> biomeUpdates = new HashMap<>();
 
@@ -249,41 +243,25 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
         }
 
         /**
-         * Sets {@linkplain BlockState a block state}
+         * Sets {@linkplain BlockState a block state} of a block
          * at {@linkplain ChunkRelativeBlockPosition a chunk-relative block position} specified to be updated
-         * with {@linkplain BlockState a block state} with values specified.
+         * with a value specified.
          *
          * @param position the chunk-relative block positions
-         * @param blockTypeKey a block type of the block state
-         * @param properties properties of the block state, {@code null} is a default block state of the block type
-         *                   should be used
+         * @param blockState the value
          * @since 1.0
          */
-        private void updateBlockState(@NonNull ChunkRelativeBlockPosition position, @NonNull Key blockTypeKey,
-                                      @Nullable Map<String, String> properties) {
-            JetRegistryManager registryManager = this.acquisition.world().server().registryManager();
-            JetMinecraftRegistry<BlockType> blockTypeRegistry = registryManager.blockTypeRegistry();
-
-            JetRegistryEntry<BlockType> blockTypeEntry = blockTypeRegistry.get(blockTypeKey);
-            if (blockTypeEntry == null) {
-                throw new IllegalArgumentException(String.format(
-                        "Could not find a block type with key of %s",
-                        blockTypeKey
-                ));
-            }
+        private void updateBlockState(@NonNull ChunkRelativeBlockPosition position, @NonNull BlockState blockState) {
+            if (!(blockState instanceof JetBlockState validatedBlockState))
+                throw new IllegalArgumentException("The block state specified is not a valid block state");
 
             BlockState currentBlockState = this.chunk().blockState(position);
-            BlockStateRegistry blockStateRegistry = registryManager.blockStateRegistry();
-
-            JetRegistryEntry<BlockType> currentBlockTypeEntry = blockStateRegistry.blockType(currentBlockState);
-            if (blockTypeEntry == currentBlockTypeEntry) {
+            if (currentBlockState == blockState) {
                 this.blockStateUpdates.remove(position);
                 return;
             }
 
-            BlockType blockType = blockTypeEntry.value();
-            BlockState blockState = properties == null ? blockType.defaultState() : blockType.state(properties);
-            this.blockStateUpdates.put(position, blockState);
+            this.blockStateUpdates.put(position, validatedBlockState);
         }
 
         /**
@@ -389,11 +367,11 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
             }
 
             JetRegistryManager registryManager = this.acquisition.world().server().registryManager();
-            BlockStateRegistry blockStateRegistry = registryManager.blockStateRegistry();
+            JetBlockStateRegistry blockStateRegistry = registryManager.blockStateRegistry();
             JetMinecraftRegistry<BlockEntityType> blockEntityTypeRegistry = registryManager.blockEntityTypeRegistry();
 
             Map<ChunkSectionPosition, Map<ChunkRelativeBlockPosition, BlockState>> sectionUpdates = new HashMap<>();
-            for (Map.Entry<ChunkRelativeBlockPosition, BlockState> blockUpdate : this.blockStateUpdates.entrySet()) {
+            for (Map.Entry<ChunkRelativeBlockPosition, JetBlockState> blockUpdate : this.blockStateUpdates.entrySet()) {
                 ChunkSectionPosition chunkSectionPosition = ChunkSectionPosition.from(
                         this.chunkPosition,
                         blockUpdate.getKey().absoluteY(),
@@ -406,7 +384,7 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
                 );
             }
 
-            ElementOrder<BlockState> blockStateOrder = blockStateRegistry.order();
+            ElementOrder<JetBlockState> blockStateOrder = blockStateRegistry.order();
             for (ChunkSectionPosition sectionPosition : sectionUpdates.keySet()) {
                 Map<ChunkRelativeBlockPosition, BlockState> updates = sectionUpdates.get(sectionPosition);
                 if (updates.size() == 1) {
@@ -438,9 +416,14 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
                 CompoundBinaryTag blockEntityData = update.getValue();
 
                 JetChunk chunk = this.acquisition.getChunk(this.chunkPosition);
-                BlockState blockState = chunk.blockState(position);
+                if (!(chunk.blockState(position) instanceof JetBlockState blockState)) {
+                    throw new IllegalArgumentException(String.format(
+                            "Block state of a block at a position of %s is not a valid block state",
+                            position
+                    ));
+                }
 
-                JetRegistryEntry<BlockType> blockType = blockStateRegistry.blockType(blockState);
+                JetRegistryEntry<JetBlockType> blockType = blockState.blockType();
                 JetRegistryEntry<BlockEntityType> blockEntityType = blockType.value().blockEntityType();
 
                 if (blockEntityType == null) {

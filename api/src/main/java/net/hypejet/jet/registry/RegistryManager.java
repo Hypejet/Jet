@@ -9,6 +9,8 @@ import net.hypejet.jet.data.model.api.registries.damage.DamageType;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.registries.painting.PaintingVariant;
 import net.hypejet.jet.data.model.api.registries.wolf.WolfVariant;
+import net.hypejet.jet.registry.blockstate.BlockStateRegistry;
+import net.hypejet.jet.world.block.BlockType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -96,5 +98,15 @@ public interface RegistryManager {
      * @return the registry
      * @since 1.0
      */
-    @NonNull MinecraftRegistry<?> blockTypeRegistry();
+    @NonNull MinecraftRegistry<? extends BlockType> blockTypeRegistry();
+
+    /**
+     * Gets {@linkplain BlockStateRegistry a block state registry} containing all possible
+     * {@linkplain net.hypejet.jet.world.block.BlockState block states} that can be used
+     * on {@linkplain net.hypejet.jet.MinecraftServer a server} associated with this registry manager.
+     *
+     * @return the block state registry
+     * @since 1.0
+     */
+    @NonNull BlockStateRegistry blockStateRegistry();
 }

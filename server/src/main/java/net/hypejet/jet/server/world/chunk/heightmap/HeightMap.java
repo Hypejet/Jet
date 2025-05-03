@@ -4,16 +4,17 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState;
 import net.hypejet.jet.server.util.math.MathUtil;
 import net.hypejet.jet.server.util.storage.BitStorage;
 import net.hypejet.jet.server.util.storage.BitStorageUpdate;
+import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.section.ChunkSectionList;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
+import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.Contract;
@@ -23,13 +24,13 @@ import java.util.Objects;
 
 /**
  * Represents a map, which stores highest height for each column of {@linkplain JetChunk a chunk}, which is considered
- * {@linkplain HeightMapType#isOpaque(BlockState) opaque} by {@linkplain HeightMapType a type of the height map}.
+ * {@linkplain HeightMapType#isOpaque(JetBlockState) opaque} by {@linkplain HeightMapType a type of the height map}.
  *
  * <p>It is used mainly by Minecraft client for client-side optimizations.</p>
  *
  * @since 1.0
  * @see JetChunk
- * @see HeightMapType#isOpaque(BlockState)
+ * @see HeightMapType#isOpaque(JetBlockState)
  * @see HeightMapType
  */
 public final class HeightMap {
@@ -102,12 +103,12 @@ public final class HeightMap {
      */
     @Contract(pure = true)
     public @NonNull HeightMap withUpdates(@NonNull ChunkSectionList chunkSectionList,
-                                          @NonNull Map<ChunkRelativeBlockPosition, BlockState> updates) {
+                                          @NonNull Map<ChunkRelativeBlockPosition, JetBlockState> updates) {
         if (updates.isEmpty())
             return this;
 
         Int2ObjectMap<BitStorageUpdate> dataUpdates = new Int2ObjectOpenHashMap<>();
-        for (Map.Entry<ChunkRelativeBlockPosition, BlockState> update : updates.entrySet()) {
+        for (Map.Entry<ChunkRelativeBlockPosition, JetBlockState> update : updates.entrySet()) {
             ChunkRelativeBlockPosition position = update.getKey();
 
             byte blockX = position.relativeX();
@@ -210,7 +211,14 @@ public final class HeightMap {
             AbstractChunkPalette<BlockState> blockStatePalette = section.blockStatePalette();
 
             BlockState blockState = blockStatePalette.getElement(ChunkPaletteRelativePosition.from(position));
-            if (heightMapType.isOpaque(blockState))
+            if (!(blockState instanceof JetBlockState validatedBlockState)) {
+                throw new IllegalArgumentException(String.format(
+                        "Block state at a chunk-relative block position of %s is not a valid block state",
+                        position
+                ));
+            }
+
+            if (heightMapType.isOpaque(validatedBlockState))
                 return toElement(blockY, dimensionType);
         }
 

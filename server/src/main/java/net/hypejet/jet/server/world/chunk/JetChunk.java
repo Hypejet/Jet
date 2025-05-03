@@ -4,12 +4,9 @@ import it.unimi.dsi.fastutil.objects.Object2ByteMap;
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState;
 import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.registry.JetRegistryEntry;
-import net.hypejet.jet.server.registry.blockstate.BlockStateRegistry;
-import net.hypejet.jet.server.world.block.BlockType;
+import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.heightmap.HeightMap;
 import net.hypejet.jet.server.world.chunk.heightmap.HeightMapType;
 import net.hypejet.jet.server.world.chunk.light.JetLightSection;
@@ -18,6 +15,7 @@ import net.hypejet.jet.server.world.chunk.light.LightSerializationData;
 import net.hypejet.jet.server.world.chunk.section.ChunkSectionList;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
+import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.chunk.Chunk;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
@@ -38,7 +36,7 @@ import java.util.Set;
  * @since 1.0
  * @see Chunk
  */
-public final class JetChunk implements Chunk<BlockState> {
+public final class JetChunk implements Chunk {
 
     private final JetMinecraftServer server;
 
@@ -155,7 +153,7 @@ public final class JetChunk implements Chunk<BlockState> {
      * @since 1.0
      */
     public @NonNull JetChunk withUpdates(
-            @NonNull Map<ChunkRelativeBlockPosition, BlockState> blockStateUpdates,
+            @NonNull Map<ChunkRelativeBlockPosition, JetBlockState> blockStateUpdates,
             @NonNull Map<ChunkRelativeBlockPosition, CompoundBinaryTag> blockEntityUpdates,
             @NonNull Map<ChunkRelativeBiomePosition, RegistryEntry<Biome>> biomeUpdates,
             @NonNull Object2ByteMap<ChunkRelativeBlockPosition> skyLightUpdates,
@@ -169,17 +167,9 @@ public final class JetChunk implements Chunk<BlockState> {
             heightMaps.add(heightMap.withUpdates(chunkSectionList, blockStateUpdates));
 
         Map<ChunkRelativeBlockPosition, CompoundBinaryTag> blockEntityDataMap = new HashMap<>(this.blockEntities);
-        for (Map.Entry<ChunkRelativeBlockPosition, BlockState> update : blockStateUpdates.entrySet()) {
+        for (Map.Entry<ChunkRelativeBlockPosition, JetBlockState> update : blockStateUpdates.entrySet()) {
             ChunkRelativeBlockPosition position = update.getKey();
-            BlockState blockState = update.getValue();
-
-            BlockStateRegistry blockStateRegistry = this.server.registryManager().blockStateRegistry();
-            JetRegistryEntry<BlockType> blockTypeEntry = blockStateRegistry.blockType(blockState);
-
-            BlockState previousBlockState = this.blockState(position);
-            JetRegistryEntry<BlockType> previousBlockTypeEntry = blockStateRegistry.blockType(previousBlockState);
-
-            if (blockTypeEntry != previousBlockTypeEntry)
+            if (update.getValue().blockType() != this.blockState(position).blockType())
                 blockEntityDataMap.remove(position);
         }
 

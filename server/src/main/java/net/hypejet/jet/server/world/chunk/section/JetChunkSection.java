@@ -3,12 +3,13 @@ package net.hypejet.jet.server.world.chunk.section;
 import it.unimi.dsi.fastutil.objects.Object2ShortMap;
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState;
 import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
+import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.chunk.section.ChunkSection;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.Contract;
@@ -22,7 +23,7 @@ import java.util.Objects;
  * @since 1.0
  * @see ChunkSection
  */
-public final class JetChunkSection implements ChunkSection<BlockState> {
+public final class JetChunkSection implements ChunkSection {
 
     private final JetMinecraftServer server;
     private final short nonAirBlockCount;
@@ -161,7 +162,11 @@ public final class JetChunkSection implements ChunkSection<BlockState> {
         short nonAirBlockCount = 0;
 
         for (Object2ShortMap.Entry<BlockState> entry : blockStatePalette.elementCountMap().object2ShortEntrySet()) {
-            if (entry.getKey().isAir()) continue;
+            BlockState blockState = entry.getKey();
+            if (!(blockState instanceof JetBlockState validatedBlockState))
+                throw new IllegalArgumentException("The block state is not a valid block state");
+
+            if (validatedBlockState.isAir()) continue;
             nonAirBlockCount += entry.getShortValue();
         }
 

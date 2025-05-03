@@ -4,13 +4,12 @@ import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.registry.RegistryEntry;
+import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.chunk.ChunkLoader;
 import net.hypejet.jet.world.chunk.factory.ChunkFactory;
 import net.hypejet.jet.world.chunk.factory.light.LightStorageFactory;
-import net.hypejet.jet.world.chunk.factory.palette.BlockStateChunkPaletteFactory;
 import net.hypejet.jet.world.chunk.factory.palette.ChunkPaletteFactory;
 import net.hypejet.jet.world.chunk.factory.section.ChunkSectionFactory;
-import net.hypejet.jet.world.chunk.light.LightSection;
 import net.hypejet.jet.world.chunk.section.ChunkSection;
 import net.hypejet.jet.world.data.WorldData;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -18,14 +17,11 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Represents something that manages creation of {@linkplain World worlds} of {@linkplain MinecraftServer a server}.
  *
- * @param <CS> a type of chunk section implementation that the server uses
- * @param <LS> a type of light section implementation that the server uses
- * @param <BS> a type of block state implementation that the server uses
  * @since 1.0
  * @see World
  * @see MinecraftServer
  */
-public interface WorldManager<CS extends ChunkSection<BS>, LS extends LightSection, BS> {
+public interface WorldManager {
     /**
      * Creates {@linkplain World a world}.
      *
@@ -36,17 +32,17 @@ public interface WorldManager<CS extends ChunkSection<BS>, LS extends LightSecti
      * @since 1.0
      */
     @NonNull World createWorld(@NonNull RegistryEntry<DimensionType> dimensionType,
-                               @NonNull WorldData worldData, @NonNull ChunkLoader<BS> chunkLoader);
+                               @NonNull WorldData worldData, @NonNull ChunkLoader chunkLoader);
 
     /**
-     * Gets {@linkplain BlockStateChunkPaletteFactory a block-state chunk palette factory}, which should be used
+     * Gets {@linkplain ChunkPaletteFactory a chunk palette factory}, which should be used
      * for creating block-state {@linkplain net.hypejet.jet.world.chunk.section.ChunkPalette chunk palettes}
      * for a server associated with this world manager.
      *
      * @return the block-state chunk palette factory
      * @since 1.0
      */
-    @NonNull BlockStateChunkPaletteFactory<BS> blockStateChunkPaletteFactory();
+    @NonNull ChunkPaletteFactory<BlockState> blockStateChunkPaletteFactory();
 
     /**
      * Gets {@linkplain ChunkPaletteFactory a chunk palette factory}, which should be used for creating
@@ -75,7 +71,7 @@ public interface WorldManager<CS extends ChunkSection<BS>, LS extends LightSecti
      * @return the chunk section factory
      * @since 1.0
      */
-    @NonNull ChunkSectionFactory<CS, LS, BS> chunkSectionFactory();
+    @NonNull ChunkSectionFactory chunkSectionFactory();
 
     /**
      * Gets {@linkplain ChunkFactory a chunk factory}, which should be used for creating
@@ -84,7 +80,7 @@ public interface WorldManager<CS extends ChunkSection<BS>, LS extends LightSecti
      * @return the chunk factory
      * @since 1.0
      */
-    @NonNull ChunkFactory<CS, LS, BS> chunkFactory();
+    @NonNull ChunkFactory chunkFactory();
 
     /**
      * Gets {@linkplain MinecraftServer a server} that this world manager was created for.

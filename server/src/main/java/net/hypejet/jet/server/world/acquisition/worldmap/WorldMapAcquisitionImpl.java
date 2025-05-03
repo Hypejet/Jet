@@ -3,14 +3,10 @@ package net.hypejet.jet.server.world.acquisition.worldmap;
 import net.hypejet.concurrency.map.MapAcquisition;
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState;
 import net.hypejet.jet.registry.RegistryEntry;
-import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.util.coordinate.ChunkPositionUtil;
 import net.hypejet.jet.server.util.coordinate.ChunkRelativePositionUtil;
 import net.hypejet.jet.server.world.JetWorld;
-import net.hypejet.jet.server.world.block.BlockType;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.light.JetLightSection;
 import net.hypejet.jet.server.world.chunk.light.LightType;
@@ -18,6 +14,7 @@ import net.hypejet.jet.server.world.chunk.light.storage.AbstractLightStorage;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.world.acquisition.worldmap.WorldMapAcquisition;
+import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.coordinate.BiomePosition;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
@@ -27,8 +24,6 @@ import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Map;
 
 /**
  * Represents an implementation of {@linkplain WorldMapAcquisition a world-map acquisition}.
@@ -55,19 +50,11 @@ public class WorldMapAcquisitionImpl implements WorldMapAcquisition {
     }
 
     @Override
-    public final @Nullable JetRegistryEntry<BlockType> getOptionalBlockType(@NonNull BlockPosition position) {
+    public final @Nullable BlockState getOptionalBlockState(@NonNull BlockPosition position) {
         JetChunk chunk = this.chunkOrNull(ChunkPositionUtil.fromCoordinate(position));
         if (chunk == null)
             return null;
-        return blockType(position, chunk, this.world.server());
-    }
-
-    @Override
-    public final @Nullable Map<String, String> getOptionalBlockProperties(@NonNull BlockPosition position) {
-        JetChunk chunk = this.chunkOrNull(ChunkPositionUtil.fromCoordinate(position));
-        if (chunk == null)
-            return null;
-        return blockProperties(position, chunk);
+        return blockState(position, chunk);
     }
 
     @Override
@@ -137,25 +124,7 @@ public class WorldMapAcquisitionImpl implements WorldMapAcquisition {
     }
 
     /**
-     * Gets {@linkplain JetRegistryEntry a registry entry} of {@linkplain BlockType a block type} of a block
-     * at {@linkplain BlockPosition a block position} specified in {@linkplain JetChunk a chunk} specified.
-     *
-     * @param position the block position
-     * @param chunk the chunk
-     * @param server a server that the chunk belongs to
-     * @return the registry entry
-     * @since 1.0
-     */
-    protected static @NonNull JetRegistryEntry<BlockType> blockType(
-            @NonNull BlockPosition position, @NonNull JetChunk chunk,
-            @NonNull JetMinecraftServer server
-    ) {
-        BlockState blockState = blockState(position, chunk);
-        return server.registryManager().blockStateRegistry().blockType(blockState);
-    }
-
-    /**
-     * Gets {@linkplain Map a map} of properties of a block at {@linkplain BlockPosition a block position} specified
+     * Gets {@linkplain BlockState a block state} of a block at {@linkplain BlockPosition a block position} specified
      * in {@linkplain JetChunk a chunk} specified.
      *
      * @param position the block position
@@ -163,10 +132,8 @@ public class WorldMapAcquisitionImpl implements WorldMapAcquisition {
      * @return the map
      * @since 1.0
      */
-    protected static @NonNull Map<String, String> blockProperties(@NonNull BlockPosition position,
-                                                                  @NonNull JetChunk chunk) {
-        BlockState blockState = blockState(position, chunk);
-        return blockState.properties();
+    protected static @NonNull BlockState blockState(@NonNull BlockPosition position, @NonNull JetChunk chunk) {
+        return chunk.blockState(ChunkRelativePositionUtil.from(position));
     }
 
     /**
@@ -222,9 +189,5 @@ public class WorldMapAcquisitionImpl implements WorldMapAcquisition {
         };
 
         return lightStorage.getValue(palettePosition);
-    }
-
-    private static @NonNull BlockState blockState(@NonNull BlockPosition position, @NonNull JetChunk chunk) {
-        return chunk.blockState(ChunkRelativePositionUtil.from(position));
     }
 }

@@ -5,12 +5,13 @@ import io.netty.util.collection.IntObjectMap;
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState;
 import net.hypejet.jet.registry.RegistryEntry;
+import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
+import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -129,7 +130,7 @@ public final class ChunkSectionList {
      */
     @Contract(pure = true)
     public @NonNull ChunkSectionList withUpdates(
-            @NonNull Map<ChunkRelativeBlockPosition, BlockState> blockStateUpdates,
+            @NonNull Map<ChunkRelativeBlockPosition, JetBlockState> blockStateUpdates,
             @NonNull Map<ChunkRelativeBiomePosition, RegistryEntry<Biome>> biomeUpdates
     ) {
         if (blockStateUpdates.isEmpty() && biomeUpdates.isEmpty())
@@ -220,14 +221,14 @@ public final class ChunkSectionList {
     }
 
     private static <E, P> @NonNull IntObjectMap<List<ChunkPaletteUpdate<E>>> createChunkSectionPaletteUpdateMap(
-            @NonNull Map<P, E> updates, @NonNull DimensionType dimensionType,
+            @NonNull Map<P, ? extends E> updates, @NonNull DimensionType dimensionType,
             @NonNull ToIntFunction<P> positionToAbsoluteYFunction,
             @NonNull Function<P, ChunkPaletteRelativePosition> positionToPaletteRelativePosition,
             @NonNull ChunkPaletteType paletteType
     ) {
         IntObjectMap<List<ChunkPaletteUpdate<E>>> map = new IntObjectHashMap<>();
 
-        for (Map.Entry<P, E> update : updates.entrySet()) {
+        for (Map.Entry<P, ? extends E> update : updates.entrySet()) {
             P position = update.getKey();
             E element = update.getValue();
 

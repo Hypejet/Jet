@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.data.model.server.registry.registries.block.entity.BlockEntityType;
-import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.miscellaneous.BinaryTagNetworkWriter;
@@ -16,8 +15,8 @@ import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
 import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.registry.JetRegistryManager;
-import net.hypejet.jet.server.registry.blockstate.BlockStateRegistry;
-import net.hypejet.jet.server.world.block.BlockType;
+import net.hypejet.jet.server.world.block.JetBlockState;
+import net.hypejet.jet.server.world.block.JetBlockType;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
@@ -64,15 +63,19 @@ public final class ChunkNetworkWriter implements NetworkWriter<JetChunk> {
         }
 
         JetRegistryManager registryManager = object.server().registryManager();
-        BlockStateRegistry blockStateRegistry = registryManager.blockStateRegistry();
         JetMinecraftRegistry<BlockEntityType> blockEntityTypeRegistry = registryManager.blockEntityTypeRegistry();
 
         Set<BlockEntityEntry> entries = new HashSet<>();
         for (Map.Entry<ChunkRelativeBlockPosition, CompoundBinaryTag> entry : object.blockEntities().entrySet()) {
             ChunkRelativeBlockPosition position = entry.getKey();
+            if (!(object.blockState(position) instanceof JetBlockState blockState)) {
+                throw new IllegalArgumentException(String.format(
+                        "Block state at position %s is not a valid block state",
+                        position
+                ));
+            }
 
-            BlockState blockState = object.blockState(position);
-            JetRegistryEntry<BlockType> blockType = blockStateRegistry.blockType(blockState);
+            JetRegistryEntry<JetBlockType> blockType = blockState.blockType();
             JetRegistryEntry<BlockEntityType> blockEntityType = blockType.value().blockEntityType();
 
             if (blockEntityType == null) {

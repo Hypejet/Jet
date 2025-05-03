@@ -13,11 +13,10 @@ import java.util.Map;
 /**
  * Represents part of {@linkplain World a world}.
  *
- * @param <BS> a type of block states that block state palettes of chunk sections contain
  * @since 1.0
  * @see World
  */
-public interface Chunk<BS> {
+public interface Chunk {
     /**
      * Gets {@linkplain List a list} of {@linkplain ChunkSection chunk sections} of this chunk. The list is ordered
      * by their height, the lowest index corresponds the lowest section, the highest index corresponds the highest
@@ -26,7 +25,7 @@ public interface Chunk<BS> {
      * @return the list
      * @since 1.0
      */
-    @NonNull List<? extends ChunkSection<BS>> sections();
+    @NonNull List<? extends ChunkSection> sections();
 
     /**
      * Gets {@linkplain List a list} of {@linkplain LightSection light sections} of this chunk. The list is ordered

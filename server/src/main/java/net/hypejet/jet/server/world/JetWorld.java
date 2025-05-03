@@ -11,7 +11,6 @@ import net.hypejet.concurrency.object.notnull.WriteNotNullObjectAcquisition;
 import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.player.JetPlayer;
@@ -38,7 +37,7 @@ public final class JetWorld implements World {
     private final JetRegistryEntry<DimensionType> dimensionType;
     private final WorldData worldData;
 
-    private final ChunkLoader<BlockState> chunkLoader;
+    private final ChunkLoader chunkLoader;
     private final JetMinecraftServer server;
 
     private final NotNullObjectAcquirable<Position> defaultSpawnPosition;
@@ -56,7 +55,7 @@ public final class JetWorld implements World {
      * @since 1.0
      */
     public JetWorld(@NonNull JetRegistryEntry<DimensionType> dimensionType, @NonNull WorldData worldData,
-                    @NonNull ChunkLoader<BlockState> chunkLoader, @NonNull JetMinecraftServer server) {
+                    @NonNull ChunkLoader chunkLoader, @NonNull JetMinecraftServer server) {
         this.dimensionType = NullabilityUtil.requireNonNull(dimensionType, "dimension type");
         this.worldData = NullabilityUtil.requireNonNull(worldData, "world data");
         this.chunkLoader = NullabilityUtil.requireNonNull(chunkLoader, "chunk loader");
@@ -111,7 +110,7 @@ public final class JetWorld implements World {
      * @return the chunk provider
      * @since 1.0
      */
-    public @NonNull ChunkLoader<BlockState> chunkLoader() {
+    public @NonNull ChunkLoader chunkLoader() {
         return this.chunkLoader;
     }
 
