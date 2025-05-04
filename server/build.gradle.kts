@@ -23,7 +23,7 @@ application {
 
 tasks.withType<ShadowJar> {
     minimize {
-        exclude(project(":api")) // All dependencies of the API may be used by plugins
+        exclude(project(":api")) // Dependencies of the API may be used by plugins
         exclude(dependency(libs.logback.get())) // Minimizing logback causes problems with finding an SLF4J provider
     }
 }
