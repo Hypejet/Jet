@@ -20,6 +20,9 @@ public interface ChunkBuilder {
      * Sets a block at {@linkplain ChunkRelativeBlockPosition a chunk-relative block position} specified to have
      * {@linkplain BlockState a block state} specified.
      *
+     * <p>Note that a block entity associated with the block will be removed if block types of previous block
+     * state and the block state specified are different.</p>
+     *
      * @param position the chunk-relative block position
      * @param blockState the block state
      * @return this builder

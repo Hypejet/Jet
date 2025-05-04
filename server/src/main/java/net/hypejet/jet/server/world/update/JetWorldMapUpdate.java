@@ -247,6 +247,9 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
          * at {@linkplain ChunkRelativeBlockPosition a chunk-relative block position} specified to be updated
          * with a value specified.
          *
+         * <p>Note that a block entity associated with the block will be removed if block types of previous block
+         * state and the block state specified are different.</p>
+         *
          * @param position the chunk-relative block positions
          * @param blockState the value
          * @since 1.0

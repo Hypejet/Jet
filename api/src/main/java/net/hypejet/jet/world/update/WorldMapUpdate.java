@@ -19,6 +19,9 @@ public interface WorldMapUpdate {
      * Sets {@linkplain BlockState a block state} of a block at {@linkplain BlockPosition a block position} specified
      * to be updated with a value specified.
      *
+     * <p>Note that a block entity associated with the block will be removed if block types of previous block
+     * state and the block state specified are different.</p>
+     *
      * @param position the block position
      * @param blockState the value
      * @return this builder

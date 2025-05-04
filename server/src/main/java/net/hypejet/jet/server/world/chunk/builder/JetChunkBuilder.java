@@ -268,8 +268,11 @@ public final class JetChunkBuilder implements ChunkBuilder {
         }
 
         /**
-         * Sets {@linkplain BlockState a block state} specified to be present
-         * at {@linkplain ChunkPaletteRelativePosition a chunk-palette-relative position} specified.
+         * Sets block at {@linkplain ChunkPaletteRelativePosition a chunk-palette-relative position} specified
+         * to have {@linkplain BlockState a block state} specified.
+         *
+         * <p>Note that a block entity associated with the block will be removed if block types of previous block
+         * state and the block state specified are different.</p>
          *
          * @param position the chunk-palette-relative position
          * @param blockState the block state
