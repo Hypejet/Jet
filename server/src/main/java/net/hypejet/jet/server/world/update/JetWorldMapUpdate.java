@@ -262,6 +262,15 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
             }
 
             this.blockStateUpdates.put(position, validatedBlockState);
+
+            /* Since clients receiving block state use their light engines to automatically update the light,
+               we need to always send a light value as we do not know the new client light value, because the server
+               has no light engine implemented by default.
+               TODO: Replace the light hack with a proper light implementation */
+            if (currentBlockState.blockType() != blockState.blockType()) {
+                this.updateSkyLightLevel(position, this.chunk().skyLightLevel(position));
+                this.updateBlockLightLevel(position, this.chunk().blockLightLevel(position));
+            }
         }
 
         /**
@@ -312,9 +321,16 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
          */
         private void updateSkyLightLevel(@NonNull ChunkRelativeBlockPosition position, byte level) {
             if (this.chunk().skyLightLevel(position) == level) {
-                this.skyLightUpdates.removeByte(position);
-                return;
+                // TODO: Replace the light hack with a proper light implementation
+                BlockState previousBlockState = this.chunk().blockState(position);
+                BlockState updatedBlockState = this.blockStateUpdates.get(position);
+
+                if (updatedBlockState == null || previousBlockState.blockType() == updatedBlockState.blockType()) {
+                    this.skyLightUpdates.removeByte(position);
+                    return;
+                }
             }
+
             this.skyLightUpdates.put(position, level);
         }
 
@@ -329,8 +345,14 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
          */
         private void updateBlockLightLevel(@NonNull ChunkRelativeBlockPosition position, byte level) {
             if (this.chunk().blockLightLevel(position) == level) {
-                this.blockLightUpdates.removeByte(position);
-                return;
+                // TODO: Replace the light hack with a proper light implementation
+                BlockState previousBlockState = this.chunk().blockState(position);
+                BlockState updatedBlockState = this.blockStateUpdates.get(position);
+
+                if (updatedBlockState == null || previousBlockState.blockType() == updatedBlockState.blockType()) {
+                    this.blockLightUpdates.removeByte(position);
+                    return;
+                }
             }
             this.blockLightUpdates.put(position, level);
         }
