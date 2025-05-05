@@ -5,7 +5,6 @@ import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.registry.RegistryEntry;
-import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.heightmap.HeightMap;
 import net.hypejet.jet.server.world.chunk.heightmap.HeightMapType;
@@ -38,8 +37,6 @@ import java.util.Set;
  */
 public final class JetChunk implements Chunk {
 
-    private final JetMinecraftServer server;
-
     private final ChunkSectionList chunkSectionList;
     private final LightSectionList lightSectionList;
 
@@ -49,7 +46,6 @@ public final class JetChunk implements Chunk {
     /**
      * Constructs the {@linkplain JetChunk chunk implementation}.
      *
-     * @param server a server that the chunk is constructed for
      * @param chunkSectionList a chunk section list, which contains all chunk sections that the chunk should have
      * @param lightSectionList a light section list, which contains all light sections that the chunk should have
      * @param heightMaps a set of height maps that the chunk should have
@@ -57,11 +53,9 @@ public final class JetChunk implements Chunk {
      *                      to data of block entities associated with them
      * @since 1.0
      */
-    private JetChunk(@NonNull JetMinecraftServer server, @NonNull ChunkSectionList chunkSectionList,
+    private JetChunk(@NonNull ChunkSectionList chunkSectionList,
                      @NonNull LightSectionList lightSectionList, @NonNull Set<HeightMap> heightMaps,
                      @NonNull Map<ChunkRelativeBlockPosition, CompoundBinaryTag> blockEntities) {
-        this.server = NullabilityUtil.requireNonNull(server, "server");
-
         this.chunkSectionList = NullabilityUtil.requireNonNull(chunkSectionList, "chunk section list");
         this.lightSectionList = NullabilityUtil.requireNonNull(lightSectionList, "light section list");
 
@@ -104,16 +98,6 @@ public final class JetChunk implements Chunk {
      */
     public @NonNull LightSectionList lightSectionList() {
         return this.lightSectionList;
-    }
-
-    /**
-     * Gets {@linkplain JetMinecraftServer a server} that this chunk has been created for.
-     *
-     * @return the server
-     * @since 1.0
-     */
-    public @NonNull JetMinecraftServer server() {
-        return this.server;
     }
 
     /**
@@ -174,7 +158,7 @@ public final class JetChunk implements Chunk {
         }
 
         blockEntityDataMap.putAll(blockEntityUpdates);
-        return new JetChunk(this.server, chunkSectionList, lightSectionList, heightMaps, blockEntityDataMap);
+        return new JetChunk(chunkSectionList, lightSectionList, heightMaps, blockEntityDataMap);
     }
 
     /**
@@ -285,7 +269,6 @@ public final class JetChunk implements Chunk {
     /**
      * Creates {@linkplain JetChunk a chunk}.
      *
-     * @param server a server that the chunk should be created for
      * @param dimensionType a registry entry of a dimension type of worlds that the chunk is created for
      * @param chunkSections a list of chunk sections that the chunk should have, where the lowest index is the lowest
      *                      section and the highest index is the highest section
@@ -297,11 +280,10 @@ public final class JetChunk implements Chunk {
      * @since 1.0
      */
     public static @NonNull JetChunk create(
-            @NonNull JetMinecraftServer server, @NonNull DimensionType dimensionType,
+            @NonNull DimensionType dimensionType,
             @NonNull List<JetChunkSection> chunkSections, @NonNull List<JetLightSection> lightSections,
             @NonNull Map<ChunkRelativeBlockPosition, CompoundBinaryTag> blockEntities
     ) {
-        NullabilityUtil.requireNonNull(server, "server");
         NullabilityUtil.requireNonNull(dimensionType, "dimension type");
         NullabilityUtil.requireNonNull(chunkSections, "chunk sections");
         NullabilityUtil.requireNonNull(lightSections, "light sections");
@@ -314,6 +296,6 @@ public final class JetChunk implements Chunk {
         for (HeightMapType type : HeightMapType.values())
             heightMaps.add(HeightMap.create(type, chunkSectionList, dimensionType));
 
-        return new JetChunk(server, chunkSectionList, lightSectionList, heightMaps, blockEntities);
+        return new JetChunk(chunkSectionList, lightSectionList, heightMaps, blockEntities);
     }
 }

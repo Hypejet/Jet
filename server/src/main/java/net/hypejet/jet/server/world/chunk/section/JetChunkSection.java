@@ -4,7 +4,6 @@ import it.unimi.dsi.fastutil.objects.Object2ShortMap;
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.registry.RegistryEntry;
-import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
@@ -25,7 +24,6 @@ import java.util.Objects;
  */
 public final class JetChunkSection implements ChunkSection {
 
-    private final JetMinecraftServer server;
     private final short nonAirBlockCount;
 
     private final AbstractChunkPalette<BlockState> blockStatePalette;
@@ -34,32 +32,27 @@ public final class JetChunkSection implements ChunkSection {
     /**
      * Constructs the {@linkplain JetChunkSection chunk section implementation}.
      *
-     * @param server a server that the chunk section should belong to
      * @param blockStatePalette a chunk palette of block states of the chunk section
      * @param biomePalette a chunk palette of biomes of the chunk section
      * @throws IllegalArgumentException if usage types of palettes specified are invalid
      * @since 1.0
      */
-    public JetChunkSection(@NonNull JetMinecraftServer server,
-                           @NonNull AbstractChunkPalette<BlockState> blockStatePalette,
+    public JetChunkSection(@NonNull AbstractChunkPalette<BlockState> blockStatePalette,
                            @NonNull AbstractChunkPalette<RegistryEntry<Biome>> biomePalette) {
-        this(server, calculateNonAirBlockCount(blockStatePalette), blockStatePalette, biomePalette);
+        this(calculateNonAirBlockCount(blockStatePalette), blockStatePalette, biomePalette);
     }
 
     /**
      * Constructs the {@linkplain JetChunkSection chunk section implementation}.
      *
-     * @param server a server that the chunk section should belong to
      * @param nonAirBlockStateCount a count of non-air block states of the chunk section
      * @param blockStatePalette a chunk palette of block states of the chunk section
      * @param biomePalette a chunk palette of biomes of the chunk section
      * @throws IllegalArgumentException if usage types of palettes specified are invalid
      * @since 1.0
      */
-    private JetChunkSection(@NonNull JetMinecraftServer server, short nonAirBlockStateCount,
-                            @NonNull AbstractChunkPalette<BlockState> blockStatePalette,
+    private JetChunkSection(short nonAirBlockStateCount, @NonNull AbstractChunkPalette<BlockState> blockStatePalette,
                             @NonNull AbstractChunkPalette<RegistryEntry<Biome>> biomePalette) {
-        this.server = NullabilityUtil.requireNonNull(server, "server");
         NullabilityUtil.requireNonNull(blockStatePalette, "block state palette");
         NullabilityUtil.requireNonNull(biomePalette, "biome palette");
 
@@ -130,8 +123,8 @@ public final class JetChunkSection implements ChunkSection {
             return this;
 
         if (blockStatePaletteUnchanged)
-            return new JetChunkSection(this.server, this.nonAirBlockCount, blockStatePalette, biomePalette);
-        return new JetChunkSection(this.server, blockStatePalette, biomePalette);
+            return new JetChunkSection(this.nonAirBlockCount, blockStatePalette, biomePalette);
+        return new JetChunkSection(blockStatePalette, biomePalette);
     }
 
     @Override

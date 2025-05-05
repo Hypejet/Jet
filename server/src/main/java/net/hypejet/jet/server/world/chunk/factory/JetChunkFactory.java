@@ -54,7 +54,7 @@ public final class JetChunkFactory implements ChunkFactory {
                                          @NonNull List<LightSection> lightSections,
                                          @NonNull Map<ChunkRelativeBlockPosition, CompoundBinaryTag> blockEntities) {
         return JetChunk.create(
-                this.server, dimensionType, validateChunkSections(chunkSections),
+                dimensionType, validateChunkSections(chunkSections),
                 validateLightSections(lightSections), blockEntities
         );
     }
@@ -89,9 +89,11 @@ public final class JetChunkFactory implements ChunkFactory {
         if (!(defaultBiome instanceof JetRegistryEntry<Biome> validatedBiome))
             throw new IllegalArgumentException("The biome registry entry specified is not a valid registry entry");
 
+        JetRegistryManager registryManager = this.server.registryManager();
         return new JetChunkBuilder(
-                dimensionType, this.server, validatedBlockState,
-                validatedBiome, defaultBlockEntity
+                dimensionType, registryManager.blockStateRegistry().order(),
+                registryManager.biomeRegistry().elementOrder(),
+                validatedBlockState, validatedBiome, defaultBlockEntity
         );
     }
 

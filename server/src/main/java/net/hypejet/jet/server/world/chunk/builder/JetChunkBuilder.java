@@ -6,9 +6,8 @@ import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.registry.RegistryEntry;
-import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.registry.JetRegistryEntry;
-import net.hypejet.jet.server.registry.JetRegistryManager;
+import net.hypejet.jet.server.util.order.ElementOrder;
 import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.light.JetLightSection;
@@ -45,9 +44,10 @@ public final class JetChunkBuilder implements ChunkBuilder {
     private final Int2ObjectMap<LightSectionBuilder> lightSectionBuilders = new Int2ObjectOpenHashMap<>();
 
     private final Map<ChunkRelativeBlockPosition, CompoundBinaryTag> blockEntities = new HashMap<>();
-
     private final DimensionType dimensionType;
-    private final JetMinecraftServer server;
+
+    private final ElementOrder<JetBlockState> blockStateOrder;
+    private final ElementOrder<JetRegistryEntry<Biome>> biomeOrder;
 
     private final JetBlockState defaultBlockState;
     private final JetRegistryEntry<Biome> defaultBiome;
@@ -56,7 +56,10 @@ public final class JetChunkBuilder implements ChunkBuilder {
      * Constructs the {@linkplain JetChunkBuilder chunk builder implementation}.
      *
      * @param dimensionType a dimension type of world that the chunk is created for
-     * @param server a server that should own the chunk
+     * @param blockStateOrder an element order of all available block states on a server that the chunk is created for,
+     *                        used for bit storages of block-state chunk palettes
+     * @param biomeOrder an element order of all available biomes on a server that the chunk is created for,
+     *                        used for bit storages of biome chunk palettes
      * @param defaultBlockState a default block state that the block state list of chunk sections
      *                          should be initially filled with
      * @param defaultBiome a registry entry of a default biome that the biome list of chunk sections
@@ -65,11 +68,14 @@ public final class JetChunkBuilder implements ChunkBuilder {
      *                           with, {@code null} if the map should not be filled
      * @since 1.0
      */
-    public JetChunkBuilder(@NonNull DimensionType dimensionType, @NonNull JetMinecraftServer server,
+    public JetChunkBuilder(@NonNull DimensionType dimensionType, @NonNull ElementOrder<JetBlockState> blockStateOrder,
+                           @NonNull ElementOrder<JetRegistryEntry<Biome>> biomeOrder,
                            @NonNull JetBlockState defaultBlockState, @NonNull JetRegistryEntry<Biome> defaultBiome,
                            @Nullable CompoundBinaryTag defaultBlockEntity) {
         this.dimensionType = NullabilityUtil.requireNonNull(dimensionType, "dimension type");
-        this.server = NullabilityUtil.requireNonNull(server, "server");
+
+        this.blockStateOrder = NullabilityUtil.requireNonNull(blockStateOrder, "block state order");
+        this.biomeOrder = NullabilityUtil.requireNonNull(biomeOrder, "biome order");
 
         this.defaultBlockState = NullabilityUtil.requireNonNull(defaultBlockState, "default block state");
         this.defaultBiome = NullabilityUtil.requireNonNull(defaultBiome, "default biome");
@@ -187,7 +193,7 @@ public final class JetChunkBuilder implements ChunkBuilder {
             lightSections.add(sectionIndex, lightSection);
         }
 
-        return JetChunk.create(this.server, this.dimensionType, chunkSections, lightSections, this.blockEntities);
+        return JetChunk.create(this.dimensionType, chunkSections, lightSections, this.blockEntities);
     }
 
     /**
@@ -226,7 +232,10 @@ public final class JetChunkBuilder implements ChunkBuilder {
      * @since 1.0
      */
     private @NonNull ChunkSectionBuilder createChunkSectionBuilder() {
-        return new ChunkSectionBuilder(this.server, this.defaultBlockState, this.defaultBiome);
+        return new ChunkSectionBuilder(
+                this.defaultBlockState, this.defaultBiome,
+                this.blockStateOrder, this.biomeOrder
+        );
     }
 
     /**
@@ -240,18 +249,24 @@ public final class JetChunkBuilder implements ChunkBuilder {
         private final List<BlockState> blockStates;
         private final List<RegistryEntry<Biome>> biomes;
 
-        private final JetMinecraftServer server;
+        private final ElementOrder<JetBlockState> blockStateOrder;
+        private final ElementOrder<JetRegistryEntry<Biome>> biomeOrder;
 
         /**
          * Constructs the {@linkplain ChunkSectionBuilder chunk section builder}.
          *
-         * @param server a server that should own the chunk section
          * @param defaultBlockState a default block state that the block state list should be initially filled with
          * @param defaultBiome a registry entry of a default biome that the biome list should be initially filled with
+         * @param blockStateOrder an element order of all available block states on a server that the chunk section
+         *                        is created for, used for a bit storages of a block-state chunk palette
+         * @param biomeOrder an element order of all available biomes on a server that the chunk section
+         *                   is created for, used for a bit storages of a biome chunk palette
          * @since 1.0
          */
-        private ChunkSectionBuilder(@NonNull JetMinecraftServer server, @NonNull JetBlockState defaultBlockState,
-                                    @NonNull JetRegistryEntry<Biome> defaultBiome) {
+        private ChunkSectionBuilder(@NonNull JetBlockState defaultBlockState,
+                                    @NonNull JetRegistryEntry<Biome> defaultBiome,
+                                    @NonNull ElementOrder<JetBlockState> blockStateOrder,
+                                    @NonNull ElementOrder<JetRegistryEntry<Biome>> biomeOrder) {
             int blockStateCount = ChunkPaletteType.BLOCK_STATE.elementCount();
             this.blockStates = new ArrayList<>(blockStateCount);
 
@@ -264,7 +279,8 @@ public final class JetChunkBuilder implements ChunkBuilder {
             for (int index = 0; index < biomeCount; index++)
                 this.biomes.add(index, defaultBiome);
 
-            this.server = server;
+            this.blockStateOrder = blockStateOrder;
+            this.biomeOrder = biomeOrder;
         }
 
         /**
@@ -332,19 +348,9 @@ public final class JetChunkBuilder implements ChunkBuilder {
          * @since 1.0
          */
         private @NonNull JetChunkSection build() {
-            JetRegistryManager registryManager = this.server.registryManager();
             return new JetChunkSection(
-                    this.server,
-                    AbstractChunkPalette.create(
-                            ChunkPaletteType.BLOCK_STATE,
-                            registryManager.blockStateRegistry().order(),
-                            this.blockStates
-                    ),
-                    AbstractChunkPalette.create(
-                            ChunkPaletteType.BIOME,
-                            registryManager.biomeRegistry().elementOrder(),
-                            this.biomes
-                    )
+                    AbstractChunkPalette.create(ChunkPaletteType.BLOCK_STATE, this.blockStateOrder, this.blockStates),
+                    AbstractChunkPalette.create(ChunkPaletteType.BIOME, this.biomeOrder, this.biomes)
             );
         }
     }
