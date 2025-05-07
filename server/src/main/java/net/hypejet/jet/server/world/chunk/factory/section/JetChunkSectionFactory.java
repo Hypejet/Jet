@@ -1,9 +1,7 @@
 package net.hypejet.jet.server.world.chunk.factory.section;
 
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.registry.RegistryEntry;
-import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.world.chunk.light.JetLightSection;
 import net.hypejet.jet.server.world.chunk.light.storage.AbstractLightStorage;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
@@ -21,18 +19,14 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see ChunkSectionFactory
  */
 public final class JetChunkSectionFactory implements ChunkSectionFactory {
-
-    private final JetMinecraftServer server;
-
     /**
-     * Constructs the {@linkplain JetChunkSectionFactory chunk section factory implementation}.
+     * An instance of the {@linkplain JetChunkSectionFactory chunk-section factory}.
      *
-     * @param server a server that should own chunk sections created by the factory
      * @since 1.0
      */
-    public JetChunkSectionFactory(@NonNull JetMinecraftServer server) {
-        this.server = NullabilityUtil.requireNonNull(server, "server");
-    }
+    public static final JetChunkSectionFactory INSTANCE = new JetChunkSectionFactory();
+
+    private JetChunkSectionFactory() {}
 
     @Override
     public @NonNull JetChunkSection createChunkSection(@NonNull ChunkPalette<BlockState> blockStatePalette,
@@ -41,7 +35,7 @@ public final class JetChunkSectionFactory implements ChunkSectionFactory {
             throw new IllegalArgumentException("The block state palette specified is not a valid chunk palette");
         if (!(biomePalette instanceof AbstractChunkPalette<RegistryEntry<Biome>> validatedBiomePalette))
             throw new IllegalArgumentException("The biome palette specified is not a valid chunk palette");
-        return new JetChunkSection(this.server, validatedBlockStatePalette, validatedBiomePalette);
+        return new JetChunkSection(validatedBlockStatePalette, validatedBiomePalette);
     }
 
     @Override

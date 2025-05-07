@@ -35,7 +35,6 @@ public final class JetWorldManager implements WorldManager {
     private final JetChunkPaletteFactory<BlockState> blockStateChunkPaletteFactory;
     private final JetChunkPaletteFactory<RegistryEntry<Biome>> biomeChunkPaletteFactory;
 
-    private final ChunkSectionFactory chunkSectionFactory;
     private final ChunkFactory chunkFactory;
 
     /**
@@ -58,7 +57,6 @@ public final class JetWorldManager implements WorldManager {
                 registryManager.biomeRegistry().elementOrder()
         );
 
-        this.chunkSectionFactory = new JetChunkSectionFactory(server);
         this.chunkFactory = new JetChunkFactory(server);
     }
 
@@ -89,7 +87,7 @@ public final class JetWorldManager implements WorldManager {
 
     @Override
     public @NonNull ChunkSectionFactory chunkSectionFactory() {
-        return this.chunkSectionFactory;
+        return JetChunkSectionFactory.INSTANCE;
     }
 
     @Override

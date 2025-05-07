@@ -16,6 +16,7 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkBatc
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkBatchStartPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerInvalidateChunkPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerWorldEventPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.coordinate.ChunkPositionUtil;
 import net.hypejet.jet.server.world.acquisition.worldmap.WriteWorldMapAcquisitionImpl;
 import net.hypejet.jet.server.world.chunk.JetChunk;
@@ -284,10 +285,11 @@ public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnect
 
                 this.player.sendPacket(new ServerChunkBatchStartPlayPacket());
 
-                for (ChunkPosition chunkPosition : chunksToSendPositions) {
-                    JetChunk chunk = worldMapAcquisition.getChunk(chunkPosition);
-                    this.player.sendPacket(new ServerChunkAndLightDataPlayPacket(chunkPosition, chunk));
-                    this.chunksScheduled.remove(chunkPosition);
+                JetRegistryManager registryManager = this.player.server().registryManager();
+                for (ChunkPosition position : chunksToSendPositions) {
+                    JetChunk chunk = worldMapAcquisition.getChunk(position);
+                    this.player.sendPacket(ServerChunkAndLightDataPlayPacket.create(position, chunk, registryManager));
+                    this.chunksScheduled.remove(position);
                 }
 
                 int batchSize = chunksToSendPositions.size();
