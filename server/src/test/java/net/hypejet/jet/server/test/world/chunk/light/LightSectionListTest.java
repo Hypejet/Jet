@@ -6,7 +6,7 @@ import it.unimi.dsi.fastutil.objects.Object2ByteMap;
 import it.unimi.dsi.fastutil.objects.Object2ByteMaps;
 import it.unimi.dsi.fastutil.objects.Object2ByteOpenHashMap;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
-import net.hypejet.jet.server.test.world.chunk.ChunkTestDimensionHolder;
+import net.hypejet.jet.server.test.world.chunk.ChunkTestUtil;
 import net.hypejet.jet.server.world.chunk.light.JetLightSection;
 import net.hypejet.jet.server.world.chunk.light.LightSectionList;
 import net.hypejet.jet.server.world.chunk.light.LightType;
@@ -32,7 +32,7 @@ import java.util.List;
 public final class LightSectionListTest {
     @Test
     public void testUpdatingAndSectionIndices() {
-        DimensionType dimensionType = ChunkTestDimensionHolder.DIMENSION_TYPE;
+        DimensionType dimensionType = ChunkTestUtil.DIMENSION_TYPE;
 
         JetLightSection emptySection = new JetLightSection(EmptyLightStorage.INSTANCE, EmptyLightStorage.INSTANCE);
         int sectionCount = LightSectionList.createSectionCount(dimensionType);

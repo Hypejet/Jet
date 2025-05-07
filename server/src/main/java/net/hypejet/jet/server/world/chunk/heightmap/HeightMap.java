@@ -80,15 +80,14 @@ public final class HeightMap {
      *
      * @param blockX the chunk-relative {@code block X} coordinate value
      * @param blockZ the chunk-relative {@code block Z} coordinate value
-     * @param dimensionType a dimension type of chunk that this height map belongs to
      * @return the absolute {@code block Y} coordinate value of the height
      * @since 1.0
      */
     @Contract(pure = true)
-    public int getBlockY(byte blockX, byte blockZ, @NonNull DimensionType dimensionType) {
+    public int getBlockY(byte blockX, byte blockZ) {
         int elementIndex = createElementIndex(blockX, blockZ);
         int element = this.data.getElement(elementIndex);
-        return toBlockY(element, dimensionType);
+        return toBlockY(element, this.dimensionType);
     }
 
     /**
@@ -114,7 +113,7 @@ public final class HeightMap {
             byte blockX = position.relativeX();
             byte blockZ = position.relativeZ();
 
-            int previousBlockY = this.getBlockY(blockX, blockZ, this.dimensionType);
+            int previousBlockY = this.getBlockY(blockX, blockZ);
             int newBlockY = position.absoluteY();
 
             if (previousBlockY > newBlockY)

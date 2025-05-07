@@ -5,7 +5,7 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2ByteMap;
 import it.unimi.dsi.fastutil.objects.Object2ByteOpenHashMap;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
-import net.hypejet.jet.server.test.world.chunk.ChunkTestDimensionHolder;
+import net.hypejet.jet.server.test.world.chunk.ChunkTestUtil;
 import net.hypejet.jet.server.world.chunk.light.JetLightSection;
 import net.hypejet.jet.server.world.chunk.light.LightSectionList;
 import net.hypejet.jet.server.world.chunk.light.LightSerializationData;
@@ -34,7 +34,7 @@ import java.util.List;
 public final class LightSerializationDataTest {
     @Test
     public void testDataCreation() {
-        DimensionType dimensionType = ChunkTestDimensionHolder.DIMENSION_TYPE;
+        DimensionType dimensionType = ChunkTestUtil.DIMENSION_TYPE;
 
         AbstractLightStorage skyLightStorage = AbstractLightStorage.create(
                 new NibbleArray.Builder(ChunkPaletteType.BLOCK_STATE.elementCount())
@@ -125,7 +125,7 @@ public final class LightSerializationDataTest {
 
     @Test
     public void testUpdateDataCreation() {
-        DimensionType dimensionType = ChunkTestDimensionHolder.DIMENSION_TYPE;
+        DimensionType dimensionType = ChunkTestUtil.DIMENSION_TYPE;
 
         AbstractLightStorage storage = AbstractLightStorage.create(
                 new NibbleArray.Builder(ChunkPaletteType.BLOCK_STATE.elementCount())
