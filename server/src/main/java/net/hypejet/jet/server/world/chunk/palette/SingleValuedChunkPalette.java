@@ -68,6 +68,16 @@ public final class SingleValuedChunkPalette<E> extends AbstractChunkPalette<E> {
     }
 
     /**
+     * Gets the element that this chunk palette returns for each position.
+     *
+     * @return the element
+     * @since 1.0
+     */
+    public @NonNull E element() {
+        return this.element;
+    }
+
+    /**
      * Gets an identifier of the element that this chunk palette returns for each position.
      *
      * @return the element identifier

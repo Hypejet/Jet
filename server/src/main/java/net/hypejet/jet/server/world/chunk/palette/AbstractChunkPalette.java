@@ -256,6 +256,24 @@ public sealed abstract class AbstractChunkPalette<E> implements ChunkPalette<E>
     }
 
     /**
+     * Creates {@linkplain ChunkPaletteRelativePosition a chunk-palette-relative position} that an index specified
+     * corresponds to in {@linkplain ChunkPalette chunk palettes}
+     * with {@linkplain ChunkPaletteType a chunk-palette-type specified}.
+     *
+     * @param index the index
+     * @param type the chunk-palette-type
+     * @return the chunk-palette-relative position
+     * @since 1.0
+     */
+    public static @NonNull ChunkPaletteRelativePosition createPosition(int index, @NonNull ChunkPaletteType type) {
+        byte axisLength = type.axisLength();
+        return new ChunkPaletteRelativePosition(
+                (byte) (index % axisLength), (byte) (index / axisLength),
+                (byte) (index / (axisLength * axisLength)), type
+        );
+    }
+
+    /**
      * Creates {@linkplain Object2ShortMap a map}, which maps elements to their count in the element list specified.
      *
      * @param elements the element list
