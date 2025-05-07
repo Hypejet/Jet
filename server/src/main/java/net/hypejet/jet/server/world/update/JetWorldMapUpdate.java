@@ -70,6 +70,8 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
     private final Map<ChunkPosition, ChunkUpdateBuilder> updateBuilders = new HashMap<>();
     private final WriteWorldMapAcquisitionImpl acquisition;
 
+    private boolean updated;
+
     /**
      * Constructs the {@linkplain JetWorldMapUpdate world map update implementation}.
      *
@@ -84,6 +86,7 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
     public @NonNull WorldMapUpdate updateBlockState(@NonNull BlockPosition position, @NonNull BlockState blockState) {
         NullabilityUtil.requireNonNull(position, "position");
         NullabilityUtil.requireNonNull(blockState, "block state");
+        this.ensureNotUpdated();
 
         ChunkPosition chunkPosition = ChunkPositionUtil.fromCoordinate(position);
         ChunkRelativeBlockPosition relativePosition = ChunkRelativePositionUtil.from(position);
@@ -97,6 +100,7 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
                                                      @NonNull CompoundBinaryTag blockEntityData) {
         NullabilityUtil.requireNonNull(position, "position");
         NullabilityUtil.requireNonNull(blockEntityData, "block entity data");
+        this.ensureNotUpdated();
 
         ChunkPosition chunkPosition = ChunkPositionUtil.fromCoordinate(position);
         ChunkRelativeBlockPosition relativePosition = ChunkRelativePositionUtil.from(position);
@@ -110,6 +114,7 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
                                                @NonNull RegistryEntry<Biome> biome) {
         NullabilityUtil.requireNonNull(position, "position");
         NullabilityUtil.requireNonNull(biome, "biome");
+        this.ensureNotUpdated();
 
         ChunkPosition chunkPosition = ChunkPositionUtil.fromBiomePosition(position);
         ChunkRelativeBiomePosition relativePosition = ChunkRelativePositionUtil.from(position);
@@ -121,6 +126,7 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
     @Override
     public @NonNull WorldMapUpdate updateSkyLightLevel(@NonNull BlockPosition position, byte level) {
         NullabilityUtil.requireNonNull(position, "position");
+        this.ensureNotUpdated();
 
         ChunkPosition chunkPosition = ChunkPositionUtil.fromCoordinate(position);
         ChunkRelativeBlockPosition relativePosition = ChunkRelativePositionUtil.from(position);
@@ -132,6 +138,7 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
     @Override
     public @NonNull WorldMapUpdate updateBlockLightLevel(@NonNull BlockPosition position, byte level) {
         NullabilityUtil.requireNonNull(position, "position");
+        this.ensureNotUpdated();
 
         ChunkPosition chunkPosition = ChunkPositionUtil.fromCoordinate(position);
         ChunkRelativeBlockPosition relativePosition = ChunkRelativePositionUtil.from(position);
@@ -142,6 +149,9 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
 
     @Override
     public void update() {
+        this.ensureNotUpdated();
+        this.updated = true;
+
         for (ChunkUpdateBuilder updateBuilder : this.updateBuilders.values())
             this.acquisition.setChunk(updateBuilder.chunkPosition, updateBuilder.createUpdatedChunk());
 
@@ -209,6 +219,11 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
                 chunkPosition,
                 ignored -> new ChunkUpdateBuilder(chunkPosition, this.acquisition)
         );
+    }
+
+    private void ensureNotUpdated() {
+        if (this.updated)
+            throw new IllegalStateException("The update has been already performed");
     }
 
     /**
