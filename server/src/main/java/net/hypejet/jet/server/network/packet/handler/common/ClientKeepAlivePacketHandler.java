@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.packet.handler.common;
 import net.hypejet.jet.server.network.packet.handler.ClientPacketHandler;
 import net.hypejet.jet.server.network.packet.packets.client.common.ClientKeepAlivePacket;
 import net.hypejet.jet.server.network.session.Session;
-import net.hypejet.jet.server.network.session.keepalive.KeepAliveResponseHandler;
+import net.hypejet.jet.server.network.session.common.CommonSessionPacketHandler;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -26,10 +26,8 @@ public final class ClientKeepAlivePacketHandler extends ClientPacketHandler<Clie
 
     @Override
     public void handle(@NonNull ClientKeepAlivePacket packet, @NonNull Session session) {
-        if (!(session.sessionTask() instanceof KeepAliveResponseHandler responseHandler)) {
-            throw new IllegalStateException("A keep alive packet has been received during a session task" +
-                    ", which is not a keep alive response handler");
-        }
-        responseHandler.handleKeepAliveResponse(packet.keepAliveIdentifier());
+        if (!(session.sessionTask() instanceof CommonSessionPacketHandler handler))
+            throw new IllegalArgumentException("The session task does not implement a common session packet handler");
+        handler.handleKeepAliveResponse(packet.keepAliveIdentifier());
     }
 }

@@ -1,6 +1,5 @@
 package net.hypejet.jet.network;
 
-import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.entity.player.Player;
 import net.kyori.adventure.text.Component;
@@ -38,15 +37,6 @@ public interface PlayerConnection {
      * @since 1.0
      */
     @NonNull Player playerOrThrow();
-
-    /**
-     * Creates {@linkplain NotNullObjectAcquisition a not-null object acquisition} of
-     * {@linkplain PlayerConnectionState a state of the connection}.
-     *
-     * @return the acquisition
-     * @since 1.0
-     */
-    @NonNull NotNullObjectAcquisition<PlayerConnectionState> connectionState();
 
     /**
      * Sends a disconnection packet and closes the connection.

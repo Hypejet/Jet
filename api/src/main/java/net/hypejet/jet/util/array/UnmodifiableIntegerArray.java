@@ -33,6 +33,7 @@ public record UnmodifiableIntegerArray(int @NonNull [] array) {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (!(o instanceof UnmodifiableIntegerArray otherArray)) return false;
         return Objects.deepEquals(this.array, otherArray.array);
     }

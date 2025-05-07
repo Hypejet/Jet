@@ -16,20 +16,21 @@ public final class VarIntArrayNetworkWriter extends AggregateNetworkWriter<int[]
 
     /**
      * An instance of the {@linkplain VarIntArrayNetworkReader variable-length integer array network reader}, which
-     * allows length up to {@link Integer#MAX_VALUE}.
+     * allows for lengths up to {@link Integer#MAX_VALUE} and encodes them.
      *
      * @since 1.0
      */
-    public static final VarIntArrayNetworkWriter INSTANCE = new VarIntArrayNetworkWriter(Integer.MAX_VALUE);
+    public static final VarIntArrayNetworkWriter INSTANCE = new VarIntArrayNetworkWriter(Integer.MAX_VALUE, true);
 
     /**
      * Constructs the {@linkplain VarIntArrayNetworkWriter variable-length integer array network writer}.
      *
      * @param maxLength a max length that an array can have
+     * @param encodeLength whether the length of variable-length integer arrays should be encoded
      * @since 1.0
      */
-    public VarIntArrayNetworkWriter(int maxLength) {
-        super(maxLength);
+    public VarIntArrayNetworkWriter(int maxLength, boolean encodeLength) {
+        super(maxLength, encodeLength);
     }
 
     @Override

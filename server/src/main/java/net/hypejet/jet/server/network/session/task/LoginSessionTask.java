@@ -4,19 +4,23 @@ import net.hypejet.concurrency.object.WriteObjectAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquirable;
 import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.event.events.login.LoginFinishedEvent;
 import net.hypejet.jet.event.events.login.LoginStartEvent;
-import net.hypejet.jet.login.LoginManager;
-import net.hypejet.jet.login.profile.GameProfileProperty;
+import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
-import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.ProtocolState;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.packet.packets.client.login.ClientLoginRequestLoginPacket;
+import net.hypejet.jet.server.network.packet.packets.server.common.ServerCookieRequestPacket;
 import net.hypejet.jet.server.network.packet.packets.server.login.ServerEnableCompressionLoginPacket;
 import net.hypejet.jet.server.network.packet.packets.server.login.ServerLoginSuccessLoginPacket;
 import net.hypejet.jet.server.network.session.Session;
+import net.hypejet.jet.server.network.session.data.LoginData;
 import net.hypejet.jet.server.util.unit.Unit;
+import net.hypejet.jet.session.login.LoginManager;
+import net.hypejet.jet.session.login.profile.GameProfileProperty;
+import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -47,7 +51,7 @@ public final class LoginSessionTask implements SessionTask, LoginManager {
 
     private final CompletableFuture<ClientLoginRequestLoginPacket> requestFuture = new CompletableFuture<>();
 
-    private final CompletableFuture<Unit> pluginFuture = new CompletableFuture<>();
+    private final CompletableFuture<LoginData> pluginFuture = new CompletableFuture<>();
     private final CompletableFuture<Unit> acknowledgeFuture = new CompletableFuture<>();
 
     private final BooleanAcquirable finished = new BooleanAcquirable();
@@ -62,6 +66,7 @@ public final class LoginSessionTask implements SessionTask, LoginManager {
      * @param clientProtocolVersion a protocol version of the client trying to connect
      * @param transferring whether the client is joining due to transferring from another server
      * @throws IllegalStateException if the caller thread is not an event loop thread
+     * @since 1.0
      */
     public LoginSessionTask(@NonNull SocketPlayerConnection connection,
                             int clientProtocolVersion, boolean transferring) {
@@ -117,18 +122,22 @@ public final class LoginSessionTask implements SessionTask, LoginManager {
             if (finishedAcquisition.get())
                 throw new IllegalArgumentException("The session has been already finished");
             finishedAcquisition.set(true);
-            // TODO: Handle properties
-            this.connection.initializePlayer(new JetPlayer(uniqueId, username, this.connection));
-            this.pluginFuture.complete(Unit.INSTANCE);
+            this.pluginFuture.complete(new LoginData(username, uniqueId, properties));
         }
+    }
+
+    @Override
+    public void requestCookie(@NonNull Key key) {
+        NullabilityUtil.requireNonNull(key, "key");
+        this.connection.sendPacket(new ServerCookieRequestPacket(key));
     }
 
     /**
      * Handles a login request from a client.
      *
      * @param packet a packet of the login request
-     * @since 1.0
      * @throws IllegalArgumentException if the client has already sent a login request
+     * @since 1.0
      */
     public void handleLoginRequest(@NonNull ClientLoginRequestLoginPacket packet) {
         if (this.requestFuture.isDone())
@@ -139,8 +148,8 @@ public final class LoginSessionTask implements SessionTask, LoginManager {
     /**
      * Handles an acknowledgement to the login finish from a client.
      *
-     * @since 1.0
      * @throws IllegalArgumentException if the client has already sent an acknowledgement
+     * @since 1.0
      */
     public void acknowledgeFinishLogin() {
         if (this.acknowledgeFuture.isDone())
@@ -185,30 +194,47 @@ public final class LoginSessionTask implements SessionTask, LoginManager {
 
     private void runVirtualThreadTask() {
         try {
+            EventNode<Object> eventNode = this.connection.server().eventNode();
+
             try {
                 ClientLoginRequestLoginPacket requestPacket = this.requestFuture.get(TIME_OUT_TIME, TIME_OUT_UNIT);
-                this.connection.server().eventNode().call(new LoginStartEvent(
+                eventNode.call(new LoginStartEvent(
                         requestPacket.username(), requestPacket.uniqueId(), this
                 ));
             } catch (TimeoutException exception) {
                 throw new RuntimeException("The login request has not been sent by a client on time", exception);
             }
 
+            LoginData loginData;
+
             try {
-                this.pluginFuture.get(TIME_OUT_TIME, TIME_OUT_UNIT);
+                loginData = this.pluginFuture.get(TIME_OUT_TIME, TIME_OUT_UNIT);
             } catch (TimeoutException exception) {
                 throw new RuntimeException("The login session has not been finished on time", exception);
             }
 
+            LoginFinishedEvent finishedEvent = new LoginFinishedEvent(this.connection);
+            eventNode.call(finishedEvent);
+
+            switch (finishedEvent.getResult()) {
+                case LoginFinishedEvent.Result.Fail fail -> {
+                    this.connection.disconnect(fail.disconnectReason());
+                    return;
+                }
+                case LoginFinishedEvent.Result.Success ignored -> {}
+            }
+
             try (WriteObjectAcquisition<Session> sessionAcquisition = this.connection.acquireSessionWrite()) {
-                JetPlayer player = this.connection.playerOrThrow();
-                // TODO: Handle properties
-                player.sendPacket(new ServerLoginSuccessLoginPacket(player.uniqueId(), player.username(), Set.of()));
+                this.connection.sendPacket(new ServerLoginSuccessLoginPacket(
+                        loginData.uniqueId(), loginData.username(), loginData.properties()
+                ));
 
                 this.acknowledgeFuture.get(TIME_OUT_TIME, TIME_OUT_UNIT);
 
-                sessionAcquisition.set(new Session(ProtocolState.CONFIGURATION, this.connection,
-                        new ConfigurationSessionTask(player)));
+                sessionAcquisition.set(new Session(
+                        ProtocolState.CONFIGURATION, this.connection,
+                        new ConfigurationSessionTask(this.connection, loginData)
+                ));
 
                 this.connection.clientPacketReader().resumePacketReading();
             } catch (TimeoutException exception) {

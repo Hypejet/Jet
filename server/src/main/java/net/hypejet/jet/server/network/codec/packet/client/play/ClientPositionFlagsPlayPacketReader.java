@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.codec.packet.client.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
-import net.hypejet.jet.server.network.codec.game.world.coordinate.PositionFlagsReader;
+import net.hypejet.jet.server.network.codec.game.world.coordinate.PositionFlagsNetworkReader;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientPositionFlagsPlayPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -27,6 +27,6 @@ public final class ClientPositionFlagsPlayPacketReader implements NetworkReader<
 
     @Override
     public @NonNull ClientPositionFlagsPlayPacket read(@NonNull ByteBuf buf) {
-        return new ClientPositionFlagsPlayPacket(PositionFlagsReader.INSTANCE.read(buf));
+        return new ClientPositionFlagsPlayPacket(PositionFlagsNetworkReader.INSTANCE.read(buf));
     }
 }

@@ -1,13 +1,16 @@
 package net.hypejet.jet.entity.player;
 
-import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
+import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
+import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
+import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.command.CommandSource;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.Entity;
+import net.hypejet.jet.entity.acquisition.gamemode.GameModeAcquisition;
+import net.hypejet.jet.entity.acquisition.gamemode.WriteGameModeAcquisition;
 import net.hypejet.jet.network.PlayerConnection;
-import net.kyori.adventure.key.Key;
-import net.kyori.adventure.text.Component;
+import net.hypejet.jet.util.game.audience.CommonAudience;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -21,7 +24,7 @@ import java.util.Set;
  * @see Entity
  * @see PlayerConnection
  */
-public interface Player extends Entity, CommandSource {
+public interface Player extends Entity, CommandSource, CommonAudience {
     /**
      * Gets a username of the player.
      *
@@ -39,31 +42,22 @@ public interface Player extends Entity, CommandSource {
     @NonNull PlayerConnection connection();
 
     /**
-     * A shortcut for {@link PlayerConnection#disconnect(Component)}, which is accessed by {@link #connection()}.
-     *
-     * @param reason the reason of disconnection
-     * @since 1.0
-     * @see PlayerConnection#disconnect(Component)
-     */
-    void disconnect(@NonNull Component reason);
-
-    /**
-     * Creates {@linkplain NullableObjectAcquisition a nullable object acquisition} holding
+     * Creates {@linkplain NotNullObjectAcquisition a not-null object acquisition} of clientside
      * {@linkplain Settings settings} of the player.
      *
-     * @return the acquisition, whose object is {@code null} if the settings were not initialized yet
+     * @return the not-null object acquisition
      * @since 1.0
      */
-    @NonNull NullableObjectAcquisition<Settings> settings();
+    @NonNull NotNullObjectAcquisition<Settings> settings();
 
     /**
-     * Creates {@linkplain NullableObjectAcquisition a nullable object acquisition} holding client brand of the
-     * {@linkplain Player player}.
+     * Creates {@linkplain NotNullObjectAcquisition a not-null object acquisition} of a brand name of a client
+     * associated with this {@linkplain Player player}.
      *
-     * @return the acquisition, whose object is {@code null} if the client did not send it yet
+     * @return the not-null object acquisition
      * @since 1.0
      */
-    @NonNull NullableObjectAcquisition<String> clientBrand();
+    @NonNull NotNullObjectAcquisition<String> clientBrand();
 
     /**
      * Gets {@linkplain MinecraftServer a Minecraft server} that the player is connected to.
@@ -74,13 +68,40 @@ public interface Player extends Entity, CommandSource {
     @NonNull MinecraftServer server();
 
     /**
-     * Sends a plugin message to the player.
+     * Creates {@linkplain GameModeAcquisition a game mode acquisition} of {@linkplain GameMode a game mode}
+     * of this {@linkplain Player player}.
      *
-     * @param identifier an identifier of the plugin message
-     * @param data a data of the plugin message
+     * @return the game mode acquisition
      * @since 1.0
      */
-    void sendPluginMessage(@NonNull Key identifier, byte @NonNull [] data);
+    @NonNull GameModeAcquisition acquireGameModeRead();
+
+    /**
+     * Creates {@linkplain WriteGameModeAcquisition a write game mode acquisition}
+     * of {@linkplain GameMode a game mode} of this {@linkplain Player player}.
+     *
+     * @return the write game mode acquisition
+     * @since 1.0
+     */
+    @NonNull WriteGameModeAcquisition acquireGameModeWrite();
+
+    /**
+     * Creates {@linkplain BooleanAcquisition a boolean acquisition}, which holds a value defining whether a respawn
+     * screen is enabled for this {@linkplain Player player}.
+     *
+     * @return the boolean acquisition
+     * @since 1.0
+     */
+    @NonNull BooleanAcquisition acquireRespawnScreenEnabledRead();
+
+    /**
+     * Creates {@linkplain WriteBooleanAcquisition a write boolean acquisition}, which holds a value defining
+     * whether a respawn screen is enabled for this {@linkplain Player player}.
+     *
+     * @return the boolean acquisition
+     * @since 1.0
+     */
+    @NonNull WriteBooleanAcquisition acquireRespawnScreenEnabledWrite();
 
     /**
      * Represents a Minecraft chat mode setting of {@linkplain Player a player}.

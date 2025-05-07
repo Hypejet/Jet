@@ -1,15 +1,14 @@
 package net.hypejet.jet.event.events.login;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.login.LoginManager;
+import net.hypejet.jet.session.login.LoginManager;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Represents {@linkplain LoginEvent a login event}, which is called when a client sends a response to a requested
- * plugin message during {@linkplain net.hypejet.jet.network.PlayerConnectionState#LOGIN a login player connection
- * state}.
+ * plugin message during a login state.
  *
  * @param loginManager a login manager of the login state
  * @param requestIdentifier an identifier created when the plugin message was requested

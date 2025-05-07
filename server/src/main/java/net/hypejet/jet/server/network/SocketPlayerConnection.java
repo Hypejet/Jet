@@ -15,7 +15,6 @@ import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.object.notnull.WriteNotNullObjectAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.network.PlayerConnection;
-import net.hypejet.jet.network.PlayerConnectionState;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.exception.NetworkException;
@@ -34,6 +33,7 @@ import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerDisconnectPacket;
 import net.hypejet.jet.server.network.packet.reader.ClientPacketReader;
 import net.hypejet.jet.server.network.session.Session;
+import net.hypejet.jet.server.network.session.pack.ResourcePackHandler;
 import net.hypejet.jet.server.network.session.task.HandshakeSessionTask;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.hypejet.jet.server.util.acquisition.NotNullObjectMappedAcquisition;
@@ -84,6 +84,8 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
 
     private final NotNullObjectAcquirable<Session> session;
     private final ClientPacketReader clientPacketReader;
+
+    private final ResourcePackHandler resourcePackHandler = new ResourcePackHandler(this);
 
     /**
      * Constructs the {@link SocketPlayerConnection socket player connection}.
@@ -141,14 +143,6 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     }
 
     @Override
-    public @NonNull NotNullObjectAcquisition<PlayerConnectionState> connectionState() {
-        return new NotNullObjectMappedAcquisition<>(
-                this.protocolState(),
-                acquisition -> acquisition.get().toConnectionState()
-        );
-    }
-
-    @Override
     public void disconnect(@NonNull Component reason) {
         try (NotNullObjectAcquisition<ProtocolState> protocolStateAcquisition = this.protocolState()) {
             CompletableFuture<?> disconnectPacketResultFuture;
@@ -186,7 +180,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
         }
 
         if (this.player != null)
-            this.server.unregisterPlayer(this.player);
+            this.player.handleDisconnection();
         this.clientPacketReader.handleDisconnection();
     }
 
@@ -279,6 +273,16 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     }
 
     /**
+     * Gets {@linkplain ResourcePackHandler a resource pack handler} of this connection.
+     *
+     * @return the resource pack handler
+     * @since 1.0
+     */
+    public @NonNull ResourcePackHandler resourcePackHandler() {
+        return this.resourcePackHandler;
+    }
+
+    /**
      * Closes the connection.
      *
      * @since 1.0
@@ -304,8 +308,8 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
      * Initializes the {@linkplain JetPlayer player} of this connection.
      *
      * @param player the player
-     * @since 1.0
      * @throws IllegalArgumentException if the player was already initialized
+     * @since 1.0
      */
     public void initializePlayer(@NonNull JetPlayer player) {
         this.playerLock.writeLock().lock();
@@ -322,8 +326,8 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     /**
      * Ensures that the caller thread is {@linkplain EventLoop an event loop} thread.
      *
-     * @since 1.0
      * @throws IllegalStateException if the caller thread is not an event loop thread
+     * @since 1.0
      */
     public void ensureInEventLoop() {
         if (!this.channel.eventLoop().inEventLoop())

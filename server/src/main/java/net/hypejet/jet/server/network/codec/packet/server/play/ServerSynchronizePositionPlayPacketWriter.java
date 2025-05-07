@@ -1,22 +1,21 @@
 package net.hypejet.jet.server.network.codec.packet.server.play;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.server.network.codec.NetworkCodec;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.hypejet.jet.data.model.api.coordinate.Position;
+import net.hypejet.jet.entity.movement.flag.RelativeFlag;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.world.coordinate.VectorNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket;
-import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket.RelativeFlag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Represents {@linkplain NetworkWriter a network writer}, which writes
- * {@linkplain ServerSynchronizePositionPlayPacket a synchronize position play packet}.
+ * {@linkplain ServerSynchronizePositionPlayPacket a server synchronize position play packet}.
  *
  * @since 1.0
  * @see ServerSynchronizePositionPlayPacket
@@ -34,64 +33,64 @@ public final class ServerSynchronizePositionPlayPacketWriter
     public static final ServerSynchronizePositionPlayPacketWriter
             INSTANCE = new ServerSynchronizePositionPlayPacketWriter();
 
-    private static final RelativeFlagCollectionNetworkCodec FLAG_CODEC = new RelativeFlagCollectionNetworkCodec();
+    private static final RelativeFlagCollectionNetworkWriter
+            RELATIVE_FLAGS_WRITER = new RelativeFlagCollectionNetworkWriter();
 
     private ServerSynchronizePositionPlayPacketWriter() {}
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerSynchronizePositionPlayPacket object) {
-        VarIntNetworkCodec.INSTANCE.write(buf, object.teleportId());
-        VectorNetworkCodec.INSTANCE.write(buf, object.position());
+        VarIntNetworkCodec.INSTANCE.write(buf, object.identifier());
+
+        Position position = object.position();
+        buf.writeDouble(position.x());
+        buf.writeDouble(position.y());
+        buf.writeDouble(position.z());
+
         VectorNetworkCodec.INSTANCE.write(buf, object.deltaMovement());
-        buf.writeFloat(object.yaw());
-        buf.writeFloat(object.pitch());
-        FLAG_CODEC.write(buf, object.relativeFlags());
+
+        buf.writeFloat(position.yaw());
+        buf.writeFloat(position.pitch());
+
+        RELATIVE_FLAGS_WRITER.write(buf, object.relativeFlags());
     }
 
     /**
-     * Represents {@linkplain NetworkCodec a network codec}, which reads and writes
+     * Represents {@linkplain NetworkWriter a network writer}, which reads and writes
      * {@linkplain Collection a collection} of {@linkplain RelativeFlag relative flags}.
      *
      * @since 1.0
      * @see RelativeFlag
      * @see Collection
-     * @see NetworkCodec
+     * @see NetworkWriter
      */
-    private static final class RelativeFlagCollectionNetworkCodec implements NetworkCodec<Collection<RelativeFlag>> {
+    private static final class RelativeFlagCollectionNetworkWriter implements NetworkWriter<Collection<RelativeFlag>> {
 
-        private static final EnumMap<RelativeFlag, Integer> FLAG_IDS = new EnumMap<>(RelativeFlag.class);
+        private static final Object2IntMap<RelativeFlag> FLAG_MASKS = new Object2IntOpenHashMap<>();
 
         static {
-            FLAG_IDS.put(RelativeFlag.RELATIVE_X, 0);
-            FLAG_IDS.put(RelativeFlag.RELATIVE_Y, 1);
-            FLAG_IDS.put(RelativeFlag.RELATIVE_Z, 2);
-            FLAG_IDS.put(RelativeFlag.RELATIVE_YAW, 3);
-            FLAG_IDS.put(RelativeFlag.RELATIVE_PITCH, 4);
-            FLAG_IDS.put(RelativeFlag.RELATIVE_DELTA_X, 5);
-            FLAG_IDS.put(RelativeFlag.RELATIVE_DELTA_Y, 6);
-            FLAG_IDS.put(RelativeFlag.RELATIVE_DELTA_Z, 7);
-            FLAG_IDS.put(RelativeFlag.ROTATE_DELTA, 8);
-        }
-
-        @Override
-        public @NonNull Collection<RelativeFlag> read(@NonNull ByteBuf buf) {
-            int value = buf.readInt();
-            Set<RelativeFlag> flags = new HashSet<>();
-
-            for (RelativeFlag flag : RelativeFlag.values()) {
-                if ((value & FLAG_IDS.get(flag)) != 0) {
-                    flags.add(flag);
-                }
-            }
-
-            return flags;
+            FLAG_MASKS.put(RelativeFlag.X, 0x01);
+            FLAG_MASKS.put(RelativeFlag.Y, 0x02);
+            FLAG_MASKS.put(RelativeFlag.Z, 0x04);
+            FLAG_MASKS.put(RelativeFlag.YAW, 0x08);
+            FLAG_MASKS.put(RelativeFlag.PITCH, 0x10);
+            FLAG_MASKS.put(RelativeFlag.DELTA_X, 0x20);
+            FLAG_MASKS.put(RelativeFlag.DELTA_Y, 0x40);
+            FLAG_MASKS.put(RelativeFlag.DELTA_Z, 0x80);
+            FLAG_MASKS.put(RelativeFlag.ROTATE_DELTA, 0x100);
         }
 
         @Override
         public void write(@NonNull ByteBuf buf, @NonNull Collection<RelativeFlag> object) {
-            byte value = 0;
-            for (RelativeFlag flag : object)
-                value |= FLAG_IDS.get(flag);
+            int value = 0;
+            for (RelativeFlag flag : object) {
+                if (!FLAG_MASKS.containsKey(flag)) {
+                    throw new IllegalArgumentException(String.format(
+                            "Could not find an identifier of a relative flag of %s", flag
+                    ));
+                }
+                value |= FLAG_MASKS.getInt(flag);
+            }
             buf.writeInt(value);
         }
     }

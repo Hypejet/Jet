@@ -23,8 +23,8 @@ public record PluginDependency(@NonNull String pluginName, @NonNull Set<String> 
      * @param versionsSupported set of strings representing versions of the plugin, which are supported,
      *                          must not be empty
      * @param required whether the dependency plugin is required
-     * @since 1.0
      * @throws IllegalArgumentException if the set of versions supported is empty
+     * @since 1.0
      */
     public PluginDependency {
         NullabilityUtil.requireNonNull(pluginName, "plugin name");

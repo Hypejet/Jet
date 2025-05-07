@@ -25,6 +25,7 @@ import net.hypejet.jet.server.registry.tags.Tags;
 import net.hypejet.jet.server.util.acquisition.BooleanMappedAcquisition;
 import net.hypejet.jet.server.util.acquisition.CollectionMappedAcquisition;
 import net.hypejet.jet.server.util.acquisition.NotNullObjectMappedAcquisition;
+import net.hypejet.jet.server.util.order.ElementOrder;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -41,10 +42,12 @@ import java.util.Set;
 import java.util.function.UnaryOperator;
 
 /**
- * Represents an implementation of {@linkplain MinecraftRegistry a Minecraft registry}.
+ * Represents an implementation of {@linkplain MinecraftRegistry a Minecraft registry} using
+ * {@linkplain ElementOrder an element order}.
  *
  * @param <V> a type of values of entries of this registry
  * @since 1.0
+ * @see ElementOrder
  */
 public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
 
@@ -57,12 +60,9 @@ public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
     private final Class<V> entryValueClass;
 
     private final Map<Key, JetRegistryEntry<V>> keyToRegistryEntryMap;
-    private final Map<JetRegistryEntry<V>, Key> registryEntryToKeyMap;
-
-    private final List<JetRegistryEntry<V>> sortedEntries;
-    private final Map<JetRegistryEntry<V>, Integer> registryEntryToIdentifierMap;
 
     private final HashMapAcquirable<JetRegistryEntry<V>, Tags> tags;
+    private final ElementOrder<JetRegistryEntry<V>> elementOrder;
 
     /**
      * Constructs the {@linkplain JetSerializableMinecraftRegistry Minecraft registry}.
@@ -70,16 +70,15 @@ public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
      * @param registryKey a key of the registry
      * @param entryValueClass a class of values of entries of the registry
      * @param server a server, on which the registry is registered
-     * @param entries a collection of registry entries, which should be put into the registry
+     * @param entries a list of registry entries, which should be put into the registry, the order is preserved
      * @param enabledFeaturePacks feature packs, which are enabled on the server
      * @param entryToTagsMap tags of the registry entries specified
      * @since 1.0
      */
-    protected JetMinecraftRegistry(@NonNull Key registryKey, @NonNull Class<V> entryValueClass,
-                                   @NonNull JetMinecraftServer server, @NonNull List<JetRegistryEntry<V>> entries,
-                                   @NonNull Set<FeaturePack> enabledFeaturePacks,
-                                   @NonNull Map<JetRegistryEntry<V>, Tags> entryToTagsMap) {
-        NullabilityUtil.requireNonNull(entries, "entries");
+    public JetMinecraftRegistry(@NonNull Key registryKey, @NonNull Class<V> entryValueClass,
+                                @NonNull JetMinecraftServer server, @NonNull List<JetRegistryEntry<V>> entries,
+                                @NonNull Set<FeaturePack> enabledFeaturePacks,
+                                @NonNull Map<JetRegistryEntry<V>, Tags> entryToTagsMap) {
         NullabilityUtil.requireNonNull(enabledFeaturePacks, "enabled feature packs");
         NullabilityUtil.requireNonNull(entryToTagsMap, "entry to tags map");
 
@@ -94,84 +93,57 @@ public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
         Map<Key, JetRegistryEntry<V>> keyToRegistryEntryMap = new HashMap<>();
         Map<JetRegistryEntry<V>, Tags> tags = new HashMap<>();
 
-        List<JetRegistryEntry<V>> sortedEntries = new ArrayList<>();
         for (JetRegistryEntry<V> entry : entries) {
-            Key key = entry.key();
-            V value = entry.value();
-
             PackInfo knownPackInfo = entry.knownPackInfo();
             if (knownPackInfo != null && !enabledFeaturePackInfos.contains(knownPackInfo)) continue;
 
-            keyToRegistryEntryMap.put(entry.key(), new JetRegistryEntry<>(key, value, knownPackInfo));
-
+            keyToRegistryEntryMap.put(entry.key(), entry);
             tags.put(entry, entryToTagsMap.get(entry));
-            sortedEntries.add(entry);
         }
 
         this.keyToRegistryEntryMap = Map.copyOf(keyToRegistryEntryMap);
-        this.sortedEntries = List.copyOf(sortedEntries);
 
-        Map<JetRegistryEntry<V>, Integer> registryEntryToIdentifierMap = new HashMap<>();
-        for (int index = 0; index < sortedEntries.size(); index++)
-            registryEntryToIdentifierMap.put(sortedEntries.get(index), index);
-        this.registryEntryToIdentifierMap = Map.copyOf(registryEntryToIdentifierMap);
-
-        Map<JetRegistryEntry<V>, Key> registryEntryToKeyMap = new HashMap<>();
-        for (Map.Entry<Key, JetRegistryEntry<V>> entry : keyToRegistryEntryMap.entrySet())
-            registryEntryToKeyMap.put(entry.getValue(), entry.getKey());
-
-        this.registryEntryToKeyMap = Map.copyOf(registryEntryToKeyMap);
         this.tags = new HashMapAcquirable<>(tags);
+        this.elementOrder = new ElementOrder<>(entries);
     }
 
     @Override
-    public @NonNull Key registryKey() {
+    public final @NonNull Key registryKey() {
         return this.registryKey;
     }
 
     @Override
-    public @NonNull Class<V> entryValueClass() {
+    public final @NonNull Class<V> entryValueClass() {
         return this.entryValueClass;
     }
 
     @Override
-    public @Nullable JetRegistryEntry<V> get(@NonNull Key key) {
+    public final @Nullable JetRegistryEntry<V> get(@NonNull Key key) {
         return this.keyToRegistryEntryMap.get(NullabilityUtil.requireNonNull(key, "identifier"));
     }
 
     @Override
-    public @Nullable RegistryEntry<V> get(int identifier) {
-        return this.sortedEntries.get(identifier);
+    public final @Nullable JetRegistryEntry<V> get(int identifier) {
+        return this.elementOrder.get(identifier);
     }
 
     @Override
-    public boolean isRegistered(@NonNull RegistryEntry<V> entry) {
-        return this.registryEntryToKeyMap.containsKey(validateEntry(entry));
+    public final boolean isRegistered(@NonNull RegistryEntry<V> entry) {
+        return this.elementOrder.contains(validateEntry(entry));
     }
 
     @Override
-    public @NonNull Key keyOf(@NonNull RegistryEntry<V> entry) {
-        Key key = this.registryEntryToKeyMap.get(validateEntry(entry));
-        if (key == null)
-            throw NOT_REGISTERED_EXCEPTION;
-        return key;
+    public final int identifierOf(@NonNull RegistryEntry<V> entry) {
+        return this.elementOrder.identifierOf(validateEntry(entry));
     }
 
     @Override
-    public int identifierOf(@NonNull RegistryEntry<V> entry) {
-       Integer identifier = this.registryEntryToIdentifierMap.get(validateEntry(entry));
-        if (identifier == null)
-            throw NOT_REGISTERED_EXCEPTION;
-       return identifier;
+    public final @NonNull List<JetRegistryEntry<V>> entries() {
+        return this.elementOrder.elements();
     }
 
     @Override
-    public @NonNull List<JetRegistryEntry<V>> entries() {
-        return this.sortedEntries;
-    }
-
-    @Override
-    public @NonNull BooleanAcquisition hasTag(@NonNull RegistryEntry<V> entry, @NonNull Key tag) {
+    public final @NonNull BooleanAcquisition hasTag(@NonNull RegistryEntry<V> entry, @NonNull Key tag) {
         NullabilityUtil.requireNonNull(tag, "tag");
         return new BooleanMappedAcquisition<>(
                 this.tagsFor(entry),
@@ -180,7 +152,7 @@ public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
     }
 
     @Override
-    public @NonNull CollectionAcquisition<Key, ?> tagsFor(@NonNull RegistryEntry<V> entry) {
+    public final @NonNull CollectionAcquisition<Key, ?> tagsFor(@NonNull RegistryEntry<V> entry) {
         JetRegistryEntry<V> validatedEntry = validateEntry(entry);
         return new CollectionMappedAcquisition<>(this.tags.acquireRead(), acquisition -> {
             Tags tags = acquisition.map().get(validatedEntry);
@@ -191,7 +163,7 @@ public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
     }
 
     @Override
-    public void updateTags(@NonNull RegistryEntry<V> entry, @NonNull UnaryOperator<Collection<Key>> tagUnaryOperator) {
+    public final void updateTags(@NonNull RegistryEntry<V> entry, @NonNull UnaryOperator<Collection<Key>> tagUnaryOperator) {
         JetRegistryEntry<V> validatedEntry = validateEntry(entry);
 
         try (MapAcquisition<JetRegistryEntry<V>, Tags, ?> tagMapAcquisition = this.tags.acquireWrite()) {
@@ -229,11 +201,22 @@ public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
      * @return the tag registry
      * @since 1.0
      */
-    public @NonNull NotNullObjectAcquisition<TagRegistry> createTagRegistry() {
+    public final @NonNull NotNullObjectAcquisition<TagRegistry> createTagRegistry() {
         return new NotNullObjectMappedAcquisition<>(
                 this.tags.acquireRead(),
                 acquisition -> createTagRegistry(acquisition.map())
         );
+    }
+
+    /**
+     * Represents {@linkplain ElementOrder an element order} of elements stored
+     * in this {@linkplain JetMinecraftRegistry Minecraft registry}.
+     *
+     * @return the element order
+     * @since 1.0
+     */
+    public @NonNull ElementOrder<JetRegistryEntry<V>> elementOrder() {
+        return this.elementOrder;
     }
 
     private @NonNull TagRegistry createTagRegistry(@NonNull Map<JetRegistryEntry<V>, Tags> tags) {
@@ -276,14 +259,12 @@ public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
             JetRegistryEntry<V> registryEntry = new JetRegistryEntry<>(dataEntry.key(),
                     entryValueClass.cast(dataEntry.value()), dataEntry.knownPackInfo());
 
-            Tags tags = null;
             Collection<Key> tagCollection = dataEntry.tags();
-
-            if (tagCollection != null)
-                tags = new Tags(tagCollection);
+            if (tagCollection == null)
+                tagCollection = Set.of();
 
             entries.add(registryEntry);
-            entryToTagsMap.put(registryEntry, tags);
+            entryToTagsMap.put(registryEntry, new Tags(tagCollection));
         }
 
         return new JetMinecraftRegistry<>(registryKey, entryValueClass, server, List.copyOf(entries),

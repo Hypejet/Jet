@@ -33,12 +33,22 @@ import net.hypejet.jet.server.network.codec.packet.server.login.ServerLoginSucce
 import net.hypejet.jet.server.network.codec.packet.server.login.ServerPluginMessageRequestLoginPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerActionBarPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerCenterChunkPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerChunkAndLightDataPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerChunkBatchFinishedPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerCommandSuggestionsResponsePlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerDeclareCommandsPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerInvalidateChunkPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerJoinGamePlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerPlayerListHeaderAndFooterPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerRespawnPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizePositionPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizeRotationPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSystemMessagePlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerUpdateBiomesPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerUpdateBlockEntityPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerUpdateBlockStatePlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerUpdateChunkSectionBlockStatesPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerUpdateLightPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerWorldEventPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.status.ServerListResponseStatusPacketWriter;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerAddResourcePackPacket;
@@ -65,12 +75,23 @@ import net.hypejet.jet.server.network.packet.packets.server.login.ServerLoginSuc
 import net.hypejet.jet.server.network.packet.packets.server.login.ServerPluginMessageRequestLoginPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerActionBarPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerCenterChunkPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkAndLightDataPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkBatchFinishedPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkBatchStartPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerCommandSuggestionsResponsePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerInvalidateChunkPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerRespawnPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizeRotationPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSystemMessagePlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateBiomesPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateBlockEntityPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateBlockStatePlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateChunkSectionBlockStatesPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateLightPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerWorldEventPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.status.ServerListResponseStatusPacket;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
@@ -86,8 +107,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Represents a registry of {@linkplain NetworkWriter network writers}, which write {@linkplain ServerPacket server
- * packets}.
+ * Represents a registry of {@linkplain NetworkWriter network writers}, which write
+ * {@linkplain ServerPacket server packets}.
  *
  * @since 1.0
  * @see ServerPacket
@@ -206,7 +227,7 @@ public final class ServerPacketRegistry {
                                 ServerActionBarPlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.TAB_LIST, ServerPlayerListHeaderAndFooterPlayPacket.class,
                                 ServerPlayerListHeaderAndFooterPlayPacketWriter.INSTANCE)
-                        .add(ServerPlayPackets.ENTITY_POSITION_SYNC, ServerSynchronizePositionPlayPacket.class,
+                        .add(ServerPlayPackets.PLAYER_POSITION, ServerSynchronizePositionPlayPacket.class,
                                 ServerSynchronizePositionPlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.SET_CHUNK_CACHE_CENTER, ServerCenterChunkPlayPacket.class,
                                 ServerCenterChunkPlayPacketWriter.INSTANCE)
@@ -214,6 +235,29 @@ public final class ServerPacketRegistry {
                                 ServerDeclareCommandsPlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.COMMAND_SUGGESTIONS, ServerCommandSuggestionsResponsePlayPacket.class,
                                 ServerCommandSuggestionsResponsePlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.LEVEL_CHUNK_WITH_LIGHT, ServerChunkAndLightDataPlayPacket.class,
+                                ServerChunkAndLightDataPlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.FORGET_LEVEL_CHUNK, ServerInvalidateChunkPlayPacket.class,
+                                ServerInvalidateChunkPlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.CHUNK_BATCH_FINISHED, ServerChunkBatchFinishedPlayPacket.class,
+                                ServerChunkBatchFinishedPlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.RESPAWN, ServerRespawnPlayPacket.class,
+                                ServerRespawnPlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.PLAYER_ROTATION, ServerSynchronizeRotationPlayPacket.class,
+                                ServerSynchronizeRotationPlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.BLOCK_UPDATE, ServerUpdateBlockStatePlayPacket.class,
+                                ServerUpdateBlockStatePlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.BLOCK_ENTITY_DATA, ServerUpdateBlockEntityPlayPacket.class,
+                                ServerUpdateBlockEntityPlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.CHUNKS_BIOMES, ServerUpdateBiomesPlayPacket.class,
+                                ServerUpdateBiomesPlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.LIGHT_UPDATE, ServerUpdateLightPlayPacket.class,
+                                ServerUpdateLightPlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.SECTION_BLOCKS_UPDATE,
+                                ServerUpdateChunkSectionBlockStatesPlayPacket.class,
+                                ServerUpdateChunkSectionBlockStatesPlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.CHUNK_BATCH_START, ServerChunkBatchStartPlayPacket.class,
+                                (buf, object) -> {})
                         .build()
         );
 

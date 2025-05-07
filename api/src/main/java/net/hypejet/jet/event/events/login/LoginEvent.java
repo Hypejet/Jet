@@ -1,14 +1,14 @@
 package net.hypejet.jet.event.events.login;
 
-import net.hypejet.jet.login.LoginManager;
+import net.hypejet.jet.session.login.LoginManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents an event related to {@linkplain net.hypejet.jet.network.PlayerConnectionState#LOGIN a login player
- * connection state}.
+ * Represents an event related to logging state
+ * of {@linkplain net.hypejet.jet.network.PlayerConnection a player connection}.
  *
  * @since 1.0
- * @see net.hypejet.jet.network.PlayerConnectionState#LOGIN
+ * @see net.hypejet.jet.network.PlayerConnection
  */
 public interface LoginEvent {
     /**

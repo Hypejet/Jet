@@ -80,6 +80,7 @@ public final class JetPlugin implements Plugin {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (!(o instanceof JetPlugin plugin)) return false;
         return Objects.equals(this.metadata, plugin.metadata)
                 && Objects.equals(this.instance, plugin.instance)

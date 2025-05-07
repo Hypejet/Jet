@@ -98,6 +98,7 @@ public final class RegistryInitializeEvent<E> {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (!(o instanceof RegistryInitializeEvent<?> event)) return false;
         return Objects.equals(this.key, event.key)
                 && Objects.equals(this.entryClass, event.entryClass)

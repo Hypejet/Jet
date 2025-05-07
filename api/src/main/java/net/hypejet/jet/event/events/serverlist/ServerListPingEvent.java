@@ -63,6 +63,7 @@ public final class ServerListPingEvent {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (!(o instanceof ServerListPingEvent event)) return false;
         return Objects.equals(this.connection, event.connection) && Objects.equals(this.ping, event.ping);
     }

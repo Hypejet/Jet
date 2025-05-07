@@ -78,8 +78,8 @@ public final class ClientPacketReader implements NetworkDisconnectionHandler {
     /**
      * Blocks a thread responsible for decoding and reading packets until {@link #resumePacketReading()} is called.
      *
-     * @since 1.0
      * @throws IllegalStateException if the caller thread is not a client packet reader thread
+     * @since 1.0
      */
     public void pausePacketReading() {
         if (Thread.currentThread() != this.readerThread)

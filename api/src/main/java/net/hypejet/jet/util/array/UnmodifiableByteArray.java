@@ -33,6 +33,7 @@ public record UnmodifiableByteArray(byte @NonNull [] array) {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (!(o instanceof UnmodifiableByteArray otherArray)) return false;
         return Objects.deepEquals(this.array, otherArray.array);
     }

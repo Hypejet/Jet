@@ -13,21 +13,22 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class LongArrayNetworkWriter extends AggregateNetworkWriter<long[]> {
 
     /**
-     * An instance of the {@linkplain LongArrayNetworkWriter long array network writer}, which allows lengths
-     * up to {@link Integer#MAX_VALUE}.
+     * An instance of the {@linkplain LongArrayNetworkWriter long array network writer}, which allows for lengths
+     * up to {@link Integer#MAX_VALUE} and encodes them.
      *
      * @since 1.0
      */
-    public static final LongArrayNetworkWriter INSTANCE = new LongArrayNetworkWriter(Integer.MAX_VALUE);
+    public static final LongArrayNetworkWriter INSTANCE = new LongArrayNetworkWriter(Integer.MAX_VALUE, true);
 
     /**
      * Constructs the {@linkplain LongArrayNetworkWriter a long array network writer}.
      *
      * @param maxLength a max length that a long array can have
+     * @param encodeLength whether length of long arrays should be encoded
      * @since 1.0
      */
-    public LongArrayNetworkWriter(int maxLength) {
-        super(maxLength);
+    public LongArrayNetworkWriter(int maxLength, boolean encodeLength) {
+        super(maxLength, encodeLength);
     }
 
     @Override

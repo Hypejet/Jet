@@ -85,8 +85,8 @@ public record ServerDeclareCommandsPlayPacket(@NonNull RootNode rootNode) implem
          * Initializes children of the command node.
          *
          * @param children the children
-         * @since 1.0
          * @throws IllegalStateException if the children nodes have been already initialized
+         * @since 1.0
          */
         public final void initializeChildren(@NonNull Collection<Node> children) {
             if (this.children != null)

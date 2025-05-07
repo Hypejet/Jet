@@ -1,5 +1,10 @@
 package net.hypejet.jet.entity;
 
+import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
+import net.hypejet.jet.entity.acquisition.world.WriteEntityWorldAcquisition;
+import net.hypejet.jet.entity.movement.acquisition.MovementAcquisition;
+import net.hypejet.jet.entity.movement.acquisition.WriteMovementAcquisition;
+import net.hypejet.jet.world.World;
 import net.kyori.adventure.identity.Identified;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
@@ -39,6 +44,46 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
      * @since 1.0
      */
     @NonNull UUID uniqueId();
+
+    /**
+     * Creates {@linkplain MovementAcquisition a movement acquisition}
+     * of {@linkplain net.hypejet.jet.data.model.api.coordinate.Position a position}
+     * and {@linkplain net.hypejet.jet.data.model.api.coordinate.Vector a vector}
+     * of this {@linkplain Entity entity}.
+     *
+     * @return the movement acquisition
+     * @since 1.0
+     */
+    @NonNull MovementAcquisition acquireMovementRead();
+
+    /**
+     * Creates {@linkplain WriteMovementAcquisition a write movement acquisition}
+     * of {@linkplain net.hypejet.jet.data.model.api.coordinate.Position a position}
+     * and {@linkplain net.hypejet.jet.data.model.api.coordinate.Vector a vector}
+     * of this {@linkplain Entity entity}.
+     *
+     * @return the write movement acquisition
+     * @since 1.0
+     */
+    @NonNull WriteMovementAcquisition acquireMovementWrite();
+
+    /**
+     * Creates {@linkplain NotNullObjectAcquisition a not-null object acquisition} of {@linkplain World a world}
+     * of this {@linkplain Entity entity}.
+     *
+     * @return the not-null object acquisition
+     * @since 1.0
+     */
+    @NonNull NotNullObjectAcquisition<World> acquireWorldRead();
+
+    /**
+     * Creates {@linkplain WriteEntityWorldAcquisition a write entity world acquisition} of {@linkplain World a world}
+     * of this {@linkplain Entity entity}.
+     *
+     * @return the write entity world acquisition
+     * @since 1.0
+     */
+    @NonNull WriteEntityWorldAcquisition acquireWorldWrite();
 
     /**
      * Represents a hand of an entity.

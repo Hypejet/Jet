@@ -1,35 +1,55 @@
 package net.hypejet.jet.server.network.session.task;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.hypejet.concurrency.object.WriteObjectAcquisition;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
+import net.hypejet.concurrency.object.nullable.NullableObjectAcquirable;
+import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
+import net.hypejet.concurrency.object.nullable.WriteNullableObjectAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquirable;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
+import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.data.model.api.pack.PackInfo;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.data.model.server.registry.registries.pack.FeaturePack;
+import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.configuration.ConfigurationStartEvent;
+import net.hypejet.jet.network.PlayerConnection;
 import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.ProtocolState;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
+import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.configuration.ClientKnownPacksConfigurationPacket;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket.TagRegistry;
 import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerFeatureFlagsConfigurationPacket;
 import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerFinishConfigurationPacket;
 import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerKnownPacksConfigurationPacket;
 import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerRegistryDataConfigurationPacket;
+import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerResetChatConfigurationPacket;
 import net.hypejet.jet.server.network.session.Session;
+import net.hypejet.jet.server.network.session.common.CommonSessionPacketHandler;
+import net.hypejet.jet.server.network.session.data.ConfigurationData;
+import net.hypejet.jet.server.network.session.data.LoginData;
 import net.hypejet.jet.server.network.session.keepalive.KeepAliveHandler;
-import net.hypejet.jet.server.network.session.keepalive.KeepAliveResponseHandler;
+import net.hypejet.jet.server.network.session.pack.ResourcePackHandler;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
 import net.hypejet.jet.server.registry.JetSerializableMinecraftRegistry;
 import net.hypejet.jet.server.registry.function.RegistryTagUpdateFunction;
+import net.hypejet.jet.server.util.NetworkUtil;
+import net.hypejet.jet.server.util.game.audience.PacketReceivingCommonAudience;
 import net.hypejet.jet.server.util.unit.Unit;
+import net.hypejet.jet.server.world.JetWorld;
+import net.hypejet.jet.session.configuration.ConfigurationManager;
+import net.hypejet.jet.world.World;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTag;
+import net.kyori.adventure.resource.ResourcePackStatus;
+import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.ArrayList;
@@ -37,6 +57,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -51,35 +72,44 @@ import java.util.concurrent.TimeoutException;
  * @see ProtocolState#CONFIGURATION
  * @see SessionTask
  */
-public final class ConfigurationSessionTask implements SessionTask, KeepAliveResponseHandler, RegistryTagUpdateFunction {
+public final class ConfigurationSessionTask implements SessionTask, RegistryTagUpdateFunction, ConfigurationManager,
+        CommonSessionPacketHandler, PacketReceivingCommonAudience {
+
+    private static final Key SERVER_BRAND_PLUGIN_MESSAGE_KEY = Key.key("brand");
 
     private static final long TIME_OUT_DURATION = 20;
     private static final TimeUnit TIME_OUT_UNIT = TimeUnit.SECONDS;
 
-    private final BooleanAcquirable tagsSent = new BooleanAcquirable();
+    private final SocketPlayerConnection connection;
+    private final LoginData loginData;
 
-    private final JetPlayer player;
     private final KeepAliveHandler keepAliveHandler;
+    private final BooleanAcquirable tagsSent = new BooleanAcquirable();
 
     private final CompletableFuture<ClientKnownPacksConfigurationPacket> knownPacksFuture = new CompletableFuture<>();
     private final CompletableFuture<Unit> acknowledgeFuture = new CompletableFuture<>();
 
+    private final NullableObjectAcquirable<Player.Settings> settings = new NullableObjectAcquirable<>();
+    private final NullableObjectAcquirable<String> clientBrand = new NullableObjectAcquirable<>();
+
     /**
      * Constructs the {@linkplain ConfigurationSessionTask configuration session task}.
      *
-     * @param player a player that the session task should be handled for
+     * @param connection a connection that the session task should be handled for
+     * @param loginData a data of the connection set during a login session task
      * @since 1.0
      */
-    public ConfigurationSessionTask(@NonNull JetPlayer player) {
-        this.player = NullabilityUtil.requireNonNull(player, "player");
-        this.keepAliveHandler = new KeepAliveHandler(player);
+    public ConfigurationSessionTask(@NonNull SocketPlayerConnection connection, @NonNull LoginData loginData) {
+        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
+        this.loginData = NullabilityUtil.requireNonNull(loginData, "login data");
+        this.keepAliveHandler = new KeepAliveHandler(this.connection, loginData.username());
     }
 
     @Override
     public void start() {
         Thread.ofVirtual()
-                .name(String.format("Configuration session task thread - %s", this.player.username()))
-                .uncaughtExceptionHandler(this.player.connection())
+                .name(String.format("Configuration session task thread - %s", this.loginData.username()))
+                .uncaughtExceptionHandler(this.connection)
                 .start(this::runVirtualThreadTask);
     }
 
@@ -96,11 +126,57 @@ public final class ConfigurationSessionTask implements SessionTask, KeepAliveRes
     }
 
     @Override
+    public void handleResourcePackStatus(@NonNull UUID uniqueId, @NonNull ResourcePackStatus status) {
+        this.resourcePackHandler().handleState(uniqueId, status, this);
+    }
+
+    @Override
     public void updateTags(@NonNull ServerUpdateTagsPacket packet) {
         try (BooleanAcquisition tagsSentAcquisition = this.tagsSent.acquireWrite()) {
             if (!tagsSentAcquisition.get()) return;
-            this.player.sendPacket(packet);
+            this.sendPacket(packet);
         }
+    }
+
+    @Override
+    public void resetChat() {
+        this.sendPacket(new ServerResetChatConfigurationPacket());
+    }
+
+    @Override
+    public @NonNull PlayerConnection connection() {
+        return this.connection;
+    }
+
+    @Override
+    public @NonNull ResourcePackHandler resourcePackHandler() {
+        return this.connection.resourcePackHandler();
+    }
+
+    @Override
+    public void handleClientBrand(@NonNull String name) {
+        NullabilityUtil.requireNonNull(name, "name");
+        try (WriteNullableObjectAcquisition<String> acquisition = this.clientBrand.acquireWrite()) {
+            acquisition.set(name);
+        }
+    }
+
+    @Override
+    public void handleClientInformation(Player.@NonNull Settings settings) {
+        NullabilityUtil.requireNonNull(settings, "settings");
+        try (WriteNullableObjectAcquisition<Player.Settings> acquisition = this.settings.acquireWrite()) {
+            acquisition.set(settings);
+        }
+    }
+
+    @Override
+    public void disconnect(@NonNull Component reason) {
+        this.connection.disconnect(reason);
+    }
+
+    @Override
+    public void sendPacket(@NonNull ServerPacket packet) {
+        this.connection.sendPacket(packet);
     }
 
     /**
@@ -121,43 +197,44 @@ public final class ConfigurationSessionTask implements SessionTask, KeepAliveRes
      * @since 1.0
      */
     public void handleFinishAcknowledge() {
-        SocketPlayerConnection connection = this.player.connection();
-
         if (this.acknowledgeFuture.isDone())
             throw new IllegalStateException("The configuration finish has been already acknowledged");
         this.acknowledgeFuture.complete(Unit.INSTANCE);
 
         // Ensure that no packet from the further session is handled
-        connection.clientPacketReader().pausePacketReading();
-    }
-
-    /**
-     * Gets {@linkplain JetPlayer a player} that the task is handled for.
-     *
-     * @return the player
-     * @since 1.0
-     */
-    public @NonNull JetPlayer player() {
-        return this.player;
+        this.connection.clientPacketReader().pausePacketReading();
     }
 
     private void runVirtualThreadTask() {
         this.keepAliveHandler.schedule();
+        JetMinecraftServer server = this.connection.server();
 
-        JetMinecraftServer server = this.player.server();
-        server.eventNode().call(new ConfigurationStartEvent(this.player));
-        this.player.sendServerBrand(server.brandName());
+        ConfigurationStartEvent startEvent = new ConfigurationStartEvent(this);
+        server.eventNode().call(startEvent);
 
-        Set<FeaturePack> enabledFeaturePacks = this.player.server().registryManager().enabledFeaturePacks();
+        World spawningWorld = startEvent.getSpawningWorld();
+        if (spawningWorld == null)
+            throw new IllegalStateException("The spawning world has not been set");
+
+        if (!(spawningWorld instanceof JetWorld validatedSpawningWorld))
+            throw new IllegalArgumentException("The spawning world is not a valid world");
+
+        Position spawningPosition = startEvent.getSpawningPosition();
+        if (spawningPosition == null)
+            throw new IllegalStateException("The spawning position has not been set");
+
+        this.sendServerBrand();
+        Set<FeaturePack> enabledFeaturePacks = this.connection.server().registryManager().enabledFeaturePacks();
 
         Set<Key> featureFlags = new HashSet<>();
         for (FeaturePack featurePack : enabledFeaturePacks)
             featureFlags.addAll(featurePack.requiredFeatureFlags());
-        this.player.sendPacket(new ServerFeatureFlagsConfigurationPacket(Set.copyOf(featureFlags)));
+
+        this.sendPacket(new ServerFeatureFlagsConfigurationPacket(Set.copyOf(featureFlags)));
 
         Set<PackInfo> packInfos = new HashSet<>();
         enabledFeaturePacks.forEach(dataPack -> packInfos.add(dataPack.info()));
-        this.player.sendPacket(new ServerKnownPacksConfigurationPacket(Set.copyOf(packInfos)));
+        this.sendPacket(new ServerKnownPacksConfigurationPacket(Set.copyOf(packInfos)));
 
         try {
             ClientKnownPacksConfigurationPacket packet;
@@ -167,10 +244,10 @@ public final class ConfigurationSessionTask implements SessionTask, KeepAliveRes
                 throw new RuntimeException("The known packs packet has not been sent on time", exception);
             }
 
-            Collection<JetMinecraftRegistry<?>> registries = server.registryManager().getRegistries().values();
+            Collection<JetMinecraftRegistry<?>> registries = server.registryManager().networkRegistries();
             for (JetMinecraftRegistry<?> registry : registries) {
                 if (!(registry instanceof JetSerializableMinecraftRegistry<?> serializableRegistry)) continue;
-                sendRegistry(this.player, serializableRegistry, packet.featurePacks());
+                sendRegistry(this.connection, serializableRegistry, packet.featurePacks());
             }
 
             try (WriteBooleanAcquisition tagsSentAcquisition = this.tagsSent.acquireWrite()) {
@@ -183,25 +260,48 @@ public final class ConfigurationSessionTask implements SessionTask, KeepAliveRes
                     for (NotNullObjectAcquisition<TagRegistry> tagRegistryAcquisition : tagRegistryAcquisitions)
                         tagRegistries.add(tagRegistryAcquisition.get());
 
-                    this.player.sendPacket(new ServerUpdateTagsPacket(Set.copyOf(tagRegistries)));
+                    this.sendPacket(new ServerUpdateTagsPacket(Set.copyOf(tagRegistries)));
                     tagsSentAcquisition.set(true);
                 } finally {
                     tagRegistryAcquisitions.forEach(NotNullObjectAcquisition::close);
                 }
             }
 
-            SocketPlayerConnection connection = this.player.connection();
             if (!this.keepAliveHandler.stopAndAwaitTermination(TIME_OUT_DURATION, TIME_OUT_UNIT)) {
-                connection.close(); // The keep alive handler has timed out
+                this.connection.close(); // The keep alive handler has timed out
                 return;
             }
 
-            try (WriteObjectAcquisition<Session> sessionAcquisition = connection.acquireSessionWrite()) {
-                connection.sendPacket(new ServerFinishConfigurationPacket());
+            try (WriteObjectAcquisition<Session> sessionAcquisition = this.connection.acquireSessionWrite()) {
+                this.sendPacket(new ServerFinishConfigurationPacket());
                 this.acknowledgeFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
 
-                sessionAcquisition.set(new Session(ProtocolState.PLAY, connection, new PlaySessionTask(this.player)));
-                connection.clientPacketReader().resumePacketReading();
+                try (
+                        NullableObjectAcquisition<Player.Settings> settingsAcquisition = this.settings.acquireRead();
+                        NullableObjectAcquisition<String> clientBrandAcquisition = this.clientBrand.acquireRead()
+                ) {
+                    Player.Settings settings = settingsAcquisition.get();
+                    if (settings == null)
+                        throw new IllegalStateException("Settings of the client have not been initialized");
+
+                    String clientBrand = clientBrandAcquisition.get();
+                    if (clientBrand == null)
+                        throw new IllegalStateException("Brand name of the client has not been initialized");
+
+                    sessionAcquisition.set(new Session(
+                            ProtocolState.PLAY, this.connection,
+                            new PlaySessionTask(
+                                    this.connection,
+                                    new ConfigurationData(
+                                            this.loginData, validatedSpawningWorld, spawningPosition,
+                                            startEvent.shouldEnableRespawnScreen(), startEvent.getPreviousGameMode(),
+                                            startEvent.getGameMode(), settings, clientBrand
+                                    )
+                            )
+                    ));
+                }
+
+                this.connection.clientPacketReader().resumePacketReading();
             } catch (TimeoutException exception) {
                 throw new RuntimeException(
                         "The configuration session task has not been acknowledged on time",
@@ -217,7 +317,18 @@ public final class ConfigurationSessionTask implements SessionTask, KeepAliveRes
         }
     }
 
-    private static <V> void sendRegistry(@NonNull JetPlayer player,
+    private void sendServerBrand() {
+        ByteBuf buf = Unpooled.buffer();
+        try {
+            StringNetworkCodec.INSTANCE.write(buf, this.connection.server().brandName());
+            byte[] messageData = NetworkUtil.readRemainingBytes(buf);
+            this.sendPluginMessage(SERVER_BRAND_PLUGIN_MESSAGE_KEY, messageData);
+        } finally {
+            buf.release();
+        }
+    }
+
+    private static <V> void sendRegistry(@NonNull SocketPlayerConnection connection,
                                          @NonNull JetSerializableMinecraftRegistry<V> registry,
                                          @NonNull Collection<PackInfo> dataPackResponse) {
         Key registryKey = registry.registryKey();
@@ -231,11 +342,11 @@ public final class ConfigurationSessionTask implements SessionTask, KeepAliveRes
             if (knownPackInfo == null || !dataPackResponse.contains(knownPackInfo))
                 serializedEntry = registry.binaryTagWriter().write(entry.value());
             else
-                serializedEntry = null; // The client already knows the value of the entry
+                serializedEntry = null; // The client already knows value of the entry
 
             entries.add(new ServerRegistryDataConfigurationPacket.Entry(identifier, serializedEntry));
         }
 
-        player.sendPacket(new ServerRegistryDataConfigurationPacket(registryKey, List.copyOf(entries)));
+        connection.sendPacket(new ServerRegistryDataConfigurationPacket(registryKey, List.copyOf(entries)));
     }
 }

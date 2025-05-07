@@ -61,16 +61,6 @@ public interface MinecraftRegistry<V> {
     boolean isRegistered(@NonNull RegistryEntry<V> entry);
 
     /**
-     * Gets {@linkplain Key a key} of a registry entry registered in this Minecraft registry.
-     *
-     * @param entry the registry entry
-     * @return the key
-     * @throws IllegalArgumentException if the registry entry specified has not been specified in this registry
-     * @since 1.0
-     */
-    @NonNull Key keyOf(@NonNull RegistryEntry<V> entry);
-
-    /**
      * Gets a numeric identifier of a registry entry registered in this Minecraft registry.
      *
      * @param entry the registry entry
