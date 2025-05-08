@@ -92,6 +92,16 @@ public final class BitStorage {
     }
 
     /**
+     * Gets a number of elements stored in this {@linkplain BitStorage bit storage}.
+     *
+     * @return the number
+     * @since 1.0
+     */
+    public int size() {
+        return this.size;
+    }
+
+    /**
      * Gets a long array that stores elements of this {@linkplain BitStorage bit storage}. Elements of the long array
      * can store multiple values at once.
      *
@@ -112,9 +122,22 @@ public final class BitStorage {
      */
     @Contract(pure = true)
     public @NonNull BitStorage withUpdates(@NonNull BitStorageUpdate @NonNull ... updates) {
+        if (updates.length == 0) return this;
+
         long[] data = this.data.clone();
-        for (BitStorageUpdate update : updates)
-            setValue(data, update.elementIndex(), update.newElement());
+        boolean storageUpdated = false;
+
+        for (BitStorageUpdate update : updates) {
+            int elementIndex = update.elementIndex();
+            int newElement = update.newElement();
+
+            if (this.getElement(elementIndex) == newElement) continue;
+            if (!storageUpdated) storageUpdated = true;
+
+            setValue(data, elementIndex, newElement);
+        }
+
+        if (!storageUpdated) return this;
         return new BitStorage(this.bitsPerElement, this.elementsPerDataValue, this.size, this.maxValue, data);
     }
 
