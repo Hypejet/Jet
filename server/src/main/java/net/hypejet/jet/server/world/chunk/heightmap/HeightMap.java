@@ -169,23 +169,21 @@ public final class HeightMap {
     }
 
     /**
-     * Creates {@linkplain HeightMap a height map} for {@linkplain ChunkSectionList a chunk section list}
-     * specified of {@linkplain JetChunk a chunk}
-     * with {@linkplain DimensionType a dimension type} specified.
+     * Creates {@linkplain HeightMap a height map} for {@linkplain ChunkSectionList a chunk section list} specified.
      *
      * @param type a type that the height map should have
      * @param chunkSectionList the chunk section list
-     * @param dimensionType the dimension type
      * @return the height map
      * @since 1.0
      */
-    @Contract(pure = true, value = "_, _, _ -> new")
-    public static @NonNull HeightMap create(@NonNull HeightMapType type, @NonNull ChunkSectionList chunkSectionList,
-                                            @NonNull DimensionType dimensionType) {
+    @Contract(pure = true, value = "_, _ -> new")
+    public static @NonNull HeightMap create(@NonNull HeightMapType type, @NonNull ChunkSectionList chunkSectionList) {
         byte axisLength = ChunkPaletteType.BLOCK_STATE.axisLength();
         int[] elements = new int[axisLength * axisLength];
 
+        DimensionType dimensionType = chunkSectionList.dimensionType();
         int height = dimensionType.height();
+
         for (byte blockX = 0; blockX < axisLength; blockX++) {
             for (byte blockZ = 0; blockZ < axisLength; blockZ++) {
                 elements[createElementIndex(blockX, blockZ)] = findHeightAndCreateElement(

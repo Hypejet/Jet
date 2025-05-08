@@ -1,5 +1,6 @@
 package net.hypejet.jet.server.world.chunk;
 
+import com.google.common.collect.Maps;
 import it.unimi.dsi.fastutil.objects.Object2ByteMap;
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
@@ -22,6 +23,7 @@ import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -40,7 +42,7 @@ public final class JetChunk implements Chunk {
     private final ChunkSectionList chunkSectionList;
     private final LightSectionList lightSectionList;
 
-    private final Set<HeightMap> heightMaps;
+    private final Map<HeightMapType, HeightMap> heightMaps;
     private final Map<ChunkRelativeBlockPosition, CompoundBinaryTag> blockEntities;
 
     /**
@@ -59,8 +61,15 @@ public final class JetChunk implements Chunk {
         this.chunkSectionList = NullabilityUtil.requireNonNull(chunkSectionList, "chunk section list");
         this.lightSectionList = NullabilityUtil.requireNonNull(lightSectionList, "light section list");
 
-        this.heightMaps = Set.copyOf(NullabilityUtil.requireNonNull(heightMaps, "height maps"));
-        this.blockEntities = Map.copyOf(NullabilityUtil.requireNonNull(blockEntities, "block entities"));
+        NullabilityUtil.requireNonNull(heightMaps, "height maps");
+        NullabilityUtil.requireNonNull(blockEntities, "block entities");
+
+        EnumMap<HeightMapType, HeightMap> heightMapsMap = new EnumMap<>(HeightMapType.class);
+        for (HeightMap heightMap : heightMaps)
+            heightMapsMap.put(heightMap.type(), heightMap);
+
+        this.heightMaps = Maps.immutableEnumMap(heightMapsMap);
+        this.blockEntities = Map.copyOf(blockEntities);
     }
 
     @Override
@@ -101,12 +110,13 @@ public final class JetChunk implements Chunk {
     }
 
     /**
-     * Gets {@linkplain Set a set} of {@linkplain HeightMap height maps} of the chunk.
+     * Gets {@linkplain Map a map} that maps {@linkplain HeightMapType height map types}
+     * to chunk {@linkplain HeightMap height maps} of the corresponding types.
      *
      * @return the set
      * @since 1.0
      */
-    public @NonNull Set<HeightMap> heightMaps() {
+    public @NonNull Map<HeightMapType, HeightMap> heightMaps() {
         return this.heightMaps;
     }
 
@@ -147,7 +157,7 @@ public final class JetChunk implements Chunk {
         LightSectionList lightSectionList = this.lightSectionList.withUpdates(skyLightUpdates, blockLightUpdates);
 
         Set<HeightMap> heightMaps = new HashSet<>();
-        for (HeightMap heightMap : this.heightMaps)
+        for (HeightMap heightMap : this.heightMaps.values())
             heightMaps.add(heightMap.withUpdates(chunkSectionList, blockStateUpdates));
 
         Map<ChunkRelativeBlockPosition, CompoundBinaryTag> blockEntityDataMap = new HashMap<>(this.blockEntities);
@@ -294,7 +304,7 @@ public final class JetChunk implements Chunk {
 
         Set<HeightMap> heightMaps = new HashSet<>();
         for (HeightMapType type : HeightMapType.values())
-            heightMaps.add(HeightMap.create(type, chunkSectionList, dimensionType));
+            heightMaps.add(HeightMap.create(type, chunkSectionList));
 
         return new JetChunk(chunkSectionList, lightSectionList, heightMaps, blockEntities);
     }

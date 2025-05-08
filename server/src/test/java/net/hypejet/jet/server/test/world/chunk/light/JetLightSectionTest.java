@@ -37,11 +37,11 @@ public final class JetLightSectionTest {
         JetLightSection updatedSection = section.withUpdates(
                 Set.of(new LightStorageUpdate(
                         new ChunkPaletteRelativePosition((byte) 6, (byte) 1, (byte) 3, ChunkPaletteType.BLOCK_STATE),
-                        (byte) 0
+                        (byte) 9
                 )),
                 Set.of(new LightStorageUpdate(
                         new ChunkPaletteRelativePosition((byte) 2, (byte) 0, (byte) 4, ChunkPaletteType.BLOCK_STATE),
-                        (byte) 0
+                        (byte) 6
                 ))
         );
 

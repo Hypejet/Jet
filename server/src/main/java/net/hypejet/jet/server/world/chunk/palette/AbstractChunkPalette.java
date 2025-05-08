@@ -152,9 +152,9 @@ public sealed abstract class AbstractChunkPalette<E> implements ChunkPalette<E>
             if (!elementCountMap.containsKey(previousElement))
                 continue;
 
-            short decreasedValue = (short) (elementCountMap.getShort(previousElementIdentifier) - 1);
+            short decreasedValue = (short) (elementCountMap.getShort(previousElement) - 1);
             if (decreasedValue <= 0) {
-                elementCountMap.removeShort(previousElementIdentifier);
+                elementCountMap.removeShort(previousElement);
                 continue;
             }
 
@@ -253,24 +253,6 @@ public sealed abstract class AbstractChunkPalette<E> implements ChunkPalette<E>
     public static int calculateElementIndex(@NonNull ChunkPaletteRelativePosition position) {
         byte axisLength = position.paletteType().axisLength();
         return position.x() + (axisLength * position.z()) + (axisLength * axisLength * position.y());
-    }
-
-    /**
-     * Creates {@linkplain ChunkPaletteRelativePosition a chunk-palette-relative position} that an index specified
-     * corresponds to in {@linkplain ChunkPalette chunk palettes}
-     * with {@linkplain ChunkPaletteType a chunk-palette-type specified}.
-     *
-     * @param index the index
-     * @param type the chunk-palette-type
-     * @return the chunk-palette-relative position
-     * @since 1.0
-     */
-    public static @NonNull ChunkPaletteRelativePosition createPosition(int index, @NonNull ChunkPaletteType type) {
-        byte axisLength = type.axisLength();
-        return new ChunkPaletteRelativePosition(
-                (byte) (index % axisLength), (byte) (index / axisLength),
-                (byte) (index / (axisLength * axisLength)), type
-        );
     }
 
     /**

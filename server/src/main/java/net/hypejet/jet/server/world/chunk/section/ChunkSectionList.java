@@ -27,15 +27,13 @@ import java.util.function.ToIntFunction;
 /**
  * Represents a storage of {@linkplain JetChunkSection chunk sections} of {@linkplain JetChunk a chunk}.
  *
+ * @param dimensionType a dimension type of world of a chunk that the chunk section list is created for
+ * @param sections a list of sections that the chunk section list should have
  * @since 1.0
  * @see JetChunkSection
  * @see JetChunk
  */
-public final class ChunkSectionList {
-
-    private final DimensionType dimensionType;
-    private final List<JetChunkSection> sections;
-
+public record ChunkSectionList(@NonNull DimensionType dimensionType, @NonNull List<JetChunkSection> sections) {
     /**
      * Constructs the {@linkplain ChunkSectionList chunk section list}.
      *
@@ -43,12 +41,12 @@ public final class ChunkSectionList {
      * @param sections a list of sections that the chunk section list should have
      * @since 1.0
      */
-    public ChunkSectionList(@NonNull DimensionType dimensionType, @NonNull List<JetChunkSection> sections) {
-        this.dimensionType = NullabilityUtil.requireNonNull(dimensionType, "dimension type");
-        this.sections = List.copyOf(NullabilityUtil.requireNonNull(sections, "sections"));
+    public ChunkSectionList {
+        NullabilityUtil.requireNonNull(dimensionType, "dimension type");
+        sections = List.copyOf(NullabilityUtil.requireNonNull(sections, "sections"));
 
         int expectedSectionCount = createSectionCount(dimensionType);
-        int actualSectionCount = this.sections.size();
+        int actualSectionCount = sections.size();
 
         if (actualSectionCount != expectedSectionCount) {
             throw new IllegalArgumentException(String.format(
@@ -56,17 +54,6 @@ public final class ChunkSectionList {
                     actualSectionCount, expectedSectionCount
             ));
         }
-    }
-
-    /**
-     * Gets {@linkplain List a list} of {@linkplain JetChunkSection chunk sections}
-     * that this {@linkplain ChunkSectionList chunk section list} stores.
-     *
-     * @return the list
-     * @since 1.0
-     */
-    public @NonNull List<JetChunkSection> sections() {
-        return this.sections;
     }
 
     /**
@@ -103,7 +90,7 @@ public final class ChunkSectionList {
      */
     public @NonNull JetChunkSection section(int sectionY) {
         int sectionIndex = createSectionIndex(sectionY, this.dimensionType);
-        if (sectionIndex <= 0 || sectionIndex >= this.sections.size())
+        if (sectionIndex < 0 || sectionIndex >= this.sections.size())
             throw new IndexOutOfBoundsException("Section-Y specified is invalid for this chunk section list");
 
         JetChunkSection section = this.sections.get(sectionIndex);
@@ -257,14 +244,9 @@ public final class ChunkSectionList {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ChunkSectionList otherSection)) return false;
-        return Objects.equals(this.dimensionType, otherSection.dimensionType)
-                && Objects.equals(this.sections, otherSection.sections);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.dimensionType, this.sections);
+        if (!(o instanceof ChunkSectionList(DimensionType otherDimensionType, List<JetChunkSection> otherSections)))
+            return false;
+        return Objects.equals(this.dimensionType, otherDimensionType) && Objects.equals(this.sections, otherSections);
     }
 
     @Override

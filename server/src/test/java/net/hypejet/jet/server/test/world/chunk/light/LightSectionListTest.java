@@ -72,9 +72,7 @@ public final class LightSectionListTest {
 
         List<JetLightSection> sections = sectionList.sections();
         List<JetLightSection> updatedSections = updatedList.sections();
-
-        for (int index = 0; index < unaffectedSections.size(); index++)
-            Assertions.assertEquals(sections.get(index), updatedSections.get(index));
+        unaffectedSections.forEach(index -> Assertions.assertSame(sections.get(index), updatedSections.get(index)));
     }
 
     private static void assertUpdated(@NonNull LightSectionList previousList, @NonNull LightSectionList newList,
@@ -104,7 +102,7 @@ public final class LightSectionListTest {
         for (Object2ByteMap.Entry<ChunkRelativeBlockPosition> entry : updates.object2ByteEntrySet()) {
             ChunkRelativeBlockPosition position = entry.getKey();
             int sectionY = ChunkSectionList.createSectionY(position.absoluteY(), ChunkPaletteType.BLOCK_STATE);
-            unaffectedSections.removeInt(LightSectionList.createSectionIndex(sectionY, dimensionType));
+            unaffectedSections.rem(LightSectionList.createSectionIndex(sectionY, dimensionType));
         }
     }
 }

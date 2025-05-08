@@ -100,21 +100,21 @@ public final class LightSerializationDataTest {
         }
 
         List<NibbleArray> skyLightData = serializationData.skyLightData();
-        List<NibbleArray> blockLightData = serializationData.skyLightData();
+        List<NibbleArray> blockLightData = serializationData.blockLightData();
 
         int skyLightDataIndex = 0;
         int blockLightDataIndex = 0;
 
         for (JetLightSection section : lightSections) {
-            AbstractLightStorage sectionSkyLightStorage = section.blockLightStorage();
+            AbstractLightStorage sectionSkyLightStorage = section.skyLightStorage();
             if (sectionSkyLightStorage instanceof DirectLightStorage) {
-                Assertions.assertEquals(sectionSkyLightStorage.data(), skyLightData.get(skyLightDataIndex));
+                Assertions.assertSame(sectionSkyLightStorage.data(), skyLightData.get(skyLightDataIndex));
                 skyLightDataIndex++;
             }
             
             AbstractLightStorage sectionBlockLightStorage = section.blockLightStorage();
             if (sectionBlockLightStorage instanceof DirectLightStorage) {
-                Assertions.assertEquals(sectionBlockLightStorage.data(), blockLightData.get(blockLightDataIndex));
+                Assertions.assertSame(sectionBlockLightStorage.data(), blockLightData.get(blockLightDataIndex));
                 blockLightDataIndex++;
             }
         }

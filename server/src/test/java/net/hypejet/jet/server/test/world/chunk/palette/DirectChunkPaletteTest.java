@@ -25,9 +25,11 @@ public final class DirectChunkPaletteTest {
         ChunkPaletteType paletteType = ChunkPaletteType.BIOME;
 
         int elementListSize = MathUtil.power(2, paletteType.minimumDirectBits()) - 1;
-        int elementCount = paletteType.elementCount();
+        if (elementListSize <= 1) elementListSize++;
 
+        int elementCount = paletteType.elementCount();
         List<String> elementList = new ArrayList<>();
+
         for (int index = 0; index < elementListSize; index++)
             elementList.add(index, String.valueOf(index));
 

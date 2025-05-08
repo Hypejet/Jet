@@ -17,6 +17,7 @@ import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPositio
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -25,13 +26,17 @@ import java.util.Set;
  * Represents {@linkplain ServerPacket a server packet}, which initializes {@linkplain JetChunk a chunk} for a client.
  *
  * @param chunkPosition a position of the chunk
- * @param chunk the chunk to initialize
+ * @param heightMaps a collection of heightmaps that the chunk should have
+ * @param chunkSectionList a chunk-section list of chunk sections that the chunk should have
+ * @param blockEntities a map, which maps chunk-relative block positions to block entities that block at these
+ *                      positions should have
+ * @param lightSerializationData a light serialization data of light data that the chunk should have
  * @since 1.0
  * @see JetChunk
  * @see ServerPacket
  */
 public record ServerChunkAndLightDataPlayPacket(
-        @NonNull ChunkPosition chunkPosition, @NonNull Set<HeightMap> heightMaps,
+        @NonNull ChunkPosition chunkPosition, @NonNull Collection<HeightMap> heightMaps,
         @NonNull ChunkSectionList chunkSectionList,
         @NonNull Map<ChunkRelativeBlockPosition, BlockEntity> blockEntities,
         @NonNull LightSerializationData lightSerializationData
@@ -40,7 +45,7 @@ public record ServerChunkAndLightDataPlayPacket(
      * Constructs the {@linkplain ServerChunkAndLightDataPlayPacket server chunk and light data play packet}.
      *
      * @param chunkPosition a position of the chunk
-     * @param heightMaps a set of heightmaps that the chunk should have
+     * @param heightMaps a collection of heightmaps that the chunk should have
      * @param chunkSectionList a chunk-section list of chunk sections that the chunk should have
      * @param blockEntities a map, which maps chunk-relative block positions to block entities that block at these
      *                      positions should have
@@ -90,7 +95,7 @@ public record ServerChunkAndLightDataPlayPacket(
         }
 
         return new ServerChunkAndLightDataPlayPacket(
-                chunkPosition, chunk.heightMaps(), chunk.chunkSectionList(),
+                chunkPosition, chunk.heightMaps().values(), chunk.chunkSectionList(),
                 blockEntities, chunk.lightSerializationData()
         );
     }

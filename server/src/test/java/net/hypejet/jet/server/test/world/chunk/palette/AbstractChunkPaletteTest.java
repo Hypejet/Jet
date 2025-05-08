@@ -41,7 +41,7 @@ public final class AbstractChunkPaletteTest {
 
     @Test
     public void testDirectCreation() {
-        testCreation(SingleValuedChunkPalette.class, ChunkPaletteType::minimumDirectBits);
+        testCreation(DirectChunkPalette.class, ChunkPaletteType::minimumDirectBits);
     }
 
     @Test
@@ -72,6 +72,8 @@ public final class AbstractChunkPaletteTest {
             int axisLength = type.axisLength();
 
             int elementListSize = MathUtil.power(2, type.minimumDirectBits()) - 1;
+            if (elementListSize <= 1) elementListSize++;
+
             List<String> elementList = createElementList(elementListSize);
             ElementOrder<String> elementOrder = new ElementOrder<>(elementList);
 
@@ -85,16 +87,20 @@ public final class AbstractChunkPaletteTest {
             Assertions.assertInstanceOf(IndirectChunkPalette.class, palette);
 
             List<ChunkPaletteUpdate<String>> updates = new ArrayList<>();
-            for (int index = 0; index < elementListSize; index++) {
-                updates.add(new ChunkPaletteUpdate<>(
-                        new ChunkPaletteRelativePosition(
-                                (byte) (index % axisLength),
-                                (byte) (index / axisLength),
-                                (byte) (index / (axisLength * axisLength)),
-                                type
-                        ),
-                        elementList.get(index)
-                ));
+            int index = 0;
+
+            for (byte x = 0; x < axisLength; x++) {
+                for (byte y = 0; y < axisLength; y++) {
+                    for (byte z = 0; z < axisLength; z++) {
+                        updates.add(new ChunkPaletteUpdate<>(
+                                new ChunkPaletteRelativePosition(x, y, z, type),
+                                elementList.get(index)
+                        ));
+
+                        index++;
+                        if (index >= elementListSize) break;
+                    }
+                }
             }
 
             Assertions.assertInstanceOf(DirectChunkPalette.class, palette.withUpdates(updates));
@@ -105,6 +111,8 @@ public final class AbstractChunkPaletteTest {
     public void testDirectToIndirectUpdate() {
         for (ChunkPaletteType type : ChunkPaletteType.values()) {
             int elementListSize = MathUtil.power(2, type.minimumDirectBits()) - 1;
+            if (elementListSize <= 1) elementListSize++;
+
             int elementCount = type.elementCount();
 
             List<String> elementList = createElementList(elementListSize);
@@ -120,16 +128,26 @@ public final class AbstractChunkPaletteTest {
             Assertions.assertInstanceOf(DirectChunkPalette.class, palette);
 
             List<ChunkPaletteUpdate<String>> updates = new ArrayList<>();
-            int maximumIndirectBits = type.maximumIndirectBits();
-            int maximumIndirectElements = MathUtil.power(2, maximumIndirectBits) - 1;
 
-            for (int index = 0; index < directElements.size(); index++) {
-                int indexModulo = index % elementListSize;
-                if (indexModulo < maximumIndirectBits) continue;
-                updates.add(new ChunkPaletteUpdate<>(
-                        AbstractChunkPalette.createPosition(index, type),
-                        elementList.get(indexModulo % maximumIndirectElements)
-                ));
+            int maximumIndirectElements = MathUtil.power(2, type.maximumIndirectBits()) - 1;
+            if (maximumIndirectElements <= 1) maximumIndirectElements++;
+
+            byte axisLength = type.axisLength();
+            for (byte x = 0; x < axisLength; x++) {
+                for (byte y = 0; y < axisLength; y++) {
+                    for (byte z = 0; z < axisLength; z++) {
+                        ChunkPaletteRelativePosition position = new ChunkPaletteRelativePosition(x, y, z, type);
+                        int index = AbstractChunkPalette.calculateElementIndex(position);
+
+                        int indexModulo = index % elementListSize;
+                        if (indexModulo < maximumIndirectElements) continue;
+
+                        updates.add(new ChunkPaletteUpdate<>(
+                                position,
+                                elementList.get(indexModulo % maximumIndirectElements)
+                        ));
+                    }
+                }
             }
 
             Assertions.assertInstanceOf(IndirectChunkPalette.class, palette.withUpdates(updates));
@@ -152,11 +170,17 @@ public final class AbstractChunkPaletteTest {
             Assertions.assertInstanceOf(IndirectChunkPalette.class, palette);
 
             List<ChunkPaletteUpdate<String>> updates = new ArrayList<>();
-            for (int index = 0; index < elementCount && index % elementCount == 0; index++) {
-                updates.add(new ChunkPaletteUpdate<>(
-                        AbstractChunkPalette.createPosition(index, type),
-                        elementList.getLast()
-                ));
+            byte axisLength = type.axisLength();
+
+            for (byte x = 0; x < axisLength; x++) {
+                for (byte y = 0; y < axisLength; y++) {
+                    for (byte z = 0; z < axisLength; z++) {
+                        ChunkPaletteRelativePosition position = new ChunkPaletteRelativePosition(x, y, z, type);
+                        int index = AbstractChunkPalette.calculateElementIndex(position);
+                        if (index % 2 == 0) continue;
+                        updates.add(new ChunkPaletteUpdate<>(position, elementList.getFirst()));
+                    }
+                }
             }
 
             Assertions.assertInstanceOf(SingleValuedChunkPalette.class, palette.withUpdates(updates));
@@ -169,13 +193,16 @@ public final class AbstractChunkPaletteTest {
     ) {
         for (ChunkPaletteType type : ChunkPaletteType.values()) {
             int bitCount = bitCountFunction.applyAsInt(type);
-            List<String> elementList = createElementList(bitCount);
 
+            int elementListSize = bitCount == 0 ? 0 : MathUtil.power(2, bitCount) - 1;
+            if (elementListSize <= 1) elementListSize++;
+
+            List<String> elementList = createElementList(elementListSize);
             int elementCount = type.elementCount();
             List<String> elements = new ArrayList<>();
 
             for (int index = 0; index < elementCount; index++) {
-                String element = elementList.get(index % bitCount);
+                String element = elementList.get(index % elementListSize);
                 elements.add(index, element);
             }
 

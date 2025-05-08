@@ -24,42 +24,42 @@ import java.util.List;
 public final class IndirectChunkPaletteTest {
     @Test
     public void testContents() {
-        ChunkPaletteType paletteType = ChunkPaletteType.BIOME;
+        for (ChunkPaletteType paletteType : ChunkPaletteType.values()) {
+            int elementListSize = MathUtil.power(2, paletteType.minimumIndirectBits()) - 1;
+            if (elementListSize <= 1) elementListSize++;
 
-        int elementListSize = MathUtil.power(2, paletteType.minimumIndirectBits()) - 1;
-        int elementCount = paletteType.elementCount();
+            List<String> elementList = new ArrayList<>();
+            for (int index = 0; index < elementListSize; index++)
+                elementList.add(index, String.valueOf(index));
 
-        List<String> elementList = new ArrayList<>();
-        ElementOrder<String> elementOrder = new ElementOrder<>(elementList);
+            int elementCount = paletteType.elementCount();
+            List<String> elements = new ArrayList<>(elementCount);
+            Object2ShortMap<String> elementCountMap = new Object2ShortOpenHashMap<>();
 
-        for (int index = 0; index < elementListSize; index++)
-            elementList.add(index, String.valueOf(index));
+            for (int index = 0; index < elementCount; index++) {
+                String element = elementList.get(index % elementListSize);
+                elements.add(index, element);
+                short count = elementCountMap.containsKey(element) ? (short) (elementCountMap.getShort(element) + 1) : 1;
+                elementCountMap.put(element, count);
+            }
 
-        List<String> elements = new ArrayList<>(elementCount);
-        Object2ShortMap<String> elementCountMap = new Object2ShortOpenHashMap<>();
+            ElementOrder<String> elementOrder = new ElementOrder<>(elementList);
+            AbstractChunkPalette<String> palette = AbstractChunkPalette.create(paletteType, elementOrder, elements);
 
-        for (int index = 0; index < elementCount; index++) {
-            String element = elementList.get(index % elementListSize);
-            elements.add(index, element);
-            short count = elementCountMap.containsKey(element) ? (short) (elementCountMap.getShort(element) + 1) : 1;
-            elementCountMap.put(element, count);
+            Assertions.assertInstanceOf(IndirectChunkPalette.class, palette);
+            Assertions.assertEquals(elements, palette.elements());
+            Assertions.assertEquals(elementCountMap, palette.elementCountMap());
+
+            IndirectChunkPalette<String> castPalette = (IndirectChunkPalette<String>) palette;
+            IntList registryIndices = new IntArrayList(castPalette.registryIndices());
+
+            for (String element : elementCountMap.keySet()) {
+                int elementIdentifier = elementOrder.identifierOf(element);
+                Assertions.assertTrue(registryIndices.contains(elementIdentifier));
+                registryIndices.rem(elementIdentifier);
+            }
+
+            Assertions.assertTrue(registryIndices.isEmpty());
         }
-
-        AbstractChunkPalette<String> palette = AbstractChunkPalette.create(paletteType, elementOrder, elements);
-
-        Assertions.assertInstanceOf(IndirectChunkPalette.class, palette);
-        Assertions.assertEquals(elements, palette.elements());
-        Assertions.assertEquals(elementCountMap, palette.elementCountMap());
-
-        IndirectChunkPalette<String> castPalette = (IndirectChunkPalette<String>) palette;
-        IntList registryIndices = new IntArrayList(castPalette.registryIndices());
-
-        for (String element : elementCountMap.keySet()) {
-            int elementIdentifier = elementOrder.identifierOf(element);
-            Assertions.assertTrue(registryIndices.contains(elementIdentifier));
-            registryIndices.removeInt(elementIdentifier);
-        }
-
-        Assertions.assertTrue(registryIndices.isEmpty());
     }
 }

@@ -9,6 +9,7 @@ import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.test.world.chunk.ChunkTestUtil;
 import net.hypejet.jet.server.util.order.ElementOrder;
 import net.hypejet.jet.server.world.block.JetBlockState;
+import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.builder.JetChunkBuilder;
 import net.hypejet.jet.server.world.chunk.heightmap.HeightMap;
 import net.hypejet.jet.server.world.chunk.heightmap.HeightMapType;
@@ -102,9 +103,7 @@ public final class HeightMapTest {
             }
         }
 
-        ChunkSectionList chunkSectionList = chunkBuilder.build().chunkSectionList();
-        HeightMap heightMap = HeightMap.create(type, chunkSectionList, dimensionType);
-
+        HeightMap heightMap = chunkBuilder.build().heightMaps().get(type);
         for (byte x = 0; x < axisLength; x++) {
             for (byte z = 0; z < axisLength; z++) {
                 int expectedY = expectedHeights.getInt(ByteBytePair.of(x, z));
@@ -130,7 +129,7 @@ public final class HeightMapTest {
         chunkBuilder.setBlockState(position, opaqueBlockState);
 
         ChunkSectionList sectionList = chunkBuilder.build().chunkSectionList();
-        HeightMap heightMap = HeightMap.create(type, sectionList, dimensionType);
+        HeightMap heightMap = HeightMap.create(type, sectionList);
 
         int initialHeight = heightMap.getBlockY(position.relativeX(), position.relativeZ());
         Assertions.assertEquals(position.absoluteY(), initialHeight);
@@ -154,7 +153,7 @@ public final class HeightMapTest {
     }
 
     private static void ensureOpaque(@NonNull HeightMapType type, @NonNull JetBlockState opaqueBlockState) {
-        if (type.isOpaque(opaqueBlockState)) {
+        if (!type.isOpaque(opaqueBlockState)) {
             throw new IllegalArgumentException(
                     "The opaque block state must be considered as opaque by the height map type specified"
             );

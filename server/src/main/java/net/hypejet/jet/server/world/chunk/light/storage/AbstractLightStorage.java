@@ -67,9 +67,7 @@ public sealed abstract class AbstractLightStorage implements LightStorage
             if (!lightChanged) lightChanged = true;
 
             arrayBuilder.set(AbstractChunkPalette.calculateElementIndex(position), newValue);
-
-            short newValueCount = valueCountMap.containsKey(newValue) ? (short) (valueCountMap.get(newValue) + 1) : 1;
-            valueCountMap.put(newValue, newValueCount);
+            incrementValue(valueCountMap, newValue);
 
             if (!valueCountMap.containsKey(previousValue))
                 continue;
@@ -137,15 +135,15 @@ public sealed abstract class AbstractLightStorage implements LightStorage
 
     private static @NotNull Byte2ShortMap createCountMap(@NonNull NibbleArray array) {
         Byte2ShortMap valueCountMap = new Byte2ShortOpenHashMap();
-        for (int paletteIndex = 0; paletteIndex < DATA_VALUE_COUNT; paletteIndex++) {
-            byte value = array.get(paletteIndex);
-
-            short valueCount = 1;
-            if (valueCountMap.containsKey(value))
-                valueCount += valueCountMap.get(value);
-
-            valueCountMap.put(value, valueCount);
-        }
+        for (int paletteIndex = 0; paletteIndex < DATA_VALUE_COUNT; paletteIndex++)
+            incrementValue(valueCountMap, array.get(paletteIndex));
         return valueCountMap;
+    }
+
+    private static void incrementValue(@NonNull Byte2ShortMap map, byte key) {
+        short newCount = 1;
+        if (map.containsKey(key))
+            newCount += map.get(key);
+        map.put(key, newCount);
     }
 }

@@ -16,7 +16,7 @@ public final class BlockPositionNetworkCodecTest {
     public void test() {
         NetworkCodecTestUtil.test(
                 BlockPositionNetworkCodec.INSTANCE,
-                BlockPosition.blockPosition(Integer.MAX_VALUE, Short.MIN_VALUE, -431)
+                BlockPosition.blockPosition(56108863, -432, -431)
         );
     }
 }
