@@ -94,7 +94,8 @@ public record ServerObjectiveActionPlayPacket(@NonNull String objectiveName, @No
      *
      * @param displayName a display name that the scoreboard objective should have
      * @param renderType a render type that the scoreboard objective should have
-     * @param numberFormat a number format that the scoreboard objective should have
+     * @param numberFormat a number format that the scoreboard objective should have, {@code null} if default
+     *                     formatting should be used
      * @since 1.0
      * @see ???
      */
@@ -105,7 +106,8 @@ public record ServerObjectiveActionPlayPacket(@NonNull String objectiveName, @No
          *
          * @param displayName a display name that the scoreboard objective should have
          * @param renderType a render type that the scoreboard objective should have
-         * @param numberFormat a number format that the scoreboard objective should have
+         * @param numberFormat a number format that the scoreboard objective should have, {@code null} if default
+         *                     formatting should be used
          * @since 1.0
          */
         public ObjectiveData {

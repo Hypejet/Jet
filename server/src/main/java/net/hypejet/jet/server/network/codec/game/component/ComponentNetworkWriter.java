@@ -19,7 +19,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class ComponentNetworkWriter implements NetworkWriter<Component> {
 
     /**
-     * An instance of the {@linkplain ComponentNetworkWriter component network writer}.
+     * A default instance of the {@linkplain ComponentNetworkWriter component network writer}.
      *
      * @since 1.0
      */

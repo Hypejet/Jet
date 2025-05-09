@@ -18,7 +18,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class JsonComponentNetworkWriter implements NetworkWriter<Component> {
 
     /**
-     * An instance of the {@linkplain JsonComponentNetworkWriter json component writer}.
+     * A default instance of the {@linkplain JsonComponentNetworkWriter json component writer}.
      *
      * @since 1.0
      */
