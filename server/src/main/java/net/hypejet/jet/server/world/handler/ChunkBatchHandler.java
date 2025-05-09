@@ -294,7 +294,9 @@ public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnect
 
                 int batchSize = chunksToSendPositions.size();
                 this.player.sendPacket(new ServerChunkBatchFinishedPlayPacket(batchSize));
+
                 this.chunksToSend -= batchSize;
+                this.unacknowledgedBatches++;
             }
         }
     }
