@@ -7,6 +7,7 @@ import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.plugin.PluginManager;
 import net.hypejet.jet.registry.RegistryManager;
+import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.world.WorldManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -103,4 +104,12 @@ public interface MinecraftServer {
      * @since 1.0
      */
     @NonNull WorldManager worldManager();
+
+    /**
+     * Gets {@linkplain Scoreboard a scoreboard} of the server.
+     *
+     * @return the scoreboard
+     * @since 1.0
+     */
+    @NonNull Scoreboard scoreboard();
 }

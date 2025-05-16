@@ -1,16 +1,13 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.scoreboard.score.number.NumberFormat;
-import net.hypejet.jet.scoreboard.score.render.RenderType;
+import net.hypejet.jet.scoreboard.objective.ScoreboardObjective;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
-import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Represents {@linkplain ServerPacket a server packet} which does {@linkplain Action an action} specified
- * to a scoreboard objective with name specified.
+ * to {@linkplain ScoreboardObjective a scoreboard objective} with name specified.
  *
  * @param objectiveName the name of the scoreboard objective
  * @param action the action that should be done to the scoreboard objective
@@ -31,49 +28,49 @@ public record ServerObjectiveActionPlayPacket(@NonNull String objectiveName, @No
     }
 
     /**
-     * Represents an action that should be done for a Minecraft scoreboard objective.
+     * Represents an action that should be done to {@linkplain ScoreboardObjective a scoreboard objective}.
      *
      * @since 1.0
      */
     public sealed interface Action {
         /**
-         * Represents {@linkplain Action an action} creating a scoreboard objective.
+         * Represents {@linkplain Action an action} creating {@linkplain ScoreboardObjective a scoreboard objective}.
          *
-         * @param data a data that the scoreboard objective should have
+         * @param objective a data that the scoreboard objective should have
          * @since 1.0
          */
-        record Create(@NonNull ObjectiveData data) implements Action {
+        record Create(@NonNull ScoreboardObjective objective) implements Action {
             /**
              * Constructs the {@linkplain Create create action}.
              *
-             * @param data a data that the scoreboard objective should have
+             * @param objective a data that the scoreboard objective should have
              * @since 1.0
              */
             public Create {
-                NullabilityUtil.requireNonNull(data, "data");
+                NullabilityUtil.requireNonNull(objective, "objective");
             }
         }
 
         /**
-         * Represents {@linkplain Action an action} updating a scoreboard objective.
+         * Represents {@linkplain Action an action} updating {@linkplain ScoreboardObjective a scoreboard objective}.
          *
-         * @param data a new data that the scoreboard objective should have
+         * @param objective a new data that the scoreboard objective should have
          * @since 1.0
          */
-        record Update(@NonNull ObjectiveData data) implements Action {
+        record Update(@NonNull ScoreboardObjective objective) implements Action {
             /**
              * Constructs the {@linkplain Update update action}.
              *
-             * @param data a new data that the scoreboard objective should have
+             * @param objective a new data that the scoreboard objective should have
              * @since 1.0
              */
             public Update {
-                NullabilityUtil.requireNonNull(data, "data");
+                NullabilityUtil.requireNonNull(objective, "objective");
             }
         }
 
         /**
-         * Represents {@linkplain Action an action} removing a scoreboard objective.
+         * Represents {@linkplain Action an action} removing {@linkplain ScoreboardObjective a scoreboard objective}.
          *
          * @since 1.0
          */
@@ -86,33 +83,6 @@ public record ServerObjectiveActionPlayPacket(@NonNull String objectiveName, @No
             public static final Remove INSTANCE = new Remove();
 
             private Remove() {}
-        }
-    }
-
-    /**
-     * Represents a packet data of {@linkplain ??? a scoreboard objective}.
-     *
-     * @param displayName a display name that the scoreboard objective should have
-     * @param renderType a render type that the scoreboard objective should have
-     * @param numberFormat a number format that the scoreboard objective should have, {@code null} if default
-     *                     formatting should be used
-     * @since 1.0
-     * @see ???
-     */
-    public record ObjectiveData(@NonNull Component displayName, @NonNull RenderType renderType,
-                                @Nullable NumberFormat numberFormat) {
-        /**
-         * Constructs the {@linkplain ObjectiveData objective data}.
-         *
-         * @param displayName a display name that the scoreboard objective should have
-         * @param renderType a render type that the scoreboard objective should have
-         * @param numberFormat a number format that the scoreboard objective should have, {@code null} if default
-         *                     formatting should be used
-         * @since 1.0
-         */
-        public ObjectiveData {
-            NullabilityUtil.requireNonNull(displayName, "display name");
-            NullabilityUtil.requireNonNull(renderType, "render type");
         }
     }
 }

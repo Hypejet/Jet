@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.objects.Object2ByteMap;
 import it.unimi.dsi.fastutil.objects.Object2ByteOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.hypejet.jet.scoreboard.objective.ScoreboardObjective;
 import net.hypejet.jet.scoreboard.score.render.RenderType;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.component.ComponentNetworkWriter;
@@ -57,9 +58,9 @@ public final class ServerObjectiveActionPlayPacketWriter implements NetworkWrite
             throw new IllegalArgumentException(String.format("Unknown action: %s", actionClass.getSimpleName()));
         buf.writeByte(ACTION_IDENTIFIERS.getByte(actionClass));
 
-        ServerObjectiveActionPlayPacket.ObjectiveData objectiveData = switch (action) {
-            case Action.Create(ServerObjectiveActionPlayPacket.ObjectiveData data) -> data;
-            case Action.Update(ServerObjectiveActionPlayPacket.ObjectiveData data) -> data;
+        ScoreboardObjective objectiveData = switch (action) {
+            case Action.Create(ScoreboardObjective objective) -> objective;
+            case Action.Update(ScoreboardObjective objective) -> objective;
             case Action.Remove ignored -> null;
         };
 
