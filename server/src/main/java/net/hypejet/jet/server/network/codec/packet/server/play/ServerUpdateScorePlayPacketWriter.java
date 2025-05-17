@@ -1,6 +1,7 @@
 package net.hypejet.jet.server.network.codec.packet.server.play;
 
 import io.netty.buffer.ByteBuf;
+import net.hypejet.jet.scoreboard.score.Score;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.component.ComponentNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.scoreboard.score.number.NumberFormatNetworkWriter;
@@ -32,8 +33,10 @@ public final class ServerUpdateScorePlayPacketWriter implements NetworkWriter<Se
     public void write(@NonNull ByteBuf buf, @NonNull ServerUpdateScorePlayPacket object) {
         StringNetworkCodec.INSTANCE.write(buf, object.entityName());
         StringNetworkCodec.INSTANCE.write(buf, object.objectiveName());
-        VarIntNetworkCodec.INSTANCE.write(buf, object.score());
-        NetworkUtil.writeOptional(object.displayName(), ComponentNetworkWriter.INSTANCE, buf);
-        NetworkUtil.writeOptional(object.numberFormat(), NumberFormatNetworkWriter.INSTANCE, buf);
+
+        Score score = object.score();
+        VarIntNetworkCodec.INSTANCE.write(buf, score.score());
+        NetworkUtil.writeOptional(score.displayName(), ComponentNetworkWriter.INSTANCE, buf);
+        NetworkUtil.writeOptional(score.numberFormat(), NumberFormatNetworkWriter.INSTANCE, buf);
     }
 }
