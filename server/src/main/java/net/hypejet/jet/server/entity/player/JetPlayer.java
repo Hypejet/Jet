@@ -17,6 +17,7 @@ import net.hypejet.jet.entity.acquisition.gamemode.WriteGameModeAcquisition;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.settings.ChangeSettingsEvent;
 import net.hypejet.jet.event.events.world.InitialSpawnEvent;
+import net.hypejet.jet.scoreboard.position.ScoreboardPosition;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.entity.JetEntity;
@@ -35,6 +36,7 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerActionBar
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerRespawnPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerSetObjectiveDisplayedPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSystemMessagePlayPacket;
 import net.hypejet.jet.server.network.session.data.ConfigurationData;
 import net.hypejet.jet.server.network.session.data.LoginData;
@@ -55,9 +57,12 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Represents an implementation of {@linkplain Player a player}.
@@ -83,6 +88,9 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     private final BooleanAcquirable respawnScreenEnabled;
 
     private final NullableObjectAcquirable<DeathLocation> lastDeathLocation = new NullableObjectAcquirable<>(); // TODO: Updating
+
+    private final Map<ScoreboardPosition, String> objectivesDisplayed = new HashMap<>();
+    private final ReentrantReadWriteLock objectivesDisplayedLock = new ReentrantReadWriteLock();
 
     /**
      * Constructs the {@linkplain JetPlayer player}.
@@ -197,6 +205,63 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     }
 
     @Override
+    public @Nullable String getDisplayedObjective(@NonNull ScoreboardPosition position) {
+        NullabilityUtil.requireNonNull(position, "position");
+        try {
+            this.objectivesDisplayedLock.readLock().lock();
+            return this.objectivesDisplayed.get(position);
+        } finally {
+            this.objectivesDisplayedLock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public @Nullable String setDisplayedObjective(@NonNull ScoreboardPosition position, @NonNull String name) {
+        return this.server().scoreboard().setDisplayedObjective(
+                this, position, name,
+                this.objectivesDisplayed, this.objectivesDisplayedLock
+        );
+    }
+
+    @Override
+    public @Nullable String removeDisplayedObjective(@NonNull ScoreboardPosition position) {
+        NullabilityUtil.requireNonNull(position, "position");
+        try {
+            this.objectivesDisplayedLock.writeLock().lock();
+            String removedObjectiveName = this.objectivesDisplayed.remove(position);
+            if (removedObjectiveName != null)
+                this.sendPacket(new ServerSetObjectiveDisplayedPlayPacket(position, null));
+            return removedObjectiveName;
+        } finally {
+            this.objectivesDisplayedLock.writeLock().unlock();
+        }
+    }
+
+    @Override
+    public boolean removeDisplayedObjective(@NonNull ScoreboardPosition position, @NonNull String name) {
+        NullabilityUtil.requireNonNull(position, "position");
+        NullabilityUtil.requireNonNull(name, "name");
+
+        try {
+            this.objectivesDisplayedLock.writeLock().lock();
+            boolean result = this.objectivesDisplayed.remove(position, name);
+            if (result) this.sendPacket(new ServerSetObjectiveDisplayedPlayPacket(position, null));
+            return result;
+        } finally {
+            this.objectivesDisplayedLock.writeLock().unlock();
+        }
+    }
+
+    @Override
+    public boolean replaceDisplayedObjective(@NonNull ScoreboardPosition position,
+                                             @NonNull String name, @NonNull String newName) {
+        return this.server().scoreboard().replaceDisplayedObjective(
+                this, position, name, newName,
+                this.objectivesDisplayed, this.objectivesDisplayedLock
+        );
+    }
+
+    @Override
     public void sendMessage(@NotNull Identity source, @NotNull Component message, @NotNull MessageType type) {
         ServerPacket packet = switch (type) {
             case CHAT -> throw new IllegalArgumentException("Non-system messages are not supported yet");
@@ -219,6 +284,11 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     public void handleDisconnection() {
         this.chunkBatchHandler.handleDisconnection();
         this.server().unregisterPlayer(this);
+    }
+
+    @Override
+    public void sendPacket(@NonNull ServerPacket packet) {
+        this.connection.sendPacket(packet);
     }
 
     /**
@@ -277,18 +347,6 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     }
 
     /**
-     * Sends a packet to a client backed by {@linkplain SocketPlayerConnection a socket player connection} attached
-     * to this player.
-     *
-     * @param packet the server packet
-     * @since 1.0
-     * @see SocketPlayerConnection#sendPacket(ServerPacket)
-     */
-    public void sendPacket(@NonNull ServerPacket packet) {
-        this.connection.sendPacket(packet);
-    }
-
-    /**
      * Sends {@linkplain ServerRespawnPlayPacket a respawn play packet} to a client associated
      * with this {@linkplain JetPlayer player}.
      *
@@ -324,6 +382,24 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     public void sendSpawnPackets(@NonNull JetWorld world, @NonNull Position position) {
         // TODO
         this.movementHandler.synchronize(position, Vector.zero(), Set.of());
+    }
+
+    /**
+     * Handles removal of {@linkplain net.hypejet.jet.scoreboard.objective.ScoreboardObjective a scoreboard objective}
+     * from {@linkplain net.hypejet.jet.server.scoreboard.JetScoreboard a scoreboard} visible
+     * for this {@linkplain JetPlayer player}.
+     *
+     * @param name a name of the scoreboard objective
+     * @since 1.0
+     */
+    public void handleScoreboardObjectiveRemoval(@NonNull String name) {
+        NullabilityUtil.requireNonNull(name, "name");
+        try {
+            this.objectivesDisplayedLock.readLock().lock();
+            this.objectivesDisplayed.entrySet().removeIf(entry -> entry.getValue().equals(name));
+        } finally {
+            this.objectivesDisplayedLock.readLock().unlock();
+        }
     }
 
     /**

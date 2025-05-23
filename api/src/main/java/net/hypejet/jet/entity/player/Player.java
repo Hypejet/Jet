@@ -10,8 +10,11 @@ import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.acquisition.gamemode.GameModeAcquisition;
 import net.hypejet.jet.entity.acquisition.gamemode.WriteGameModeAcquisition;
 import net.hypejet.jet.network.PlayerConnection;
+import net.hypejet.jet.scoreboard.exception.NoSuchObjectiveException;
+import net.hypejet.jet.scoreboard.position.ScoreboardPosition;
 import net.hypejet.jet.util.game.audience.CommonAudience;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collection;
 import java.util.Locale;
@@ -102,6 +105,75 @@ public interface Player extends Entity, CommandSource, CommonAudience {
      * @since 1.0
      */
     @NonNull WriteBooleanAcquisition acquireRespawnScreenEnabledWrite();
+
+    /**
+     * Gets {@linkplain net.hypejet.jet.scoreboard.objective.ScoreboardObjective a scoreboard objective}
+     * that is displayed for this {@linkplain Player player} at {@linkplain ScoreboardPosition a scoreboard position}
+     * specified.
+     *
+     * @param position the scoreboard position
+     * @return a name of the scoreboard objective, {@code null} if no scoreboard objective is displayed for the player
+     *         at a scoreboard position specified
+     * @since 1.0
+     */
+    @Nullable String getDisplayedObjective(@NonNull ScoreboardPosition position);
+
+    /**
+     * Sets {@linkplain net.hypejet.jet.scoreboard.objective.ScoreboardObjective a scoreboard objective} that should be
+     * displayed for this {@linkplain Player player} at {@linkplain ScoreboardPosition a scoreboard position}
+     * specified.
+     *
+     * @param position the scoreboard position
+     * @param name a name of the scoreboard objective
+     * @return a name of a previous scoreboard objective that was displayed for the player at the scoreboard position
+     *         specified, {@code null} if none
+     * @throws NoSuchObjectiveException if no scoreboard objective with name specified was registered in a scoreboard
+     *                                  visible for this player
+     * @since 1.0
+     */
+    @Nullable String setDisplayedObjective(@NonNull ScoreboardPosition position, @NonNull String name);
+
+    /**
+     * Removes {@linkplain net.hypejet.jet.scoreboard.objective.ScoreboardObjective a scoreboard objective}
+     * from being displayed for this {@linkplain Player player}
+     * at {@linkplain ScoreboardPosition a scoreboard position} specified.
+     *
+     * @param position the scoreboard position
+     * @return a name of a scoreboard objective removed, {@code null} if no scoreboard objective was displayed
+     *         at the scoreboard position specified
+     * @since 1.0
+     */
+    @Nullable String removeDisplayedObjective(@NonNull ScoreboardPosition position);
+
+    /**
+     * Removes {@linkplain net.hypejet.jet.scoreboard.objective.ScoreboardObjective a scoreboard objective}
+     * from being displayed for this {@linkplain Player player}
+     * at {@linkplain ScoreboardPosition a scoreboard position} specified.
+     * The removal is done only if name of the scoreboard objective is equal to a value specified.
+     *
+     * @param position the scoreboard position
+     * @param name the value
+     * @return {@code true} if the scoreboard objective was removed from being displayed, {@code false otherwise}
+     * @since 1.0
+     */
+    boolean removeDisplayedObjective(@NonNull ScoreboardPosition position, @NonNull String name);
+
+    /**
+     * Replaces {@linkplain net.hypejet.jet.scoreboard.objective.ScoreboardObjective a scoreboard objective}
+     * displayed for this {@linkplain Player player} at {@linkplain ScoreboardPosition a scoreboard position}
+     * specified. The replacement is done only if name of a scoreboard objective displayed at the scoreboard position
+     * at time of calling the method is equal to a value specified.
+     *
+     * @param position the scoreboard position
+     * @param name the value
+     * @param newName a name of a new scoreboard objective that should be displayed
+     * @return {@code true} if the scoreboard objective displayed was replaced, {@code false} otherwise
+     * @throws NoSuchObjectiveException if no scoreboard objective with the new name specified was registered
+     *                                  in a scoreboard visible for this player
+     * @since 1.0
+     */
+    boolean replaceDisplayedObjective(@NonNull ScoreboardPosition position,
+                                      @NonNull String name, @NonNull String newName);
 
     /**
      * Represents a Minecraft chat mode setting of {@linkplain Player a player}.
