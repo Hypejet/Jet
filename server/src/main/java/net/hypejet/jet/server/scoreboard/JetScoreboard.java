@@ -1,6 +1,5 @@
 package net.hypejet.jet.server.scoreboard;
 
-import net.hypejet.concurrency.collection.CollectionAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.scoreboard.Scoreboard;
@@ -8,8 +7,8 @@ import net.hypejet.jet.scoreboard.exception.NoSuchObjectiveException;
 import net.hypejet.jet.scoreboard.objective.ScoreboardObjective;
 import net.hypejet.jet.scoreboard.position.ScoreboardPosition;
 import net.hypejet.jet.scoreboard.score.Score;
-import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerObjectiveActionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerObjectiveActionPlayPacket.Action;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerResetScorePlayPacket;
@@ -33,21 +32,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public final class JetScoreboard implements Scoreboard {
 
-    private final JetMinecraftServer server;
-
     private final Map<String, ScoreboardObjective> objectives = new HashMap<>();
     private final Map<String, Map<String, Score>> scoreMaps = new HashMap<>();
-    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-    /**
-     * Constructs the {@linkplain JetScoreboard scoreboard implementation}.
-     *
-     * @param server a server that the scoreboard is being constructed for
-     * @since 1.0
-     */
-    public JetScoreboard(@NonNull JetMinecraftServer server) {
-        this.server = NullabilityUtil.requireNonNull(server, "server");
-    }
+    private final Set<JetPlayer> viewers = new HashSet<>();
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     @Override
     public @Nullable ScoreboardObjective getObjective(@NonNull String name) {
@@ -286,6 +275,16 @@ public final class JetScoreboard implements Scoreboard {
         }
     }
 
+    @Override
+    public @NonNull Set<JetPlayer> viewers() {
+        try {
+            this.lock.readLock().lock();
+            return Set.copyOf(this.viewers);
+        } finally {
+            this.lock.readLock().unlock();
+        }
+    }
+
     /**
      * Displays {@linkplain ScoreboardObjective a scoreboard objective} for {@linkplain JetPlayer a player} specified.
      *
@@ -317,7 +316,7 @@ public final class JetScoreboard implements Scoreboard {
             displayedObjectivesLock.writeLock().lock();
 
             if (!this.objectives.containsKey(name)) {
-                throw new IllegalArgumentException(String.format(
+                throw new NoSuchObjectiveException(String.format(
                         "A scoreboard objective with name of %s does not exist",
                         name
                 ));
@@ -368,7 +367,7 @@ public final class JetScoreboard implements Scoreboard {
             displayedObjectivesLock.writeLock().lock();
 
             if (!this.objectives.containsKey(name)) {
-                throw new IllegalArgumentException(String.format(
+                throw new NoSuchObjectiveException(String.format(
                         "A scoreboard objective with name of %s does not exist",
                         name
                 ));
@@ -380,6 +379,57 @@ public final class JetScoreboard implements Scoreboard {
         } finally {
             this.lock.readLock().unlock();
             displayedObjectivesLock.writeLock().unlock();
+        }
+    }
+
+    /**
+     * Adds {@linkplain JetPlayer a player} specified to {@linkplain Set a set} of viewers
+     * of this {@linkplain JetScoreboard scoreboard}. Moreover, {@linkplain ServerPacket server packets} initializing
+     * the scoreboard are sent to the same player.
+     *
+     * @param player the player
+     * @since 1.0
+     */
+    public void addViewer(@NonNull JetPlayer player) {
+        try {
+            this.lock.writeLock().lock();
+            this.viewers.add(player);
+
+            for (Map.Entry<String, ScoreboardObjective> entry : this.objectives.entrySet()) {
+                String name = entry.getKey();
+                ScoreboardObjective objective = entry.getValue();
+                player.sendPacket(new ServerObjectiveActionPlayPacket(name, new Action.Create(objective)));
+            }
+
+            for (Map.Entry<String, Map<String, Score>> entry : this.scoreMaps.entrySet()) {
+                String objectiveName = entry.getKey();
+                for (Map.Entry<String, Score> scoreEntry : entry.getValue().entrySet()) {
+                    String entityName = scoreEntry.getKey();
+                    Score score = scoreEntry.getValue();
+                    player.sendPacket(new ServerUpdateScorePlayPacket(entityName, objectiveName, score));
+                }
+            }
+        } finally {
+            this.lock.writeLock().unlock();
+        }
+    }
+
+    /**
+     * Removes {@linkplain JetPlayer a player} specified from {@linkplain Set a set} of viewers
+     * of this {@linkplain JetScoreboard scoreboard}. Moreover, {@linkplain ServerPacket server packets} removing
+     * the scoreboard are sent to the same player.
+     *
+     * @param player the player
+     * @since 1.0
+     */
+    public void removeViewer(@NonNull JetPlayer player) {
+        try {
+            this.lock.writeLock().lock();
+            this.viewers.remove(player);
+            for (String name : this.objectives.keySet())
+                player.sendPacket(new ServerObjectiveActionPlayPacket(name, Action.Remove.INSTANCE));
+        } finally {
+            this.lock.writeLock().unlock();
         }
     }
 
@@ -396,30 +446,23 @@ public final class JetScoreboard implements Scoreboard {
 
     private void handleObjectiveRemoval(@NonNull String name) {
         this.sendObjectiveUpdate(name, Action.Remove.INSTANCE);
-        try (CollectionAcquisition<JetPlayer, ?> acquisition = this.server.players()) {
-            acquisition.collection().forEach(player -> player.handleScoreboardObjectiveRemoval(name));
-        }
+        this.viewers.forEach(player -> player.handleScoreboardObjectiveRemoval(name));
     }
 
     private void sendObjectiveUpdate(@NonNull String name, @NonNull Action action) {
-        try (CollectionAcquisition<JetPlayer, ?> acquisition = this.server.players()) {
-            ServerObjectiveActionPlayPacket packet = new ServerObjectiveActionPlayPacket(name, action); // TODO: FRAME
-            acquisition.collection().forEach(player -> player.sendPacket(packet));
-        }
+        this.sendPacketToViewers(new ServerObjectiveActionPlayPacket(name, action));
     }
 
     private void sendScoreUpdate(@NonNull String entityName, @NonNull String objectiveName, @NonNull Score newScore) {
-        try (CollectionAcquisition<JetPlayer, ?> acquisition = this.server.players()) {
-            ServerUpdateScorePlayPacket packet = new ServerUpdateScorePlayPacket(entityName, objectiveName, newScore); // TODO: FRAME
-            acquisition.collection().forEach(player -> player.sendPacket(packet));
-        }
+        this.sendPacketToViewers(new ServerUpdateScorePlayPacket(entityName, objectiveName, newScore));
     }
 
     private void sendScoreReset(@NonNull String entityName, @Nullable String objectiveName) {
-        try (CollectionAcquisition<JetPlayer, ?> acquisition = this.server.players()) {
-            ServerResetScorePlayPacket packet = new ServerResetScorePlayPacket(entityName, objectiveName); // TODO: FRAME
-            acquisition.collection().forEach(player -> player.sendPacket(packet));
-        }
+        this.sendPacketToViewers(new ServerResetScorePlayPacket(entityName, objectiveName));
+    }
+
+    private void sendPacketToViewers(@NonNull ServerPacket packet) {
+        this.viewers.forEach(player -> player.sendPacket(packet)); // TODO: FRAME
     }
 
     private static @NonNull String ownerName(@NonNull Entity entity) {

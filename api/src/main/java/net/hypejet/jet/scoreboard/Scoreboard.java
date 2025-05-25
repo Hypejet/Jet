@@ -1,6 +1,7 @@
 package net.hypejet.jet.scoreboard;
 
 import net.hypejet.jet.entity.Entity;
+import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.scoreboard.exception.NoSuchObjectiveException;
 import net.hypejet.jet.scoreboard.objective.ScoreboardObjective;
 import net.hypejet.jet.scoreboard.score.Score;
@@ -241,4 +242,13 @@ public interface Scoreboard {
      * @since 1.0
      */
     @NonNull Map<String, Score> scores(@NonNull String objective);
+
+    /**
+     * Gets copy of {@linkplain Set a set} of {@linkplain Player players}
+     * that see this {@linkplain Scoreboard scoreboard}.
+     *
+     * @return the set
+     * @since 1.0
+     */
+    @NonNull Set<? extends Player> viewers();
 }

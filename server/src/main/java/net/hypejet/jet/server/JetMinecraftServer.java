@@ -14,7 +14,7 @@ import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.NetworkManager;
 import net.hypejet.jet.server.plugin.JetPluginManager;
 import net.hypejet.jet.server.registry.JetRegistryManager;
-import net.hypejet.jet.server.scoreboard.JetScoreboard;
+import net.hypejet.jet.server.scoreboard.JetScoreboardManager;
 import net.hypejet.jet.server.world.JetWorldManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
@@ -40,8 +40,8 @@ public final class JetMinecraftServer implements MinecraftServer {
     private final JetRegistryManager registryManager;
     private final JetPluginManager pluginManager;
     private final JetWorldManager worldManager;
+    private final JetScoreboardManager scoreboardManager;
 
-    private final JetScoreboard scoreboard;
     private final HashSetAcquirable<JetPlayer> players = new HashSetAcquirable<>();
 
     /**
@@ -54,7 +54,7 @@ public final class JetMinecraftServer implements MinecraftServer {
         this.commandManager = new JetCommandManager(this);
         this.registryManager = new JetRegistryManager(this);
         this.worldManager = new JetWorldManager(this);
-        this.scoreboard = new JetScoreboard(this);
+        this.scoreboardManager = new JetScoreboardManager();
         this.pluginManager = new JetPluginManager(this);
         this.networkManager = new NetworkManager(this);
         this.eventNode.call(new ServerReadyEvent());
@@ -120,8 +120,8 @@ public final class JetMinecraftServer implements MinecraftServer {
     }
 
     @Override
-    public @NonNull JetScoreboard scoreboard() {
-        return this.scoreboard;
+    public @NonNull JetScoreboardManager scoreboardManager() {
+        return this.scoreboardManager;
     }
 
     /**
