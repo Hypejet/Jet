@@ -2,8 +2,10 @@ package net.hypejet.jet.server.scoreboard;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.Entity;
+import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.scoreboard.exception.NoSuchObjectiveException;
+import net.hypejet.jet.scoreboard.exception.NotViewerException;
 import net.hypejet.jet.scoreboard.objective.ScoreboardObjective;
 import net.hypejet.jet.scoreboard.position.ScoreboardPosition;
 import net.hypejet.jet.scoreboard.score.Score;
@@ -20,8 +22,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -35,7 +37,7 @@ public final class JetScoreboard implements Scoreboard {
     private final Map<String, ScoreboardObjective> objectives = new HashMap<>();
     private final Map<String, Map<String, Score>> scoreMaps = new HashMap<>();
 
-    private final Set<JetPlayer> viewers = new HashSet<>();
+    private final Map<JetPlayer, DisplayedObjectivesHandler> viewers = new HashMap<>();
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     @Override
@@ -276,109 +278,60 @@ public final class JetScoreboard implements Scoreboard {
     }
 
     @Override
+    public @Nullable String getDisplayedObjective(@NonNull Player player, @NonNull ScoreboardPosition position) {
+        NullabilityUtil.requireNonNull(player, "player");
+        NullabilityUtil.requireNonNull(position, "position");
+
+        JetPlayer castPlayer = JetPlayer.cast(player);
+        try {
+            this.lock.readLock().lock();
+            return this.displayedObjectivesHandler(castPlayer).getDisplayedObjective(position);
+        } finally {
+            this.lock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public @Nullable String setDisplayedObjective(@NonNull Player player, @NonNull ScoreboardPosition position,
+                                                  @Nullable String name) {
+        NullabilityUtil.requireNonNull(player, "player");
+        NullabilityUtil.requireNonNull(position, "position");
+
+        JetPlayer castPlayer = JetPlayer.cast(player);
+        try {
+            this.lock.readLock().lock();
+            if (name != null && !this.objectives.containsKey(name))
+                throw createNoSuchObjectiveException(name);
+            return this.displayedObjectivesHandler(castPlayer).setDisplayedObjective(position, name);
+        } finally {
+            this.lock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public boolean replaceDisplayedObjective(@NonNull Player player, @NonNull ScoreboardPosition position,
+                                             @Nullable String name, @Nullable String newName) {
+        NullabilityUtil.requireNonNull(player, "player");
+        NullabilityUtil.requireNonNull(position, "position");
+
+        JetPlayer castPlayer = JetPlayer.cast(player);
+        try {
+            this.lock.readLock().lock();
+            if (newName != null && !this.objectives.containsKey(newName))
+                throw createNoSuchObjectiveException(newName);
+            return this.displayedObjectivesHandler(castPlayer).replaceDisplayedObjective(position, name, newName);
+        } finally {
+            this.lock.readLock().unlock();
+        }
+    }
+
+    @Override
     public @NonNull Set<JetPlayer> viewers() {
         try {
             this.lock.readLock().lock();
-            return Set.copyOf(this.viewers);
+            return Set.copyOf(this.viewers.keySet());
         } finally {
             this.lock.readLock().unlock();
-        }
-    }
-
-    /**
-     * Displays {@linkplain ScoreboardObjective a scoreboard objective} for {@linkplain JetPlayer a player} specified.
-     *
-     * @param player the player
-     * @param position a scoreboard position where the scoreboard objective should be displayed at
-     * @param name a name of the scoreboard objective that should be displayed
-     * @param displayedObjectives a mutable map which maps scoreboard positions to names of scoreboard objectives
-     *                            that are displayed at these positions for the player
-     * @param displayedObjectivesLock a read-write lock that guards multithreaded access to the map containing
-     *                                displayed objectives
-     * @return a name of a previous scoreboard objective that was displayed to the player, {@code null} if none
-     * @throws NoSuchObjectiveException if no scoreboard objective with the name specified was registered
-     *                                  in this scoreboard
-     * @since 1.0
-     */
-    public @Nullable String setDisplayedObjective(
-            @NonNull JetPlayer player, @NonNull ScoreboardPosition position, @NonNull String name,
-            @NonNull Map<ScoreboardPosition, String> displayedObjectives,
-            @NonNull ReadWriteLock displayedObjectivesLock
-    ) {
-        NullabilityUtil.requireNonNull(player, "player");
-        NullabilityUtil.requireNonNull(position, "position");
-        NullabilityUtil.requireNonNull(name, "name");
-        NullabilityUtil.requireNonNull(displayedObjectives, "displayed objectives");
-        NullabilityUtil.requireNonNull(displayedObjectivesLock, "displayed objectives lock");
-
-        try {
-            this.lock.readLock().lock();
-            displayedObjectivesLock.writeLock().lock();
-
-            if (!this.objectives.containsKey(name)) {
-                throw new NoSuchObjectiveException(String.format(
-                        "A scoreboard objective with name of %s does not exist",
-                        name
-                ));
-            }
-
-            player.sendPacket(new ServerSetObjectiveDisplayedPlayPacket(position, name));
-            return displayedObjectives.put(position, name);
-        } finally {
-            this.lock.readLock().unlock();
-            displayedObjectivesLock.writeLock().unlock();
-        }
-    }
-
-    /**
-     * Replaces {@linkplain ScoreboardObjective a scoreboard objective} displayed
-     * at some {@linkplain ScoreboardPosition scoreboard position} for {@linkplain JetPlayer a player} specified.
-     * The replacement is done only if name of a scoreboard objective displayed at the scoreboard position
-     * at time of calling the method is equal to a value specified.
-     *
-     * @param player the player
-     * @param position the scoreboard position
-     * @param name the value
-     * @param newName a name of a new scoreboard objective that should be displayed
-     * @param displayedObjectives a mutable map which maps scoreboard positions to names of scoreboard objectives
-     *                            that are displayed at these positions for the player
-     * @param displayedObjectivesLock a read-write lock that guards multithreaded access to the map containing
-     *                                displayed objectives
-     * @return {@code true} if the scoreboard objective displayed was replaced, {@code false} otherwise
-     * @throws NoSuchObjectiveException if no scoreboard objective with the new name specified was registered
-     *                                  in this scoreboard
-     * @since 1.0
-     */
-    public boolean replaceDisplayedObjective(
-            @NonNull JetPlayer player, @NonNull ScoreboardPosition position,
-            @NonNull String name, @NonNull String newName,
-            @NonNull Map<ScoreboardPosition, String> displayedObjectives,
-            @NonNull ReadWriteLock displayedObjectivesLock
-    ) {
-        NullabilityUtil.requireNonNull(player, "player");
-        NullabilityUtil.requireNonNull(position, "position");
-        NullabilityUtil.requireNonNull(name, "name");
-        NullabilityUtil.requireNonNull(newName, "new name");
-        NullabilityUtil.requireNonNull(displayedObjectives, "displayed objectives");
-        NullabilityUtil.requireNonNull(displayedObjectivesLock, "displayed objectives lock");
-
-        try {
-            this.lock.readLock().lock();
-            displayedObjectivesLock.writeLock().lock();
-
-            if (!this.objectives.containsKey(name)) {
-                throw new NoSuchObjectiveException(String.format(
-                        "A scoreboard objective with name of %s does not exist",
-                        name
-                ));
-            }
-
-            boolean result = displayedObjectives.replace(position, name, newName);
-            if (result) player.sendPacket(new ServerSetObjectiveDisplayedPlayPacket(position, newName));
-            return result;
-        } finally {
-            this.lock.readLock().unlock();
-            displayedObjectivesLock.writeLock().unlock();
         }
     }
 
@@ -388,12 +341,16 @@ public final class JetScoreboard implements Scoreboard {
      * the scoreboard are sent to the same player.
      *
      * @param player the player
+     * @throws IllegalStateException if the player is already a viewer of this scoreboard
      * @since 1.0
      */
     public void addViewer(@NonNull JetPlayer player) {
         try {
             this.lock.writeLock().lock();
-            this.viewers.add(player);
+            if (this.viewers.containsKey(player))
+                throw new IllegalStateException("The player specified is already a viewer of this scoreboard");
+
+            this.viewers.put(player, new DisplayedObjectivesHandler(player));
 
             for (Map.Entry<String, ScoreboardObjective> entry : this.objectives.entrySet()) {
                 String name = entry.getKey();
@@ -420,11 +377,15 @@ public final class JetScoreboard implements Scoreboard {
      * the scoreboard are sent to the same player.
      *
      * @param player the player
+     * @throws IllegalStateException if the player is not a viewer of this scoreboard
      * @since 1.0
      */
     public void removeViewer(@NonNull JetPlayer player) {
         try {
             this.lock.writeLock().lock();
+            if (!this.viewers.containsKey(player))
+                throw new IllegalStateException("The player specified is not a viewer of this scoreboard");
+
             this.viewers.remove(player);
             for (String name : this.objectives.keySet())
                 player.sendPacket(new ServerObjectiveActionPlayPacket(name, Action.Remove.INSTANCE));
@@ -435,18 +396,21 @@ public final class JetScoreboard implements Scoreboard {
 
     private @NonNull Map<String, Score> scoreMap(@NonNull String objective) {
         Map<String, Score> scoreMap = this.scoreMaps.get(objective);
-        if (scoreMap == null) {
-            throw new NoSuchObjectiveException(String.format(
-                    "Objective with name of %s has not been registered",
-                    objective
-            ));
-        }
+        if (scoreMap == null)
+            throw createNoSuchObjectiveException(objective);
         return scoreMap;
+    }
+
+    private @NonNull DisplayedObjectivesHandler displayedObjectivesHandler(@NonNull JetPlayer player) {
+        DisplayedObjectivesHandler handler = this.viewers.get(player);
+        if (handler == null)
+            throw new NotViewerException("The player specified is not a viewer of this scoreboard");
+        return handler;
     }
 
     private void handleObjectiveRemoval(@NonNull String name) {
         this.sendObjectiveUpdate(name, Action.Remove.INSTANCE);
-        this.viewers.forEach(player -> player.handleScoreboardObjectiveRemoval(name));
+        this.viewers.values().forEach(handler -> handler.handleObjectiveRemoval(name));
     }
 
     private void sendObjectiveUpdate(@NonNull String name, @NonNull Action action) {
@@ -462,11 +426,137 @@ public final class JetScoreboard implements Scoreboard {
     }
 
     private void sendPacketToViewers(@NonNull ServerPacket packet) {
-        this.viewers.forEach(player -> player.sendPacket(packet)); // TODO: FRAME
+        this.viewers.keySet().forEach(player -> player.sendPacket(packet)); // TODO: FRAME
     }
 
     private static @NonNull String ownerName(@NonNull Entity entity) {
         // TODO: Check entity type instead of the entity being an instance of player
         return entity instanceof JetPlayer player ? player.username() : entity.uniqueId().toString();
+    }
+
+    private static @NonNull NoSuchObjectiveException createNoSuchObjectiveException(@NonNull String name) {
+        return new NoSuchObjectiveException(String.format(
+                "Objective with name of %s was not registered in this scoreboard",
+                name
+        ));
+    }
+
+    /**
+     * Represents something that handles displaying of {@linkplain ScoreboardObjective scoreboard objectives}
+     * for {@linkplain JetPlayer a player}.
+     *
+     * @since 1.0
+     * @see ScoreboardObjective
+     * @see JetPlayer
+     */
+    private static final class DisplayedObjectivesHandler {
+
+        private final JetPlayer player;
+
+        private final Map<ScoreboardPosition, String> displayedObjectives = new HashMap<>();
+        private final ReentrantReadWriteLock displayedObjectivesLock = new ReentrantReadWriteLock();
+
+        /**
+         * Constructs the {@linkplain DisplayedObjectivesHandler displayed objectives handler}.
+         *
+         * @param player the player that the handling should be done for
+         * @since 1.0
+         */
+        private DisplayedObjectivesHandler(@NonNull JetPlayer player) {
+            this.player = NullabilityUtil.requireNonNull(player, "player");
+        }
+
+        /**
+         * Gets name of {@linkplain ScoreboardObjective a scoreboard objective} displayed
+         * for {@linkplain JetPlayer a player} associated with this handler
+         * at {@linkplain ScoreboardPosition a scoreboard position} specified.
+         *
+         * @param position the scoreboard position
+         * @return the scoreboard objective name, {@code null} if no scoreboard objective is displayed for the player
+         *         at the scoreboard position
+         * @since 1.0
+         */
+        private @Nullable String getDisplayedObjective(@NonNull ScoreboardPosition position) {
+            try {
+                this.displayedObjectivesLock.readLock().lock();
+                return this.displayedObjectives.get(position);
+            } finally {
+                this.displayedObjectivesLock.readLock().unlock();
+            }
+        }
+
+        /**
+         * Sets {@linkplain ScoreboardObjective a scoreboard objective} that should be displayed
+         * at some {@linkplain ScoreboardPosition scoreboard position} for {@linkplain JetPlayer a player}
+         * associated with this handler.
+         *
+         * @param position the scoreboard position
+         * @param name a name of the scoreboard objective that should be displayed, {@code null} if no scoreboard
+         *             objective should be displayed at the scoreboard position
+         * @return a name of a previous scoreboard objective that was displayed for the player
+         *         at the same position, {@code null} if none
+         * @since 1.0
+         */
+        private @Nullable String setDisplayedObjective(@NonNull ScoreboardPosition position, @Nullable String name) {
+            try {
+                this.displayedObjectivesLock.writeLock().lock();
+                return this.updateObjective(position, name);
+            } finally {
+                this.displayedObjectivesLock.writeLock().unlock();
+            }
+        }
+
+        /**
+         * Replaces {@linkplain ScoreboardObjective a scoreboard objective} displayed
+         * at some {@linkplain ScoreboardPosition scoreboard position} for {@linkplain JetPlayer a player}
+         * associated with this handler. The replacement is done only if name of a scoreboard objective
+         * displayed for the player at the same scoreboard position at time of calling the method is equal
+         * to a value specified.
+         *
+         * @param position the scoreboard position
+         * @param name the value, {@code null} if it is expected that no scoreboard objective is displayed
+         *             for the player at the scoreboard position at time of calling the method
+         * @param newName a name of a new scoreboard objective that should be displayed for the player
+         *                at the scoreboard position, {@code null} if no scoreboard objective should be displayed
+         *                at that scoreboard position
+         * @return {@code true} if the scoreboard objective displayed was replaced, {@code false} otherwise
+         * @since 1.0
+         */
+        private boolean replaceDisplayedObjective(@NonNull ScoreboardPosition position,
+                                                  @Nullable String name, @Nullable String newName) {
+            try {
+                this.displayedObjectivesLock.writeLock().lock();
+
+                String previousName = this.displayedObjectives.get(position);
+                if (!Objects.equals(previousName, name)) return false;
+
+                this.updateObjective(position, newName);
+                return true;
+            } finally {
+                this.displayedObjectivesLock.writeLock().unlock();
+            }
+        }
+
+        /**
+         * Handles removal of {@linkplain ScoreboardObjective a scoreboard objective} with name specified.
+         *
+         * @param name the scoreboard objective name
+         * @since 1.0
+         */
+        private void handleObjectiveRemoval(@NonNull String name) {
+            try {
+                this.displayedObjectivesLock.writeLock().lock();
+                this.displayedObjectives.entrySet().removeIf(entry -> entry.getValue().equals(name));
+            } finally {
+                this.displayedObjectivesLock.writeLock().unlock();
+            }
+        }
+
+        private @Nullable String updateObjective(@NonNull ScoreboardPosition position, @Nullable String name) {
+            if (Objects.equals(name, this.displayedObjectives.get(position))) return name;
+            this.player.sendPacket(new ServerSetObjectiveDisplayedPlayPacket(position, name));
+            if (name == null) return this.displayedObjectives.remove(position);
+            else return this.displayedObjectives.put(position, name);
+        }
     }
 }

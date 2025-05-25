@@ -18,7 +18,6 @@ import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.settings.ChangeSettingsEvent;
 import net.hypejet.jet.event.events.world.InitialSpawnEvent;
 import net.hypejet.jet.scoreboard.Scoreboard;
-import net.hypejet.jet.scoreboard.position.ScoreboardPosition;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.entity.JetEntity;
@@ -37,7 +36,6 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerActionBar
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerRespawnPlayPacket;
-import net.hypejet.jet.server.network.packet.packets.server.play.ServerSetObjectiveDisplayedPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSystemMessagePlayPacket;
 import net.hypejet.jet.server.network.session.data.ConfigurationData;
 import net.hypejet.jet.server.network.session.data.LoginData;
@@ -59,13 +57,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.UnaryOperator;
 
 /**
  * Represents an implementation of {@linkplain Player a player}.
@@ -92,9 +87,6 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
 
     private final NullableObjectAcquirable<DeathLocation> lastDeathLocation = new NullableObjectAcquirable<>(); // TODO: Updating
 
-    private final Map<ScoreboardPosition, String> objectivesDisplayed = new HashMap<>();
-    private final ReentrantReadWriteLock objectivesDisplayedLock = new ReentrantReadWriteLock();
-
     private @NonNull JetScoreboard scoreboard;
     private final ReentrantReadWriteLock scoreboardLock = new ReentrantReadWriteLock();
 
@@ -115,8 +107,8 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
      */
     private JetPlayer(@NonNull UUID uniqueId, @NonNull String username, @NonNull SocketPlayerConnection connection,
                       @NonNull JetWorld world, @NonNull Position position, boolean enableRespawnScreen,
-                      Player.@Nullable GameMode previousGameMode, Player.@NonNull GameMode gameMode,
-                      Player.@NonNull Settings settings, @NonNull String clientBrand) {
+                      @Nullable GameMode previousGameMode, @NonNull GameMode gameMode,
+                      @NonNull Settings settings, @NonNull String clientBrand) {
         super(ENTITY_TYPE, uniqueId, Pointers.builder()
                 .withStatic(Identity.UUID, NullabilityUtil.requireNonNull(uniqueId, "unique identifier"))
                 .withStatic(Identity.NAME, NullabilityUtil.requireNonNull(username, "username"))
@@ -227,7 +219,13 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
         NullabilityUtil.requireNonNull(scoreboard, "scoreboard");
         if (!(scoreboard instanceof JetScoreboard validatedScoreboard))
             throw new IllegalArgumentException("The scoreboard specified is not a valid scoreboard");
-        return this.updateScoreboard(previousScoreboard -> validatedScoreboard, false);
+
+        try {
+            this.scoreboardLock.writeLock().lock();
+            return this.updateScoreboard(validatedScoreboard);
+        } finally {
+            this.scoreboardLock.writeLock().unlock();
+        }
     }
 
     @Override
@@ -237,80 +235,15 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
 
         if (!(newScoreboard instanceof JetScoreboard validatedNewScoreboard))
             throw new IllegalArgumentException("The scoreboard specified is not a valid scoreboard");
-
-        return this.updateScoreboard(
-                previousScoreboard -> previousScoreboard == scoreboard
-                        ? validatedNewScoreboard
-                        : previousScoreboard,
-                true
-        ) == newScoreboard;
-    }
-
-
-    @Override
-    public @Nullable String getDisplayedObjective(@NonNull ScoreboardPosition position) {
-        NullabilityUtil.requireNonNull(position, "position");
-        try {
-            this.objectivesDisplayedLock.readLock().lock();
-            return this.objectivesDisplayed.get(position);
-        } finally {
-            this.objectivesDisplayedLock.readLock().unlock();
-        }
-    }
-
-    @Override
-    public @Nullable String setDisplayedObjective(@NonNull ScoreboardPosition position, @NonNull String name) {
-        try {
-            this.scoreboardLock.readLock().lock();
-            return this.scoreboard.setDisplayedObjective(
-                    this, position, name,
-                    this.objectivesDisplayed, this.objectivesDisplayedLock
-            );
-        } finally {
-            this.scoreboardLock.readLock().unlock();
-        }
-    }
-
-    @Override
-    public @Nullable String removeDisplayedObjective(@NonNull ScoreboardPosition position) {
-        NullabilityUtil.requireNonNull(position, "position");
-        try {
-            this.objectivesDisplayedLock.writeLock().lock();
-            String removedObjectiveName = this.objectivesDisplayed.remove(position);
-            if (removedObjectiveName != null)
-                this.sendPacket(new ServerSetObjectiveDisplayedPlayPacket(position, null));
-            return removedObjectiveName;
-        } finally {
-            this.objectivesDisplayedLock.writeLock().unlock();
-        }
-    }
-
-    @Override
-    public boolean removeDisplayedObjective(@NonNull ScoreboardPosition position, @NonNull String name) {
-        NullabilityUtil.requireNonNull(position, "position");
-        NullabilityUtil.requireNonNull(name, "name");
+        // TODO: Validate both scoreboards
 
         try {
-            this.objectivesDisplayedLock.writeLock().lock();
-            boolean result = this.objectivesDisplayed.remove(position, name);
-            if (result) this.sendPacket(new ServerSetObjectiveDisplayedPlayPacket(position, null));
-            return result;
+            this.scoreboardLock.writeLock().lock();
+            if (this.scoreboard != scoreboard) return false;
+            this.updateScoreboard(validatedNewScoreboard);
+            return true;
         } finally {
-            this.objectivesDisplayedLock.writeLock().unlock();
-        }
-    }
-
-    @Override
-    public boolean replaceDisplayedObjective(@NonNull ScoreboardPosition position,
-                                             @NonNull String name, @NonNull String newName) {
-        try {
-            this.scoreboardLock.readLock().lock();
-            return this.scoreboard.replaceDisplayedObjective(
-                    this, position, name, newName,
-                    this.objectivesDisplayed, this.objectivesDisplayedLock
-            );
-        } finally {
-            this.scoreboardLock.readLock().unlock();
+            this.scoreboardLock.writeLock().unlock();
         }
     }
 
@@ -438,24 +371,6 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     }
 
     /**
-     * Handles removal of {@linkplain net.hypejet.jet.scoreboard.objective.ScoreboardObjective a scoreboard objective}
-     * from {@linkplain net.hypejet.jet.server.scoreboard.JetScoreboard a scoreboard} visible
-     * for this {@linkplain JetPlayer player}.
-     *
-     * @param name a name of the scoreboard objective
-     * @since 1.0
-     */
-    public void handleScoreboardObjectiveRemoval(@NonNull String name) {
-        NullabilityUtil.requireNonNull(name, "name");
-        try {
-            this.objectivesDisplayedLock.readLock().lock();
-            this.objectivesDisplayed.entrySet().removeIf(entry -> entry.getValue().equals(name));
-        } finally {
-            this.objectivesDisplayedLock.readLock().unlock();
-        }
-    }
-
-    /**
      * Creates {@linkplain JetPlayer a player} with {@linkplain SocketPlayerConnection a player connection}
      * and {@linkplain ConfigurationData a configuration data} specified.
      *
@@ -479,29 +394,30 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
         );
     }
 
-    private @NonNull JetScoreboard updateScoreboard(@NonNull UnaryOperator<JetScoreboard> updater, boolean returnNew) {
-        try {
-            this.scoreboardLock.writeLock().lock();
+    /**
+     * Tries to cast {@linkplain Player a player} specified to {@linkplain JetPlayer a player implementation}.
+     * If it fails, throws an exception with a detailed message.
+     *
+     * @param player the player
+     * @return the player implementation
+     * @throws IllegalArgumentException if the player could not be cast to a player implementation
+     * @since 1.0
+     */
+    public static @NonNull JetPlayer cast(@NonNull Player player) {
+        if (!(player instanceof JetPlayer validatedPlayer))
+            throw new IllegalArgumentException("The player specified is not a valid player");
+        return validatedPlayer;
+    }
 
-            JetScoreboard previousScoreboard = this.scoreboard;
-            JetScoreboard newScoreboard = updater.apply(previousScoreboard);
-            if (previousScoreboard == newScoreboard) return previousScoreboard;
+    private @NonNull JetScoreboard updateScoreboard(@NonNull JetScoreboard scoreboard) {
+        JetScoreboard previousScoreboard = this.scoreboard;
+        if (scoreboard == previousScoreboard) return previousScoreboard;
 
-            try {
-                this.objectivesDisplayedLock.writeLock().lock();
+        previousScoreboard.removeViewer(this);
+        scoreboard.addViewer(this);
 
-                previousScoreboard.removeViewer(this);
-                newScoreboard.addViewer(this);
-
-                this.scoreboard = newScoreboard;
-                this.objectivesDisplayed.clear();
-                return returnNew ? newScoreboard : previousScoreboard;
-            } finally {
-                this.objectivesDisplayedLock.writeLock().unlock();
-            }
-        } finally {
-            this.scoreboardLock.writeLock().unlock();
-        }
+        this.scoreboard = scoreboard;
+        return previousScoreboard;
     }
 
     private void sendJoinGamePacket(@NonNull JetWorld world) {

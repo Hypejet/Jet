@@ -3,7 +3,9 @@ package net.hypejet.jet.scoreboard;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.scoreboard.exception.NoSuchObjectiveException;
+import net.hypejet.jet.scoreboard.exception.NotViewerException;
 import net.hypejet.jet.scoreboard.objective.ScoreboardObjective;
+import net.hypejet.jet.scoreboard.position.ScoreboardPosition;
 import net.hypejet.jet.scoreboard.score.Score;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -242,6 +244,61 @@ public interface Scoreboard {
      * @since 1.0
      */
     @NonNull Map<String, Score> scores(@NonNull String objective);
+
+    /**
+     * Gets name of {@linkplain ScoreboardObjective a scoreboard objective} displayed
+     * for some {@linkplain Player player} at {@linkplain ScoreboardPosition a scoreboard position} specified.
+     *
+     * @param player the player
+     * @param position the scoreboard position
+     * @return the scoreboard objective name, {@code null} if no scoreboard objective is displayed for the player
+     *         at the scoreboard position
+     * @throws NotViewerException if the player specified is not a viewer of this scoreboard
+     * @since 1.0
+     */
+    @Nullable String getDisplayedObjective(@NonNull Player player, @NonNull ScoreboardPosition position);
+
+    /**
+     * Sets {@linkplain ScoreboardObjective a scoreboard objective} that should be displayed
+     * at some {@linkplain ScoreboardPosition scoreboard position} for {@linkplain Player a player} specified.
+     *
+     * @param player the player
+     * @param position the scoreboard position
+     * @param name a name of the scoreboard objective that should be displayed, {@code null} if no scoreboard
+     *             objective should be displayed at the scoreboard position
+     * @return a name of a previous scoreboard objective that was displayed for the player
+     *         at the same position, {@code null} if none
+     * @throws NotViewerException if the player specified is not a viewer of this scoreboard
+     * @throws NoSuchObjectiveException if the scoreboard objective name specified is not {@code null}
+     *                                  and no scoreboard objective with the same name was registered
+     *                                  in this scoreboard
+     * @since 1.0
+     */
+    @Nullable String setDisplayedObjective(@NonNull Player player, @NonNull ScoreboardPosition position,
+                                           @Nullable String name);
+
+    /**
+     * Replaces {@linkplain ScoreboardObjective a scoreboard objective} displayed
+     * at some {@linkplain ScoreboardPosition scoreboard position} for {@linkplain Player a player} specified.
+     * The replacement is done only if name of a scoreboard objective displayed for the player at the same scoreboard
+     * position at time of calling the method is equal to a value specified.
+     *
+     * @param player the player
+     * @param position the scoreboard position
+     * @param name the value, {@code null} if it is expected that no scoreboard objective is displayed
+     *             for the player at the scoreboard position at time of calling the method
+     * @param newName a name of a new scoreboard objective that should be displayed for the player
+     *                at the scoreboard position, {@code null} if no scoreboard objective should be displayed
+     *                at that scoreboard position
+     * @return {@code true} if the scoreboard objective displayed was replaced, {@code false} otherwise
+     * @throws NotViewerException if the player specified is not a viewer of this scoreboard
+     * @throws NoSuchObjectiveException if the new scoreboard objective name specified is not {@code null}
+     *                                  and no scoreboard objective with the same name was registered
+     *                                  in this scoreboard
+     * @since 1.0
+     */
+    boolean replaceDisplayedObjective(@NonNull Player player, @NonNull ScoreboardPosition position,
+                                      @Nullable String name, @Nullable String newName);
 
     /**
      * Gets copy of {@linkplain Set a set} of {@linkplain Player players}
