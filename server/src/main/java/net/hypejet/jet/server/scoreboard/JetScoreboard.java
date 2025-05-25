@@ -466,6 +466,7 @@ public final class JetScoreboard implements Scoreboard {
     }
 
     private static @NonNull String ownerName(@NonNull Entity entity) {
+        // TODO: Check entity type instead of the entity being an instance of player
         return entity instanceof JetPlayer player ? player.username() : entity.uniqueId().toString();
     }
 }
