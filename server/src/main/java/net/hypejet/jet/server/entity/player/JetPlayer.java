@@ -482,21 +482,25 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     private @NonNull JetScoreboard updateScoreboard(@NonNull UnaryOperator<JetScoreboard> updater, boolean returnNew) {
         try {
             this.scoreboardLock.writeLock().lock();
-            this.objectivesDisplayedLock.writeLock().lock();
 
             JetScoreboard previousScoreboard = this.scoreboard;
             JetScoreboard newScoreboard = updater.apply(previousScoreboard);
             if (previousScoreboard == newScoreboard) return previousScoreboard;
 
-            previousScoreboard.removeViewer(this);
-            newScoreboard.addViewer(this);
+            try {
+                this.objectivesDisplayedLock.writeLock().lock();
 
-            this.scoreboard = newScoreboard;
-            this.objectivesDisplayed.clear();
-            return returnNew ? newScoreboard : previousScoreboard;
+                previousScoreboard.removeViewer(this);
+                newScoreboard.addViewer(this);
+
+                this.scoreboard = newScoreboard;
+                this.objectivesDisplayed.clear();
+                return returnNew ? newScoreboard : previousScoreboard;
+            } finally {
+                this.objectivesDisplayedLock.writeLock().unlock();
+            }
         } finally {
             this.scoreboardLock.writeLock().unlock();
-            this.objectivesDisplayedLock.writeLock().unlock();
         }
     }
 
