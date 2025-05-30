@@ -153,21 +153,19 @@ public final class JetScoreboard implements Scoreboard {
     }
 
     @Override
-    public @Nullable Score setScore(@NonNull Entity entity, @NonNull String objective, @NonNull Score score) {
+    public @Nullable Score setScore(@NonNull Entity entity, @NonNull String objective, @Nullable Score score) {
         NullabilityUtil.requireNonNull(entity, "entity");
         return this.setScore(ownerName(entity), objective, score);
     }
 
     @Override
-    public @Nullable Score setScore(@NonNull String owner, @NonNull String objective, @NonNull Score score) {
+    public @Nullable Score setScore(@NonNull String owner, @NonNull String objective, @Nullable Score score) {
         NullabilityUtil.requireNonNull(owner, "owner");
         NullabilityUtil.requireNonNull(objective, "objective");
-        NullabilityUtil.requireNonNull(score, "score");
 
         try {
             this.lock.writeLock().lock();
-            this.sendScoreUpdate(owner, objective, score);
-            return this.scoreMap(objective).put(owner, score);
+            return this.updateScore(this.scoreMap(objective), owner, objective, score);
         } finally {
             this.lock.writeLock().unlock();
         }
@@ -175,66 +173,26 @@ public final class JetScoreboard implements Scoreboard {
 
     @Override
     public boolean replaceScore(@NonNull Entity entity, @NonNull String objective,
-                                @NonNull Score expectedScore, @NonNull Score newScore) {
+                                @Nullable Score expectedScore, @Nullable Score newScore) {
         NullabilityUtil.requireNonNull(entity, "entity");
         return this.replaceScore(ownerName(entity), objective, expectedScore, newScore);
     }
 
     @Override
     public boolean replaceScore(@NonNull String owner, @NonNull String objective,
-                                @NonNull Score expectedScore, @NonNull Score newScore) {
-        NullabilityUtil.requireNonNull(owner, "owner");
-        NullabilityUtil.requireNonNull(objective, "objective");
-        NullabilityUtil.requireNonNull(expectedScore, "expected score");
-        NullabilityUtil.requireNonNull(newScore, "new score");
-
-        try {
-            this.lock.writeLock().lock();
-            boolean result = this.scoreMap(objective).replace(owner, expectedScore, newScore);
-            if (result) this.sendScoreUpdate(owner, objective, newScore);
-            return result;
-        } finally {
-            this.lock.writeLock().unlock();
-        }
-    }
-
-    @Override
-    public @Nullable Score removeScore(@NonNull Entity entity, @NonNull String objective) {
-        NullabilityUtil.requireNonNull(entity, "entity");
-        return this.removeScore(ownerName(entity), objective);
-    }
-
-    @Override
-    public @Nullable Score removeScore(@NonNull String owner, @NonNull String objective) {
+                                @Nullable Score expectedScore, @Nullable Score newScore) {
         NullabilityUtil.requireNonNull(owner, "owner");
         NullabilityUtil.requireNonNull(objective, "objective");
 
         try {
             this.lock.writeLock().lock();
-            this.sendScoreReset(owner, objective);
-            return this.scoreMap(objective).remove(owner);
-        } finally {
-            this.lock.writeLock().unlock();
-        }
-    }
 
-    @Override
-    public boolean removeScore(@NonNull Entity entity, @NonNull String objective, @NonNull Score score) {
-        NullabilityUtil.requireNonNull(entity, "entity");
-        return this.removeScore(ownerName(entity), objective, score);
-    }
+            Map<String, Score> scoreMap = this.scoreMap(objective);
+            if (Objects.equals(scoreMap.get(owner), expectedScore))
+                return false;
 
-    @Override
-    public boolean removeScore(@NonNull String owner, @NonNull String objective, @NonNull Score score) {
-        NullabilityUtil.requireNonNull(owner, "owner");
-        NullabilityUtil.requireNonNull(objective, "objective");
-        NullabilityUtil.requireNonNull(score, "score");
-
-        try {
-            this.lock.writeLock().lock();
-            boolean result = this.scoreMap(objective).remove(owner, score);
-            if (result) this.sendScoreReset(owner, objective);
-            return result;
+            this.updateScore(scoreMap, owner, objective, newScore);
+            return true;
         } finally {
             this.lock.writeLock().unlock();
         }
@@ -260,7 +218,7 @@ public final class JetScoreboard implements Scoreboard {
                 objectiveNames.add(entry.getKey());
             }
 
-            this.sendScoreReset(owner, null);
+            this.sendPacketToViewers(new ServerResetScorePlayPacket(owner, null));
             return Set.copyOf(objectiveNames);
         } finally {
             this.lock.writeLock().unlock();
@@ -417,14 +375,6 @@ public final class JetScoreboard implements Scoreboard {
         this.sendPacketToViewers(new ServerObjectiveActionPlayPacket(name, action));
     }
 
-    private void sendScoreUpdate(@NonNull String entityName, @NonNull String objectiveName, @NonNull Score newScore) {
-        this.sendPacketToViewers(new ServerUpdateScorePlayPacket(entityName, objectiveName, newScore));
-    }
-
-    private void sendScoreReset(@NonNull String entityName, @Nullable String objectiveName) {
-        this.sendPacketToViewers(new ServerResetScorePlayPacket(entityName, objectiveName));
-    }
-
     private void sendPacketToViewers(@NonNull ServerPacket packet) {
         this.viewers.keySet().forEach(player -> player.sendPacket(packet)); // TODO: FRAME
     }
@@ -439,6 +389,20 @@ public final class JetScoreboard implements Scoreboard {
                 "Objective with name of %s was not registered in this scoreboard",
                 name
         ));
+    }
+
+    private @Nullable Score updateScore(@NonNull Map<String, Score> scoreMap, @NonNull String owner,
+                                        @NonNull String objective, @Nullable Score score) {
+        if (Objects.equals(scoreMap.get(owner), score))
+            return score;
+
+        if (score == null) {
+            this.sendPacketToViewers(new ServerResetScorePlayPacket(owner, objective));
+            return scoreMap.remove(owner);
+        }
+
+        this.sendPacketToViewers(new ServerUpdateScorePlayPacket(owner, objective, score));
+        return scoreMap.put(owner, score);
     }
 
     /**

@@ -113,102 +113,56 @@ public interface Scoreboard {
      *
      * @param entity the entity
      * @param objective a name of a scoreboard objective to set the score in
-     * @param score a value that the score should be set to
+     * @param score a value that the score should be set to, {@code null} if score of the entity should be removed
      * @return a previous score of the entity, {@code null} if the entity did not have a score
      * @throws NoSuchObjectiveException if a scoreboard objective with the name specified does not exist
      * @since 1.0
      */
-    @Nullable Score setScore(@NonNull Entity entity, @NonNull String objective, @NonNull Score score);
+    @Nullable Score setScore(@NonNull Entity entity, @NonNull String objective, @Nullable Score score);
 
     /**
      * Sets {@linkplain Score a score} of an owner with name specified.
      *
      * @param owner the owner name
      * @param objective a name of a scoreboard objective to set the score in
-     * @param score a value that the score should be set to
+     * @param score a value that the score should be set to, {@code null} if score of the owner should be removed
      * @return a previous score of the owner, {@code null} if the owner did not have a score
      * @throws NoSuchObjectiveException if a scoreboard objective with the name specified does not exist
      * @since 1.0
      */
-    @Nullable Score setScore(@NonNull String owner, @NonNull String objective, @NonNull Score score);
+    @Nullable Score setScore(@NonNull String owner, @NonNull String objective, @Nullable Score score);
 
     /**
-     * Sets {@linkplain Score a score} of {@linkplain Entity an entity} specified only if score of the entity
-     * at time of calling the method is equal to a value specified.
+     * Sets {@linkplain Score a score} of some {@linkplain Entity entity} only if score of the entity
+     * at time of calling the method is {@linkplain Object#equals(Object) equal} to a value specified.
      *
      * @param entity the entity
      * @param objective a name of a scoreboard objective to set the score in
-     * @param expectedScore a value that the score should be equal to
-     * @param newScore a value that the score should be set to
+     * @param expectedScore the value, {@code null} if it is expected that the entity does not have a score
+     *                      in the scoreboard objective at time of calling the method
+     * @param newScore a value that the score should be set to, {@code null} if score of the entity should be removed
      * @return {@code true} if the score has been replaced, {@code false} otherwise
      * @throws NoSuchObjectiveException if a scoreboard objective with the name specified does not exist
      * @since 1.0
      */
     boolean replaceScore(@NonNull Entity entity, @NonNull String objective,
-                         @NonNull Score expectedScore, @NonNull Score newScore);
+                         @Nullable Score expectedScore, @Nullable Score newScore);
 
     /**
-     * Sets {@linkplain Score a score} of an owner with name specified only if score of the owner at time
-     * of calling the method is equal to a value specified.
+     * Sets {@linkplain Score a score} of some owner only if score of the owner at time
+     * of calling the method is {@linkplain Object#equals(Object) equal} to a value specified.
      *
-     * @param owner the owner name
+     * @param owner a name of the owner
      * @param objective a name of a scoreboard objective to set the score in
-     * @param expectedScore a value that the score should be equal to
-     * @param newScore a value that the score should be set to
+     * @param expectedScore the value, {@code null} if it is expected that the owner does not have a score
+     *                      in the scoreboard objective at time of calling the method
+     * @param newScore a value that the score should be set to, {@code null} if score of the owner should be removed
      * @return {@code true} if the score has been replaced, {@code false} otherwise
      * @throws NoSuchObjectiveException if a scoreboard objective with the name specified does not exist
      * @since 1.0
      */
     boolean replaceScore(@NonNull String owner, @NonNull String objective,
-                         @NonNull Score expectedScore, @NonNull Score newScore);
-
-    /**
-     * Removes {@linkplain Score a score} of {@linkplain Entity an entity} specified.
-     *
-     * @param entity the entity
-     * @param objective a name of a scoreboard objective to remove the score from
-     * @return a score that the entity had, {@code null} if none
-     * @throws NoSuchObjectiveException if a scoreboard objective with the name specified does not exist
-     * @since 1.0
-     */
-    @Nullable Score removeScore(@NonNull Entity entity, @NonNull String objective);
-
-    /**
-     * Removes {@linkplain Score a score} of an owner with name specified.
-     *
-     * @param owner the owner name
-     * @param objective a name of a scoreboard objective to remove the score from
-     * @return a score that the entity had, {@code null} if none
-     * @throws NoSuchObjectiveException if a scoreboard objective with the name specified does not exist
-     * @since 1.0
-     */
-    @Nullable Score removeScore(@NonNull String owner, @NonNull String objective);
-
-    /**
-     * Removes {@linkplain Score a score} of {@linkplain Entity an entity} specified only if their score at time
-     * of calling the method is equal to a value specified.
-     *
-     * @param entity the entity
-     * @param objective a name of a scoreboard objective to remove the score from
-     * @param score the value
-     * @return {@code true} if the score was removed, {@code false} otherwise
-     * @throws NoSuchObjectiveException if a scoreboard objective with the name specified does not exist
-     * @since 1.0
-     */
-    boolean removeScore(@NonNull Entity entity, @NonNull String objective, @NonNull Score score);
-
-    /**
-     * Removes {@linkplain Score a score} of an owner with name specified only if their score at time of calling
-     * the method is equal to a value specified.
-     *
-     * @param owner the owner name
-     * @param objective a name of a scoreboard objective to remove the score from
-     * @param score the value
-     * @return {@code true} if the score was removed, {@code false} otherwise
-     * @throws NoSuchObjectiveException if a scoreboard objective with the name specified does not exist
-     * @since 1.0
-     */
-    boolean removeScore(@NonNull String owner, @NonNull String objective, @NonNull Score score);
+                         @Nullable Score expectedScore, @Nullable Score newScore);
 
     /**
      * Removes all {@linkplain Score scores} of {@linkplain Entity an entity} specified
