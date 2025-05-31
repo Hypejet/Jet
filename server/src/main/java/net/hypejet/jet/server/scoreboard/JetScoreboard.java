@@ -42,7 +42,6 @@ public final class JetScoreboard implements Scoreboard {
 
     @Override
     public @Nullable ScoreboardObjective getObjective(@NonNull String name) {
-        NullabilityUtil.requireNonNull(name, "name");
         try {
             this.lock.readLock().lock();
             return this.objectives.get(name);
@@ -52,72 +51,23 @@ public final class JetScoreboard implements Scoreboard {
     }
 
     @Override
-    public @NonNull ScoreboardObjective registerObjective(@NonNull String name,
-                                                          @NonNull ScoreboardObjective objective) {
-        NullabilityUtil.requireNonNull(name, "name");
-        NullabilityUtil.requireNonNull(objective, "objective");
-
+    public @Nullable ScoreboardObjective setObjective(@NonNull String name, @Nullable ScoreboardObjective objective) {
         try {
             this.lock.writeLock().lock();
-            if (this.objectives.containsKey(name))
-                return this.objectives.get(name);
-
-            this.objectives.put(name, objective);
-            this.scoreMaps.put(name, new HashMap<>());
-            this.sendObjectiveUpdate(name, new Action.Create(objective));
-
-            return objective;
+            return this.updateObjective(name, objective);
         } finally {
             this.lock.writeLock().unlock();
         }
     }
 
     @Override
-    public boolean replaceObjective(@NonNull String name, @NonNull ScoreboardObjective expectedObjective,
-                                    @NonNull ScoreboardObjective newObjective) {
-        NullabilityUtil.requireNonNull(name, "name");
-        NullabilityUtil.requireNonNull(expectedObjective, "expected objective");
-        NullabilityUtil.requireNonNull(newObjective, "new objective");
-
+    public boolean replaceObjective(@NonNull String name, @Nullable ScoreboardObjective expectedObjective,
+                                    @Nullable ScoreboardObjective newObjective) {
         try {
             this.lock.writeLock().lock();
-            boolean result = this.objectives.replace(name, expectedObjective, newObjective);
-            if (result) this.sendObjectiveUpdate(name, new Action.Update(newObjective));
-            return result;
-        } finally {
-            this.lock.writeLock().unlock();
-        }
-    }
-
-    @Override
-    public @Nullable ScoreboardObjective removeObjective(@NonNull String name) {
-        NullabilityUtil.requireNonNull(name, "name");
-
-        try {
-            this.lock.writeLock().lock();
-            this.scoreMaps.remove(name);
-
-            ScoreboardObjective objectiveRemoved = this.objectives.remove(name);
-            if (objectiveRemoved != null)
-                this.handleObjectiveRemoval(name);
-            return objectiveRemoved;
-        } finally {
-            this.lock.writeLock().unlock();
-        }
-    }
-
-    @Override
-    public boolean removeObjective(@NonNull String name, @NonNull ScoreboardObjective expectedObjective) {
-        NullabilityUtil.requireNonNull(name, "name");
-        NullabilityUtil.requireNonNull(expectedObjective, "expected objective");
-
-        try {
-            this.lock.writeLock().lock();
-            this.scoreMaps.remove(name);
-
-            boolean result = this.objectives.remove(name, expectedObjective);
-            if (result) this.handleObjectiveRemoval(name);
-            return result;
+            if (!Objects.equals(this.objectives.get(name), expectedObjective)) return false;
+            this.updateObjective(name, newObjective);
+            return true;
         } finally {
             this.lock.writeLock().unlock();
         }
@@ -188,7 +138,7 @@ public final class JetScoreboard implements Scoreboard {
             this.lock.writeLock().lock();
 
             Map<String, Score> scoreMap = this.scoreMap(objective);
-            if (Objects.equals(scoreMap.get(owner), expectedScore))
+            if (!Objects.equals(scoreMap.get(owner), expectedScore))
                 return false;
 
             this.updateScore(scoreMap, owner, objective, newScore);
@@ -366,15 +316,6 @@ public final class JetScoreboard implements Scoreboard {
         return handler;
     }
 
-    private void handleObjectiveRemoval(@NonNull String name) {
-        this.sendObjectiveUpdate(name, Action.Remove.INSTANCE);
-        this.viewers.values().forEach(handler -> handler.handleObjectiveRemoval(name));
-    }
-
-    private void sendObjectiveUpdate(@NonNull String name, @NonNull Action action) {
-        this.sendPacketToViewers(new ServerObjectiveActionPlayPacket(name, action));
-    }
-
     private void sendPacketToViewers(@NonNull ServerPacket packet) {
         this.viewers.keySet().forEach(player -> player.sendPacket(packet)); // TODO: FRAME
     }
@@ -389,6 +330,30 @@ public final class JetScoreboard implements Scoreboard {
                 "Objective with name of %s was not registered in this scoreboard",
                 name
         ));
+    }
+
+    private @Nullable ScoreboardObjective updateObjective(@NonNull String name,
+                                                          @Nullable ScoreboardObjective objective) {
+        ScoreboardObjective currentObjective = this.objectives.get(name);
+        if (Objects.equals(currentObjective, objective)) return objective;
+
+        if (objective == null) {
+            this.viewers.values().forEach(handler -> handler.handleObjectiveRemoval(name));
+            this.sendPacketToViewers(new ServerObjectiveActionPlayPacket(name, Action.Remove.INSTANCE));
+            this.scoreMaps.remove(name);
+            return this.objectives.remove(name);
+        }
+
+        Action action;
+        if (currentObjective == null) {
+            action = new Action.Create(objective);
+            this.scoreMaps.put(name, new HashMap<>());
+        } else {
+            action = new Action.Update(objective);
+        }
+
+        this.sendPacketToViewers(new ServerObjectiveActionPlayPacket(name, action));
+        return this.objectives.put(name, objective);
     }
 
     private @Nullable Score updateScore(@NonNull Map<String, Score> scoreMap, @NonNull String owner,

@@ -21,7 +21,7 @@ import java.util.Set;
 public interface Scoreboard {
     /**
      * Gets {@linkplain ScoreboardObjective a scoreboard objective} registered
-     * in this {@linkplain Scoreboard scoreboard} by a name specified.
+     * in this {@linkplain Scoreboard scoreboard} with some name.
      *
      * @param name the name
      * @return the scoreboard objective, {@code null} if no scoreboard objective with the name specified
@@ -31,49 +31,32 @@ public interface Scoreboard {
     @Nullable ScoreboardObjective getObjective(@NonNull String name);
 
     /**
-     * Registers {@linkplain ScoreboardObjective a scoreboard objective} specified with a name specified
-     * if no other scoreboard objective with the name specified has been registered.
+     * Sets some {@linkplain ScoreboardObjective scoreboard objective}
+     * in this {@linkplain Scoreboard scoreboard} to have a data specified.
      *
-     * @param name the name
-     * @return the scoreboard objective specified, or another scoreboard objective if it was already registered
-     *         with the name specified
+     * @param name a name of the scoreboard objective
+     * @param objective the data, {@code null} if the scoreboard objective should be removed along with all scores
+     *                  associated with it
+     * @return a previous data of the scoreboard objective, {@code null} if the scoreboard objective did not exist
      * @since 1.0
      */
-    @NonNull ScoreboardObjective registerObjective(@NonNull String name, @NonNull ScoreboardObjective objective);
+    @Nullable ScoreboardObjective setObjective(@NonNull String name, @Nullable ScoreboardObjective objective);
 
     /**
-     * Replaces {@linkplain ScoreboardObjective a scoreboard objective} with a name specified from this scoreboard
-     * only if it is equal to an expected scoreboard objective specified.
+     * Replaces data of some {@linkplain ScoreboardObjective scoreboard objective}
+     * in this {@linkplain Scoreboard scoreboard}. The replacement is done only if data of the scoreboard objective
+     * at time of calling the method is {@linkplain Object#equals(Object) equal} to a value specified.
      *
-     * @param name the name
-     * @param expectedObjective the expected scoreboard objective
-     * @param newObjective a scoreboard objective that the existing objective should be replaced with
+     * @param name a name of the scoreboard objective
+     * @param expectedObjective the value, {@code null} if it is expected that the scoreboard objective
+     *                          is not registered at time of calling the method
+     * @param newObjective a scoreboard objective that the existing objective should be replaced with, {@code null} if
+     *                     the scoreboard objective should be removed along with all scores associated with it
      * @return {@code true} if the scoreboard objective was replaced, {@code false} otherwise
      * @since 1.0
      */
-    boolean replaceObjective(@NonNull String name, @NonNull ScoreboardObjective expectedObjective,
-                             @NonNull ScoreboardObjective newObjective);
-
-    /**
-     * Removes {@linkplain ScoreboardObjective a scoreboard objective} registered in this scoreboard.
-     *
-     * @param name a name that was given to the scoreboard objective when it was registered
-     * @return the scoreboard objective that was removed, {@code null} if no scoreboard objective
-     *         was registered with the name specified
-     * @since 1.0
-     */
-    @Nullable ScoreboardObjective removeObjective(@NonNull String name);
-
-    /**
-     * Removes {@linkplain ScoreboardObjective a scoreboard objective} registered in this scoreboard only if it is
-     * equal to the expected scoreboard objective specified.
-     *
-     * @param name a name that was given to the scoreboard objective when it was registered
-     * @param expectedObjective the expected scoreboard objective
-     * @return {@code true} if the scoreboard objective was removed, {@code false} otherwise
-     * @since 1.0
-     */
-    boolean removeObjective(@NonNull String name, @NonNull ScoreboardObjective expectedObjective);
+    boolean replaceObjective(@NonNull String name, @Nullable ScoreboardObjective expectedObjective,
+                             @Nullable ScoreboardObjective newObjective);
 
     /**
      * Gets a copy of {@linkplain Map a map} which maps names to {@linkplain ScoreboardObjective scoreboard objectives}
