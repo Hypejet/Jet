@@ -23,6 +23,10 @@ public interface ScoreboardManager {
     /**
      * Creates {@linkplain Scoreboard a scoreboard} instance.
      *
+     * <p>The scoreboard is not stored anywhere by default by the server, therefore it exists in memory for as long
+     * as at least one {@linkplain net.hypejet.jet.entity.player.Player player} is a viewer of it, or it is used
+     * by {@linkplain net.hypejet.jet.plugin.Plugin a plugin}</p>
+     *
      * @return the instance
      * @since 1.0
      */
