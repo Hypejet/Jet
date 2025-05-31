@@ -49,7 +49,7 @@ public final class NumberFormatNetworkWriter implements NetworkWriter<NumberForm
             ));
         }
 
-        int identifier = IDENTIFIERS.getInt(buf);
+        int identifier = IDENTIFIERS.getInt(formatClass);
         VarIntNetworkCodec.INSTANCE.write(buf, identifier);
 
         switch (object) {
