@@ -1,5 +1,6 @@
 package net.hypejet.jet.scoreboard;
 
+import net.hypejet.jet.MinecraftServer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -12,8 +13,7 @@ public interface ScoreboardManager {
     /**
      * Gets {@linkplain Scoreboard a scoreboard} instance that is used by default
      * for all {@linkplain net.hypejet.jet.entity.player.Player players} joining
-     * {@linkplain net.hypejet.jet.MinecraftServer a server} associated
-     * with this {@linkplain ScoreboardManager scoreboard manager}.
+     * the {@linkplain MinecraftServer server} associated with this {@linkplain ScoreboardManager scoreboard manager}.
      *
      * @return the default scoreboard instance
      * @since 1.0
@@ -23,9 +23,10 @@ public interface ScoreboardManager {
     /**
      * Creates {@linkplain Scoreboard a scoreboard} instance.
      *
-     * <p>The scoreboard is not stored anywhere by default by the server, therefore it exists in memory for as long
-     * as at least one {@linkplain net.hypejet.jet.entity.player.Player player} is a viewer of it, or it is used
-     * by {@linkplain net.hypejet.jet.plugin.Plugin a plugin}</p>
+     * <p>The created scoreboard instance is not registered or tracked by the {@linkplain MinecraftServer server}
+     * associated with this {@linkplain ScoreboardManager scoreboard manager}. It remains in memory for as long
+     * as it is viewed by any {@linkplain net.hypejet.jet.entity.player.Player player} or tracked
+     * by {@linkplain net.hypejet.jet.plugin.Plugin a plugin}.</p>
      *
      * @return the instance
      * @since 1.0
