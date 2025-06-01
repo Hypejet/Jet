@@ -105,7 +105,7 @@ public interface Player extends Entity, CommandSource, CommonAudience {
     @NonNull WriteBooleanAcquisition acquireRespawnScreenEnabledWrite();
 
     /**
-     * Gets {@linkplain Scoreboard a scoreboard} displayed for this {@linkplain Player player}.
+     * Gets {@linkplain Scoreboard a scoreboard} visible for this {@linkplain Player player}.
      *
      * @return the scoreboard
      * @since 1.0
@@ -113,22 +113,23 @@ public interface Player extends Entity, CommandSource, CommonAudience {
     @NonNull Scoreboard getScoreboard();
 
     /**
-     * Sets {@linkplain Scoreboard a scoreboard} that should be displayed for this {@linkplain Player player}.
+     * Replaces the {@linkplain Scoreboard scoreboard} visible to this {@linkplain Player player}.
      *
-     * @param scoreboard the scoreboard
-     * @return a previous scoreboard that was displayed for the player
+     * @param scoreboard the scoreboard to set as visible
+     * @return the scoreboard that was replaced
      * @since 1.0
      */
     @NonNull Scoreboard setScoreboard(@NonNull Scoreboard scoreboard);
 
     /**
-     * Replaces {@linkplain Scoreboard a scoreboard} displayed for this {@linkplain Player player}.
-     * The replacement is done only if scoreboard displayed for the player at time of calling the method
-     * is the same as a value specified.
+     * Replaces the {@linkplain Scoreboard scoreboard} visible to this {@linkplain Player player}.
      *
-     * @param scoreboard the value
-     * @param newScoreboard a new scoreboard that should be displayed for the player
-     * @return {@code true} if the scoreboard was replaced, {@code false} otherwise
+     * <p>The replacement is done only if the scoreboard currently visible to the player
+     * is the same as the specified value.</p>
+     *
+     * @param scoreboard the expected current scoreboard
+     * @param newScoreboard the scoreboard to set as visible
+     * @return {@code true} if the visible scoreboard was replaced, {@code false} otherwise
      * @since 1.0
      */
     boolean replaceScoreboard(@NonNull Scoreboard scoreboard, @NonNull Scoreboard newScoreboard);
