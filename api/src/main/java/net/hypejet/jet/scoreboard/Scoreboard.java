@@ -148,28 +148,28 @@ public interface Scoreboard {
                          @Nullable Score expectedScore, @Nullable Score newScore);
 
     /**
-     * Removes all {@linkplain Score scores} of {@linkplain Entity an entity} specified
+     * Removes all {@linkplain Score scores} associated with the specified entity
      * from all {@linkplain ScoreboardObjective scoreboard objectives} registered
-     * in this {@linkplain Scoreboard scoreboard}
+     * in this {@linkplain Scoreboard scoreboard}.
      *
      * @param entity the entity
-     * @return a set of names of all scoreboard objectives where scores of the entity were removed,
-     *         therefore it does not include names of scoreboard objectives where the entity did not have a score
+     * @return a map that associates the names of scoreboard objectives (from which scores of the entity were removed)
+     *         with the scores the entity held in these objectives prior to removal
      * @since 1.0
      */
-    @NonNull Set<String> removeScores(@NonNull Entity entity);
+    @NonNull Map<String, Score> removeScores(@NonNull Entity entity);
 
     /**
-     * Removes all {@linkplain Score scores} of an owner with name specified
+     * Removes all {@linkplain Score scores} associated with the specified owner
      * from all {@linkplain ScoreboardObjective scoreboard objectives} registered
-     * in this {@linkplain Scoreboard scoreboard}
+     * in this {@linkplain Scoreboard scoreboard}.
      *
-     * @param owner the owner name
-     * @return a set of names of all scoreboard objectives where scores of the owner were removed,
-     *         therefore it does not include names of scoreboard objectives where the owner did not have a score
+     * @param owner the name of the owner
+     * @return a map that associates the names of scoreboard objectives (from which scores of the owner were removed)
+     *         with the scores the owner held in these objectives prior to removal
      * @since 1.0
      */
-    @NonNull Set<String> removeScores(@NonNull String owner);
+    @NonNull Map<String, Score> removeScores(@NonNull String owner);
 
     /**
      * Gets copy of {@linkplain Map a map} which maps owner names to {@linkplain Score scores} that the owners have

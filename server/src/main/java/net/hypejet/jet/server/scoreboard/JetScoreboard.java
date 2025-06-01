@@ -20,7 +20,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -42,6 +41,7 @@ public final class JetScoreboard implements Scoreboard {
 
     @Override
     public @Nullable ScoreboardObjective getObjective(@NonNull String name) {
+        NullabilityUtil.requireNonNull(name, "name");
         try {
             this.lock.readLock().lock();
             return this.objectives.get(name);
@@ -52,6 +52,7 @@ public final class JetScoreboard implements Scoreboard {
 
     @Override
     public @Nullable ScoreboardObjective setObjective(@NonNull String name, @Nullable ScoreboardObjective objective) {
+        NullabilityUtil.requireNonNull(name, "name");
         try {
             this.lock.writeLock().lock();
             return this.updateObjective(name, objective);
@@ -63,6 +64,7 @@ public final class JetScoreboard implements Scoreboard {
     @Override
     public boolean replaceObjective(@NonNull String name, @Nullable ScoreboardObjective expectedObjective,
                                     @Nullable ScoreboardObjective newObjective) {
+        NullabilityUtil.requireNonNull(name, "name");
         try {
             this.lock.writeLock().lock();
             if (!Objects.equals(this.objectives.get(name), expectedObjective)) return false;
@@ -149,27 +151,26 @@ public final class JetScoreboard implements Scoreboard {
     }
 
     @Override
-    public @NonNull Set<String> removeScores(@NonNull Entity entity) {
+    public @NonNull Map<String, Score> removeScores(@NonNull Entity entity) {
         NullabilityUtil.requireNonNull(entity, "entity");
         return this.removeScores(ownerName(entity));
     }
 
     @Override
-    public @NonNull Set<String> removeScores(@NonNull String owner) {
+    public @NonNull Map<String, Score> removeScores(@NonNull String owner) {
         NullabilityUtil.requireNonNull(owner, "owner");
         try {
             this.lock.writeLock().lock();
 
-            Set<String> objectiveNames = new HashSet<>();
+            Map<String, Score> objectiveToScoreMap = new HashMap<>();
             for (Map.Entry<String, Map<String, Score>> entry : this.scoreMaps.entrySet()) {
                 Map<String, Score> scoreMap = entry.getValue();
                 if (!scoreMap.containsKey(owner)) continue;
-                scoreMap.remove(owner);
-                objectiveNames.add(entry.getKey());
+                objectiveToScoreMap.put(entry.getKey(), scoreMap.remove(owner));
             }
 
             this.sendPacketToViewers(new ServerResetScorePlayPacket(owner, null));
-            return Set.copyOf(objectiveNames);
+            return Map.copyOf(objectiveToScoreMap);
         } finally {
             this.lock.writeLock().unlock();
         }
