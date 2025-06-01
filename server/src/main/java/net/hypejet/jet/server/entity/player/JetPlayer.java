@@ -103,12 +103,13 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
      * @param gameMode an initial game mode that the player should have
      * @param settings initial settings of a client associated with the connection
      * @param clientBrand a brand name of a client associated with the player
+     * @param initialScoreboard an initial scoreboard that the player should have
      * @since 1.0
      */
     private JetPlayer(@NonNull UUID uniqueId, @NonNull String username, @NonNull SocketPlayerConnection connection,
                       @NonNull JetWorld world, @NonNull Position position, boolean enableRespawnScreen,
-                      @Nullable GameMode previousGameMode, @NonNull GameMode gameMode,
-                      @NonNull Settings settings, @NonNull String clientBrand) {
+                      @Nullable GameMode previousGameMode, @NonNull GameMode gameMode, @NonNull Settings settings,
+                      @NonNull String clientBrand, @NonNull JetScoreboard initialScoreboard) {
         super(ENTITY_TYPE, uniqueId, Pointers.builder()
                 .withStatic(Identity.UUID, NullabilityUtil.requireNonNull(uniqueId, "unique identifier"))
                 .withStatic(Identity.NAME, NullabilityUtil.requireNonNull(username, "username"))
@@ -122,7 +123,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
         this.gameMode = new GameModeAcquirable(this, gameMode, previousGameMode);
         this.respawnScreenEnabled = new BooleanAcquirable(enableRespawnScreen);
 
-        this.scoreboard = this.server().scoreboardManager().defaultScoreboard();
+        this.scoreboard = NullabilityUtil.requireNonNull(initialScoreboard, "initial scoreboard");
         connection.initializePlayer(this);
 
         this.sendJoinGamePacket(world);
@@ -390,7 +391,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
                 loginData.uniqueId(), loginData.username(), connection, configurationData.world(),
                 configurationData.position(), configurationData.enableRespawnScreen(),
                 configurationData.previousGameMode(), configurationData.gameMode(), configurationData.settings(),
-                configurationData.clientBrand()
+                configurationData.clientBrand(), configurationData.initialScoreboard()
         );
     }
 

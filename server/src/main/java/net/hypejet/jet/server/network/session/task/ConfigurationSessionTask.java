@@ -40,6 +40,7 @@ import net.hypejet.jet.server.network.session.pack.ResourcePackHandler;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
 import net.hypejet.jet.server.registry.JetSerializableMinecraftRegistry;
 import net.hypejet.jet.server.registry.function.RegistryTagUpdateFunction;
+import net.hypejet.jet.server.scoreboard.JetScoreboard;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.hypejet.jet.server.util.game.audience.PacketReceivingCommonAudience;
 import net.hypejet.jet.server.util.unit.Unit;
@@ -51,6 +52,8 @@ import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.resource.ResourcePackStatus;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -79,6 +82,8 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
 
     private static final long TIME_OUT_DURATION = 20;
     private static final TimeUnit TIME_OUT_UNIT = TimeUnit.SECONDS;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationSessionTask.class);
 
     private final SocketPlayerConnection connection;
     private final LoginData loginData;
@@ -223,6 +228,18 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
         if (spawningPosition == null)
             throw new IllegalStateException("The spawning position has not been set");
 
+        JetScoreboard initialScoreboard;
+        if (startEvent.getInitialScoreboard() instanceof JetScoreboard validatedScoreboard) {
+            initialScoreboard = validatedScoreboard;
+        } else {
+            initialScoreboard = server.scoreboardManager().defaultScoreboard();
+            LOGGER.warn(
+                    "The initial scoreboard specified in a configuration-start event for a player with username" +
+                            " of {} is not a valid scoreboard, using the default scoreboard instead.",
+                    this.loginData.username()
+            );
+        }
+
         this.sendServerBrand();
         Set<FeaturePack> enabledFeaturePacks = this.connection.server().registryManager().enabledFeaturePacks();
 
@@ -295,7 +312,7 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
                                     new ConfigurationData(
                                             this.loginData, validatedSpawningWorld, spawningPosition,
                                             startEvent.shouldEnableRespawnScreen(), startEvent.getPreviousGameMode(),
-                                            startEvent.getGameMode(), settings, clientBrand
+                                            startEvent.getGameMode(), settings, clientBrand, initialScoreboard
                                     )
                             )
                     ));

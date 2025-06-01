@@ -4,6 +4,7 @@ import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.network.PlayerConnection;
+import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.session.configuration.ConfigurationManager;
 import net.hypejet.jet.world.World;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
@@ -28,9 +29,10 @@ public final class ConfigurationStartEvent {
     private @MonotonicNonNull Position spawningPosition;
 
     private Player.@Nullable GameMode previousGameMode;
-    private Player.GameMode gameMode = Player.GameMode.SURVIVAL;
+    private Player.@NonNull GameMode gameMode = Player.GameMode.SURVIVAL;
 
     private boolean enableRespawnScreen = true;
+    private @NonNull Scoreboard initialScoreboard;
 
     /**
      * Constructs the {@linkplain ConfigurationStartEvent configuration start event}.
@@ -40,6 +42,7 @@ public final class ConfigurationStartEvent {
      */
     public ConfigurationStartEvent(@NonNull ConfigurationManager manager) {
         this.manager = NullabilityUtil.requireNonNull(manager, "manager");
+        this.initialScoreboard = manager.connection().server().scoreboardManager().defaultScoreboard();
     }
 
     /**
@@ -131,6 +134,26 @@ public final class ConfigurationStartEvent {
      */
     public void setGameMode(Player.@NonNull GameMode gameMode) {
         this.gameMode = NullabilityUtil.requireNonNull(gameMode, "game mode");
+    }
+
+    /**
+     * Gets an initial {@linkplain Scoreboard scoreboard} that the {@linkplain Player player} should have.
+     *
+     * @return the scoreboard
+     * @since 1.0
+     */
+    public @NonNull Scoreboard getInitialScoreboard() {
+        return this.initialScoreboard;
+    }
+
+    /**
+     * Sets an initial {@linkplain Scoreboard scoreboard} that the {@linkplain Player player} should have.
+     *
+     * @param initialScoreboard the scoreboard that the player should have as their initial scoreboard
+     * @since 1.0
+     */
+    public void setInitialScoreboard(@NonNull Scoreboard initialScoreboard) {
+        this.initialScoreboard = NullabilityUtil.requireNonNull(initialScoreboard, "initial scoreboard");
     }
 
     /**
