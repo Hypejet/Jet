@@ -21,51 +21,46 @@ import java.util.Set;
 public interface Scoreboard {
     /**
      * Gets {@linkplain ScoreboardObjective a scoreboard objective} registered
-     * in this {@linkplain Scoreboard scoreboard}.
+     * in this {@linkplain Scoreboard scoreboard} with some name.
      *
-     * @param name the name of the scoreboard objective
-     * @return the scoreboard objective, {@code null} if no scoreboard objective with the specified name
-     *         was registered in this scoreboard
+     * @param name the name
+     * @return the scoreboard objective, {@code null} if no scoreboard objective with the name specified
+     *         has been registered in this scoreboard
      * @since 1.0
      */
     @Nullable ScoreboardObjective getObjective(@NonNull String name);
 
     /**
-     * Sets the specified {@linkplain ScoreboardObjective scoreboard objective} to have the specified data.
+     * Sets some {@linkplain ScoreboardObjective scoreboard objective}
+     * in this {@linkplain Scoreboard scoreboard} to have a data specified.
      *
-     * @param name the name of the scoreboard objective
-     * @param objective the data, {@code null} if the scoreboard objective should be removed along
-     *                  with all scores associated with it
-     * @return a previous data that the scoreboard objective had, {@code null} if the scoreboard objective
-     *         did not exist and the method call initialized the scoreboard objective
+     * @param name a name of the scoreboard objective
+     * @param objective the data, {@code null} if the scoreboard objective should be removed along with all scores
+     *                  associated with it
+     * @return a previous data of the scoreboard objective, {@code null} if the scoreboard objective did not exist
      * @since 1.0
      */
     @Nullable ScoreboardObjective setObjective(@NonNull String name, @Nullable ScoreboardObjective objective);
 
     /**
-     * Replaces data of the specified {@linkplain ScoreboardObjective scoreboard objective}.
+     * Replaces data of some {@linkplain ScoreboardObjective scoreboard objective}
+     * in this {@linkplain Scoreboard scoreboard}. The replacement is done only if data of the scoreboard objective
+     * at time of calling the method is {@linkplain Object#equals(Object) equal} to a value specified.
      *
-     * <p>The replacement is done only if data of the scoreboard objective
-     * at time of calling the method is {@linkplain Object#equals(Object) equal} to the specified value.</p>
-     *
-     * <p>If the expected value is specified as {@code null} and the requirement is satisfied,
-     * the scoreboard objective is initialized with the replacement value, but only if the replacement
-     * is not {@code null}.</p>
-     *
-     * @param name the name of the scoreboard objective
+     * @param name a name of the scoreboard objective
      * @param expectedObjective the value, {@code null} if it is expected that the scoreboard objective
-     *                          is not initialized at time of calling the method
-     * @param newObjective the data that data of the scoreboard objective should be replaced with, {@code null} if
+     *                          is not registered at time of calling the method
+     * @param newObjective a scoreboard objective that the existing objective should be replaced with, {@code null} if
      *                     the scoreboard objective should be removed along with all scores associated with it
-     * @return {@code true} if the scoreboard objective data was replaced, {@code false} otherwise
+     * @return {@code true} if the scoreboard objective was replaced, {@code false} otherwise
      * @since 1.0
      */
     boolean replaceObjective(@NonNull String name, @Nullable ScoreboardObjective expectedObjective,
                              @Nullable ScoreboardObjective newObjective);
 
     /**
-     * Gets a copy of {@linkplain Map map} associating the names
-     * of {@linkplain ScoreboardObjective scoreboard objectives} with these scoreboard objectives.
+     * Gets a copy of {@linkplain Map a map} which maps names to {@linkplain ScoreboardObjective scoreboard objectives}
+     * that the names were given to during registration in this scoreboard.
      *
      * @return the map copy
      * @since 1.0
@@ -73,90 +68,80 @@ public interface Scoreboard {
     @NonNull Map<String, ScoreboardObjective> objectives();
 
     /**
-     * Gets {@linkplain Score a score} of the specified {@linkplain Entity entity}.
+     * Gets {@linkplain Score a score} of {@linkplain Entity an entity} specified.
      *
      * @param entity the entity
-     * @param objective the name of a scoreboard objective to get the score from
-     * @return the score, {@code null} if the entity has no score in the specified scoreboard objective
-     * @throws NoSuchObjectiveException if no scoreboard objective with the specified name was registered
+     * @param objective a name of a scoreboard objective to get the score from
+     * @return the score, {@code null} if the entity specified has no score
+     *         in the scoreboard objective with name specified
+     * @throws NoSuchObjectiveException if a scoreboard objective with the name specified does not exist
      * @since 1.0
      */
     @Nullable Score getScore(@NonNull Entity entity, @NonNull String objective);
 
     /**
-     * Gets {@linkplain Score a score} of the specified owner.
+     * Gets {@linkplain Score a score} of an owner with name specified.
      *
-     * @param owner the name of the owner
-     * @param objective the name of a scoreboard objective to get the score from
-     * @return the score, {@code null} if the owner has no score in the specified scoreboard objective
-     * @throws NoSuchObjectiveException if no scoreboard objective with the specified name was registered
+     * @param owner the owner name
+     * @param objective a name of a scoreboard objective to get the score from
+     * @return the score, {@code null} if an owner with name specified
+     *         has no score in the scoreboard objective with name specified
+     * @throws NoSuchObjectiveException if a scoreboard objective with the name specified does not exist
      * @since 1.0
      */
     @Nullable Score getScore(@NonNull String owner, @NonNull String objective);
 
     /**
-     * Replaces {@linkplain Score a score} of the specified {@linkplain Entity entity}.
+     * Sets {@linkplain Score a score} of {@linkplain Entity an entity} specified.
      *
      * @param entity the entity
-     * @param objective the name of the scoreboard objective to replace the score in
-     * @param score a value that the score should be replaced to, {@code null} if the score should be removed
-     * @return a score the entity held prior to replacement in the specified scoreboard objective, {@code null} if
-     *         the entity did not have a score in that scoreboard objective
-     * @throws NoSuchObjectiveException if no scoreboard objective with the specified name was registered
+     * @param objective a name of a scoreboard objective to set the score in
+     * @param score a value that the score should be set to, {@code null} if score of the entity should be removed
+     * @return a previous score of the entity, {@code null} if the entity did not have a score
+     * @throws NoSuchObjectiveException if a scoreboard objective with the name specified does not exist
      * @since 1.0
      */
     @Nullable Score setScore(@NonNull Entity entity, @NonNull String objective, @Nullable Score score);
 
     /**
-     * Replaces {@linkplain Score a score} of the specified owner.
+     * Sets {@linkplain Score a score} of an owner with name specified.
      *
-     * @param owner the name of the owner
-     * @param objective the name of the scoreboard objective to replace the score in
-     * @param score a value that the score should be replaced to, {@code null} if the score should be removed
-     * @return a score the owner held prior to replacement in the specified scoreboard objective, {@code null} if
-     *         the owner did not have a score in that scoreboard objective
-     * @throws NoSuchObjectiveException if no scoreboard objective with the specified name was registered
+     * @param owner the owner name
+     * @param objective a name of a scoreboard objective to set the score in
+     * @param score a value that the score should be set to, {@code null} if score of the owner should be removed
+     * @return a previous score of the owner, {@code null} if the owner did not have a score
+     * @throws NoSuchObjectiveException if a scoreboard objective with the name specified does not exist
      * @since 1.0
      */
     @Nullable Score setScore(@NonNull String owner, @NonNull String objective, @Nullable Score score);
 
     /**
-     * Replaces {@linkplain Score a score} of the specified {@linkplain Entity entity}.
-     *
-     * <p>The replacement is done only if score of the entity at time of calling the method
-     * is {@linkplain Object#equals(Object) equal} to the specified value.</p>
-     *
-     * <p>If the expected value is specified as {@code null} and the requirement is satisfied,
-     * the score is initialized with the replacement value, but only if the replacement is not {@code null}.</p>
+     * Sets {@linkplain Score a score} of some {@linkplain Entity entity} only if score of the entity
+     * at time of calling the method is {@linkplain Object#equals(Object) equal} to a value specified.
      *
      * @param entity the entity
-     * @param objective the name of the scoreboard objective to replace the score in
+     * @param objective a name of a scoreboard objective to set the score in
      * @param expectedScore the value, {@code null} if it is expected that the entity does not have a score
      *                      in the scoreboard objective at time of calling the method
      * @param newScore a value that the score should be set to, {@code null} if score of the entity should be removed
      * @return {@code true} if the score has been replaced, {@code false} otherwise
-     * @throws NoSuchObjectiveException if no scoreboard objective with the specified name was registered
+     * @throws NoSuchObjectiveException if a scoreboard objective with the name specified does not exist
      * @since 1.0
      */
     boolean replaceScore(@NonNull Entity entity, @NonNull String objective,
                          @Nullable Score expectedScore, @Nullable Score newScore);
 
     /**
-     * Replaces {@linkplain Score a score} of the specified owner.
+     * Sets {@linkplain Score a score} of some owner only if score of the owner at time
+     * of calling the method is {@linkplain Object#equals(Object) equal} to a value specified.
      *
-     * <p>The replacement is done only if score of the owner at time of calling the method
-     * is {@linkplain Object#equals(Object) equal} to the specified value.</p>
-     *
-     * <p>If the expected value is specified as {@code null} and the requirement is satisfied,
-     * the score is initialized with the replacement value, but only if the replacement is not {@code null}.</p>
-     *
-     * @param owner the name of the owner
-     * @param objective the name of the scoreboard objective to replace the score in
+     * @param owner a name of the owner
+     * @param objective a name of a scoreboard objective to set the score in
      * @param expectedScore the value, {@code null} if it is expected that the owner does not have a score
      *                      in the scoreboard objective at time of calling the method
      * @param newScore a value that the score should be set to, {@code null} if score of the owner should be removed
      * @return {@code true} if the score has been replaced, {@code false} otherwise
-     * @throws NoSuchObjectiveException if no scoreboard objective with the specified name was registered
+     * @throws NoSuchObjectiveException if a scoreboard objective with the name specified does not exist
      * @since 1.0
      */
     boolean replaceScore(@NonNull String owner, @NonNull String objective,
@@ -187,42 +172,43 @@ public interface Scoreboard {
     @NonNull Map<String, Score> removeScores(@NonNull String owner);
 
     /**
-     * Gets copy of {@linkplain Map a map} associating owner names with {@linkplain Score scores} that the owners have
-     * in the specified {@linkplain ScoreboardObjective scoreboard objective}.
+     * Gets copy of {@linkplain Map a map} which maps owner names to {@linkplain Score scores} that the owners have
+     * in {@linkplain ScoreboardObjective a scoreboard objective} with name specified.
      *
-     * @param objective the name of the scoreboard objective
+     * @param objective the scoreboard objective name
      * @return the map copy
-     * @throws NoSuchObjectiveException if no scoreboard objective with the specified name was registered
+     * @throws NoSuchObjectiveException if a scoreboard objective with the name specified does not exist
      * @since 1.0
      */
     @NonNull Map<String, Score> scores(@NonNull String objective);
 
     /**
-     * Gets the name of {@linkplain ScoreboardObjective a scoreboard objective} displayed
-     * for the given {@linkplain Player player} at the specified {@linkplain ScoreboardPosition scoreboard position}.
+     * Gets name of {@linkplain ScoreboardObjective a scoreboard objective} displayed
+     * for some {@linkplain Player player} at {@linkplain ScoreboardPosition a scoreboard position} specified.
      *
      * @param player the player
      * @param position the scoreboard position
      * @return the scoreboard objective name, {@code null} if no scoreboard objective is displayed for the player
-     *         at the specified scoreboard position
-     * @throws NotViewerException if the specified player is not a viewer of this scoreboard
+     *         at the scoreboard position
+     * @throws NotViewerException if the player specified is not a viewer of this scoreboard
      * @since 1.0
      */
     @Nullable String getDisplayedObjective(@NonNull Player player, @NonNull ScoreboardPosition position);
 
     /**
-     * Replaces {@linkplain ScoreboardObjective a scoreboard objective} displayed
-     * for the given {@linkplain Player player} at the specified {@linkplain ScoreboardPosition scoreboard position}.
+     * Sets {@linkplain ScoreboardObjective a scoreboard objective} that should be displayed
+     * at some {@linkplain ScoreboardPosition scoreboard position} for {@linkplain Player a player} specified.
      *
      * @param player the player
      * @param position the scoreboard position
-     * @param name the name of the scoreboard objective that the displayed scoreboard objective should be replaced
-     *             to, {@code null} if no scoreboard objective should be displayed at the scoreboard position
-     * @return the name of a previous scoreboard objective that was displayed for the player
-     *         at the specified scoreboard position, {@code null} if none
-     * @throws NotViewerException if the specified player is not a viewer of this scoreboard
-     * @throws NoSuchObjectiveException if the specified scoreboard objective name is not {@code null}
+     * @param name a name of the scoreboard objective that should be displayed, {@code null} if no scoreboard
+     *             objective should be displayed at the scoreboard position
+     * @return a name of a previous scoreboard objective that was displayed for the player
+     *         at the same position, {@code null} if none
+     * @throws NotViewerException if the player specified is not a viewer of this scoreboard
+     * @throws NoSuchObjectiveException if the scoreboard objective name specified is not {@code null}
      *                                  and no scoreboard objective with the same name was registered
+     *                                  in this scoreboard
      * @since 1.0
      */
     @Nullable String setDisplayedObjective(@NonNull Player player, @NonNull ScoreboardPosition position,
@@ -230,33 +216,32 @@ public interface Scoreboard {
 
     /**
      * Replaces {@linkplain ScoreboardObjective a scoreboard objective} displayed
-     * for the given {@linkplain Player player} at the specified {@linkplain ScoreboardPosition scoreboard position}.
-     *
-     * <p>The replacement is done only if the name of a scoreboard objective displayed for the player
-     * at the same scoreboard position at time of calling the method is {@linkplain Object#equals(Object) equal}
-     * to the specified value.</p>
+     * at some {@linkplain ScoreboardPosition scoreboard position} for {@linkplain Player a player} specified.
+     * The replacement is done only if name of a scoreboard objective displayed for the player at the same scoreboard
+     * position at time of calling the method is equal to a value specified.
      *
      * @param player the player
      * @param position the scoreboard position
      * @param name the value, {@code null} if it is expected that no scoreboard objective is displayed
      *             for the player at the scoreboard position at time of calling the method
-     * @param newName a name of the scoreboard objective that the scoreboard objective should be replaced to,
-     *                {@code null} if no scoreboard objective should be displayed the specified scoreboard position
+     * @param newName a name of a new scoreboard objective that should be displayed for the player
+     *                at the scoreboard position, {@code null} if no scoreboard objective should be displayed
+     *                at that scoreboard position
      * @return {@code true} if the scoreboard objective displayed was replaced, {@code false} otherwise
-     * @throws NotViewerException if the specified player is not a viewer of this scoreboard
-     * @throws NoSuchObjectiveException if the specified name of the scoreboard objective that the displayed scoreboard
-     *                                  objective should be replaced to is not {@code null} and no scoreboard objective
-     *                                  with the same name was registered
+     * @throws NotViewerException if the player specified is not a viewer of this scoreboard
+     * @throws NoSuchObjectiveException if the new scoreboard objective name specified is not {@code null}
+     *                                  and no scoreboard objective with the same name was registered
+     *                                  in this scoreboard
      * @since 1.0
      */
     boolean replaceDisplayedObjective(@NonNull Player player, @NonNull ScoreboardPosition position,
                                       @Nullable String name, @Nullable String newName);
 
     /**
-     * Gets a copy of {@linkplain Set a set} of {@linkplain Player players}
+     * Gets copy of {@linkplain Set a set} of {@linkplain Player players}
      * that see this {@linkplain Scoreboard scoreboard}.
      *
-     * @return the set copy
+     * @return the set
      * @since 1.0
      */
     @NonNull Set<? extends Player> viewers();
