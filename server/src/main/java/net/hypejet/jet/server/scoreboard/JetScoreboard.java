@@ -38,13 +38,13 @@ public final class JetScoreboard implements Scoreboard {
 
     @Override
     public @Nullable ScoreboardObjective getObjective(@NonNull String name) {
-        NullabilityUtil.requireNonNull(name, "name");
+        validateObjectiveName(name);
         return this.objectives.get(name);
     }
 
     @Override
     public @Nullable ScoreboardObjective setObjective(@NonNull String name, @Nullable ScoreboardObjective objective) {
-        NullabilityUtil.requireNonNull(name, "name");
+        validateObjectiveName(name);
 
         ScoreboardObjective currentObjective = this.objectives.get(name);
         if (Objects.equals(currentObjective, objective)) return objective;
@@ -85,7 +85,7 @@ public final class JetScoreboard implements Scoreboard {
     @Override
     public @Nullable Score getScore(@NonNull String owner, @NonNull String objective) {
         NullabilityUtil.requireNonNull(owner, "owner");
-        NullabilityUtil.requireNonNull(objective, "objective");
+        validateObjectiveName(objective);
         return this.scoreMap(objective).get(owner);
     }
 
@@ -98,7 +98,7 @@ public final class JetScoreboard implements Scoreboard {
     @Override
     public @Nullable Score setScore(@NonNull String owner, @NonNull String objective, @Nullable Score score) {
         NullabilityUtil.requireNonNull(owner, "owner");
-        NullabilityUtil.requireNonNull(objective, "objective");
+        validateObjectiveName(objective);
 
         Map<String, Score> scoreMap = this.scoreMap(objective);
         if (Objects.equals(scoreMap.get(owner), score)) return score;
@@ -152,8 +152,11 @@ public final class JetScoreboard implements Scoreboard {
         NullabilityUtil.requireNonNull(position, "position");
 
         JetPlayer castPlayer = JetPlayer.cast(player);
-        if (name != null && !this.objectives.containsKey(name))
-            throw createNoSuchObjectiveException(name);
+        if (name != null) {
+            validateObjectiveName(name);
+            if (!this.objectives.containsKey(name))
+                throw createNoSuchObjectiveException(name);
+        }
 
         return this.displayedObjectivesHandler(castPlayer).setDisplayedObjective(position, name);
     }
@@ -239,6 +242,12 @@ public final class JetScoreboard implements Scoreboard {
                 "Objective with name of %s was not registered in this scoreboard",
                 name
         ));
+    }
+
+    private static void validateObjectiveName(@NonNull String objectiveName) {
+        NullabilityUtil.requireNonNull(objectiveName, "objective name");
+        if (objectiveName.isEmpty())
+            throw new IllegalArgumentException("A scoreboard objective name must not be empty");
     }
 
     /**
