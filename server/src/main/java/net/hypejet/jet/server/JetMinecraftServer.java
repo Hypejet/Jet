@@ -121,6 +121,16 @@ public final class JetMinecraftServer implements MinecraftServer {
     }
 
     /**
+     * Gets {@linkplain Ticker a ticker} of the server.
+     *
+     * @return the ticker
+     * @since 1.0
+     */
+    public @NonNull Ticker ticker() {
+        return this.ticker;
+    }
+
+    /**
      * Registers a player on the server.
      *
      * @param player the player
