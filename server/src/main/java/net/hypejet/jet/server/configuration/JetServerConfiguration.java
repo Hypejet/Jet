@@ -38,6 +38,7 @@ import java.util.Set;
  * @param enforceSecureProfile whether only clients with signed public key from Mojang should be able to join
  *                             the server
  * @param showUnlockedRecipesOnly whether players can only see recipes that they unlocked
+ * @param tickDuration a duration that each game logic loop cycle of the server should have, in milliseconds
  * @since 1.0
  * @see ServerConfiguration
  */
@@ -46,7 +47,8 @@ public record JetServerConfiguration(
         @NonNull Component unsupportedVersionMessage, @NonNull Component serverListDescription, int maximumPlayers,
         @NonNull Set<Key> enabledFeaturePacks, boolean transfersAllowed, @NonNull Component transfersNotAllowedMessage,
         @IntRange(from = ChunkBatchHandler.MINIMUM_VIEW_DISTANCE) byte maximumViewDistance, byte simulationDistance,
-        boolean hardcore, boolean reducedDebugInfo, boolean enforceSecureProfile, boolean showUnlockedRecipesOnly
+        boolean hardcore, boolean reducedDebugInfo, boolean enforceSecureProfile, boolean showUnlockedRecipesOnly,
+        long tickDuration
 ) implements ServerConfiguration {
     /**
      * Constructs the {@linkplain JetServerConfiguration server configuration}.
@@ -72,6 +74,7 @@ public record JetServerConfiguration(
      * @param enforceSecureProfile whether only clients with signed public key from Mojang should be able to join
      *                             the server
      * @param showUnlockedRecipesOnly whether players can only see recipes that they unlocked
+     * @param tickDuration a duration that each game logic loop cycle of the server should have, in milliseconds
      * @since 1.0
      */
     public JetServerConfiguration {
@@ -111,7 +114,8 @@ public record JetServerConfiguration(
                 Set.copyOf(unparsed.enabledFeaturePacks()), unparsed.areTransfersAllowed(),
                 deserialize(unparsed.transfersNotAllowedMessage(), tagResolvers),
                 unparsed.maximumViewDistance(), unparsed.simulationDistance(), unparsed.isHardcore(),
-                unparsed.reducedDebugInfo(), unparsed.enforceSecureProfile(), unparsed.unlockedRecipesOnly()
+                unparsed.reducedDebugInfo(), unparsed.enforceSecureProfile(), unparsed.unlockedRecipesOnly(),
+                unparsed.tickDuration()
         );
     }
 
