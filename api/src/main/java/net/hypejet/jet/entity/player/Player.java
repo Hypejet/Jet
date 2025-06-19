@@ -122,18 +122,6 @@ public interface Player extends Entity, CommandSource, CommonAudience {
     @NonNull Scoreboard setScoreboard(@NonNull Scoreboard scoreboard);
 
     /**
-     * Replaces {@linkplain Scoreboard a scoreboard} displayed for this {@linkplain Player player}.
-     * The replacement is done only if scoreboard displayed for the player at time of calling the method
-     * is the same as a value specified.
-     *
-     * @param scoreboard the value
-     * @param newScoreboard a new scoreboard that should be displayed for the player
-     * @return {@code true} if the scoreboard was replaced, {@code false} otherwise
-     * @since 1.0
-     */
-    boolean replaceScoreboard(@NonNull Scoreboard scoreboard, @NonNull Scoreboard newScoreboard);
-
-    /**
      * Represents a Minecraft chat mode setting of {@linkplain Player a player}.
      *
      * <p>This is not an enum, since it depends on Minecraft. Adding an enum entry could break enum switch cases for

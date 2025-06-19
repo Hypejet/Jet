@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Represents an implementation of {@linkplain Scoreboard a scoreboard}.
@@ -35,54 +34,46 @@ public final class JetScoreboard implements Scoreboard {
 
     private final Map<String, ScoreboardObjective> objectives = new HashMap<>();
     private final Map<String, Map<String, Score>> scoreMaps = new HashMap<>();
-
     private final Map<JetPlayer, DisplayedObjectivesHandler> viewers = new HashMap<>();
-    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     @Override
     public @Nullable ScoreboardObjective getObjective(@NonNull String name) {
         NullabilityUtil.requireNonNull(name, "name");
-        try {
-            this.lock.readLock().lock();
-            return this.objectives.get(name);
-        } finally {
-            this.lock.readLock().unlock();
-        }
+        return this.objectives.get(name);
     }
 
     @Override
     public @Nullable ScoreboardObjective setObjective(@NonNull String name, @Nullable ScoreboardObjective objective) {
         NullabilityUtil.requireNonNull(name, "name");
-        try {
-            this.lock.writeLock().lock();
-            return this.updateObjective(name, objective);
-        } finally {
-            this.lock.writeLock().unlock();
-        }
-    }
 
-    @Override
-    public boolean replaceObjective(@NonNull String name, @Nullable ScoreboardObjective expectedObjective,
-                                    @Nullable ScoreboardObjective newObjective) {
-        NullabilityUtil.requireNonNull(name, "name");
-        try {
-            this.lock.writeLock().lock();
-            if (!Objects.equals(this.objectives.get(name), expectedObjective)) return false;
-            this.updateObjective(name, newObjective);
-            return true;
-        } finally {
-            this.lock.writeLock().unlock();
+        ScoreboardObjective currentObjective = this.objectives.get(name);
+        if (Objects.equals(currentObjective, objective)) return objective;
+
+        Action action;
+        ScoreboardObjective result;
+
+        if (objective == null) {
+            this.viewers.values().forEach(handler -> handler.handleObjectiveRemoval(name));
+            this.scoreMaps.remove(name);
+            action = Action.Remove.INSTANCE;
+            result = this.objectives.remove(name);
+        } else {
+            if (currentObjective == null) {
+                this.scoreMaps.put(name, new HashMap<>());
+                action = new Action.Create(objective);
+            } else {
+                action = new Action.Update(objective);
+            }
+            result = this.objectives.put(name, objective);
         }
+
+        this.sendPacketToViewers(new ServerObjectiveActionPlayPacket(name, action));
+        return result;
     }
 
     @Override
     public @NonNull Map<String, ScoreboardObjective> objectives() {
-        try {
-            this.lock.readLock().lock();
-            return Map.copyOf(this.objectives);
-        } finally {
-            this.lock.readLock().unlock();
-        }
+        return Map.copyOf(this.objectives);
     }
 
     @Override
@@ -95,13 +86,7 @@ public final class JetScoreboard implements Scoreboard {
     public @Nullable Score getScore(@NonNull String owner, @NonNull String objective) {
         NullabilityUtil.requireNonNull(owner, "owner");
         NullabilityUtil.requireNonNull(objective, "objective");
-
-        try {
-            this.lock.readLock().lock();
-            return this.scoreMap(objective).get(owner);
-        } finally {
-            this.lock.readLock().unlock();
-        }
+        return this.scoreMap(objective).get(owner);
     }
 
     @Override
@@ -115,39 +100,16 @@ public final class JetScoreboard implements Scoreboard {
         NullabilityUtil.requireNonNull(owner, "owner");
         NullabilityUtil.requireNonNull(objective, "objective");
 
-        try {
-            this.lock.writeLock().lock();
-            return this.updateScore(this.scoreMap(objective), owner, objective, score);
-        } finally {
-            this.lock.writeLock().unlock();
+        Map<String, Score> scoreMap = this.scoreMap(objective);
+        if (Objects.equals(scoreMap.get(owner), score)) return score;
+
+        if (score == null) {
+            this.sendPacketToViewers(new ServerResetScorePlayPacket(owner, objective));
+            return scoreMap.remove(owner);
         }
-    }
 
-    @Override
-    public boolean replaceScore(@NonNull Entity entity, @NonNull String objective,
-                                @Nullable Score expectedScore, @Nullable Score newScore) {
-        NullabilityUtil.requireNonNull(entity, "entity");
-        return this.replaceScore(ownerName(entity), objective, expectedScore, newScore);
-    }
-
-    @Override
-    public boolean replaceScore(@NonNull String owner, @NonNull String objective,
-                                @Nullable Score expectedScore, @Nullable Score newScore) {
-        NullabilityUtil.requireNonNull(owner, "owner");
-        NullabilityUtil.requireNonNull(objective, "objective");
-
-        try {
-            this.lock.writeLock().lock();
-
-            Map<String, Score> scoreMap = this.scoreMap(objective);
-            if (!Objects.equals(scoreMap.get(owner), expectedScore))
-                return false;
-
-            this.updateScore(scoreMap, owner, objective, newScore);
-            return true;
-        } finally {
-            this.lock.writeLock().unlock();
-        }
+        this.sendPacketToViewers(new ServerUpdateScorePlayPacket(owner, objective, score));
+        return scoreMap.put(owner, score);
     }
 
     @Override
@@ -159,45 +121,28 @@ public final class JetScoreboard implements Scoreboard {
     @Override
     public @NonNull Map<String, Score> removeScores(@NonNull String owner) {
         NullabilityUtil.requireNonNull(owner, "owner");
-        try {
-            this.lock.writeLock().lock();
 
-            Map<String, Score> objectiveToScoreMap = new HashMap<>();
-            for (Map.Entry<String, Map<String, Score>> entry : this.scoreMaps.entrySet()) {
-                Map<String, Score> scoreMap = entry.getValue();
-                if (!scoreMap.containsKey(owner)) continue;
-                objectiveToScoreMap.put(entry.getKey(), scoreMap.remove(owner));
-            }
-
-            this.sendPacketToViewers(new ServerResetScorePlayPacket(owner, null));
-            return Map.copyOf(objectiveToScoreMap);
-        } finally {
-            this.lock.writeLock().unlock();
+        Map<String, Score> objectiveToScoreMap = new HashMap<>();
+        for (Map.Entry<String, Map<String, Score>> entry : this.scoreMaps.entrySet()) {
+            Map<String, Score> scoreMap = entry.getValue();
+            if (!scoreMap.containsKey(owner)) continue;
+            objectiveToScoreMap.put(entry.getKey(), scoreMap.remove(owner));
         }
+
+        this.sendPacketToViewers(new ServerResetScorePlayPacket(owner, null));
+        return Map.copyOf(objectiveToScoreMap);
     }
 
     @Override
     public @NonNull Map<String, Score> scores(@NonNull String objective) {
-        try {
-            this.lock.readLock().lock();
-            return Map.copyOf(this.scoreMap(objective));
-        } finally {
-            this.lock.readLock().unlock();
-        }
+        return Map.copyOf(this.scoreMap(objective));
     }
 
     @Override
     public @Nullable String getDisplayedObjective(@NonNull Player player, @NonNull ScoreboardPosition position) {
         NullabilityUtil.requireNonNull(player, "player");
         NullabilityUtil.requireNonNull(position, "position");
-
-        JetPlayer castPlayer = JetPlayer.cast(player);
-        try {
-            this.lock.readLock().lock();
-            return this.displayedObjectivesHandler(castPlayer).getDisplayedObjective(position);
-        } finally {
-            this.lock.readLock().unlock();
-        }
+        return this.displayedObjectivesHandler(JetPlayer.cast(player)).getDisplayedObjective(position);
     }
 
     @Override
@@ -207,41 +152,15 @@ public final class JetScoreboard implements Scoreboard {
         NullabilityUtil.requireNonNull(position, "position");
 
         JetPlayer castPlayer = JetPlayer.cast(player);
-        try {
-            this.lock.readLock().lock();
-            if (name != null && !this.objectives.containsKey(name))
-                throw createNoSuchObjectiveException(name);
-            return this.displayedObjectivesHandler(castPlayer).setDisplayedObjective(position, name);
-        } finally {
-            this.lock.readLock().unlock();
-        }
-    }
+        if (name != null && !this.objectives.containsKey(name))
+            throw createNoSuchObjectiveException(name);
 
-    @Override
-    public boolean replaceDisplayedObjective(@NonNull Player player, @NonNull ScoreboardPosition position,
-                                             @Nullable String name, @Nullable String newName) {
-        NullabilityUtil.requireNonNull(player, "player");
-        NullabilityUtil.requireNonNull(position, "position");
-
-        JetPlayer castPlayer = JetPlayer.cast(player);
-        try {
-            this.lock.readLock().lock();
-            if (newName != null && !this.objectives.containsKey(newName))
-                throw createNoSuchObjectiveException(newName);
-            return this.displayedObjectivesHandler(castPlayer).replaceDisplayedObjective(position, name, newName);
-        } finally {
-            this.lock.readLock().unlock();
-        }
+        return this.displayedObjectivesHandler(castPlayer).setDisplayedObjective(position, name);
     }
 
     @Override
     public @NonNull Set<JetPlayer> viewers() {
-        try {
-            this.lock.readLock().lock();
-            return Set.copyOf(this.viewers.keySet());
-        } finally {
-            this.lock.readLock().unlock();
-        }
+        return Set.copyOf(this.viewers.keySet());
     }
 
     /**
@@ -254,29 +173,23 @@ public final class JetScoreboard implements Scoreboard {
      * @since 1.0
      */
     public void addViewer(@NonNull JetPlayer player) {
-        try {
-            this.lock.writeLock().lock();
-            if (this.viewers.containsKey(player))
-                throw new IllegalStateException("The player specified is already a viewer of this scoreboard");
+        if (this.viewers.containsKey(player))
+            throw new IllegalStateException("The player specified is already a viewer of this scoreboard");
+        this.viewers.put(player, new DisplayedObjectivesHandler(player));
 
-            this.viewers.put(player, new DisplayedObjectivesHandler(player));
+        for (Map.Entry<String, ScoreboardObjective> entry : this.objectives.entrySet()) {
+            String name = entry.getKey();
+            ScoreboardObjective objective = entry.getValue();
+            player.sendPacket(new ServerObjectiveActionPlayPacket(name, new Action.Create(objective)));
+        }
 
-            for (Map.Entry<String, ScoreboardObjective> entry : this.objectives.entrySet()) {
-                String name = entry.getKey();
-                ScoreboardObjective objective = entry.getValue();
-                player.sendPacket(new ServerObjectiveActionPlayPacket(name, new Action.Create(objective)));
+        for (Map.Entry<String, Map<String, Score>> entry : this.scoreMaps.entrySet()) {
+            String objectiveName = entry.getKey();
+            for (Map.Entry<String, Score> scoreEntry : entry.getValue().entrySet()) {
+                String entityName = scoreEntry.getKey();
+                Score score = scoreEntry.getValue();
+                player.sendPacket(new ServerUpdateScorePlayPacket(entityName, objectiveName, score));
             }
-
-            for (Map.Entry<String, Map<String, Score>> entry : this.scoreMaps.entrySet()) {
-                String objectiveName = entry.getKey();
-                for (Map.Entry<String, Score> scoreEntry : entry.getValue().entrySet()) {
-                    String entityName = scoreEntry.getKey();
-                    Score score = scoreEntry.getValue();
-                    player.sendPacket(new ServerUpdateScorePlayPacket(entityName, objectiveName, score));
-                }
-            }
-        } finally {
-            this.lock.writeLock().unlock();
         }
     }
 
@@ -290,17 +203,12 @@ public final class JetScoreboard implements Scoreboard {
      * @since 1.0
      */
     public void removeViewer(@NonNull JetPlayer player) {
-        try {
-            this.lock.writeLock().lock();
-            if (!this.viewers.containsKey(player))
-                throw new IllegalStateException("The player specified is not a viewer of this scoreboard");
+        if (!this.viewers.containsKey(player))
+            throw new IllegalStateException("The player specified is not a viewer of this scoreboard");
 
-            this.viewers.remove(player);
-            for (String name : this.objectives.keySet())
-                player.sendPacket(new ServerObjectiveActionPlayPacket(name, Action.Remove.INSTANCE));
-        } finally {
-            this.lock.writeLock().unlock();
-        }
+        this.viewers.remove(player);
+        for (String name : this.objectives.keySet())
+            player.sendPacket(new ServerObjectiveActionPlayPacket(name, Action.Remove.INSTANCE));
     }
 
     private @NonNull Map<String, Score> scoreMap(@NonNull String objective) {
@@ -333,44 +241,6 @@ public final class JetScoreboard implements Scoreboard {
         ));
     }
 
-    private @Nullable ScoreboardObjective updateObjective(@NonNull String name,
-                                                          @Nullable ScoreboardObjective objective) {
-        ScoreboardObjective currentObjective = this.objectives.get(name);
-        if (Objects.equals(currentObjective, objective)) return objective;
-
-        if (objective == null) {
-            this.viewers.values().forEach(handler -> handler.handleObjectiveRemoval(name));
-            this.sendPacketToViewers(new ServerObjectiveActionPlayPacket(name, Action.Remove.INSTANCE));
-            this.scoreMaps.remove(name);
-            return this.objectives.remove(name);
-        }
-
-        Action action;
-        if (currentObjective == null) {
-            action = new Action.Create(objective);
-            this.scoreMaps.put(name, new HashMap<>());
-        } else {
-            action = new Action.Update(objective);
-        }
-
-        this.sendPacketToViewers(new ServerObjectiveActionPlayPacket(name, action));
-        return this.objectives.put(name, objective);
-    }
-
-    private @Nullable Score updateScore(@NonNull Map<String, Score> scoreMap, @NonNull String owner,
-                                        @NonNull String objective, @Nullable Score score) {
-        if (Objects.equals(scoreMap.get(owner), score))
-            return score;
-
-        if (score == null) {
-            this.sendPacketToViewers(new ServerResetScorePlayPacket(owner, objective));
-            return scoreMap.remove(owner);
-        }
-
-        this.sendPacketToViewers(new ServerUpdateScorePlayPacket(owner, objective, score));
-        return scoreMap.put(owner, score);
-    }
-
     /**
      * Represents something that handles displaying of {@linkplain ScoreboardObjective scoreboard objectives}
      * for {@linkplain JetPlayer a player}.
@@ -382,9 +252,7 @@ public final class JetScoreboard implements Scoreboard {
     private static final class DisplayedObjectivesHandler {
 
         private final JetPlayer player;
-
         private final Map<ScoreboardPosition, String> displayedObjectives = new HashMap<>();
-        private final ReentrantReadWriteLock displayedObjectivesLock = new ReentrantReadWriteLock();
 
         /**
          * Constructs the {@linkplain DisplayedObjectivesHandler displayed objectives handler}.
@@ -407,12 +275,7 @@ public final class JetScoreboard implements Scoreboard {
          * @since 1.0
          */
         private @Nullable String getDisplayedObjective(@NonNull ScoreboardPosition position) {
-            try {
-                this.displayedObjectivesLock.readLock().lock();
-                return this.displayedObjectives.get(position);
-            } finally {
-                this.displayedObjectivesLock.readLock().unlock();
-            }
+            return this.displayedObjectives.get(position);
         }
 
         /**
@@ -428,43 +291,10 @@ public final class JetScoreboard implements Scoreboard {
          * @since 1.0
          */
         private @Nullable String setDisplayedObjective(@NonNull ScoreboardPosition position, @Nullable String name) {
-            try {
-                this.displayedObjectivesLock.writeLock().lock();
-                return this.updateObjective(position, name);
-            } finally {
-                this.displayedObjectivesLock.writeLock().unlock();
-            }
-        }
-
-        /**
-         * Replaces {@linkplain ScoreboardObjective a scoreboard objective} displayed
-         * at some {@linkplain ScoreboardPosition scoreboard position} for {@linkplain JetPlayer a player}
-         * associated with this handler. The replacement is done only if name of a scoreboard objective
-         * displayed for the player at the same scoreboard position at time of calling the method is equal
-         * to a value specified.
-         *
-         * @param position the scoreboard position
-         * @param name the value, {@code null} if it is expected that no scoreboard objective is displayed
-         *             for the player at the scoreboard position at time of calling the method
-         * @param newName a name of a new scoreboard objective that should be displayed for the player
-         *                at the scoreboard position, {@code null} if no scoreboard objective should be displayed
-         *                at that scoreboard position
-         * @return {@code true} if the scoreboard objective displayed was replaced, {@code false} otherwise
-         * @since 1.0
-         */
-        private boolean replaceDisplayedObjective(@NonNull ScoreboardPosition position,
-                                                  @Nullable String name, @Nullable String newName) {
-            try {
-                this.displayedObjectivesLock.writeLock().lock();
-
-                String previousName = this.displayedObjectives.get(position);
-                if (!Objects.equals(previousName, name)) return false;
-
-                this.updateObjective(position, newName);
-                return true;
-            } finally {
-                this.displayedObjectivesLock.writeLock().unlock();
-            }
+            if (Objects.equals(name, this.displayedObjectives.get(position))) return name;
+            this.player.sendPacket(new ServerSetObjectiveDisplayedPlayPacket(position, name));
+            if (name == null) return this.displayedObjectives.remove(position);
+            else return this.displayedObjectives.put(position, name);
         }
 
         /**
@@ -474,19 +304,7 @@ public final class JetScoreboard implements Scoreboard {
          * @since 1.0
          */
         private void handleObjectiveRemoval(@NonNull String name) {
-            try {
-                this.displayedObjectivesLock.writeLock().lock();
-                this.displayedObjectives.entrySet().removeIf(entry -> entry.getValue().equals(name));
-            } finally {
-                this.displayedObjectivesLock.writeLock().unlock();
-            }
-        }
-
-        private @Nullable String updateObjective(@NonNull ScoreboardPosition position, @Nullable String name) {
-            if (Objects.equals(name, this.displayedObjectives.get(position))) return name;
-            this.player.sendPacket(new ServerSetObjectiveDisplayedPlayPacket(position, name));
-            if (name == null) return this.displayedObjectives.remove(position);
-            else return this.displayedObjectives.put(position, name);
+            this.displayedObjectives.entrySet().removeIf(entry -> entry.getValue().equals(name));
         }
     }
 }

@@ -60,7 +60,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Represents an implementation of {@linkplain Player a player}.
@@ -88,7 +87,6 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     private final NullableObjectAcquirable<DeathLocation> lastDeathLocation = new NullableObjectAcquirable<>(); // TODO: Updating
 
     private @NonNull JetScoreboard scoreboard;
-    private final ReentrantReadWriteLock scoreboardLock = new ReentrantReadWriteLock();
 
     /**
      * Constructs the {@linkplain JetPlayer player}.
@@ -207,12 +205,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
 
     @Override
     public @NonNull JetScoreboard getScoreboard() {
-        try {
-            this.scoreboardLock.readLock().lock();
-            return this.scoreboard;
-        } finally {
-            this.scoreboardLock.readLock().unlock();
-        }
+        return this.scoreboard;
     }
 
     @Override
@@ -221,31 +214,14 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
         if (!(scoreboard instanceof JetScoreboard validatedScoreboard))
             throw new IllegalArgumentException("The scoreboard specified is not a valid scoreboard");
 
-        try {
-            this.scoreboardLock.writeLock().lock();
-            return this.updateScoreboard(validatedScoreboard);
-        } finally {
-            this.scoreboardLock.writeLock().unlock();
-        }
-    }
+        JetScoreboard currentScoreboard = this.scoreboard;
+        if (scoreboard == currentScoreboard) return currentScoreboard;
 
-    @Override
-    public boolean replaceScoreboard(@NonNull Scoreboard scoreboard, @NonNull Scoreboard newScoreboard) {
-        NullabilityUtil.requireNonNull(scoreboard, "scoreboard");
-        NullabilityUtil.requireNonNull(newScoreboard, "new scoreboard");
+        currentScoreboard.removeViewer(this);
+        validatedScoreboard.addViewer(this);
 
-        if (!(newScoreboard instanceof JetScoreboard validatedNewScoreboard))
-            throw new IllegalArgumentException("The scoreboard specified is not a valid scoreboard");
-        // TODO: Validate both scoreboards
-
-        try {
-            this.scoreboardLock.writeLock().lock();
-            if (this.scoreboard != scoreboard) return false;
-            this.updateScoreboard(validatedNewScoreboard);
-            return true;
-        } finally {
-            this.scoreboardLock.writeLock().unlock();
-        }
+        this.scoreboard = validatedScoreboard;
+        return currentScoreboard;
     }
 
     @Override
@@ -408,17 +384,6 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
         if (!(player instanceof JetPlayer validatedPlayer))
             throw new IllegalArgumentException("The player specified is not a valid player");
         return validatedPlayer;
-    }
-
-    private @NonNull JetScoreboard updateScoreboard(@NonNull JetScoreboard scoreboard) {
-        JetScoreboard previousScoreboard = this.scoreboard;
-        if (scoreboard == previousScoreboard) return previousScoreboard;
-
-        previousScoreboard.removeViewer(this);
-        scoreboard.addViewer(this);
-
-        this.scoreboard = scoreboard;
-        return previousScoreboard;
     }
 
     private void sendJoinGamePacket(@NonNull JetWorld world) {
