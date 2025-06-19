@@ -14,6 +14,7 @@ import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.NetworkManager;
 import net.hypejet.jet.server.plugin.JetPluginManager;
 import net.hypejet.jet.server.registry.JetRegistryManager;
+import net.hypejet.jet.server.tick.Ticker;
 import net.hypejet.jet.server.world.JetWorldManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
@@ -41,6 +42,7 @@ public final class JetMinecraftServer implements MinecraftServer {
     private final JetWorldManager worldManager;
 
     private final HashSetAcquirable<JetPlayer> players = new HashSetAcquirable<>();
+    private final Ticker ticker;
 
     /**
      * Constructs the {@linkplain JetMinecraftServer Minecraft server}.
@@ -55,6 +57,7 @@ public final class JetMinecraftServer implements MinecraftServer {
         this.pluginManager = new JetPluginManager(this);
         this.networkManager = new NetworkManager(this);
         this.eventNode.call(new ServerReadyEvent());
+        this.ticker = new Ticker(this);
     }
 
     @Override
@@ -85,7 +88,8 @@ public final class JetMinecraftServer implements MinecraftServer {
     @Override
     public void shutdown() {
         LOGGER.info("Shutting down the server...");
-        this.eventNode.addListener(new ServerShutdownEvent());
+        this.eventNode.call(new ServerShutdownEvent());
+        this.ticker.shutdown();
         this.networkManager.shutdown();
         this.pluginManager.shutdown();
         LOGGER.info("Successfully shut down the server");

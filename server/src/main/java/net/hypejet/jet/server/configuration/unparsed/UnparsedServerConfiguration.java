@@ -117,6 +117,10 @@ public final class UnparsedServerConfiguration extends OkaeriConfig {
     @CustomKey("unlocked-recipes-only")
     private boolean unlockedRecipesOnly = false;
 
+    @Comment("A duration that each game logic loop cycle of the server should have, in milliseconds")
+    @CustomKey("tick-duration")
+    private long tickDuration = 50;
+
     private UnparsedServerConfiguration() {}
 
     /**
@@ -302,6 +306,16 @@ public final class UnparsedServerConfiguration extends OkaeriConfig {
      */
     public boolean unlockedRecipesOnly() {
         return this.unlockedRecipesOnly;
+    }
+
+    /**
+     * Gets a duration that each game logic loop cycle of the server should have.
+     *
+     * @return the duration, in milliseconds
+     * @since 1.0
+     */
+    public long tickDuration() {
+        return this.tickDuration;
     }
 
     /**
