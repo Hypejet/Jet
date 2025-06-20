@@ -83,7 +83,6 @@ public final class JetScoreboard implements Scoreboard {
     @Override
     public @Nullable Score getScore(@NonNull String owner, @NonNull String objective) {
         NullabilityUtil.requireNonNull(owner, "owner");
-        validateObjectiveName(objective);
         return this.scoreMap(objective).get(owner);
     }
 
@@ -96,7 +95,6 @@ public final class JetScoreboard implements Scoreboard {
     @Override
     public @Nullable Score setScore(@NonNull String owner, @NonNull String objective, @Nullable Score score) {
         NullabilityUtil.requireNonNull(owner, "owner");
-        validateObjectiveName(objective);
 
         Map<String, Score> scoreMap = this.scoreMap(objective);
         if (Objects.equals(scoreMap.get(owner), score)) return score;
@@ -213,9 +211,9 @@ public final class JetScoreboard implements Scoreboard {
     }
 
     private @NonNull Map<String, Score> scoreMap(@NonNull String objective) {
+        validateObjectiveName(objective);
         Map<String, Score> scoreMap = this.scoreMaps.get(objective);
-        if (scoreMap == null)
-            throw createNoSuchObjectiveException(objective);
+        if (scoreMap == null) throw createNoSuchObjectiveException(objective);
         return scoreMap;
     }
 
