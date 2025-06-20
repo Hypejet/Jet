@@ -27,6 +27,7 @@ public interface Scoreboard {
      * @param name the name
      * @return the scoreboard objective, {@code null} if no scoreboard objective with the name specified
      *         has been registered in this scoreboard
+     * @throws IllegalArgumentException if the specified scoreboard objective name is invalid
      * @since 1.0
      */
     @Nullable ScoreboardObjective getObjective(@NonNull String name);
@@ -39,6 +40,7 @@ public interface Scoreboard {
      * @param objective the data, {@code null} if the scoreboard objective should be removed along with all scores
      *                  associated with it
      * @return a previous data of the scoreboard objective, {@code null} if the scoreboard objective did not exist
+     * @throws IllegalArgumentException if the specified scoreboard objective name is invalid
      * @since 1.0
      */
     @Nullable ScoreboardObjective setObjective(@NonNull String name, @Nullable ScoreboardObjective objective);
@@ -60,6 +62,7 @@ public interface Scoreboard {
      * @return the score, {@code null} if the entity specified has no score
      *         in the scoreboard objective with name specified
      * @throws IllegalArgumentException if a scoreboard objective with the name specified does not exist
+     *                                  or if the specified scoreboard objective name is invalid
      * @since 1.0
      */
     @Nullable Score getScore(@NonNull Entity entity, @NonNull String objective);
@@ -72,6 +75,7 @@ public interface Scoreboard {
      * @return the score, {@code null} if an owner with name specified
      *         has no score in the scoreboard objective with name specified
      * @throws IllegalArgumentException if a scoreboard objective with the name specified does not exist
+     *                                  or if the specified scoreboard objective name is invalid
      * @since 1.0
      */
     @Nullable Score getScore(@NonNull String owner, @NonNull String objective);
@@ -84,6 +88,7 @@ public interface Scoreboard {
      * @param score a value that the score should be set to, {@code null} if score of the entity should be removed
      * @return a previous score of the entity, {@code null} if the entity did not have a score
      * @throws IllegalArgumentException if a scoreboard objective with the name specified does not exist
+     *                                  or if the specified scoreboard objective name is invalid
      * @since 1.0
      */
     @Nullable Score setScore(@NonNull Entity entity, @NonNull String objective, @Nullable Score score);
@@ -96,6 +101,7 @@ public interface Scoreboard {
      * @param score a value that the score should be set to, {@code null} if score of the owner should be removed
      * @return a previous score of the owner, {@code null} if the owner did not have a score
      * @throws IllegalArgumentException if a scoreboard objective with the name specified does not exist
+     *                                  or if the specified scoreboard objective name is invalid
      * @since 1.0
      */
     @Nullable Score setScore(@NonNull String owner, @NonNull String objective, @Nullable Score score);
@@ -131,6 +137,7 @@ public interface Scoreboard {
      * @param objective the scoreboard objective name
      * @return the map copy
      * @throws IllegalArgumentException if a scoreboard objective with the name specified does not exist
+     *                                  or if the specified scoreboard objective name is invalid
      * @since 1.0
      */
     @NonNull Map<String, Score> scores(@NonNull String objective);
@@ -158,9 +165,10 @@ public interface Scoreboard {
      *             objective should be displayed at the specified scoreboard position
      * @return a name of a previous scoreboard objective that was displayed for the player
      *         at the same position, {@code null} if none
-     * @throws IllegalArgumentException if the player specified is not a viewer of this scoreboard or if the scoreboard
-     *                                  objective name specified is not {@code null} and no scoreboard objective
-     *                                  with the same name was registered in this scoreboard
+     * @throws IllegalArgumentException if the player specified is not a viewer of this scoreboard or if
+     *                                  the scoreboard objective name specified is not {@code null} and
+     *                                  either no scoreboard objective with the same name was registered
+     *                                  in this scoreboard or the name is invalid
      * @since 1.0
      */
     @Nullable String setDisplayedObjective(@NonNull Player player, @NonNull ScoreboardPosition position,
