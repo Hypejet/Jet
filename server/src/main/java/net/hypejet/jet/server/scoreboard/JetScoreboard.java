@@ -77,7 +77,7 @@ public final class JetScoreboard implements Scoreboard {
     @Override
     public @Nullable Score getScore(@NonNull Entity entity, @NonNull String objective) {
         NullabilityUtil.requireNonNull(entity, "entity");
-        return this.getScore(ownerName(entity), objective);
+        return this.getScore(entity.scoreboardName(), objective);
     }
 
     @Override
@@ -89,7 +89,7 @@ public final class JetScoreboard implements Scoreboard {
     @Override
     public @Nullable Score setScore(@NonNull Entity entity, @NonNull String objective, @Nullable Score score) {
         NullabilityUtil.requireNonNull(entity, "entity");
-        return this.setScore(ownerName(entity), objective, score);
+        return this.setScore(entity.scoreboardName(), objective, score);
     }
 
     @Override
@@ -111,7 +111,7 @@ public final class JetScoreboard implements Scoreboard {
     @Override
     public @NonNull Map<String, Score> removeScores(@NonNull Entity entity) {
         NullabilityUtil.requireNonNull(entity, "entity");
-        return this.removeScores(ownerName(entity));
+        return this.removeScores(entity.scoreboardName());
     }
 
     @Override
@@ -226,11 +226,6 @@ public final class JetScoreboard implements Scoreboard {
 
     private void sendPacketToViewers(@NonNull ServerPacket packet) {
         this.viewers.keySet().forEach(player -> player.sendPacket(packet)); // TODO: FRAME
-    }
-
-    private static @NonNull String ownerName(@NonNull Entity entity) {
-        // TODO: Check entity type instead of the entity being an instance of player
-        return entity instanceof JetPlayer player ? player.username() : entity.uniqueId().toString();
     }
 
     private static @NonNull IllegalArgumentException createNoSuchObjectiveException(@NonNull String name) {
