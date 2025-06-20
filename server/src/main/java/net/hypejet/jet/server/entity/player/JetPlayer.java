@@ -17,6 +17,7 @@ import net.hypejet.jet.entity.acquisition.gamemode.WriteGameModeAcquisition;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.settings.ChangeSettingsEvent;
 import net.hypejet.jet.event.events.world.InitialSpawnEvent;
+import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.entity.JetEntity;
@@ -42,6 +43,7 @@ import net.hypejet.jet.server.network.session.pack.ResourcePackHandler;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
 import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.registry.JetRegistryManager;
+import net.hypejet.jet.server.scoreboard.JetScoreboard;
 import net.hypejet.jet.server.util.game.audience.PacketReceivingCommonAudience;
 import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.server.world.chunk.JetChunk;
@@ -84,6 +86,8 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
 
     private final NullableObjectAcquirable<DeathLocation> lastDeathLocation = new NullableObjectAcquirable<>(); // TODO: Updating
 
+    private @NonNull JetScoreboard scoreboard;
+
     /**
      * Constructs the {@linkplain JetPlayer player}.
      *
@@ -97,12 +101,13 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
      * @param gameMode an initial game mode that the player should have
      * @param settings initial settings of a client associated with the connection
      * @param clientBrand a brand name of a client associated with the player
+     * @param initialScoreboard an initial scoreboard that the player should have
      * @since 1.0
      */
     private JetPlayer(@NonNull UUID uniqueId, @NonNull String username, @NonNull SocketPlayerConnection connection,
                       @NonNull JetWorld world, @NonNull Position position, boolean enableRespawnScreen,
-                      Player.@Nullable GameMode previousGameMode, Player.@NonNull GameMode gameMode,
-                      Player.@NonNull Settings settings, @NonNull String clientBrand) {
+                      @Nullable GameMode previousGameMode, @NonNull GameMode gameMode, @NonNull Settings settings,
+                      @NonNull String clientBrand, @NonNull JetScoreboard initialScoreboard) {
         super(ENTITY_TYPE, uniqueId, Pointers.builder()
                 .withStatic(Identity.UUID, NullabilityUtil.requireNonNull(uniqueId, "unique identifier"))
                 .withStatic(Identity.NAME, NullabilityUtil.requireNonNull(username, "username"))
@@ -116,11 +121,13 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
         this.gameMode = new GameModeAcquirable(this, gameMode, previousGameMode);
         this.respawnScreenEnabled = new BooleanAcquirable(enableRespawnScreen);
 
+        this.scoreboard = NullabilityUtil.requireNonNull(initialScoreboard, "initial scoreboard");
         connection.initializePlayer(this);
-        this.server().registerPlayer(this);
 
         this.sendJoinGamePacket(world);
         world.addPlayer(this);
+
+        this.scoreboard.addViewer(this);
 
         this.chunkBatchHandler = new ChunkBatchHandler(this, position);
         this.chunkBatchHandler.scheduleTask();
@@ -197,6 +204,27 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     }
 
     @Override
+    public @NonNull JetScoreboard getScoreboard() {
+        return this.scoreboard;
+    }
+
+    @Override
+    public @NonNull JetScoreboard setScoreboard(@NonNull Scoreboard scoreboard) {
+        NullabilityUtil.requireNonNull(scoreboard, "scoreboard");
+        if (!(scoreboard instanceof JetScoreboard validatedScoreboard))
+            throw new IllegalArgumentException("The scoreboard specified is not a valid scoreboard");
+
+        JetScoreboard currentScoreboard = this.scoreboard;
+        if (scoreboard == currentScoreboard) return currentScoreboard;
+
+        currentScoreboard.removeViewer(this);
+        validatedScoreboard.addViewer(this);
+
+        this.scoreboard = validatedScoreboard;
+        return currentScoreboard;
+    }
+
+    @Override
     public void sendMessage(@NotNull Identity source, @NotNull Component message, @NotNull MessageType type) {
         ServerPacket packet = switch (type) {
             case CHAT -> throw new IllegalArgumentException("Non-system messages are not supported yet");
@@ -219,6 +247,11 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     public void handleDisconnection() {
         this.chunkBatchHandler.handleDisconnection();
         this.server().unregisterPlayer(this);
+    }
+
+    @Override
+    public void sendPacket(@NonNull ServerPacket packet) {
+        this.connection.sendPacket(packet);
     }
 
     /**
@@ -274,18 +307,6 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
         try (WriteNotNullObjectAcquisition<String> acquisition = this.clientBrand.acquireWrite()) {
             acquisition.set(clientBrand);
         }
-    }
-
-    /**
-     * Sends a packet to a client backed by {@linkplain SocketPlayerConnection a socket player connection} attached
-     * to this player.
-     *
-     * @param packet the server packet
-     * @since 1.0
-     * @see SocketPlayerConnection#sendPacket(ServerPacket)
-     */
-    public void sendPacket(@NonNull ServerPacket packet) {
-        this.connection.sendPacket(packet);
     }
 
     /**
@@ -346,8 +367,23 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
                 loginData.uniqueId(), loginData.username(), connection, configurationData.world(),
                 configurationData.position(), configurationData.enableRespawnScreen(),
                 configurationData.previousGameMode(), configurationData.gameMode(), configurationData.settings(),
-                configurationData.clientBrand()
+                configurationData.clientBrand(), configurationData.initialScoreboard()
         );
+    }
+
+    /**
+     * Tries to cast {@linkplain Player a player} specified to {@linkplain JetPlayer a player implementation}.
+     * If it fails, throws an exception with a detailed message.
+     *
+     * @param player the player
+     * @return the player implementation
+     * @throws IllegalArgumentException if the player could not be cast to a player implementation
+     * @since 1.0
+     */
+    public static @NonNull JetPlayer cast(@NonNull Player player) {
+        if (!(player instanceof JetPlayer validatedPlayer))
+            throw new IllegalArgumentException("The player specified is not a valid player");
+        return validatedPlayer;
     }
 
     private void sendJoinGamePacket(@NonNull JetWorld world) {

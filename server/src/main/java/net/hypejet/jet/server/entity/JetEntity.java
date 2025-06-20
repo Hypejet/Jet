@@ -10,6 +10,7 @@ import net.hypejet.jet.server.entity.acquisition.world.EntityWorldAcquisition;
 import net.hypejet.jet.server.entity.acquisition.world.WriteEntityWorldAcquisitionImpl;
 import net.hypejet.jet.server.entity.movement.acquisition.InternalWriteMovementAcquisition;
 import net.hypejet.jet.server.entity.movement.acquisition.MovementAcquirable;
+import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.world.JetWorld;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.key.Key;
@@ -115,6 +116,12 @@ public class JetEntity implements Entity {
         return new WriteEntityWorldAcquisitionImpl(
                 this.world.acquireWrite(), this.movement.acquireWrite(), this
         );
+    }
+
+    @Override
+    public final @NonNull String scoreboardName() {
+        // TODO: Check entity type instead of the entity being an instance of player
+        return this instanceof JetPlayer player ? player.username() : this.uniqueId().toString();
     }
 
     @Override

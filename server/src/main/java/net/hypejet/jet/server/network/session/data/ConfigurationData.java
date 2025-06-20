@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.session.data;
 import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.player.Player;
+import net.hypejet.jet.server.scoreboard.JetScoreboard;
 import net.hypejet.jet.server.world.JetWorld;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -21,6 +22,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param gameMode a game mode that the player should initially have
  * @param settings a settings of a client associated with the player
  * @param clientBrand a brand name of a client associated with the player
+ * @param initialScoreboard an initial scoreboard that the player should have
  * @since 1.0
  * @see net.hypejet.jet.server.network.session.task.ConfigurationSessionTask
  * @see net.hypejet.jet.server.entity.player.JetPlayer
@@ -28,7 +30,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public record ConfigurationData(@NonNull LoginData loginData, @NonNull JetWorld world, @NonNull Position position,
                                 boolean enableRespawnScreen, Player.@Nullable GameMode previousGameMode,
                                 Player.@NonNull GameMode gameMode, Player.@NonNull Settings settings,
-                                @NonNull String clientBrand) {
+                                @NonNull String clientBrand, @NonNull JetScoreboard initialScoreboard) {
     /**
      * Constructs the {@linkplain ConfigurationData configuration data}.
      *
@@ -40,6 +42,7 @@ public record ConfigurationData(@NonNull LoginData loginData, @NonNull JetWorld 
      * @param gameMode a game mode that the player should initially have
      * @param settings a settings of a client associated with the player
      * @param clientBrand a brand name of a client associated with the player
+     * @param initialScoreboard an initial scoreboard that the player should have
      * @since 1.0
      */
     public ConfigurationData {
@@ -49,5 +52,6 @@ public record ConfigurationData(@NonNull LoginData loginData, @NonNull JetWorld 
         NullabilityUtil.requireNonNull(gameMode, "game mode");
         NullabilityUtil.requireNonNull(settings, "settings");
         NullabilityUtil.requireNonNull(clientBrand, "client brand");
+        NullabilityUtil.requireNonNull(initialScoreboard, "initial scoreboard");
     }
 }

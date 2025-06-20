@@ -10,6 +10,7 @@ import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.acquisition.gamemode.GameModeAcquisition;
 import net.hypejet.jet.entity.acquisition.gamemode.WriteGameModeAcquisition;
 import net.hypejet.jet.network.PlayerConnection;
+import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.util.game.audience.CommonAudience;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -102,6 +103,23 @@ public interface Player extends Entity, CommandSource, CommonAudience {
      * @since 1.0
      */
     @NonNull WriteBooleanAcquisition acquireRespawnScreenEnabledWrite();
+
+    /**
+     * Gets {@linkplain Scoreboard a scoreboard} displayed for this {@linkplain Player player}.
+     *
+     * @return the scoreboard
+     * @since 1.0
+     */
+    @NonNull Scoreboard getScoreboard();
+
+    /**
+     * Sets {@linkplain Scoreboard a scoreboard} that should be displayed for this {@linkplain Player player}.
+     *
+     * @param scoreboard the scoreboard
+     * @return a previous scoreboard that was displayed for the player
+     * @since 1.0
+     */
+    @NonNull Scoreboard setScoreboard(@NonNull Scoreboard scoreboard);
 
     /**
      * Represents a Minecraft chat mode setting of {@linkplain Player a player}.

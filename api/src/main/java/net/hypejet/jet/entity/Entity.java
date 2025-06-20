@@ -4,6 +4,8 @@ import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.jet.entity.acquisition.world.WriteEntityWorldAcquisition;
 import net.hypejet.jet.entity.movement.acquisition.MovementAcquisition;
 import net.hypejet.jet.entity.movement.acquisition.WriteMovementAcquisition;
+import net.hypejet.jet.scoreboard.Scoreboard;
+import net.hypejet.jet.scoreboard.score.Score;
 import net.hypejet.jet.world.World;
 import net.kyori.adventure.identity.Identified;
 import net.kyori.adventure.key.Key;
@@ -84,6 +86,15 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
      * @since 1.0
      */
     @NonNull WriteEntityWorldAcquisition acquireWorldWrite();
+
+    /**
+     * Gets a name that this {@linkplain Entity entity} uses in {@linkplain Score score} management
+     * of {@linkplain Scoreboard scoreboards}.
+     *
+     * @return the name
+     * @since 1.0
+     */
+    @NonNull String scoreboardName();
 
     /**
      * Represents a hand of an entity.

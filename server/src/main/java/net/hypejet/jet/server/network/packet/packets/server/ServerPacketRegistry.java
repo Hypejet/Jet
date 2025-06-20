@@ -39,8 +39,11 @@ import net.hypejet.jet.server.network.codec.packet.server.play.ServerCommandSugg
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerDeclareCommandsPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerInvalidateChunkPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerJoinGamePlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerObjectiveActionPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerPlayerListHeaderAndFooterPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerResetScorePlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerRespawnPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerSetObjectiveDisplayedPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizePositionPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizeRotationPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSystemMessagePlayPacketWriter;
@@ -49,6 +52,7 @@ import net.hypejet.jet.server.network.codec.packet.server.play.ServerUpdateBlock
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerUpdateBlockStatePlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerUpdateChunkSectionBlockStatesPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerUpdateLightPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerUpdateScorePlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerWorldEventPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.status.ServerListResponseStatusPacketWriter;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerAddResourcePackPacket;
@@ -82,8 +86,11 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerCommandSu
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerInvalidateChunkPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerJoinGamePlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerObjectiveActionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerResetScorePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerRespawnPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerSetObjectiveDisplayedPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizeRotationPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSystemMessagePlayPacket;
@@ -92,6 +99,7 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateBlo
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateBlockStatePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateChunkSectionBlockStatesPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateLightPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateScorePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerWorldEventPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.status.ServerListResponseStatusPacket;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
@@ -253,6 +261,14 @@ public final class ServerPacketRegistry {
                                 ServerUpdateBiomesPlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.LIGHT_UPDATE, ServerUpdateLightPlayPacket.class,
                                 ServerUpdateLightPlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.SET_SCORE, ServerUpdateScorePlayPacket.class,
+                                ServerUpdateScorePlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.RESET_SCORE, ServerResetScorePlayPacket.class,
+                                ServerResetScorePlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.SET_DISPLAY_OBJECTIVE, ServerSetObjectiveDisplayedPlayPacket.class,
+                                ServerSetObjectiveDisplayedPlayPacketWriter.INSTANCE)
+                        .add(ServerPlayPackets.SET_OBJECTIVE, ServerObjectiveActionPlayPacket.class,
+                                ServerObjectiveActionPlayPacketWriter.INSTANCE)
                         .add(ServerPlayPackets.SECTION_BLOCKS_UPDATE,
                                 ServerUpdateChunkSectionBlockStatesPlayPacket.class,
                                 ServerUpdateChunkSectionBlockStatesPlayPacketWriter.INSTANCE)
