@@ -9,7 +9,6 @@ import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.test.world.chunk.ChunkTestUtil;
 import net.hypejet.jet.server.util.order.ElementOrder;
 import net.hypejet.jet.server.world.block.JetBlockState;
-import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.builder.JetChunkBuilder;
 import net.hypejet.jet.server.world.chunk.heightmap.HeightMap;
 import net.hypejet.jet.server.world.chunk.heightmap.HeightMapType;
