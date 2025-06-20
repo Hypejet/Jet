@@ -2,8 +2,6 @@ package net.hypejet.jet.scoreboard;
 
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.player.Player;
-import net.hypejet.jet.scoreboard.exception.NoSuchObjectiveException;
-import net.hypejet.jet.scoreboard.exception.NotViewerException;
 import net.hypejet.jet.scoreboard.objective.ScoreboardObjective;
 import net.hypejet.jet.scoreboard.position.ScoreboardPosition;
 import net.hypejet.jet.scoreboard.score.Score;
@@ -61,7 +59,7 @@ public interface Scoreboard {
      * @param objective a name of a scoreboard objective to get the score from
      * @return the score, {@code null} if the entity specified has no score
      *         in the scoreboard objective with name specified
-     * @throws NoSuchObjectiveException if a scoreboard objective with the name specified does not exist
+     * @throws IllegalArgumentException if a scoreboard objective with the name specified does not exist
      * @since 1.0
      */
     @Nullable Score getScore(@NonNull Entity entity, @NonNull String objective);
@@ -73,7 +71,7 @@ public interface Scoreboard {
      * @param objective a name of a scoreboard objective to get the score from
      * @return the score, {@code null} if an owner with name specified
      *         has no score in the scoreboard objective with name specified
-     * @throws NoSuchObjectiveException if a scoreboard objective with the name specified does not exist
+     * @throws IllegalArgumentException if a scoreboard objective with the name specified does not exist
      * @since 1.0
      */
     @Nullable Score getScore(@NonNull String owner, @NonNull String objective);
@@ -85,7 +83,7 @@ public interface Scoreboard {
      * @param objective a name of a scoreboard objective to set the score in
      * @param score a value that the score should be set to, {@code null} if score of the entity should be removed
      * @return a previous score of the entity, {@code null} if the entity did not have a score
-     * @throws NoSuchObjectiveException if a scoreboard objective with the name specified does not exist
+     * @throws IllegalArgumentException if a scoreboard objective with the name specified does not exist
      * @since 1.0
      */
     @Nullable Score setScore(@NonNull Entity entity, @NonNull String objective, @Nullable Score score);
@@ -97,7 +95,7 @@ public interface Scoreboard {
      * @param objective a name of a scoreboard objective to set the score in
      * @param score a value that the score should be set to, {@code null} if score of the owner should be removed
      * @return a previous score of the owner, {@code null} if the owner did not have a score
-     * @throws NoSuchObjectiveException if a scoreboard objective with the name specified does not exist
+     * @throws IllegalArgumentException if a scoreboard objective with the name specified does not exist
      * @since 1.0
      */
     @Nullable Score setScore(@NonNull String owner, @NonNull String objective, @Nullable Score score);
@@ -132,7 +130,7 @@ public interface Scoreboard {
      *
      * @param objective the scoreboard objective name
      * @return the map copy
-     * @throws NoSuchObjectiveException if a scoreboard objective with the name specified does not exist
+     * @throws IllegalArgumentException if a scoreboard objective with the name specified does not exist
      * @since 1.0
      */
     @NonNull Map<String, Score> scores(@NonNull String objective);
@@ -144,8 +142,8 @@ public interface Scoreboard {
      * @param player the player
      * @param position the scoreboard position
      * @return the scoreboard objective name, {@code null} if no scoreboard objective is displayed for the player
-     *         at the scoreboard position
-     * @throws NotViewerException if the player specified is not a viewer of this scoreboard
+     *         at the specified scoreboard position
+     * @throws IllegalArgumentException if the player specified is not a viewer of this scoreboard
      * @since 1.0
      */
     @Nullable String getDisplayedObjective(@NonNull Player player, @NonNull ScoreboardPosition position);
@@ -157,13 +155,12 @@ public interface Scoreboard {
      * @param player the player
      * @param position the scoreboard position
      * @param name a name of the scoreboard objective that should be displayed, {@code null} if no scoreboard
-     *             objective should be displayed at the scoreboard position
+     *             objective should be displayed at the specified scoreboard position
      * @return a name of a previous scoreboard objective that was displayed for the player
      *         at the same position, {@code null} if none
-     * @throws NotViewerException if the player specified is not a viewer of this scoreboard
-     * @throws NoSuchObjectiveException if the scoreboard objective name specified is not {@code null}
-     *                                  and no scoreboard objective with the same name was registered
-     *                                  in this scoreboard
+     * @throws IllegalArgumentException if the player specified is not a viewer of this scoreboard or if the scoreboard
+     *                                  objective name specified is not {@code null} and no scoreboard objective
+     *                                  with the same name was registered in this scoreboard
      * @since 1.0
      */
     @Nullable String setDisplayedObjective(@NonNull Player player, @NonNull ScoreboardPosition position,
@@ -171,7 +168,7 @@ public interface Scoreboard {
 
     /**
      * Gets copy of {@linkplain Set a set} of {@linkplain Player players}
-     * that see this {@linkplain Scoreboard scoreboard}.
+     * that are viewers of this {@linkplain Scoreboard scoreboard}.
      *
      * @return the set
      * @since 1.0

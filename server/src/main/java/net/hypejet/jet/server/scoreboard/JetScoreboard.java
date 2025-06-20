@@ -4,8 +4,6 @@ import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.scoreboard.Scoreboard;
-import net.hypejet.jet.scoreboard.exception.NoSuchObjectiveException;
-import net.hypejet.jet.scoreboard.exception.NotViewerException;
 import net.hypejet.jet.scoreboard.objective.ScoreboardObjective;
 import net.hypejet.jet.scoreboard.position.ScoreboardPosition;
 import net.hypejet.jet.scoreboard.score.Score;
@@ -224,7 +222,7 @@ public final class JetScoreboard implements Scoreboard {
     private @NonNull DisplayedObjectivesHandler displayedObjectivesHandler(@NonNull JetPlayer player) {
         DisplayedObjectivesHandler handler = this.viewers.get(player);
         if (handler == null)
-            throw new NotViewerException("The player specified is not a viewer of this scoreboard");
+            throw new IllegalArgumentException("The player specified is not a viewer of this scoreboard");
         return handler;
     }
 
@@ -237,9 +235,9 @@ public final class JetScoreboard implements Scoreboard {
         return entity instanceof JetPlayer player ? player.username() : entity.uniqueId().toString();
     }
 
-    private static @NonNull NoSuchObjectiveException createNoSuchObjectiveException(@NonNull String name) {
-        return new NoSuchObjectiveException(String.format(
-                "Objective with name of %s was not registered in this scoreboard",
+    private static @NonNull IllegalArgumentException createNoSuchObjectiveException(@NonNull String name) {
+        return new IllegalArgumentException(String.format(
+                "Objective with name of %s has not been registered in this scoreboard",
                 name
         ));
     }
@@ -280,7 +278,7 @@ public final class JetScoreboard implements Scoreboard {
          *
          * @param position the scoreboard position
          * @return the scoreboard objective name, {@code null} if no scoreboard objective is displayed for the player
-         *         at the scoreboard position
+         *         at the specified scoreboard position
          * @since 1.0
          */
         private @Nullable String getDisplayedObjective(@NonNull ScoreboardPosition position) {
@@ -294,7 +292,7 @@ public final class JetScoreboard implements Scoreboard {
          *
          * @param position the scoreboard position
          * @param name a name of the scoreboard objective that should be displayed, {@code null} if no scoreboard
-         *             objective should be displayed at the scoreboard position
+         *             objective should be displayed at the specified scoreboard position
          * @return a name of a previous scoreboard objective that was displayed for the player
          *         at the same position, {@code null} if none
          * @since 1.0

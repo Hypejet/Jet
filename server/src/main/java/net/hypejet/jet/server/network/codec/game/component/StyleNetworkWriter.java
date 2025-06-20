@@ -17,7 +17,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class StyleNetworkWriter implements NetworkWriter<Style> {
 
     /**
-     * A default instance of {@linkplain StyleNetworkWriter style network writer}.
+     * A default instance of the {@linkplain StyleNetworkWriter style network writer}.
      *
      * @since 1.0
      */

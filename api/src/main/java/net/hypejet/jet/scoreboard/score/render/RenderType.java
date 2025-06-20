@@ -4,7 +4,7 @@ import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a way how score numbers of {@linkplain net.hypejet.jet.scoreboard.score.Score scores} are displayed.
+ * Represents a way of displaying score numbers of {@linkplain net.hypejet.jet.scoreboard.score.Score scores}.
  *
  * <p>This is not an enum, since it depends on Minecraft. Adding an enum entry could break enum switch cases for
  * example.</p>
@@ -41,12 +41,12 @@ public final class RenderType {
     }
 
     /* Methods #equals and #hashCode are not implemented, since this class is intended to be identity-compared only
-       since all instances are defined in constants of this class. */
+       as all instances are defined in the constant section of this class. */
 
     @Override
     public String toString() {
         return "RenderType{" +
-                "name='" + name + '\'' +
+                "name='" + this.name + '\'' +
                 '}';
     }
 }

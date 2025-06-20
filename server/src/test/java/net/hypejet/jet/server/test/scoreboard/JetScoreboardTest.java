@@ -64,7 +64,7 @@ public final class JetScoreboardTest {
         Assertions.assertSame(secondOwnerScore, scoreboard.getScore(secondOwner, objective));
 
         scoreboard.setScore(firstOwner, objective, null);
-        Assertions.assertNull(scoreboard.getObjective(firstOwner));
+        Assertions.assertNull(scoreboard.getScore(firstOwner, objective));
         Assertions.assertSame(secondOwnerScore, scoreboard.getScore(secondOwner, objective));
 
         scoreboard.setScore(secondOwner, objective, null);

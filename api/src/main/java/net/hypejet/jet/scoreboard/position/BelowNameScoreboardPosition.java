@@ -1,10 +1,12 @@
 package net.hypejet.jet.scoreboard.position;
 
+import net.hypejet.jet.entity.player.Player;
+
 import java.util.Objects;
 
 /**
  * Represents {@linkplain ScoreboardPosition a scoreboard position} which specifies that scoreboard scores should be
- * displayed below name tags located above heads of their owners.
+ * displayed below name tags located above heads of {@linkplain Player players} owning the scores.
  *
  * @since 1.0
  * @see ScoreboardPosition
