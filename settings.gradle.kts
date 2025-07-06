@@ -1,3 +1,3 @@
 rootProject.name = "jet-parent"
 
-include("api", "server")
+include("api", "server", "data:generator", "data:codecs")
