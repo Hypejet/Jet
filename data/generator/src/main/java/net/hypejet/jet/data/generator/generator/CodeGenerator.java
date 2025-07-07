@@ -1,0 +1,52 @@
+package net.hypejet.jet.data.generator.generator;
+
+import com.palantir.javapoet.JavaFile;
+import com.palantir.javapoet.TypeSpec;
+import org.jetbrains.annotations.NotNull;
+
+import java.lang.reflect.Type;
+
+/**
+ * Represents a {@linkplain Generator generator} generating code of a {@linkplain Type Java type}.
+ *
+ * @since 1.0
+ * @see Type
+ * @see Generator
+ */
+public non-sealed interface CodeGenerator extends Generator {
+    /**
+     * Generates a {@linkplain TypeSpec type spec} of the type.
+     *
+     * @return the generated type spec
+     * @since 1.0
+     */
+    @NotNull TypeSpec generate();
+
+    /**
+     * Gets a destination where a {@linkplain JavaFile Java file} with the type should be put to.
+     *
+     * @return the destination
+     * @since 1.0
+     */
+    @NotNull Destination destination();
+
+    /**
+     * Gets a destination of a {@linkplain JavaFile Java file}.
+     *
+     * @since 1.0
+     */
+    enum Destination {
+        /**
+         * An API module destination.
+         *
+         * @since 1.0
+         */
+        API,
+        /**
+         * A server module destination.
+         *
+         * @since 1.0
+         */
+        SERVER
+    }
+}
