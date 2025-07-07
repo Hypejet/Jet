@@ -14,15 +14,15 @@ import java.io.IOException;
  * @see Key
  * @see TypeAdapter
  */
-public final class KeyAdapter extends TypeAdapter<Key> {
+public final class KeyTypeAdapter extends TypeAdapter<Key> {
     /**
-     * An instance of the {@linkplain KeyAdapter key adapter}.
+     * An instance of the {@linkplain KeyTypeAdapter key adapter}.
      *
      * @since 1.0
      */
-    public static final KeyAdapter INSTANCE = new KeyAdapter();
+    public static final KeyTypeAdapter INSTANCE = new KeyTypeAdapter();
 
-    private KeyAdapter() {}
+    private KeyTypeAdapter() {}
 
     @Override
     public void write(JsonWriter out, Key value) throws IOException {
