@@ -4,6 +4,7 @@ shadow = "8.1.7"
 
 # Nullability
 checker-framework-plugin = "0.6.39"
+jspecify = "1.0.0"
 
 # Networking
 netty = "4.1.110.Final"
@@ -20,10 +21,10 @@ junit-platform = "1.10.2"
 configs = "5.0.1"
 
 # Json serialization
-gson = "2.11.0"
+gson = "2.13.1"
 
 # Minecraft-related libraries
-adventure = "4.18.0-SNAPSHOT"
+adventure = "4.24.0-SNAPSHOT"
 jetData = "1.0-SNAPSHOT"
 brigadier = "1.0.0-SNAPSHOT"
 vanillaGradle = "0.2.1-SNAPSHOT"
@@ -47,6 +48,9 @@ picocli = "4.7.7"
 [libraries]
 # Networking
 netty = { module = "io.netty:netty-all", version.ref = "netty" }
+
+# Nullability
+jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 
 # Minecraft text
 adventure = { module = "net.kyori:adventure-api", version.ref = "adventure" }

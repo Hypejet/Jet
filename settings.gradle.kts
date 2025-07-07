@@ -6,4 +6,4 @@ pluginManagement {
     }
 }
 
-include("api", "server", "data:generator", "data:codecs")
+include("api", "server", "data:generator", "data:json")
