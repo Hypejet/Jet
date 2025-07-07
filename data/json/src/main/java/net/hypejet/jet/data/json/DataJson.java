@@ -16,6 +16,7 @@ public final class DataJson {
      */
     public static final Gson GSON = new GsonBuilder()
             .registerTypeAdapterFactory(DataTypeAdapterFactory.INSTANCE)
+            .setPrettyPrinting()
             .create();
 
     private DataJson() {}
