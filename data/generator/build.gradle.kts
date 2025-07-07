@@ -6,8 +6,12 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":data:json"))
     implementation(libs.javapoet)
     implementation(libs.picocli)
+    implementation(libs.jspecify)
+    implementation(libs.adventure)
+    implementation(libs.gson)
 }
 
 application {
