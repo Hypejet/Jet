@@ -7,6 +7,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import net.hypejet.jet.data.json.entry.DataEntry;
+import net.hypejet.jet.data.json.util.JsonUtil;
 import net.kyori.adventure.key.Key;
 import org.jspecify.annotations.NonNull;
 
@@ -27,6 +28,7 @@ public final class DataEntryTypeAdapter<V> extends TypeAdapter<DataEntry<V>> {
 
     private static final String KEY_FIELD = "key";
     private static final String VALUE_FIELD = "value";
+    private static final String TAGS_FIELD = "tag";
     private static final String REQUIRED_PACKS_FIELD = "packs";
 
     private final Gson gson;
@@ -54,12 +56,16 @@ public final class DataEntryTypeAdapter<V> extends TypeAdapter<DataEntry<V>> {
         out.name(VALUE_FIELD);
         this.gson.toJson(value.value(), this.valueClass, out);
 
+        Set<Key> tags = value.tags();
+        if (!tags.isEmpty()) {
+            out.name(TAGS_FIELD);
+            JsonUtil.writeCollection(out, this.gson, Key.class, tags);
+        }
+
         Set<Key> requiredPacks = value.requiredPacks();
         if (!requiredPacks.isEmpty()) {
             out.name(REQUIRED_PACKS_FIELD);
-            out.beginArray();
-            requiredPacks.forEach(key -> this.gson.toJson(key, Key.class, out));
-            out.endArray();
+            JsonUtil.writeCollection(out, this.gson, Key.class, requiredPacks);
         }
 
         out.endObject();
@@ -69,6 +75,7 @@ public final class DataEntryTypeAdapter<V> extends TypeAdapter<DataEntry<V>> {
     public DataEntry<V> read(JsonReader in) throws IOException {
         Key key = null;
         V value = null;
+        Set<Key> tags = new HashSet<>();
         Set<Key> requiredPacks = new HashSet<>();
 
         in.beginObject();
@@ -77,12 +84,8 @@ public final class DataEntryTypeAdapter<V> extends TypeAdapter<DataEntry<V>> {
             switch (name) {
                 case KEY_FIELD -> key = this.gson.fromJson(in, Key.class);
                 case VALUE_FIELD -> value = this.gson.fromJson(in, this.valueClass);
-                case REQUIRED_PACKS_FIELD -> {
-                    in.beginArray();
-                    while (in.peek() != JsonToken.END_ARRAY)
-                        requiredPacks.add(this.gson.fromJson(in, Key.class));
-                    in.endArray();
-                }
+                case TAGS_FIELD -> JsonUtil.readCollection(in, this.gson, Key.class, tags);
+                case REQUIRED_PACKS_FIELD -> JsonUtil.readCollection(in, this.gson, Key.class, requiredPacks);
                 default -> throw new JsonParseException("Unknown field: " + name);
             }
         }
@@ -94,6 +97,6 @@ public final class DataEntryTypeAdapter<V> extends TypeAdapter<DataEntry<V>> {
             throw new JsonParseException("The value field has not been specified");
         }
 
-        return new DataEntry<>(key, value, requiredPacks);
+        return new DataEntry<>(key, value, tags, requiredPacks);
     }
 }
