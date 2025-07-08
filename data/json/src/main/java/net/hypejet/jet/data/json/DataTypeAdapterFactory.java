@@ -5,9 +5,16 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
 import net.hypejet.jet.data.json.adapters.DataEntryTypeAdapter;
-import net.hypejet.jet.data.json.adapters.KeyAdapter;
+import net.hypejet.jet.data.json.adapters.KeyTypeAdapter;
+import net.hypejet.jet.data.json.adapters.model.HolderTypeAdapter;
+import net.hypejet.jet.data.json.adapters.model.SoundEventTypeAdapter;
+import net.hypejet.jet.data.json.adapters.model.WeightedTypeAdapter;
 import net.hypejet.jet.data.json.entry.DataEntry;
+import net.hypejet.jet.data.json.model.JsonHolder;
+import net.hypejet.jet.data.json.model.JsonSoundEvent;
+import net.hypejet.jet.data.json.model.JsonWeighted;
 import net.kyori.adventure.key.Key;
+import org.jspecify.annotations.NonNull;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -32,21 +39,33 @@ public final class DataTypeAdapterFactory implements TypeAdapterFactory {
     @Override
     public <T> TypeAdapter create(Gson gson, TypeToken<T> type) {
         Class<? super T> rawType = type.getRawType();
+        Type actualType = type.getType();
+
         if (Key.class.isAssignableFrom(rawType)) {
-            return KeyAdapter.INSTANCE;
+            return KeyTypeAdapter.INSTANCE;
+        } else if (JsonSoundEvent.class.isAssignableFrom(rawType)) {
+            return new SoundEventTypeAdapter(gson);
+        } else if (JsonHolder.class.isAssignableFrom(rawType)) {
+            return new HolderTypeAdapter<>(gson, onlyParameterizedArgument(actualType));
+        } else if (JsonWeighted.class.isAssignableFrom(rawType)) {
+            return new WeightedTypeAdapter<>(gson, onlyParameterizedArgument(actualType));
         } else if (DataEntry.class.isAssignableFrom(type.getRawType())) {
-            if (!(type.getType() instanceof ParameterizedType parameterizedType))
-                throw new IllegalArgumentException("The data entry type must be a parameterized type");
-
-            Type[] arguments = parameterizedType.getActualTypeArguments();
-            if (arguments.length != 1)
-                throw new IllegalArgumentException("The data entry parameterized type must have exactly one argument");
-
-            if (!(arguments[0] instanceof Class<?> argument))
-                throw new IllegalArgumentException("The data entry parameterized type argument is not a class");
-            return new DataEntryTypeAdapter<>(gson, argument);
+            return new DataEntryTypeAdapter<>(gson, onlyParameterizedArgument(actualType));
         } else {
             return null;
         }
+    }
+
+    private static @NonNull Class<?> onlyParameterizedArgument(@NonNull Type type) {
+        if (!(type instanceof ParameterizedType parameterizedType))
+            throw new IllegalArgumentException("The specified type must be a parameterized type");
+
+        Type[] arguments = parameterizedType.getActualTypeArguments();
+        if (arguments.length != 1)
+            throw new IllegalArgumentException("The specified parameterized type must have exactly one argument");
+
+        if (!(arguments[0] instanceof Class<?> argument))
+            throw new IllegalArgumentException("The specified parameterized type argument is not a class");
+        return argument;
     }
 }

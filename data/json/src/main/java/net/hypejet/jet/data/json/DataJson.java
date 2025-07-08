@@ -2,6 +2,7 @@ package net.hypejet.jet.data.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.hypejet.jet.data.json.adapters.model.biome.BiomeTypeAdapterFactory;
 
 /**
  * Represents a holder of a {@linkplain Gson gson} instance converting Jet data objects.
@@ -16,6 +17,7 @@ public final class DataJson {
      */
     public static final Gson GSON = new GsonBuilder()
             .registerTypeAdapterFactory(DataTypeAdapterFactory.INSTANCE)
+            .registerTypeAdapterFactory(BiomeTypeAdapterFactory.INSTANCE)
             .setPrettyPrinting()
             .create();
 
