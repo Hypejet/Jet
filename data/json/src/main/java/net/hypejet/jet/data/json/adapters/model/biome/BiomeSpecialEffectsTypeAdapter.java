@@ -48,12 +48,9 @@ final class BiomeSpecialEffectsTypeAdapter extends TypeAdapter<JsonBiomeSpecialE
     private static final String MOOD_SOUND_FIELD = "mood-sound";
     private static final String ADDITIONS_SOUND_FIELD = "additions-sound";
     private static final String MUSIC_FIELD = "music";
-    private static final String MUSIC_VOLUME_FIELD = "music-field";
+    private static final String MUSIC_VOLUME_FIELD = "music-volume";
 
-    private static final Type MUSIC_LIST_TYPE = TypeToken.getParameterized(
-            List.class,
-            TypeToken.getParameterized(JsonWeighted.class, JsonMusic.class).getType()
-    ).getType();
+    private static final Type MUSIC_WEIGHTED_TYPE = new TypeToken<JsonWeighted<JsonMusic>>() {}.getType();
 
     private final Gson gson;
 
@@ -128,8 +125,11 @@ final class BiomeSpecialEffectsTypeAdapter extends TypeAdapter<JsonBiomeSpecialE
             this.gson.toJson(additionsSound, JsonAdditionsSound.class, out);
         }
 
-        out.name(MUSIC_FIELD);
-        JsonUtil.writeCollection(out, this.gson, MUSIC_LIST_TYPE, value.music());
+        List<JsonWeighted<JsonMusic>> music = value.music();
+        if (!music.isEmpty()) {
+            out.name(MUSIC_FIELD);
+            JsonUtil.writeCollection(out, this.gson, MUSIC_WEIGHTED_TYPE, value.music());
+        }
 
         out.name(MUSIC_VOLUME_FIELD);
         out.value(value.musicVolume());
@@ -191,7 +191,7 @@ final class BiomeSpecialEffectsTypeAdapter extends TypeAdapter<JsonBiomeSpecialE
                 case AMBIENT_SOUND_FIELD -> ambientSound = this.gson.fromJson(in, DataJsonTypes.SOUND_EVENT_HOLDER);
                 case MOOD_SOUND_FIELD -> moodSound = this.gson.fromJson(in, JsonAmbientMoodSound.class);
                 case ADDITIONS_SOUND_FIELD -> additionsSound = this.gson.fromJson(in, JsonAdditionsSound.class);
-                case MUSIC_FIELD -> JsonUtil.readCollection(in, this.gson, MUSIC_LIST_TYPE, music);
+                case MUSIC_FIELD -> JsonUtil.readCollection(in, this.gson, MUSIC_WEIGHTED_TYPE, music);
                 case MUSIC_VOLUME_FIELD -> {
                     musicVolume = in.nextInt();
                     musicVolumeInitialized = true;
