@@ -5,6 +5,7 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
 import net.hypejet.jet.data.json.adapters.DataEntryTypeAdapter;
+import net.hypejet.jet.data.json.adapters.FeaturePackTypeAdapter;
 import net.hypejet.jet.data.json.adapters.KeyTypeAdapter;
 import net.hypejet.jet.data.json.adapters.model.HolderTypeAdapter;
 import net.hypejet.jet.data.json.adapters.model.SoundEventTypeAdapter;
@@ -43,6 +44,8 @@ public final class DataTypeAdapterFactory implements TypeAdapterFactory {
 
         if (Key.class.isAssignableFrom(rawType)) {
             return KeyTypeAdapter.INSTANCE;
+        } else if (DataEntry.FeaturePack.class.isAssignableFrom(rawType)) {
+            return FeaturePackTypeAdapter.INSTANCE;
         } else if (JsonSoundEvent.class.isAssignableFrom(rawType)) {
             return new SoundEventTypeAdapter(gson);
         } else if (JsonHolder.class.isAssignableFrom(rawType)) {
