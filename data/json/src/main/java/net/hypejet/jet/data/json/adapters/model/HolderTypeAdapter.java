@@ -47,7 +47,7 @@ public final class HolderTypeAdapter<V> extends TypeAdapter<JsonHolder<V>> {
                 this.gson.toJson(direct.value(), this.valueClass, out);
                 out.endObject();
             }
-            case JsonHolder.Registry<V> registry -> this.gson.toJson(registry.key(), Key.class, out);
+            case JsonHolder.Reference<V> reference -> this.gson.toJson(reference.key(), Key.class, out);
         }
     }
 
@@ -63,7 +63,7 @@ public final class HolderTypeAdapter<V> extends TypeAdapter<JsonHolder<V>> {
             in.endObject();
             return new JsonHolder.Direct<>(value);
         } else {
-            return new JsonHolder.Registry<>(this.gson.fromJson(in, Key.class));
+            return new JsonHolder.Reference<>(this.gson.fromJson(in, Key.class));
         }
     }
 }

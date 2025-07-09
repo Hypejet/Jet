@@ -150,7 +150,7 @@ public final class BiomeAdapter {
 
     private static @NonNull JsonHolder<JsonSoundEvent> convertSoundEvent(@NonNull Holder<SoundEvent> holder) {
         return holder.unwrap().map(
-                key -> new JsonHolder.Registry<>(KeyAdapter.convert(key.location())),
+                key -> new JsonHolder.Reference<>(KeyAdapter.convert(key.location())),
                 soundEvent -> new JsonHolder.Direct<>(new JsonSoundEvent(
                         KeyAdapter.convert(soundEvent.location()),
                         soundEvent.fixedRange().orElse(null)

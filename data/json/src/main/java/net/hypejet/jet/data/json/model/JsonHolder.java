@@ -20,14 +20,14 @@ public sealed interface JsonHolder<V> {
      * @param <V> a type of the held value
      * @since 1.0
      */
-    record Registry<V>(@NonNull Key key) implements JsonHolder<V> {
+    record Reference<V>(@NonNull Key key) implements JsonHolder<V> {
         /**
-         * Constructs the {@linkplain Registry registry holder}.
+         * Constructs the {@linkplain Reference reference holder}.
          *
          * @param key the key
          * @since 1.0
          */
-        public Registry {
+        public Reference {
             Objects.requireNonNull(key, "key");
         }
     }
