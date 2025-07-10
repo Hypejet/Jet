@@ -1,7 +1,5 @@
 package net.hypejet.jet.data.generator.adpater;
 
-import net.hypejet.jet.data.json.model.JsonHolder;
-import net.hypejet.jet.data.json.model.JsonSoundEvent;
 import net.hypejet.jet.data.json.model.JsonWeighted;
 import net.hypejet.jet.data.json.model.biome.JsonAdditionsSound;
 import net.hypejet.jet.data.json.model.biome.JsonAmbientMoodSound;
@@ -11,9 +9,7 @@ import net.hypejet.jet.data.json.model.biome.JsonClimateSettings;
 import net.hypejet.jet.data.json.model.biome.JsonGrassColorModifier;
 import net.hypejet.jet.data.json.model.biome.JsonMusic;
 import net.hypejet.jet.data.json.model.biome.JsonTemperatureModifier;
-import net.minecraft.core.Holder;
 import net.minecraft.sounds.Music;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.random.Weighted;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.biome.AmbientAdditionsSettings;
@@ -105,7 +101,7 @@ public final class BiomeAdapter {
                     case SWAMP -> JsonGrassColorModifier.SWAMP;
                 },
                 null, // TODO
-                effects.getAmbientLoopSoundEvent().map(BiomeAdapter::convertSoundEvent).orElse(null),
+                effects.getAmbientLoopSoundEvent().map(SoundEventHolderAdapter::convert).orElse(null),
                 effects.getAmbientMoodSettings().map(BiomeAdapter::convertMoodSound).orElse(null),
                 effects.getAmbientAdditionsSettings().map(BiomeAdapter::convertAdditionsSound).orElse(null),
                 effects.getBackgroundMusic().map(BiomeAdapter::convertMusic).orElse(List.of()),
@@ -115,7 +111,7 @@ public final class BiomeAdapter {
 
     private static @NonNull JsonAmbientMoodSound convertMoodSound(@NonNull AmbientMoodSettings settings) {
         return new JsonAmbientMoodSound(
-                convertSoundEvent(settings.getSoundEvent()),
+                SoundEventHolderAdapter.convert(settings.getSoundEvent()),
                 settings.getTickDelay(),
                 settings.getBlockSearchExtent(),
                 settings.getSoundPositionOffset()
@@ -124,7 +120,7 @@ public final class BiomeAdapter {
 
     private static @NonNull JsonAdditionsSound convertAdditionsSound(@NonNull AmbientAdditionsSettings settings) {
         return new JsonAdditionsSound(
-                convertSoundEvent(settings.getSoundEvent()),
+                SoundEventHolderAdapter.convert(settings.getSoundEvent()),
                 settings.getTickChance()
         );
     }
@@ -136,7 +132,7 @@ public final class BiomeAdapter {
             convertedList.add(
                     new JsonWeighted<>(
                             new JsonMusic(
-                                    convertSoundEvent(music.event()),
+                                    SoundEventHolderAdapter.convert(music.event()),
                                     music.minDelay(),
                                     music.maxDelay(),
                                     music.replaceCurrentMusic()
@@ -146,15 +142,5 @@ public final class BiomeAdapter {
             );
         }
         return List.copyOf(convertedList);
-    }
-
-    private static @NonNull JsonHolder<JsonSoundEvent> convertSoundEvent(@NonNull Holder<SoundEvent> holder) {
-        return holder.unwrap().map(
-                key -> new JsonHolder.Reference<>(KeyAdapter.convert(key.location())),
-                soundEvent -> new JsonHolder.Direct<>(new JsonSoundEvent(
-                        KeyAdapter.convert(soundEvent.location()),
-                        soundEvent.fixedRange().orElse(null)
-                ))
-        );
     }
 }
