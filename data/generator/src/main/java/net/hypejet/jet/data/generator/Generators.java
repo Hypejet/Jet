@@ -4,6 +4,7 @@ import com.palantir.javapoet.JavaFile;
 import net.hypejet.jet.data.generator.adpater.BiomeAdapter;
 import net.hypejet.jet.data.generator.adpater.ChatTypeAdapter;
 import net.hypejet.jet.data.generator.adpater.TrimMaterialAdapter;
+import net.hypejet.jet.data.generator.adpater.TrimPatternAdapter;
 import net.hypejet.jet.data.generator.extractor.ConverterRegistryExtractor;
 import net.hypejet.jet.data.generator.generator.CodeGenerator;
 import net.hypejet.jet.data.generator.generator.Generator;
@@ -14,6 +15,7 @@ import net.hypejet.jet.data.generator.generator.generators.VersionInfoGenerator;
 import net.hypejet.jet.data.json.model.biome.JsonBiome;
 import net.hypejet.jet.data.json.model.chat.type.JsonChatType;
 import net.hypejet.jet.data.json.model.trim.material.JsonTrimMaterial;
+import net.hypejet.jet.data.json.model.trim.pattern.JsonTrimPattern;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.core.Registry;
@@ -87,6 +89,10 @@ final class Generators {
                 .add(
                         Registries.CHAT_TYPE, ChatTypeAdapter::convert, JsonChatType.class,
                         Path.of("chat-types.json"), "ChatTypeKeys"
+                )
+                .add(
+                        Registries.TRIM_PATTERN, TrimPatternAdapter::convert, JsonTrimPattern.class,
+                        Path.of("trim-patterns.json"), "TrimPatternKeys"
                 )
                 .add(
                         Registries.TRIM_MATERIAL, TrimMaterialAdapter::convert, JsonTrimMaterial.class,
