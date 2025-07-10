@@ -5,6 +5,7 @@ import net.hypejet.jet.data.generator.adpater.BiomeAdapter;
 import net.hypejet.jet.data.generator.adpater.ChatTypeAdapter;
 import net.hypejet.jet.data.generator.adpater.TrimMaterialAdapter;
 import net.hypejet.jet.data.generator.adpater.TrimPatternAdapter;
+import net.hypejet.jet.data.generator.adpater.WolfVariantAdapter;
 import net.hypejet.jet.data.generator.extractor.ConverterRegistryExtractor;
 import net.hypejet.jet.data.generator.generator.CodeGenerator;
 import net.hypejet.jet.data.generator.generator.Generator;
@@ -16,6 +17,7 @@ import net.hypejet.jet.data.json.model.biome.JsonBiome;
 import net.hypejet.jet.data.json.model.chat.type.JsonChatType;
 import net.hypejet.jet.data.json.model.trim.material.JsonTrimMaterial;
 import net.hypejet.jet.data.json.model.trim.pattern.JsonTrimPattern;
+import net.hypejet.jet.data.json.model.variant.wolf.JsonWolfVariant;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.core.Registry;
@@ -97,6 +99,10 @@ final class Generators {
                 .add(
                         Registries.TRIM_MATERIAL, TrimMaterialAdapter::convert, JsonTrimMaterial.class,
                         Path.of("trim-materials.json"), "TrimMaterialKeys"
+                )
+                .add(
+                        Registries.WOLF_VARIANT, WolfVariantAdapter::convert, JsonWolfVariant.class,
+                        Path.of("wolf-variants.json"), "WolfVariantKeys"
                 )
                 .build();
 
