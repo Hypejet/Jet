@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.hypejet.jet.data.json.adapters.model.biome.BiomeTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.chat.type.ChatTypeTypeAdapterFactory;
+import net.hypejet.jet.data.json.adapters.model.trim.material.TrimMaterialTypeAdapterFactory;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 /**
@@ -21,6 +22,7 @@ public final class DataJson {
             .registerTypeAdapterFactory(DataTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(BiomeTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(ChatTypeTypeAdapterFactory.INSTANCE)
+            .registerTypeAdapterFactory(TrimMaterialTypeAdapterFactory.INSTANCE)
             .setPrettyPrinting()
             .create();
 

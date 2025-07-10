@@ -23,6 +23,8 @@ public final class ChatTypeTypeAdapterFactory implements TypeAdapterFactory {
      */
     public static final ChatTypeTypeAdapterFactory INSTANCE = new ChatTypeTypeAdapterFactory();
 
+    private ChatTypeTypeAdapterFactory() {}
+
     @Override
     public <T> TypeAdapter create(Gson gson, TypeToken<T> type) {
         Class<? super T> rawType = type.getRawType();
