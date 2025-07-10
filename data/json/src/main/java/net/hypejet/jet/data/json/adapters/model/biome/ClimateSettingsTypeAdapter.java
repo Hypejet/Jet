@@ -97,11 +97,11 @@ final class ClimateSettingsTypeAdapter extends TypeAdapter<JsonClimateSettings> 
         if (!hasPrecipitationInitialized) {
             throw new JsonParseException("The has precipitation field has not been specified");
         } else if (!temperatureInitialized) {
-            throw new JsonParseException("The temperature field has not been initialized");
+            throw new JsonParseException("The temperature field has not been specified");
         } else if (temperatureModifier == null) {
-            throw new JsonParseException("The temperature modifier field has not been initialized");
+            throw new JsonParseException("The temperature modifier field has not been specified");
         } else if (!downfallInitialized) {
-            throw new JsonParseException("The downfall field has not been initialized");
+            throw new JsonParseException("The downfall field has not been specified");
         }
 
         return new JsonClimateSettings(hasPrecipitation, temperature, temperatureModifier, downfall);

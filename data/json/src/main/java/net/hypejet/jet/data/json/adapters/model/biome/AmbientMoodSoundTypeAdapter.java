@@ -102,7 +102,7 @@ final class AmbientMoodSoundTypeAdapter extends TypeAdapter<JsonAmbientMoodSound
         } else if (!blockSearchExtentInitialized) {
             throw new JsonParseException("The block search extent field has not been specified");
         } else if (!offsetInitialized) {
-            throw new JsonParseException("The offset field has not been initialized");
+            throw new JsonParseException("The offset field has not been specified");
         }
 
         return new JsonAmbientMoodSound(sound, tickDelay, blockSearchExtent, offset);

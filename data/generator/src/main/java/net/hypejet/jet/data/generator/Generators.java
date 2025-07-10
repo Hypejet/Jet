@@ -2,6 +2,7 @@ package net.hypejet.jet.data.generator;
 
 import com.palantir.javapoet.JavaFile;
 import net.hypejet.jet.data.generator.adpater.BiomeAdapter;
+import net.hypejet.jet.data.generator.adpater.ChatTypeAdapter;
 import net.hypejet.jet.data.generator.extractor.ConverterRegistryExtractor;
 import net.hypejet.jet.data.generator.generator.CodeGenerator;
 import net.hypejet.jet.data.generator.generator.Generator;
@@ -10,6 +11,7 @@ import net.hypejet.jet.data.generator.generator.generators.KeyDefinitionGenerato
 import net.hypejet.jet.data.generator.generator.generators.RegistryExtractorResourceGenerator;
 import net.hypejet.jet.data.generator.generator.generators.VersionInfoGenerator;
 import net.hypejet.jet.data.json.model.biome.JsonBiome;
+import net.hypejet.jet.data.json.model.chat.type.JsonChatType;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.core.Registry;
@@ -76,7 +78,14 @@ final class Generators {
 
         Set<Generator> generators = new GeneratorsBuilder(registryAccess)
                 .add(new VersionInfoGenerator())
-                .add(Registries.BIOME, BiomeAdapter::convert, JsonBiome.class, Path.of("biomes.json"), "BiomeKeys")
+                .add(
+                        Registries.BIOME, BiomeAdapter::convert, JsonBiome.class,
+                        Path.of("biomes.json"), "BiomeKeys"
+                )
+                .add(
+                        Registries.CHAT_TYPE, ChatTypeAdapter::convert, JsonChatType.class,
+                        Path.of("chat-types.json"), "ChatTypeKeys"
+                )
                 .build();
 
         for (Generator generator : generators) {

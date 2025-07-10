@@ -19,6 +19,7 @@ import net.hypejet.jet.data.json.model.biome.JsonTemperatureModifier;
  * converting types related to {@linkplain JsonBiome biomes}.
  *
  * @since 1.0
+ * @see JsonBiome
  * @see TypeAdapterFactory
  */
 public final class BiomeTypeAdapterFactory implements TypeAdapterFactory {

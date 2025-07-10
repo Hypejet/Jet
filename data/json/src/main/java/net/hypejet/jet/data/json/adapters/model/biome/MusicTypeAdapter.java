@@ -96,13 +96,13 @@ final class MusicTypeAdapter extends TypeAdapter<JsonMusic> {
         in.endObject();
 
         if (sound == null) {
-            throw new JsonParseException("The sound field has not been initialized");
+            throw new JsonParseException("The sound field has not been specified");
         } else if (!minDelayInitialized) {
-            throw new JsonParseException("The min delay field has not been initialized");
+            throw new JsonParseException("The min delay field has not been specified");
         } else if (!maxDelayInitialized) {
-            throw new JsonParseException("The max delay field has not been initialized");
+            throw new JsonParseException("The max delay field has not been specified");
         } else if (!replaceCurrentMusicInitialized) {
-            throw new JsonParseException("The replace current music field has not been initialized");
+            throw new JsonParseException("The replace current music field has not been specified");
         }
 
         return new JsonMusic(sound, minDelay, maxDelay, replaceCurrentMusic);

@@ -75,9 +75,9 @@ final class AdditionsSoundTypeAdapter extends TypeAdapter<JsonAdditionsSound> {
         in.endObject();
 
         if (sound == null) {
-            throw new JsonParseException("The sound field has not been initialized");
+            throw new JsonParseException("The sound field has not been specified");
         } else if (!tickChanceInitialized) {
-            throw new JsonParseException("The tick chance field has not been initialized");
+            throw new JsonParseException("The tick chance field has not been specified");
         }
 
         return new JsonAdditionsSound(sound, tickChance);

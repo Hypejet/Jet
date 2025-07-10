@@ -12,6 +12,8 @@ dependencies {
     implementation(libs.jspecify)
     implementation(libs.adventure)
     implementation(libs.gson)
+    implementation(libs.adventure.serializer.nbt)
+    implementation(libs.adventure.serializer.gson)
 }
 
 application {
