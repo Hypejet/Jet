@@ -6,6 +6,7 @@ import net.hypejet.jet.data.json.adapters.model.biome.BiomeTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.chat.type.ChatTypeTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.trim.material.TrimMaterialTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.trim.pattern.TrimPatternTypeAdapterFactory;
+import net.hypejet.jet.data.json.adapters.model.variant.cat.CatVariantTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.variant.frog.FrogVariantTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.variant.pig.PigVariantTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.variant.wolf.WolfVariantTypeAdapterFactory;
@@ -31,6 +32,7 @@ public final class DataJson {
             .registerTypeAdapterFactory(WolfVariantTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(PigVariantTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(FrogVariantTypeAdapterFactory.INSTANCE)
+            .registerTypeAdapterFactory(CatVariantTypeAdapterFactory.INSTANCE)
             .setPrettyPrinting()
             .create();
 
