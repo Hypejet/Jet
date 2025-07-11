@@ -4,6 +4,7 @@ import com.palantir.javapoet.JavaFile;
 import net.hypejet.jet.data.generator.adpater.BiomeAdapter;
 import net.hypejet.jet.data.generator.adpater.CatVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.ChatTypeAdapter;
+import net.hypejet.jet.data.generator.adpater.ChickenVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.CowVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.FrogVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.PigVariantAdapter;
@@ -23,6 +24,7 @@ import net.hypejet.jet.data.json.model.chat.type.JsonChatType;
 import net.hypejet.jet.data.json.model.trim.material.JsonTrimMaterial;
 import net.hypejet.jet.data.json.model.trim.pattern.JsonTrimPattern;
 import net.hypejet.jet.data.json.model.variant.cat.JsonCatVariant;
+import net.hypejet.jet.data.json.model.variant.chicken.JsonChickenVariant;
 import net.hypejet.jet.data.json.model.variant.cow.JsonCowVariant;
 import net.hypejet.jet.data.json.model.variant.frog.JsonFrogVariant;
 import net.hypejet.jet.data.json.model.variant.pig.JsonPigVariant;
@@ -133,6 +135,10 @@ final class Generators {
                 .add(
                         Registries.COW_VARIANT, CowVariantAdapter::convert, JsonCowVariant.class,
                         Path.of("cow-variants.json"), "CowVariantKeys"
+                )
+                .add(
+                        Registries.CHICKEN_VARIANT, ChickenVariantAdapter::convert, JsonChickenVariant.class,
+                        Path.of("chicken-variants.json"), "ChickenVariantKeys"
                 )
                 .build();
 
