@@ -1,4 +1,4 @@
-package net.hypejet.jet.data.json.adapters.model.wolf.variant;
+package net.hypejet.jet.data.json.adapters.model.variant.wolf;
 
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;

@@ -3,6 +3,7 @@ package net.hypejet.jet.data.generator;
 import com.palantir.javapoet.JavaFile;
 import net.hypejet.jet.data.generator.adpater.BiomeAdapter;
 import net.hypejet.jet.data.generator.adpater.ChatTypeAdapter;
+import net.hypejet.jet.data.generator.adpater.PigVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.TrimMaterialAdapter;
 import net.hypejet.jet.data.generator.adpater.TrimPatternAdapter;
 import net.hypejet.jet.data.generator.adpater.WolfSoundVariantAdapter;
@@ -18,6 +19,7 @@ import net.hypejet.jet.data.json.model.biome.JsonBiome;
 import net.hypejet.jet.data.json.model.chat.type.JsonChatType;
 import net.hypejet.jet.data.json.model.trim.material.JsonTrimMaterial;
 import net.hypejet.jet.data.json.model.trim.pattern.JsonTrimPattern;
+import net.hypejet.jet.data.json.model.variant.pig.JsonPigVariant;
 import net.hypejet.jet.data.json.model.variant.wolf.JsonWolfSoundVariant;
 import net.hypejet.jet.data.json.model.variant.wolf.JsonWolfVariant;
 import net.minecraft.SharedConstants;
@@ -109,6 +111,10 @@ final class Generators {
                 .add(
                         Registries.WOLF_SOUND_VARIANT, WolfSoundVariantAdapter::convert, JsonWolfSoundVariant.class,
                         Path.of("wolf-sound-variants.json"), "WolfSoundVariantKeys"
+                )
+                .add(
+                        Registries.PIG_VARIANT, PigVariantAdapter::convert, JsonPigVariant.class,
+                        Path.of("pig-variants.json"), "PigVariantKeys"
                 )
                 .build();
 
