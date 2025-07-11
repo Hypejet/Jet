@@ -7,6 +7,7 @@ import net.hypejet.jet.data.generator.adpater.ChatTypeAdapter;
 import net.hypejet.jet.data.generator.adpater.ChickenVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.CowVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.FrogVariantAdapter;
+import net.hypejet.jet.data.generator.adpater.PaintingVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.PigVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.TrimMaterialAdapter;
 import net.hypejet.jet.data.generator.adpater.TrimPatternAdapter;
@@ -27,6 +28,7 @@ import net.hypejet.jet.data.json.model.variant.cat.JsonCatVariant;
 import net.hypejet.jet.data.json.model.variant.chicken.JsonChickenVariant;
 import net.hypejet.jet.data.json.model.variant.cow.JsonCowVariant;
 import net.hypejet.jet.data.json.model.variant.frog.JsonFrogVariant;
+import net.hypejet.jet.data.json.model.variant.painting.JsonPaintingVariant;
 import net.hypejet.jet.data.json.model.variant.pig.JsonPigVariant;
 import net.hypejet.jet.data.json.model.variant.wolf.JsonWolfSoundVariant;
 import net.hypejet.jet.data.json.model.variant.wolf.JsonWolfVariant;
@@ -139,6 +141,10 @@ final class Generators {
                 .add(
                         Registries.CHICKEN_VARIANT, ChickenVariantAdapter::convert, JsonChickenVariant.class,
                         Path.of("chicken-variants.json"), "ChickenVariantKeys"
+                )
+                .add(
+                        Registries.PAINTING_VARIANT, PaintingVariantAdapter::convert, JsonPaintingVariant.class,
+                        Path.of("painting-variants.json"), "PaintingVariantKeys"
                 )
                 .build();
 
