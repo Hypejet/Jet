@@ -3,6 +3,7 @@ package net.hypejet.jet.data.generator;
 import com.palantir.javapoet.JavaFile;
 import net.hypejet.jet.data.generator.adpater.BiomeAdapter;
 import net.hypejet.jet.data.generator.adpater.ChatTypeAdapter;
+import net.hypejet.jet.data.generator.adpater.FrogVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.PigVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.TrimMaterialAdapter;
 import net.hypejet.jet.data.generator.adpater.TrimPatternAdapter;
@@ -19,6 +20,7 @@ import net.hypejet.jet.data.json.model.biome.JsonBiome;
 import net.hypejet.jet.data.json.model.chat.type.JsonChatType;
 import net.hypejet.jet.data.json.model.trim.material.JsonTrimMaterial;
 import net.hypejet.jet.data.json.model.trim.pattern.JsonTrimPattern;
+import net.hypejet.jet.data.json.model.variant.frog.JsonFrogVariant;
 import net.hypejet.jet.data.json.model.variant.pig.JsonPigVariant;
 import net.hypejet.jet.data.json.model.variant.wolf.JsonWolfSoundVariant;
 import net.hypejet.jet.data.json.model.variant.wolf.JsonWolfVariant;
@@ -115,6 +117,10 @@ final class Generators {
                 .add(
                         Registries.PIG_VARIANT, PigVariantAdapter::convert, JsonPigVariant.class,
                         Path.of("pig-variants.json"), "PigVariantKeys"
+                )
+                .add(
+                        Registries.FROG_VARIANT, FrogVariantAdapter::convert, JsonFrogVariant.class,
+                        Path.of("frog-variants.json"), "FrogVariantKeys"
                 )
                 .build();
 
