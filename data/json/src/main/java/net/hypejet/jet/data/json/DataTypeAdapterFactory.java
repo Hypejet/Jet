@@ -6,12 +6,14 @@ import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
 import net.hypejet.jet.data.json.adapters.DataEntryTypeAdapter;
 import net.hypejet.jet.data.json.adapters.FeaturePackTypeAdapter;
+import net.hypejet.jet.data.json.adapters.IntProviderTypeAdapter;
 import net.hypejet.jet.data.json.adapters.KeyTypeAdapter;
 import net.hypejet.jet.data.json.adapters.model.HolderTypeAdapter;
 import net.hypejet.jet.data.json.adapters.model.SoundEventTypeAdapter;
 import net.hypejet.jet.data.json.adapters.model.WeightedTypeAdapter;
 import net.hypejet.jet.data.json.entry.DataEntry;
 import net.hypejet.jet.data.json.model.JsonHolder;
+import net.hypejet.jet.data.json.model.JsonIntProvider;
 import net.hypejet.jet.data.json.model.JsonSoundEvent;
 import net.hypejet.jet.data.json.model.JsonWeighted;
 import net.kyori.adventure.key.Key;
@@ -48,11 +50,13 @@ public final class DataTypeAdapterFactory implements TypeAdapterFactory {
             return FeaturePackTypeAdapter.INSTANCE;
         } else if (JsonSoundEvent.class.isAssignableFrom(rawType)) {
             return new SoundEventTypeAdapter(gson);
+        } else if (JsonIntProvider.class.isAssignableFrom(rawType)) {
+            return new IntProviderTypeAdapter(gson);
         } else if (JsonHolder.class.isAssignableFrom(rawType)) {
             return new HolderTypeAdapter<>(gson, onlyParameterizedArgument(actualType));
         } else if (JsonWeighted.class.isAssignableFrom(rawType)) {
             return new WeightedTypeAdapter<>(gson, onlyParameterizedArgument(actualType));
-        } else if (DataEntry.class.isAssignableFrom(type.getRawType())) {
+        } else if (DataEntry.class.isAssignableFrom(rawType)) {
             return new DataEntryTypeAdapter<>(gson, onlyParameterizedArgument(actualType));
         } else {
             return null;

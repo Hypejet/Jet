@@ -1,11 +1,11 @@
-package net.hypejet.jet.data.json.adapters.model.chat.type;
+package net.hypejet.jet.data.json.adapters.model.type.chat;
 
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
-import net.hypejet.jet.data.json.model.chat.type.JsonChatType;
-import net.hypejet.jet.data.json.model.chat.type.JsonChatTypeDecoration;
+import net.hypejet.jet.data.json.model.type.chat.JsonChatType;
+import net.hypejet.jet.data.json.model.type.chat.JsonChatTypeDecoration;
 
 /**
  * Represents a {@linkplain TypeAdapterFactory type adapter factory} providing {@linkplain TypeAdapter type adapters}

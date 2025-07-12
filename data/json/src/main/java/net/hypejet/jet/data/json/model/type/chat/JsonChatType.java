@@ -1,4 +1,4 @@
-package net.hypejet.jet.data.json.model.chat.type;
+package net.hypejet.jet.data.json.model.type.chat;
 
 import org.jspecify.annotations.NonNull;
 

@@ -3,9 +3,10 @@ package net.hypejet.jet.data.json;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.hypejet.jet.data.json.adapters.model.biome.BiomeTypeAdapterFactory;
-import net.hypejet.jet.data.json.adapters.model.chat.type.ChatTypeTypeAdapterFactory;
+import net.hypejet.jet.data.json.adapters.model.type.chat.ChatTypeTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.trim.material.TrimMaterialTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.trim.pattern.TrimPatternTypeAdapterFactory;
+import net.hypejet.jet.data.json.adapters.model.type.dimension.DimensionTypeTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.variant.cat.CatVariantTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.variant.chicken.ChickenVariantTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.variant.cow.CowVariantTypeAdapterFactory;
@@ -39,6 +40,7 @@ public final class DataJson {
             .registerTypeAdapterFactory(CowVariantTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(ChickenVariantTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(PaintingVariantTypeAdapterFactory.INSTANCE)
+            .registerTypeAdapterFactory(DimensionTypeTypeAdapterFactory.INSTANCE)
             .setPrettyPrinting()
             .create();
 

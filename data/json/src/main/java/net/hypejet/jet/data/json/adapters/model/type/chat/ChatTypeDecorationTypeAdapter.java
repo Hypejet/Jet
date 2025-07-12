@@ -1,4 +1,4 @@
-package net.hypejet.jet.data.json.adapters.model.chat.type;
+package net.hypejet.jet.data.json.adapters.model.type.chat;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
@@ -6,7 +6,7 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import net.hypejet.jet.data.json.model.chat.type.JsonChatTypeDecoration;
+import net.hypejet.jet.data.json.model.type.chat.JsonChatTypeDecoration;
 import net.hypejet.jet.data.json.util.JsonUtil;
 import net.kyori.adventure.text.format.Style;
 import org.jspecify.annotations.NonNull;

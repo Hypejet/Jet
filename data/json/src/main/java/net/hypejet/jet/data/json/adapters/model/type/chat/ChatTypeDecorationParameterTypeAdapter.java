@@ -1,9 +1,9 @@
-package net.hypejet.jet.data.json.adapters.model.chat.type;
+package net.hypejet.jet.data.json.adapters.model.type.chat;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import net.hypejet.jet.data.json.model.chat.type.JsonChatTypeDecoration;
+import net.hypejet.jet.data.json.model.type.chat.JsonChatTypeDecoration;
 
 import java.io.IOException;
 

@@ -1,7 +1,7 @@
 package net.hypejet.jet.data.generator.adpater;
 
-import net.hypejet.jet.data.json.model.chat.type.JsonChatType;
-import net.hypejet.jet.data.json.model.chat.type.JsonChatTypeDecoration;
+import net.hypejet.jet.data.json.model.type.chat.JsonChatType;
+import net.hypejet.jet.data.json.model.type.chat.JsonChatTypeDecoration;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.ChatTypeDecoration;
 import org.jspecify.annotations.NonNull;
