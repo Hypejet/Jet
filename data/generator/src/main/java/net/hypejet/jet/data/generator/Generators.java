@@ -6,6 +6,7 @@ import net.hypejet.jet.data.generator.adpater.CatVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.ChatTypeAdapter;
 import net.hypejet.jet.data.generator.adpater.ChickenVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.CowVariantAdapter;
+import net.hypejet.jet.data.generator.adpater.DamageTypeAdapter;
 import net.hypejet.jet.data.generator.adpater.DimensionTypeAdapter;
 import net.hypejet.jet.data.generator.adpater.FrogVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.PaintingVariantAdapter;
@@ -25,6 +26,7 @@ import net.hypejet.jet.data.json.model.biome.JsonBiome;
 import net.hypejet.jet.data.json.model.type.chat.JsonChatType;
 import net.hypejet.jet.data.json.model.trim.material.JsonTrimMaterial;
 import net.hypejet.jet.data.json.model.trim.pattern.JsonTrimPattern;
+import net.hypejet.jet.data.json.model.type.damage.JsonDamageType;
 import net.hypejet.jet.data.json.model.type.dimension.JsonDimensionType;
 import net.hypejet.jet.data.json.model.variant.cat.JsonCatVariant;
 import net.hypejet.jet.data.json.model.variant.chicken.JsonChickenVariant;
@@ -151,6 +153,10 @@ final class Generators {
                 .add(
                         Registries.DIMENSION_TYPE, DimensionTypeAdapter::convert, JsonDimensionType.class,
                         Path.of("dimension-types.json"), "DimensionTypeKeys"
+                )
+                .add(
+                        Registries.DAMAGE_TYPE, DamageTypeAdapter::convert, JsonDamageType.class,
+                        Path.of("damage-types.json"), "DamageTypeKeys"
                 )
                 .build();
 
