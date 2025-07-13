@@ -1,6 +1,7 @@
 package net.hypejet.jet.data.generator;
 
 import com.palantir.javapoet.JavaFile;
+import net.hypejet.jet.data.generator.adpater.BannerPatternAdapter;
 import net.hypejet.jet.data.generator.adpater.BiomeAdapter;
 import net.hypejet.jet.data.generator.adpater.CatVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.ChatTypeAdapter;
@@ -23,6 +24,7 @@ import net.hypejet.jet.data.generator.generator.generators.KeyDefinitionGenerato
 import net.hypejet.jet.data.generator.generator.generators.RegistryExtractorResourceGenerator;
 import net.hypejet.jet.data.generator.generator.generators.VersionInfoGenerator;
 import net.hypejet.jet.data.json.model.biome.JsonBiome;
+import net.hypejet.jet.data.json.model.pattern.banner.JsonBannerPattern;
 import net.hypejet.jet.data.json.model.type.chat.JsonChatType;
 import net.hypejet.jet.data.json.model.trim.material.JsonTrimMaterial;
 import net.hypejet.jet.data.json.model.trim.pattern.JsonTrimPattern;
@@ -157,6 +159,10 @@ final class Generators {
                 .add(
                         Registries.DAMAGE_TYPE, DamageTypeAdapter::convert, JsonDamageType.class,
                         Path.of("damage-types.json"), "DamageTypeKeys"
+                )
+                .add(
+                        Registries.BANNER_PATTERN, BannerPatternAdapter::convert, JsonBannerPattern.class,
+                        Path.of("banner-patterns.json"), "BannerPatternKeys"
                 )
                 .build();
 
