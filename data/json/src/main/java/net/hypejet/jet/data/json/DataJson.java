@@ -3,6 +3,7 @@ package net.hypejet.jet.data.json;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.hypejet.jet.data.json.adapters.model.biome.BiomeTypeAdapterFactory;
+import net.hypejet.jet.data.json.adapters.model.item.ItemTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.pattern.banner.BannerPatternTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.type.chat.ChatTypeTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.trim.material.TrimMaterialTypeAdapterFactory;
@@ -45,6 +46,7 @@ public final class DataJson {
             .registerTypeAdapterFactory(DimensionTypeTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(DamageTypeTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(BannerPatternTypeAdapterFactory.INSTANCE)
+            .registerTypeAdapterFactory(ItemTypeAdapterFactory.INSTANCE)
             .setPrettyPrinting()
             .create();
 
