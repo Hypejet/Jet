@@ -8,11 +8,13 @@ import net.hypejet.jet.data.json.adapters.DataEntryTypeAdapter;
 import net.hypejet.jet.data.json.adapters.FeaturePackTypeAdapter;
 import net.hypejet.jet.data.json.adapters.IntProviderTypeAdapter;
 import net.hypejet.jet.data.json.adapters.KeyTypeAdapter;
+import net.hypejet.jet.data.json.adapters.model.HolderSetTypeAdapter;
 import net.hypejet.jet.data.json.adapters.model.HolderTypeAdapter;
 import net.hypejet.jet.data.json.adapters.model.SoundEventTypeAdapter;
 import net.hypejet.jet.data.json.adapters.model.WeightedTypeAdapter;
 import net.hypejet.jet.data.json.entry.DataEntry;
 import net.hypejet.jet.data.json.model.JsonHolder;
+import net.hypejet.jet.data.json.model.JsonHolderSet;
 import net.hypejet.jet.data.json.model.JsonIntProvider;
 import net.hypejet.jet.data.json.model.JsonSoundEvent;
 import net.hypejet.jet.data.json.model.JsonWeighted;
@@ -58,6 +60,8 @@ public final class DataTypeAdapterFactory implements TypeAdapterFactory {
             return new WeightedTypeAdapter<>(gson, onlyParameterizedArgument(actualType));
         } else if (DataEntry.class.isAssignableFrom(rawType)) {
             return new DataEntryTypeAdapter<>(gson, onlyParameterizedArgument(actualType));
+        } else if (JsonHolderSet.class.isAssignableFrom(rawType)) {
+            return new HolderSetTypeAdapter<>(gson, onlyParameterizedArgument(actualType));
         } else {
             return null;
         }

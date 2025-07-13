@@ -13,7 +13,7 @@ import java.util.Objects;
  */
 public sealed interface JsonHolder<V> {
     /**
-     * Represents {@linkplain JsonHolder a holder} holding {@linkplain Key key} that the held value can be retrieved
+     * Represents a {@linkplain JsonHolder holder} holding {@linkplain Key key} that the held value can be retrieved
      * with from a registry associated with it.
      *
      * @param key the key
@@ -33,7 +33,7 @@ public sealed interface JsonHolder<V> {
     }
 
     /**
-     * Represents {@linkplain JsonHolder a holder} directly holding the value.
+     * Represents a {@linkplain JsonHolder holder} directly holding the value.
      *
      * @param value the held value
      * @param <V> a type of the held value
