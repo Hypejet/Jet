@@ -71,13 +71,17 @@ public final class KeyDefinitionGenerator<V> implements CodeGenerator {
         return Destination.API;
     }
 
+    // TODO: Replace with names specified by Minecraft
     private static @NotNull String createConstantName(@NotNull ResourceLocation location) {
         String locationPathString = location.getPath();
         StringBuilder constantNameBuilder = new StringBuilder();
 
         for (int index = 0; index < locationPathString.length(); index++) {
             char character = locationPathString.charAt(index);
-            if (index == 0 ? Character.isJavaIdentifierStart(character) : Character.isJavaIdentifierPart(character)) {
+
+            if (Character.isJavaIdentifierPart(character)) {
+                if (index == 0 && !Character.isJavaIdentifierStart(character))
+                    constantNameBuilder.append(FORBIDDEN_IDENTIFIER_PART_REPLACEMENT);
                 constantNameBuilder.append(Character.toUpperCase(character));
             } else {
                 constantNameBuilder.append(FORBIDDEN_IDENTIFIER_PART_REPLACEMENT);

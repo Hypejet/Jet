@@ -12,6 +12,7 @@ import net.hypejet.jet.data.generator.adpater.DimensionTypeAdapter;
 import net.hypejet.jet.data.generator.adpater.EnchantmentAdapter;
 import net.hypejet.jet.data.generator.adpater.FrogVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.ItemAdapter;
+import net.hypejet.jet.data.generator.adpater.JukeboxSongAdapter;
 import net.hypejet.jet.data.generator.adpater.PaintingVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.PigVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.TrimMaterialAdapter;
@@ -29,6 +30,7 @@ import net.hypejet.jet.data.json.model.biome.JsonBiome;
 import net.hypejet.jet.data.json.model.enchantment.JsonEnchantment;
 import net.hypejet.jet.data.json.model.item.JsonItem;
 import net.hypejet.jet.data.json.model.pattern.banner.JsonBannerPattern;
+import net.hypejet.jet.data.json.model.song.JsonJukeboxSong;
 import net.hypejet.jet.data.json.model.type.chat.JsonChatType;
 import net.hypejet.jet.data.json.model.trim.material.JsonTrimMaterial;
 import net.hypejet.jet.data.json.model.trim.pattern.JsonTrimPattern;
@@ -171,6 +173,10 @@ final class Generators {
                 .add(
                         Registries.ENCHANTMENT, value -> EnchantmentAdapter.convert(value, registryAccess),
                         JsonEnchantment.class, Path.of("enchantments.json"), "EnchantmentKeys"
+                )
+                .add(
+                        Registries.JUKEBOX_SONG, JukeboxSongAdapter::convert, JsonJukeboxSong.class,
+                        Path.of("jukebox-songs.json"), "JukeboxSongKeys"
                 )
                 .add(Registries.ITEM, ItemAdapter::convert, JsonItem.class, Path.of("items.json"), "ItemKeys")
                 .build();
