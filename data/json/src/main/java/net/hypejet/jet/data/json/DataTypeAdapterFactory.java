@@ -4,21 +4,25 @@ import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
+import net.hypejet.jet.data.json.adapters.BinaryTagHolderTypeAdapter;
 import net.hypejet.jet.data.json.adapters.DataEntryTypeAdapter;
 import net.hypejet.jet.data.json.adapters.FeaturePackTypeAdapter;
 import net.hypejet.jet.data.json.adapters.IntProviderTypeAdapter;
 import net.hypejet.jet.data.json.adapters.KeyTypeAdapter;
+import net.hypejet.jet.data.json.adapters.model.EquipmentSlotGroupTypeAdapter;
 import net.hypejet.jet.data.json.adapters.model.HolderSetTypeAdapter;
 import net.hypejet.jet.data.json.adapters.model.HolderTypeAdapter;
 import net.hypejet.jet.data.json.adapters.model.SoundEventTypeAdapter;
 import net.hypejet.jet.data.json.adapters.model.WeightedTypeAdapter;
 import net.hypejet.jet.data.json.entry.DataEntry;
+import net.hypejet.jet.data.json.model.JsonEquipmentSlotGroup;
 import net.hypejet.jet.data.json.model.JsonHolder;
 import net.hypejet.jet.data.json.model.JsonHolderSet;
 import net.hypejet.jet.data.json.model.JsonIntProvider;
 import net.hypejet.jet.data.json.model.JsonSoundEvent;
 import net.hypejet.jet.data.json.model.JsonWeighted;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import org.jspecify.annotations.NonNull;
 
 import java.lang.reflect.ParameterizedType;
@@ -50,6 +54,10 @@ public final class DataTypeAdapterFactory implements TypeAdapterFactory {
             return KeyTypeAdapter.INSTANCE;
         } else if (DataEntry.FeaturePack.class.isAssignableFrom(rawType)) {
             return FeaturePackTypeAdapter.INSTANCE;
+        } else if (JsonEquipmentSlotGroup.class.isAssignableFrom(rawType)) {
+            return EquipmentSlotGroupTypeAdapter.INSTANCE;
+        } else if (BinaryTagHolder.class.isAssignableFrom(rawType)) {
+            return BinaryTagHolderTypeAdapter.INSTANCE;
         } else if (JsonSoundEvent.class.isAssignableFrom(rawType)) {
             return new SoundEventTypeAdapter(gson);
         } else if (JsonIntProvider.class.isAssignableFrom(rawType)) {

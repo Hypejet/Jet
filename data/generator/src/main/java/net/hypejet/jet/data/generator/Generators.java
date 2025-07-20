@@ -9,6 +9,7 @@ import net.hypejet.jet.data.generator.adpater.ChickenVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.CowVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.DamageTypeAdapter;
 import net.hypejet.jet.data.generator.adpater.DimensionTypeAdapter;
+import net.hypejet.jet.data.generator.adpater.EnchantmentAdapter;
 import net.hypejet.jet.data.generator.adpater.FrogVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.ItemAdapter;
 import net.hypejet.jet.data.generator.adpater.PaintingVariantAdapter;
@@ -25,6 +26,7 @@ import net.hypejet.jet.data.generator.generator.generators.KeyDefinitionGenerato
 import net.hypejet.jet.data.generator.generator.generators.RegistryExtractorResourceGenerator;
 import net.hypejet.jet.data.generator.generator.generators.VersionInfoGenerator;
 import net.hypejet.jet.data.json.model.biome.JsonBiome;
+import net.hypejet.jet.data.json.model.enchantment.JsonEnchantment;
 import net.hypejet.jet.data.json.model.item.JsonItem;
 import net.hypejet.jet.data.json.model.pattern.banner.JsonBannerPattern;
 import net.hypejet.jet.data.json.model.type.chat.JsonChatType;
@@ -165,6 +167,10 @@ final class Generators {
                 .add(
                         Registries.BANNER_PATTERN, BannerPatternAdapter::convert, JsonBannerPattern.class,
                         Path.of("banner-patterns.json"), "BannerPatternKeys"
+                )
+                .add(
+                        Registries.ENCHANTMENT, value -> EnchantmentAdapter.convert(value, registryAccess),
+                        JsonEnchantment.class, Path.of("enchantments.json"), "EnchantmentKeys"
                 )
                 .add(Registries.ITEM, ItemAdapter::convert, JsonItem.class, Path.of("items.json"), "ItemKeys")
                 .build();

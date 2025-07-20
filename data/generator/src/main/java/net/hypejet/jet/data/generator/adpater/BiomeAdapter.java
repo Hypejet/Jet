@@ -101,7 +101,7 @@ public final class BiomeAdapter {
                     case SWAMP -> JsonGrassColorModifier.SWAMP;
                 },
                 null, // TODO
-                effects.getAmbientLoopSoundEvent().map(SoundEventHolderAdapter::convert).orElse(null),
+                effects.getAmbientLoopSoundEvent().map(HolderAdapter::convertSoundEventHolder).orElse(null),
                 effects.getAmbientMoodSettings().map(BiomeAdapter::convertMoodSound).orElse(null),
                 effects.getAmbientAdditionsSettings().map(BiomeAdapter::convertAdditionsSound).orElse(null),
                 effects.getBackgroundMusic().map(BiomeAdapter::convertMusic).orElse(List.of()),
@@ -111,7 +111,7 @@ public final class BiomeAdapter {
 
     private static @NonNull JsonAmbientMoodSound convertMoodSound(@NonNull AmbientMoodSettings settings) {
         return new JsonAmbientMoodSound(
-                SoundEventHolderAdapter.convert(settings.getSoundEvent()),
+                HolderAdapter.convertSoundEventHolder(settings.getSoundEvent()),
                 settings.getTickDelay(),
                 settings.getBlockSearchExtent(),
                 settings.getSoundPositionOffset()
@@ -120,7 +120,7 @@ public final class BiomeAdapter {
 
     private static @NonNull JsonAdditionsSound convertAdditionsSound(@NonNull AmbientAdditionsSettings settings) {
         return new JsonAdditionsSound(
-                SoundEventHolderAdapter.convert(settings.getSoundEvent()),
+                HolderAdapter.convertSoundEventHolder(settings.getSoundEvent()),
                 settings.getTickChance()
         );
     }
@@ -132,7 +132,7 @@ public final class BiomeAdapter {
             convertedList.add(
                     new JsonWeighted<>(
                             new JsonMusic(
-                                    SoundEventHolderAdapter.convert(music.event()),
+                                    HolderAdapter.convertSoundEventHolder(music.event()),
                                     music.minDelay(),
                                     music.maxDelay(),
                                     music.replaceCurrentMusic()

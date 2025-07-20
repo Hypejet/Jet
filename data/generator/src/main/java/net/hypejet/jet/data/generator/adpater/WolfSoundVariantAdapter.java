@@ -23,12 +23,12 @@ public final class WolfSoundVariantAdapter {
      */
     public static @NonNull JsonWolfSoundVariant convert(@NonNull WolfSoundVariant variant) {
         return new JsonWolfSoundVariant(
-                SoundEventHolderAdapter.convert(variant.ambientSound()),
-                SoundEventHolderAdapter.convert(variant.deathSound()),
-                SoundEventHolderAdapter.convert(variant.growlSound()),
-                SoundEventHolderAdapter.convert(variant.hurtSound()),
-                SoundEventHolderAdapter.convert(variant.pantSound()),
-                SoundEventHolderAdapter.convert(variant.whineSound())
+                HolderAdapter.convertSoundEventHolder(variant.ambientSound()),
+                HolderAdapter.convertSoundEventHolder(variant.deathSound()),
+                HolderAdapter.convertSoundEventHolder(variant.growlSound()),
+                HolderAdapter.convertSoundEventHolder(variant.hurtSound()),
+                HolderAdapter.convertSoundEventHolder(variant.pantSound()),
+                HolderAdapter.convertSoundEventHolder(variant.whineSound())
         );
     }
 }
