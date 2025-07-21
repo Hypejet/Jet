@@ -12,6 +12,7 @@ import net.hypejet.jet.data.generator.adpater.CowVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.DamageTypeAdapter;
 import net.hypejet.jet.data.generator.adpater.DimensionTypeAdapter;
 import net.hypejet.jet.data.generator.adpater.EnchantmentAdapter;
+import net.hypejet.jet.data.generator.adpater.EntityTypeAdapter;
 import net.hypejet.jet.data.generator.adpater.FrogVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.InstrumentAdapter;
 import net.hypejet.jet.data.generator.adpater.ItemAdapter;
@@ -33,6 +34,7 @@ import net.hypejet.jet.data.json.model.biome.JsonBiome;
 import net.hypejet.jet.data.json.model.block.JsonBlock;
 import net.hypejet.jet.data.json.model.block.JsonBlockEntityType;
 import net.hypejet.jet.data.json.model.enchantment.JsonEnchantment;
+import net.hypejet.jet.data.json.model.entity.JsonEntityType;
 import net.hypejet.jet.data.json.model.instrument.JsonInstrument;
 import net.hypejet.jet.data.json.model.item.JsonItem;
 import net.hypejet.jet.data.json.model.pattern.banner.JsonBannerPattern;
@@ -194,8 +196,12 @@ final class Generators {
                 .add(Registries.ITEM, ItemAdapter::convert, JsonItem.class, Path.of("items.json"), "ItemKeys")
                 .add(Registries.BLOCK, BlockAdapter::convert, JsonBlock.class, Path.of("blocks.json"), "BlockKeys")
                 .add(
+                        Registries.ENTITY_TYPE, EntityTypeAdapter::convert, JsonEntityType.class,
+                        Path.of("entity-types.json"), "EntityTypeKeys"
+                )
+                .add(
                         Registries.BLOCK_ENTITY_TYPE, value -> BlockEntityTypeAdapter.convert(value, registryAccess),
-                        JsonBlockEntityType.class, Path.of("block-entity-types.json"), "BlockEntityTypes"
+                        JsonBlockEntityType.class, Path.of("block-entity-types.json"), "BlockEntityTypeKeys"
                 )
                 .build();
 
