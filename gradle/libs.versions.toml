@@ -45,6 +45,9 @@ javapoet = "0.7.0"
 # Command line arguments
 picocli = "4.7.7"
 
+# Utilities
+guava = "33.4.8-jre"
+
 [libraries]
 # Networking
 netty = { module = "io.netty:netty-all", version.ref = "netty" }
@@ -96,6 +99,7 @@ picocli = { module = "info.picocli:picocli", version.ref = "picocli" }
 # Utilities
 concurrencyUtilities = { module = "net.hypejet:concurrency-utilities", version.ref = "concurrencyUtilities" }
 fastutil = { module = "it.unimi.dsi:fastutil", version.ref = "fastutil" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
 
 [bundles]
 # Configuration

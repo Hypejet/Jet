@@ -4,9 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import net.hypejet.jet.data.json.model.JsonHolder;
 import net.hypejet.jet.data.json.model.JsonSoundEvent;
+import net.kyori.adventure.key.Key;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Set;
 
 /**
  * Represents a holder of {@linkplain ParameterizedType parameterized types} to be used with {@linkplain Gson gson}.
@@ -22,6 +24,12 @@ public final class DataJsonTypes {
      */
     public static final Type SOUND_EVENT_HOLDER = new TypeToken<JsonHolder<JsonSoundEvent>>() {}.getType();
 
-    private DataJsonTypes() {}
+    /**
+     * A parameterized type of {@linkplain Set set} of {@linkplain Key keys}.
+     *
+     * @since 1.0
+     */
+    public static final Type KEY_SET = new TypeToken<Set<Key>>() {}.getType();
 
+    private DataJsonTypes() {}
 }

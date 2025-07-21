@@ -3,6 +3,8 @@ package net.hypejet.jet.data.generator;
 import com.palantir.javapoet.JavaFile;
 import net.hypejet.jet.data.generator.adpater.BannerPatternAdapter;
 import net.hypejet.jet.data.generator.adpater.BiomeAdapter;
+import net.hypejet.jet.data.generator.adpater.BlockAdapter;
+import net.hypejet.jet.data.generator.adpater.BlockEntityTypeAdapter;
 import net.hypejet.jet.data.generator.adpater.CatVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.ChatTypeAdapter;
 import net.hypejet.jet.data.generator.adpater.ChickenVariantAdapter;
@@ -28,6 +30,8 @@ import net.hypejet.jet.data.generator.generator.generators.KeyDefinitionGenerato
 import net.hypejet.jet.data.generator.generator.generators.RegistryExtractorResourceGenerator;
 import net.hypejet.jet.data.generator.generator.generators.VersionInfoGenerator;
 import net.hypejet.jet.data.json.model.biome.JsonBiome;
+import net.hypejet.jet.data.json.model.block.JsonBlock;
+import net.hypejet.jet.data.json.model.block.JsonBlockEntityType;
 import net.hypejet.jet.data.json.model.enchantment.JsonEnchantment;
 import net.hypejet.jet.data.json.model.instrument.JsonInstrument;
 import net.hypejet.jet.data.json.model.item.JsonItem;
@@ -112,6 +116,7 @@ final class Generators {
 
         Set<Generator> generators = new GeneratorsBuilder(registryAccess)
                 .add(new VersionInfoGenerator())
+                // ------------------------ Data driven registries ------------------------
                 .add(
                         Registries.BIOME, BiomeAdapter::convert, JsonBiome.class,
                         Path.of("biomes.json"), "BiomeKeys"
@@ -184,7 +189,14 @@ final class Generators {
                         Registries.INSTRUMENT, InstrumentAdapter::convert, JsonInstrument.class,
                         Path.of("instruments.json"), "InstrumentKeys"
                 )
+                // TODO: Dialogs
+                // ------------------------ Built-in registries ------------------------
                 .add(Registries.ITEM, ItemAdapter::convert, JsonItem.class, Path.of("items.json"), "ItemKeys")
+                .add(Registries.BLOCK, BlockAdapter::convert, JsonBlock.class, Path.of("blocks.json"), "BlockKeys")
+                .add(
+                        Registries.BLOCK_ENTITY_TYPE, value -> BlockEntityTypeAdapter.convert(value, registryAccess),
+                        JsonBlockEntityType.class, Path.of("block-entity-types.json"), "BlockEntityTypes"
+                )
                 .build();
 
         for (Generator generator : generators) {

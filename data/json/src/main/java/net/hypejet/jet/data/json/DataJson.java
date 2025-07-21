@@ -2,7 +2,9 @@ package net.hypejet.jet.data.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.hypejet.jet.data.json.adapters.guava.GuavaTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.biome.BiomeTypeAdapterFactory;
+import net.hypejet.jet.data.json.adapters.model.block.BlockTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.enchantment.EnchantmentTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.instrument.InstrumentTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.item.ItemTypeAdapterFactory;
@@ -35,6 +37,7 @@ public final class DataJson {
      */
     public static final Gson GSON = GsonComponentSerializer.gson().populator().apply(new GsonBuilder())
             .registerTypeAdapterFactory(DataTypeAdapterFactory.INSTANCE)
+            .registerTypeAdapterFactory(GuavaTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(BiomeTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(ChatTypeTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(TrimMaterialTypeAdapterFactory.INSTANCE)
@@ -53,6 +56,7 @@ public final class DataJson {
             .registerTypeAdapterFactory(EnchantmentTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(JukeboxSongTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(InstrumentTypeAdapterFactory.INSTANCE)
+            .registerTypeAdapterFactory(BlockTypeAdapterFactory.INSTANCE)
             .setPrettyPrinting()
             .create();
 
