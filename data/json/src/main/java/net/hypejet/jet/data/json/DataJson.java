@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.hypejet.jet.data.json.adapters.model.biome.BiomeTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.enchantment.EnchantmentTypeAdapterFactory;
+import net.hypejet.jet.data.json.adapters.model.instrument.InstrumentTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.item.ItemTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.pattern.banner.BannerPatternTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.song.JukeboxSongTypeAdapterFactory;
@@ -51,6 +52,7 @@ public final class DataJson {
             .registerTypeAdapterFactory(ItemTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(EnchantmentTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(JukeboxSongTypeAdapterFactory.INSTANCE)
+            .registerTypeAdapterFactory(InstrumentTypeAdapterFactory.INSTANCE)
             .setPrettyPrinting()
             .create();
 
