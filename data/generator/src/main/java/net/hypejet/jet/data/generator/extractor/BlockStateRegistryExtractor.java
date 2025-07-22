@@ -26,15 +26,15 @@ import java.util.Set;
  * @see BlockState
  * @see RegistryExtractor
  */
-public final class BlockStateExtractor implements RegistryExtractor<JsonBlockState> {
+public final class BlockStateRegistryExtractor implements RegistryExtractor<JsonBlockState> {
     /**
-     * An instance of the {@linkplain BlockStateExtractor block state extractor}.
+     * An instance of the {@linkplain BlockStateRegistryExtractor block state registry extractor}.
      *
      * @since 1.0
      */
-    public static final BlockStateExtractor INSTANCE = new BlockStateExtractor();
+    public static final BlockStateRegistryExtractor INSTANCE = new BlockStateRegistryExtractor();
 
-    private BlockStateExtractor() {}
+    private BlockStateRegistryExtractor() {}
 
     @Override
     public @NotNull List<DataEntry<JsonBlockState>> extract(@NotNull RegistryAccess registryAccess) {
