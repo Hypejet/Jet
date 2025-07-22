@@ -8,6 +8,7 @@ import net.kyori.adventure.key.Key;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -30,6 +31,14 @@ public final class DataJsonTypes {
      * @since 1.0
      */
     public static final Type KEY_SET = new TypeToken<Set<Key>>() {}.getType();
+
+    /**
+     * A parameterized type of {@linkplain Map map} associating {@linkplain String string}
+     * with {@linkplain String strings}.
+     *
+     * @since 1.0
+     */
+    public static final Type STRING_TO_STRING_MAP = new TypeToken<Map<String, String>>() {}.getType();
 
     private DataJsonTypes() {}
 }

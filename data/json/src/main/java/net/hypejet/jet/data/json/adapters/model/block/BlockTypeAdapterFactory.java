@@ -6,6 +6,7 @@ import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
 import net.hypejet.jet.data.json.model.block.JsonBlock;
 import net.hypejet.jet.data.json.model.block.JsonBlockEntityType;
+import net.hypejet.jet.data.json.model.block.JsonBlockState;
 
 /**
  * Represents a {@linkplain TypeAdapterFactory type adapter factory} providing {@linkplain TypeAdapter type adapters}
@@ -32,6 +33,8 @@ public final class BlockTypeAdapterFactory implements TypeAdapterFactory {
             return new BlockTypeAdapter(gson);
         } else if (JsonBlockEntityType.class.isAssignableFrom(rawType)) {
             return new BlockEntityTypeTypeAdapter(gson);
+        } else if (JsonBlockState.class.isAssignableFrom(rawType)) {
+            return new BlockStateTypeAdapter(gson);
         } else {
             return null;
         }

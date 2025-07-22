@@ -23,6 +23,7 @@ import net.hypejet.jet.data.generator.adpater.TrimMaterialAdapter;
 import net.hypejet.jet.data.generator.adpater.TrimPatternAdapter;
 import net.hypejet.jet.data.generator.adpater.WolfSoundVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.WolfVariantAdapter;
+import net.hypejet.jet.data.generator.extractor.BlockStateExtractor;
 import net.hypejet.jet.data.generator.extractor.ConverterRegistryExtractor;
 import net.hypejet.jet.data.generator.generator.CodeGenerator;
 import net.hypejet.jet.data.generator.generator.Generator;
@@ -203,6 +204,11 @@ final class Generators {
                         Registries.BLOCK_ENTITY_TYPE, value -> BlockEntityTypeAdapter.convert(value, registryAccess),
                         JsonBlockEntityType.class, Path.of("block-entity-types.json"), "BlockEntityTypeKeys"
                 )
+                .add(new RegistryExtractorResourceGenerator<>(
+                        BlockStateExtractor.INSTANCE,
+                        registryAccess,
+                        Path.of("block-states.json")
+                ))
                 .build();
 
         for (Generator generator : generators) {
