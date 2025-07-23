@@ -7,6 +7,7 @@ import net.hypejet.jet.data.json.adapters.model.biome.BiomeTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.block.BlockTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.enchantment.EnchantmentTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.entity.EntityTypeTypeAdapterFactory;
+import net.hypejet.jet.data.json.adapters.model.event.GameEventTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.instrument.InstrumentTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.item.ItemTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.pattern.banner.BannerPatternTypeAdapterFactory;
@@ -59,6 +60,7 @@ public final class DataJson {
             .registerTypeAdapterFactory(InstrumentTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(BlockTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(EntityTypeTypeAdapterFactory.INSTANCE)
+            .registerTypeAdapterFactory(GameEventTypeAdapterFactory.INSTANCE)
             .setPrettyPrinting()
             .create();
 

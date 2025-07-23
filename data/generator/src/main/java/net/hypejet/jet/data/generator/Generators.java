@@ -14,6 +14,7 @@ import net.hypejet.jet.data.generator.adpater.DimensionTypeAdapter;
 import net.hypejet.jet.data.generator.adpater.EnchantmentAdapter;
 import net.hypejet.jet.data.generator.adpater.EntityTypeAdapter;
 import net.hypejet.jet.data.generator.adpater.FrogVariantAdapter;
+import net.hypejet.jet.data.generator.adpater.GameEventAdapter;
 import net.hypejet.jet.data.generator.adpater.InstrumentAdapter;
 import net.hypejet.jet.data.generator.adpater.ItemAdapter;
 import net.hypejet.jet.data.generator.adpater.JukeboxSongAdapter;
@@ -36,6 +37,7 @@ import net.hypejet.jet.data.json.model.block.JsonBlock;
 import net.hypejet.jet.data.json.model.block.JsonBlockEntityType;
 import net.hypejet.jet.data.json.model.enchantment.JsonEnchantment;
 import net.hypejet.jet.data.json.model.entity.JsonEntityType;
+import net.hypejet.jet.data.json.model.event.JsonGameEvent;
 import net.hypejet.jet.data.json.model.instrument.JsonInstrument;
 import net.hypejet.jet.data.json.model.item.JsonItem;
 import net.hypejet.jet.data.json.model.pattern.banner.JsonBannerPattern;
@@ -203,6 +205,10 @@ final class Generators {
                 .add(
                         Registries.BLOCK_ENTITY_TYPE, value -> BlockEntityTypeAdapter.convert(value, registryAccess),
                         JsonBlockEntityType.class, Path.of("block-entity-types.json"), "BlockEntityTypeKeys"
+                )
+                .add(
+                        Registries.GAME_EVENT, GameEventAdapter::convert, JsonGameEvent.class,
+                        Path.of("game-events.json"), "GameEventKeys"
                 )
                 .add(new RegistryExtractorResourceGenerator<>(
                         BlockStateRegistryExtractor.INSTANCE,
