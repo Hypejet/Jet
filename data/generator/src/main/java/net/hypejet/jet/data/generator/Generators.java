@@ -253,7 +253,13 @@ final class Generators {
                 case ResourceGenerator resourceGenerator -> {
                     Path path = resourcesPath.resolve(resourceGenerator.path());
                     Files.createDirectories(path.getParent());
-                    Files.writeString(path, resourceGenerator.generate(), StandardOpenOption.CREATE);
+
+                    Files.writeString(
+                            path,
+                            resourceGenerator.generate(),
+                            StandardOpenOption.TRUNCATE_EXISTING,
+                            StandardOpenOption.CREATE
+                    );
                 }
             }
         }
