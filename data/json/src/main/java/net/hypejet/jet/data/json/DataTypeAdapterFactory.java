@@ -9,6 +9,7 @@ import net.hypejet.jet.data.json.adapters.DataEntryTypeAdapter;
 import net.hypejet.jet.data.json.adapters.FeaturePackTypeAdapter;
 import net.hypejet.jet.data.json.adapters.IntProviderTypeAdapter;
 import net.hypejet.jet.data.json.adapters.KeyTypeAdapter;
+import net.hypejet.jet.data.json.adapters.UnitTypeAdapter;
 import net.hypejet.jet.data.json.adapters.model.EquipmentSlotGroupTypeAdapter;
 import net.hypejet.jet.data.json.adapters.model.HolderSetTypeAdapter;
 import net.hypejet.jet.data.json.adapters.model.HolderTypeAdapter;
@@ -21,6 +22,7 @@ import net.hypejet.jet.data.json.model.JsonHolderSet;
 import net.hypejet.jet.data.json.model.JsonIntProvider;
 import net.hypejet.jet.data.json.model.JsonSoundEvent;
 import net.hypejet.jet.data.json.model.JsonWeighted;
+import net.hypejet.jet.data.json.util.JsonUnit;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import org.jspecify.annotations.NonNull;
@@ -58,6 +60,8 @@ public final class DataTypeAdapterFactory implements TypeAdapterFactory {
             return EquipmentSlotGroupTypeAdapter.INSTANCE;
         } else if (BinaryTagHolder.class.isAssignableFrom(rawType)) {
             return BinaryTagHolderTypeAdapter.INSTANCE;
+        } else if (JsonUnit.class.isAssignableFrom(rawType)) {
+            return UnitTypeAdapter.INSTANCE;
         } else if (JsonSoundEvent.class.isAssignableFrom(rawType)) {
             return new SoundEventTypeAdapter(gson);
         } else if (JsonIntProvider.class.isAssignableFrom(rawType)) {

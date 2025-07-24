@@ -20,7 +20,6 @@ import net.hypejet.jet.data.generator.adpater.ItemAdapter;
 import net.hypejet.jet.data.generator.adpater.JukeboxSongAdapter;
 import net.hypejet.jet.data.generator.adpater.PaintingVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.PigVariantAdapter;
-import net.hypejet.jet.data.generator.adpater.PoiTypeAdapter;
 import net.hypejet.jet.data.generator.adpater.TrimMaterialAdapter;
 import net.hypejet.jet.data.generator.adpater.TrimPatternAdapter;
 import net.hypejet.jet.data.generator.adpater.WolfSoundVariantAdapter;
@@ -42,7 +41,6 @@ import net.hypejet.jet.data.json.model.event.JsonGameEvent;
 import net.hypejet.jet.data.json.model.instrument.JsonInstrument;
 import net.hypejet.jet.data.json.model.item.JsonItem;
 import net.hypejet.jet.data.json.model.pattern.banner.JsonBannerPattern;
-import net.hypejet.jet.data.json.model.poi.JsonPoiType;
 import net.hypejet.jet.data.json.model.song.JsonJukeboxSong;
 import net.hypejet.jet.data.json.model.type.chat.JsonChatType;
 import net.hypejet.jet.data.json.model.trim.material.JsonTrimMaterial;
@@ -57,6 +55,7 @@ import net.hypejet.jet.data.json.model.variant.painting.JsonPaintingVariant;
 import net.hypejet.jet.data.json.model.variant.pig.JsonPigVariant;
 import net.hypejet.jet.data.json.model.variant.wolf.JsonWolfSoundVariant;
 import net.hypejet.jet.data.json.model.variant.wolf.JsonWolfVariant;
+import net.hypejet.jet.data.json.util.JsonUnit;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.core.Registry;
@@ -213,8 +212,12 @@ final class Generators {
                         Path.of("game-events.json"), "GameEventKeys"
                 )
                 .add(
-                        Registries.POINT_OF_INTEREST_TYPE, PoiTypeAdapter::convert, JsonPoiType.class,
-                        Path.of("point-of-interest-types.json"), "PointOfInterestTypeKeys"
+                        Registries.FLUID, ignored -> JsonUnit.INSTANCE,
+                        JsonUnit.class, Path.of("fluids.json"), "FluidKeys"
+                )
+                .add(
+                        Registries.POINT_OF_INTEREST_TYPE, ignored -> JsonUnit.INSTANCE,
+                        JsonUnit.class, Path.of("point-of-interest-types.json"), "PointOfInterestTypeKeys"
                 )
                 .add(new RegistryExtractorResourceGenerator<>(
                         BlockStateRegistryExtractor.INSTANCE,
