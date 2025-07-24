@@ -61,6 +61,7 @@ import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.ChatType;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.Bootstrap;
@@ -74,9 +75,54 @@ import net.minecraft.server.packs.repository.ServerPacksSource;
 import net.minecraft.server.packs.resources.CloseableResourceManager;
 import net.minecraft.server.packs.resources.MultiPackResourceManager;
 import net.minecraft.tags.TagLoader;
+import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
+import net.minecraft.world.entity.ai.village.poi.PoiTypes;
+import net.minecraft.world.entity.animal.CatVariant;
+import net.minecraft.world.entity.animal.CatVariants;
+import net.minecraft.world.entity.animal.ChickenVariant;
+import net.minecraft.world.entity.animal.ChickenVariants;
+import net.minecraft.world.entity.animal.CowVariant;
+import net.minecraft.world.entity.animal.CowVariants;
+import net.minecraft.world.entity.animal.PigVariant;
+import net.minecraft.world.entity.animal.PigVariants;
+import net.minecraft.world.entity.animal.frog.FrogVariant;
+import net.minecraft.world.entity.animal.frog.FrogVariants;
+import net.minecraft.world.entity.animal.wolf.WolfSoundVariant;
+import net.minecraft.world.entity.animal.wolf.WolfSoundVariants;
+import net.minecraft.world.entity.animal.wolf.WolfVariant;
+import net.minecraft.world.entity.animal.wolf.WolfVariants;
+import net.minecraft.world.entity.decoration.PaintingVariant;
+import net.minecraft.world.entity.decoration.PaintingVariants;
 import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.world.item.Instrument;
+import net.minecraft.world.item.Instruments;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.JukeboxSong;
+import net.minecraft.world.item.JukeboxSongs;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.equipment.trim.TrimMaterial;
+import net.minecraft.world.item.equipment.trim.TrimMaterials;
+import net.minecraft.world.item.equipment.trim.TrimPattern;
+import net.minecraft.world.item.equipment.trim.TrimPatterns;
 import net.minecraft.world.level.DataPackConfig;
 import net.minecraft.world.level.WorldDataConfiguration;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BannerPattern;
+import net.minecraft.world.level.block.entity.BannerPatterns;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.validation.DirectoryValidator;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
@@ -124,100 +170,114 @@ final class Generators {
                 .add(new VersionInfoGenerator())
                 // ------------------------ Data driven registries ------------------------
                 .add(
-                        Registries.BIOME, BiomeAdapter::convert, JsonBiome.class,
-                        Path.of("biomes.json"), "BiomeKeys"
+                        Registries.BIOME, BiomeAdapter::convert, Biomes.class,
+                        Biome.class, JsonBiome.class, Path.of("biomes.json"), "BiomeKeys"
                 )
                 .add(
-                        Registries.CHAT_TYPE, ChatTypeAdapter::convert, JsonChatType.class,
-                        Path.of("chat-types.json"), "ChatTypeKeys"
+                        Registries.CHAT_TYPE, ChatTypeAdapter::convert, ChatType.class,
+                        ChatType.class, JsonChatType.class, Path.of("chat-types.json"), "ChatTypeKeys"
                 )
                 .add(
-                        Registries.TRIM_PATTERN, TrimPatternAdapter::convert, JsonTrimPattern.class,
-                        Path.of("trim-patterns.json"), "TrimPatternKeys"
+                        Registries.TRIM_PATTERN, TrimPatternAdapter::convert, TrimPatterns.class,
+                        TrimPattern.class, JsonTrimPattern.class, Path.of("trim-patterns.json"), "TrimPatternKeys"
                 )
                 .add(
-                        Registries.TRIM_MATERIAL, TrimMaterialAdapter::convert, JsonTrimMaterial.class,
-                        Path.of("trim-materials.json"), "TrimMaterialKeys"
+                        Registries.TRIM_MATERIAL, TrimMaterialAdapter::convert, TrimMaterials.class,
+                        TrimMaterial.class, JsonTrimMaterial.class, Path.of("trim-materials.json"), "TrimMaterialKeys"
                 )
                 .add(
-                        Registries.WOLF_VARIANT, WolfVariantAdapter::convert, JsonWolfVariant.class,
-                        Path.of("wolf-variants.json"), "WolfVariantKeys"
+                        Registries.WOLF_VARIANT, WolfVariantAdapter::convert, WolfVariants.class,
+                        WolfVariant.class, JsonWolfVariant.class, Path.of("wolf-variants.json"), "WolfVariantKeys"
                 )
                 .add(
-                        Registries.WOLF_SOUND_VARIANT, WolfSoundVariantAdapter::convert, JsonWolfSoundVariant.class,
-                        Path.of("wolf-sound-variants.json"), "WolfSoundVariantKeys"
+                        Registries.PIG_VARIANT, PigVariantAdapter::convert, PigVariants.class,
+                        PigVariant.class, JsonPigVariant.class, Path.of("pig-variants.json"), "PigVariantKeys"
                 )
                 .add(
-                        Registries.PIG_VARIANT, PigVariantAdapter::convert, JsonPigVariant.class,
-                        Path.of("pig-variants.json"), "PigVariantKeys"
+                        Registries.FROG_VARIANT, FrogVariantAdapter::convert, FrogVariants.class,
+                        FrogVariant.class, JsonFrogVariant.class, Path.of("frog-variants.json"), "FrogVariantKeys"
                 )
                 .add(
-                        Registries.FROG_VARIANT, FrogVariantAdapter::convert, JsonFrogVariant.class,
-                        Path.of("frog-variants.json"), "FrogVariantKeys"
+                        Registries.CAT_VARIANT, CatVariantAdapter::convert, CatVariants.class,
+                        CatVariant.class, JsonCatVariant.class, Path.of("cat-variants.json"), "CatVariantKeys"
                 )
                 .add(
-                        Registries.CAT_VARIANT, CatVariantAdapter::convert, JsonCatVariant.class,
-                        Path.of("cat-variants.json"), "CatVariantKeys"
+                        Registries.COW_VARIANT, CowVariantAdapter::convert, CowVariants.class,
+                        CowVariant.class, JsonCowVariant.class, Path.of("cow-variants.json"), "CowVariantKeys"
                 )
                 .add(
-                        Registries.COW_VARIANT, CowVariantAdapter::convert, JsonCowVariant.class,
-                        Path.of("cow-variants.json"), "CowVariantKeys"
+                        Registries.DAMAGE_TYPE, DamageTypeAdapter::convert, DamageTypes.class,
+                        DamageType.class, JsonDamageType.class, Path.of("damage-types.json"), "DamageTypeKeys"
                 )
                 .add(
-                        Registries.CHICKEN_VARIANT, ChickenVariantAdapter::convert, JsonChickenVariant.class,
-                        Path.of("chicken-variants.json"), "ChickenVariantKeys"
+                        Registries.JUKEBOX_SONG, JukeboxSongAdapter::convert, JukeboxSongs.class,
+                        JukeboxSong.class, JsonJukeboxSong.class, Path.of("jukebox-songs.json"), "JukeboxSongKeys"
                 )
                 .add(
-                        Registries.PAINTING_VARIANT, PaintingVariantAdapter::convert, JsonPaintingVariant.class,
-                        Path.of("painting-variants.json"), "PaintingVariantKeys"
+                        Registries.INSTRUMENT, InstrumentAdapter::convert, Instruments.class,
+                        Instrument.class, JsonInstrument.class, Path.of("instruments.json"), "InstrumentKeys"
                 )
                 .add(
-                        Registries.DIMENSION_TYPE, DimensionTypeAdapter::convert, JsonDimensionType.class,
-                        Path.of("dimension-types.json"), "DimensionTypeKeys"
+                        Registries.WOLF_SOUND_VARIANT, WolfSoundVariantAdapter::convert, WolfSoundVariants.class,
+                        WolfSoundVariant.class, JsonWolfSoundVariant.class, Path.of("wolf-sound-variants.json"),
+                        "WolfSoundVariantKeys"
                 )
                 .add(
-                        Registries.DAMAGE_TYPE, DamageTypeAdapter::convert, JsonDamageType.class,
-                        Path.of("damage-types.json"), "DamageTypeKeys"
+                        Registries.CHICKEN_VARIANT, ChickenVariantAdapter::convert, ChickenVariants.class,
+                        ChickenVariant.class, JsonChickenVariant.class, Path.of("chicken-variants.json"),
+                        "ChickenVariantKeys"
                 )
                 .add(
-                        Registries.BANNER_PATTERN, BannerPatternAdapter::convert, JsonBannerPattern.class,
-                        Path.of("banner-patterns.json"), "BannerPatternKeys"
+                        Registries.PAINTING_VARIANT, PaintingVariantAdapter::convert, PaintingVariants.class,
+                        PaintingVariant.class, JsonPaintingVariant.class, Path.of("painting-variants.json"),
+                        "PaintingVariantKeys"
+                )
+                .add(
+                        Registries.DIMENSION_TYPE, DimensionTypeAdapter::convert, BuiltinDimensionTypes.class,
+                        DimensionType.class, JsonDimensionType.class, Path.of("dimension-types.json"),
+                        "DimensionTypeKeys"
+                )
+                .add(
+                        Registries.BANNER_PATTERN, BannerPatternAdapter::convert, BannerPatterns.class,
+                        BannerPattern.class, JsonBannerPattern.class, Path.of("banner-patterns.json"),
+                        "BannerPatternKeys"
                 )
                 .add(
                         Registries.ENCHANTMENT, value -> EnchantmentAdapter.convert(value, registryAccess),
-                        JsonEnchantment.class, Path.of("enchantments.json"), "EnchantmentKeys"
-                )
-                .add(
-                        Registries.JUKEBOX_SONG, JukeboxSongAdapter::convert, JsonJukeboxSong.class,
-                        Path.of("jukebox-songs.json"), "JukeboxSongKeys"
-                )
-                .add(
-                        Registries.INSTRUMENT, InstrumentAdapter::convert, JsonInstrument.class,
-                        Path.of("instruments.json"), "InstrumentKeys"
+                        Enchantments.class, Enchantment.class, JsonEnchantment.class, Path.of("enchantments.json"),
+                        "EnchantmentKeys"
                 )
                 // TODO: Dialogs
                 // ------------------------ Built-in registries ------------------------
-                .add(Registries.ITEM, ItemAdapter::convert, JsonItem.class, Path.of("items.json"), "ItemKeys")
-                .add(Registries.BLOCK, BlockAdapter::convert, JsonBlock.class, Path.of("blocks.json"), "BlockKeys")
                 .add(
-                        Registries.ENTITY_TYPE, EntityTypeAdapter::convert, JsonEntityType.class,
-                        Path.of("entity-types.json"), "EntityTypeKeys"
+                        Registries.ITEM, ItemAdapter::convert, Items.class,
+                        Item.class, JsonItem.class, Path.of("items.json"), "ItemKeys"
+                )
+                .add(
+                        Registries.BLOCK, BlockAdapter::convert, Blocks.class,
+                        Block.class, JsonBlock.class, Path.of("blocks.json"), "BlockKeys"
+                )
+                .add(
+                        Registries.ENTITY_TYPE, EntityTypeAdapter::convert, EntityType.class,
+                        EntityType.class, JsonEntityType.class, Path.of("entity-types.json"), "EntityTypeKeys"
+                )
+                .add(
+                        Registries.GAME_EVENT, GameEventAdapter::convert, GameEvent.class,
+                        GameEvent.class, JsonGameEvent.class, Path.of("game-events.json"), "GameEventKeys"
+                )
+                .add(
+                        Registries.FLUID, ignored -> JsonUnit.INSTANCE, Fluids.class,
+                        Fluid.class, JsonUnit.class, Path.of("fluids.json"), "FluidKeys"
+                )
+                .add(
+                        Registries.POINT_OF_INTEREST_TYPE, ignored -> JsonUnit.INSTANCE, PoiTypes.class,
+                        PoiType.class, JsonUnit.class, Path.of("point-of-interest-types.json"),
+                        "PointOfInterestTypeKeys"
                 )
                 .add(
                         Registries.BLOCK_ENTITY_TYPE, value -> BlockEntityTypeAdapter.convert(value, registryAccess),
-                        JsonBlockEntityType.class, Path.of("block-entity-types.json"), "BlockEntityTypeKeys"
-                )
-                .add(
-                        Registries.GAME_EVENT, GameEventAdapter::convert, JsonGameEvent.class,
-                        Path.of("game-events.json"), "GameEventKeys"
-                )
-                .add(
-                        Registries.FLUID, ignored -> JsonUnit.INSTANCE,
-                        JsonUnit.class, Path.of("fluids.json"), "FluidKeys"
-                )
-                .add(
-                        Registries.POINT_OF_INTEREST_TYPE, ignored -> JsonUnit.INSTANCE,
-                        JsonUnit.class, Path.of("point-of-interest-types.json"), "PointOfInterestTypeKeys"
+                        BlockEntityType.class, BlockEntityType.class, JsonBlockEntityType.class,
+                        Path.of("block-entity-types.json"), "BlockEntityTypeKeys"
                 )
                 .add(new RegistryExtractorResourceGenerator<>(
                         BlockStateRegistryExtractor.INSTANCE,
@@ -344,6 +404,8 @@ final class Generators {
          *
          * @param registryKey resource key of a registry that the generators should use
          * @param valueConverter a function converting values from the specified registry to Jet data equivalents
+         * @param keyDefinitionClass a class containing constants associated with values of the specified registry
+         * @param unconvertedValueClass a class of the registry values
          * @param convertedValueClass a class of Jet data equivalents of the registry values
          * @param resourceFilePath a relative path that output of the registry-extractor resource generator
          *                         should be written to
@@ -355,10 +417,15 @@ final class Generators {
          */
         private <MV, CV> @NonNull GeneratorsBuilder add(@NonNull ResourceKey<Registry<MV>> registryKey,
                                                         @NonNull Function<MV, CV> valueConverter,
+                                                        @NonNull Class<?> keyDefinitionClass,
+                                                        @NonNull Class<? super MV> unconvertedValueClass,
                                                         @NonNull Class<CV> convertedValueClass,
                                                         @NonNull Path resourceFilePath, @NonNull String className) {
             return this
-                    .add(new KeyDefinitionGenerator<>(this.registryAccess.lookupOrThrow(registryKey), className))
+                    .add(new KeyDefinitionGenerator<>(
+                            this.registryAccess.lookupOrThrow(registryKey),
+                            className, unconvertedValueClass, keyDefinitionClass
+                    ))
                     .add(new RegistryExtractorResourceGenerator<>(
                             new ConverterRegistryExtractor<>(registryKey, valueConverter, convertedValueClass),
                             this.registryAccess, resourceFilePath
