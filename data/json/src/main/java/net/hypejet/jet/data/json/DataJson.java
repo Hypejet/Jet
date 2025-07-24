@@ -11,6 +11,7 @@ import net.hypejet.jet.data.json.adapters.model.event.GameEventTypeAdapterFactor
 import net.hypejet.jet.data.json.adapters.model.instrument.InstrumentTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.item.ItemTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.pattern.banner.BannerPatternTypeAdapterFactory;
+import net.hypejet.jet.data.json.adapters.model.poi.PoiTypeTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.song.JukeboxSongTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.type.chat.ChatTypeTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.trim.material.TrimMaterialTypeAdapterFactory;
@@ -61,6 +62,7 @@ public final class DataJson {
             .registerTypeAdapterFactory(BlockTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(EntityTypeTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(GameEventTypeAdapterFactory.INSTANCE)
+            .registerTypeAdapterFactory(PoiTypeTypeAdapterFactory.INSTANCE)
             .setPrettyPrinting()
             .create();
 

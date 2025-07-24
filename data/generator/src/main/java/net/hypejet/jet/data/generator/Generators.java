@@ -20,6 +20,7 @@ import net.hypejet.jet.data.generator.adpater.ItemAdapter;
 import net.hypejet.jet.data.generator.adpater.JukeboxSongAdapter;
 import net.hypejet.jet.data.generator.adpater.PaintingVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.PigVariantAdapter;
+import net.hypejet.jet.data.generator.adpater.PoiTypeAdapter;
 import net.hypejet.jet.data.generator.adpater.TrimMaterialAdapter;
 import net.hypejet.jet.data.generator.adpater.TrimPatternAdapter;
 import net.hypejet.jet.data.generator.adpater.WolfSoundVariantAdapter;
@@ -41,6 +42,7 @@ import net.hypejet.jet.data.json.model.event.JsonGameEvent;
 import net.hypejet.jet.data.json.model.instrument.JsonInstrument;
 import net.hypejet.jet.data.json.model.item.JsonItem;
 import net.hypejet.jet.data.json.model.pattern.banner.JsonBannerPattern;
+import net.hypejet.jet.data.json.model.poi.JsonPoiType;
 import net.hypejet.jet.data.json.model.song.JsonJukeboxSong;
 import net.hypejet.jet.data.json.model.type.chat.JsonChatType;
 import net.hypejet.jet.data.json.model.trim.material.JsonTrimMaterial;
@@ -209,6 +211,10 @@ final class Generators {
                 .add(
                         Registries.GAME_EVENT, GameEventAdapter::convert, JsonGameEvent.class,
                         Path.of("game-events.json"), "GameEventKeys"
+                )
+                .add(
+                        Registries.POINT_OF_INTEREST_TYPE, PoiTypeAdapter::convert, JsonPoiType.class,
+                        Path.of("point-of-interest-types.json"), "PointOfInterestTypeKeys"
                 )
                 .add(new RegistryExtractorResourceGenerator<>(
                         BlockStateRegistryExtractor.INSTANCE,
