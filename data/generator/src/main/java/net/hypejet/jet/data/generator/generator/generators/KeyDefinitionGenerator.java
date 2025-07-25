@@ -2,6 +2,7 @@ package net.hypejet.jet.data.generator.generator.generators;
 
 import com.palantir.javapoet.CodeBlock;
 import com.palantir.javapoet.FieldSpec;
+import com.palantir.javapoet.MethodSpec;
 import com.palantir.javapoet.TypeSpec;
 import net.hypejet.jet.data.generator.generator.CodeGenerator;
 import net.kyori.adventure.key.Key;
@@ -60,6 +61,9 @@ public final class KeyDefinitionGenerator<V> implements CodeGenerator {
     public @NotNull TypeSpec generate() {
         TypeSpec.Builder typeSpecBuilder = TypeSpec.classBuilder(this.className)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                .addMethod(MethodSpec.constructorBuilder()
+                        .addModifiers(Modifier.PRIVATE)
+                        .build())
                 .addJavadoc(
                         "A definition of keys of all default $S registry entries",
                         this.registry.key().location().toString()

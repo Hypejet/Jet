@@ -25,3 +25,15 @@ minecraft {
     version(libs.versions.minecraft.get())
     platform(MinecraftPlatform.SERVER)
 }
+
+tasks.named<JavaExec>("run") {
+    args(
+        createArgument("api", "api", "java"),
+        createArgument("server", "server", "java"),
+        createArgument("resources", "server", "resources"),
+    )
+}
+
+private fun createArgument(name: String, project: String, path: String): String {
+    return "--$name=" + project(":$project").layout.projectDirectory.dir("src").dir("generated").dir(path)
+}

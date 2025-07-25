@@ -3,6 +3,10 @@ plugins {
     alias(libs.plugins.checker.framework)
 }
 
+sourceSets.main {
+    java.srcDirs(layout.projectDirectory.dir("src").dir("generated").dir("java"))
+}
+
 dependencies {
     api(libs.slf4j)
     api(libs.gson)
@@ -27,6 +31,15 @@ publishing {
     }
 }
 
-tasks.jar {
-    manifest.attributes("Automatic-Module-Name" to "net.hypejet.jet.api")
+val generatorProject = project(":data:generator")
+
+tasks {
+    generatorProject.afterEvaluate {
+        classes {
+            dependsOn(generatorProject.tasks.named("run"))
+        }
+    }
+    jar {
+        manifest.attributes("Automatic-Module-Name" to "net.hypejet.jet.api")
+    }
 }

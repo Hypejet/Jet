@@ -32,6 +32,7 @@ import net.hypejet.jet.data.generator.generator.ResourceGenerator;
 import net.hypejet.jet.data.generator.generator.generators.KeyDefinitionGenerator;
 import net.hypejet.jet.data.generator.generator.generators.RegistryExtractorResourceGenerator;
 import net.hypejet.jet.data.generator.generator.generators.VersionInfoGenerator;
+import net.hypejet.jet.data.generator.util.FileUtils;
 import net.hypejet.jet.data.json.model.biome.JsonBiome;
 import net.hypejet.jet.data.json.model.block.JsonBlock;
 import net.hypejet.jet.data.json.model.block.JsonBlockEntityType;
@@ -155,10 +156,14 @@ final class Generators {
      * @param serverPath an output directory of generated Java server source files
      * @param apiPath an output directory of generated Java API source files
      * @param resourcesPath an output directory of generated resource files
-     * @throws IOException when an I/O error occurs while writing files
+     * @throws IOException if an I/O error occurs during file management
      * @since 1.0
      */
     static void run(@NotNull Path serverPath, @NotNull Path apiPath, @NotNull Path resourcesPath) throws IOException {
+        FileUtils.deleteRecursively(serverPath);
+        FileUtils.deleteRecursively(apiPath);
+        FileUtils.deleteRecursively(resourcesPath);
+
         SharedConstants.tryDetectVersion();
         Bootstrap.bootStrap();
         Bootstrap.validate();

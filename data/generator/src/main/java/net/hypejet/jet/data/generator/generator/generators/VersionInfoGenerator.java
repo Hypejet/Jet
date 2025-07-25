@@ -24,7 +24,7 @@ public final class VersionInfoGenerator implements CodeGenerator {
         return TypeSpec.classBuilder("MinecraftVersion")
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addJavadoc("A definition of constant values of a Minecraft version that the server runs on.")
-                .addMethod(MethodSpec.compactConstructorBuilder()
+                .addMethod(MethodSpec.constructorBuilder()
                         .addModifiers(Modifier.PRIVATE)
                         .build())
                 .addField(FieldSpec.builder(String.class, "VERSION_NAME")
