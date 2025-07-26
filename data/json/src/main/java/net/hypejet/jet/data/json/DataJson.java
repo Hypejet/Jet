@@ -9,6 +9,7 @@ import net.hypejet.jet.data.json.adapters.model.block.BlockTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.entity.EntityTypeTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.event.GameEventTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.item.ItemTypeAdapterFactory;
+import net.hypejet.jet.data.json.adapters.util.UtilTypeAdapterFactory;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 /**
@@ -23,7 +24,7 @@ public final class DataJson {
      * @since 1.0
      */
     public static final Gson GSON = GsonComponentSerializer.gson().populator().apply(new GsonBuilder())
-            .registerTypeAdapterFactory(DataTypeAdapterFactory.INSTANCE)
+            .registerTypeAdapterFactory(UtilTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(RegistryEntryTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(GuavaTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(AdventureTypeAdapterFactory.INSTANCE)

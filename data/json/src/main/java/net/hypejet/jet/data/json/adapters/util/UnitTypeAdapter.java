@@ -1,4 +1,4 @@
-package net.hypejet.jet.data.json.adapters;
+package net.hypejet.jet.data.json.adapters.util;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
@@ -14,13 +14,13 @@ import java.io.IOException;
  * @see JsonUnit
  * @see TypeAdapter
  */
-public final class UnitTypeAdapter extends TypeAdapter<JsonUnit> {
+final class UnitTypeAdapter extends TypeAdapter<JsonUnit> {
     /**
      * An instance of the {@linkplain UnitTypeAdapter unit type adapter}.
      *
      * @since 1.0
      */
-    public static final UnitTypeAdapter INSTANCE = new UnitTypeAdapter();
+    static final UnitTypeAdapter INSTANCE = new UnitTypeAdapter();
 
     private UnitTypeAdapter() {}
 
