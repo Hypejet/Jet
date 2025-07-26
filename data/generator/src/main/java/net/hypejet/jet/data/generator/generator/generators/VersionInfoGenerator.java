@@ -18,6 +18,15 @@ import javax.lang.model.element.Modifier;
  * @see CodeGenerator
  */
 public final class VersionInfoGenerator implements CodeGenerator {
+    /**
+     * An instance of the {@linkplain VersionInfoGenerator version info generator}.
+     *
+     * @since 1.0
+     */
+    public static final VersionInfoGenerator INSTANCE = new VersionInfoGenerator();
+
+    private VersionInfoGenerator() {}
+
     @Override
     public @NotNull TypeSpec generate() {
         WorldVersion version = SharedConstants.getCurrentVersion();

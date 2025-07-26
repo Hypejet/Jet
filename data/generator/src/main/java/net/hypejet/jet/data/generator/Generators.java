@@ -149,7 +149,7 @@ final class Generators {
         RegistryAccess registryAccess = createRegistryAccess(packRepository);
 
         Set<Generator> generators = new GeneratorsBuilder(registryAccess)
-                .add(new VersionInfoGenerator())
+                .add(VersionInfoGenerator.INSTANCE)
                 // ------------------------ Data driven registries ------------------------
                 .add(
                         Registries.BIOME, Biome.NETWORK_CODEC, Biomes.class,
