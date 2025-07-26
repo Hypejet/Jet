@@ -1,4 +1,4 @@
-package net.hypejet.jet.data.json.adapters;
+package net.hypejet.jet.data.json.adapters.adventure;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
@@ -14,13 +14,13 @@ import java.io.IOException;
  * @see Key
  * @see TypeAdapter
  */
-public final class KeyTypeAdapter extends TypeAdapter<Key> {
+final class KeyTypeAdapter extends TypeAdapter<Key> {
     /**
      * An instance of the {@linkplain KeyTypeAdapter key adapter}.
      *
      * @since 1.0
      */
-    public static final KeyTypeAdapter INSTANCE = new KeyTypeAdapter();
+    static final KeyTypeAdapter INSTANCE = new KeyTypeAdapter();
 
     private KeyTypeAdapter() {}
 

@@ -1,4 +1,4 @@
-package net.hypejet.jet.data.json.adapters;
+package net.hypejet.jet.data.json.adapters.adventure;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
@@ -14,13 +14,13 @@ import java.io.IOException;
  * @see BinaryTagHolder
  * @see TypeAdapter
  */
-public final class BinaryTagHolderTypeAdapter extends TypeAdapter<BinaryTagHolder> {
+final class BinaryTagHolderTypeAdapter extends TypeAdapter<BinaryTagHolder> {
     /**
      * An instance of the {@linkplain BinaryTagHolderTypeAdapter binary tag holder type adapter}.
      *
      * @since 1.0
      */
-    public static final BinaryTagHolderTypeAdapter INSTANCE = new BinaryTagHolderTypeAdapter();
+    static final BinaryTagHolderTypeAdapter INSTANCE = new BinaryTagHolderTypeAdapter();
 
     private BinaryTagHolderTypeAdapter() {}
 
