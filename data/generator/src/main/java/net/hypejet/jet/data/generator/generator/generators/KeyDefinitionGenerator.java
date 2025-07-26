@@ -120,6 +120,10 @@ public final class KeyDefinitionGenerator<V> implements CodeGenerator {
                     location = ((ResourceKey<?>) value).location();
                 } else if (Holder.Reference.class.isAssignableFrom(type)) {
                     location = ((Holder.Reference<?>) value).key().location();
+                } else if (Holder.class.isAssignableFrom(type)) {
+                    Holder<?> holder = (Holder<?>) value;
+                    if (holder.kind() != Holder.Kind.REFERENCE) continue;
+                    location = holder.unwrapKey().orElseThrow().location();
                 } else if (this.registryValueClass.isAssignableFrom(type)) {
                     V registryValue = this.registryValueClass.cast(value);
                     location = this.registry.getKey(registryValue);

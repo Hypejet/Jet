@@ -9,6 +9,7 @@ import net.hypejet.jet.data.json.adapters.model.block.BlockTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.entity.EntityTypeTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.event.GameEventTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.item.ItemTypeAdapterFactory;
+import net.hypejet.jet.data.json.adapters.model.sound.SoundEventTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.util.UtilTypeAdapterFactory;
 
 /**
@@ -31,6 +32,7 @@ public final class DataJson {
             .registerTypeAdapterFactory(BlockTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(EntityTypeTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(GameEventTypeAdapterFactory.INSTANCE)
+            .registerTypeAdapterFactory(SoundEventTypeAdapterFactory.INSTANCE)
             .setPrettyPrinting()
             .create();
 

@@ -7,6 +7,7 @@ import net.hypejet.jet.data.generator.adpater.BlockEntityTypeAdapter;
 import net.hypejet.jet.data.generator.adpater.EntityTypeAdapter;
 import net.hypejet.jet.data.generator.adpater.GameEventAdapter;
 import net.hypejet.jet.data.generator.adpater.ItemAdapter;
+import net.hypejet.jet.data.generator.adpater.SoundEventAdapter;
 import net.hypejet.jet.data.generator.extractor.BlockStateRegistryExtractor;
 import net.hypejet.jet.data.generator.extractor.ConverterRegistryExtractor;
 import net.hypejet.jet.data.generator.generator.CodeGenerator;
@@ -21,6 +22,7 @@ import net.hypejet.jet.data.json.model.block.JsonBlockEntityType;
 import net.hypejet.jet.data.json.model.entity.JsonEntityType;
 import net.hypejet.jet.data.json.model.event.JsonGameEvent;
 import net.hypejet.jet.data.json.model.item.JsonItem;
+import net.hypejet.jet.data.json.model.sound.JsonSoundEvent;
 import net.hypejet.jet.data.json.util.JsonUnit;
 import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import net.minecraft.SharedConstants;
@@ -44,6 +46,8 @@ import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.server.packs.repository.ServerPacksSource;
 import net.minecraft.server.packs.resources.CloseableResourceManager;
 import net.minecraft.server.packs.resources.MultiPackResourceManager;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.TagLoader;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -241,6 +245,10 @@ final class Generators {
                 .add(
                         Registries.FLUID, ignored -> JsonUnit.INSTANCE, Fluids.class,
                         Fluid.class, JsonUnit.class, Path.of("fluids.json"), "FluidKeys"
+                )
+                .add(
+                        Registries.SOUND_EVENT, SoundEventAdapter::convert, SoundEvents.class,
+                        SoundEvent.class, JsonSoundEvent.class, Path.of("sound-events.json"), "SoundEventKeys"
                 )
                 .add(
                         Registries.POINT_OF_INTEREST_TYPE, ignored -> JsonUnit.INSTANCE, PoiTypes.class,
