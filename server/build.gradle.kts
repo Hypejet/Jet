@@ -21,9 +21,6 @@ application {
     mainClass.set("net.hypejet.jet.server.JetServerEntrypoint")
 }
 
-val dataGeneratorProject = project(":data:generator")
-val dataJsonProject = project(":data:json")
-
 val generatedSourcesRoot = layout.projectDirectory.dir("src").dir("generated")
 val generatedJavaPath = generatedSourcesRoot.dir("java")
 val generatedResourcesPath = generatedSourcesRoot.dir("resources")
@@ -34,17 +31,21 @@ sourceSets.main {
 }
 
 tasks {
-    val generatedSourcesTask = register("generatedSources") {
-        inputs.files(dataGeneratorProject.sourceSets.main.get().allSource.srcDirs)
-        inputs.files(dataGeneratorProject.configurations.compileClasspath.get().resolvedConfiguration.files)
+    val generateSourcesTask = register("generateSources") {
+        val dataGeneratorProject = project(":data:generator")
+        val generatorMainSourceSet = dataGeneratorProject.sourceSets.main.get()
+
+        inputs.files(generatorMainSourceSet.allSource.srcDirs)
         inputs.files(dataGeneratorProject.configurations.runtimeClasspath.get().resolvedConfiguration.files)
 
         outputs.dir(generatedJavaPath)
         outputs.dir(generatedResourcesPath)
 
+        dependsOn(dataGeneratorProject.tasks.build)
+
         doLast {
             dataGeneratorProject.javaexec {
-                classpath = dataGeneratorProject.sourceSets.main.get().runtimeClasspath
+                classpath = generatorMainSourceSet.runtimeClasspath
                 mainClass = "net.hypejet.jet.data.generator.GeneratorMain"
                 args(
                     "--server=" + generatedJavaPath.asFile.absolutePath,
@@ -54,10 +55,10 @@ tasks {
         }
     }
     sourcesJar {
-        dependsOn(generatedSourcesTask)
+        dependsOn(generateSourcesTask)
     }
     withType<AbstractCompile> {
-        dependsOn(generatedSourcesTask)
+        dependsOn(generateSourcesTask)
     }
     withType<ShadowJar> {
         minimize {
