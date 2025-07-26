@@ -10,7 +10,6 @@ import net.hypejet.jet.data.json.adapters.model.entity.EntityTypeTypeAdapterFact
 import net.hypejet.jet.data.json.adapters.model.event.GameEventTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.item.ItemTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.util.UtilTypeAdapterFactory;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 /**
  * Represents a holder of a {@linkplain Gson gson} instance converting Jet data objects.
@@ -23,7 +22,7 @@ public final class DataJson {
      *
      * @since 1.0
      */
-    public static final Gson GSON = GsonComponentSerializer.gson().populator().apply(new GsonBuilder())
+    public static final Gson GSON = new GsonBuilder()
             .registerTypeAdapterFactory(UtilTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(RegistryEntryTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(GuavaTypeAdapterFactory.INSTANCE)

@@ -13,7 +13,6 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.guava)
     implementation(libs.adventure.serializer.nbt)
-    implementation(libs.adventure.serializer.gson)
 }
 
 minecraft {
