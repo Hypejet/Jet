@@ -1,7 +1,7 @@
 package net.hypejet.jet.data.generator.extractor;
 
 import net.hypejet.jet.data.generator.adpater.KeyAdapter;
-import net.hypejet.jet.data.json.entry.DataEntry;
+import net.hypejet.jet.data.json.entry.JsonRegistryEntry;
 import net.kyori.adventure.key.Key;
 import net.minecraft.core.RegistrationInfo;
 import net.minecraft.core.Registry;
@@ -50,9 +50,9 @@ public final class ConverterRegistryExtractor<MV, CV> implements RegistryExtract
     }
 
     @Override
-    public @NotNull List<DataEntry<CV>> extract(@NotNull RegistryAccess registryAccess) {
+    public @NotNull List<JsonRegistryEntry<CV>> extract(@NotNull RegistryAccess registryAccess) {
         Registry<MV> registry = registryAccess.lookupOrThrow(this.registryKey);
-        List<DataEntry<CV>> entries = new ArrayList<>();
+        List<JsonRegistryEntry<CV>> entries = new ArrayList<>();
 
         for (MV value : registry) {
             ResourceKey<MV> key = registry.getResourceKey(value).orElseThrow();
@@ -61,13 +61,13 @@ public final class ConverterRegistryExtractor<MV, CV> implements RegistryExtract
                     .map(tag -> KeyAdapter.convert(tag.location()))
                     .collect(Collectors.toUnmodifiableSet());
 
-            DataEntry.FeaturePack featurePack = registry.registrationInfo(key)
+            JsonRegistryEntry.FeaturePack featurePack = registry.registrationInfo(key)
                     .flatMap(RegistrationInfo::knownPackInfo)
-                    .map(pack -> new DataEntry.FeaturePack(pack.namespace(), pack.id(), pack.version()))
+                    .map(pack -> new JsonRegistryEntry.FeaturePack(pack.namespace(), pack.id(), pack.version()))
                     .orElse(null);
 
             CV convertedValue = this.converter.apply(value);
-            entries.add(new DataEntry<>(KeyAdapter.convert(key.location()), convertedValue, tags, featurePack));
+            entries.add(new JsonRegistryEntry<>(KeyAdapter.convert(key.location()), convertedValue, tags, featurePack));
         }
 
         return List.copyOf(entries);

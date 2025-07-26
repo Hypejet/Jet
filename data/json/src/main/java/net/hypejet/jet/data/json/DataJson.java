@@ -3,6 +3,7 @@ package net.hypejet.jet.data.json;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.hypejet.jet.data.json.adapters.adventure.AdventureTypeAdapterFactory;
+import net.hypejet.jet.data.json.adapters.entry.RegistryEntryTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.guava.GuavaTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.block.BlockTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.entity.EntityTypeTypeAdapterFactory;
@@ -23,6 +24,7 @@ public final class DataJson {
      */
     public static final Gson GSON = GsonComponentSerializer.gson().populator().apply(new GsonBuilder())
             .registerTypeAdapterFactory(DataTypeAdapterFactory.INSTANCE)
+            .registerTypeAdapterFactory(RegistryEntryTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(GuavaTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(AdventureTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(ItemTypeAdapterFactory.INSTANCE)

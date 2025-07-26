@@ -1,22 +1,22 @@
-package net.hypejet.jet.data.json.adapters;
+package net.hypejet.jet.data.json.adapters.entry;
 
 import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import net.hypejet.jet.data.json.entry.DataEntry;
+import net.hypejet.jet.data.json.entry.JsonRegistryEntry;
 
 import java.io.IOException;
 
 /**
- * Represents a {@linkplain TypeAdapter type adapter} of {@linkplain DataEntry.FeaturePack feature packs}.
+ * Represents a {@linkplain TypeAdapter type adapter} of {@linkplain JsonRegistryEntry.FeaturePack feature packs}.
  *
  * @since 1.0
- * @see DataEntry.FeaturePack
+ * @see JsonRegistryEntry.FeaturePack
  * @see TypeAdapter
  */
-public final class FeaturePackTypeAdapter extends TypeAdapter<DataEntry.FeaturePack> {
+final class FeaturePackTypeAdapter extends TypeAdapter<JsonRegistryEntry.FeaturePack> {
 
     private static final String NAMESPACE_FIELD = "namespace";
     private static final String VALUE_FIELD = "value";
@@ -28,12 +28,12 @@ public final class FeaturePackTypeAdapter extends TypeAdapter<DataEntry.FeatureP
      * @since 1.0
      * @see FeaturePackTypeAdapter
      */
-    public static final FeaturePackTypeAdapter INSTANCE = new FeaturePackTypeAdapter();
+    static final FeaturePackTypeAdapter INSTANCE = new FeaturePackTypeAdapter();
 
     private FeaturePackTypeAdapter() {}
 
     @Override
-    public void write(JsonWriter out, DataEntry.FeaturePack value) throws IOException {
+    public void write(JsonWriter out, JsonRegistryEntry.FeaturePack value) throws IOException {
         out.beginObject();
 
         out.name(NAMESPACE_FIELD);
@@ -49,7 +49,7 @@ public final class FeaturePackTypeAdapter extends TypeAdapter<DataEntry.FeatureP
     }
 
     @Override
-    public DataEntry.FeaturePack read(JsonReader in) throws IOException {
+    public JsonRegistryEntry.FeaturePack read(JsonReader in) throws IOException {
         in.beginObject();
 
         String namespace = null;
@@ -76,6 +76,6 @@ public final class FeaturePackTypeAdapter extends TypeAdapter<DataEntry.FeatureP
             throw new JsonParseException("The version has not been specified");
         }
 
-        return new DataEntry.FeaturePack(namespace, value, version);
+        return new JsonRegistryEntry.FeaturePack(namespace, value, version);
     }
 }

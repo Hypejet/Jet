@@ -1,7 +1,7 @@
 package net.hypejet.jet.data.generator.extractor;
 
 import net.hypejet.jet.data.generator.adpater.KeyAdapter;
-import net.hypejet.jet.data.json.entry.DataEntry;
+import net.hypejet.jet.data.json.entry.JsonRegistryEntry;
 import net.hypejet.jet.data.json.model.block.JsonBlockState;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -37,9 +37,9 @@ public final class BlockStateRegistryExtractor implements RegistryExtractor<Json
     private BlockStateRegistryExtractor() {}
 
     @Override
-    public @NotNull List<DataEntry<JsonBlockState>> extract(@NotNull RegistryAccess registryAccess) {
+    public @NotNull List<JsonRegistryEntry<JsonBlockState>> extract(@NotNull RegistryAccess registryAccess) {
         Registry<Block> blockRegistry = registryAccess.lookupOrThrow(Registries.BLOCK);
-        List<DataEntry<JsonBlockState>> entries = new ArrayList<>();
+        List<JsonRegistryEntry<JsonBlockState>> entries = new ArrayList<>();
 
         for (BlockState blockState : Block.BLOCK_STATE_REGISTRY) {
             ResourceLocation location = blockRegistry.getKey(blockState.getBlock());
@@ -54,7 +54,7 @@ public final class BlockStateRegistryExtractor implements RegistryExtractor<Json
             for (Map.Entry<Property<?>, Comparable<?>> entry : blockState.getValues().entrySet())
                 properties.put(entry.getKey().getName(), entry.getValue().toString());
 
-            entries.add(new DataEntry<>(
+            entries.add(new JsonRegistryEntry<>(
                     KeyAdapter.convert(location),
                     new JsonBlockState(
                             properties,

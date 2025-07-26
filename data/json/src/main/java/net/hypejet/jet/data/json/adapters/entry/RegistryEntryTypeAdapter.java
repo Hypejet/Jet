@@ -1,4 +1,4 @@
-package net.hypejet.jet.data.json.adapters;
+package net.hypejet.jet.data.json.adapters.entry;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
@@ -6,7 +6,7 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import net.hypejet.jet.data.json.entry.DataEntry;
+import net.hypejet.jet.data.json.entry.JsonRegistryEntry;
 import net.hypejet.jet.data.json.util.JsonUtil;
 import net.kyori.adventure.key.Key;
 import org.jspecify.annotations.NonNull;
@@ -17,14 +17,14 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Represents a {@linkplain TypeAdapter type adapter} of {@linkplain DataEntry data entries}.
+ * Represents a {@linkplain TypeAdapter type adapter} of {@linkplain JsonRegistryEntry registry entries}.
  *
- * @param <V> a type of value of the data entries that the type adapter converts
+ * @param <V> a type of value of the registry entries that the type adapter converts
  * @since 1.0
- * @see DataEntry
+ * @see JsonRegistryEntry
  * @see TypeAdapter
  */
-public final class DataEntryTypeAdapter<V> extends TypeAdapter<DataEntry<V>> {
+final class RegistryEntryTypeAdapter<V> extends TypeAdapter<JsonRegistryEntry<V>> {
 
     private static final String KEY_FIELD = "key";
     private static final String VALUE_FIELD = "value";
@@ -35,19 +35,19 @@ public final class DataEntryTypeAdapter<V> extends TypeAdapter<DataEntry<V>> {
     private final Class<V> valueClass;
 
     /**
-     * Constructs the {@linkplain DataEntryTypeAdapter data entry type adapter}.
+     * Constructs the {@linkplain RegistryEntryTypeAdapter registry entry type adapter}.
      *
      * @param gson a gson object to convert other objects with
-     * @param valueClass a class of values of the data entries that the type adapter should convert
+     * @param valueClass a class of values of the registry entries that the type adapter should convert
      * @since 1.0
      */
-    public DataEntryTypeAdapter(@NonNull Gson gson, @NonNull Class<V> valueClass) {
+    RegistryEntryTypeAdapter(@NonNull Gson gson, @NonNull Class<V> valueClass) {
         this.gson = Objects.requireNonNull(gson, "gson");
         this.valueClass = Objects.requireNonNull(valueClass, "value class");
     }
 
     @Override
-    public void write(JsonWriter out, DataEntry<V> value) throws IOException {
+    public void write(JsonWriter out, JsonRegistryEntry<V> value) throws IOException {
         out.beginObject();
 
         out.name(KEY_FIELD);
@@ -62,21 +62,21 @@ public final class DataEntryTypeAdapter<V> extends TypeAdapter<DataEntry<V>> {
             JsonUtil.writeCollection(out, this.gson, Key.class, tags);
         }
 
-        DataEntry.FeaturePack knownPack = value.knownPack();
+        JsonRegistryEntry.FeaturePack knownPack = value.knownPack();
         if (knownPack != null) {
             out.name(KNOWN_PACK_FIELD);
-            this.gson.toJson(knownPack, DataEntry.FeaturePack.class, out);
+            this.gson.toJson(knownPack, JsonRegistryEntry.FeaturePack.class, out);
         }
 
         out.endObject();
     }
 
     @Override
-    public DataEntry<V> read(JsonReader in) throws IOException {
+    public JsonRegistryEntry<V> read(JsonReader in) throws IOException {
         Key key = null;
         V value = null;
         Set<Key> tags = new HashSet<>();
-        DataEntry.FeaturePack knownPack = null;
+        JsonRegistryEntry.FeaturePack knownPack = null;
 
         in.beginObject();
         while (in.peek() == JsonToken.NAME) {
@@ -85,7 +85,7 @@ public final class DataEntryTypeAdapter<V> extends TypeAdapter<DataEntry<V>> {
                 case KEY_FIELD -> key = this.gson.fromJson(in, Key.class);
                 case VALUE_FIELD -> value = this.gson.fromJson(in, this.valueClass);
                 case TAGS_FIELD -> JsonUtil.readCollection(in, this.gson, Key.class, tags);
-                case KNOWN_PACK_FIELD -> knownPack = this.gson.fromJson(in, DataEntry.FeaturePack.class);
+                case KNOWN_PACK_FIELD -> knownPack = this.gson.fromJson(in, JsonRegistryEntry.FeaturePack.class);
                 default -> throw new JsonParseException("Unknown field: " + name);
             }
         }
@@ -97,6 +97,6 @@ public final class DataEntryTypeAdapter<V> extends TypeAdapter<DataEntry<V>> {
             throw new JsonParseException("The value field has not been specified");
         }
 
-        return new DataEntry<>(key, value, tags, knownPack);
+        return new JsonRegistryEntry<>(key, value, tags, knownPack);
     }
 }

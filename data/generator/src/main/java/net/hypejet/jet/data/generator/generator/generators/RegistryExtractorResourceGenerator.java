@@ -4,7 +4,7 @@ import com.google.gson.reflect.TypeToken;
 import net.hypejet.jet.data.generator.extractor.RegistryExtractor;
 import net.hypejet.jet.data.generator.generator.ResourceGenerator;
 import net.hypejet.jet.data.json.DataJson;
-import net.hypejet.jet.data.json.entry.DataEntry;
+import net.hypejet.jet.data.json.entry.JsonRegistryEntry;
 import net.minecraft.core.RegistryAccess;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,7 +16,7 @@ import java.util.Objects;
  * Represents a {@linkplain ResourceGenerator resource generator} which generates an JSON-serialized output containing
  * data extracted from a {@linkplain RegistryExtractor registry extractor}.
  *
- * @param <T> a type of values of data entries extracted by the registry extractor
+ * @param <T> a type of values of registry entries extracted by the registry extractor
  * @since 1.0
  * @see RegistryExtractor
  * @see ResourceGenerator
@@ -45,7 +45,7 @@ public final class RegistryExtractorResourceGenerator<T> implements ResourceGene
     @Override
     public @NotNull String generate() {
         Class<T> valueClass = this.registryExtractor.valueClass();
-        TypeToken<?> dataEntryToken = TypeToken.getParameterized(DataEntry.class, valueClass);
+        TypeToken<?> dataEntryToken = TypeToken.getParameterized(JsonRegistryEntry.class, valueClass);
         TypeToken<?> dataEntryListToken = TypeToken.getParameterized(List.class, dataEntryToken.getType());
         return DataJson.GSON.toJson(this.registryExtractor.extract(this.registryAccess), dataEntryListToken.getType());
     }
