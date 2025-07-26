@@ -3,10 +3,6 @@ plugins {
     alias(libs.plugins.checker.framework)
 }
 
-sourceSets.main {
-    java.srcDirs(layout.projectDirectory.dir("src").dir("generated").dir("java"))
-}
-
 dependencies {
     api(libs.slf4j)
     api(libs.gson)
@@ -31,15 +27,33 @@ publishing {
     }
 }
 
-val generatorProject = project(":data:generator")
+val dataGeneratorProject = project(":data:generator")
+val dataJsonProject = project(":data:json")
+val generatedJavaPath = layout.projectDirectory.dir("src").dir("generated").dir("java")
+
+sourceSets.main {
+    java.srcDirs(generatedJavaPath)
+}
 
 tasks {
-    generatorProject.afterEvaluate {
-        classes {
-            dependsOn(generatorProject.tasks.named("run"))
-        }
+    val generatedSourcesTask = register("generatedSources") {
+        projectInput(dataGeneratorProject, inputs)
+        projectInput(dataJsonProject, inputs)
+        outputs.dir(generatedJavaPath)
+        doLast { dataGeneratorProject.tasks.named<JavaExec>("run").get().exec() }
+    }
+    withType<AbstractCompile> {
+        dependsOn(generatedSourcesTask)
+    }
+    sourcesJar {
+        dependsOn(generatedSourcesTask)
     }
     jar {
         manifest.attributes("Automatic-Module-Name" to "net.hypejet.jet.api")
     }
+}
+
+private fun projectInput(project: Project, inputs: TaskInputs) {
+    inputs.files(project.sourceSets.main.get().allSource.srcDirs)
+    inputs.files(project.configurations.compileClasspath.get().resolvedConfiguration.files)
 }

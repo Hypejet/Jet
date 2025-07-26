@@ -6,12 +6,6 @@ plugins {
     alias(libs.plugins.checker.framework)
 }
 
-sourceSets.main {
-    val generatedDir = layout.projectDirectory.dir("src").dir("generated")
-    java.srcDirs(generatedDir.dir("java"))
-    resources.srcDirs(generatedDir.dir("resources"))
-}
-
 dependencies {
     implementation(project(":api"))
     implementation(project(":data:json"))
@@ -27,13 +21,31 @@ application {
     mainClass.set("net.hypejet.jet.server.JetServerEntrypoint")
 }
 
-val generatorProject = project(":data:generator")
+val dataGeneratorProject = project(":data:generator")
+val dataJsonProject = project(":data:json")
+
+val generatedSourcesRoot = layout.projectDirectory.dir("src").dir("generated")
+val generatedJavaPath = generatedSourcesRoot.dir("java")
+val generatedResourcesPath = generatedSourcesRoot.dir("resources")
+
+sourceSets.main {
+    java.srcDirs(generatedJavaPath)
+    resources.srcDirs(generatedResourcesPath)
+}
 
 tasks {
-    generatorProject.afterEvaluate {
-        classes {
-            dependsOn(generatorProject.tasks.named("run"))
-        }
+    val generatedSourcesTask = register("generatedSources") {
+        projectInput(dataGeneratorProject, inputs)
+        projectInput(dataJsonProject, inputs)
+        outputs.dir(generatedJavaPath)
+        outputs.dir(generatedResourcesPath)
+        doLast { dataGeneratorProject.tasks.named<JavaExec>("run").get().exec() }
+    }
+    sourcesJar {
+        dependsOn(generatedSourcesTask)
+    }
+    withType<AbstractCompile> {
+        dependsOn(generatedSourcesTask)
     }
     withType<ShadowJar> {
         minimize {
@@ -41,4 +53,9 @@ tasks {
             exclude(dependency(libs.logback.get())) // Minimizing logback causes problems with finding an SLF4J provider
         }
     }
+}
+
+private fun projectInput(project: Project, inputs: TaskInputs) {
+    inputs.files(project.sourceSets.main.get().allSource.srcDirs)
+    inputs.files(project.configurations.compileClasspath.get().resolvedConfiguration.files)
 }
