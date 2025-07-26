@@ -3,14 +3,14 @@ package net.hypejet.jet.data.json.adapters.model.item;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import net.hypejet.jet.data.json.model.item.JsonItem;
-import net.hypejet.jet.data.json.util.JsonUtil;
+import net.hypejet.jet.data.json.token.DataJsonTypes;
 import net.kyori.adventure.key.Key;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -37,13 +37,16 @@ final class ItemTypeAdapter extends TypeAdapter<JsonItem> {
 
     @Override
     public void write(JsonWriter out, JsonItem value) throws IOException {
-        JsonUtil.writeCollection(out, this.gson, Key.class, value.requiredFeatureFlags());
+        Set<Key> requiredFeatureFlags = value.requiredFeatureFlags();
+        if (requiredFeatureFlags.isEmpty()) {
+            out.nullValue();
+        } else {
+            this.gson.toJson(value.requiredFeatureFlags(), DataJsonTypes.KEY_SET, out);
+        }
     }
 
     @Override
     public JsonItem read(JsonReader in) throws IOException {
-        Set<Key> requiredFeatureFlags = new HashSet<>();
-        JsonUtil.readCollection(in, this.gson, Key.class, requiredFeatureFlags);
-        return new JsonItem(requiredFeatureFlags);
+        return new JsonItem(in.peek() == JsonToken.NULL ? Set.of() : this.gson.fromJson(in, DataJsonTypes.KEY_SET));
     }
 }

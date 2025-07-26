@@ -7,7 +7,6 @@ import com.palantir.javapoet.TypeSpec;
 import net.hypejet.jet.data.generator.generator.CodeGenerator;
 import net.minecraft.SharedConstants;
 import net.minecraft.WorldVersion;
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
 import javax.lang.model.element.Modifier;
@@ -29,7 +28,7 @@ public final class VersionInfoGenerator implements CodeGenerator {
     private VersionInfoGenerator() {}
 
     @Override
-    public @NotNull TypeSpec generate() {
+    public @NonNull TypeSpec generate() {
         WorldVersion version = SharedConstants.getCurrentVersion();
         return TypeSpec.classBuilder("MinecraftVersion")
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
@@ -56,7 +55,7 @@ public final class VersionInfoGenerator implements CodeGenerator {
     }
 
     @Override
-    public @NotNull Destination destination() {
+    public @NonNull Destination destination() {
         return Destination.SERVER;
     }
 

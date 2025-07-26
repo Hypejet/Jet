@@ -3,7 +3,7 @@ package net.hypejet.jet.data.generator.extractor;
 import net.hypejet.jet.data.json.entry.JsonRegistryEntry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public interface RegistryExtractor<T> {
      * @return registry entries of the extracted and converted data, as a list with preserved order
      * @since 1.0
      */
-    @NotNull List<JsonRegistryEntry<T>> extract(@NotNull RegistryAccess registryAccess);
+    @NonNull List<JsonRegistryEntry<T>> extract(@NonNull RegistryAccess registryAccess);
 
     /**
      * Gets a {@linkplain Class class} of the Jet equivalent of the registry data.
@@ -30,5 +30,5 @@ public interface RegistryExtractor<T> {
      * @return the class
      * @since 1.0
      */
-    @NotNull Class<T> valueClass();
+    @NonNull Class<T> valueClass();
 }

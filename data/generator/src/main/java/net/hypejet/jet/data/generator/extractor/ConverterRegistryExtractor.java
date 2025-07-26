@@ -7,7 +7,6 @@ import net.minecraft.core.RegistrationInfo;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
@@ -50,7 +49,7 @@ public final class ConverterRegistryExtractor<MV, CV> implements RegistryExtract
     }
 
     @Override
-    public @NotNull List<JsonRegistryEntry<CV>> extract(@NotNull RegistryAccess registryAccess) {
+    public @NonNull List<JsonRegistryEntry<CV>> extract(@NonNull RegistryAccess registryAccess) {
         Registry<MV> registry = registryAccess.lookupOrThrow(this.registryKey);
         List<JsonRegistryEntry<CV>> entries = new ArrayList<>();
 
@@ -74,7 +73,7 @@ public final class ConverterRegistryExtractor<MV, CV> implements RegistryExtract
     }
 
     @Override
-    public @NotNull Class<CV> valueClass() {
+    public @NonNull Class<CV> valueClass() {
         return this.convertedValueClass;
     }
 }

@@ -10,7 +10,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,8 +48,8 @@ public final class KeyDefinitionGenerator<V> implements CodeGenerator {
      * @param keyDefinitionClass a class containing constants associated with values of the specified registry
      * @since 1.0
      */
-    public KeyDefinitionGenerator(@NotNull Registry<V> registry, @NotNull String className,
-                                  @NotNull Class<V> registryValueClass, @NonNull Class<?> keyDefinitionClass) {
+    public KeyDefinitionGenerator(@NonNull Registry<V> registry, @NonNull String className,
+                                  @NonNull Class<V> registryValueClass, @NonNull Class<?> keyDefinitionClass) {
         this.registry = Objects.requireNonNull(registry, "registry");
         this.className = Objects.requireNonNull(className, "class name");
         this.registryValueClass = Objects.requireNonNull(registryValueClass, "registry value class");
@@ -58,7 +57,7 @@ public final class KeyDefinitionGenerator<V> implements CodeGenerator {
     }
 
     @Override
-    public @NotNull TypeSpec generate() {
+    public @NonNull TypeSpec generate() {
         TypeSpec.Builder typeSpecBuilder = TypeSpec.classBuilder(this.className)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addMethod(MethodSpec.constructorBuilder()
@@ -89,7 +88,7 @@ public final class KeyDefinitionGenerator<V> implements CodeGenerator {
     }
 
     @Override
-    public @NotNull Destination destination() {
+    public @NonNull Destination destination() {
         return Destination.API;
     }
 
@@ -98,7 +97,7 @@ public final class KeyDefinitionGenerator<V> implements CodeGenerator {
         return "net.hypejet.jet.registry.keys";
     }
 
-    private @NotNull Map<ResourceLocation, String> createFieldNames() {
+    private @NonNull Map<ResourceLocation, String> createFieldNames() {
         Map<ResourceLocation, String> fieldNames = new HashMap<>();
 
         for (Field field : this.keyDefinitionClass.getDeclaredFields()) {
@@ -149,7 +148,7 @@ public final class KeyDefinitionGenerator<V> implements CodeGenerator {
         return fieldNames;
     }
 
-    private static @NotNull String createConstantName(@NotNull ResourceLocation location) {
+    private static @NonNull String createConstantName(@NonNull ResourceLocation location) {
         String locationPathString = location.getPath();
         StringBuilder constantNameBuilder = new StringBuilder();
 

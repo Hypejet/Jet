@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +37,7 @@ public final class BlockStateRegistryExtractor implements RegistryExtractor<Json
     private BlockStateRegistryExtractor() {}
 
     @Override
-    public @NotNull List<JsonRegistryEntry<JsonBlockState>> extract(@NotNull RegistryAccess registryAccess) {
+    public @NonNull List<JsonRegistryEntry<JsonBlockState>> extract(@NonNull RegistryAccess registryAccess) {
         Registry<Block> blockRegistry = registryAccess.lookupOrThrow(Registries.BLOCK);
         List<JsonRegistryEntry<JsonBlockState>> entries = new ArrayList<>();
 
@@ -71,7 +71,7 @@ public final class BlockStateRegistryExtractor implements RegistryExtractor<Json
     }
 
     @Override
-    public @NotNull Class<JsonBlockState> valueClass() {
+    public @NonNull Class<JsonBlockState> valueClass() {
         return JsonBlockState.class;
     }
 }

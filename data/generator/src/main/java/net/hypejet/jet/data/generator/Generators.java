@@ -98,7 +98,6 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.validation.DirectoryValidator;
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -306,7 +305,7 @@ final class Generators {
      * @return the pack repository
      * @since 1.0
      */
-    private static @NotNull PackRepository createPackRepository() {
+    private static @NonNull PackRepository createPackRepository() {
         RepositorySource repositorySource = new ServerPacksSource(new DirectoryValidator(path -> false));
         PackRepository packRepository = new PackRepository(repositorySource);
 
@@ -327,7 +326,7 @@ final class Generators {
      * @return the registry access
      * @since 1.0
      */
-    private static @NotNull RegistryAccess createRegistryAccess(@NotNull PackRepository packRepository) {
+    private static @NonNull RegistryAccess createRegistryAccess(@NonNull PackRepository packRepository) {
         LayeredRegistryAccess<RegistryLayer> access = RegistryLayer.createRegistryAccess();
         List<PackResources> packResources = packRepository.openAllSelected();
 

@@ -1,6 +1,6 @@
 package net.hypejet.jet.data.generator;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -53,7 +53,7 @@ public final class GeneratorMain {
      * @return an exit code of the execution
      * @since 1.0
      */
-    private static int run(CommandLine.@NotNull ParseResult parseResult) {
+    private static int run(CommandLine.@NonNull ParseResult parseResult) {
         Integer helpExitCode = CommandLine.executeHelpRequest(parseResult);
         if (helpExitCode != null) return helpExitCode;
 
