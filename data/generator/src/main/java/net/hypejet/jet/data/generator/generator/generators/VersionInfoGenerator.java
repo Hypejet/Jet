@@ -8,6 +8,7 @@ import net.hypejet.jet.data.generator.generator.CodeGenerator;
 import net.minecraft.SharedConstants;
 import net.minecraft.WorldVersion;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import javax.lang.model.element.Modifier;
 
@@ -57,5 +58,10 @@ public final class VersionInfoGenerator implements CodeGenerator {
     @Override
     public @NotNull Destination destination() {
         return Destination.SERVER;
+    }
+
+    @Override
+    public @NonNull String packageName() {
+        return "net.hypejet.jet.server";
     }
 }

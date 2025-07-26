@@ -93,6 +93,11 @@ public final class KeyDefinitionGenerator<V> implements CodeGenerator {
         return Destination.API;
     }
 
+    @Override
+    public @NonNull String packageName() {
+        return "net.hypejet.jet.registry.keys";
+    }
+
     private @NotNull Map<ResourceLocation, String> createFieldNames() {
         Map<ResourceLocation, String> fieldNames = new HashMap<>();
 

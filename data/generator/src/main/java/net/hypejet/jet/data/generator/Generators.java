@@ -115,9 +115,6 @@ import java.util.function.Function;
  */
 final class Generators {
 
-    private static final String API_PACKAGE_NAME = "net.hypejet.jet.data.api";
-    private static final String SERVER_PACKAGE_NAME = "net.hypejet.jet.data.server";
-
     private Generators() {}
 
     /**
@@ -265,24 +262,14 @@ final class Generators {
         for (Generator generator : generators) {
             switch (generator) {
                 case CodeGenerator codeGenerator -> {
-                    Path parentPath;
-                    String packageName;
+                    Path parentPath = switch (codeGenerator.destination()) {
+                        case API -> apiPath;
+                        case SERVER -> serverPath;
+                    };
 
-                    switch (codeGenerator.destination()) {
-                        case API -> {
-                            if (apiPath == null) continue;
-                            packageName = API_PACKAGE_NAME;
-                            parentPath = apiPath;
-                        }
-                        case SERVER -> {
-                            if (serverPath == null) continue;
-                            packageName = SERVER_PACKAGE_NAME;
-                            parentPath = serverPath;
-                        }
-                        default -> throw new IllegalStateException("Unknown destination");
-                    }
+                    if (parentPath == null) continue;
 
-                    JavaFile.builder(packageName, codeGenerator.generate())
+                    JavaFile.builder(codeGenerator.packageName(), codeGenerator.generate())
                             .indent("    ") // 4 spaces
                             .skipJavaLangImports(true)
                             .build()
