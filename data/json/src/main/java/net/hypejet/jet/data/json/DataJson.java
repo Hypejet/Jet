@@ -3,27 +3,10 @@ package net.hypejet.jet.data.json;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.hypejet.jet.data.json.adapters.guava.GuavaTypeAdapterFactory;
-import net.hypejet.jet.data.json.adapters.model.biome.BiomeTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.block.BlockTypeAdapterFactory;
-import net.hypejet.jet.data.json.adapters.model.enchantment.EnchantmentTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.entity.EntityTypeTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.event.GameEventTypeAdapterFactory;
-import net.hypejet.jet.data.json.adapters.model.instrument.InstrumentTypeAdapterFactory;
 import net.hypejet.jet.data.json.adapters.model.item.ItemTypeAdapterFactory;
-import net.hypejet.jet.data.json.adapters.model.pattern.banner.BannerPatternTypeAdapterFactory;
-import net.hypejet.jet.data.json.adapters.model.song.JukeboxSongTypeAdapterFactory;
-import net.hypejet.jet.data.json.adapters.model.type.chat.ChatTypeTypeAdapterFactory;
-import net.hypejet.jet.data.json.adapters.model.trim.material.TrimMaterialTypeAdapterFactory;
-import net.hypejet.jet.data.json.adapters.model.trim.pattern.TrimPatternTypeAdapterFactory;
-import net.hypejet.jet.data.json.adapters.model.type.damage.DamageTypeTypeAdapterFactory;
-import net.hypejet.jet.data.json.adapters.model.type.dimension.DimensionTypeTypeAdapterFactory;
-import net.hypejet.jet.data.json.adapters.model.variant.cat.CatVariantTypeAdapterFactory;
-import net.hypejet.jet.data.json.adapters.model.variant.chicken.ChickenVariantTypeAdapterFactory;
-import net.hypejet.jet.data.json.adapters.model.variant.cow.CowVariantTypeAdapterFactory;
-import net.hypejet.jet.data.json.adapters.model.variant.frog.FrogVariantTypeAdapterFactory;
-import net.hypejet.jet.data.json.adapters.model.variant.painting.PaintingVariantTypeAdapterFactory;
-import net.hypejet.jet.data.json.adapters.model.variant.pig.PigVariantTypeAdapterFactory;
-import net.hypejet.jet.data.json.adapters.model.variant.wolf.WolfVariantTypeAdapterFactory;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 /**
@@ -40,24 +23,7 @@ public final class DataJson {
     public static final Gson GSON = GsonComponentSerializer.gson().populator().apply(new GsonBuilder())
             .registerTypeAdapterFactory(DataTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(GuavaTypeAdapterFactory.INSTANCE)
-            .registerTypeAdapterFactory(BiomeTypeAdapterFactory.INSTANCE)
-            .registerTypeAdapterFactory(ChatTypeTypeAdapterFactory.INSTANCE)
-            .registerTypeAdapterFactory(TrimMaterialTypeAdapterFactory.INSTANCE)
-            .registerTypeAdapterFactory(TrimPatternTypeAdapterFactory.INSTANCE)
-            .registerTypeAdapterFactory(WolfVariantTypeAdapterFactory.INSTANCE)
-            .registerTypeAdapterFactory(PigVariantTypeAdapterFactory.INSTANCE)
-            .registerTypeAdapterFactory(FrogVariantTypeAdapterFactory.INSTANCE)
-            .registerTypeAdapterFactory(CatVariantTypeAdapterFactory.INSTANCE)
-            .registerTypeAdapterFactory(CowVariantTypeAdapterFactory.INSTANCE)
-            .registerTypeAdapterFactory(ChickenVariantTypeAdapterFactory.INSTANCE)
-            .registerTypeAdapterFactory(PaintingVariantTypeAdapterFactory.INSTANCE)
-            .registerTypeAdapterFactory(DimensionTypeTypeAdapterFactory.INSTANCE)
-            .registerTypeAdapterFactory(DamageTypeTypeAdapterFactory.INSTANCE)
-            .registerTypeAdapterFactory(BannerPatternTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(ItemTypeAdapterFactory.INSTANCE)
-            .registerTypeAdapterFactory(EnchantmentTypeAdapterFactory.INSTANCE)
-            .registerTypeAdapterFactory(JukeboxSongTypeAdapterFactory.INSTANCE)
-            .registerTypeAdapterFactory(InstrumentTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(BlockTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(EntityTypeTypeAdapterFactory.INSTANCE)
             .registerTypeAdapterFactory(GameEventTypeAdapterFactory.INSTANCE)

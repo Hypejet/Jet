@@ -1,29 +1,12 @@
 package net.hypejet.jet.data.generator;
 
+import com.mojang.serialization.Codec;
 import com.palantir.javapoet.JavaFile;
-import net.hypejet.jet.data.generator.adpater.BannerPatternAdapter;
-import net.hypejet.jet.data.generator.adpater.BiomeAdapter;
 import net.hypejet.jet.data.generator.adpater.BlockAdapter;
 import net.hypejet.jet.data.generator.adpater.BlockEntityTypeAdapter;
-import net.hypejet.jet.data.generator.adpater.CatVariantAdapter;
-import net.hypejet.jet.data.generator.adpater.ChatTypeAdapter;
-import net.hypejet.jet.data.generator.adpater.ChickenVariantAdapter;
-import net.hypejet.jet.data.generator.adpater.CowVariantAdapter;
-import net.hypejet.jet.data.generator.adpater.DamageTypeAdapter;
-import net.hypejet.jet.data.generator.adpater.DimensionTypeAdapter;
-import net.hypejet.jet.data.generator.adpater.EnchantmentAdapter;
 import net.hypejet.jet.data.generator.adpater.EntityTypeAdapter;
-import net.hypejet.jet.data.generator.adpater.FrogVariantAdapter;
 import net.hypejet.jet.data.generator.adpater.GameEventAdapter;
-import net.hypejet.jet.data.generator.adpater.InstrumentAdapter;
 import net.hypejet.jet.data.generator.adpater.ItemAdapter;
-import net.hypejet.jet.data.generator.adpater.JukeboxSongAdapter;
-import net.hypejet.jet.data.generator.adpater.PaintingVariantAdapter;
-import net.hypejet.jet.data.generator.adpater.PigVariantAdapter;
-import net.hypejet.jet.data.generator.adpater.TrimMaterialAdapter;
-import net.hypejet.jet.data.generator.adpater.TrimPatternAdapter;
-import net.hypejet.jet.data.generator.adpater.WolfSoundVariantAdapter;
-import net.hypejet.jet.data.generator.adpater.WolfVariantAdapter;
 import net.hypejet.jet.data.generator.extractor.BlockStateRegistryExtractor;
 import net.hypejet.jet.data.generator.extractor.ConverterRegistryExtractor;
 import net.hypejet.jet.data.generator.generator.CodeGenerator;
@@ -33,37 +16,23 @@ import net.hypejet.jet.data.generator.generator.generators.KeyDefinitionGenerato
 import net.hypejet.jet.data.generator.generator.generators.RegistryExtractorResourceGenerator;
 import net.hypejet.jet.data.generator.generator.generators.VersionInfoGenerator;
 import net.hypejet.jet.data.generator.util.FileUtils;
-import net.hypejet.jet.data.json.model.biome.JsonBiome;
 import net.hypejet.jet.data.json.model.block.JsonBlock;
 import net.hypejet.jet.data.json.model.block.JsonBlockEntityType;
-import net.hypejet.jet.data.json.model.enchantment.JsonEnchantment;
 import net.hypejet.jet.data.json.model.entity.JsonEntityType;
 import net.hypejet.jet.data.json.model.event.JsonGameEvent;
-import net.hypejet.jet.data.json.model.instrument.JsonInstrument;
 import net.hypejet.jet.data.json.model.item.JsonItem;
-import net.hypejet.jet.data.json.model.pattern.banner.JsonBannerPattern;
-import net.hypejet.jet.data.json.model.song.JsonJukeboxSong;
-import net.hypejet.jet.data.json.model.type.chat.JsonChatType;
-import net.hypejet.jet.data.json.model.trim.material.JsonTrimMaterial;
-import net.hypejet.jet.data.json.model.trim.pattern.JsonTrimPattern;
-import net.hypejet.jet.data.json.model.type.damage.JsonDamageType;
-import net.hypejet.jet.data.json.model.type.dimension.JsonDimensionType;
-import net.hypejet.jet.data.json.model.variant.cat.JsonCatVariant;
-import net.hypejet.jet.data.json.model.variant.chicken.JsonChickenVariant;
-import net.hypejet.jet.data.json.model.variant.cow.JsonCowVariant;
-import net.hypejet.jet.data.json.model.variant.frog.JsonFrogVariant;
-import net.hypejet.jet.data.json.model.variant.painting.JsonPaintingVariant;
-import net.hypejet.jet.data.json.model.variant.pig.JsonPigVariant;
-import net.hypejet.jet.data.json.model.variant.wolf.JsonWolfSoundVariant;
-import net.hypejet.jet.data.json.model.variant.wolf.JsonWolfVariant;
 import net.hypejet.jet.data.json.util.JsonUnit;
+import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.resources.RegistryDataLoader;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.Bootstrap;
 import net.minecraft.server.MinecraftServer;
@@ -183,82 +152,76 @@ final class Generators {
                 .add(new VersionInfoGenerator())
                 // ------------------------ Data driven registries ------------------------
                 .add(
-                        Registries.BIOME, BiomeAdapter::convert, Biomes.class,
-                        Biome.class, JsonBiome.class, Path.of("biomes.json"), "BiomeKeys"
+                        Registries.BIOME, Biome.NETWORK_CODEC, Biomes.class,
+                        Biome.class, Path.of("biomes.json"), "BiomeKeys"
                 )
                 .add(
-                        Registries.CHAT_TYPE, ChatTypeAdapter::convert, ChatType.class,
-                        ChatType.class, JsonChatType.class, Path.of("chat-types.json"), "ChatTypeKeys"
+                        Registries.CHAT_TYPE, ChatType.DIRECT_CODEC, ChatType.class,
+                        ChatType.class, Path.of("chat-types.json"), "ChatTypeKeys"
                 )
                 .add(
-                        Registries.TRIM_PATTERN, TrimPatternAdapter::convert, TrimPatterns.class,
-                        TrimPattern.class, JsonTrimPattern.class, Path.of("trim-patterns.json"), "TrimPatternKeys"
+                        Registries.TRIM_PATTERN, TrimPattern.DIRECT_CODEC, TrimPatterns.class,
+                        TrimPattern.class, Path.of("trim-patterns.json"), "TrimPatternKeys"
                 )
                 .add(
-                        Registries.TRIM_MATERIAL, TrimMaterialAdapter::convert, TrimMaterials.class,
-                        TrimMaterial.class, JsonTrimMaterial.class, Path.of("trim-materials.json"), "TrimMaterialKeys"
+                        Registries.TRIM_MATERIAL, TrimMaterial.DIRECT_CODEC, TrimMaterials.class,
+                        TrimMaterial.class, Path.of("trim-materials.json"), "TrimMaterialKeys"
                 )
                 .add(
-                        Registries.WOLF_VARIANT, WolfVariantAdapter::convert, WolfVariants.class,
-                        WolfVariant.class, JsonWolfVariant.class, Path.of("wolf-variants.json"), "WolfVariantKeys"
+                        Registries.WOLF_VARIANT, WolfVariant.NETWORK_CODEC, WolfVariants.class,
+                        WolfVariant.class, Path.of("wolf-variants.json"), "WolfVariantKeys"
                 )
                 .add(
-                        Registries.PIG_VARIANT, PigVariantAdapter::convert, PigVariants.class,
-                        PigVariant.class, JsonPigVariant.class, Path.of("pig-variants.json"), "PigVariantKeys"
+                        Registries.PIG_VARIANT, PigVariant.NETWORK_CODEC, PigVariants.class,
+                        PigVariant.class, Path.of("pig-variants.json"), "PigVariantKeys"
                 )
                 .add(
-                        Registries.FROG_VARIANT, FrogVariantAdapter::convert, FrogVariants.class,
-                        FrogVariant.class, JsonFrogVariant.class, Path.of("frog-variants.json"), "FrogVariantKeys"
+                        Registries.FROG_VARIANT, FrogVariant.NETWORK_CODEC, FrogVariants.class,
+                        FrogVariant.class, Path.of("frog-variants.json"), "FrogVariantKeys"
                 )
                 .add(
-                        Registries.CAT_VARIANT, CatVariantAdapter::convert, CatVariants.class,
-                        CatVariant.class, JsonCatVariant.class, Path.of("cat-variants.json"), "CatVariantKeys"
+                        Registries.CAT_VARIANT, CatVariant.NETWORK_CODEC, CatVariants.class,
+                        CatVariant.class, Path.of("cat-variants.json"), "CatVariantKeys"
                 )
                 .add(
-                        Registries.COW_VARIANT, CowVariantAdapter::convert, CowVariants.class,
-                        CowVariant.class, JsonCowVariant.class, Path.of("cow-variants.json"), "CowVariantKeys"
+                        Registries.COW_VARIANT, CowVariant.NETWORK_CODEC, CowVariants.class,
+                        CowVariant.class, Path.of("cow-variants.json"), "CowVariantKeys"
                 )
                 .add(
-                        Registries.DAMAGE_TYPE, DamageTypeAdapter::convert, DamageTypes.class,
-                        DamageType.class, JsonDamageType.class, Path.of("damage-types.json"), "DamageTypeKeys"
+                        Registries.DAMAGE_TYPE, DamageType.DIRECT_CODEC, DamageTypes.class,
+                        DamageType.class, Path.of("damage-types.json"), "DamageTypeKeys"
                 )
                 .add(
-                        Registries.JUKEBOX_SONG, JukeboxSongAdapter::convert, JukeboxSongs.class,
-                        JukeboxSong.class, JsonJukeboxSong.class, Path.of("jukebox-songs.json"), "JukeboxSongKeys"
+                        Registries.JUKEBOX_SONG, JukeboxSong.DIRECT_CODEC, JukeboxSongs.class,
+                        JukeboxSong.class, Path.of("jukebox-songs.json"), "JukeboxSongKeys"
                 )
                 .add(
-                        Registries.INSTRUMENT, InstrumentAdapter::convert, Instruments.class,
-                        Instrument.class, JsonInstrument.class, Path.of("instruments.json"), "InstrumentKeys"
+                        Registries.INSTRUMENT, Instrument.DIRECT_CODEC, Instruments.class,
+                        Instrument.class, Path.of("instruments.json"), "InstrumentKeys"
                 )
                 .add(
-                        Registries.WOLF_SOUND_VARIANT, WolfSoundVariantAdapter::convert, WolfSoundVariants.class,
-                        WolfSoundVariant.class, JsonWolfSoundVariant.class, Path.of("wolf-sound-variants.json"),
-                        "WolfSoundVariantKeys"
+                        Registries.WOLF_SOUND_VARIANT, WolfSoundVariant.NETWORK_CODEC, WolfSoundVariants.class,
+                        WolfSoundVariant.class, Path.of("wolf-sound-variants.json"), "WolfSoundVariantKeys"
                 )
                 .add(
-                        Registries.CHICKEN_VARIANT, ChickenVariantAdapter::convert, ChickenVariants.class,
-                        ChickenVariant.class, JsonChickenVariant.class, Path.of("chicken-variants.json"),
-                        "ChickenVariantKeys"
+                        Registries.CHICKEN_VARIANT, ChickenVariant.NETWORK_CODEC, ChickenVariants.class,
+                        ChickenVariant.class, Path.of("chicken-variants.json"), "ChickenVariantKeys"
                 )
                 .add(
-                        Registries.PAINTING_VARIANT, PaintingVariantAdapter::convert, PaintingVariants.class,
-                        PaintingVariant.class, JsonPaintingVariant.class, Path.of("painting-variants.json"),
-                        "PaintingVariantKeys"
+                        Registries.PAINTING_VARIANT, PaintingVariant.DIRECT_CODEC, PaintingVariants.class,
+                        PaintingVariant.class, Path.of("painting-variants.json"), "PaintingVariantKeys"
                 )
                 .add(
-                        Registries.DIMENSION_TYPE, DimensionTypeAdapter::convert, BuiltinDimensionTypes.class,
-                        DimensionType.class, JsonDimensionType.class, Path.of("dimension-types.json"),
-                        "DimensionTypeKeys"
+                        Registries.DIMENSION_TYPE, DimensionType.DIRECT_CODEC, BuiltinDimensionTypes.class,
+                        DimensionType.class, Path.of("dimension-types.json"), "DimensionTypeKeys"
                 )
                 .add(
-                        Registries.BANNER_PATTERN, BannerPatternAdapter::convert, BannerPatterns.class,
-                        BannerPattern.class, JsonBannerPattern.class, Path.of("banner-patterns.json"),
-                        "BannerPatternKeys"
+                        Registries.BANNER_PATTERN, BannerPattern.DIRECT_CODEC, BannerPatterns.class,
+                        BannerPattern.class, Path.of("banner-patterns.json"), "BannerPatternKeys"
                 )
                 .add(
-                        Registries.ENCHANTMENT, value -> EnchantmentAdapter.convert(value, registryAccess),
-                        Enchantments.class, Enchantment.class, JsonEnchantment.class, Path.of("enchantments.json"),
-                        "EnchantmentKeys"
+                        Registries.ENCHANTMENT, Enchantment.DIRECT_CODEC, Enchantments.class,
+                        Enchantment.class, Path.of("enchantments.json"), "EnchantmentKeys"
                 )
                 // TODO: Dialogs
                 // ------------------------ Built-in registries ------------------------
@@ -403,6 +366,7 @@ final class Generators {
 
         private final Set<Generator> generators = new HashSet<>();
         private final RegistryAccess registryAccess;
+        private final RegistryOps<Tag> nbtRegistryOps;
 
         /**
          * Constructs the {@linkplain GeneratorsBuilder generators builder}.
@@ -412,6 +376,43 @@ final class Generators {
          */
         private GeneratorsBuilder(@NonNull RegistryAccess registryAccess) {
             this.registryAccess = registryAccess;
+            this.nbtRegistryOps = RegistryOps.create(NbtOps.INSTANCE, registryAccess);
+        }
+
+
+        /**
+         * Creates a {@linkplain KeyDefinitionGenerator key definition generator}
+         * and a {@linkplain RegistryExtractorResourceGenerator registry-extractor resource generator}
+         * using the specified values and adds them to this builder.
+         *
+         * @param registryKey resource key of a registry that the generators should use
+         * @param valueCodec a codec handling network serialization of values of the specified registry
+         * @param keyDefinitionClass a class containing constants associated with values of the specified registry
+         * @param valueClass a class of the registry values
+         * @param resourceFilePath a relative path that output of the registry-extractor resource generator
+         *                         should be written to
+         * @param className a name of the class that output of the key definition generator should be written to
+         * @return this builder
+         * @param <V> a type of the registry values
+         * @since 1.0
+         */
+        private <V> @NonNull GeneratorsBuilder add(@NonNull ResourceKey<Registry<V>> registryKey,
+                                                   @NonNull Codec<V> valueCodec, @NonNull Class<?> keyDefinitionClass,
+                                                   @NonNull Class<? super V> valueClass,
+                                                   @NonNull Path resourceFilePath, @NonNull String className) {
+            return this.add(
+                    registryKey,
+                    value -> BinaryTagHolder.binaryTagHolder(
+                            valueCodec.encodeStart(this.nbtRegistryOps, value)
+                                    .getOrThrow()
+                                    .toString()
+                    ),
+                    keyDefinitionClass,
+                    valueClass,
+                    BinaryTagHolder.class,
+                    resourceFilePath,
+                    className
+            );
         }
 
         /**
