@@ -35,11 +35,23 @@ sourceSets.main {
 
 tasks {
     val generatedSourcesTask = register("generatedSources") {
-        projectInput(dataGeneratorProject, inputs)
-        projectInput(dataJsonProject, inputs)
+        inputs.files(dataGeneratorProject.sourceSets.main.get().allSource.srcDirs)
+        inputs.files(dataGeneratorProject.configurations.compileClasspath.get().resolvedConfiguration.files)
+        inputs.files(dataGeneratorProject.configurations.runtimeClasspath.get().resolvedConfiguration.files)
+
         outputs.dir(generatedJavaPath)
         outputs.dir(generatedResourcesPath)
-        doLast { dataGeneratorProject.tasks.named<JavaExec>("run").get().exec() }
+
+        doLast {
+            dataGeneratorProject.javaexec {
+                classpath = dataGeneratorProject.sourceSets.main.get().runtimeClasspath
+                mainClass = "net.hypejet.jet.data.generator.GeneratorMain"
+                args(
+                    "--server=" + generatedJavaPath.asFile.absolutePath,
+                    "--resources=" + generatedResourcesPath.asFile.absolutePath
+                )
+            }
+        }
     }
     sourcesJar {
         dependsOn(generatedSourcesTask)
@@ -53,9 +65,4 @@ tasks {
             exclude(dependency(libs.logback.get())) // Minimizing logback causes problems with finding an SLF4J provider
         }
     }
-}
-
-private fun projectInput(project: Project, inputs: TaskInputs) {
-    inputs.files(project.sourceSets.main.get().allSource.srcDirs)
-    inputs.files(project.configurations.compileClasspath.get().resolvedConfiguration.files)
 }

@@ -28,7 +28,6 @@ publishing {
 }
 
 val dataGeneratorProject = project(":data:generator")
-val dataJsonProject = project(":data:json")
 val generatedJavaPath = layout.projectDirectory.dir("src").dir("generated").dir("java")
 
 sourceSets.main {
@@ -37,10 +36,18 @@ sourceSets.main {
 
 tasks {
     val generatedSourcesTask = register("generatedSources") {
-        projectInput(dataGeneratorProject, inputs)
-        projectInput(dataJsonProject, inputs)
+        inputs.files(dataGeneratorProject.sourceSets.main.get().allSource.srcDirs)
+        inputs.files(dataGeneratorProject.configurations.compileClasspath.get().resolvedConfiguration.files)
+        inputs.files(dataGeneratorProject.configurations.runtimeClasspath.get().resolvedConfiguration.files)
         outputs.dir(generatedJavaPath)
-        doLast { dataGeneratorProject.tasks.named<JavaExec>("run").get().exec() }
+
+        doLast {
+            dataGeneratorProject.javaexec {
+                classpath = dataGeneratorProject.sourceSets.main.get().runtimeClasspath
+                mainClass = "net.hypejet.jet.data.generator.GeneratorMain"
+                args("--api=" + generatedJavaPath.asFile.absolutePath)
+            }
+        }
     }
     withType<AbstractCompile> {
         dependsOn(generatedSourcesTask)
@@ -51,9 +58,4 @@ tasks {
     jar {
         manifest.attributes("Automatic-Module-Name" to "net.hypejet.jet.api")
     }
-}
-
-private fun projectInput(project: Project, inputs: TaskInputs) {
-    inputs.files(project.sourceSets.main.get().allSource.srcDirs)
-    inputs.files(project.configurations.compileClasspath.get().resolvedConfiguration.files)
 }

@@ -30,17 +30,14 @@ public final class GeneratorMain {
         CommandSpec commandSpec = CommandSpec.create()
                 .addOption(OptionSpec.builder("-s", "--server")
                         .type(Path.class)
-                        .required(true)
                         .description("An output directory of generated Java server source files")
                         .build())
                 .addOption(OptionSpec.builder("-a", "--api")
                         .type(Path.class)
-                        .required(true)
                         .description("An output directory of generated Java API source files")
                         .build())
                 .addOption(OptionSpec.builder("-r", "--resources")
                         .type(Path.class)
-                        .required(true)
                         .description("An output directory of generated resource files")
                         .build());
 

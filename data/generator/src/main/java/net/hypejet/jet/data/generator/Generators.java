@@ -127,6 +127,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.validation.DirectoryValidator;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -153,16 +154,23 @@ final class Generators {
     /**
      * Runs the generators.
      *
-     * @param serverPath an output directory of generated Java server source files
-     * @param apiPath an output directory of generated Java API source files
-     * @param resourcesPath an output directory of generated resource files
+     * @param serverPath an output directory of generated Java server source files, {@code null} if these
+     *                   files should not be generated
+     * @param apiPath an output directory of generated Java API source files, {@code null} if these
+     *                files should not be generated
+     * @param resourcesPath an output directory of generated resource files, {@code null} if these
+     *                      files should not be generated
      * @throws IOException if an I/O error occurs during file management
      * @since 1.0
      */
-    static void run(@NotNull Path serverPath, @NotNull Path apiPath, @NotNull Path resourcesPath) throws IOException {
-        FileUtils.deleteRecursively(serverPath);
-        FileUtils.deleteRecursively(apiPath);
-        FileUtils.deleteRecursively(resourcesPath);
+    static void run(@Nullable Path serverPath, @Nullable Path apiPath,
+                    @Nullable Path resourcesPath) throws IOException {
+        if (serverPath != null)
+            FileUtils.deleteRecursively(serverPath);
+        if (apiPath != null)
+            FileUtils.deleteRecursively(apiPath);
+        if (resourcesPath != null)
+            FileUtils.deleteRecursively(resourcesPath);
 
         SharedConstants.tryDetectVersion();
         Bootstrap.bootStrap();
@@ -299,10 +307,12 @@ final class Generators {
 
                     switch (codeGenerator.destination()) {
                         case API -> {
+                            if (apiPath == null) continue;
                             packageName = API_PACKAGE_NAME;
                             parentPath = apiPath;
                         }
                         case SERVER -> {
+                            if (serverPath == null) continue;
                             packageName = SERVER_PACKAGE_NAME;
                             parentPath = serverPath;
                         }
@@ -316,6 +326,8 @@ final class Generators {
                             .writeTo(parentPath);
                 }
                 case ResourceGenerator resourceGenerator -> {
+                    if (resourcesPath == null) continue;
+
                     Path path = resourcesPath.resolve(resourceGenerator.path());
                     Files.createDirectories(path.getParent());
 
