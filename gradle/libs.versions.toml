@@ -37,7 +37,7 @@ concurrencyUtilities = "1.0"
 fastutil = "8.5.15"
 
 # Minecraft
-minecraft = "1.21.7"
+minecraft = "1.21.8"
 
 # Code generation
 javapoet = "0.7.0"
