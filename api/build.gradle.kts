@@ -27,6 +27,38 @@ publishing {
     }
 }
 
-tasks.jar {
-    manifest.attributes("Automatic-Module-Name" to "net.hypejet.jet.api")
+val generatedJavaPath = layout.projectDirectory.dir("src").dir("generated").dir("java")
+
+sourceSets.main {
+    java.srcDirs(generatedJavaPath)
+}
+
+tasks {
+    val generateSourcesTask = register("generateSources") {
+        val dataGeneratorProject = project(":data:generator")
+        val generatorMainSourceSet = dataGeneratorProject.sourceSets.main.get()
+
+        inputs.files(generatorMainSourceSet.allSource.srcDirs)
+        inputs.files(dataGeneratorProject.configurations.runtimeClasspath.get().resolvedConfiguration.files)
+        outputs.dir(generatedJavaPath)
+
+        dependsOn(dataGeneratorProject.tasks.build)
+
+        doLast {
+            dataGeneratorProject.javaexec {
+                classpath = generatorMainSourceSet.runtimeClasspath
+                mainClass = "net.hypejet.jet.data.generator.GeneratorMain"
+                args("--api=" + generatedJavaPath.asFile.absolutePath)
+            }
+        }
+    }
+    withType<AbstractCompile> {
+        dependsOn(generateSourcesTask)
+    }
+    sourcesJar {
+        dependsOn(generateSourcesTask)
+    }
+    jar {
+        manifest.attributes("Automatic-Module-Name" to "net.hypejet.jet.api")
+    }
 }
