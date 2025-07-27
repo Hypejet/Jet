@@ -1,6 +1,8 @@
 dependencies {
-    compileOnly(libs.adventure)
-    compileOnly(libs.jspecify)
-    compileOnly(libs.gson)
-    compileOnly(libs.guava)
+    implementation(libs.adventure)
+    implementation(libs.jspecify)
+    implementation(libs.gson)
+    implementation(libs.guava)
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform)
 }
