@@ -3,8 +3,9 @@ package net.hypejet.jet.registry;
 import net.hypejet.jet.data.model.api.pack.PackInfo;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents an entry of {@linkplain MinecraftRegistry a Minecraft registry}.
@@ -13,7 +14,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @since 1.0
  * @see MinecraftRegistry
  */
-public interface RegistryEntry<V> extends Keyed {
+@ApiStatus.NonExtendable
+public non-sealed interface RegistryEntry<V> extends Keyed, Holder<V> {
     /**
      * Gets {@linkplain Key a key} of the registry entry.
      *
@@ -22,6 +24,14 @@ public interface RegistryEntry<V> extends Keyed {
      */
     @Override
     @NonNull Key key();
+
+    /**
+     * Gets the {@linkplain MinecraftRegistry registry} owning this registry entry.
+     *
+     * @return the registry owning this registry entry
+     * @since 1.0
+     */
+    @NonNull MinecraftRegistry<? super V> registry();
 
     /**
      * Gets a value of the registry entry.
