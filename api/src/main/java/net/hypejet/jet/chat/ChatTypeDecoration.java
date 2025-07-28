@@ -34,6 +34,9 @@ public record ChatTypeDecoration(@NonNull String translationKey, @NonNull List<P
     /**
      * A parameter of a {@linkplain ChatTypeDecoration chat type decoration}.
      *
+     * <p>This is not an enum since it depends on Minecraft.
+     * Adding new entries could break switch cases for example.</p>
+     *
      * @since 1.0
      */
     public static final class Parameter {
