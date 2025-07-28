@@ -7,8 +7,7 @@ import net.hypejet.jet.data.json.model.entity.JsonEntityType;
 import net.hypejet.jet.data.json.model.event.JsonGameEvent;
 import net.hypejet.jet.data.json.model.item.JsonItem;
 import net.hypejet.jet.data.json.model.sound.JsonSoundEvent;
-
-import java.nio.file.Path;
+import org.jspecify.annotations.NonNull;
 
 /**
  * A holder of resource files that JSON representation of extracted and converted Minecraft registry entries
@@ -18,208 +17,203 @@ import java.nio.file.Path;
  */
 public final class JsonDataResourceFiles {
     /**
-     * A root path containing registry resource files.
+     * A resource-directory-relative classpath where biome registry entries are written to.
      *
      * @since 1.0
      */
-    private static final Path REGISTRIES_ROOT_PATH = Path.of("minecraft", "registries");
+    public static final String BIOMES = resourceClasspath("biomes.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where biome registry entries are written to.
+     * A resource-directory-relative classpath where chat-type registry entries are written to.
      *
      * @since 1.0
      */
-    public static final Path BIOMES = REGISTRIES_ROOT_PATH.resolve(Path.of("biomes.json"));
+    public static final String CHAT_TYPES = resourceClasspath("chat_types.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where chat-type registry entries are written to.
+     * A resource-directory-relative classpath where trim-pattern registry entries are written to.
      *
      * @since 1.0
      */
-    public static final Path CHAT_TYPES = REGISTRIES_ROOT_PATH.resolve(Path.of("chat_types.json"));
+    public static final String TRIM_PATTERNS = resourceClasspath("trim_patterns.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where trim-pattern registry entries are written to.
+     * A resource-directory-relative classpath where trim-material registry entries are written to.
      *
      * @since 1.0
      */
-    public static final Path TRIM_PATTERNS = REGISTRIES_ROOT_PATH.resolve(Path.of("trim_patterns.json"));
+    public static final String TRIM_MATERIALS = resourceClasspath("trim_materials.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where trim-material registry entries are written to.
+     * A resource-directory-relative classpath where wolf-variant registry entries are written to.
      *
      * @since 1.0
      */
-    public static final Path TRIM_MATERIALS = REGISTRIES_ROOT_PATH.resolve(Path.of("trim_materials.json"));
+    public static final String WOLF_VARIANTS = resourceClasspath("wolf_variants.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where wolf-variant registry entries are written to.
+     * A resource-directory-relative classpath where pig-variant registry entries are written to.
      *
      * @since 1.0
      */
-    public static final Path WOLF_VARIANTS = REGISTRIES_ROOT_PATH.resolve(Path.of("wolf_variants.json"));
+    public static final String PIG_VARIANTS = resourceClasspath("biomes.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where pig-variant registry entries are written to.
+     * A resource-directory-relative classpath where frog-variant registry entries are written to.
      *
      * @since 1.0
      */
-    public static final Path PIG_VARIANTS = REGISTRIES_ROOT_PATH.resolve(Path.of("biomes.json"));
+    public static final String FROG_VARIANTS = resourceClasspath("frog_variants.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where frog-variant registry entries are written to.
+     * A resource-directory-relative classpath where cat-variant registry entries are written to.
      *
      * @since 1.0
      */
-    public static final Path FROG_VARIANTS = REGISTRIES_ROOT_PATH.resolve(Path.of("frog_variants.json"));
+    public static final String CAT_VARIANTS = resourceClasspath("cat_variants.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where cat-variant registry entries are written to.
+     * A resource-directory-relative classpath where cow-variant registry entries are written to.
      *
      * @since 1.0
      */
-    public static final Path CAT_VARIANTS = REGISTRIES_ROOT_PATH.resolve(Path.of("cat_variants.json"));
+    public static final String COW_VARIANTS = resourceClasspath("cow_variants.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where cow-variant registry entries are written to.
+     * A resource-directory-relative classpath where damage-type registry entries are written to.
      *
      * @since 1.0
      */
-    public static final Path COW_VARIANTS = REGISTRIES_ROOT_PATH.resolve(Path.of("cow_variants.json"));
+    public static final String DAMAGE_TYPES = resourceClasspath("damage_types.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where damage-type registry entries are written to.
+     * A resource-directory-relative classpath where jukebox-song registry entries are written to.
      *
      * @since 1.0
      */
-    public static final Path DAMAGE_TYPES = REGISTRIES_ROOT_PATH.resolve(Path.of("damage_types.json"));
+    public static final String JUKEBOX_SONGS = resourceClasspath("jukebox_songs.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where jukebox-song registry entries are written to.
+     * A resource-directory-relative classpath where instrument registry entries are written to.
      *
      * @since 1.0
      */
-    public static final Path JUKEBOX_SONGS = REGISTRIES_ROOT_PATH.resolve(Path.of("jukebox_songs.json"));
+    public static final String INSTRUMENTS = resourceClasspath("instruments.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where instrument registry entries are written to.
+     * A resource-directory-relative classpath where wolf-sound-variant registry entries are written to.
      *
      * @since 1.0
      */
-    public static final Path INSTRUMENTS = REGISTRIES_ROOT_PATH.resolve(Path.of("instruments.json"));
+    public static final String WOLF_SOUND_VARIANTS = resourceClasspath("wolf_sound_variants.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where wolf-sound-variant registry entries are written to.
+     * A resource-directory-relative classpath where chicken-variant registry entries are written to.
      *
      * @since 1.0
      */
-    public static final Path WOLF_SOUND_VARIANTS = REGISTRIES_ROOT_PATH.resolve(Path.of("wolf_sound_variants.json"));
+    public static final String CHICKEN_VARIANTS = resourceClasspath("chicken_variants.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where chicken-variant registry entries are written to.
+     * A resource-directory-relative classpath where painting-variant registry entries are written to.
      *
      * @since 1.0
      */
-    public static final Path CHICKEN_VARIANTS = REGISTRIES_ROOT_PATH.resolve(Path.of("chicken_variants.json"));
+    public static final String PAINTING_VARIANTS = resourceClasspath("painting_variants.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where painting-variant registry entries are written to.
+     * A resource-directory-relative classpath where dimension-type registry entries are written to.
      *
      * @since 1.0
      */
-    public static final Path PAINTING_VARIANTS = REGISTRIES_ROOT_PATH.resolve(Path.of("painting_variants.json"));
+    public static final String DIMENSION_TYPES = resourceClasspath("dimension_types.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where dimension-type registry entries are written to.
+     * A resource-directory-relative classpath where banner-pattern registry entries are written to.
      *
      * @since 1.0
      */
-    public static final Path DIMENSION_TYPES = REGISTRIES_ROOT_PATH.resolve(Path.of("dimension_types.json"));
+    public static final String BANNER_PATTERNS = resourceClasspath("banner_patterns.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where banner-pattern registry entries are written to.
+     * A resource-directory-relative classpath where enchantment registry entries are written to.
      *
      * @since 1.0
      */
-    public static final Path BANNER_PATTERNS = REGISTRIES_ROOT_PATH.resolve(Path.of("banner_patterns.json"));
+    public static final String ENCHANTMENTS = resourceClasspath("enchantments.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where enchantment registry entries are written to.
+     * A resource-directory-relative classpath where {@linkplain JsonItem item} registry entries are written to.
      *
      * @since 1.0
      */
-    public static final Path ENCHANTMENTS = REGISTRIES_ROOT_PATH.resolve(Path.of("enchantments.json"));
+    public static final String ITEMS = resourceClasspath("items.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where {@linkplain JsonItem item} registry entries
+     * A resource-directory-relative classpath where {@linkplain JsonBlock block} registry entries are written to.
+     *
+     * @since 1.0
+     */
+    public static final String BLOCKS = resourceClasspath("blocks.json");
+
+    /**
+     * A resource-directory-relative classpath where {@linkplain JsonEntityType entity-type} registry entries
      * are written to.
      *
      * @since 1.0
      */
-    public static final Path ITEMS = REGISTRIES_ROOT_PATH.resolve(Path.of("items.json"));
+    public static final String ENTITY_TYPES = resourceClasspath("entity_types.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where {@linkplain JsonBlock block} registry entries
+     * A resource-directory-relative classpath where {@linkplain JsonGameEvent game-event} registry entries
      * are written to.
      *
      * @since 1.0
      */
-    public static final Path BLOCKS = REGISTRIES_ROOT_PATH.resolve(Path.of("blocks.json"));
+    public static final String GAME_EVENTS = resourceClasspath("game_events.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where {@linkplain JsonEntityType entity-type}
-     * registry entries are written to.
+     * A resource-directory-relative classpath where fluid registry entries are written to.
      *
      * @since 1.0
      */
-    public static final Path ENTITY_TYPES = REGISTRIES_ROOT_PATH.resolve(Path.of("entity_types.json"));
+    public static final String FLUIDS = resourceClasspath("fluids.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where {@linkplain JsonGameEvent game-event}
-     * registry entries are written to.
-     *
-     * @since 1.0
-     */
-    public static final Path GAME_EVENTS = REGISTRIES_ROOT_PATH.resolve(Path.of("game_events.json"));
-
-    /**
-     * A resource-directory-relative {@linkplain Path path} where fluid registry entries are written to.
-     *
-     * @since 1.0
-     */
-    public static final Path FLUIDS = REGISTRIES_ROOT_PATH.resolve(Path.of("fluids.json"));
-
-    /**
-     * A resource-directory-relative {@linkplain Path path} where {@linkplain JsonSoundEvent sound-event}
-     * registry entries are written to.
-     *
-     * @since 1.0
-     */
-    public static final Path SOUND_EVENTS = REGISTRIES_ROOT_PATH.resolve(Path.of("sound_events.json"));
-
-    /**
-     * A resource-directory-relative {@linkplain Path path} where point-of-interest-type registry entries
+     * A resource-directory-relative classpath where {@linkplain JsonSoundEvent sound-event} registry entries
      * are written to.
      *
      * @since 1.0
      */
-    public static final Path POI_TYPES = REGISTRIES_ROOT_PATH.resolve(Path.of("poi_types.json"));
+    public static final String SOUND_EVENTS = resourceClasspath("sound_events.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where {@linkplain JsonBlockEntityType block-entity-type}
+     * A resource-directory-relative classpath where point-of-interest-type registry entries
+     * are written to.
+     *
+     * @since 1.0
+     */
+    public static final String POI_TYPES = resourceClasspath("poi_types.json");
+
+    /**
+     * A resource-directory-relative classpath where {@linkplain JsonBlockEntityType block-entity-type}
      * registry entries are written to.
      *
      * @since 1.0
      */
-    public static final Path BLOCK_ENTITY_TYPES = REGISTRIES_ROOT_PATH.resolve(Path.of("block_entity_types.json"));
+    public static final String BLOCK_ENTITY_TYPES = resourceClasspath("block_entity_types.json");
 
     /**
-     * A resource-directory-relative {@linkplain Path path} where {@linkplain JsonBlockState block-state}
-     * registry entries are written to.
+     * A resource-directory-relative classpath where {@linkplain JsonBlockState block-state} registry entries
+     * are written to.
      *
      * @since 1.0
      */
-    public static final Path BLOCK_STATES = REGISTRIES_ROOT_PATH.resolve(Path.of("block_states.json"));
+    public static final String BLOCK_STATES = resourceClasspath("block_states.json");
 
     private JsonDataResourceFiles() {}
+
+    private static @NonNull String resourceClasspath(@NonNull String file) {
+        return "minecraft/registries/" + file;
+    }
 }

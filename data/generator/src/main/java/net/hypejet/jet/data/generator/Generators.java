@@ -383,7 +383,7 @@ final class Generators {
          * @param valueCodec a codec handling network serialization of values of the specified registry
          * @param keyDefinitionClass a class containing constants associated with values of the specified registry
          * @param valueClass a class of the registry values
-         * @param resourceFilePath a relative path that output of the registry-extractor resource generator
+         * @param resourceFilePath a relative classpath that output of the registry-extractor resource generator
          *                         should be written to
          * @param className a name of the class that output of the key definition generator should be written to
          * @return this builder
@@ -393,7 +393,7 @@ final class Generators {
         private <V> @NonNull GeneratorsBuilder add(@NonNull ResourceKey<Registry<V>> registryKey,
                                                    @NonNull Codec<V> valueCodec, @NonNull Class<?> keyDefinitionClass,
                                                    @NonNull Class<? super V> valueClass,
-                                                   @NonNull Path resourceFilePath, @NonNull String className) {
+                                                   @NonNull String resourceFilePath, @NonNull String className) {
             return this.add(
                     registryKey,
                     value -> BinaryTagHolder.binaryTagHolder(
@@ -419,7 +419,7 @@ final class Generators {
          * @param keyDefinitionClass a class containing constants associated with values of the specified registry
          * @param unconvertedValueClass a class of the registry values
          * @param convertedValueClass a class of Jet data equivalents of the registry values
-         * @param resourceFilePath a relative path that output of the registry-extractor resource generator
+         * @param resourceFilePath a relative classpath that output of the registry-extractor resource generator
          *                         should be written to
          * @param className a name of the class that output of the key definition generator should be written to
          * @return this builder
@@ -432,7 +432,7 @@ final class Generators {
                                                         @NonNull Class<?> keyDefinitionClass,
                                                         @NonNull Class<? super MV> unconvertedValueClass,
                                                         @NonNull Class<CV> convertedValueClass,
-                                                        @NonNull Path resourceFilePath, @NonNull String className) {
+                                                        @NonNull String resourceFilePath, @NonNull String className) {
             return this
                     .add(new KeyDefinitionGenerator<>(
                             this.registryAccess.lookupOrThrow(registryKey),
