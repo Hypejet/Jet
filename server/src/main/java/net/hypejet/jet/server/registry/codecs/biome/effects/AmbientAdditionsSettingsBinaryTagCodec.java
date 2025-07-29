@@ -34,10 +34,10 @@ public final class AmbientAdditionsSettingsBinaryTagCodec implements BinaryTagCo
 
     @Override
     public @NotNull AmbientAdditionsSettings decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof CompoundBinaryTag tag) {
+        if (encoded instanceof CompoundBinaryTag compound) {
             return new AmbientAdditionsSettings(
-                    SoundEventBinaryTagCodec.HOLDER_CODEC.decode(requiredTag(SOUND_EVENT_FIELD, tag)),
-                    requiredTag(TICK_CHANCE_FIELD, tag, BinaryTagTypes.DOUBLE).value()
+                    SoundEventBinaryTagCodec.HOLDER_CODEC.decode(requiredTag(SOUND_EVENT_FIELD, compound)),
+                    requiredTag(TICK_CHANCE_FIELD, compound, BinaryTagTypes.DOUBLE).value()
             );
         } else {
             throw new IllegalArgumentException(

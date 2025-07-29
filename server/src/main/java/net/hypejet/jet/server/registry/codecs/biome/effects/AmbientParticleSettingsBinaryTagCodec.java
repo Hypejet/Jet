@@ -31,10 +31,10 @@ public final class AmbientParticleSettingsBinaryTagCodec implements BinaryTagCod
 
     @Override
     public @NotNull AmbientParticleSettings decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof CompoundBinaryTag tag) {
+        if (encoded instanceof CompoundBinaryTag compound) {
             return new AmbientParticleSettings(
-                    requiredTag(OPTIONS_FIELD, tag),
-                    requiredTag(PROBABILITY_FIELD, tag, BinaryTagTypes.FLOAT).value()
+                    requiredTag(OPTIONS_FIELD, compound),
+                    requiredTag(PROBABILITY_FIELD, compound, BinaryTagTypes.FLOAT).value()
             );
         } else {
             throw new IllegalArgumentException(

@@ -44,10 +44,10 @@ public final class SoundEventBinaryTagCodec implements BinaryTagCodec<SoundEvent
 
     @Override
     public @NotNull SoundEvent decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof CompoundBinaryTag tag) {
-            FloatBinaryTag rangeTag = optionalTag(RANGE_FIELD, tag, BinaryTagTypes.FLOAT);
+        if (encoded instanceof CompoundBinaryTag compound) {
+            FloatBinaryTag rangeTag = optionalTag(RANGE_FIELD, compound, BinaryTagTypes.FLOAT);
             return new SoundEvent(
-                    KeyBinaryTagCodec.INSTANCE.decode(requiredTag(SOUND_KEY_FIELD, tag)),
+                    KeyBinaryTagCodec.INSTANCE.decode(requiredTag(SOUND_KEY_FIELD, compound)),
                     rangeTag == null ? null : rangeTag.value()
             );
         } else {

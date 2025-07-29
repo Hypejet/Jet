@@ -35,12 +35,12 @@ public final class AmbientMoodSettingsBinaryTagCodec implements BinaryTagCodec<A
 
     @Override
     public @NotNull AmbientMoodSettings decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof CompoundBinaryTag tag) {
+        if (encoded instanceof CompoundBinaryTag compound) {
             return new AmbientMoodSettings(
-                    SoundEventBinaryTagCodec.HOLDER_CODEC.decode(requiredTag(SOUND_FIELD, tag)),
-                    requiredTag(TICK_DELAY_FIELD, tag, BinaryTagTypes.INT).value(),
-                    requiredTag(BLOCK_SEARCH_EXTENT_FIELD, tag, BinaryTagTypes.INT).value(),
-                    requiredTag(OFFSET_FIELD, tag, BinaryTagTypes.DOUBLE).value()
+                    SoundEventBinaryTagCodec.HOLDER_CODEC.decode(requiredTag(SOUND_FIELD, compound)),
+                    requiredTag(TICK_DELAY_FIELD, compound, BinaryTagTypes.INT).value(),
+                    requiredTag(BLOCK_SEARCH_EXTENT_FIELD, compound, BinaryTagTypes.INT).value(),
+                    requiredTag(OFFSET_FIELD, compound, BinaryTagTypes.DOUBLE).value()
             );
         } else {
             throw new IllegalArgumentException(

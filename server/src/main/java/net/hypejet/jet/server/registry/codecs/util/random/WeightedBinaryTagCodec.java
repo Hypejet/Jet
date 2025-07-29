@@ -37,10 +37,10 @@ public final class WeightedBinaryTagCodec<V> implements BinaryTagCodec<Weighted<
 
     @Override
     public @NotNull Weighted<V> decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof CompoundBinaryTag tag) {
+        if (encoded instanceof CompoundBinaryTag compound) {
             return new Weighted<>(
-                    this.valueCodec.decode(requiredTag(DATA_FIELD, tag)),
-                    requiredTag(WEIGHT_FIELD, tag, BinaryTagTypes.INT).value()
+                    this.valueCodec.decode(requiredTag(DATA_FIELD, compound)),
+                    requiredTag(WEIGHT_FIELD, compound, BinaryTagTypes.INT).value()
             );
         } else {
             throw new IllegalArgumentException("The encoded tag must be of compound type to decode it to a weighted");
