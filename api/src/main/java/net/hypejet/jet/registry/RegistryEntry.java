@@ -1,6 +1,7 @@
 package net.hypejet.jet.registry;
 
 import net.hypejet.jet.data.model.api.pack.PackInfo;
+import net.hypejet.jet.registry.holder.Holder;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import org.jetbrains.annotations.ApiStatus;
@@ -15,7 +16,7 @@ import org.jspecify.annotations.Nullable;
  * @see MinecraftRegistry
  */
 @ApiStatus.NonExtendable
-public non-sealed interface RegistryEntry<V> extends Keyed, Holder<V> {
+public interface RegistryEntry<V> extends Keyed {
     /**
      * Gets {@linkplain Key a key} of the registry entry.
      *
@@ -48,4 +49,13 @@ public non-sealed interface RegistryEntry<V> extends Keyed, Holder<V> {
      * @since 1.0
      */
     @Nullable PackInfo knownPackInfo();
+
+    /**
+     * Creates a {@linkplain Holder.Reference reference holder}
+     * referencing to this {@linkplain RegistryEntry registry entry}.
+     *
+     * @return the reference holder
+     * @since 1.0
+     */
+    Holder.@NonNull Reference<V> createHolder();
 }

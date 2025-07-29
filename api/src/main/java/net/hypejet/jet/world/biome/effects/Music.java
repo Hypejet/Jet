@@ -1,7 +1,7 @@
 package net.hypejet.jet.world.biome.effects;
 
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
-import net.hypejet.jet.registry.Holder;
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.world.sound.SoundEvent;
 import org.jspecify.annotations.NonNull;
 

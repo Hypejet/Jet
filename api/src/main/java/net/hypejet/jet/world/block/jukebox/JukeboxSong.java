@@ -1,6 +1,6 @@
 package net.hypejet.jet.world.block.jukebox;
 
-import net.hypejet.jet.registry.Holder;
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.util.range.RangeUtil;
 import net.hypejet.jet.world.sound.SoundEvent;
 import net.kyori.adventure.text.Component;

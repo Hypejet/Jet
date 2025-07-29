@@ -1,6 +1,8 @@
-package net.hypejet.jet.registry;
+package net.hypejet.jet.registry.holder;
 
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
+import net.hypejet.jet.registry.MinecraftRegistry;
+import net.hypejet.jet.registry.RegistryEntry;
 import net.kyori.adventure.key.Key;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NonNull;
@@ -23,10 +25,11 @@ public interface HolderSet<V> {
     /**
      * Gets contents of this {@linkplain HolderSet holder set}.
      *
+     * @param registry a registry that should provide holders if this holder set does not store them directly
      * @return the contents
      * @since 1.0
      */
-    @NonNull List<Holder<V>> contents();
+    @NonNull List<Holder<V>> contents(@NonNull MinecraftRegistry<V> registry);
 
     /**
      * A {@linkplain HolderSet holder set} directly storing the holders in a {@linkplain List list}.
@@ -43,40 +46,42 @@ public interface HolderSet<V> {
          * @since 1.0
          */
         public Direct {
-            Objects.requireNonNull(contents, "contents");
+            contents = List.copyOf(Objects.requireNonNull(contents, "contents"));
+        }
+
+        @Override
+        public @NonNull List<Holder<V>> contents(@NonNull MinecraftRegistry<V> registry) {
+            return this.contents;
         }
     }
 
     /**
-     * A {@linkplain HolderSet holder set} referencing to all {@linkplain RegistryEntry registry entries}
-     * bound to the specified tag.
+     * A {@linkplain HolderSet holder set} referencing to {@linkplain Holder holders}
+     * associated with all {@linkplain RegistryEntry registry entries} bound to the specified tag.
      *
-     * @param registry a registry whose registry entries should be referenced
      * @param tagKey the key of the tag
      * @param <V> a value type of holders that this holder set store
      * @since 1.0
      */
-    record Named<V>(@NonNull MinecraftRegistry<V> registry, @NonNull Key tagKey) implements HolderSet<V> {
+    record Named<V>(@NonNull Key tagKey) implements HolderSet<V> {
         /**
          * Constructs the {@linkplain Named named holder set}.
          *
-         * @param registry a registry whose registry entries should be referenced
          * @param tagKey the key of the tag
          * @since 1.0
          */
         public Named {
-            Objects.requireNonNull(registry, "registry");
             Objects.requireNonNull(tagKey, "tag key");
         }
 
         @Override
-        public @NonNull List<Holder<V>> contents() {
+        public @NonNull List<Holder<V>> contents(@NonNull MinecraftRegistry<V> registry) {
             List<Holder<V>> holders = new ArrayList<>();
 
-            for (RegistryEntry<V> entry : this.registry.entries()) {
-                try (BooleanAcquisition acquisition = this.registry.hasTag(entry, this.tagKey)) {
+            for (RegistryEntry<V> entry : registry.entries()) {
+                try (BooleanAcquisition acquisition = registry.hasTag(entry, this.tagKey)) {
                     if (!acquisition.get()) continue;
-                    holders.add(entry);
+                    holders.add(entry.createHolder());
                 }
             }
 

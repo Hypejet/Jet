@@ -1,6 +1,6 @@
 package net.hypejet.jet.world.sound;
 
-import net.hypejet.jet.registry.Holder;
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.util.range.RangeUtil;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NonNull;

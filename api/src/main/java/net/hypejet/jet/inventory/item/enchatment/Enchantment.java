@@ -2,7 +2,7 @@ package net.hypejet.jet.inventory.item.enchatment;
 
 import net.hypejet.jet.entity.equipment.EquipmentSlotGroup;
 import net.hypejet.jet.inventory.item.Item;
-import net.hypejet.jet.registry.HolderSet;
+import net.hypejet.jet.registry.holder.HolderSet;
 import net.hypejet.jet.util.range.RangeUtil;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.text.Component;

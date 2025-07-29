@@ -1,6 +1,6 @@
 package net.hypejet.jet.entity.variant.wolf;
 
-import net.hypejet.jet.registry.Holder;
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.world.sound.SoundEvent;
 import org.jspecify.annotations.NonNull;
 

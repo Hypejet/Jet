@@ -3,9 +3,11 @@ package net.hypejet.jet.server.registry;
 import net.hypejet.jet.data.model.api.pack.PackInfo;
 import net.hypejet.jet.registry.MinecraftRegistry;
 import net.hypejet.jet.registry.RegistryEntry;
+import net.hypejet.jet.registry.holder.Holder;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -38,5 +40,10 @@ public record JetRegistryEntry<V>(
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(registry, "registry");
         Objects.requireNonNull(value, "value");
+    }
+
+    @Override
+    public @NotNull Holder.Reference<V> createHolder() {
+        return new Holder.Reference<>(this.key);
     }
 }
