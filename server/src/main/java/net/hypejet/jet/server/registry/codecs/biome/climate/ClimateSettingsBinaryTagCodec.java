@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.registry.codecs.biome.climate;
 
 import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.IndexBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.adventure.IndexBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.primitive.StringBinaryTagCodec;
 import net.hypejet.jet.server.util.index.IndexUtil;
 import net.hypejet.jet.world.biome.climate.ClimateSettings;

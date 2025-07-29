@@ -1,5 +1,6 @@
-package net.hypejet.jet.server.registry.codecs;
+package net.hypejet.jet.server.registry.codecs.adventure;
 
+import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.util.Index;
 import org.jetbrains.annotations.NotNull;

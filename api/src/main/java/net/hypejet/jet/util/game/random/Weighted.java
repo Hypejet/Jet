@@ -1,5 +1,6 @@
 package net.hypejet.jet.util.game.random;
 
+import net.hypejet.jet.util.range.RangeUtil;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
@@ -22,5 +23,6 @@ public record Weighted<V>(@NonNull V value, int weight) {
      */
     public Weighted {
         Objects.requireNonNull(value, "value");
+        RangeUtil.ensureNotNegative(weight);
     }
 }
