@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.registry.codecs.biome.effects;
+package net.hypejet.jet.server.registry.codecs.world.biome.effects;
 
 import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.world.sound.SoundEventBinaryTagCodec;

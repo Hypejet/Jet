@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.registry.codecs.biome.effects;
+package net.hypejet.jet.server.registry.codecs.world.biome.effects;
 
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;

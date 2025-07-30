@@ -1,8 +1,8 @@
-package net.hypejet.jet.server.registry.codecs.biome;
+package net.hypejet.jet.server.registry.codecs.world.biome;
 
 import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.adventure.IndexBinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.biome.effects.SpecialEffectsBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.world.biome.effects.SpecialEffectsBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.primitive.StringBinaryTagCodec;
 import net.hypejet.jet.server.util.index.IndexUtil;
 import net.hypejet.jet.world.biome.Biome;
