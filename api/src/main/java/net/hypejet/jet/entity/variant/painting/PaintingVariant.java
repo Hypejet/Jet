@@ -20,8 +20,10 @@ import java.util.Objects;
  *               using this painting variant
  * @since 1.0
  */
-public record PaintingVariant(@Range(from = 1, to = 16) int width, @Range(from = 1, to = 16) int height,
-                              @NonNull Key asset, @Nullable Component title, @Nullable Component author) {
+public record PaintingVariant(@Range(from = MIN_SIZE, to = MAX_SIZE) int width,
+                              @Range(from = MIN_SIZE, to = MAX_SIZE) int height,
+                              @NonNull Key asset, @Nullable Component title,
+                              @Nullable Component author) {
 
     private static final int MIN_SIZE = 1;
     private static final int MAX_SIZE = 16;
