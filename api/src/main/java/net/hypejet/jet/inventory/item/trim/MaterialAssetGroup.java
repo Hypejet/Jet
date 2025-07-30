@@ -15,6 +15,7 @@ import java.util.Objects;
  * @since 1.0
  * @see TrimMaterial
  */
+// TODO: Create a dedicated equipment asset object for key of the "overrides" map
 public record MaterialAssetGroup(@NonNull Asset baseAsset, @NonNull Map<Key, Asset> overrides) {
     /**
      * Constructs the {@linkplain MaterialAssetGroup material asset group}.

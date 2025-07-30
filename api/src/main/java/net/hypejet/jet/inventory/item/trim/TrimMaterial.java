@@ -1,8 +1,8 @@
 package net.hypejet.jet.inventory.item.trim;
 
+import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NonNull;
 
-import java.awt.Component;
 import java.util.Objects;
 
 /**
