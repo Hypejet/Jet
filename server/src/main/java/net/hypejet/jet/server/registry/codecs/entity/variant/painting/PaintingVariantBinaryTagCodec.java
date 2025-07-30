@@ -23,7 +23,7 @@ public final class PaintingVariantBinaryTagCodec implements BinaryTagCodec<Paint
 
     private static final String WIDTH_FIELD = "width";
     private static final String HEIGHT_FIELD = "height";
-    private static final String ASSET_FIELD = "asset";
+    private static final String ASSET_FIELD = "asset_id";
     private static final String TITLE_FIELD = "title";
     private static final String AUTHOR_FIELD = "author";
 
