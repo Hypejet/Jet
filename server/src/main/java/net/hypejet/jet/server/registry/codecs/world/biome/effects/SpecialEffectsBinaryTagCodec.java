@@ -6,7 +6,7 @@ import net.hypejet.jet.server.registry.codecs.adventure.IndexBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.primitive.ListBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.primitive.StringBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.util.color.ColorBinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.util.random.WeightedBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.util.game.random.WeightedBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.world.sound.SoundEventBinaryTagCodec;
 import net.hypejet.jet.server.util.index.IndexUtil;
 import net.hypejet.jet.util.color.Color;

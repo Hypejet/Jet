@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.registry.codecs.util.random;
+package net.hypejet.jet.server.registry.codecs.util.game.random;
 
 import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.hypejet.jet.util.game.random.Weighted;
