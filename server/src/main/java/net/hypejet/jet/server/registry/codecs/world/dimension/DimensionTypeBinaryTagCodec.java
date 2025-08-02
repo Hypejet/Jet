@@ -70,7 +70,7 @@ public final class DimensionTypeBinaryTagCodec implements BinaryTagCodec<Dimensi
                     requiredTag(MIN_Y_FIELD, compound, BinaryTagTypes.INT).value(),
                     requiredTag(HEIGHT_FIELD, compound, BinaryTagTypes.INT).value(),
                     requiredTag(LOGICAL_HEIGHT_FIELD, compound, BinaryTagTypes.INT).value(),
-                    KeyBinaryTagCodec.INSTANCE.decode(requiredTag(INFINIBURN_FIELD, compound)),
+                    KeyBinaryTagCodec.HASHED_INSTANCE.decode(requiredTag(INFINIBURN_FIELD, compound)),
                     KeyBinaryTagCodec.INSTANCE.decode(requiredTag(EFFECTS_FIELD, compound)),
                     requiredTag(AMBIENT_LIGHT_FIELD, compound, BinaryTagTypes.FLOAT).value(),
                     cloudHeightTag == null ? null : cloudHeightTag.value(),
@@ -102,7 +102,7 @@ public final class DimensionTypeBinaryTagCodec implements BinaryTagCodec<Dimensi
                 .putInt(MIN_Y_FIELD, decoded.minY())
                 .putInt(HEIGHT_FIELD, decoded.height())
                 .putInt(LOGICAL_HEIGHT_FIELD, decoded.logicalHeight())
-                .put(INFINIBURN_FIELD, KeyBinaryTagCodec.INSTANCE.encode(decoded.infiniburn()))
+                .put(INFINIBURN_FIELD, KeyBinaryTagCodec.HASHED_INSTANCE.encode(decoded.infiniburn()))
                 .put(EFFECTS_FIELD, KeyBinaryTagCodec.INSTANCE.encode(decoded.effects()))
                 .putFloat(AMBIENT_LIGHT_FIELD, decoded.ambientLight())
                 .putBoolean(PIGLIN_SAFE_FIELD, monsterSettings.piglinSafe())
