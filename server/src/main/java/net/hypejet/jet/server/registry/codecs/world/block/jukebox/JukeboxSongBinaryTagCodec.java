@@ -45,7 +45,7 @@ public final class JukeboxSongBinaryTagCodec implements BinaryTagCodec<JukeboxSo
             );
         } else {
             throw new IllegalArgumentException(
-                    "The encoded tag type must be of compound type to decode it to jukebox song"
+                    "The encoded tag type must be of compound type to decode it to a jukebox song"
             );
         }
     }
