@@ -38,7 +38,6 @@ import net.hypejet.jet.server.network.session.data.LoginData;
 import net.hypejet.jet.server.network.session.keepalive.KeepAliveHandler;
 import net.hypejet.jet.server.network.session.pack.ResourcePackHandler;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
-import net.hypejet.jet.server.registry.JetSerializableMinecraftRegistry;
 import net.hypejet.jet.server.registry.function.RegistryTagUpdateFunction;
 import net.hypejet.jet.server.scoreboard.JetScoreboard;
 import net.hypejet.jet.server.util.NetworkUtil;

@@ -1,6 +1,5 @@
 package net.hypejet.jet.registry.holder;
 
-import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.jet.registry.MinecraftRegistry;
 import net.hypejet.jet.registry.RegistryEntry;
 import net.kyori.adventure.key.Key;
@@ -79,10 +78,8 @@ public interface HolderSet<V> {
             List<Holder<V>> holders = new ArrayList<>();
 
             for (RegistryEntry<V> entry : registry.entries()) {
-                try (BooleanAcquisition acquisition = registry.hasTag(entry, this.tagKey)) {
-                    if (!acquisition.get()) continue;
-                    holders.add(entry.createHolder());
-                }
+                if (!registry.hasTag(entry, this.tagKey)) continue;
+                holders.add(entry.createHolder());
             }
 
             return List.copyOf(holders);

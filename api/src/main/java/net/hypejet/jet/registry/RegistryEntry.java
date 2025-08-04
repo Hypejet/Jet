@@ -27,14 +27,6 @@ public interface RegistryEntry<V> extends Keyed {
     @NonNull Key key();
 
     /**
-     * Gets the {@linkplain MinecraftRegistry registry} owning this registry entry.
-     *
-     * @return the registry owning this registry entry
-     * @since 1.0
-     */
-    @NonNull MinecraftRegistry<? super V> registry();
-
-    /**
      * Gets a value of the registry entry.
      *
      * @return the value
