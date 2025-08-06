@@ -13,7 +13,6 @@ import net.hypejet.jet.data.json.util.JsonUnit;
 import net.hypejet.jet.event.events.registry.RegistryInitializeEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.registry.MinecraftRegistry;
-import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.registry.RegistryManager;
 import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.server.entity.JetEntityType;
@@ -275,8 +274,7 @@ public final class JetRegistryManager implements RegistryManager {
          * {@linkplain RegistryReference registry reference} with the created registry.
          *
          * @param reference the registry reference
-         * @param resourceFileClasspath a classpath of a resource file with built-in entries
-         *                              to be added to the registry
+         * @param resourceFileClasspath a classpath of a resource file with built-in values to be added to the registry
          * @param valueType a class of the registry final value type
          * @param valueConverter a function converting values from the resource file to values that should be put
          *                       to the registry
@@ -298,8 +296,7 @@ public final class JetRegistryManager implements RegistryManager {
          * {@linkplain RegistryReference registry reference} with the created registry.
          *
          * @param reference the registry reference
-         * @param resourceFileClasspath a classpath of a resource file with built-in entries
-         *                              to be added to the registry
+         * @param resourceFileClasspath a classpath of a resource file with built-in values to be added to the registry
          * @param valueType a class of the registry final value type
          * @param valueConverter a function converting values from the resource file to values that should be put
          *                       to the registry
@@ -323,14 +320,15 @@ public final class JetRegistryManager implements RegistryManager {
                 ));
             }
 
-            List<JetRegistryEntry<CV>> entries = new ArrayList<>();
-            Map<JetRegistryEntry<CV>, Set<Key>> tags = new HashMap<>();
+            List<JetMinecraftRegistry.RegistrationInfo<CV>> registrations = new ArrayList<>();
+            Map<Key, Set<Key>> tags = new HashMap<>();
 
             List<JsonRegistryEntry<DV>> dataEntries = JetDataUtil.deserializeEntries(resourceFileClasspath, valueType);
             for (JsonRegistryEntry<DV> dataEntry : dataEntries) {
-                KnownPack convertedKnownPack;
-
+                Key key = dataEntry.key();
                 JsonKnownPack knownPack = dataEntry.knownPack();
+
+                KnownPack convertedKnownPack;
                 if (knownPack == null) {
                     convertedKnownPack = null;
                 } else {
@@ -341,22 +339,21 @@ public final class JetRegistryManager implements RegistryManager {
                     );
                 }
 
-                JetRegistryEntry<CV> entry = new JetRegistryEntry<>(
-                        dataEntry.key(),
+                registrations.add(new JetMinecraftRegistry.RegistrationInfo<>(
+                        key,
                         valueConverter.apply(dataEntry.value()),
                         convertedKnownPack
-                );
+                ));
 
-                entries.add(entry);
-                tags.put(entry, dataEntry.tags());
+                tags.put(key, dataEntry.tags());
             }
 
             JetMinecraftRegistry<CV> registry;
 
             if (networkableData == null) {
-                registry = new JetMinecraftRegistry<>(entries, tags, null);
+                registry = new JetMinecraftRegistry<>(registrations, tags, null);
             } else {
-                NetworkableRegistryBuilder<CV> registryBuilder = new NetworkableRegistryBuilder<>(entries, tags);
+                NetworkableRegistryBuilder<CV> registryBuilder = new NetworkableRegistryBuilder<>(registrations, tags);
                 this.eventNode.call(new RegistryInitializeEvent<>(reference, registryBuilder));
                 registry = registryBuilder.build(networkableData);
             }
@@ -384,43 +381,35 @@ public final class JetRegistryManager implements RegistryManager {
          */
         private static final class NetworkableRegistryBuilder<V> implements RegistryInitializeEvent.RegistryAccess<V> {
 
-            private final Map<Key, JetRegistryEntry<V>> entries = new HashMap<>();
-            private final Map<JetRegistryEntry<V>, Set<Key>> tags = new HashMap<>();
+            private final List<JetMinecraftRegistry.RegistrationInfo<V>> registrations = new ArrayList<>();
+            private final Map<Key, Set<Key>> tags = new HashMap<>();
 
             private boolean registryCreated;
 
             /**
              * Constructs the {@linkplain NetworkableRegistryBuilder networkable registry builder}.
              *
-             * @param initialEntries a list of initial registry entries that the registry should have,
-             *                       the order is not preserved
-             * @param initialTags a map associating the initial registry entries with initial tags that these
-             *                    entries should have
+             * @param initialRegistrations an info list of initial registrations that the registry should have,
+             *                             the order is preserved
+             * @param initialTags a map associating keys of initial values that the registry should have
+             *                    with initial tags that these values should be associated with
              * @since 1.0
              */
-            private NetworkableRegistryBuilder(@NonNull List<JetRegistryEntry<V>> initialEntries,
-                                               @NonNull Map<JetRegistryEntry<V>, Set<Key>> initialTags) {
-                initialEntries.forEach(entry -> this.entries.put(entry.key(), entry));
+            private NetworkableRegistryBuilder(
+                    @NonNull List<JetMinecraftRegistry.RegistrationInfo<V>> initialRegistrations,
+                    @NonNull Map<Key, Set<Key>> initialTags
+            ) {
+                this.registrations.addAll(initialRegistrations);
                 this.tags.putAll(initialTags);
             }
 
             @Override
-            public @NonNull RegistryEntry<V> register(@NonNull Key key, @NonNull V value,
-                                                      @Nullable KnownPack knownPack) {
+            public void register(@NonNull Key key, @NonNull V value, @Nullable KnownPack knownPack) {
                 Objects.requireNonNull(key, "key");
                 Objects.requireNonNull(value, "value");
-
                 if (this.registryCreated)
                     throw new IllegalArgumentException("The registry has already been created");
-
-                JetRegistryEntry<V> registryEntry = new JetRegistryEntry<>(key, value, knownPack);
-                this.entries.put(key, registryEntry);
-                return registryEntry;
-            }
-
-            @Override
-            public @NonNull Map<Key, RegistryEntry<V>> currentEntries() {
-                return Map.copyOf(this.entries);
+                this.registrations.add(new JetMinecraftRegistry.RegistrationInfo<>(key, value, knownPack));
             }
 
             /**
@@ -432,7 +421,7 @@ public final class JetRegistryManager implements RegistryManager {
              */
             private @NonNull JetMinecraftRegistry<V> build(JetMinecraftRegistry.@NonNull NetworkableData<V> data) {
                 this.registryCreated = true;
-                return new JetMinecraftRegistry<>(List.copyOf(this.entries.values()), this.tags, data);
+                return new JetMinecraftRegistry<>(List.copyOf(this.registrations), this.tags, data);
             }
         }
     }

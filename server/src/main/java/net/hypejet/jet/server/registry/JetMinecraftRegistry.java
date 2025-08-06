@@ -4,11 +4,11 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.hypejet.jet.registry.MinecraftRegistry;
-import net.hypejet.jet.registry.RegistryEntry;
+import net.hypejet.jet.registry.feature.KnownPack;
 import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.kyori.adventure.key.Key;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,77 +20,62 @@ import java.util.function.UnaryOperator;
 /**
  * An implementation of {@linkplain MinecraftRegistry Minecraft registry}.
  *
- * @param <V> a type of entry values of this registry
+ * @param <V> a type of values available in this registry
  * @since 1.0
  * @see MinecraftRegistry
  */
 public final class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
 
-    private final Map<Key, JetRegistryEntry<V>> keyToEntryMap;
-    private final Object2IntMap<JetRegistryEntry<V>> entryToIdentifierMap;
-    private final List<JetRegistryEntry<V>> entries;
-    private final NetworkableData<V> networkableData;
+    private final Object2IntMap<Key> keyToIndexMap;
+    private final Map<Key, Set<Key>> tags = new HashMap<>();
 
-    private final Map<JetRegistryEntry<V>, Set<Key>> tags = new HashMap<>();
+    private final List<RegistrationInfo<V>> registrationInfos;
+    private final NetworkableData<V> networkableData;
 
     /**
      * Constructs the {@linkplain JetMinecraftRegistry Minecraft registry implementation}.
      *
-     * @param entries a list of registry entries that the registry should have, the order is preserved
-     * @param tags a map associating registry entries with keys of tags that these registry entries should have
+     * @param registrationInfos an info list of registrations that the registry should have, the order is preserved
+     * @param tags a map associating keys of registry values with keys of tags that these registry values should have
      * @param networkableData an additional data that the registry should have for network writing
      *                        purposes, {@code null} if values of the registry should not be able
      *                        to be written to network
      * @since 1.0
      */
-    public JetMinecraftRegistry(@NonNull List<JetRegistryEntry<V>> entries,
-                                @NonNull Map<JetRegistryEntry<V>, Set<Key>> tags,
+    public JetMinecraftRegistry(@NonNull List<RegistrationInfo<V>> registrationInfos, @NonNull Map<Key, Set<Key>> tags,
                                 @Nullable NetworkableData<V> networkableData) {
-        Objects.requireNonNull(entries, "entries");
+        Objects.requireNonNull(registrationInfos, "registration infos");
         Objects.requireNonNull(tags, "tags");
 
-        Map<Key, JetRegistryEntry<V>> keyToEntryMap = new HashMap<>();
-        Object2IntMap<JetRegistryEntry<V>> entryToIdentifierMap = new Object2IntOpenHashMap<>();
-
-        for (int index = 0; index < entries.size(); index++) {
-            JetRegistryEntry<V> entry = entries.get(index);
-            keyToEntryMap.put(entry.key(), entry);
-            entryToIdentifierMap.put(entry, index);
-        }
-
-        this.keyToEntryMap = Map.copyOf(keyToEntryMap);
-        this.entryToIdentifierMap = Object2IntMaps.unmodifiable(entryToIdentifierMap);
-        this.entries = List.copyOf(entries);
+        this.keyToIndexMap = createKeyToIndexMap(registrationInfos);
+        this.registrationInfos = List.copyOf(registrationInfos);
         this.networkableData = networkableData;
 
         this.tags.putAll(tags);
-        this.tags.replaceAll((entry, keys) -> Set.copyOf(keys));
+        this.tags.replaceAll((key, tagKeys) -> Set.copyOf(tagKeys));
     }
 
     @Override
-    public @Nullable JetRegistryEntry<V> get(@NonNull Key key) {
-        return this.keyToEntryMap.get(key);
+    public @Nullable V get(@NonNull Key key) {
+        Objects.requireNonNull(key, "key");
+        if (!this.keyToIndexMap.containsKey(key)) return null;
+        return this.registrationInfos.get(this.keyToIndexMap.getInt(key)).value();
     }
 
     @Override
-    public @NonNull List<JetRegistryEntry<V>> entries() {
-        return this.entries;
+    public @NonNull Set<Key> keySet() {
+        return this.keyToIndexMap.keySet();
     }
 
     @Override
-    public boolean hasTag(@NonNull RegistryEntry<V> entry, @NonNull Key tag) {
-        return this.tagsFor(entry).contains(tag);
+    public @NonNull Set<Key> tagsFor(@NonNull Key key) {
+        return this.tags.get(this.ensureRegistered(key));
     }
 
     @Override
-    public @NonNull Set<Key> tagsFor(@NonNull RegistryEntry<V> entry) {
-        return this.tags.get(this.ensureRegistered(entry));
-    }
-
-    @Override
-    public void updateTags(@NonNull RegistryEntry<V> entry,
-                                 @NonNull UnaryOperator<Set<Key>> tagUnaryOperator) {
-        this.tags.compute(this.ensureRegistered(entry), (ignored, tagSet) -> {
+    public void updateTags(@NonNull Key key, @NonNull UnaryOperator<Set<Key>> tagUnaryOperator) {
+        Objects.requireNonNull(tagUnaryOperator, "tag unary operator");
+        this.tags.compute(this.ensureRegistered(key), (ignored, tagSet) -> {
             Set<Key> updatedTagSet = tagUnaryOperator.apply(tagSet == null ? Set.of() : Set.copyOf(tagSet));
             if (updatedTagSet.isEmpty()) return null;
             return Set.copyOf(updatedTagSet);
@@ -98,27 +83,26 @@ public final class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
     }
 
     /**
-     * Gets an entry-list index of the specified {@linkplain JetRegistryEntry registry entry}.
+     * Gets a registry index of a registry value associated with the specified {@linkplain Key key}.
      *
-     * @param entry the registry entry
-     * @return the entry-list index
-     * @throws IllegalArgumentException if this registry does not contain the specified registry entry
+     * @param key the key of the registry value
+     * @return the registry index
+     * @throws IllegalArgumentException if no registry value is associated with the specified key
      * @since 1.0
      */
-    public int indexOf(@NonNull JetRegistryEntry<V> entry) {
-        this.ensureRegistered(entry);
-        return this.entryToIdentifierMap.getInt(entry);
+    public int indexOf(@NonNull Key key) {
+        return this.keyToIndexMap.getInt(this.ensureRegistered(key));
     }
 
     /**
-     * Gets a {@linkplain Map map} associating {@linkplain JetRegistryEntry registry entries}
-     * with keys of tags that these registry entries should have.
+     * Gets {@linkplain List list} of {@linkplain RegistrationInfo registration infos} of all registrations
+     * from this {@linkplain JetMinecraftRegistry registry} with preserved order.
      *
-     * @return the tag  map
+     * @return the registration-info list
      * @since 1.0
      */
-    public @NonNull Map<JetRegistryEntry<V>, Set<Key>> tags() {
-        return Map.copyOf(this.tags);
+    public @NonNull List<RegistrationInfo<V>> registrationInfos() {
+        return registrationInfos;
     }
 
     /**
@@ -131,12 +115,33 @@ public final class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
         return this.networkableData;
     }
 
-    private @NonNull JetRegistryEntry<V> ensureRegistered(@NonNull RegistryEntry<V> entry) {
-        if (!(entry instanceof JetRegistryEntry<V> validatedEntry))
-            throw new IllegalArgumentException("The specified registry entry is not a valid registry entry");
-        if (!this.entryToIdentifierMap.containsKey(entry))
-            throw new IllegalArgumentException("This registry does not contain \"" + entry.key() + "\" entry");
-        return validatedEntry;
+    private @NonNull Key ensureRegistered(@NonNull Key key) {
+        Objects.requireNonNull(key, "key");
+        if (!this.keyToIndexMap.containsKey(key))
+            throw new IllegalArgumentException("This registry does not contain a value for \"" + key + "\" key");
+        return key;
+    }
+
+    private static <V> @NonNull Object2IntMap<Key> createKeyToIndexMap(
+            @NonNull List<RegistrationInfo<V>> registrationInfos
+    ) {
+        Object2IntMap<Key> keyToIndexMap = new Object2IntOpenHashMap<>();
+
+        for (int index = 0; index < registrationInfos.size(); index++) {
+            RegistrationInfo<V> registrationInfo = registrationInfos.get(index);
+            Key key = registrationInfo.key();
+
+            if (keyToIndexMap.containsKey(key)) {
+                throw new IllegalArgumentException(String.format(
+                        "The registry already has a registration info for \"%s\" key",
+                        key
+                ));
+            }
+
+            keyToIndexMap.put(key, index);
+        }
+
+        return Object2IntMaps.unmodifiable(keyToIndexMap);
     }
 
     /**
@@ -159,6 +164,33 @@ public final class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
         public NetworkableData {
             Objects.requireNonNull(valueCodec, "value codec");
             Objects.requireNonNull(registryKey, "registry key");
+        }
+    }
+
+    /**
+     * An information about a registration that should be or was done in a {@linkplain JetMinecraftRegistry registry}.
+     *
+     * @param key the key that the registration info should be bound to
+     * @param value a registry value that should be associated with the key
+     * @param knownPack an information about a feature pack that can enable the registration without sending
+     *                  the entire registration info to the client, {@code null} if there is no such a feature pack
+     * @param <V> the type of value that should be associated with the key
+     * @since 1.0
+     */
+    public record RegistrationInfo<V>(@NonNull Key key, @NonNull V value, @Nullable KnownPack knownPack) {
+        /**
+         * Constructs the {@linkplain RegistrationInfo registration info}.
+         *
+         * @param key the key that the created registration info should be bound to
+         * @param value a registry value that should be associated with the key
+         * @param knownPack an information about a feature pack that should be able to enable the registration
+         *                  (that the registration info is constructed for) without sending the encoded value
+         *                  to the client, {@code null} if there is no such a feature pack
+         * @since 1.0
+         */
+        public RegistrationInfo {
+            Objects.requireNonNull(key, "key");
+            Objects.requireNonNull(value, "value");
         }
     }
 }

@@ -1,6 +1,5 @@
 package net.hypejet.jet.registry.blockstate;
 
-import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.block.BlockType;
 import org.checkerframework.checker.nullness.qual.NonNull;

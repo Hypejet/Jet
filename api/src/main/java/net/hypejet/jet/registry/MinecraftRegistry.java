@@ -11,58 +11,47 @@ import java.util.function.UnaryOperator;
 /**
  * Represents a Minecraft registry.
  *
- * @param <V> a type of entry values of this registry
+ * @param <V> a type of values available in this registry
  * @since 1.0
  */
 public interface MinecraftRegistry<V> {
     /**
-     * Gets a registry entry by its key.
+     * Gets a value associated with the specified {@linkplain Key key}.
      *
      * @param key the key
-     * @return the registry entry
+     * @return the value, {@code null} if no value is associated with the specified key
      * @since 1.0
      */
-    @Nullable RegistryEntry<V> get(@NonNull Key key);
+    @Nullable V get(@NonNull Key key);
 
     /**
-     * Gets a {@linkplain Collection collection} of all entries registered in this registry.
+     * Gets a {@linkplain Collection collection} of all {@linkplain Key keys}
+     * that have corresponding values in this {@linkplain MinecraftRegistry registry}.
      *
      * @return the collection
      * @since 1.0
      */
-    @NonNull Collection<? extends RegistryEntry<V>> entries();
+    @NonNull Set<Key> keySet();
 
     /**
-     * Gets whether the specified {@linkplain RegistryEntry registry entry} is associated with the specified tag.
+     * Creates a {@linkplain Set set} of keys of tags associated with
+     * a registry value associated with the specified {@linkplain Key key}.
      *
-     * @param entry the registry entry
-     * @param tag   the key of the tag
-     * @return {@code true} if the registry entry specified is associated with
-     *         the specified tag, {@code false} otherwise
-     * @throws IllegalArgumentException if the specified registry entry has not been registered in this registry
-     * @since 1.0
-     */
-    boolean hasTag(@NonNull RegistryEntry<V> entry, @NonNull Key tag);
-
-    /**
-     * Creates a {@linkplain Set set} of tags associated with
-     * the specified {@linkplain RegistryEntry registry entry}.
-     *
-     * @param entry the registry entry
+     * @param key the key of the registry value
      * @return the set of tags
-     * @throws IllegalArgumentException if the specified registry entry has not been registered in this registry
+     * @throws IllegalArgumentException if no registry value is associated with the specified key
      * @since 1.0
      */
-    @NonNull Set<Key> tagsFor(@NonNull RegistryEntry<V> entry);
+    @NonNull Set<Key> tagsFor(@NonNull Key key);
 
     /**
-     * Updates tags for the specified {@linkplain RegistryEntry registry entry}.
+     * Updates tags for a registry value associated with the specified {@linkplain Key key}.
      *
-     * @param entry            the registry entry
+     * @param key the key of the registry value
      * @param tagUnaryOperator a unary operator to update the tags with, the provided set
      *                         is a set of current tags, the returned set is a set of new tags
-     * @throws IllegalArgumentException if the specified registry entry has not been specified in this registry
+     * @throws IllegalArgumentException if no registry value is associated with the specified key
      * @since 1.0
      */
-    void updateTags(@NonNull RegistryEntry<V> entry, @NonNull UnaryOperator<Set<Key>> tagUnaryOperator);
+    void updateTags(@NonNull Key key, @NonNull UnaryOperator<Set<Key>> tagUnaryOperator);
 }

@@ -1,6 +1,5 @@
 package net.hypejet.jet.world.block;
 
-import net.hypejet.jet.registry.RegistryEntry;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Map;

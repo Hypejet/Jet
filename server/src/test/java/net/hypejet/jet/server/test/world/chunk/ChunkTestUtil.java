@@ -5,7 +5,6 @@ import net.hypejet.jet.data.model.api.number.IntegerProvider;
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.biome.effects.BiomeEffectSettings;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
-import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.block.JetBlockType;
 import net.kyori.adventure.key.Key;

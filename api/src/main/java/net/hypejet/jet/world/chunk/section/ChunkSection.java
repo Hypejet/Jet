@@ -1,7 +1,6 @@
 package net.hypejet.jet.world.chunk.section;
 
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
-import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.world.block.BlockState;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

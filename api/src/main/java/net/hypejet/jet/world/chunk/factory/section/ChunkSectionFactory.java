@@ -1,7 +1,6 @@
 package net.hypejet.jet.world.chunk.factory.section;
 
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
-import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.chunk.light.LightSection;
 import net.hypejet.jet.world.chunk.light.LightStorage;

@@ -7,7 +7,6 @@ import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.entity.Entity;
-import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.world.acquisition.worldmap.WorldMapAcquisition;
 import net.hypejet.jet.world.acquisition.worldmap.WriteWorldMapAcquisition;
 import net.hypejet.jet.world.data.WorldData;

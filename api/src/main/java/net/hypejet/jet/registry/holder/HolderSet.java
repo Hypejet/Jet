@@ -1,7 +1,6 @@
 package net.hypejet.jet.registry.holder;
 
 import net.hypejet.jet.registry.MinecraftRegistry;
-import net.hypejet.jet.registry.RegistryEntry;
 import net.kyori.adventure.key.Key;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NonNull;

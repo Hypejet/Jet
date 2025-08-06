@@ -14,7 +14,6 @@ import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.player.JetPlayer;
-import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.world.acquisition.worldmap.WorldMapAcquisitionImpl;
 import net.hypejet.jet.server.world.acquisition.worldmap.WriteWorldMapAcquisitionImpl;
 import net.hypejet.jet.server.world.chunk.JetChunk;

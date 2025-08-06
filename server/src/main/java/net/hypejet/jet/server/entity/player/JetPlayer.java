@@ -41,7 +41,6 @@ import net.hypejet.jet.server.network.session.data.ConfigurationData;
 import net.hypejet.jet.server.network.session.data.LoginData;
 import net.hypejet.jet.server.network.session.pack.ResourcePackHandler;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
-import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.scoreboard.JetScoreboard;
 import net.hypejet.jet.server.util.game.audience.PacketReceivingCommonAudience;

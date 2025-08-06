@@ -2,7 +2,6 @@ package net.hypejet.jet.server.world.acquisition.worldmap;
 
 import net.hypejet.concurrency.map.MapAcquisition;
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
-import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.util.coordinate.ChunkPositionUtil;
 import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.server.world.chunk.JetChunk;

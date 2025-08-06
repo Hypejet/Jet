@@ -11,7 +11,6 @@ import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.data.model.server.registry.registries.block.entity.BlockEntityType;
-import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
@@ -21,7 +20,6 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateBlo
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateChunkSectionBlockStatesPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateLightPlayPacket;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
-import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.registry.blockstate.JetBlockStateRegistry;
 import net.hypejet.jet.server.util.coordinate.AbsolutePositionUtil;

@@ -3,7 +3,6 @@ package net.hypejet.jet.server.network.codec.packet.server.play;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
-import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.world.chunk.palette.ChunkPaletteNetworkWriter;

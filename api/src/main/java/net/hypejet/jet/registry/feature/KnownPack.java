@@ -1,6 +1,5 @@
 package net.hypejet.jet.registry.feature;
 
-import net.hypejet.jet.registry.RegistryEntry;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;

@@ -2,7 +2,6 @@ package net.hypejet.jet.world.chunk.factory;
 
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
-import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.chunk.Chunk;
 import net.hypejet.jet.world.chunk.builder.ChunkBuilder;

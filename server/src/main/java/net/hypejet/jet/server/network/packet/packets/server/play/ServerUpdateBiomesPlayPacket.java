@@ -2,7 +2,6 @@ package net.hypejet.jet.server.network.packet.packets.server.play;
 
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;

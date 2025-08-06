@@ -1,7 +1,6 @@
 package net.hypejet.jet.server.world.block;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.block.BlockType;
 import org.checkerframework.checker.nullness.qual.NonNull;

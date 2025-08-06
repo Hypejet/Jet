@@ -3,7 +3,6 @@ package net.hypejet.jet.server.world.chunk.section;
 import it.unimi.dsi.fastutil.objects.Object2ShortMap;
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;

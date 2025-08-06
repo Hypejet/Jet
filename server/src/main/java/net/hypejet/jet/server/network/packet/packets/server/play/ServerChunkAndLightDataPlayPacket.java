@@ -4,7 +4,6 @@ import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.data.model.server.registry.registries.block.entity.BlockEntityType;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
-import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.block.JetBlockType;

@@ -3,7 +3,6 @@ package net.hypejet.jet.world;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
-import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.chunk.ChunkLoader;
 import net.hypejet.jet.world.chunk.factory.ChunkFactory;

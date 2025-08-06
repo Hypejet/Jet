@@ -17,7 +17,6 @@ import net.hypejet.jet.data.model.server.registry.registries.pack.FeaturePack;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.configuration.ConfigurationStartEvent;
 import net.hypejet.jet.network.PlayerConnection;
-import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.network.ProtocolState;
 import net.hypejet.jet.server.network.SocketPlayerConnection;

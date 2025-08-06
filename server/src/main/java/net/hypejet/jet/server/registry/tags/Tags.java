@@ -1,7 +1,6 @@
 package net.hypejet.jet.server.registry.tags;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

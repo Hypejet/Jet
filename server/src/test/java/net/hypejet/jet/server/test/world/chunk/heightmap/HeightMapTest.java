@@ -5,7 +5,6 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
-import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.test.world.chunk.ChunkTestUtil;
 import net.hypejet.jet.server.util.order.ElementOrder;
 import net.hypejet.jet.server.world.block.JetBlockState;

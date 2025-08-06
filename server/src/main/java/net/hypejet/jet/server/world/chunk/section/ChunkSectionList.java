@@ -5,7 +5,6 @@ import io.netty.util.collection.IntObjectMap;
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;

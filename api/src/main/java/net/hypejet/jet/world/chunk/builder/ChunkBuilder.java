@@ -1,7 +1,6 @@
 package net.hypejet.jet.world.chunk.builder;
 
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
-import net.hypejet.jet.registry.RegistryEntry;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.chunk.Chunk;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
