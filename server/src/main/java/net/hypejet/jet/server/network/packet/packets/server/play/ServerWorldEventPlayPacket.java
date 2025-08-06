@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.packet.packets.server.play;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
-import net.hypejet.jet.world.event.WorldEvent;
+import net.hypejet.jet.world.event.world.WorldEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

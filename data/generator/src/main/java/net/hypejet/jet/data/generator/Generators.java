@@ -311,7 +311,7 @@ final class Generators {
 
         MinecraftServer.configurePackRepository(
                 packRepository,
-                new WorldDataConfiguration(DataPackConfig.DEFAULT, FeatureFlags.REGISTRY.allFlags()),
+                new WorldDataConfiguration(DataPackConfig.DEFAULT, FeatureFlags.VANILLA_SET),
                 false, true
         );
 

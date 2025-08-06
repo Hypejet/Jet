@@ -2,6 +2,7 @@ package net.hypejet.jet.data.generator.extractor;
 
 import net.hypejet.jet.data.generator.adpater.KeyAdapter;
 import net.hypejet.jet.data.json.entry.JsonRegistryEntry;
+import net.hypejet.jet.data.json.model.feature.JsonKnownPack;
 import net.kyori.adventure.key.Key;
 import net.minecraft.core.RegistrationInfo;
 import net.minecraft.core.Registry;
@@ -60,13 +61,13 @@ public final class ConverterRegistryExtractor<MV, CV> implements RegistryExtract
                     .map(tag -> KeyAdapter.convert(tag.location()))
                     .collect(Collectors.toUnmodifiableSet());
 
-            JsonRegistryEntry.FeaturePack featurePack = registry.registrationInfo(key)
+            JsonKnownPack knownPack = registry.registrationInfo(key)
                     .flatMap(RegistrationInfo::knownPackInfo)
-                    .map(pack -> new JsonRegistryEntry.FeaturePack(pack.namespace(), pack.id(), pack.version()))
+                    .map(pack -> new JsonKnownPack(pack.namespace(), pack.id(), pack.version()))
                     .orElse(null);
 
             CV convertedValue = this.converter.apply(value);
-            entries.add(new JsonRegistryEntry<>(KeyAdapter.convert(key.location()), convertedValue, tags, featurePack));
+            entries.add(new JsonRegistryEntry<>(KeyAdapter.convert(key.location()), convertedValue, tags, knownPack));
         }
 
         return List.copyOf(entries);

@@ -8,7 +8,7 @@ import net.hypejet.jet.entity.acquisition.gamemode.WriteGameModeAcquisition;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerWorldEventPlayPacket;
-import net.hypejet.jet.world.event.events.ChangeGameModeWorldEvent;
+import net.hypejet.jet.world.event.world.events.ChangeGameModeWorldEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

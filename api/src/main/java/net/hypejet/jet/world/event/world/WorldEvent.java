@@ -1,4 +1,4 @@
-package net.hypejet.jet.world.event;
+package net.hypejet.jet.world.event.world;
 
 /**
  * Represents an event of {@linkplain net.hypejet.jet.world.World a world}.

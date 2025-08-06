@@ -29,7 +29,7 @@ public final class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
     private final Map<Key, JetRegistryEntry<V>> keyToEntryMap;
     private final Object2IntMap<JetRegistryEntry<V>> entryToIdentifierMap;
     private final List<JetRegistryEntry<V>> entries;
-    private final BinaryTagCodec<V> valueCodec;
+    private final NetworkableData<V> networkableData;
 
     private final Map<JetRegistryEntry<V>, Set<Key>> tags = new HashMap<>();
 
@@ -38,13 +38,14 @@ public final class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
      *
      * @param entries a list of registry entries that the registry should have, the order is preserved
      * @param tags a map associating registry entries with keys of tags that these registry entries should have
-     * @param valueCodec a binary-tag codec that should handle serialization of values of the registry, {@code null}
-     *                   if values of the constructed registry should not be able to be serialized to the network
+     * @param networkableData an additional data that the registry should have for network writing
+     *                        purposes, {@code null} if values of the registry should not be able
+     *                        to be written to network
      * @since 1.0
      */
-    private JetMinecraftRegistry(@NonNull List<JetRegistryEntry<V>> entries,
-                                 @NonNull Map<JetRegistryEntry<V>, Set<Key>> tags,
-                                 @Nullable BinaryTagCodec<V> valueCodec) {
+    public JetMinecraftRegistry(@NonNull List<JetRegistryEntry<V>> entries,
+                                @NonNull Map<JetRegistryEntry<V>, Set<Key>> tags,
+                                @Nullable NetworkableData<V> networkableData) {
         Objects.requireNonNull(entries, "entries");
         Objects.requireNonNull(tags, "tags");
 
@@ -60,7 +61,7 @@ public final class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
         this.keyToEntryMap = Map.copyOf(keyToEntryMap);
         this.entryToIdentifierMap = Object2IntMaps.unmodifiable(entryToIdentifierMap);
         this.entries = List.copyOf(entries);
-        this.valueCodec = valueCodec;
+        this.networkableData = networkableData;
 
         this.tags.putAll(tags);
         this.tags.replaceAll((entry, keys) -> Set.copyOf(keys));
@@ -121,14 +122,13 @@ public final class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
     }
 
     /**
-     * Gets a {@linkplain BinaryTagCodec binary-tag codec} that should handle serialization of values of the registry.
+     * Gets an additional data that this registry should have for network writing purposes.
      *
-     * @return the binary-tag codec of values of this registry, {@code null} if values
-     *         of this registry should not be able to be serialized to the network
+     * @return the additional data, {@code null} if values of this registry are not network-serializable
      * @since 1.0
      */
-    public @NonNull BinaryTagCodec<V> valueCodec() {
-        return this.valueCodec;
+    public @Nullable NetworkableData<V> networkableData() {
+        return this.networkableData;
     }
 
     private @NonNull JetRegistryEntry<V> ensureRegistered(@NonNull RegistryEntry<V> entry) {
@@ -137,5 +137,28 @@ public final class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
         if (!this.entryToIdentifierMap.containsKey(entry))
             throw new IllegalArgumentException("This registry does not contain \"" + entry.key() + "\" entry");
         return validatedEntry;
+    }
+
+    /**
+     * An additional data of a {@linkplain JetMinecraftRegistry registry}
+     * available when its can be written to a network.
+     *
+     * @param valueCodec a binary tag codec to write the registry values with
+     * @param registryKey a key of the registry that this data was created for
+     * @param <V> the value type of the registry
+     * @since 1.0
+     */
+    public record NetworkableData<V>(@NonNull BinaryTagCodec<V> valueCodec, @NonNull Key registryKey) {
+        /**
+         * Constructs the {@linkplain NetworkableData networkable registry data}.
+         *
+         * @param valueCodec a binary tag codec to write the registry values with
+         * @param registryKey a key of the registry that the data is constructed for
+         * @since 1.0
+         */
+        public NetworkableData {
+            Objects.requireNonNull(valueCodec, "value codec");
+            Objects.requireNonNull(registryKey, "registry key");
+        }
     }
 }

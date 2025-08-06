@@ -1,7 +1,7 @@
-package net.hypejet.jet.world.event.events;
+package net.hypejet.jet.world.event.world.events;
 
 import net.hypejet.jet.entity.player.Player;
-import net.hypejet.jet.world.event.WorldEvent;
+import net.hypejet.jet.world.event.world.WorldEvent;
 
 /**
  * Represents {@linkplain WorldEvent a world event}, which is sent when {@linkplain Player a player} is being struck by

@@ -1,7 +1,7 @@
-package net.hypejet.jet.world.event.events;
+package net.hypejet.jet.world.event.world.events;
 
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.world.event.WorldEvent;
+import net.hypejet.jet.world.event.world.WorldEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

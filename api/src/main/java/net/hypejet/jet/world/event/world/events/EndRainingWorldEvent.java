@@ -1,6 +1,6 @@
-package net.hypejet.jet.world.event.events;
+package net.hypejet.jet.world.event.world.events;
 
-import net.hypejet.jet.world.event.WorldEvent;
+import net.hypejet.jet.world.event.world.WorldEvent;
 
 /**
  * Represents {@linkplain WorldEvent a world event}, which stops playing a raining effect.

@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.world.event.events;
 
 import net.hypejet.jet.server.world.event.WorldEventValueProvider;
-import net.hypejet.jet.world.event.events.RainLevelChangeWorldEvent;
+import net.hypejet.jet.world.event.world.events.RainLevelChangeWorldEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

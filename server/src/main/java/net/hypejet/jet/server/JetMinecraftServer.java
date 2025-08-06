@@ -53,10 +53,10 @@ public final class JetMinecraftServer implements MinecraftServer {
     JetMinecraftServer() {
         this.configuration = JetServerConfiguration.parse(this, UnparsedServerConfiguration.create());
         this.commandManager = new JetCommandManager(this);
-        this.registryManager = new JetRegistryManager(this);
         this.worldManager = new JetWorldManager(this);
         this.scoreboardManager = new JetScoreboardManager();
         this.pluginManager = new JetPluginManager(this);
+        this.registryManager = new JetRegistryManager(this.eventNode);
         this.networkManager = new NetworkManager(this);
         this.eventNode.call(new ServerReadyEvent());
         this.ticker = new Ticker(this);

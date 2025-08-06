@@ -4,7 +4,7 @@ import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerWorldEventPlayPacket;
-import net.hypejet.jet.world.event.events.EnableRespawnScreenWorldEvent;
+import net.hypejet.jet.world.event.world.events.EnableRespawnScreenWorldEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**

@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.world.event.events;
 
 import net.hypejet.jet.server.world.event.WorldEventValueProvider;
-import net.hypejet.jet.world.event.events.ThunderLevelChangeWorldEvent;
+import net.hypejet.jet.world.event.world.events.ThunderLevelChangeWorldEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

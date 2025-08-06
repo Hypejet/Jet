@@ -12,7 +12,6 @@ import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.util.data.JetDataUtil;
 import net.hypejet.jet.server.util.order.ElementOrder;
 import net.hypejet.jet.server.world.block.JetBlockState;
-import net.hypejet.jet.server.world.block.JetBlockType;
 import net.hypejet.jet.world.block.BlockType;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -31,18 +30,16 @@ public final class JetBlockStateRegistry implements BlockStateRegistry {
 
     private final ElementOrder<JetBlockState> order;
 
-    private final Map<JetRegistryEntry<JetBlockType>, Map<Map<String, String>, JetBlockState>> possibleStates;
-    private final Map<JetRegistryEntry<JetBlockType>, JetBlockState> defaultStates;
+    private final Map<JetRegistryEntry<BlockType>, Map<Map<String, String>, JetBlockState>> possibleStates;
+    private final Map<JetRegistryEntry<BlockType>, JetBlockState> defaultStates;
 
     /**
      * Constructs the {@linkplain BlockStateRegistry block state registry}.
      *
      * @param blockTypeRegistry a registry of all possible block types
-     * @param blockDataEntries a list of deserialized data registry entries representing unconverted block types
      * @since 1.0
      */
-    public JetBlockStateRegistry(@NonNull JetMinecraftRegistry<JetBlockType> blockTypeRegistry,
-                                 @NonNull List<JsonRegistryEntry<JsonBlock>> blockDataEntries) {
+    public JetBlockStateRegistry(@NonNull JetMinecraftRegistry<BlockType> blockTypeRegistry) {
         NullabilityUtil.requireNonNull(blockTypeRegistry, "block type registry");
 
         List<JsonRegistryEntry<JsonBlockState>> blockStateDataEntries = JetDataUtil.deserializeEntries(
@@ -50,10 +47,15 @@ public final class JetBlockStateRegistry implements BlockStateRegistry {
                 JsonBlockState.class
         );
 
+        List<JsonRegistryEntry<JsonBlock>> blockDataEntries = JetDataUtil.deserializeEntries(
+                JsonDataResourceFiles.BLOCKS,
+                JsonBlock.class
+        );
+
         List<JetBlockState> blockStates = new ArrayList<>();
         for (JsonRegistryEntry<JsonBlockState> blockStateEntry : blockStateDataEntries) {
             Key blockTypeKey = blockStateEntry.key();
-            JetRegistryEntry<JetBlockType> blockType = blockTypeRegistry.get(blockTypeKey);
+            JetRegistryEntry<BlockType> blockType = blockTypeRegistry.get(blockTypeKey);
 
             if (blockType == null)
                 throw new IllegalArgumentException(String.format("Could not find a %s block type", blockTypeKey));
@@ -67,12 +69,12 @@ public final class JetBlockStateRegistry implements BlockStateRegistry {
 
         ElementOrder<JetBlockState> blockStateOrder = new ElementOrder<>(blockStates);
 
-        Map<JetRegistryEntry<JetBlockType>, Map<Map<String, String>, JetBlockState>> possibleStates = new HashMap<>();
-        Map<JetRegistryEntry<JetBlockType>, JetBlockState> defaultStates = new HashMap<>();
+        Map<JetRegistryEntry<BlockType>, Map<Map<String, String>, JetBlockState>> possibleStates = new HashMap<>();
+        Map<JetRegistryEntry<BlockType>, JetBlockState> defaultStates = new HashMap<>();
 
         for (JsonRegistryEntry<JsonBlock> blockDataEntry : blockDataEntries) {
             Key blockTypeKey = blockDataEntry.key();
-            JetRegistryEntry<JetBlockType> blockType = blockTypeRegistry.get(blockTypeKey);
+            JetRegistryEntry<BlockType> blockType = blockTypeRegistry.get(blockTypeKey);
 
             if (blockType == null)
                 throw new IllegalArgumentException(String.format("Could not find a %s block type", blockTypeKey));

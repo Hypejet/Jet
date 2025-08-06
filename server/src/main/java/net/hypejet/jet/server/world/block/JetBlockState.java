@@ -3,6 +3,7 @@ package net.hypejet.jet.server.world.block;
 import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.world.block.BlockState;
+import net.hypejet.jet.world.block.BlockType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Map;
@@ -18,7 +19,7 @@ import java.util.Map;
  * @param blocksMotion whether motion of players entering a block with this block state is be blocked
  * @since 1.0
  */
-public record JetBlockState(@NonNull JetRegistryEntry<JetBlockType> blockType, @NonNull Map<String, String> properties,
+public record JetBlockState(@NonNull JetRegistryEntry<BlockType> blockType, @NonNull Map<String, String> properties,
                             boolean isAir, boolean hasFluidState, boolean blocksMotion)
         implements BlockState {
     /**

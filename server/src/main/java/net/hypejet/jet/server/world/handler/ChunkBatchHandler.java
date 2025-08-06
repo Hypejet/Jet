@@ -22,7 +22,7 @@ import net.hypejet.jet.server.world.acquisition.worldmap.WriteWorldMapAcquisitio
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.view.ChunkView;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
-import net.hypejet.jet.world.event.events.StartWaitingForWorldChunksWorldEvent;
+import net.hypejet.jet.world.event.world.events.StartWaitingForWorldChunksWorldEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 

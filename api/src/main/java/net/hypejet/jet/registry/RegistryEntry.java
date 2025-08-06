@@ -1,12 +1,10 @@
 package net.hypejet.jet.registry;
 
-import net.hypejet.jet.data.model.api.pack.PackInfo;
 import net.hypejet.jet.registry.holder.Holder;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Represents an entry of {@linkplain MinecraftRegistry a Minecraft registry}.
@@ -33,14 +31,6 @@ public interface RegistryEntry<V> extends Keyed {
      * @since 1.0
      */
     @NonNull V value();
-
-    /**
-     * Gets an information of a feature pack, which enables this registry entry.
-     *
-     * @return the feature pack, {@code null} if no feature packs enable the entry
-     * @since 1.0
-     */
-    @Nullable PackInfo knownPackInfo();
 
     /**
      * Creates a {@linkplain Holder.Reference reference holder}

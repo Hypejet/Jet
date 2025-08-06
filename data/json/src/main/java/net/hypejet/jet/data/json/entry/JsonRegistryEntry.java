@@ -1,5 +1,6 @@
 package net.hypejet.jet.data.json.entry;
 
+import net.hypejet.jet.data.json.model.feature.JsonKnownPack;
 import net.kyori.adventure.key.Key;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -19,7 +20,7 @@ import java.util.Set;
  * @since 1.0
  */
 public record JsonRegistryEntry<V>(@NonNull Key key, @NonNull V value, @NonNull Set<Key> tags,
-                                   @Nullable FeaturePack knownPack) {
+                                   @Nullable JsonKnownPack knownPack) {
     /**
      * Constructs the {@linkplain JsonRegistryEntry registry entry}.
      *
@@ -34,29 +35,5 @@ public record JsonRegistryEntry<V>(@NonNull Key key, @NonNull V value, @NonNull 
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(value, "value");
         tags = Set.copyOf(Objects.requireNonNull(tags, "tags"));
-    }
-
-    /**
-     * Represents a feature pack that can enable a {@linkplain JsonRegistryEntry registry entry}.
-     *
-     * @param namespace a namespace of the feature pack identifier
-     * @param value a value of the feature pack identifier
-     * @param version a version of the feature pack
-     * @since 1.0
-     */
-    public record FeaturePack(@NonNull String namespace, @NonNull String value, @NonNull String version) {
-        /**
-         * Constructs the {@linkplain FeaturePack feature pack}.
-         *
-         * @param namespace a namespace of the feature pack identifier
-         * @param value a value of the feature pack identifier
-         * @param version a version of the feature pack
-         * @since 1.0
-         */
-        public FeaturePack {
-            Objects.requireNonNull(namespace, "namespace");
-            Objects.requireNonNull(value, "value");
-            Objects.requireNonNull(version, "version");
-        }
     }
 }
