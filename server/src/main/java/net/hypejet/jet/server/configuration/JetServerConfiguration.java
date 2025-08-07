@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.configuration;
 
 import net.hypejet.jet.configuration.ServerConfiguration;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.unparsed.UnparsedServerConfiguration;
 import net.hypejet.jet.server.network.netty.transport.NettyTransportSelector;
@@ -73,11 +73,11 @@ public record JetServerConfiguration(
      * @since 1.0
      */
     public JetServerConfiguration {
-        NullabilityUtil.requireNonNull(address, "address");
-        NullabilityUtil.requireNonNull(transportSelector, "transport selector");
-        NullabilityUtil.requireNonNull(unsupportedVersionMessage, "unsupported version message");
-        NullabilityUtil.requireNonNull(serverListDescription, "server list description");
-        NullabilityUtil.requireNonNull(transfersAllowed, "transfers not allowed message");
+        Objects.requireNonNull(address, "address");
+        Objects.requireNonNull(transportSelector, "transport selector");
+        Objects.requireNonNull(unsupportedVersionMessage, "unsupported version message");
+        Objects.requireNonNull(serverListDescription, "server list description");
+        Objects.requireNonNull(transfersAllowed, "transfers not allowed message");
 
         byte minimumViewDistance = ChunkBatchHandler.MINIMUM_VIEW_DISTANCE;
         if (maximumViewDistance < minimumViewDistance) {

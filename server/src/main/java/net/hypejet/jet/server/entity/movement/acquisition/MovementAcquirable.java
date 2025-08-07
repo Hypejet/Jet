@@ -4,7 +4,7 @@ import net.hypejet.concurrency.Acquirable;
 import net.hypejet.concurrency.Acquisition;
 import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.data.model.api.coordinate.Vector;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.entity.movement.acquisition.MovementAcquisition;
 import net.hypejet.jet.entity.movement.flag.RelativeFlag;
 import net.hypejet.jet.server.entity.JetEntity;
@@ -44,8 +44,8 @@ public final class MovementAcquirable extends Acquirable<MovementAcquisition, In
      * @since 1.0
      */
     public MovementAcquirable(@NonNull JetEntity entity, @NonNull Position initialPosition) {
-        this.entity = NullabilityUtil.requireNonNull(entity, "entity");
-        this.position = NullabilityUtil.requireNonNull(initialPosition, "initial position");
+        this.entity = Objects.requireNonNull(entity, "entity");
+        this.position = Objects.requireNonNull(initialPosition, "initial position");
     }
 
     @Override
@@ -318,9 +318,9 @@ public final class MovementAcquirable extends Acquirable<MovementAcquisition, In
 
         private void update(@NonNull Position position, @NonNull Vector deltaMovement,
                             @NonNull Collection<RelativeFlag> flags, boolean synchronize) {
-            NullabilityUtil.requireNonNull(position, "position");
-            NullabilityUtil.requireNonNull(deltaMovement, "delta movement");
-            NullabilityUtil.requireNonNull(flags, "flags");
+            Objects.requireNonNull(position, "position");
+            Objects.requireNonNull(deltaMovement, "delta movement");
+            Objects.requireNonNull(flags, "flags");
 
             this.ensurePermittedAndLocked();
             MovementAcquirable acquirable = this.acquirable();

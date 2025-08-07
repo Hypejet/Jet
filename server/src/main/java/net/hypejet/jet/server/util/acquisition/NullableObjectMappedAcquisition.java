@@ -2,7 +2,7 @@ package net.hypejet.jet.server.util.acquisition;
 
 import net.hypejet.concurrency.Acquisition;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,8 +30,8 @@ public final class NullableObjectMappedAcquisition<OA extends Acquisition, M> im
      * @since 1.0
      */
     public NullableObjectMappedAcquisition(@NotNull OA originalAcquisition, @NotNull Function<OA, M> mapper) {
-        this.originalAcquisition = NullabilityUtil.requireNonNull(originalAcquisition, "original acquisition");
-        this.mapper = NullabilityUtil.requireNonNull(mapper, "mapper");
+        this.originalAcquisition = Objects.requireNonNull(originalAcquisition, "original acquisition");
+        this.mapper = Objects.requireNonNull(mapper, "mapper");
     }
 
     @Override

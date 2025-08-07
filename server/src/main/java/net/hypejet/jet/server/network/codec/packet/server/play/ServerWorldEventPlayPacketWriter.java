@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.network.codec.packet.server.play;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerWorldEventPlayPacket;
 import net.hypejet.jet.server.world.event.WorldEventValueProvider;
@@ -139,8 +139,8 @@ public final class ServerWorldEventPlayPacketWriter implements NetworkWriter<Ser
          * @since 1.0
          */
         private WorldEventType {
-            NullabilityUtil.requireNonNull(worldEventClass, "world event class");
-            NullabilityUtil.requireNonNull(valueProvider, "value provider");
+            Objects.requireNonNull(worldEventClass, "world event class");
+            Objects.requireNonNull(valueProvider, "value provider");
         }
     }
 }

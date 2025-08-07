@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.netty.decoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.RawPacket;
@@ -31,7 +31,7 @@ public final class RawPacketDecoder extends ByteToMessageDecoder {
      * @since 1.0
      */
     public RawPacketDecoder(@NonNull SocketPlayerConnection connection) {
-        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
+        this.connection = Objects.requireNonNull(connection, "connection");
     }
 
     @Override

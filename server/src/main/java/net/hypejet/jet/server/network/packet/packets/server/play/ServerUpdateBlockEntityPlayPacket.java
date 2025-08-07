@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
@@ -27,7 +27,7 @@ public record ServerUpdateBlockEntityPlayPacket(@NonNull BlockPosition position,
      * @since 1.0
      */
     public ServerUpdateBlockEntityPlayPacket {
-        NullabilityUtil.requireNonNull(position, "position");
-        NullabilityUtil.requireNonNull(data, "data");
+        Objects.requireNonNull(position, "position");
+        Objects.requireNonNull(data, "data");
     }
 }

@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.session.task;
 import net.hypejet.concurrency.object.WriteObjectAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquirable;
 import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.event.events.login.LoginFinishedEvent;
 import net.hypejet.jet.event.events.login.LoginStartEvent;
 import net.hypejet.jet.event.node.EventNode;
@@ -70,7 +70,7 @@ public final class LoginSessionTask implements SessionTask, LoginManager {
      */
     public LoginSessionTask(@NonNull SocketPlayerConnection connection,
                             int clientProtocolVersion, boolean transferring) {
-        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
+        this.connection = Objects.requireNonNull(connection, "connection");
         this.clientProtocolVersion = clientProtocolVersion;
         this.transferring = transferring;
     }
@@ -128,7 +128,7 @@ public final class LoginSessionTask implements SessionTask, LoginManager {
 
     @Override
     public void requestCookie(@NonNull Key key) {
-        NullabilityUtil.requireNonNull(key, "key");
+        Objects.requireNonNull(key, "key");
         this.connection.sendPacket(new ServerCookieRequestPacket(key));
     }
 

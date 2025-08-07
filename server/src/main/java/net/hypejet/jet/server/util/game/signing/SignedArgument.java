@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.util.game.signing;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -31,7 +31,7 @@ public record SignedArgument(@NonNull String name, @NonNull UnmodifiableByteArra
      * @since 1.0
      */
     public SignedArgument {
-        NullabilityUtil.requireNonNull(name, "name");
-        NullabilityUtil.requireNonNull(signature, "signature");
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(signature, "signature");
     }
 }

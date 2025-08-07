@@ -73,9 +73,7 @@ public interface Holder<V> {
 
         @Override
         public @Nullable V value(@NonNull MinecraftRegistry<? extends V> registry) {
-            RegistryEntry<? extends V> entry = registry.get(this.key);
-            if (entry == null) return null;
-            return entry.value();
+            return registry.get(this.key);
         }
     }
 }

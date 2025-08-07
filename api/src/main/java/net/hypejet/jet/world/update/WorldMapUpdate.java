@@ -1,6 +1,7 @@
 package net.hypejet.jet.world.update;
 
-import net.hypejet.jet.data.model.api.registries.biome.Biome;
+import net.hypejet.jet.registry.holder.Holder;
+import net.hypejet.jet.world.biome.Biome;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.coordinate.BiomePosition;
 import net.hypejet.jet.world.coordinate.BlockPosition;
@@ -41,15 +42,15 @@ public interface WorldMapUpdate {
                                               @NonNull CompoundBinaryTag blockEntityData);
 
     /**
-     * Sets {@linkplain Biome a biome} at {@linkplain BiomePosition a biome position} specified to be updated
-     * with value of {@linkplain RegistryEntry a registry entry} specified.
+     * Sets a {@linkplain Biome biome} at the specified {@linkplain BiomePosition biome position}
+     * to be updated with value referenced by the specified {@linkplain Holder.Reference holder}.
      *
      * @param position the biome position
      * @param biome the biome
      * @return this builder
      * @since 1.0
      */
-    @NonNull WorldMapUpdate updateBiome(@NonNull BiomePosition position, @NonNull RegistryEntry<Biome> biome);
+    @NonNull WorldMapUpdate updateBiome(@NonNull BiomePosition position, Holder.@NonNull Reference<Biome> biome);
 
     /**
      * Sets a skylight level at {@linkplain BlockPosition a block position} specified to be updated

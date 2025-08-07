@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.server.configuration;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTag;
@@ -29,7 +29,7 @@ public record ServerRegistryDataConfigurationPacket(@NonNull Key registry, @NonN
      * @since 1.0
      */
     public ServerRegistryDataConfigurationPacket {
-        entries = List.copyOf(NullabilityUtil.requireNonNull(entries, "entries"));
+        entries = List.copyOf(Objects.requireNonNull(entries, "entries"));
     }
 
     /**
@@ -49,7 +49,7 @@ public record ServerRegistryDataConfigurationPacket(@NonNull Key registry, @NonN
          * @since 1.0
          */
         public Entry {
-            NullabilityUtil.requireNonNull(key, "key");
+            Objects.requireNonNull(key, "key");
         }
     }
 }

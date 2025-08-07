@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.world.chunk.light.LightSerializationData;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
@@ -25,7 +25,7 @@ public record ServerUpdateLightPlayPacket(@NonNull ChunkPosition position, @NonN
      * @since 1.0
      */
     public ServerUpdateLightPlayPacket {
-        NullabilityUtil.requireNonNull(position, "position");
-        NullabilityUtil.requireNonNull(data, "data");
+        Objects.requireNonNull(position, "position");
+        Objects.requireNonNull(data, "data");
     }
 }

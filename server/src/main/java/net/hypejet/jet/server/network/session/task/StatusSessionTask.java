@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.session.task;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.event.events.serverlist.ServerListPingEvent;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
@@ -52,7 +52,7 @@ public final class StatusSessionTask implements SessionTask {
      * @since 1.0
      */
     public StatusSessionTask(@NonNull SocketPlayerConnection connection) {
-        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
+        this.connection = Objects.requireNonNull(connection, "connection");
     }
 
     @Override
@@ -129,7 +129,7 @@ public final class StatusSessionTask implements SessionTask {
     }
 
     private static @NotNull ServerListPing createDefaultServerListPing(@NonNull JetMinecraftServer server) {
-        JetServerConfiguration configuration = NullabilityUtil.requireNonNull(server, "server").configuration();
+        JetServerConfiguration configuration = Objects.requireNonNull(server, "server").configuration();
         return new ServerListPing(new ServerListPing.Version(server.minecraftVersion(), server.protocolVersion()),
                 // TODO: An actual list of players online
                 new ServerListPing.Players(configuration.maximumPlayers(), 0, List.of()),

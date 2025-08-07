@@ -1,7 +1,8 @@
 package net.hypejet.jet.world.difficulty;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents a level of Minecraft difficulty.
@@ -43,7 +44,7 @@ public final class Difficulty {
     private final String name;
 
     private Difficulty(@NonNull String name) {
-        this.name = NullabilityUtil.requireNonNull(name, "name");
+        this.name = Objects.requireNonNull(name, "name");
     }
 
     /**

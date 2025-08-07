@@ -1,8 +1,9 @@
 package net.hypejet.jet.world.event.world.events;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.world.event.world.WorldEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain WorldEvent a world event}, which triggers {@linkplain Event a Minecraft demo event}.
@@ -18,7 +19,7 @@ public record DemoWorldEvent(@NonNull Event event) implements WorldEvent {
      * @since 1.0
      */
     public DemoWorldEvent {
-        NullabilityUtil.requireNonNull(event, "event");
+        Objects.requireNonNull(event, "event");
     }
 
     /**
@@ -68,7 +69,7 @@ public record DemoWorldEvent(@NonNull Event event) implements WorldEvent {
         private final String name;
 
         private Event(@NonNull String name) {
-            this.name = NullabilityUtil.requireNonNull(name, "name");
+            this.name = Objects.requireNonNull(name, "name");
         }
 
         /**

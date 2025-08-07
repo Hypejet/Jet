@@ -1,16 +1,17 @@
 package net.hypejet.jet.world.chunk.factory;
 
-import net.hypejet.jet.data.model.api.registries.biome.Biome;
-import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
+import net.hypejet.jet.registry.holder.Holder;
+import net.hypejet.jet.world.biome.Biome;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.chunk.Chunk;
 import net.hypejet.jet.world.chunk.builder.ChunkBuilder;
 import net.hypejet.jet.world.chunk.light.LightSection;
 import net.hypejet.jet.world.chunk.section.ChunkSection;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
+import net.hypejet.jet.world.dimension.DimensionType;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -50,12 +51,12 @@ public interface ChunkFactory {
     @NonNull ChunkBuilder createChunkBuilder(@NonNull DimensionType dimensionType);
 
     /**
-     * Creates {@linkplain ChunkBuilder a chunk builder} and fills it initially with a block with data specified
-     * and fills it with a biome specified.
+     * Creates a {@linkplain ChunkBuilder chunk builder} and fills it initially with a block
+     * with the specified data and fills it with the specified biome.
      *
      * @param dimensionType a dimension type of worlds that the chunk is created for
      * @param blockState a block state of which the block should be
-     * @param defaultBiome a registry entry of the biome
+     * @param defaultBiome a holder referencing to the biome that the chunk builder should be initially filled with
      * @param defaultBlockEntity a data of a block entity that the block should have, {@code null} if the block
      *                           should not have a block entity
      * @return the chunk builder
@@ -63,6 +64,6 @@ public interface ChunkFactory {
      */
     @NonNull ChunkBuilder createChunkBuilder(
             @NonNull DimensionType dimensionType, @NonNull BlockState blockState,
-            @NonNull RegistryEntry<Biome> defaultBiome, @Nullable CompoundBinaryTag defaultBlockEntity
+            Holder.@NonNull Reference<Biome> defaultBiome, @Nullable CompoundBinaryTag defaultBlockEntity
     );
 }

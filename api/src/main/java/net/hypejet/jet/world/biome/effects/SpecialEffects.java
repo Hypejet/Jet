@@ -1,9 +1,9 @@
 package net.hypejet.jet.world.biome.effects;
 
-import net.hypejet.jet.data.model.api.registries.biome.Biome;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.util.color.Color;
 import net.hypejet.jet.util.game.random.Weighted;
+import net.hypejet.jet.world.biome.Biome;
 import net.hypejet.jet.world.sound.SoundEvent;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -35,6 +35,7 @@ import java.util.Objects;
  *                        no music should be played
  * @param backgroundMusicVolume a volume of the music that should be played in the biome
  * @since 1.0
+ * @see Biome
  */
 public record SpecialEffects(@NonNull Color fogColor, @NonNull Color waterColor, @NonNull Color waterFogColor,
                              @NonNull Color skyColor, @Nullable Color foliageColor, @Nullable Color dryFoliageColor,

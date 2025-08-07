@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.util.game.signing;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.util.bitset.UnmodifiableBitSet;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -33,7 +33,7 @@ public record SeenMessages(int messageCount, @NonNull UnmodifiableBitSet acknowl
      * @since 1.0
      */
     public SeenMessages {
-        NullabilityUtil.requireNonNull(acknowledged, "acknowledged messages");
+        Objects.requireNonNull(acknowledged, "acknowledged messages");
     }
 
     /**

@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
@@ -24,6 +24,6 @@ public record ServerInvalidateChunkPlayPacket(@NonNull ChunkPosition chunkPositi
      * @since 1.0
      */
     public ServerInvalidateChunkPlayPacket {
-        NullabilityUtil.requireNonNull(chunkPosition, "chunk position");
+        Objects.requireNonNull(chunkPosition, "chunk position");
     }
 }

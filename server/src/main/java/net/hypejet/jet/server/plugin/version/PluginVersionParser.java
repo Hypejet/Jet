@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.plugin.version;
 
 import com.google.common.collect.Iterators;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.plugin.version.part.NumberVersionPart;
 import net.hypejet.jet.server.plugin.version.part.VersionPart;
 import net.hypejet.jet.server.plugin.version.part.WildcardVersionPart;
@@ -35,7 +35,7 @@ public final class PluginVersionParser {
      * @since 1.0
      */
     public static @NonNull List<VersionPart> parseVersion(@NonNull String versionString) {
-        NullabilityUtil.requireNonNull(versionString, "version string");
+        Objects.requireNonNull(versionString, "version string");
 
         String[] split = versionString.split(VERSION_SPLITTER);
         List<VersionPart> parsed = new ArrayList<>(split.length);

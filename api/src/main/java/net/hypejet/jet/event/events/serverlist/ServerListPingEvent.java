@@ -1,6 +1,5 @@
 package net.hypejet.jet.event.events.serverlist;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.network.PlayerConnection;
 import net.hypejet.jet.util.game.ping.ServerListPing;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -27,8 +26,8 @@ public final class ServerListPingEvent {
      * @since 1.0
      */
     public ServerListPingEvent(@NonNull PlayerConnection connection, @NonNull ServerListPing ping) {
-        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
-        this.ping = NullabilityUtil.requireNonNull(ping, "ping");
+        this.connection = Objects.requireNonNull(connection, "connection");
+        this.ping = Objects.requireNonNull(ping, "ping");
     }
 
     /**
@@ -58,7 +57,7 @@ public final class ServerListPingEvent {
      * @since 1.0
      */
     public void setPing(@NonNull ServerListPing ping) {
-        this.ping = NullabilityUtil.requireNonNull(ping, "ping");
+        this.ping = Objects.requireNonNull(ping, "ping");
     }
 
     @Override

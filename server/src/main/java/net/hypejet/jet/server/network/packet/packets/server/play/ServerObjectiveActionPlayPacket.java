@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.scoreboard.objective.ScoreboardObjective;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -23,8 +23,8 @@ public record ServerObjectiveActionPlayPacket(@NonNull String objectiveName, @No
      * @since 1.0
      */
     public ServerObjectiveActionPlayPacket {
-        NullabilityUtil.requireNonNull(objectiveName, "objective name");
-        NullabilityUtil.requireNonNull(action, "action");
+        Objects.requireNonNull(objectiveName, "objective name");
+        Objects.requireNonNull(action, "action");
     }
 
     /**
@@ -47,7 +47,7 @@ public record ServerObjectiveActionPlayPacket(@NonNull String objectiveName, @No
              * @since 1.0
              */
             public Create {
-                NullabilityUtil.requireNonNull(objective, "objective");
+                Objects.requireNonNull(objective, "objective");
             }
         }
 
@@ -65,7 +65,7 @@ public record ServerObjectiveActionPlayPacket(@NonNull String objectiveName, @No
              * @since 1.0
              */
             public Update {
-                NullabilityUtil.requireNonNull(objective, "objective");
+                Objects.requireNonNull(objective, "objective");
             }
         }
 

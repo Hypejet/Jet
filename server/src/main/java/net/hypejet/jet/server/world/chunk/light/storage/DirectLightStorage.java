@@ -3,7 +3,7 @@ package net.hypejet.jet.server.world.chunk.light.storage;
 import it.unimi.dsi.fastutil.bytes.Byte2ShortMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ShortMaps;
 import it.unimi.dsi.fastutil.bytes.Byte2ShortOpenHashMap;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
@@ -32,8 +32,8 @@ public final class DirectLightStorage extends AbstractLightStorage {
      * @since 1.0
      */
     DirectLightStorage(@NonNull NibbleArray data, @NonNull Byte2ShortMap valueCountMap) {
-        NullabilityUtil.requireNonNull(data, "data");
-        NullabilityUtil.requireNonNull(valueCountMap, "value count map");
+        Objects.requireNonNull(data, "data");
+        Objects.requireNonNull(valueCountMap, "value count map");
 
         if (data.length() != DATA_VALUE_COUNT) {
             throw new IllegalArgumentException(String.format(
@@ -42,7 +42,7 @@ public final class DirectLightStorage extends AbstractLightStorage {
             ));
         }
 
-        this.data = NullabilityUtil.requireNonNull(data, "data");
+        this.data = Objects.requireNonNull(data, "data");
         this.valueCountMap = Byte2ShortMaps.unmodifiable(new Byte2ShortOpenHashMap(valueCountMap));
     }
 

@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.exception;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -37,8 +37,8 @@ public final class NetworkException extends RuntimeException {
      */
     public NetworkException(@NonNull SocketPlayerConnection connection,
                             @NonNull Throwable cause, @Nullable String message) {
-        super(message, NullabilityUtil.requireNonNull(cause, "cause"));
-        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
+        super(message, Objects.requireNonNull(cause, "cause"));
+        this.connection = Objects.requireNonNull(connection, "connection");
     }
 
     /**

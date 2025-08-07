@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.world.chunk.heightmap;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.world.block.JetBlockState;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -46,7 +46,7 @@ public enum HeightMapType {
      * @since 1.0
      */
     HeightMapType(@NonNull String serializationName) {
-        this.serializationName = NullabilityUtil.requireNonNull(serializationName, "serialization name");
+        this.serializationName = Objects.requireNonNull(serializationName, "serialization name");
     }
 
     /**

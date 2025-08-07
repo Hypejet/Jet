@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.util.game.gamemode;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.entity.player.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -43,7 +43,7 @@ public final class GameModeUtil {
      * @since 1.0
      */
     public static byte identifierOf(Player.@NonNull GameMode gameMode) {
-        NullabilityUtil.requireNonNull(gameMode, "game mode");
+        Objects.requireNonNull(gameMode, "game mode");
         if (gameMode == Player.GameMode.SURVIVAL)
             return SURVIVAL_GAME_MODE;
         else if (gameMode == Player.GameMode.CREATIVE)

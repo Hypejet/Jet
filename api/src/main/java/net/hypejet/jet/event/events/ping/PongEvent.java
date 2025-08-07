@@ -1,8 +1,9 @@
 package net.hypejet.jet.event.events.ping;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.network.PlayerConnection;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents an event called when a client associated with {@linkplain PlayerConnection a player connection}
@@ -21,6 +22,6 @@ public record PongEvent(@NonNull PlayerConnection connection, int pingIdentifier
      * @since 1.0
      */
     public PongEvent {
-        NullabilityUtil.requireNonNull(connection, "connection");
+        Objects.requireNonNull(connection, "connection");
     }
 }

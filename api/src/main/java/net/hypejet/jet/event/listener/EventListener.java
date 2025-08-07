@@ -1,11 +1,11 @@
 package net.hypejet.jet.event.listener;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.event.priority.EventPriority;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -77,9 +77,9 @@ public final class EventListener<E> implements Comparable<EventListener<?>> {
      */
     public EventListener(@NonNull Consumer<E> consumer, @NonNull Class<? extends E> eventClass,
                          @NonNull EventPriority priority, @Nullable Predicate<E> predicate) {
-        this.consumer = NullabilityUtil.requireNonNull(consumer, "consumer");
-        this.eventClass = NullabilityUtil.requireNonNull(eventClass, "event class");
-        this.priority = NullabilityUtil.requireNonNull(priority, "event priority");
+        this.consumer = Objects.requireNonNull(consumer, "consumer");
+        this.eventClass = Objects.requireNonNull(eventClass, "event class");
+        this.priority = Objects.requireNonNull(priority, "event priority");
         this.predicate = predicate;
     }
 

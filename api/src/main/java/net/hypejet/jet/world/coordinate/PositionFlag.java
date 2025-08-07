@@ -1,8 +1,8 @@
 package net.hypejet.jet.world.coordinate;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -38,7 +38,7 @@ public final class PositionFlag {
     private final String name;
 
     private PositionFlag(@NonNull String name) {
-        this.name = NullabilityUtil.requireNonNull(name, "name");
+        this.name = Objects.requireNonNull(name, "name");
     }
 
     /**

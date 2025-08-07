@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.server.common;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.util.array.UnmodifiableIntegerArray;
 import net.kyori.adventure.key.Key;
@@ -26,7 +26,7 @@ public record ServerUpdateTagsPacket(@NonNull Collection<TagRegistry> registries
      * @since 1.0
      */
     public ServerUpdateTagsPacket {
-        registries = Set.copyOf(NullabilityUtil.requireNonNull(registries, "registries"));
+        registries = Set.copyOf(Objects.requireNonNull(registries, "registries"));
     }
 
     /**
@@ -48,8 +48,8 @@ public record ServerUpdateTagsPacket(@NonNull Collection<TagRegistry> registries
          * @since 1.0
          */
         public TagRegistry {
-            NullabilityUtil.requireNonNull(key, "key");
-            tags = Set.copyOf(NullabilityUtil.requireNonNull(tags, "tags"));
+            Objects.requireNonNull(key, "key");
+            tags = Set.copyOf(Objects.requireNonNull(tags, "tags"));
         }
     }
 
@@ -81,8 +81,8 @@ public record ServerUpdateTagsPacket(@NonNull Collection<TagRegistry> registries
          * @since 1.0
          */
         public Tag {
-            NullabilityUtil.requireNonNull(key, "key");
-            NullabilityUtil.requireNonNull(entries, "entries");
+            Objects.requireNonNull(key, "key");
+            Objects.requireNonNull(entries, "entries");
         }
     }
 }

@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.client.common;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import net.kyori.adventure.key.Key;
@@ -35,7 +35,7 @@ public record ClientPluginMessagePacket(@NonNull Key key, @NonNull UnmodifiableB
      * @since 1.0
      */
     public ClientPluginMessagePacket {
-        NullabilityUtil.requireNonNull(key, "key");
-        NullabilityUtil.requireNonNull(data, "data");
+        Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(data, "data");
     }
 }

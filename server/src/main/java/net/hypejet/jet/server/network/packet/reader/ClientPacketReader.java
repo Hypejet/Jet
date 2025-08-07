@@ -5,7 +5,7 @@ import io.netty.buffer.Unpooled;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquirable;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.object.notnull.WriteNotNullObjectAcquisition;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.ProtocolState;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.codec.NetworkReader;
@@ -55,8 +55,8 @@ public final class ClientPacketReader implements NetworkDisconnectionHandler {
      * @since 1.0
      */
     public ClientPacketReader(@NonNull SocketPlayerConnection connection, @NonNull Session initialSession) {
-        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
-        NullabilityUtil.requireNonNull(initialSession, "initial session");
+        this.connection = Objects.requireNonNull(connection, "connection");
+        Objects.requireNonNull(initialSession, "initial session");
         this.sessionAcquirable = new NotNullObjectAcquirable<>(initialSession);
 
         this.readerThread = Thread.ofVirtual()
@@ -72,7 +72,7 @@ public final class ClientPacketReader implements NetworkDisconnectionHandler {
      * @since 1.0
      */
     public void queue(@NonNull RawPacket packet) {
-        this.packetQueue.add(NullabilityUtil.requireNonNull(packet, "packet"));
+        this.packetQueue.add(Objects.requireNonNull(packet, "packet"));
     }
 
     /**

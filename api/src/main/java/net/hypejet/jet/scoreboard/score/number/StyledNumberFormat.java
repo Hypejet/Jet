@@ -1,8 +1,9 @@
 package net.hypejet.jet.scoreboard.score.number;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.kyori.adventure.text.format.Style;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain NumberFormat a number format} specifying that the score should be formatted
@@ -20,6 +21,6 @@ public record StyledNumberFormat(@NonNull Style style) implements NumberFormat {
      * @since 1.0
      */
     public StyledNumberFormat {
-        NullabilityUtil.requireNonNull(style, "style");
+        Objects.requireNonNull(style, "style");
     }
 }

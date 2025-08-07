@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -21,6 +21,6 @@ public record ServerSystemMessagePlayPacket(@NonNull Component message, boolean 
      * @since 1.0
      */
     public ServerSystemMessagePlayPacket {
-        NullabilityUtil.requireNonNull(message, "message");
+        Objects.requireNonNull(message, "message");
     }
 }

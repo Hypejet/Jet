@@ -28,7 +28,7 @@ public final class SingleValuedChunkPaletteTest {
 
         SingleValuedChunkPalette<String> palette = new SingleValuedChunkPalette<>(paletteType, element, elementOrder);
         Assertions.assertEquals(element, palette.element());
-        Assertions.assertEquals(elementOrder.identifierOf(element), palette.elementIdentifier());
+        Assertions.assertEquals(elementOrder.identifierOf(element), palette.elementRegistryIndex());
 
         List<String> elements = new ArrayList<>(elementCount);
         for (int index = 0; index < elementCount; index++)

@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.network.packet.packets.client.play;
 
 import net.hypejet.jet.data.model.api.coordinate.Vector;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import net.hypejet.jet.world.coordinate.PositionFlag;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -29,7 +29,7 @@ public record ClientPositionPlayPacket(@NonNull Vector vector, @NonNull Collecti
      * @since 1.0
      */
     public ClientPositionPlayPacket {
-        NullabilityUtil.requireNonNull(vector, "vector");
-        flags = Set.copyOf(NullabilityUtil.requireNonNull(flags, "flags"));
+        Objects.requireNonNull(vector, "vector");
+        flags = Set.copyOf(Objects.requireNonNull(flags, "flags"));
     }
 }

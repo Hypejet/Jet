@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.configuration;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.kyori.adventure.text.minimessage.tag.TagPattern;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -52,7 +52,7 @@ public enum ConfigurationPlaceholder {
      * @since 1.0
      */
     ConfigurationPlaceholder(@NonNull @TagPattern String placeholderName) {
-        this.placeholderName = NullabilityUtil.requireNonNull(placeholderName, "name");
+        this.placeholderName = Objects.requireNonNull(placeholderName, "name");
     }
 
     /**

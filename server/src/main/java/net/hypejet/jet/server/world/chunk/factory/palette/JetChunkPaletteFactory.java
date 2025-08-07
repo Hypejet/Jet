@@ -1,14 +1,13 @@
 package net.hypejet.jet.server.world.chunk.factory.palette;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.server.util.order.ElementOrder;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.SingleValuedChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.world.chunk.factory.palette.ChunkPaletteFactory;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents an implementation of {@linkplain ChunkPaletteFactory a chunk-palette factory}.
@@ -20,31 +19,31 @@ import java.util.List;
 public final class JetChunkPaletteFactory<E> implements ChunkPaletteFactory<E> {
 
     private final ChunkPaletteType paletteType;
-    private final ElementOrder<? extends E> elementOrder;
+    private final AbstractChunkPalette.IndexSpecification<E> indexSpecification;
 
     /**
      * Constructs the {@linkplain JetChunkPaletteFactory chunk-palette factory implementation}.
      *
      * @param paletteType a type of chunk palettes that the chunk-palette factory should create
-     * @param elementOrder an element order of all elements that should be able to be used
-     *                     in the chunk-palettes created
+     * @param indexSpecification an index specification specifying registry indices for elements of palettes
+     *                           that the constructed chunk-palette factory should create
      * @since 1.0
      */
     public JetChunkPaletteFactory(@NonNull ChunkPaletteType paletteType,
-                                  @NonNull ElementOrder<? extends E> elementOrder) {
-        this.paletteType = NullabilityUtil.requireNonNull(paletteType, "palette type");
-        this.elementOrder = NullabilityUtil.requireNonNull(elementOrder, "element order");
+                                  AbstractChunkPalette.@NonNull IndexSpecification<E> indexSpecification) {
+        this.paletteType = Objects.requireNonNull(paletteType, "palette type");
+        this.indexSpecification = Objects.requireNonNull(indexSpecification, "index specification");
     }
 
     @Override
     public @NonNull AbstractChunkPalette<E> createSingleValued(@NonNull E element) {
-        NullabilityUtil.requireNonNull(element, "element");
-        return new SingleValuedChunkPalette<>(this.paletteType, element, this.elementOrder);
+        Objects.requireNonNull(element, "element");
+        return new SingleValuedChunkPalette<>(this.paletteType, element, this.indexSpecification);
     }
 
     @Override
     public @NonNull AbstractChunkPalette<E> createDirect(@NonNull List<E> elements) {
-        NullabilityUtil.requireNonNull(elements, "elements");
-        return AbstractChunkPalette.create(this.paletteType, this.elementOrder, elements);
+        Objects.requireNonNull(elements, "elements");
+        return AbstractChunkPalette.create(this.paletteType, this.indexSpecification, elements);
     }
 }

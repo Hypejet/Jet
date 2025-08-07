@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.client.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -24,6 +24,6 @@ public record ClientQueryBlockEntityTagPacket(int transactionId, @NonNull BlockP
      * @since 1.0
      */
     public ClientQueryBlockEntityTagPacket {
-        NullabilityUtil.requireNonNull(blockPosition, "block position");
+        Objects.requireNonNull(blockPosition, "block position");
     }
 }

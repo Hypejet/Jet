@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.network.codec.aggregate.collection;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.AggregateNetworkWriter;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -41,7 +41,7 @@ public final class CollectionNetworkWriter<E> extends AggregateNetworkWriter<Col
      */
     public CollectionNetworkWriter(int maxLength, @NonNull NetworkWriter<E> elementWriter) {
         super(maxLength, true);
-        this.elementWriter = NullabilityUtil.requireNonNull(elementWriter, "element writer");
+        this.elementWriter = Objects.requireNonNull(elementWriter, "element writer");
     }
 
     /**
@@ -54,7 +54,7 @@ public final class CollectionNetworkWriter<E> extends AggregateNetworkWriter<Col
      */
     public CollectionNetworkWriter(boolean encodeLength, @NonNull NetworkWriter<E> elementWriter) {
         super(Integer.MAX_VALUE, encodeLength);
-        this.elementWriter = NullabilityUtil.requireNonNull(elementWriter, "element writer");
+        this.elementWriter = Objects.requireNonNull(elementWriter, "element writer");
     }
 
     /**
@@ -67,7 +67,7 @@ public final class CollectionNetworkWriter<E> extends AggregateNetworkWriter<Col
      */
     public CollectionNetworkWriter(int maxLength, boolean encodeLength, @NonNull NetworkWriter<E> elementWriter) {
         super(maxLength, encodeLength);
-        this.elementWriter = NullabilityUtil.requireNonNull(elementWriter, "element writer");
+        this.elementWriter = Objects.requireNonNull(elementWriter, "element writer");
     }
 
     @Override

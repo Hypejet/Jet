@@ -1,9 +1,10 @@
 package net.hypejet.jet.world.event.world.events;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.world.event.world.WorldEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain WorldEvent a world event} used to change {@linkplain Player.GameMode a game mode} for
@@ -20,6 +21,6 @@ public record ChangeGameModeWorldEvent(Player.@NonNull GameMode gameMode) implem
      * @since 1.0
      */
     public ChangeGameModeWorldEvent {
-        NullabilityUtil.requireNonNull(gameMode, "game mode");
+        Objects.requireNonNull(gameMode, "game mode");
     }
 }

@@ -2,19 +2,19 @@ package net.hypejet.jet.server.world.chunk.section;
 
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
-import net.hypejet.jet.data.model.api.registries.biome.Biome;
-import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
+import net.hypejet.jet.world.biome.Biome;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import net.hypejet.jet.world.dimension.DimensionType;
 import org.jetbrains.annotations.Contract;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +41,8 @@ public record ChunkSectionList(@NonNull DimensionType dimensionType, @NonNull Li
      * @since 1.0
      */
     public ChunkSectionList {
-        NullabilityUtil.requireNonNull(dimensionType, "dimension type");
-        sections = List.copyOf(NullabilityUtil.requireNonNull(sections, "sections"));
+        Objects.requireNonNull(dimensionType, "dimension type");
+        sections = List.copyOf(Objects.requireNonNull(sections, "sections"));
 
         int expectedSectionCount = createSectionCount(dimensionType);
         int actualSectionCount = sections.size();
@@ -109,15 +109,15 @@ public record ChunkSectionList(@NonNull DimensionType dimensionType, @NonNull Li
      *
      * @param blockStateUpdates a map which maps chunk-relative block positions to new block states
      *                          that should be present there
-     * @param biomeUpdates a map which maps chunk-relative biome positions to registry entries of new biomes
-     *                     that should be present there
+     * @param biomeUpdates a map which maps chunk-relative biome positions to holders referencing
+     *                     to new biomes that should be present there
      * @return the copy
      * @since 1.0
      */
     @Contract(pure = true)
     public @NonNull ChunkSectionList withUpdates(
             @NonNull Map<ChunkRelativeBlockPosition, JetBlockState> blockStateUpdates,
-            @NonNull Map<ChunkRelativeBiomePosition, RegistryEntry<Biome>> biomeUpdates
+            @NonNull Map<ChunkRelativeBiomePosition, Holder.Reference<Biome>> biomeUpdates
     ) {
         if (blockStateUpdates.isEmpty() && biomeUpdates.isEmpty())
             return this;
@@ -125,7 +125,7 @@ public record ChunkSectionList(@NonNull DimensionType dimensionType, @NonNull Li
         List<JetChunkSection> sections = new ArrayList<>(this.sections);
 
         IntObjectMap<List<ChunkPaletteUpdate<BlockState>>> blockStatePaletteUpdates;
-        IntObjectMap<List<ChunkPaletteUpdate<RegistryEntry<Biome>>>> biomePaletteUpdates;
+        IntObjectMap<List<ChunkPaletteUpdate<Holder.Reference<Biome>>>> biomePaletteUpdates;
 
         blockStatePaletteUpdates = createChunkSectionPaletteUpdateMap(
                 blockStateUpdates, this.dimensionType, ChunkRelativeBlockPosition::absoluteY,
@@ -140,7 +140,7 @@ public record ChunkSectionList(@NonNull DimensionType dimensionType, @NonNull Li
         boolean sectionListUpdated = false;
         for (int index = 0; index < sections.size(); index++) {
             List<ChunkPaletteUpdate<BlockState>> blockStateUpdateList = blockStatePaletteUpdates.get(index);
-            List<ChunkPaletteUpdate<RegistryEntry<Biome>>> biomeUpdateList = biomePaletteUpdates.get(index);
+            List<ChunkPaletteUpdate<Holder.Reference<Biome>>> biomeUpdateList = biomePaletteUpdates.get(index);
 
             if (blockStateUpdateList == null && biomeUpdateList == null)
                 continue;

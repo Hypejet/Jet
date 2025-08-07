@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.client.login;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -23,7 +23,7 @@ public record ClientLoginRequestLoginPacket(@NonNull String username, @NonNull U
      * @since 1.0
      */
     public ClientLoginRequestLoginPacket {
-        NullabilityUtil.requireNonNull(username, "username");
-        NullabilityUtil.requireNonNull(uniqueId, "unique identifier");
+        Objects.requireNonNull(username, "username");
+        Objects.requireNonNull(uniqueId, "unique identifier");
     }
 }

@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.entity.player.spawn;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.world.data.WorldData;
 import net.kyori.adventure.key.Key;
@@ -37,8 +37,8 @@ public record PlayerSpawnInfo(int dimensionTypeIdentifier, @NonNull Key dimensio
      * @since 1.0
      */
     public PlayerSpawnInfo {
-        NullabilityUtil.requireNonNull(dimensionTypeKey, "dimension type key");
-        NullabilityUtil.requireNonNull(worldData, "world data");
-        NullabilityUtil.requireNonNull(gameMode, "game mode");
+        Objects.requireNonNull(dimensionTypeKey, "dimension type key");
+        Objects.requireNonNull(worldData, "world data");
+        Objects.requireNonNull(gameMode, "game mode");
     }
 }

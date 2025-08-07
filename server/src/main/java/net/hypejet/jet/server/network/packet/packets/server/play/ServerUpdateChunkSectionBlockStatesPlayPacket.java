@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.packet.packets.server.play;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.server.world.coordinate.chunk.section.ChunkSectionPosition;
@@ -36,8 +36,8 @@ public record ServerUpdateChunkSectionBlockStatesPlayPacket(
      * @since 1.0
      */
     public ServerUpdateChunkSectionBlockStatesPlayPacket {
-        NullabilityUtil.requireNonNull(position, "position");
-        NullabilityUtil.requireNonNull(updates, "updates");
+        Objects.requireNonNull(position, "position");
+        Objects.requireNonNull(updates, "updates");
         updates = Object2IntMaps.unmodifiable(new Object2IntOpenHashMap<>(updates));
     }
 }

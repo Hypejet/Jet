@@ -1,7 +1,6 @@
 package net.hypejet.jet.entity.acquisition.world;
 
 import net.hypejet.concurrency.object.notnull.WriteNotNullObjectAcquisition;
-import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.world.World;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;

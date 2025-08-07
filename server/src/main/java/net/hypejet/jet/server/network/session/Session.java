@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.session;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.ProtocolState;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.packet.handler.NetworkDisconnectionHandler;
@@ -28,9 +28,9 @@ public record Session(@NonNull ProtocolState protocolState, @NonNull SocketPlaye
      * @since 1.0
      */
     public Session {
-        NullabilityUtil.requireNonNull(protocolState, "protocol state");
-        NullabilityUtil.requireNonNull(connection, "connection");
-        NullabilityUtil.requireNonNull(sessionTask, "session task");
+        Objects.requireNonNull(protocolState, "protocol state");
+        Objects.requireNonNull(connection, "connection");
+        Objects.requireNonNull(sessionTask, "session task");
     }
 
     @Override

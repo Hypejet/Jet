@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.client.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -46,8 +46,8 @@ public record ClientChatSessionUpdatePlayPacket(@NonNull UUID sessionId, long ex
      * @since 1.0
      */
     public ClientChatSessionUpdatePlayPacket {
-        NullabilityUtil.requireNonNull(sessionId, "session id");
-        NullabilityUtil.requireNonNull(publicKey, "public key");
-        NullabilityUtil.requireNonNull(keySignature, "key signature");
+        Objects.requireNonNull(sessionId, "session id");
+        Objects.requireNonNull(publicKey, "public key");
+        Objects.requireNonNull(keySignature, "key signature");
     }
 }

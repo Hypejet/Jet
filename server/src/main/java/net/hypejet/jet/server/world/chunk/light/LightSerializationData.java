@@ -4,8 +4,7 @@ import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.light.storage.AbstractLightStorage;
 import net.hypejet.jet.server.world.chunk.light.storage.DirectLightStorage;
@@ -15,12 +14,12 @@ import net.hypejet.jet.server.world.chunk.section.ChunkSectionList;
 import net.hypejet.jet.util.array.NibbleArray;
 import net.hypejet.jet.util.bitset.UnmodifiableBitSet;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
+import net.hypejet.jet.world.dimension.DimensionType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -74,12 +73,12 @@ public final class LightSerializationData {
             @NonNull UnmodifiableBitSet emptySkyLightMask, @NonNull UnmodifiableBitSet emptyBlockLightMask,
             @NonNull List<NibbleArray> skyLightData, @NonNull List<NibbleArray> blockLightData
     ) {
-        this.skyLightMask = NullabilityUtil.requireNonNull(skyLightMask, "skylight mask");
-        this.blockLightMask = NullabilityUtil.requireNonNull(blockLightMask, "block light mask");
-        this.emptySkyLightMask = NullabilityUtil.requireNonNull(emptySkyLightMask, "empty skylight mask");
-        this.emptyBlockLightMask = NullabilityUtil.requireNonNull(emptyBlockLightMask, "empty block light mask");
-        this.skyLightData = List.copyOf(NullabilityUtil.requireNonNull(skyLightData, "skylight data"));
-        this.blockLightData = List.copyOf(NullabilityUtil.requireNonNull(blockLightData, "block light data"));
+        this.skyLightMask = Objects.requireNonNull(skyLightMask, "skylight mask");
+        this.blockLightMask = Objects.requireNonNull(blockLightMask, "block light mask");
+        this.emptySkyLightMask = Objects.requireNonNull(emptySkyLightMask, "empty skylight mask");
+        this.emptyBlockLightMask = Objects.requireNonNull(emptyBlockLightMask, "empty block light mask");
+        this.skyLightData = List.copyOf(Objects.requireNonNull(skyLightData, "skylight data"));
+        this.blockLightData = List.copyOf(Objects.requireNonNull(blockLightData, "block light data"));
     }
 
     /**
@@ -194,7 +193,7 @@ public final class LightSerializationData {
      * @since 1.0
      */
     public static @NonNull LightSerializationData create(@NonNull LightSectionList lightSectionList) {
-        NullabilityUtil.requireNonNull(lightSectionList, "light section list");
+        Objects.requireNonNull(lightSectionList, "light section list");
 
         IntObjectMap<AbstractLightStorage> indexToSkyLightStorageMap = new IntObjectHashMap<>();
         IntObjectMap<AbstractLightStorage> indexToBlockLightStorageMap = new IntObjectHashMap<>();
@@ -213,7 +212,10 @@ public final class LightSerializationData {
      * Creates {@linkplain LightSerializationData a light serialization data} acknowledging light updates of blocks
      * with {@linkplain ChunkRelativeBlockPosition chunk-relative block positions} specified.
      *
-     * @param affectedBlockPositions the chunk-relative block positions
+     * @param skyLightAffectedBlockPositions the chunk-relative block positions of positions
+     *                                       where skylight updates were made
+     * @param blockLightAffectedBlockPositions the chunk-relative block positions of positions
+     *                                         where block light updates were made
      * @param updatedChunkSectionList a light section list with the light updates specified performed
      * @param dimensionType a dimension type of world of a chunk that the light serialization data is created for
      * @return the light serialization data

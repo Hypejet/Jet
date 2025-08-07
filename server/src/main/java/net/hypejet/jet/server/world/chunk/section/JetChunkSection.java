@@ -1,16 +1,16 @@
 package net.hypejet.jet.server.world.chunk.section;
 
 import it.unimi.dsi.fastutil.objects.Object2ShortMap;
-import net.hypejet.jet.data.model.api.registries.biome.Biome;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;
+import net.hypejet.jet.world.biome.Biome;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.chunk.section.ChunkSection;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.Contract;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -26,7 +26,7 @@ public final class JetChunkSection implements ChunkSection {
     private final short nonAirBlockCount;
 
     private final AbstractChunkPalette<BlockState> blockStatePalette;
-    private final AbstractChunkPalette<RegistryEntry<Biome>> biomePalette;
+    private final AbstractChunkPalette<Holder.Reference<Biome>> biomePalette;
 
     /**
      * Constructs the {@linkplain JetChunkSection chunk section implementation}.
@@ -37,7 +37,7 @@ public final class JetChunkSection implements ChunkSection {
      * @since 1.0
      */
     public JetChunkSection(@NonNull AbstractChunkPalette<BlockState> blockStatePalette,
-                           @NonNull AbstractChunkPalette<RegistryEntry<Biome>> biomePalette) {
+                           @NonNull AbstractChunkPalette<Holder.Reference<Biome>> biomePalette) {
         this(calculateNonAirBlockCount(blockStatePalette), blockStatePalette, biomePalette);
     }
 
@@ -51,9 +51,9 @@ public final class JetChunkSection implements ChunkSection {
      * @since 1.0
      */
     private JetChunkSection(short nonAirBlockStateCount, @NonNull AbstractChunkPalette<BlockState> blockStatePalette,
-                            @NonNull AbstractChunkPalette<RegistryEntry<Biome>> biomePalette) {
-        NullabilityUtil.requireNonNull(blockStatePalette, "block state palette");
-        NullabilityUtil.requireNonNull(biomePalette, "biome palette");
+                            @NonNull AbstractChunkPalette<Holder.Reference<Biome>> biomePalette) {
+        Objects.requireNonNull(blockStatePalette, "block state palette");
+        Objects.requireNonNull(biomePalette, "biome palette");
 
         if (blockStatePalette.type() != ChunkPaletteType.BLOCK_STATE)
             throw new IllegalArgumentException("Type of the block state palette is not a block state palette type");
@@ -83,7 +83,7 @@ public final class JetChunkSection implements ChunkSection {
      * @since 1.0
      */
     @Override
-    public @NonNull AbstractChunkPalette<RegistryEntry<Biome>> biomePalette() {
+    public @NonNull AbstractChunkPalette<Holder.Reference<Biome>> biomePalette() {
         return this.biomePalette;
     }
 
@@ -109,13 +109,13 @@ public final class JetChunkSection implements ChunkSection {
     @Contract(pure = true)
     public @NonNull JetChunkSection withUpdates(
             @NonNull Collection<ChunkPaletteUpdate<BlockState>> blockStateUpdates,
-            @NonNull Collection<ChunkPaletteUpdate<RegistryEntry<Biome>>> biomeUpdates
+            @NonNull Collection<ChunkPaletteUpdate<Holder.Reference<Biome>>> biomeUpdates
     ) {
         if (blockStateUpdates.isEmpty() && biomeUpdates.isEmpty())
             return this;
 
         AbstractChunkPalette<BlockState> blockStatePalette = this.blockStatePalette.withUpdates(blockStateUpdates);
-        AbstractChunkPalette<RegistryEntry<Biome>> biomePalette = this.biomePalette.withUpdates(biomeUpdates);
+        AbstractChunkPalette<Holder.Reference<Biome>> biomePalette = this.biomePalette.withUpdates(biomeUpdates);
 
         boolean blockStatePaletteUnchanged = this.blockStatePalette.equals(blockStatePalette);
         if (blockStatePaletteUnchanged && this.biomePalette.equals(biomePalette))
@@ -150,7 +150,7 @@ public final class JetChunkSection implements ChunkSection {
     }
 
     private static short calculateNonAirBlockCount(@NonNull AbstractChunkPalette<BlockState> blockStatePalette) {
-        NullabilityUtil.requireNonNull(blockStatePalette, "block state palette");
+        Objects.requireNonNull(blockStatePalette, "block state palette");
         short nonAirBlockCount = 0;
 
         for (Object2ShortMap.Entry<BlockState> entry : blockStatePalette.elementCountMap().object2ShortEntrySet()) {

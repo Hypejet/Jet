@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.client.common;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import net.kyori.adventure.resource.ResourcePackStatus;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -27,7 +27,7 @@ public record ClientResourcePackStatePacket(@NonNull UUID uniqueId, @NonNull Res
      * @since 1.0
      */
     public ClientResourcePackStatePacket {
-        NullabilityUtil.requireNonNull(uniqueId, "unique id");
-        NullabilityUtil.requireNonNull(status, "status");
+        Objects.requireNonNull(uniqueId, "unique id");
+        Objects.requireNonNull(status, "status");
     }
 }

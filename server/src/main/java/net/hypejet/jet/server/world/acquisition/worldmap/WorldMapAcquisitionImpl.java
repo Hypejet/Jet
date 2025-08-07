@@ -2,7 +2,7 @@ package net.hypejet.jet.server.world.acquisition.worldmap;
 
 import net.hypejet.concurrency.map.MapAcquisition;
 import net.hypejet.jet.data.model.api.registries.biome.Biome;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.util.coordinate.ChunkPositionUtil;
 import net.hypejet.jet.server.util.coordinate.ChunkRelativePositionUtil;
 import net.hypejet.jet.server.world.JetWorld;
@@ -44,8 +44,8 @@ public class WorldMapAcquisitionImpl implements WorldMapAcquisition {
      */
     public WorldMapAcquisitionImpl(@NonNull JetWorld world,
                                    @NonNull MapAcquisition<ChunkPosition, JetChunk, ?> acquisition) {
-        this.world = NullabilityUtil.requireNonNull(world, "world");
-        this.acquisition = NullabilityUtil.requireNonNull(acquisition, "acquisition");
+        this.world = Objects.requireNonNull(world, "world");
+        this.acquisition = Objects.requireNonNull(acquisition, "acquisition");
     }
 
     @Override

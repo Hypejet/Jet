@@ -1,7 +1,6 @@
 package net.hypejet.jet.server.world.block;
 
 import net.hypejet.jet.data.json.model.block.JsonBlock;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.world.block.BlockType;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -24,7 +23,7 @@ public record JetBlockType(@NonNull Set<Key> requiredFeatureFlags) implements Bl
      * @since 1.0
      */
     public JetBlockType {
-        NullabilityUtil.requireNonNull(requiredFeatureFlags, "required feature flags");
+        Objects.requireNonNull(requiredFeatureFlags, "required feature flags");
     }
 
     /**

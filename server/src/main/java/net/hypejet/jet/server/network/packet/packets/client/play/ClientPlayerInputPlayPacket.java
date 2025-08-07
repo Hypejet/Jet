@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.network.packet.packets.client.play;
 
 import com.google.common.collect.Sets;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -22,7 +22,7 @@ public record ClientPlayerInputPlayPacket(@NonNull Set<InputFlag> inputFlags) im
      * @since 1.0
      */
     public ClientPlayerInputPlayPacket {
-        inputFlags = Sets.immutableEnumSet(NullabilityUtil.requireNonNull(inputFlags, "input flags"));
+        inputFlags = Sets.immutableEnumSet(Objects.requireNonNull(inputFlags, "input flags"));
     }
 
     /**

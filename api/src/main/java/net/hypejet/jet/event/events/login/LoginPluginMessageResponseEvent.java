@@ -1,10 +1,11 @@
 package net.hypejet.jet.event.events.login;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.session.login.LoginManager;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain LoginEvent a login event}, which is called when a client sends a response to a requested
@@ -43,6 +44,6 @@ public record LoginPluginMessageResponseEvent(@NonNull LoginManager loginManager
      * @since 1.0
      */
     public LoginPluginMessageResponseEvent {
-        NullabilityUtil.requireNonNull(loginManager, "login manager");
+        Objects.requireNonNull(loginManager, "login manager");
     }
 }

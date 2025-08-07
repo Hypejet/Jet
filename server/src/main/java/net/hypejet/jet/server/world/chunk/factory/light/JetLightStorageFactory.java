@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.world.chunk.factory.light;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.world.chunk.light.storage.AbstractLightStorage;
 import net.hypejet.jet.server.world.chunk.light.storage.EmptyLightStorage;
 import net.hypejet.jet.util.array.NibbleArray;
@@ -25,7 +25,7 @@ public final class JetLightStorageFactory implements LightStorageFactory {
 
     @Override
     public @NonNull AbstractLightStorage createDirect(@NonNull NibbleArray array) {
-        NullabilityUtil.requireNonNull(array, "array");
+        Objects.requireNonNull(array, "array");
         return AbstractLightStorage.create(array);
     }
 

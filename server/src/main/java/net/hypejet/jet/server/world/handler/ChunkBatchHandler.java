@@ -4,8 +4,7 @@ import com.google.common.collect.Ordering;
 import net.hypejet.concurrency.empty.EmptyAcquirable;
 import net.hypejet.concurrency.empty.EmptyAcquisition;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
-import net.hypejet.jet.data.model.api.coordinate.Position;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.server.entity.acquisition.world.EntityWorldAcquisition;
 import net.hypejet.jet.server.entity.player.JetPlayer;
@@ -84,8 +83,8 @@ public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnect
      * @since 1.0
      */
     public ChunkBatchHandler(@NonNull JetPlayer player, @NonNull Position position) {
-        this.player = NullabilityUtil.requireNonNull(player, "player");
-        NullabilityUtil.requireNonNull(position, "position");
+        this.player = Objects.requireNonNull(player, "player");
+        Objects.requireNonNull(position, "position");
 
         try (NotNullObjectAcquisition<Player.Settings> settingsAcquisition = this.player.settings()) {
             ChunkPosition centerChunkPosition = ChunkPositionUtil.fromCoordinate(position);
@@ -178,7 +177,7 @@ public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnect
      * @since 1.0
      */
     public void handlePositionUpdate(@NonNull Position position) {
-        NullabilityUtil.requireNonNull(position, "position");
+        Objects.requireNonNull(position, "position");
         ChunkPosition centerChunkPosition = ChunkPositionUtil.fromCoordinate(position);
         this.updateChunkView(chunkView -> new ChunkView(centerChunkPosition, chunkView.viewDistance()));
     }

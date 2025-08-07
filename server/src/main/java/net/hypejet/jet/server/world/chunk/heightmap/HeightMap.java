@@ -3,7 +3,7 @@ package net.hypejet.jet.server.world.chunk.heightmap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.util.math.MathUtil;
 import net.hypejet.jet.server.util.storage.BitStorage;
 import net.hypejet.jet.server.util.storage.BitStorageUpdate;
@@ -49,9 +49,9 @@ public final class HeightMap {
      * @since 1.0
      */
     private HeightMap(@NonNull DimensionType dimensionType, @NonNull HeightMapType type, @NonNull BitStorage data) {
-        this.dimensionType = NullabilityUtil.requireNonNull(dimensionType, "dimension type");
-        this.type = NullabilityUtil.requireNonNull(type, "type");
-        this.data = NullabilityUtil.requireNonNull(data, "data");
+        this.dimensionType = Objects.requireNonNull(dimensionType, "dimension type");
+        this.type = Objects.requireNonNull(type, "type");
+        this.data = Objects.requireNonNull(data, "data");
     }
 
     /**

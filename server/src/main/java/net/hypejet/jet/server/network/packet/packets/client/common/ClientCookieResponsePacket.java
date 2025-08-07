@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.client.common;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerCookieRequestPacket;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
@@ -38,6 +38,6 @@ public record ClientCookieResponsePacket(@NonNull Key key, @Nullable Unmodifiabl
      * @since 1.0
      */
     public ClientCookieResponsePacket {
-        NullabilityUtil.requireNonNull(key, "key");
+        Objects.requireNonNull(key, "key");
     }
 }

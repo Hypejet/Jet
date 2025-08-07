@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -19,6 +19,6 @@ public record ServerActionBarPlayPacket(@NonNull Component text) implements Serv
      * @since 1.0
      */
     public ServerActionBarPlayPacket {
-        NullabilityUtil.requireNonNull(text, "text");
+        Objects.requireNonNull(text, "text");
     }
 }

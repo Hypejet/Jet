@@ -6,7 +6,7 @@ import net.hypejet.concurrency.collection.set.SetAcquirable;
 import net.hypejet.concurrency.map.MapAcquirable;
 import net.hypejet.concurrency.map.MapAcquisition;
 import net.hypejet.concurrency.map.hashmap.HashMapAcquirable;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerAddResourcePackPacket;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerRemoveResourcePackPacket;
@@ -41,7 +41,7 @@ public final class ResourcePackHandler {
      * @since 1.0
      */
     public ResourcePackHandler(@NonNull SocketPlayerConnection connection) {
-        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
+        this.connection = Objects.requireNonNull(connection, "connection");
     }
 
     /**
@@ -51,7 +51,7 @@ public final class ResourcePackHandler {
      * @since 1.0
      */
     public void request(@NonNull ResourcePackRequest request) {
-        NullabilityUtil.requireNonNull(request, "request");
+        Objects.requireNonNull(request, "request");
         try (MapAcquisition<UUID, ResourcePackRequest, ?> pendingAcquisition = this.pendingPacks.acquireWrite()) {
             if (request.replace())
                 this.clear();
@@ -94,7 +94,7 @@ public final class ResourcePackHandler {
      * @since 1.0
      */
     public void remove(@NonNull Collection<UUID> packs) {
-        NullabilityUtil.requireNonNull(packs, "packs");
+        Objects.requireNonNull(packs, "packs");
         if (packs.isEmpty()) return;
 
         try (
@@ -149,9 +149,9 @@ public final class ResourcePackHandler {
      * @since 1.0
      */
     public void handleState(@NonNull UUID uniqueId, @NonNull ResourcePackStatus status, @NonNull Audience audience) {
-        NullabilityUtil.requireNonNull(uniqueId, "unique identifier");
-        NullabilityUtil.requireNonNull(status, "status");
-        NullabilityUtil.requireNonNull(audience, "audience");
+        Objects.requireNonNull(uniqueId, "unique identifier");
+        Objects.requireNonNull(status, "status");
+        Objects.requireNonNull(audience, "audience");
 
         try (MapAcquisition<UUID, ResourcePackRequest, ?> acquisition = this.pendingPacks.acquireWrite()) {
             Map<UUID, ResourcePackRequest> requests = acquisition.map();

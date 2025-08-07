@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.session.data;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.session.login.profile.GameProfileProperty;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -31,8 +31,8 @@ public record LoginData(@NonNull String username, @NonNull UUID uniqueId,
      * @since 1.0
      */
     public LoginData {
-        NullabilityUtil.requireNonNull(username, "username");
-        NullabilityUtil.requireNonNull(uniqueId, "unique identifier");
-        properties = Set.copyOf(NullabilityUtil.requireNonNull(properties, "properties"));
+        Objects.requireNonNull(username, "username");
+        Objects.requireNonNull(uniqueId, "unique identifier");
+        properties = Set.copyOf(Objects.requireNonNull(properties, "properties"));
     }
 }

@@ -55,7 +55,7 @@ public interface HolderSet<V> {
 
     /**
      * A {@linkplain HolderSet holder set} referencing to {@linkplain Holder holders}
-     * associated with all {@linkplain RegistryEntry registry entries} bound to the specified tag.
+     * associated with all registrations bound to the specified tag.
      *
      * @param tagKey the key of the tag
      * @param <V> a value type of holders that this holder set store
@@ -76,9 +76,9 @@ public interface HolderSet<V> {
         public @NonNull List<Holder<V>> contents(@NonNull MinecraftRegistry<V> registry) {
             List<Holder<V>> holders = new ArrayList<>();
 
-            for (RegistryEntry<V> entry : registry.entries()) {
-                if (!registry.hasTag(entry, this.tagKey)) continue;
-                holders.add(entry.createHolder());
+            for (Key key : registry.keySet()) {
+                if (!registry.tagsFor(key).contains(this.tagKey)) continue;
+                holders.add(new Holder.Reference<>(key));
             }
 
             return List.copyOf(holders);

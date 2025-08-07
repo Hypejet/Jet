@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.netty.encoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
@@ -27,7 +27,7 @@ public final class PacketLengthEncoder extends MessageToByteEncoder<ByteBuf> {
      * @since 1.0
      */
     public PacketLengthEncoder(@NonNull SocketPlayerConnection connection) {
-        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
+        this.connection = Objects.requireNonNull(connection, "connection");
     }
 
     @Override

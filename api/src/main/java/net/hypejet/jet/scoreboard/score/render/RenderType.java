@@ -1,7 +1,8 @@
 package net.hypejet.jet.scoreboard.score.render;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents a way of displaying score numbers of {@linkplain net.hypejet.jet.scoreboard.score.Score scores}.
@@ -37,7 +38,7 @@ public final class RenderType {
      * @since 1.0
      */
     private RenderType(@NonNull String name) {
-        this.name = NullabilityUtil.requireNonNull(name, "name");
+        this.name = Objects.requireNonNull(name, "name");
     }
 
     /* Methods #equals and #hashCode are not implemented, since this class is intended to be identity-compared only

@@ -1,9 +1,9 @@
 package net.hypejet.jet.util.bitset;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.BitSet;
+import java.util.Objects;
 
 /**
  * Represents a holder of {@linkplain BitSet a bitset}, which is intended be unmodifiable. In order to ensure that,
@@ -20,7 +20,7 @@ public record UnmodifiableBitSet(@NonNull BitSet bitSet) {
      * @since 1.0
      */
     public UnmodifiableBitSet {
-        bitSet = (BitSet) NullabilityUtil.requireNonNull(bitSet, "bitset").clone();
+        bitSet = (BitSet) Objects.requireNonNull(bitSet, "bitset").clone();
     }
 
     @Override

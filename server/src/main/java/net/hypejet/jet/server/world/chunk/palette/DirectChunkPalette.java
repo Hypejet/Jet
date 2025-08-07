@@ -2,15 +2,14 @@ package net.hypejet.jet.server.world.chunk.palette;
 
 import it.unimi.dsi.fastutil.objects.Object2ShortMap;
 import it.unimi.dsi.fastutil.objects.Object2ShortMaps;
-import it.unimi.dsi.fastutil.objects.Object2ShortOpenCustomHashMap;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.server.util.hash.IdentityHashStrategy;
+import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
 import net.hypejet.jet.server.util.math.MathUtil;
-import net.hypejet.jet.server.util.order.ElementOrder;
 import net.hypejet.jet.server.util.storage.BitStorage;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jspecify.annotations.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain AbstractChunkPalette a chunk palette}, which stores all elements directly in the data array.
@@ -29,23 +28,19 @@ public final class DirectChunkPalette<E> extends AbstractChunkPalette<E> {
      *
      * @param bitsPerElement number of bits that each element of the data should use
      * @param type a type of which the palette should be
-     * @param storage a bit storage that stores identifiers of elements that the chunk palette should contain
-     * @param elementOrder an element order, from which identifiers of elements of the palette should be retrieved
+     * @param storage a bit storage that stores registry indices of elements that the chunk palette should contain
+     * @param indexSpecification an index specification specifying registry indices
+     *                           for elements of the constructed palette
      * @param elementCountMap a map, which maps elements to their count in the palette
      * @since 1.0
      */
-    private DirectChunkPalette(byte bitsPerElement, @NonNull ChunkPaletteType type, @NonNull BitStorage storage,
-                               @NonNull ElementOrder<? extends E> elementOrder,
+    private DirectChunkPalette(byte bitsPerElement, @NonNull ChunkPaletteType type,
+                               @NonNull BitStorage storage, @NonNull IndexSpecification<E> indexSpecification,
                                @NonNull Object2ShortMap<E> elementCountMap) {
-        super(bitsPerElement, type, NullabilityUtil.requireNonNull(storage, "storage").data(), elementOrder);
+        super(bitsPerElement, type, Objects.requireNonNull(storage, "storage").data(), indexSpecification);
+        Objects.requireNonNull(elementCountMap, "element count map");
         this.storage = storage;
-
-        this.elementCountMap = Object2ShortMaps.unmodifiable(
-                new Object2ShortOpenCustomHashMap<>(
-                        NullabilityUtil.requireNonNull(elementCountMap, "element count map"),
-                        IdentityHashStrategy.INSTANCE
-                )
-        );
+        this.elementCountMap = Object2ShortMaps.unmodifiable(new Object2ShortOpenHashMap<>(elementCountMap));
     }
 
     @Override
@@ -62,8 +57,8 @@ public final class DirectChunkPalette<E> extends AbstractChunkPalette<E> {
         }
 
         int elementIndex = AbstractChunkPalette.calculateElementIndex(position);
-        int elementIdentifier = this.storage.getElement(elementIndex);
-        return this.elementOrder().getOrThrow(elementIdentifier);
+        int elementRegistryIndex = this.storage.getElement(elementIndex);
+        return this.indexSpecification().valueByIndex(elementRegistryIndex);
     }
 
     @Override
@@ -81,7 +76,7 @@ public final class DirectChunkPalette<E> extends AbstractChunkPalette<E> {
      *
      * @param type a type of which the palette should be
      * @param elements elements that the chunk palette should have
-     * @param elementOrder an element order, from which identifiers of elements of the palette should be retrieved
+     * @param indexSpecification an index specification specifying registry indices for elements of the created palette
      * @param elementCountMap a map, which maps elements to their count in the palette
      * @return the direct chunk palette
      * @since 1.0
@@ -89,16 +84,16 @@ public final class DirectChunkPalette<E> extends AbstractChunkPalette<E> {
     /* TODO: | Replace the factory method with public constructor when flexible constructors get finally implemented
        TODO: | in Java */
     static <E> @NonNull DirectChunkPalette<E> create(@NonNull ChunkPaletteType type, int @NonNull [] elements,
-                                                     @NonNull ElementOrder<? extends E> elementOrder,
+                                                     @NonNull IndexSpecification<E> indexSpecification,
                                                      @NonNull Object2ShortMap<E> elementCountMap) {
         byte bitsPerElement = type.minimumDirectBits();
         for (E element : elementCountMap.keySet()) {
-            int elementIdentifier = elementOrder.identifierOf(element);
-            bitsPerElement = (byte) Math.max(MathUtil.bitCount(elementIdentifier), bitsPerElement);
+            int elementRegistryIndex = indexSpecification.indexFor(element);
+            bitsPerElement = (byte) Math.max(MathUtil.bitCount(elementRegistryIndex), bitsPerElement);
         }
 
         BitStorage storage = new BitStorage(bitsPerElement, elements);
-        return new DirectChunkPalette<>(bitsPerElement, type, storage, elementOrder, elementCountMap);
+        return new DirectChunkPalette<>(bitsPerElement, type, storage, indexSpecification, elementCountMap);
     }
 
     @Override

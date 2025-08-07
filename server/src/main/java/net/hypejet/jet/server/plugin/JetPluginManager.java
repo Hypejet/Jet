@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import net.hypejet.jet.MinecraftServer;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.plugin.Plugin;
 import net.hypejet.jet.plugin.PluginManager;
 import net.hypejet.jet.plugin.dependency.PluginDependency;
@@ -102,12 +102,12 @@ public final class JetPluginManager implements PluginManager {
 
     @Override
     public @Nullable JetPlugin getPlugin(@NonNull String name) {
-        return this.nameToPluginMap.get(NullabilityUtil.requireNonNull(name, "name"));
+        return this.nameToPluginMap.get(Objects.requireNonNull(name, "name"));
     }
 
     @Override
     public @Nullable Plugin getPlugin(@NonNull Object instance) {
-        return this.instanceToPluginMap.get(NullabilityUtil.requireNonNull(instance, "instance"));
+        return this.instanceToPluginMap.get(Objects.requireNonNull(instance, "instance"));
     }
 
     @Override
@@ -392,8 +392,8 @@ public final class JetPluginManager implements PluginManager {
          * @since 1.0
          */
         private PluginPair {
-            NullabilityUtil.requireNonNull(metadata, "metadata");
-            NullabilityUtil.requireNonNull(classLoader, "class loader");
+            Objects.requireNonNull(metadata, "metadata");
+            Objects.requireNonNull(classLoader, "class loader");
         }
     }
 
@@ -419,7 +419,7 @@ public final class JetPluginManager implements PluginManager {
              * @since 1.0
              */
             public Success {
-                NullabilityUtil.requireNonNull(plugin, "plugin");
+                Objects.requireNonNull(plugin, "plugin");
             }
         }
 

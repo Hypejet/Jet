@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.codec.mapper;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.data.codecs.util.mapper.Mapper;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -29,8 +29,8 @@ public final class MapperNetworkCodec<R, W> implements NetworkCodec<R> {
      * @since 1.0
      */
     public MapperNetworkCodec(@NonNull Mapper<R, W> mapper, @NonNull NetworkCodec<W> codec) {
-        this.mapper = NullabilityUtil.requireNonNull(mapper, "mapper");
-        this.codec = NullabilityUtil.requireNonNull(codec, "codec");
+        this.mapper = Objects.requireNonNull(mapper, "mapper");
+        this.codec = Objects.requireNonNull(codec, "codec");
     }
 
     @Override

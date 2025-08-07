@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.scoreboard.objective.ScoreboardObjective;
 import net.hypejet.jet.scoreboard.score.Score;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
@@ -28,6 +28,6 @@ public record ServerResetScorePlayPacket(@NonNull String entityName, @Nullable S
      * @since 1.0
      */
     public ServerResetScorePlayPacket {
-        NullabilityUtil.requireNonNull(entityName, "entity name");
+        Objects.requireNonNull(entityName, "entity name");
     }
 }

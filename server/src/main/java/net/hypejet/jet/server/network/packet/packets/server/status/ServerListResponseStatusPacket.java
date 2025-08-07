@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.server.status;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.util.game.ping.ServerListPing;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -20,6 +20,6 @@ public record ServerListResponseStatusPacket(@NonNull ServerListPing ping) imple
      * @since 1.0
      */
     public ServerListResponseStatusPacket {
-        NullabilityUtil.requireNonNull(ping, "ping");
+        Objects.requireNonNull(ping, "ping");
     }
 }

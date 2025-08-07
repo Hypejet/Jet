@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.client.login;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import net.hypejet.jet.server.network.packet.packets.server.login.ServerEncryptionRequestLoginPacket;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
@@ -36,7 +36,7 @@ public record ClientEncryptionResponseLoginPacket(@NonNull UnmodifiableByteArray
      * @since 1.0
      */
     public ClientEncryptionResponseLoginPacket {
-        NullabilityUtil.requireNonNull(sharedSecret, "shared secret");
-        NullabilityUtil.requireNonNull(verifyToken, "verify token");
+        Objects.requireNonNull(sharedSecret, "shared secret");
+        Objects.requireNonNull(verifyToken, "verify token");
     }
 }

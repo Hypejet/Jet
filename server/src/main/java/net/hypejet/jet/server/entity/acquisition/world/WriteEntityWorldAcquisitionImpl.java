@@ -3,7 +3,7 @@ package net.hypejet.jet.server.entity.acquisition.world;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.object.notnull.WriteNotNullObjectAcquisition;
 import net.hypejet.jet.data.model.api.coordinate.Position;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.entity.acquisition.world.WriteEntityWorldAcquisition;
 import net.hypejet.jet.event.events.world.PreWorldSwitchEvent;
 import net.hypejet.jet.event.events.world.WorldSwitchEvent;
@@ -47,8 +47,8 @@ public final class WriteEntityWorldAcquisitionImpl
                                            @NonNull InternalWriteMovementAcquisition movementAcquisition,
                                            @NonNull JetEntity entity) {
         super(worldAcquisition);
-        this.movementAcquisition = NullabilityUtil.requireNonNull(movementAcquisition, "movement acquisition");
-        this.entity = NullabilityUtil.requireNonNull(entity, "entity");
+        this.movementAcquisition = Objects.requireNonNull(movementAcquisition, "movement acquisition");
+        this.entity = Objects.requireNonNull(entity, "entity");
     }
 
     @Override

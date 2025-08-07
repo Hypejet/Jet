@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -24,7 +24,7 @@ public record ServerUpdateBlockStatePlayPacket(@NonNull BlockPosition position, 
      * @since 1.0
      */
     public ServerUpdateBlockStatePlayPacket {
-        NullabilityUtil.requireNonNull(position, "position");
-        NullabilityUtil.requireNonNull(blockStateIdentifier, "block state identifier");
+        Objects.requireNonNull(position, "position");
+        Objects.requireNonNull(blockStateIdentifier, "block state identifier");
     }
 }

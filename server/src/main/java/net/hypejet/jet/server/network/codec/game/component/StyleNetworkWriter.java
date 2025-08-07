@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.network.codec.game.component;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.miscellaneous.BinaryTagNetworkWriter;
 import net.kyori.adventure.text.format.Style;
@@ -32,7 +32,7 @@ public final class StyleNetworkWriter implements NetworkWriter<Style> {
      * @since 1.0
      */
     private StyleNetworkWriter(@NonNull NBTComponentSerializer serializer) {
-        this.serializer = NullabilityUtil.requireNonNull(serializer, "serializer");
+        this.serializer = Objects.requireNonNull(serializer, "serializer");
     }
 
     @Override

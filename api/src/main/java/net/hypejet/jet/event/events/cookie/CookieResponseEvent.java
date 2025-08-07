@@ -1,11 +1,12 @@
 package net.hypejet.jet.event.events.cookie;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.network.PlayerConnection;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.Objects;
 
 /**
  * Represents an event, which is called when a cookie response from a client is received.
@@ -41,7 +42,7 @@ public record CookieResponseEvent(@NonNull PlayerConnection playerConnection, @N
      * @since 1.0
      */
     public CookieResponseEvent {
-        NullabilityUtil.requireNonNull(playerConnection, "player connection");
-        NullabilityUtil.requireNonNull(key, "key");
+        Objects.requireNonNull(playerConnection, "player connection");
+        Objects.requireNonNull(key, "key");
     }
 }

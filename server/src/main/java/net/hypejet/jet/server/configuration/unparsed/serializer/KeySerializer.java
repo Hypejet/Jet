@@ -4,7 +4,7 @@ import eu.okaeri.configs.schema.GenericsDeclaration;
 import eu.okaeri.configs.serdes.DeserializationData;
 import eu.okaeri.configs.serdes.ObjectSerializer;
 import eu.okaeri.configs.serdes.SerializationData;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -29,6 +29,6 @@ public final class KeySerializer implements ObjectSerializer<Key> {
 
     @Override
     public Key deserialize(@NonNull DeserializationData data, @NonNull GenericsDeclaration generics) {
-        return Key.key(NullabilityUtil.requireNonNull(data.getValue(String.class), "value"));
+        return Key.key(Objects.requireNonNull(data.getValue(String.class), "value"));
     }
 }

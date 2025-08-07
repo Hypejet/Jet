@@ -3,6 +3,7 @@ package net.hypejet.jet.registry;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collection;
 import java.util.Set;
@@ -14,6 +15,7 @@ import java.util.function.UnaryOperator;
  * @param <V> a type of values available in this registry
  * @since 1.0
  */
+@ApiStatus.NonExtendable
 public interface MinecraftRegistry<V> {
     /**
      * Gets a value associated with the specified {@linkplain Key key}.

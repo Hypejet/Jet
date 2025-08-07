@@ -1,8 +1,9 @@
 package net.hypejet.jet.util.game.link.label;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ServerLinkLabel a server link label} that displays {@linkplain Component a component}.
@@ -19,6 +20,6 @@ public record ComponentLabel(@NonNull Component component) implements ServerLink
      * @since 1.0
      */
     public ComponentLabel {
-        NullabilityUtil.requireNonNull(component, "component");
+        Objects.requireNonNull(component, "component");
     }
 }

@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.util.array;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Arrays;
@@ -21,7 +21,7 @@ public record UnmodifiableLongArray(long @NonNull [] array) {
      * @since 1.0
      */
     public UnmodifiableLongArray {
-        array = NullabilityUtil.requireNonNull(array, "array").clone();
+        array = Objects.requireNonNull(array, "array").clone();
     }
 
     @Override

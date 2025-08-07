@@ -1,6 +1,7 @@
 package net.hypejet.jet.world.chunk.factory.section;
 
-import net.hypejet.jet.data.model.api.registries.biome.Biome;
+import net.hypejet.jet.registry.holder.Holder;
+import net.hypejet.jet.world.biome.Biome;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.chunk.light.LightSection;
 import net.hypejet.jet.world.chunk.light.LightStorage;
@@ -26,7 +27,7 @@ public interface ChunkSectionFactory {
      * @since 1.0
      */
     @NonNull ChunkSection createChunkSection(@NonNull ChunkPalette<BlockState> blockStatePalette,
-                                             @NonNull ChunkPalette<RegistryEntry<Biome>> biomePalette);
+                                             @NonNull ChunkPalette<Holder.Reference<Biome>> biomePalette);
 
     /**
      * Creates {@linkplain LightSection a light section} with {@linkplain LightStorage light storages} specified

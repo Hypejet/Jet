@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.network.codec.mapped;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -27,8 +27,8 @@ public record MappedValueNetworkWriter<O, M>(@NonNull Function<O, M> mapper,
      * @since 1.0
      */
     public MappedValueNetworkWriter {
-        NullabilityUtil.requireNonNull(mapper, "mapper");
-        NullabilityUtil.requireNonNull(mappedValueWriter, "mapped value writer");
+        Objects.requireNonNull(mapper, "mapper");
+        Objects.requireNonNull(mappedValueWriter, "mapped value writer");
     }
 
     @Override

@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.server.login;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -44,8 +44,8 @@ public record ServerEncryptionRequestLoginPacket(
      * @since 1.0
      */
     public ServerEncryptionRequestLoginPacket {
-        NullabilityUtil.requireNonNull(serverId, "server id");
-        NullabilityUtil.requireNonNull(publicKey, "public key");
-        NullabilityUtil.requireNonNull(verifyToken, "verify token");
+        Objects.requireNonNull(serverId, "server id");
+        Objects.requireNonNull(publicKey, "public key");
+        Objects.requireNonNull(verifyToken, "verify token");
     }
 }

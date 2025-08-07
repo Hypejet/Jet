@@ -1,8 +1,9 @@
 package net.hypejet.jet.scoreboard.score.number;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain NumberFormat a number format} specifying that {@linkplain Component a component} specified
@@ -19,6 +20,6 @@ public record FixedNumberFormat(@NonNull Component placeholder) implements Numbe
      * @since 1.0
      */
     public FixedNumberFormat {
-        NullabilityUtil.requireNonNull(placeholder, "placeholder");
+        Objects.requireNonNull(placeholder, "placeholder");
     }
 }

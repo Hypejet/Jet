@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.data.model.server.registry.registries.block.entity.BlockEntityType;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
@@ -52,11 +52,11 @@ public record ServerChunkAndLightDataPlayPacket(
      * @since 1.0
      */
     public ServerChunkAndLightDataPlayPacket {
-        NullabilityUtil.requireNonNull(chunkPosition, "chunk position");
-        NullabilityUtil.requireNonNull(heightMaps, "height maps");
-        NullabilityUtil.requireNonNull(chunkSectionList, "chunk-section list");
-        NullabilityUtil.requireNonNull(blockEntities, "block entities");
-        NullabilityUtil.requireNonNull(lightSerializationData, "light serialization data");
+        Objects.requireNonNull(chunkPosition, "chunk position");
+        Objects.requireNonNull(heightMaps, "height maps");
+        Objects.requireNonNull(chunkSectionList, "chunk-section list");
+        Objects.requireNonNull(blockEntities, "block entities");
+        Objects.requireNonNull(lightSerializationData, "light serialization data");
 
         heightMaps = Set.copyOf(heightMaps);
         blockEntities = Map.copyOf(blockEntities);
@@ -115,7 +115,7 @@ public record ServerChunkAndLightDataPlayPacket(
          * @since 1.0
          */
         public BlockEntity {
-            NullabilityUtil.requireNonNull(data, "data");
+            Objects.requireNonNull(data, "data");
         }
     }
 }

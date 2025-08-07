@@ -13,7 +13,7 @@ import io.netty.util.concurrent.Future;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquirable;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.object.notnull.WriteNotNullObjectAcquisition;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.network.PlayerConnection;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.player.JetPlayer;
@@ -100,8 +100,8 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
             throw new IllegalArgumentException("The event loop must be a single-threaded event loop");
         }
 
-        this.channel = NullabilityUtil.requireNonNull(channel, "channel");
-        this.server = NullabilityUtil.requireNonNull(server, "server");
+        this.channel = Objects.requireNonNull(channel, "channel");
+        this.server = Objects.requireNonNull(server, "server");
 
         // We update handlers after the instantiation and such an operation require to be executed in an event loop
         this.ensureInEventLoop();
@@ -435,7 +435,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
          * @since 1.0
          */
         private WriteSessionAcquisition {
-            NullabilityUtil.requireNonNull(originalAcquisition, "original acquisition");
+            Objects.requireNonNull(originalAcquisition, "original acquisition");
         }
 
         @Override

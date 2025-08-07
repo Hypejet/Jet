@@ -1,6 +1,5 @@
 package net.hypejet.jet.world.coordinate;
 
-import net.hypejet.jet.data.model.api.coordinate.Coordinate;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Objects;

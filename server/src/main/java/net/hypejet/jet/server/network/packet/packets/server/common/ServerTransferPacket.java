@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.server.common;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -21,6 +21,6 @@ public record ServerTransferPacket(@NonNull String address, int port) implements
      * @since 1.0
      */
     public ServerTransferPacket {
-        NullabilityUtil.requireNonNull(address, "address");
+        Objects.requireNonNull(address, "address");
     }
 }

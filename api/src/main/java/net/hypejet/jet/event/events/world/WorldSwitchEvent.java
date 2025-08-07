@@ -1,10 +1,10 @@
 package net.hypejet.jet.event.events.world;
 
-import net.hypejet.jet.data.model.api.coordinate.Position;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.world.World;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents an event, which is called when {@linkplain World a world} has been changed
@@ -17,8 +17,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 1.0
  * @see World
  */
-public record WorldSwitchEvent(@NonNull Player player, @NonNull World previousWorld, @NonNull World newWorld,
-                               @NonNull Position startingPosition) {
+public record WorldSwitchEvent(@NonNull Player player, @NonNull World previousWorld,
+                               @NonNull World newWorld, @NonNull Position startingPosition) {
     /**
      * Constructs the {@linkplain WorldSwitchEvent world switch event}.
      *
@@ -29,9 +29,9 @@ public record WorldSwitchEvent(@NonNull Player player, @NonNull World previousWo
      * @since 1.0
      */
     public WorldSwitchEvent {
-        NullabilityUtil.requireNonNull(player, "player");
-        NullabilityUtil.requireNonNull(previousWorld, "previous world");
-        NullabilityUtil.requireNonNull(newWorld, "new world");
-        NullabilityUtil.requireNonNull(startingPosition, "starting position");
+        Objects.requireNonNull(player, "player");
+        Objects.requireNonNull(previousWorld, "previous world");
+        Objects.requireNonNull(newWorld, "new world");
+        Objects.requireNonNull(startingPosition, "starting position");
     }
 }

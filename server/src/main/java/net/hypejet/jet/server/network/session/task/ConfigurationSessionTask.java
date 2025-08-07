@@ -12,7 +12,7 @@ import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.data.model.api.pack.PackInfo;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.data.model.server.registry.registries.pack.FeaturePack;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.configuration.ConfigurationStartEvent;
@@ -103,8 +103,8 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
      * @since 1.0
      */
     public ConfigurationSessionTask(@NonNull SocketPlayerConnection connection, @NonNull LoginData loginData) {
-        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
-        this.loginData = NullabilityUtil.requireNonNull(loginData, "login data");
+        this.connection = Objects.requireNonNull(connection, "connection");
+        this.loginData = Objects.requireNonNull(loginData, "login data");
         this.keepAliveHandler = new KeepAliveHandler(this.connection, loginData.username());
     }
 
@@ -158,7 +158,7 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
 
     @Override
     public void handleClientBrand(@NonNull String name) {
-        NullabilityUtil.requireNonNull(name, "name");
+        Objects.requireNonNull(name, "name");
         try (WriteNullableObjectAcquisition<String> acquisition = this.clientBrand.acquireWrite()) {
             acquisition.set(name);
         }
@@ -166,7 +166,7 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
 
     @Override
     public void handleClientInformation(Player.@NonNull Settings settings) {
-        NullabilityUtil.requireNonNull(settings, "settings");
+        Objects.requireNonNull(settings, "settings");
         try (WriteNullableObjectAcquisition<Player.Settings> acquisition = this.settings.acquireWrite()) {
             acquisition.set(settings);
         }
@@ -262,7 +262,7 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
             Collection<JetMinecraftRegistry<?>> registries = server.registryManager().networkRegistries();
             for (JetMinecraftRegistry<?> registry : registries) {
                 if (!(registry instanceof JetSerializableMinecraftRegistry<?> serializableRegistry)) continue;
-                sendRegistry(this.connection, serializableRegistry, packet.featurePacks());
+                sendRegistry(this.connection, serializableRegistry, packet.knownPacks());
             }
 
             try (WriteBooleanAcquisition tagsSentAcquisition = this.tagsSent.acquireWrite()) {

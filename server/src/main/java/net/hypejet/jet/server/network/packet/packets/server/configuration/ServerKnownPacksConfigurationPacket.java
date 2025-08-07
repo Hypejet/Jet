@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.network.packet.packets.server.configuration;
 
 import net.hypejet.jet.data.model.api.pack.PackInfo;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -23,6 +23,6 @@ public record ServerKnownPacksConfigurationPacket(@NonNull Collection<PackInfo> 
      * @since 1.0
      */
     public ServerKnownPacksConfigurationPacket {
-        featurePacks = Set.copyOf(NullabilityUtil.requireNonNull(featurePacks, "feature packs"));
+        featurePacks = Set.copyOf(Objects.requireNonNull(featurePacks, "feature packs"));
     }
 }

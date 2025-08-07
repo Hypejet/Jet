@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.netty.handler;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.packet.RawPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -25,7 +25,7 @@ public final class RawPacketHandler extends SimpleChannelInboundHandler<RawPacke
      */
     public RawPacketHandler(@NonNull SocketPlayerConnection connection) {
         super(RawPacket.class);
-        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
+        this.connection = Objects.requireNonNull(connection, "connection");
     }
 
     @Override

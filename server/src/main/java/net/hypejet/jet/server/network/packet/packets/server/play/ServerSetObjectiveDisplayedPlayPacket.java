@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.scoreboard.position.ScoreboardPosition;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -25,6 +25,6 @@ public record ServerSetObjectiveDisplayedPlayPacket(@NonNull ScoreboardPosition 
      * @since 1.0
      */
     public ServerSetObjectiveDisplayedPlayPacket {
-        NullabilityUtil.requireNonNull(position, "position");
+        Objects.requireNonNull(position, "position");
     }
 }

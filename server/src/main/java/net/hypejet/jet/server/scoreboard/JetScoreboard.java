@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.scoreboard;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.scoreboard.Scoreboard;
@@ -76,25 +76,25 @@ public final class JetScoreboard implements Scoreboard {
 
     @Override
     public @Nullable Score getScore(@NonNull Entity entity, @NonNull String objective) {
-        NullabilityUtil.requireNonNull(entity, "entity");
+        Objects.requireNonNull(entity, "entity");
         return this.getScore(entity.scoreboardName(), objective);
     }
 
     @Override
     public @Nullable Score getScore(@NonNull String owner, @NonNull String objective) {
-        NullabilityUtil.requireNonNull(owner, "owner");
+        Objects.requireNonNull(owner, "owner");
         return this.scoreMap(objective).get(owner);
     }
 
     @Override
     public @Nullable Score setScore(@NonNull Entity entity, @NonNull String objective, @Nullable Score score) {
-        NullabilityUtil.requireNonNull(entity, "entity");
+        Objects.requireNonNull(entity, "entity");
         return this.setScore(entity.scoreboardName(), objective, score);
     }
 
     @Override
     public @Nullable Score setScore(@NonNull String owner, @NonNull String objective, @Nullable Score score) {
-        NullabilityUtil.requireNonNull(owner, "owner");
+        Objects.requireNonNull(owner, "owner");
 
         Map<String, Score> scoreMap = this.scoreMap(objective);
         if (Objects.equals(scoreMap.get(owner), score)) return score;
@@ -110,13 +110,13 @@ public final class JetScoreboard implements Scoreboard {
 
     @Override
     public @NonNull Map<String, Score> removeScores(@NonNull Entity entity) {
-        NullabilityUtil.requireNonNull(entity, "entity");
+        Objects.requireNonNull(entity, "entity");
         return this.removeScores(entity.scoreboardName());
     }
 
     @Override
     public @NonNull Map<String, Score> removeScores(@NonNull String owner) {
-        NullabilityUtil.requireNonNull(owner, "owner");
+        Objects.requireNonNull(owner, "owner");
 
         Map<String, Score> objectiveToScoreMap = new HashMap<>();
         for (Map.Entry<String, Map<String, Score>> entry : this.scoreMaps.entrySet()) {
@@ -136,16 +136,16 @@ public final class JetScoreboard implements Scoreboard {
 
     @Override
     public @Nullable String getDisplayedObjective(@NonNull Player player, @NonNull ScoreboardPosition position) {
-        NullabilityUtil.requireNonNull(player, "player");
-        NullabilityUtil.requireNonNull(position, "position");
+        Objects.requireNonNull(player, "player");
+        Objects.requireNonNull(position, "position");
         return this.displayedObjectivesHandler(JetPlayer.cast(player)).getDisplayedObjective(position);
     }
 
     @Override
     public @Nullable String setDisplayedObjective(@NonNull Player player, @NonNull ScoreboardPosition position,
                                                   @Nullable String name) {
-        NullabilityUtil.requireNonNull(player, "player");
-        NullabilityUtil.requireNonNull(position, "position");
+        Objects.requireNonNull(player, "player");
+        Objects.requireNonNull(position, "position");
 
         JetPlayer castPlayer = JetPlayer.cast(player);
         if (name != null) {
@@ -236,7 +236,7 @@ public final class JetScoreboard implements Scoreboard {
     }
 
     private static void validateObjectiveName(@NonNull String objectiveName) {
-        NullabilityUtil.requireNonNull(objectiveName, "objective name");
+        Objects.requireNonNull(objectiveName, "objective name");
         if (objectiveName.isEmpty())
             throw new IllegalArgumentException("A scoreboard objective name must not be empty");
     }
@@ -261,7 +261,7 @@ public final class JetScoreboard implements Scoreboard {
          * @since 1.0
          */
         private DisplayedObjectivesHandler(@NonNull JetPlayer player) {
-            this.player = NullabilityUtil.requireNonNull(player, "player");
+            this.player = Objects.requireNonNull(player, "player");
         }
 
         /**

@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.registry.tags;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import java.util.Objects;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -22,6 +22,6 @@ public record Tags(@NonNull Collection<Key> tags) {
      * @since 1.0
      */
     public Tags {
-        tags = Set.copyOf(NullabilityUtil.requireNonNull(tags, "tags"));
+        tags = Set.copyOf(Objects.requireNonNull(tags, "tags"));
     }
 }
