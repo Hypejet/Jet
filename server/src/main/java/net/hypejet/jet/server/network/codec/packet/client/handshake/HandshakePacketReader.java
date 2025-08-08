@@ -1,14 +1,16 @@
 package net.hypejet.jet.server.network.codec.packet.client.handshake;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.data.codecs.util.mapper.Mapper;
 import net.hypejet.jet.server.network.codec.NetworkReader;
-import net.hypejet.jet.server.network.codec.mapper.MapperNetworkCodec;
+import net.hypejet.jet.server.network.codec.index.IndexNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.handshake.ClientHandshakePacket;
 import net.hypejet.jet.server.network.packet.packets.client.handshake.ClientHandshakePacket.HandshakeIntent;
+import net.hypejet.jet.server.util.index.IndexUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Map;
 
 /**
  * Represents {@link NetworkReader a network reader}, which reads {@link ClientHandshakePacket a handshake packet}.
@@ -26,12 +28,12 @@ public final class HandshakePacketReader implements NetworkReader<ClientHandshak
      */
     public static final HandshakePacketReader INSTANCE = new HandshakePacketReader();
 
-    private static final MapperNetworkCodec<HandshakeIntent, Integer> INTENT_CODEC = new MapperNetworkCodec<>(
-            Mapper.builder(HandshakeIntent.class, int.class)
-                    .register(HandshakeIntent.STATUS, 1)
-                    .register(HandshakeIntent.LOGIN, 2)
-                    .register(HandshakeIntent.TRANSFER, 3)
-                    .build(),
+    private static final IndexNetworkCodec<HandshakeIntent, Integer> INTENT_CODEC = new IndexNetworkCodec<>(
+            IndexUtil.fromMap(Map.of(
+                    1, HandshakeIntent.STATUS,
+                    2, HandshakeIntent.LOGIN,
+                    3, HandshakeIntent.TRANSFER
+            )),
             VarIntNetworkCodec.INSTANCE
     );
 

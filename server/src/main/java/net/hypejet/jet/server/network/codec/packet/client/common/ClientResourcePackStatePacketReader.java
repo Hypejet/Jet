@@ -1,14 +1,16 @@
 package net.hypejet.jet.server.network.codec.packet.client.common;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.data.codecs.util.mapper.Mapper;
 import net.hypejet.jet.server.network.codec.NetworkReader;
-import net.hypejet.jet.server.network.codec.mapper.MapperNetworkCodec;
+import net.hypejet.jet.server.network.codec.index.IndexNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.codec.other.UUIDNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.common.ClientResourcePackStatePacket;
+import net.hypejet.jet.server.util.index.IndexUtil;
 import net.kyori.adventure.resource.ResourcePackStatus;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Map;
 
 /**
  * Represents {@linkplain NetworkReader a network reader}, which reads
@@ -27,17 +29,17 @@ public final class ClientResourcePackStatePacketReader implements NetworkReader<
      */
     public static final ClientResourcePackStatePacketReader INSTANCE = new ClientResourcePackStatePacketReader();
 
-    private static final MapperNetworkCodec<ResourcePackStatus, Integer> STATE_CODEC = new MapperNetworkCodec<>(
-            Mapper.builder(ResourcePackStatus.class, int.class)
-                    .register(ResourcePackStatus.SUCCESSFULLY_LOADED, 0)
-                    .register(ResourcePackStatus.DECLINED, 1)
-                    .register(ResourcePackStatus.FAILED_DOWNLOAD, 2)
-                    .register(ResourcePackStatus.ACCEPTED, 3)
-                    .register(ResourcePackStatus.DOWNLOADED, 4)
-                    .register(ResourcePackStatus.INVALID_URL, 5)
-                    .register(ResourcePackStatus.FAILED_RELOAD, 6)
-                    .register(ResourcePackStatus.DISCARDED, 7)
-                    .build(),
+    private static final IndexNetworkCodec<ResourcePackStatus, Integer> STATE_CODEC = new IndexNetworkCodec<>(
+            IndexUtil.fromMap(Map.of(
+                    0, ResourcePackStatus.SUCCESSFULLY_LOADED,
+                    1, ResourcePackStatus.DECLINED,
+                    2, ResourcePackStatus.FAILED_DOWNLOAD,
+                    3, ResourcePackStatus.ACCEPTED,
+                    4, ResourcePackStatus.DOWNLOADED,
+                    5, ResourcePackStatus.INVALID_URL,
+                    6, ResourcePackStatus.FAILED_RELOAD,
+                    7, ResourcePackStatus.DISCARDED
+            )),
             VarIntNetworkCodec.INSTANCE
     );
 

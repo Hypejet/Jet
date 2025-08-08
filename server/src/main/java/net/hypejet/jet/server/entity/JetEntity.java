@@ -1,7 +1,6 @@
 package net.hypejet.jet.server.entity;
 
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquirable;
-import net.hypejet.jet.data.model.api.coordinate.Position;
 import java.util.Objects;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.acquisition.world.WriteEntityWorldAcquisition;
@@ -12,6 +11,7 @@ import net.hypejet.jet.server.entity.movement.acquisition.InternalWriteMovementA
 import net.hypejet.jet.server.entity.movement.acquisition.MovementAcquirable;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.world.JetWorld;
+import net.hypejet.jet.world.coordinate.Position;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.pointer.Pointers;

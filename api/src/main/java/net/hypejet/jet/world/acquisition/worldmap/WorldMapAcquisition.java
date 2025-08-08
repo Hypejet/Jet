@@ -4,7 +4,7 @@ import net.hypejet.concurrency.Acquisition;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.world.biome.Biome;
 import net.hypejet.jet.world.block.BlockState;
-import net.hypejet.jet.world.coordinate.BiomePosition;
+import net.hypejet.jet.world.coordinate.biome.BiomePosition;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;

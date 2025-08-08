@@ -20,6 +20,7 @@ import net.hypejet.jet.server.util.coordinate.ChunkPositionUtil;
 import net.hypejet.jet.server.world.acquisition.worldmap.WriteWorldMapAcquisitionImpl;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.view.ChunkView;
+import net.hypejet.jet.world.coordinate.Position;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
 import net.hypejet.jet.world.event.world.events.StartWaitingForWorldChunksWorldEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -268,7 +269,7 @@ public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnect
                    are guarded by the same lock. It may also negatively affect chunk-view updating inside
                    the write world-map acquisition, because we acquire write world-map acquisition just after the
                    lock is being acquired. These cases lead to a deadlock. */
-                EmptyAcquisition ignored = this.lock.acquireWrite();
+                EmptyAcquisition ignored = this.lock.acquireWrite()
         ) {
             if (this.unacknowledgedBatches >= this.maximumUnacknowledgedBatches) return;
             this.chunksToSend = Math.min(this.chunksToSend + this.chunksPerTick, Math.max(1f, this.chunksPerTick));

@@ -1,10 +1,10 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import net.hypejet.jet.data.model.api.coordinate.Position;
-import net.hypejet.jet.data.model.api.coordinate.Vector;
 import java.util.Objects;
 import net.hypejet.jet.entity.movement.flag.RelativeFlag;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
+import net.hypejet.jet.world.coordinate.Position;
+import net.hypejet.jet.world.coordinate.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;

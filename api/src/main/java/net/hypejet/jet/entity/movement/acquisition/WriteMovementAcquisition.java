@@ -1,6 +1,8 @@
 package net.hypejet.jet.entity.movement.acquisition;
 
 import net.hypejet.jet.entity.movement.flag.RelativeFlag;
+import net.hypejet.jet.world.coordinate.Position;
+import net.hypejet.jet.world.coordinate.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;

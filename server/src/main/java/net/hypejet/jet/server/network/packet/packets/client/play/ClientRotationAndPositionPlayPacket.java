@@ -1,9 +1,9 @@
 package net.hypejet.jet.server.network.packet.packets.client.play;
 
-import net.hypejet.jet.data.model.api.coordinate.Position;
 import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
-import net.hypejet.jet.world.coordinate.PositionFlag;
+import net.hypejet.jet.world.coordinate.Position;
+import net.hypejet.jet.world.coordinate.flag.PositionFlag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;

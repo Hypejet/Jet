@@ -8,8 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Objects;
-
 /**
  * A {@linkplain BinaryTagCodec binary tag codec} of {@linkplain Holder holders}.
  *

@@ -17,6 +17,7 @@ import net.hypejet.jet.server.world.acquisition.worldmap.WriteWorldMapAcquisitio
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.world.World;
 import net.hypejet.jet.world.chunk.ChunkLoader;
+import net.hypejet.jet.world.coordinate.Position;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
 import net.hypejet.jet.world.data.WorldData;
 import net.hypejet.jet.world.dimension.DimensionType;

@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.codec.packet.server.common;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
-import net.hypejet.jet.server.network.codec.game.key.PackedKeyNetworkCodec;
+import net.hypejet.jet.server.network.codec.game.key.KeyNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerCookieRequestPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -27,6 +27,6 @@ public final class ServerCookieRequestPacketWriter implements NetworkWriter<Serv
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerCookieRequestPacket object) {
-        PackedKeyNetworkCodec.INSTANCE.write(buf, object.key());
+        KeyNetworkCodec.INSTANCE.write(buf, object.key());
     }
 }

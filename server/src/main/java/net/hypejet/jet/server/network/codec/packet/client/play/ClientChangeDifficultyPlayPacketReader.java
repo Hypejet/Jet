@@ -1,13 +1,15 @@
 package net.hypejet.jet.server.network.codec.packet.client.play;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.data.codecs.util.mapper.Mapper;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.PrimitiveNetworkCodecs;
-import net.hypejet.jet.server.network.codec.mapper.MapperNetworkCodec;
+import net.hypejet.jet.server.network.codec.index.IndexNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientChangeDifficultyPlayPacket;
+import net.hypejet.jet.server.util.index.IndexUtil;
 import net.hypejet.jet.world.difficulty.Difficulty;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Map;
 
 /**
  * Represents {@linkplain NetworkReader a network reader}, which reads
@@ -27,13 +29,13 @@ public final class ClientChangeDifficultyPlayPacketReader implements NetworkRead
      */
     public static final ClientChangeDifficultyPlayPacketReader INSTANCE = new ClientChangeDifficultyPlayPacketReader();
 
-    private static final MapperNetworkCodec<Difficulty, Byte> DIFFICULTY_CODEC = new MapperNetworkCodec<>(
-            Mapper.builder(Difficulty.class, byte.class)
-                    .register(Difficulty.PEACEFUL, (byte) 0)
-                    .register(Difficulty.EASY, (byte) 1)
-                    .register(Difficulty.NORMAL, (byte) 2)
-                    .register(Difficulty.HARD, (byte) 3)
-                    .build(),
+    private static final IndexNetworkCodec<Difficulty, Byte> DIFFICULTY_CODEC = new IndexNetworkCodec<>(
+            IndexUtil.fromMap(Map.of(
+                    (byte) 0, Difficulty.PEACEFUL,
+                    (byte) 1, Difficulty.EASY,
+                    (byte) 2, Difficulty.NORMAL,
+                    (byte) 3, Difficulty.HARD
+            )),
             PrimitiveNetworkCodecs.BYTE
     );
 

@@ -1,10 +1,10 @@
 package net.hypejet.jet.server.network.session.data;
 
-import net.hypejet.jet.data.model.api.coordinate.Position;
 import java.util.Objects;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.server.scoreboard.JetScoreboard;
 import net.hypejet.jet.server.world.JetWorld;
+import net.hypejet.jet.world.coordinate.Position;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 

@@ -87,7 +87,7 @@ public final class ServerChunkAndLightDataPlayPacketWriter
             ChunkRelativeBlockPositionNetworkWriter.INSTANCE.write(buf, position);
 
             BlockEntity blockEntity = object.getValue();
-            VarIntNetworkCodec.INSTANCE.write(buf, blockEntity.typeIdentifier());
+            VarIntNetworkCodec.INSTANCE.write(buf, blockEntity.typeRegistryIndex());
             BinaryTagNetworkWriter.INSTANCE.write(buf, blockEntity.data());
         }
     }

@@ -3,6 +3,7 @@ package net.hypejet.jet.event.events.world;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.CancellableEvent;
 import net.hypejet.jet.world.World;
+import net.hypejet.jet.world.coordinate.Position;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Objects;

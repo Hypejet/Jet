@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.codec.packet.server.configuration;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
-import net.hypejet.jet.server.network.codec.game.key.PackedKeyNetworkCodec;
+import net.hypejet.jet.server.network.codec.game.key.KeyNetworkCodec;
 import net.hypejet.jet.server.network.codec.game.registry.RegistryDataEntryNetworkWriter;
 import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerRegistryDataConfigurationPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -31,7 +31,7 @@ public final class ServerRegistryDataConfigurationPacketWriter
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerRegistryDataConfigurationPacket object) {
-        PackedKeyNetworkCodec.INSTANCE.write(buf, object.registry());
+        KeyNetworkCodec.INSTANCE.write(buf, object.registry());
         RegistryDataEntryNetworkWriter.COLLECTION_WRITER.write(buf, object.entries());
     }
 }

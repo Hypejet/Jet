@@ -1,10 +1,11 @@
 package net.hypejet.jet.server.world.chunk.factory.section;
 
-import net.hypejet.jet.data.model.api.registries.biome.Biome;
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.world.chunk.light.JetLightSection;
 import net.hypejet.jet.server.world.chunk.light.storage.AbstractLightStorage;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
+import net.hypejet.jet.world.biome.Biome;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.chunk.factory.section.ChunkSectionFactory;
 import net.hypejet.jet.world.chunk.light.LightStorage;
@@ -29,10 +30,10 @@ public final class JetChunkSectionFactory implements ChunkSectionFactory {
 
     @Override
     public @NonNull JetChunkSection createChunkSection(@NonNull ChunkPalette<BlockState> blockStatePalette,
-                                                       @NonNull ChunkPalette<RegistryEntry<Biome>> biomePalette) {
+                                                       @NonNull ChunkPalette<Holder.Reference<Biome>> biomePalette) {
         if (!(blockStatePalette instanceof AbstractChunkPalette<BlockState> validatedBlockStatePalette))
             throw new IllegalArgumentException("The block state palette specified is not a valid chunk palette");
-        if (!(biomePalette instanceof AbstractChunkPalette<RegistryEntry<Biome>> validatedBiomePalette))
+        if (!(biomePalette instanceof AbstractChunkPalette<Holder.Reference<Biome>> validatedBiomePalette))
             throw new IllegalArgumentException("The biome palette specified is not a valid chunk palette");
         return new JetChunkSection(validatedBlockStatePalette, validatedBiomePalette);
     }

@@ -2,9 +2,11 @@ package net.hypejet.jet.server.network.codec.packet.client.configuration;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
-import net.hypejet.jet.server.network.codec.game.pack.PackInfoNetworkCodec;
+import net.hypejet.jet.server.network.codec.game.registry.feature.KnownPackNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.configuration.ClientKnownPacksConfigurationPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.List;
 
 /**
  * Represents {@linkplain NetworkReader a network reader}, which reads
@@ -30,6 +32,6 @@ public final class ClientKnownPacksConfigurationPacketReader
 
     @Override
     public @NonNull ClientKnownPacksConfigurationPacket read(@NonNull ByteBuf buf) {
-        return new ClientKnownPacksConfigurationPacket(PackInfoNetworkCodec.COLLECTION_CODEC.read(buf));
+        return new ClientKnownPacksConfigurationPacket(List.copyOf(KnownPackNetworkCodec.COLLECTION_CODEC.read(buf)));
     }
 }

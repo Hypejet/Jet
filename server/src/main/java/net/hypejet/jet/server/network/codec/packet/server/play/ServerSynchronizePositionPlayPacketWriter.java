@@ -3,12 +3,12 @@ package net.hypejet.jet.server.network.codec.packet.server.play;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.entity.movement.flag.RelativeFlag;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.world.coordinate.VectorNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket;
+import net.hypejet.jet.world.coordinate.Position;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;

@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.entity.movement.acquisition;
 
-import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.entity.movement.acquisition.WriteMovementAcquisition;
+import net.hypejet.jet.world.coordinate.Position;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

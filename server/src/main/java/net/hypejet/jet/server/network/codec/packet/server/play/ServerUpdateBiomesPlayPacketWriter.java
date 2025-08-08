@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.codec.packet.server.play;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.hypejet.jet.data.model.api.registries.biome.Biome;
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.world.chunk.palette.ChunkPaletteNetworkWriter;
@@ -10,6 +10,7 @@ import net.hypejet.jet.server.network.codec.game.world.coordinate.chunk.ChunkPos
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateBiomesPlayPacket;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
+import net.hypejet.jet.world.biome.Biome;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -55,7 +56,7 @@ public final class ServerUpdateBiomesPlayPacketWriter implements NetworkWriter<S
 
             ByteBuf paletteBuf = Unpooled.buffer();
             try {
-                for (AbstractChunkPalette<RegistryEntry<Biome>> palette : object.palettes())
+                for (AbstractChunkPalette<Holder.Reference<Biome>> palette : object.palettes())
                     ChunkPaletteNetworkWriter.INSTANCE.write(paletteBuf, palette);
                 VarIntNetworkCodec.INSTANCE.write(buf, paletteBuf.readableBytes());
                 buf.writeBytes(paletteBuf);

@@ -5,7 +5,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.hypejet.jet.data.codecs.util.JsonUtil;
+import com.google.gson.JsonParseException;
 import net.hypejet.jet.plugin.dependency.PluginDependency;
 import net.hypejet.jet.server.plugin.metadata.PluginMetadata;
 import net.kyori.adventure.key.Key;
@@ -36,6 +36,14 @@ public final class PluginMetadataDeserializer implements JsonDeserializer<Plugin
     public PluginMetadata deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
         JsonObject object = json.getAsJsonObject();
 
+        JsonElement name = object.get(NAME);
+        if (name == null)
+            throw new JsonParseException("The plugin name has not been specified");
+
+        JsonElement version = object.get(VERSION);
+        if (version == null)
+            throw new JsonParseException("The plugin version has not been specified");
+
         JsonObject entrypointsObject = object.getAsJsonObject(ENTRYPOINTS);
         Map<Key, String> entrypoints = new HashMap<>();
 
@@ -61,8 +69,8 @@ public final class PluginMetadataDeserializer implements JsonDeserializer<Plugin
         }
 
         return new PluginMetadata(
-                JsonUtil.read(NAME, String.class, object, context),
-                JsonUtil.read(VERSION, String.class, object, context),
+                name.getAsString(),
+                version.getAsString(),
                 Map.copyOf(entrypoints),
                 Set.copyOf(authors),
                 Set.copyOf(dependencies)

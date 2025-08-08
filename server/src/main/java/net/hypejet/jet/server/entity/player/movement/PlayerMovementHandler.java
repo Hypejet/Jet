@@ -3,14 +3,14 @@ package net.hypejet.jet.server.entity.player.movement;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquirable;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
 import net.hypejet.concurrency.object.nullable.WriteNullableObjectAcquisition;
-import net.hypejet.jet.data.model.api.coordinate.Position;
-import net.hypejet.jet.data.model.api.coordinate.Vector;
 import java.util.Objects;
 import net.hypejet.jet.entity.movement.flag.RelativeFlag;
 import net.hypejet.jet.server.entity.movement.acquisition.InternalWriteMovementAcquisition;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientConfirmMovementSynchronizationPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket;
+import net.hypejet.jet.world.coordinate.Position;
+import net.hypejet.jet.world.coordinate.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;

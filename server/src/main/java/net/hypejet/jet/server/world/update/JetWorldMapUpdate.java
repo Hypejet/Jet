@@ -36,7 +36,7 @@ import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPalet
 import net.hypejet.jet.server.world.coordinate.chunk.section.ChunkSectionPosition;
 import net.hypejet.jet.world.biome.Biome;
 import net.hypejet.jet.world.block.BlockState;
-import net.hypejet.jet.world.coordinate.BiomePosition;
+import net.hypejet.jet.world.coordinate.biome.BiomePosition;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
@@ -197,7 +197,7 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
                 if (updateBuilder.biomeUpdates.isEmpty()) continue;
 
                 JetChunk chunk = this.acquisition.getChunk(chunkPosition);
-                List<AbstractChunkPalette<RegistryEntry<Biome>>> palettes = new ArrayList<>();
+                List<AbstractChunkPalette<Holder.Reference<Biome>>> palettes = new ArrayList<>();
 
                 for (JetChunkSection section : chunk.sections())
                     palettes.add(section.biomePalette());

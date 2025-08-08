@@ -8,6 +8,7 @@ import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.world.acquisition.worldmap.WorldMapAcquisition;
 import net.hypejet.jet.world.acquisition.worldmap.WriteWorldMapAcquisition;
+import net.hypejet.jet.world.coordinate.Position;
 import net.hypejet.jet.world.data.WorldData;
 import net.hypejet.jet.world.dimension.DimensionType;
 import org.checkerframework.checker.nullness.qual.NonNull;

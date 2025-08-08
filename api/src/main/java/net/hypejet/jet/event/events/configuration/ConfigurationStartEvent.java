@@ -5,6 +5,7 @@ import net.hypejet.jet.network.PlayerConnection;
 import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.session.configuration.ConfigurationManager;
 import net.hypejet.jet.world.World;
+import net.hypejet.jet.world.coordinate.Position;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;

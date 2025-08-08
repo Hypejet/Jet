@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.codec.packet.client.common;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.aggregate.array.bytes.ByteArrayNetworkReader;
-import net.hypejet.jet.server.network.codec.game.key.PackedKeyNetworkCodec;
+import net.hypejet.jet.server.network.codec.game.key.KeyNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.common.ClientCookieResponsePacket;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -29,7 +29,9 @@ public final class ClientCookieResponsePacketReader implements NetworkReader<Cli
 
     @Override
     public @NonNull ClientCookieResponsePacket read(@NonNull ByteBuf buf) {
-        return new ClientCookieResponsePacket(PackedKeyNetworkCodec.INSTANCE.read(buf),
-                NetworkUtil.readOptional(ByteArrayNetworkReader.INSTANCE, buf));
+        return new ClientCookieResponsePacket(
+                KeyNetworkCodec.INSTANCE.read(buf),
+                NetworkUtil.readOptional(ByteArrayNetworkReader.INSTANCE, buf)
+        );
     }
 }

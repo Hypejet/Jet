@@ -1,4 +1,4 @@
-package net.hypejet.jet.world.coordinate;
+package net.hypejet.jet.world.coordinate.flag;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 

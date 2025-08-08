@@ -2,8 +2,6 @@ package net.hypejet.jet.server.world.chunk.heightmap;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
-import java.util.Objects;
 import net.hypejet.jet.server.util.math.MathUtil;
 import net.hypejet.jet.server.util.storage.BitStorage;
 import net.hypejet.jet.server.util.storage.BitStorageUpdate;
@@ -16,6 +14,7 @@ import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
+import net.hypejet.jet.world.dimension.DimensionType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.Contract;
 

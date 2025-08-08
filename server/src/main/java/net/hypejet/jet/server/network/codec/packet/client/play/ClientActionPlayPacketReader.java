@@ -1,13 +1,15 @@
 package net.hypejet.jet.server.network.codec.packet.client.play;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.data.codecs.util.mapper.Mapper;
 import net.hypejet.jet.server.network.codec.NetworkReader;
-import net.hypejet.jet.server.network.codec.mapper.MapperNetworkCodec;
+import net.hypejet.jet.server.network.codec.index.IndexNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientActionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientActionPlayPacket.Action;
+import net.hypejet.jet.server.util.index.IndexUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Map;
 
 /**
  * Represents {@linkplain NetworkReader a network reader}, which reads
@@ -29,18 +31,18 @@ public final class ClientActionPlayPacketReader implements NetworkReader<ClientA
     private static final int MIN_JUMP_BOOST = 0;
     private static final int MAX_JUMP_BOOST = 100;
 
-    private static final MapperNetworkCodec<Action, Integer> ACTION_CODEC = new MapperNetworkCodec<>(
-            Mapper.builder(Action.class, int.class)
-                    .register(Action.START_SNEAKING, 0)
-                    .register(Action.STOP_SNEAKING, 1)
-                    .register(Action.LEAVE_BED, 2)
-                    .register(Action.START_SPRINTING, 3)
-                    .register(Action.STOP_SPRINTING, 4)
-                    .register(Action.START_JUMPING_WITH_HORSE, 5)
-                    .register(Action.STOP_JUMPING_WITH_HORSE, 6)
-                    .register(Action.OPEN_VEHICLE_INVENTORY, 7)
-                    .register(Action.START_FLYING_WITH_ELYTRA, 8)
-                    .build(),
+    private static final IndexNetworkCodec<Action, Integer> ACTION_CODEC = new IndexNetworkCodec<>(
+            IndexUtil.fromMap(Map.of(
+                    0, Action.START_SNEAKING,
+                    1, Action.STOP_SNEAKING,
+                    2, Action.LEAVE_BED,
+                    3, Action.START_SPRINTING,
+                    4, Action.STOP_SPRINTING,
+                    5, Action.START_JUMPING_WITH_HORSE,
+                    6, Action.STOP_JUMPING_WITH_HORSE,
+                    7, Action.OPEN_VEHICLE_INVENTORY,
+                    8, Action.START_FLYING_WITH_ELYTRA
+            )),
             VarIntNetworkCodec.INSTANCE
     );
 

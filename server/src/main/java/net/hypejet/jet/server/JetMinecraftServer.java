@@ -128,6 +128,16 @@ public final class JetMinecraftServer implements MinecraftServer {
     }
 
     /**
+     * Gets an identifier of a Minecraft version that the server runs on.
+     *
+     * @return the Minecraft version identifier
+     * @since 1.0
+     */
+    public @NonNull String versionId() {
+        return MinecraftVersion.VERSION_ID;
+    }
+
+    /**
      * Gets {@linkplain Ticker a ticker} of the server.
      *
      * @return the ticker
