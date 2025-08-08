@@ -14,6 +14,7 @@ import net.hypejet.jet.data.generator.generator.CodeGenerator;
 import net.hypejet.jet.data.generator.generator.Generator;
 import net.hypejet.jet.data.generator.generator.ResourceGenerator;
 import net.hypejet.jet.data.generator.generator.generators.KeyDefinitionGenerator;
+import net.hypejet.jet.data.generator.generator.generators.PacketIdentifierGenerator;
 import net.hypejet.jet.data.generator.generator.generators.RegistryExtractorResourceGenerator;
 import net.hypejet.jet.data.generator.generator.generators.VersionInfoGenerator;
 import net.hypejet.jet.data.generator.util.FileUtils;
@@ -33,7 +34,18 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.ProtocolInfo;
 import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.protocol.configuration.ConfigurationPacketTypes;
+import net.minecraft.network.protocol.configuration.ConfigurationProtocols;
+import net.minecraft.network.protocol.game.GamePacketTypes;
+import net.minecraft.network.protocol.game.GameProtocols;
+import net.minecraft.network.protocol.handshake.HandshakePacketTypes;
+import net.minecraft.network.protocol.handshake.HandshakeProtocols;
+import net.minecraft.network.protocol.login.LoginPacketTypes;
+import net.minecraft.network.protocol.login.LoginProtocols;
+import net.minecraft.network.protocol.status.StatusPacketTypes;
+import net.minecraft.network.protocol.status.StatusProtocols;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
@@ -264,6 +276,48 @@ final class Generators {
                         registryAccess,
                         JsonDataResourceFiles.BLOCK_STATES
                 ))
+                // ------------------------ Packets ------------------------
+                .add(
+                        "ClientHandshakePackets", HandshakeProtocols.SERVERBOUND_TEMPLATE,
+                        "A definition of identifiers of server-bound handshake packets.",
+                        HandshakePacketTypes.class
+                )
+                .add(
+                        "ServerStatusPackets", StatusProtocols.CLIENTBOUND_TEMPLATE,
+                        "A definition of identifiers of client-bound status packets.",
+                        StatusPacketTypes.class
+                ).add(
+                        "ClientStatusPackets", StatusProtocols.SERVERBOUND_TEMPLATE,
+                        "A definition of identifiers of server-bound status packets.",
+                        StatusPacketTypes.class
+                )
+                .add(
+                        "ServerLoginPackets", LoginProtocols.CLIENTBOUND_TEMPLATE,
+                        "A definition of identifiers of client-bound login packets.",
+                        LoginPacketTypes.class
+                ).add(
+                        "ClientLoginPackets", LoginProtocols.SERVERBOUND_TEMPLATE,
+                        "A definition of identifiers of server-bound login packets.",
+                        LoginPacketTypes.class
+                )
+                .add(
+                        "ServerConfigurationPackets", ConfigurationProtocols.CLIENTBOUND_TEMPLATE,
+                        "A definition of identifiers of client-bound configuration packets.",
+                        ConfigurationPacketTypes.class
+                ).add(
+                        "ClientConfigurationPackets", ConfigurationProtocols.SERVERBOUND_TEMPLATE,
+                        "A definition of identifiers of server-bound configuration packets.",
+                        ConfigurationPacketTypes.class
+                )
+                .add(
+                        "ServerPlayPackets", GameProtocols.CLIENTBOUND_TEMPLATE,
+                        "A definition of identifiers of client-bound play packets.",
+                        GamePacketTypes.class
+                ).add(
+                        "ClientPlayPackets", GameProtocols.SERVERBOUND_TEMPLATE,
+                        "A definition of identifiers of server-bound play packets.",
+                        GamePacketTypes.class
+                )
                 .build();
 
         for (Generator generator : generators) {
@@ -442,6 +496,28 @@ final class Generators {
                             new ConverterRegistryExtractor<>(registryKey, valueConverter, convertedValueClass),
                             this.registryAccess, resourceFilePath
                     ));
+        }
+
+        /**
+         * Creates a {@linkplain PacketIdentifierGenerator packet identifier generator}
+         * with values specified and adds it to this builder.
+         *
+         * @param className a name that the generator output class should have
+         * @param detailsProvider a details provider providing information about
+         *                        packets whose identifiers should be extracted
+         * @param javadocHeader a javadoc header that the generator output class should have
+         * @param keyDefinitionClass a class containing constants associated with
+         *                           packets whose identifiers should be extracted
+         * @return this builder
+         * @since 1.0
+         */
+        private @NonNull GeneratorsBuilder add(
+                @NonNull String className, ProtocolInfo.@NonNull DetailsProvider detailsProvider,
+                @NonNull String javadocHeader, @NonNull Class<?> keyDefinitionClass
+        ) {
+            return this.add(new PacketIdentifierGenerator(
+                    className, detailsProvider, javadocHeader, keyDefinitionClass
+            ));
         }
 
         /**

@@ -29,7 +29,7 @@ import net.hypejet.jet.server.network.packet.RawPacket;
 import net.hypejet.jet.server.network.packet.handler.NetworkDisconnectionHandler;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry;
-import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry.RegistryPacketSpecification;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry.PacketSpecification;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerDisconnectPacket;
 import net.hypejet.jet.server.network.packet.reader.ClientPacketReader;
 import net.hypejet.jet.server.network.session.Session;
@@ -367,7 +367,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
 
     private static @NonNull RawPacket encode(@NonNull ServerPacket packet, @NonNull ProtocolState state) {
         Class<? extends ServerPacket> packetClass = packet.getClass();
-        RegistryPacketSpecification<?> specification = ServerPacketRegistry.specificationFor(state, packetClass);
+        PacketSpecification<?> specification = ServerPacketRegistry.specificationFor(state, packetClass);
 
         if (specification == null) {
             throw new IllegalArgumentException(String.format(
@@ -385,8 +385,10 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
         }
     }
 
-    private static <P extends ServerPacket> void write(@NonNull RegistryPacketSpecification<P> specification,
-                                                       @NonNull ByteBuf buf, @NonNull ServerPacket packet) {
+    private static <P extends ServerPacket> void write(
+            ServerPacketRegistry.@NonNull PacketSpecification<P> specification,
+            @NonNull ByteBuf buf, @NonNull ServerPacket packet
+    ) {
         specification.packetWriter().write(buf, specification.packetClass().cast(packet));
     }
 
