@@ -1,17 +1,19 @@
 package net.hypejet.jet.registry.feature;
 
+import net.hypejet.jet.registry.MinecraftRegistry;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
 
 /**
- * An information of a feature pack that can enable a {@linkplain RegistryEntry registry entry}.
+ * An information of a feature pack that can enable a {@linkplain MinecraftRegistry registry} registration
+ * without sending the entire registration info to the client.
  *
  * @param namespace a namespace of the feature pack
  * @param path a path of the resource pack
  * @param version a version of the resource pack
  * @since 1.0
- * @see RegistryEntry
+ * @see MinecraftRegistry
  */
 public record KnownPack(@NonNull String namespace, @NonNull String path, @NonNull String version) {
     /**

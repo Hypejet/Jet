@@ -4,11 +4,16 @@ import com.google.common.primitives.ImmutableIntArray;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.hypejet.concurrency.collection.CollectionAcquisition;
+import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.jet.registry.MinecraftRegistry;
 import net.hypejet.jet.registry.feature.KnownPack;
-import net.hypejet.jet.server.network.codec.NetworkWriter;
+import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket;
+import net.hypejet.jet.server.network.session.Session;
 import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
+import net.hypejet.jet.server.registry.function.RegistryTagUpdateFunction;
 import net.kyori.adventure.key.Key;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -36,6 +41,7 @@ public final class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
 
     private final List<RegistrationInfo<V>> registrationInfos;
     private final BinaryTagCodec<V> valueCodec;
+    private final JetMinecraftServer server;
 
     /**
      * Constructs the {@linkplain JetMinecraftRegistry Minecraft registry implementation}.
@@ -43,13 +49,16 @@ public final class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
      * @param registryKey the key that the registry should have
      * @param registrationInfos an info list of registrations that the registry should have, the order is preserved
      * @param tags a map associating keys of registry values with keys of tags that these registry values should have
+     * @param server the server that the registry is created for
      * @param valueCodec a binary tag codec that values of the registry should be written with, {@code null} if
      *                   values of the registry should not be able to be written to network
      * @since 1.0
      */
     public JetMinecraftRegistry(@NonNull Key registryKey, @NonNull List<RegistrationInfo<V>> registrationInfos,
-                                @NonNull Map<Key, Set<Key>> tags, @Nullable BinaryTagCodec<V> valueCodec) {
+                                @NonNull Map<Key, Set<Key>> tags, @NonNull JetMinecraftServer server,
+                                @Nullable BinaryTagCodec<V> valueCodec) {
         this.registryKey = Objects.requireNonNull(registryKey, "registry key");
+        this.server = Objects.requireNonNull(server, "server");
 
         Objects.requireNonNull(registrationInfos, "registration infos");
         this.keyToIndexMap = createKeyToIndexMap(registrationInfos);
@@ -81,11 +90,22 @@ public final class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
     @Override
     public void updateTags(@NonNull Key key, @NonNull UnaryOperator<Set<Key>> tagUnaryOperator) {
         Objects.requireNonNull(tagUnaryOperator, "tag unary operator");
+
         this.tags.compute(this.ensureRegistered(key), (ignored, tagSet) -> {
             Set<Key> updatedTagSet = tagUnaryOperator.apply(tagSet == null ? Set.of() : Set.copyOf(tagSet));
             if (updatedTagSet.isEmpty()) return null;
             return Set.copyOf(updatedTagSet);
         });
+
+        try (CollectionAcquisition<JetPlayer, ?> playersAcquisition = this.server.players()) {
+            ServerUpdateTagsPacket packet = new ServerUpdateTagsPacket(Set.of(this.createTagRegistry())); // TODO: Frame
+            playersAcquisition.collection().forEach(player -> {
+                try (NotNullObjectAcquisition<Session> sessionAcquisition = player.connection().acquireSessionRead()) {
+                    if (sessionAcquisition.get().sessionTask() instanceof RegistryTagUpdateFunction function)
+                        function.updateTags(packet);
+                }
+            });
+        }
     }
 
     /**

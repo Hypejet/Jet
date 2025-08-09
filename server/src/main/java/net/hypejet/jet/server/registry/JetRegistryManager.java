@@ -11,10 +11,10 @@ import net.hypejet.jet.data.json.model.sound.JsonSoundEvent;
 import net.hypejet.jet.data.json.resource.JsonDataResourceFiles;
 import net.hypejet.jet.data.json.util.JsonUnit;
 import net.hypejet.jet.event.events.registry.RegistryInitializeEvent;
-import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.registry.MinecraftRegistry;
 import net.hypejet.jet.registry.RegistryManager;
 import net.hypejet.jet.registry.reference.RegistryReference;
+import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntityType;
 import net.hypejet.jet.server.entity.ai.JetPoiType;
 import net.hypejet.jet.server.inventory.item.JetItem;
@@ -74,11 +74,11 @@ public final class JetRegistryManager implements RegistryManager {
     /**
      * Constructs the {@linkplain JetRegistryManager registry manager}.
      *
-     * @param eventNode an event node where registry-related events should be called
+     * @param server the server that the registry manager is constructed for
      * @since 1.0
      */
-    public JetRegistryManager(@NonNull EventNode<Object> eventNode) {
-        this.registries = new RegistryMapBuilder(eventNode)
+    public JetRegistryManager(@NonNull JetMinecraftServer server) {
+        this.registries = new RegistryMapBuilder(server)
                 .dataDriven(
                         RegistryReference.BIOME, Key.key("worldgen/biome"),
                         JsonDataResourceFiles.BIOMES, BiomeBinaryTagCodec.INSTANCE
@@ -233,17 +233,17 @@ public final class JetRegistryManager implements RegistryManager {
      */
     private static final class RegistryMapBuilder {
 
-        private final EventNode<Object> eventNode;
+        private final JetMinecraftServer server;
         private final Map<RegistryReference<?>, JetMinecraftRegistry<?>> registries = new HashMap<>();
 
         /**
          * Constructs the {@linkplain RegistryMapBuilder registry-map builder}.
          *
-         * @param eventNode an event node where registry-related events should be called
+         * @param server the server that the constructed builder should create the registry map for
          * @since 1.0
          */
-        private RegistryMapBuilder(@NonNull EventNode<Object> eventNode) {
-            this.eventNode = Objects.requireNonNull(eventNode, "event node");
+        private RegistryMapBuilder(@NonNull JetMinecraftServer server) {
+            this.server = Objects.requireNonNull(server, "server");
         }
 
         /**
@@ -361,11 +361,11 @@ public final class JetRegistryManager implements RegistryManager {
             JetMinecraftRegistry<CV> registry;
 
             if (valueCodec == null) {
-                registry = new JetMinecraftRegistry<>(registryKey, registrations, tags, null);
+                registry = new JetMinecraftRegistry<>(registryKey, registrations, tags, this.server, null);
             } else {
                 NetworkableRegistryBuilder<CV> registryBuilder = new NetworkableRegistryBuilder<>(registrations, tags);
-                this.eventNode.call(new RegistryInitializeEvent<>(reference, registryBuilder));
-                registry = registryBuilder.build(registryKey, valueCodec);
+                this.server.eventNode().call(new RegistryInitializeEvent<>(reference, registryBuilder));
+                registry = registryBuilder.build(registryKey, valueCodec, this.server);
             }
 
             this.registries.put(reference, registry);
@@ -427,13 +427,18 @@ public final class JetRegistryManager implements RegistryManager {
              *
              * @param registryKey the key that the registry should have
              * @param valueCodec a binary tag codec that values of the registry should be written with
+             * @param server a server that the registry should be created for
              * @return the created registry
              * @since 1.0
              */
             private @NonNull JetMinecraftRegistry<V> build(@NonNull Key registryKey,
-                                                           @NonNull BinaryTagCodec<V> valueCodec) {
+                                                           @NonNull BinaryTagCodec<V> valueCodec,
+                                                           @NonNull JetMinecraftServer server) {
                 this.registryCreated = true;
-                return new JetMinecraftRegistry<>(registryKey, List.copyOf(this.registrations), this.tags, valueCodec);
+                return new JetMinecraftRegistry<>(
+                        registryKey, List.copyOf(this.registrations),
+                        this.tags, server, valueCodec
+                );
             }
         }
     }

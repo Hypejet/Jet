@@ -67,6 +67,16 @@ public record ServerChunkAndLightDataPlayPacket(
         blockEntities = Map.copyOf(blockEntities);
     }
 
+    /**
+     * Creates a {@linkplain ServerChunkAndLightDataPlayPacket chunk-and-light data play packet}
+     * for the specified {@linkplain JetChunk chunk}.
+     *
+     * @param chunkPosition the position of the chunk that the packet is being created for
+     * @param chunk the chunk that the packet is being created for
+     * @param registryManager a registry manager whose values are used by the chunk
+     * @return the chunk-and-light data play packet
+     * @since 1.0
+     */
     public static @NonNull ServerChunkAndLightDataPlayPacket create(
             @NonNull ChunkPosition chunkPosition, @NonNull JetChunk chunk,
             @NonNull JetRegistryManager registryManager

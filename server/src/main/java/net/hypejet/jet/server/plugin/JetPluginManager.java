@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Stream;
@@ -67,6 +66,7 @@ public final class JetPluginManager implements PluginManager {
     /**
      * Constructs the {@linkplain JetPluginManager plugin manager}.
      *
+     * @param server the server that the plugin manager is constructed for
      * @since 1.0
      */
     public JetPluginManager(@NonNull JetMinecraftServer server) {

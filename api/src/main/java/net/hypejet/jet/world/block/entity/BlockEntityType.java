@@ -13,8 +13,8 @@ import org.jspecify.annotations.NonNull;
 @ApiStatus.NonExtendable
 public interface BlockEntityType {
     /**
-     * Gets a {@linkplain HolderSet holder set} referencing to block
-     * registry entries that support block entities of this type.
+     * Gets a {@linkplain HolderSet holder set} referencing
+     * to {@linkplain BlockType blocks} that support block entities of this type.
      *
      * @return the holder set
      * @since 1.0

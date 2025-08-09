@@ -15,7 +15,7 @@ import java.util.Objects;
 /**
  * An implementation of a {@linkplain BlockEntityType block entity type}.
  *
- * @param validBlocks a holder set referencing to block registry entries that support block entities of this type
+ * @param validBlocks a holder set referencing to blocks that support block entities of this type
  * @since 1.0
  * @see BlockEntityType
  */
@@ -23,8 +23,8 @@ public record JetBlockEntityType(@NonNull HolderSet<BlockType> validBlocks) impl
     /**
      * Constructs the {@linkplain JetBlockEntityType block entity type}.
      *
-     * @param validBlocks a holder set referencing to block registry entries that should
-     *                    support block entities of the constructed block entity type
+     * @param validBlocks a holder set referencing to blocks that should support block entities
+     *                    of the constructed block entity type
      * @since 1.0
      */
     public JetBlockEntityType {

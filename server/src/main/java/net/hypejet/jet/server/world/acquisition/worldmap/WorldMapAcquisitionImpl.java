@@ -158,7 +158,7 @@ public class WorldMapAcquisitionImpl implements WorldMapAcquisition {
      *
      * @param position the biome position
      * @param chunk the chunk
-     * @return the registry entry
+     * @return the biome holder
      * @since 1.0
      */
     protected static Holder.@NonNull Reference<Biome> biome(@NonNull BiomePosition position, @NonNull JetChunk chunk) {
@@ -169,13 +169,13 @@ public class WorldMapAcquisitionImpl implements WorldMapAcquisition {
     }
 
     /**
-     * Gets level of a light with {@linkplain LightType a light type} specified
-     * at {@linkplain BlockPosition a block position} specified in {@linkplain JetChunk a chunk} specified.
+     * Gets the light level of a light with the specified {@linkplain LightType light type} at the specified
+     * {@linkplain BlockPosition block position} associated with the specified {@linkplain JetChunk chunk}.
      *
-     * @param position the block position
+     * @param position the block position to get the light level from
      * @param lightType the light type
-     * @param chunk the chunk
-     * @return the registry entry
+     * @param chunk the chunk associated with the specified block position
+     * @return the light level
      * @since 1.0
      */
     protected static byte lightValue(@NonNull BlockPosition position, @NonNull LightType lightType,

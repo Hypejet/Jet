@@ -1,13 +1,13 @@
 package net.hypejet.jet.server.network.packet.packets.client.play;
 
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
+import net.hypejet.jet.world.coordinate.Position;
+import net.hypejet.jet.world.coordinate.Vector;
 
 /**
- * Represents {@linkplain ClientPacket a client packet}, which confirms
- * that {@linkplain net.hypejet.jet.data.model.api.coordinate.Position a position}
- * and {@linkplain net.hypejet.jet.data.model.api.coordinate.Vector vector} of a delta movement of
- * {@linkplain net.hypejet.jet.server.entity.player.JetPlayer a player} associated with a client has been synchronized
- * with the serverside value.
+ * A {@linkplain ClientPacket client packet} confirming that {@linkplain Position position}
+ * and delta-movement {@linkplain Vector} of a {@linkplain net.hypejet.jet.server.entity.player.JetPlayer player}
+ * has been synchronized with the serverside value.
  *
  * @param identifier an identifier of the synchronization
  * @since 1.0

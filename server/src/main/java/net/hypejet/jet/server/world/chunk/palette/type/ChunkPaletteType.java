@@ -1,6 +1,8 @@
 package net.hypejet.jet.server.world.chunk.palette.type;
 
+import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
+import net.hypejet.jet.world.biome.Biome;
 
 /**
  * Represents a type of {@linkplain AbstractChunkPalette a chunk palette}.
@@ -10,18 +12,16 @@ import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
  */
 public enum ChunkPaletteType {
     /**
-     * {@linkplain ChunkPaletteType A chunk palette type} used when
-     * {@linkplain AbstractChunkPalette a chunk palette} stores
-     * {@linkplain net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState block states}.
+     * A {@linkplain ChunkPaletteType chunk palette type} for {@linkplain AbstractChunkPalette chunk palettes}
+     * storing {@linkplain JetBlockState block states}.
      *
      * @since 1.0
      */
     BLOCK_STATE((byte) 4, (byte) 8, (byte) 15, (byte) 16),
 
     /**
-     * {@linkplain ChunkPaletteType A chunk palette type} used when
-     * {@linkplain AbstractChunkPalette a chunk palette} stores
-     * {@linkplain net.hypejet.jet.data.model.api.registries.biome.Biome biomes}.
+     * A {@linkplain ChunkPaletteType chunk palette type} for {@linkplain AbstractChunkPalette chunk palettes}
+     * storing {@linkplain Biome biomes}.
      *
      * @since 1.0
      */

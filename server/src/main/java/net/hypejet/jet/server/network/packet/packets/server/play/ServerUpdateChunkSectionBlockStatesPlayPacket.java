@@ -5,21 +5,22 @@ import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
+import net.hypejet.jet.server.world.block.JetBlockState;
+import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.server.world.coordinate.chunk.section.ChunkSectionPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents {@linkplain ServerPacket a server packet}, which updates
- * {@linkplain net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState block states}
- * of {@linkplain net.hypejet.jet.world.chunk.section.ChunkSection a chunk section}.
+ * A {@linkplain ServerPacket server packet} updating {@linkplain JetBlockState block states}
+ * in a {@linkplain JetChunkSection chunk section}.
  *
- * @param position an absolute position of the chunk section that the block states should be updated for
- * @param updates a map, which maps chunk-palette-relative positions to block state identifiers, which should
- *                be at these positions
+ * @param position an absolute position of the chunk section that the block states should be updated in
+ * @param updates a map associating chunk-palette-relative positions with registry indices of block states
+ *                that should be present at these positions
  * @since 1.0
- * @see net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState
- * @see net.hypejet.jet.world.chunk.section.ChunkSection
+ * @see JetBlockState
+ * @see JetChunkSection
  * @see ServerPacket
  */
 public record ServerUpdateChunkSectionBlockStatesPlayPacket(
@@ -31,8 +32,8 @@ public record ServerUpdateChunkSectionBlockStatesPlayPacket(
      * {@linkplain ServerUpdateChunkSectionBlockStatesPlayPacket server update chunk-section block states play packet}.
      *
      * @param position an absolute position of the chunk section that the block states should be updated for
-     * @param updates a map, which maps chunk-palette-relative positions to block state identifiers, which should
-     *                be at these positions
+     * @param updates a map associating chunk-palette-relative positions with registry indices of block states
+     *                that should be present at these positions
      * @since 1.0
      */
     public ServerUpdateChunkSectionBlockStatesPlayPacket {

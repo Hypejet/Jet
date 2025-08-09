@@ -42,9 +42,11 @@ public final class PlayerMovementHandler {
 
     /**
      * Sends a request to client to synchronize clientside {@linkplain Position position}
-     * and {@linkplain Vector vector} of a delta movement with a value specified.
+     * and delta-movement {@linkplain Vector vector} with the specified values.
      *
-     * @param position the value
+     * @param position the position value
+     * @param deltaMovement the delta-movement vector value
+     * @param flags flags of the position
      * @since 1.0
      */
     public void synchronize(@NonNull Position position, @NonNull Vector deltaMovement,

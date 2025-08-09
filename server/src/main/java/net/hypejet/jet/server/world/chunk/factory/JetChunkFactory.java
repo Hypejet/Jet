@@ -27,9 +27,9 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Represents an implementation of {@linkplain ChunkFactory a chunk factory}.
+ * An implementation of a {@linkplain ChunkFactory chunk factory}.
  *
- * @implSpec 1.0
+ * @since 1.0
  * @see ChunkFactory
  */
 public final class JetChunkFactory implements ChunkFactory {

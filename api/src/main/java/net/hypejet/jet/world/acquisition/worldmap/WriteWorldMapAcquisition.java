@@ -37,7 +37,7 @@ public interface WriteWorldMapAcquisition extends WorldMapAcquisition {
      * with the biome position has not been loaded, it is going to be loaded.</p>
      *
      * @param position the biome position
-     * @return the registry entry
+     * @return the biome holder
      * @since 1.0
      */
     Holder.@NonNull Reference<Biome> getBiome(@NonNull BiomePosition position);
