@@ -37,6 +37,6 @@ public final class TagNetworkWriter implements NetworkWriter<Tag> {
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull Tag object) {
         KeyNetworkCodec.INSTANCE.write(buf, object.key());
-        VarIntArrayNetworkWriter.INSTANCE.write(buf, object.entries().array());
+        VarIntArrayNetworkWriter.INSTANCE.write(buf, object.entries().toArray());
     }
 }

@@ -91,7 +91,10 @@ public record ServerChunkAndLightDataPlayPacket(
             Key blockEntityTypeKey = null;
 
             // FIXME: Temporal solution, needs to be replaced with a proper block-entity system
-            for (JetMinecraftRegistry.RegistrationInfo<BlockEntityType> info : blockEntityTypeRegistry.registrationInfos()) {
+            for (
+                    JetMinecraftRegistry.RegistrationInfo<BlockEntityType> info
+                    : blockEntityTypeRegistry.registrationInfos()
+            ) {
                 List<Holder<BlockType>> validBlocks = info.value().validBlocks().contents(blockTypeRegistry);
                 if (!validBlocks.contains(blockType)) continue;
                 blockEntityTypeKey = info.key();

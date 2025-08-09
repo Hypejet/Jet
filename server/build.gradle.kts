@@ -57,6 +57,9 @@ tasks {
     sourcesJar {
         dependsOn(generateSourcesTask)
     }
+    processResources {
+        dependsOn(generateSourcesTask)
+    }
     withType<AbstractCompile> {
         dependsOn(generateSourcesTask)
     }

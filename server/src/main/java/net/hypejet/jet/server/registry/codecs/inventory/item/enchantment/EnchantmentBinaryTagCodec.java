@@ -3,7 +3,6 @@ package net.hypejet.jet.server.registry.codecs.inventory.item.enchantment;
 import net.hypejet.jet.entity.equipment.EquipmentSlotGroup;
 import net.hypejet.jet.inventory.item.Item;
 import net.hypejet.jet.inventory.item.enchatment.Enchantment;
-import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.holder.HolderSet;
 import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.adventure.ComponentBinaryTagCodec;
@@ -131,7 +130,7 @@ public final class EnchantmentBinaryTagCodec implements BinaryTagCodec<Enchantme
         }
 
         HolderSet<Enchantment> exclusiveSet = decoded.exclusiveSet();
-        if (!(exclusiveSet instanceof HolderSet.Direct<?>(List<Holder<?>> contents) && contents.isEmpty())) {
+        if (!(exclusiveSet instanceof HolderSet.Direct<?>(List<?> contents) && contents.isEmpty())) {
             builder.put(EXCLUSIVE_SET_FIELD, EXCLUSIVE_SET_CODEC.encode(exclusiveSet));
         }
 

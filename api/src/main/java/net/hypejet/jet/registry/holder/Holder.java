@@ -30,6 +30,18 @@ public interface Holder<V> {
     @Nullable V value(@NonNull MinecraftRegistry<? extends V> registry);
 
     /**
+     * Gets the registry value, throws an exception if the holder does not provide the value directly and the specified
+     * {@linkplain MinecraftRegistry registry} does not contain the value.
+     *
+     * @param registry a registry that should provide the value if this holder does not store it directly
+     * @return the value
+     * @throws IllegalArgumentException if the holder does not provide the value directly and the specified registry
+     *                                  does not contain the value
+     * @since 1.0
+     */
+    @NonNull V valueOrThrow(@NonNull MinecraftRegistry<? extends V> registry);
+
+    /**
      * A {@linkplain Holder holder} directly holding the registry value.
      *
      * @param value the registry value that the holder holds
@@ -51,12 +63,17 @@ public interface Holder<V> {
         public @NonNull V value(@NonNull MinecraftRegistry<? extends V> registry) {
             return this.value;
         }
+
+        @Override
+        public @NonNull V valueOrThrow(@NonNull MinecraftRegistry<? extends V> registry) {
+            return this.value;
+        }
     }
 
     /**
      * A {@linkplain Holder holder} holding a {@linkplain MinecraftRegistry registry} reference to the registry value.
      *
-     * @param key the key of the registry entry that the holder references to
+     * @param key the key that the referenced value is associated with
      * @param <V> the type of the registry value
      * @since 1.0
      */
@@ -64,7 +81,7 @@ public interface Holder<V> {
         /**
          * Constructs the {@linkplain Reference reference holder}.
          *
-         * @param key the key of the registry entry that the holder references to
+         * @param key the key that the referenced value is associated with
          * @since 1.0
          */
         public Reference {
@@ -74,6 +91,18 @@ public interface Holder<V> {
         @Override
         public @Nullable V value(@NonNull MinecraftRegistry<? extends V> registry) {
             return registry.get(this.key);
+        }
+
+        @Override
+        public @NonNull V valueOrThrow(@NonNull MinecraftRegistry<? extends V> registry) {
+            V value = this.value(registry);
+            if (value == null) {
+                throw new IllegalArgumentException(String.format(
+                        "The specified registry does not provide a value for \"%s\" key",
+                        this.key
+                ));
+            }
+            return value;
         }
     }
 }

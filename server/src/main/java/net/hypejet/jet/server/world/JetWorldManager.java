@@ -61,7 +61,11 @@ public final class JetWorldManager implements WorldManager {
                 new BiomeIndexSpecification(registryManager.registry(RegistryReference.BIOME))
         );
 
-        this.chunkFactory = new JetChunkFactory(server);
+        this.chunkFactory = new JetChunkFactory(
+                server,
+                this.blockStateChunkPaletteFactory,
+                this.biomeChunkPaletteFactory
+        );
     }
 
     @Override

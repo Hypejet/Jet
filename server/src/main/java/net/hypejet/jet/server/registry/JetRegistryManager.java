@@ -80,107 +80,115 @@ public final class JetRegistryManager implements RegistryManager {
     public JetRegistryManager(@NonNull EventNode<Object> eventNode) {
         this.registries = new RegistryMapBuilder(eventNode)
                 .dataDriven(
-                        RegistryReference.BIOME, JsonDataResourceFiles.BIOMES,
-                        Key.key("worldgen/biome"), BiomeBinaryTagCodec.INSTANCE
+                        RegistryReference.BIOME, Key.key("worldgen/biome"),
+                        JsonDataResourceFiles.BIOMES, BiomeBinaryTagCodec.INSTANCE
                 )
                 .dataDriven(
-                        RegistryReference.CHAT_TYPE, JsonDataResourceFiles.CHAT_TYPES,
-                        Key.key("chat_type"), ChatTypeBinaryTagCodec.INSTANCE
+                        RegistryReference.CHAT_TYPE, Key.key("chat_type"),
+                        JsonDataResourceFiles.CHAT_TYPES, ChatTypeBinaryTagCodec.INSTANCE
                 )
                 .dataDriven(
-                        RegistryReference.TRIM_PATTERN, JsonDataResourceFiles.TRIM_PATTERNS,
-                        Key.key("trim_pattern"), TrimPatternBinaryTagCodec.INSTANCE
+                        RegistryReference.TRIM_PATTERN, Key.key("trim_pattern"),
+                        JsonDataResourceFiles.TRIM_PATTERNS, TrimPatternBinaryTagCodec.INSTANCE
                 )
                 .dataDriven(
-                        RegistryReference.TRIM_MATERIAL, JsonDataResourceFiles.TRIM_MATERIALS,
-                        Key.key("trim_material"), TrimMaterialBinaryTagCodec.INSTANCE
+                        RegistryReference.TRIM_MATERIAL, Key.key("trim_material"),
+                        JsonDataResourceFiles.TRIM_MATERIALS, TrimMaterialBinaryTagCodec.INSTANCE
                 )
                 .dataDriven(
-                        RegistryReference.WOLF_VARIANT, JsonDataResourceFiles.WOLF_VARIANTS,
-                        Key.key("wolf_variant"), WolfVariantBinaryTagCodec.INSTANCE
+                        RegistryReference.WOLF_VARIANT, Key.key("wolf_variant"),
+                        JsonDataResourceFiles.WOLF_VARIANTS, WolfVariantBinaryTagCodec.INSTANCE
                 )
                 .dataDriven(
-                        RegistryReference.PIG_VARIANT, JsonDataResourceFiles.PIG_VARIANTS,
-                        Key.key("pig_variant"), PigVariantBinaryTagCodec.INSTANCE
+                        RegistryReference.PIG_VARIANT, Key.key("pig_variant"),
+                        JsonDataResourceFiles.PIG_VARIANTS, PigVariantBinaryTagCodec.INSTANCE
                 )
                 .dataDriven(
-                        RegistryReference.FROG_VARIANT, JsonDataResourceFiles.FROG_VARIANTS,
-                        Key.key("frog_variant"), FrogVariantBinaryTagCodec.INSTANCE
+                        RegistryReference.FROG_VARIANT, Key.key("frog_variant"),
+                        JsonDataResourceFiles.FROG_VARIANTS, FrogVariantBinaryTagCodec.INSTANCE
                 )
                 .dataDriven(
-                        RegistryReference.CAT_VARIANT, JsonDataResourceFiles.CAT_VARIANTS,
-                        Key.key("cat_variant"), CatVariantBinaryTagCodec.INSTANCE
+                        RegistryReference.CAT_VARIANT, Key.key("cat_variant"),
+                        JsonDataResourceFiles.CAT_VARIANTS, CatVariantBinaryTagCodec.INSTANCE
                 )
                 .dataDriven(
-                        RegistryReference.COW_VARIANT, JsonDataResourceFiles.COW_VARIANTS,
-                        Key.key("cow_variant"), CowVariantBinaryTagCodec.INSTANCE
+                        RegistryReference.COW_VARIANT, Key.key("cow_variant"),
+                        JsonDataResourceFiles.COW_VARIANTS, CowVariantBinaryTagCodec.INSTANCE
                 )
                 .dataDriven(
-                        RegistryReference.DAMAGE_TYPE, JsonDataResourceFiles.DAMAGE_TYPES,
-                        Key.key("damage_type"), DamageTypeBinaryTagCodec.INSTANCE
+                        RegistryReference.DAMAGE_TYPE, Key.key("damage_type"),
+                        JsonDataResourceFiles.DAMAGE_TYPES, DamageTypeBinaryTagCodec.INSTANCE
                 )
                 .dataDriven(
-                        RegistryReference.JUKEBOX_SONG, JsonDataResourceFiles.JUKEBOX_SONGS,
-                        Key.key("jukebox_song"), JukeboxSongBinaryTagCodec.INSTANCE
+                        RegistryReference.JUKEBOX_SONG, Key.key("jukebox_song"),
+                        JsonDataResourceFiles.JUKEBOX_SONGS, JukeboxSongBinaryTagCodec.INSTANCE
                 )
                 .dataDriven(
-                        RegistryReference.INSTRUMENT, JsonDataResourceFiles.INSTRUMENTS,
-                        Key.key("instrument"), InstrumentBinaryTagCodec.INSTANCE
+                        RegistryReference.INSTRUMENT, Key.key("instrument"),
+                        JsonDataResourceFiles.INSTRUMENTS, InstrumentBinaryTagCodec.INSTANCE
                 )
                 .dataDriven(
-                        RegistryReference.WOLF_SOUND_VARIANT, JsonDataResourceFiles.WOLF_SOUND_VARIANTS,
-                        Key.key("wolf_sound_variant"), WolfSoundVariantBinaryTagCodec.INSTANCE
+                        RegistryReference.WOLF_SOUND_VARIANT, Key.key("wolf_sound_variant"),
+                        JsonDataResourceFiles.WOLF_SOUND_VARIANTS, WolfSoundVariantBinaryTagCodec.INSTANCE
                 )
                 .dataDriven(
-                        RegistryReference.CHICKEN_VARIANT, JsonDataResourceFiles.CHICKEN_VARIANTS,
-                        Key.key("chicken_variant"), ChickenVariantBinaryTagCodec.INSTANCE
+                        RegistryReference.CHICKEN_VARIANT, Key.key("chicken_variant"),
+                        JsonDataResourceFiles.CHICKEN_VARIANTS, ChickenVariantBinaryTagCodec.INSTANCE
                 )
                 .dataDriven(
-                        RegistryReference.PAINTING_VARIANT, JsonDataResourceFiles.PAINTING_VARIANTS,
-                        Key.key("painting_variant"), PaintingVariantBinaryTagCodec.INSTANCE
+                        RegistryReference.PAINTING_VARIANT, Key.key("painting_variant"),
+                        JsonDataResourceFiles.PAINTING_VARIANTS, PaintingVariantBinaryTagCodec.INSTANCE
                 )
                 .dataDriven(
-                        RegistryReference.DIMENSION_TYPE, JsonDataResourceFiles.DIMENSION_TYPES,
-                        Key.key("dimension_type"), DimensionTypeBinaryTagCodec.INSTANCE
+                        RegistryReference.DIMENSION_TYPE, Key.key("dimension_type"),
+                        JsonDataResourceFiles.DIMENSION_TYPES, DimensionTypeBinaryTagCodec.INSTANCE
                 )
                 .dataDriven(
-                        RegistryReference.BANNER_PATTERN, JsonDataResourceFiles.BANNER_PATTERNS,
-                        Key.key("banner_pattern"), BannerPatternBinaryTagCodec.INSTANCE
+                        RegistryReference.BANNER_PATTERN, Key.key("banner_pattern"),
+                        JsonDataResourceFiles.BANNER_PATTERNS, BannerPatternBinaryTagCodec.INSTANCE
                 )
                 .dataDriven(
-                        RegistryReference.ENCHANTMENT, JsonDataResourceFiles.ENCHANTMENTS,
-                        Key.key("enchantment"), EnchantmentBinaryTagCodec.INSTANCE
+                        RegistryReference.ENCHANTMENT, Key.key("enchantment"),
+                        JsonDataResourceFiles.ENCHANTMENTS, EnchantmentBinaryTagCodec.INSTANCE
                 )
                 .builtIn(
-                        RegistryReference.ITEM, JsonDataResourceFiles.ITEMS,
+                        RegistryReference.ITEM, Key.key("item"),
+                        JsonDataResourceFiles.ITEMS,
                         JsonItem.class, JetItem::convert
                 )
                 .builtIn(
-                        RegistryReference.BLOCK, JsonDataResourceFiles.BLOCKS,
+                        RegistryReference.BLOCK, Key.key("block"),
+                        JsonDataResourceFiles.BLOCKS,
                         JsonBlock.class, JetBlockType::convert
                 )
                 .builtIn(
-                        RegistryReference.ENTITY_TYPE, JsonDataResourceFiles.ENTITY_TYPES,
+                        RegistryReference.ENTITY_TYPE, Key.key("entity_type"),
+                        JsonDataResourceFiles.ENTITY_TYPES,
                         JsonEntityType.class, JetEntityType::convert
                 )
                 .builtIn(
-                        RegistryReference.GAME_EVENT, JsonDataResourceFiles.GAME_EVENTS,
+                        RegistryReference.GAME_EVENT, Key.key("game_event"),
+                        JsonDataResourceFiles.GAME_EVENTS,
                         JsonGameEvent.class, gameEvent -> new GameEvent(gameEvent.notificationRadius())
                 )
                 .builtIn(
-                        RegistryReference.FLUID, JsonDataResourceFiles.FLUIDS,
+                        RegistryReference.FLUID, Key.key("fluid"),
+                        JsonDataResourceFiles.FLUIDS,
                         JsonUnit.class, unit -> JetFluid.INSTANCE
                 )
                 .builtIn(
-                        RegistryReference.SOUND_EVENT, JsonDataResourceFiles.SOUND_EVENTS,
+                        RegistryReference.SOUND_EVENT, Key.key("sound_event"),
+                        JsonDataResourceFiles.SOUND_EVENTS,
                         JsonSoundEvent.class, soundEvent -> new SoundEvent(soundEvent.sound(), soundEvent.range())
                 )
                 .builtIn(
-                        RegistryReference.POI_TYPE, JsonDataResourceFiles.POI_TYPES,
+                        RegistryReference.POI_TYPE, Key.key("point_of_interest_type"),
+                        JsonDataResourceFiles.POI_TYPES,
                         JsonUnit.class, unit -> JetPoiType.INSTANCE
                 )
                 .builtIn(
-                        RegistryReference.BLOCK_ENTITY_TYPE, JsonDataResourceFiles.BLOCK_ENTITY_TYPES,
+                        RegistryReference.BLOCK_ENTITY_TYPE, Key.key("block_entity_type"),
+                        JsonDataResourceFiles.BLOCK_ENTITY_TYPES,
                         JsonBlockEntityType.class, JetBlockEntityType::convert
                 )
                 .build();
@@ -247,25 +255,25 @@ public final class JetRegistryManager implements RegistryManager {
          * and converted to final value types using the specified {@linkplain BinaryTagCodec binary tag codec}</p>
          *
          * @param reference the registry reference
+         * @param registryKey the key that the registry should have
          * @param resourceFileClasspath a classpath of a resource file with built-in entries
          *                              to be added to the registry
-         * @param registryKey a key that the registry should have
          * @param valueCodec a binary tag codec to read and write the registry values with
          * @return this registry-map builder
          * @param <V> the type of values that the final registry should have
          * @since 1.0
          */
         private <V> @NonNull RegistryMapBuilder dataDriven(@NonNull RegistryReference<V> reference,
-                                                           @NonNull String resourceFileClasspath,
                                                            @NonNull Key registryKey,
+                                                           @NonNull String resourceFileClasspath,
                                                            @NonNull BinaryTagCodec<V> valueCodec) {
-            return this.put(reference, resourceFileClasspath, BinaryTagHolder.class, holder -> {
+            return this.put(reference, registryKey, resourceFileClasspath, BinaryTagHolder.class, holder -> {
                 try {
                     return valueCodec.decode(TagStringIO.tagStringIO().asTag(holder.string()));
                 } catch (Exception exception) {
                     throw new RuntimeException("Failed to read a registry value", exception);
                 }
-            }, new JetMinecraftRegistry.NetworkableData<>(valueCodec, registryKey));
+            }, valueCodec);
         }
 
         /**
@@ -274,6 +282,7 @@ public final class JetRegistryManager implements RegistryManager {
          * {@linkplain RegistryReference registry reference} with the created registry.
          *
          * @param reference the registry reference
+         * @param registryKey the key that the registry should have
          * @param resourceFileClasspath a classpath of a resource file with built-in values to be added to the registry
          * @param valueType a class of the registry final value type
          * @param valueConverter a function converting values from the resource file to values that should be put
@@ -284,10 +293,11 @@ public final class JetRegistryManager implements RegistryManager {
          * @since 1.0
          */
         private <DV, CV> @NonNull RegistryMapBuilder builtIn(@NonNull RegistryReference<CV> reference,
+                                                             @NonNull Key registryKey,
                                                              @NonNull String resourceFileClasspath,
                                                              @NonNull Class<DV> valueType,
                                                              @NonNull Function<DV, CV> valueConverter) {
-            return this.put(reference, resourceFileClasspath, valueType, valueConverter, null);
+            return this.put(reference, registryKey, resourceFileClasspath, valueType, valueConverter, null);
         }
 
         /**
@@ -296,22 +306,22 @@ public final class JetRegistryManager implements RegistryManager {
          * {@linkplain RegistryReference registry reference} with the created registry.
          *
          * @param reference the registry reference
+         * @param registryKey the key that the registry should have
          * @param resourceFileClasspath a classpath of a resource file with built-in values to be added to the registry
          * @param valueType a class of the registry final value type
          * @param valueConverter a function converting values from the resource file to values that should be put
          *                       to the registry
-         * @param networkableData an additional data that the registry should have for network writing
-         *                        purposes, {@code null} if values of the registry should not be able
-         *                        to be written to network
+         * @param valueCodec a binary tag codec that values of the registry should be written with, {@code null} if
+         *                   values of the registry should not be able to be written to network
          * @return this registry-map builder
          * @param <DV> the type of values available in the resource file
          * @param <CV> the type of values that the final registry should have
          * @since 1.0
          */
         private <DV, CV> @NonNull RegistryMapBuilder put(
-                @NonNull RegistryReference<CV> reference, @NonNull String resourceFileClasspath,
-                @NonNull Class<DV> valueType, @NonNull Function<DV, CV> valueConverter,
-                JetMinecraftRegistry.@Nullable NetworkableData<CV> networkableData
+                @NonNull RegistryReference<CV> reference, @NonNull Key registryKey,
+                @NonNull String resourceFileClasspath, @NonNull Class<DV> valueType,
+                @NonNull Function<DV, CV> valueConverter, @Nullable BinaryTagCodec<CV> valueCodec
         ) {
             if (this.registries.containsKey(reference)) {
                 throw new IllegalArgumentException(String.format(
@@ -350,12 +360,12 @@ public final class JetRegistryManager implements RegistryManager {
 
             JetMinecraftRegistry<CV> registry;
 
-            if (networkableData == null) {
-                registry = new JetMinecraftRegistry<>(registrations, tags, null);
+            if (valueCodec == null) {
+                registry = new JetMinecraftRegistry<>(registryKey, registrations, tags, null);
             } else {
                 NetworkableRegistryBuilder<CV> registryBuilder = new NetworkableRegistryBuilder<>(registrations, tags);
                 this.eventNode.call(new RegistryInitializeEvent<>(reference, registryBuilder));
-                registry = registryBuilder.build(networkableData);
+                registry = registryBuilder.build(registryKey, valueCodec);
             }
 
             this.registries.put(reference, registry);
@@ -415,13 +425,15 @@ public final class JetRegistryManager implements RegistryManager {
             /**
              * Builds the "networkable" {@linkplain JetMinecraftRegistry registry}.
              *
-             * @param data a networkable data that the registry should have
-             * @return the registry created
+             * @param registryKey the key that the registry should have
+             * @param valueCodec a binary tag codec that values of the registry should be written with
+             * @return the created registry
              * @since 1.0
              */
-            private @NonNull JetMinecraftRegistry<V> build(JetMinecraftRegistry.@NonNull NetworkableData<V> data) {
+            private @NonNull JetMinecraftRegistry<V> build(@NonNull Key registryKey,
+                                                           @NonNull BinaryTagCodec<V> valueCodec) {
                 this.registryCreated = true;
-                return new JetMinecraftRegistry<>(List.copyOf(this.registrations), this.tags, data);
+                return new JetMinecraftRegistry<>(registryKey, List.copyOf(this.registrations), this.tags, valueCodec);
             }
         }
     }

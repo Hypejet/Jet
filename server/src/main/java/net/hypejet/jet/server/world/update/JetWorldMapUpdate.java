@@ -8,6 +8,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.hypejet.concurrency.collection.CollectionAcquisition;
 import net.hypejet.jet.registry.holder.Holder;
+import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
@@ -24,7 +25,6 @@ import net.hypejet.jet.server.util.coordinate.ChunkPositionUtil;
 import net.hypejet.jet.server.util.coordinate.ChunkRelativePositionUtil;
 import net.hypejet.jet.server.world.acquisition.worldmap.WriteWorldMapAcquisitionImpl;
 import net.hypejet.jet.server.world.block.JetBlockState;
-import net.hypejet.jet.server.world.block.JetBlockType;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.light.LightSectionList;
 import net.hypejet.jet.server.world.chunk.light.LightSerializationData;
@@ -36,12 +36,15 @@ import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPalet
 import net.hypejet.jet.server.world.coordinate.chunk.section.ChunkSectionPosition;
 import net.hypejet.jet.world.biome.Biome;
 import net.hypejet.jet.world.block.BlockState;
+import net.hypejet.jet.world.block.BlockType;
+import net.hypejet.jet.world.block.entity.BlockEntityType;
 import net.hypejet.jet.world.coordinate.biome.BiomePosition;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
 import net.hypejet.jet.world.update.WorldMapUpdate;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -401,8 +404,11 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
             }
 
             JetRegistryManager registryManager = this.acquisition.world().server().registryManager();
-            JetBlockStateRegistry blockStateRegistry = registryManager.blockStateRegistry();
-            JetMinecraftRegistry<BlockEntityType> blockEntityTypeRegistry = registryManager.blockEntityTypeRegistry();
+            JetMinecraftRegistry<BlockType> blockTypeRegistry = registryManager.registry(RegistryReference.BLOCK);
+
+            JetMinecraftRegistry<BlockEntityType> blockEntityTypeRegistry = registryManager.registry(
+                    RegistryReference.BLOCK_ENTITY_TYPE
+            );
 
             Map<ChunkSectionPosition, Map<ChunkRelativeBlockPosition, BlockState>> sectionUpdates = new HashMap<>();
             for (Map.Entry<ChunkRelativeBlockPosition, JetBlockState> blockUpdate : this.blockStateUpdates.entrySet()) {
@@ -418,16 +424,16 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
                 );
             }
 
-            ElementOrder<JetBlockState> blockStateOrder = blockStateRegistry.order();
+            JetBlockStateRegistry blockStateRegistry = registryManager.blockStateRegistry();
             for (ChunkSectionPosition sectionPosition : sectionUpdates.keySet()) {
                 Map<ChunkRelativeBlockPosition, BlockState> updates = sectionUpdates.get(sectionPosition);
                 if (updates.size() == 1) {
                     Map.Entry<ChunkRelativeBlockPosition, BlockState> update = updates.entrySet().iterator().next();
 
                     BlockPosition blockPosition = AbsolutePositionUtil.from(update.getKey(), this.chunkPosition);
-                    int blockStateIdentifier = blockStateOrder.identifierOf(update.getValue());
+                    int blockStateRegistryIndex = blockStateRegistry.indexOf(update.getValue());
 
-                    packets.add(new ServerUpdateBlockStatePlayPacket(blockPosition, blockStateIdentifier));
+                    packets.add(new ServerUpdateBlockStatePlayPacket(blockPosition, blockStateRegistryIndex));
                     continue;
                 }
 
@@ -435,7 +441,7 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
                 for (Map.Entry<ChunkRelativeBlockPosition, BlockState> entry : updates.entrySet()) {
                     ChunkRelativeBlockPosition position = entry.getKey();
                     ChunkPaletteRelativePosition palettePosition = ChunkPaletteRelativePosition.from(position);
-                    updateMap.put(palettePosition, blockStateOrder.identifierOf(entry.getValue()));
+                    updateMap.put(palettePosition, blockStateRegistry.indexOf(entry.getValue()));
                 }
 
                 if (updateMap.isEmpty()) continue;
@@ -457,10 +463,21 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
                     ));
                 }
 
-                JetRegistryEntry<JetBlockType> blockType = blockState.blockType();
-                JetRegistryEntry<BlockEntityType> blockEntityType = blockType.value().blockEntityType();
+                Holder.Reference<BlockType> blockType = blockState.blockType();
+                Key blockEntityTypeKey = null;
 
-                if (blockEntityType == null) {
+                // FIXME: Temporal solution, needs to be replaced with a proper block-entity system
+                for (
+                        JetMinecraftRegistry.RegistrationInfo<BlockEntityType> info
+                        : blockEntityTypeRegistry.registrationInfos()
+                ) {
+                    List<Holder<BlockType>> validBlocks = info.value().validBlocks().contents(blockTypeRegistry);
+                    if (!validBlocks.contains(blockType)) continue;
+                    blockEntityTypeKey = info.key();
+                    break;
+                }
+
+                if (blockEntityTypeKey == null) {
                     throw new IllegalArgumentException(String.format(
                             "Block type with key of %s cannot have a block entity",
                             blockType.key()
@@ -469,18 +486,20 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
 
                 packets.add(new ServerUpdateBlockEntityPlayPacket(
                         AbsolutePositionUtil.from(position, this.chunkPosition),
-                        blockEntityTypeRegistry.identifierOf(blockEntityType),
+                        blockEntityTypeRegistry.indexOf(blockEntityTypeKey),
                         blockEntityData
                 ));
             }
 
             if (!this.skyLightUpdates.isEmpty() || !this.blockLightUpdates.isEmpty()) {
-                DimensionType dimensionType = this.acquisition.world().dimensionType().value();
                 LightSectionList sectionList = this.acquisition.getChunk(this.chunkPosition).lightSectionList();
-
                 LightSerializationData data = LightSerializationData.create(
-                        this.skyLightUpdates.keySet(), this.blockLightUpdates.keySet(),
-                        sectionList, dimensionType
+                        this.skyLightUpdates.keySet(),
+                        this.blockLightUpdates.keySet(),
+                        sectionList,
+                        this.acquisition.world()
+                                .dimensionType()
+                                .valueOrThrow(registryManager.registry(RegistryReference.DIMENSION_TYPE))
                 );
 
                 packets.add(new ServerUpdateLightPlayPacket(this.chunkPosition, data));

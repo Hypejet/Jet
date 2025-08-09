@@ -2,12 +2,13 @@ package net.hypejet.jet.server.world.chunk.factory;
 
 import com.google.common.collect.Lists;
 import net.hypejet.jet.registry.holder.Holder;
+import net.hypejet.jet.registry.keys.BiomeKeys;
+import net.hypejet.jet.registry.keys.BlockKeys;
 import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.world.block.JetBlockState;
-import net.hypejet.jet.server.world.block.JetBlockType;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.builder.JetChunkBuilder;
+import net.hypejet.jet.server.world.chunk.factory.palette.JetChunkPaletteFactory;
 import net.hypejet.jet.server.world.chunk.light.JetLightSection;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.world.biome.Biome;
@@ -34,15 +35,28 @@ import java.util.Objects;
 public final class JetChunkFactory implements ChunkFactory {
 
     private final JetMinecraftServer server;
+    private final JetChunkPaletteFactory<BlockState> blockStatePaletteFactory;
+    private final JetChunkPaletteFactory<Holder.Reference<Biome>> biomePaletteFactory;
 
     /**
      * Constructs the {@linkplain JetChunkFactory chunk factory implementation}.
      *
      * @param server a server that should own chunks created by the factory
+     * @param blockStatePaletteFactory a chunk-palette factory that chunk builders created by the constructed factory
+     *                                 should use for block state chunk-palette creation
+     * @param biomePaletteFactory a chunk-palette factory that chunk builders created by the constructed factory
+     *                            should use for biome chunk-palette creation
      * @since 1.0
      */
-    public JetChunkFactory(@NonNull JetMinecraftServer server) {
+    public JetChunkFactory(@NonNull JetMinecraftServer server,
+                           @NonNull JetChunkPaletteFactory<BlockState> blockStatePaletteFactory,
+                           @NonNull JetChunkPaletteFactory<Holder.Reference<Biome>> biomePaletteFactory) {
         this.server = Objects.requireNonNull(server, "server");
+        this.blockStatePaletteFactory = Objects.requireNonNull(
+                blockStatePaletteFactory,
+                "block state palette factory"
+        );
+        this.biomePaletteFactory = Objects.requireNonNull(biomePaletteFactory, "biome palette factory");
     }
 
     @Override
@@ -58,18 +72,14 @@ public final class JetChunkFactory implements ChunkFactory {
 
     @Override
     public @NonNull JetChunkBuilder createChunkBuilder(@NonNull DimensionType dimensionType) {
-        JetRegistryManager registryManager = this.server.registryManager();
-
-        JetRegistryEntry<JetBlockType> blockType = registryManager.blockTypeRegistry().get(Blocks.AIR);
-        if (blockType == null)
-            throw new IllegalArgumentException("Could not find an air block type");
-
-        JetRegistryEntry<Biome> biome = registryManager.biomeRegistry().get(Biomes.PLAINS);
-        if (biome == null)
-            throw new IllegalStateException("Could not find a plains biome");
-
-        JetBlockState blockState = registryManager.blockStateRegistry().defaultBlockState(blockType);
-        return this.createChunkBuilder(dimensionType, blockState, biome, null);
+        return this.createChunkBuilder(
+                dimensionType,
+                this.server.registryManager()
+                        .blockStateRegistry()
+                        .defaultBlockState(new Holder.Reference<>(BlockKeys.AIR)),
+                new Holder.Reference<>(BiomeKeys.PLAINS),
+                null
+        );
     }
 
     @Override
@@ -84,11 +94,13 @@ public final class JetChunkFactory implements ChunkFactory {
         if (!(blockState instanceof JetBlockState validatedBlockState))
             throw new IllegalArgumentException("The block state specified is not a valid block state");
 
-        JetRegistryManager registryManager = this.server.registryManager();
         return new JetChunkBuilder(
-                dimensionType, registryManager.blockStateRegistry(),
-                registryManager.biomeRegistry().elementOrder(),
-                validatedBlockState, validatedBiome, defaultBlockEntity
+                dimensionType,
+                this.blockStatePaletteFactory,
+                this.biomePaletteFactory,
+                validatedBlockState,
+                defaultBiome,
+                defaultBlockEntity
         );
     }
 

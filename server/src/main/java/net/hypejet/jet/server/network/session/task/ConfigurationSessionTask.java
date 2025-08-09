@@ -3,7 +3,6 @@ package net.hypejet.jet.server.network.session.task;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.hypejet.concurrency.object.WriteObjectAcquisition;
-import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquirable;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
 import net.hypejet.concurrency.object.nullable.WriteNullableObjectAcquisition;
@@ -35,6 +34,7 @@ import net.hypejet.jet.server.network.session.data.LoginData;
 import net.hypejet.jet.server.network.session.keepalive.KeepAliveHandler;
 import net.hypejet.jet.server.network.session.pack.ResourcePackHandler;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
+import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.hypejet.jet.server.registry.function.RegistryTagUpdateFunction;
 import net.hypejet.jet.server.scoreboard.JetScoreboard;
 import net.hypejet.jet.server.util.NetworkUtil;
@@ -263,20 +263,10 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
             registries.forEach(registry -> sendRegistry(this.connection, registry, commonKnownPacks));
 
             try (WriteBooleanAcquisition tagsSentAcquisition = this.tagsSent.acquireWrite()) {
-                Collection<NotNullObjectAcquisition<TagRegistry>> tagRegistryAcquisitions = new HashSet<>();
-                try {
-                    for (JetMinecraftRegistry<?> registry : registries)
-                        tagRegistryAcquisitions.add(registry.createTagRegistry());
-
-                    Collection<TagRegistry> tagRegistries = new HashSet<>();
-                    for (NotNullObjectAcquisition<TagRegistry> tagRegistryAcquisition : tagRegistryAcquisitions)
-                        tagRegistries.add(tagRegistryAcquisition.get());
-
-                    this.sendPacket(new ServerUpdateTagsPacket(Set.copyOf(tagRegistries)));
-                    tagsSentAcquisition.set(true);
-                } finally {
-                    tagRegistryAcquisitions.forEach(NotNullObjectAcquisition::close);
-                }
+                Set<TagRegistry> tagRegistries = new HashSet<>();
+                registries.forEach(registry -> tagRegistries.add(registry.createTagRegistry()));
+                this.sendPacket(new ServerUpdateTagsPacket(Set.copyOf(tagRegistries)));
+                tagsSentAcquisition.set(true);
             }
 
             if (!this.keepAliveHandler.stopAndAwaitTermination(TIME_OUT_DURATION, TIME_OUT_UNIT)) {
@@ -343,8 +333,8 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
     private static <V> void sendRegistry(@NonNull SocketPlayerConnection connection,
                                          @NonNull JetMinecraftRegistry<V> registry,
                                          @NonNull Collection<KnownPack> knownPackResponse) {
-        JetMinecraftRegistry.NetworkableData<V> networkableData = registry.networkableData();
-        if (networkableData == null) return;
+        BinaryTagCodec<V> valueCodec = registry.valueCodec();
+        if (valueCodec == null) return;
 
         List<ServerRegistryDataConfigurationPacket.Entry> entries = new ArrayList<>();
         for (JetMinecraftRegistry.RegistrationInfo<V> registrationInfo : registry.registrationInfos()) {
@@ -355,7 +345,7 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
                 serializedValue = null; // The client already knows the value by enabling the same feature pack
             } else {
                 try {
-                    serializedValue = networkableData.valueCodec().encode(registrationInfo.value());
+                    serializedValue = valueCodec.encode(registrationInfo.value());
                 } catch (Exception exception) {
                     throw new RuntimeException("An error occurred while encoding a registry value", exception);
                 }
@@ -364,7 +354,6 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
             entries.add(new ServerRegistryDataConfigurationPacket.Entry(registrationInfo.key(), serializedValue));
         }
 
-        Key registryKey = networkableData.registryKey();
-        connection.sendPacket(new ServerRegistryDataConfigurationPacket(registryKey, List.copyOf(entries)));
+        connection.sendPacket(new ServerRegistryDataConfigurationPacket(registry.registryKey(), List.copyOf(entries)));
     }
 }
