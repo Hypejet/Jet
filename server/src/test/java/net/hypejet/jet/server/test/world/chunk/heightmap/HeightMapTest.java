@@ -3,35 +3,36 @@ package net.hypejet.jet.server.test.world.chunk.heightmap;
 import it.unimi.dsi.fastutil.bytes.ByteBytePair;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.hypejet.jet.data.model.api.registries.biome.Biome;
-import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.test.world.chunk.ChunkTestUtil;
-import net.hypejet.jet.server.util.order.ElementOrder;
 import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.builder.JetChunkBuilder;
+import net.hypejet.jet.server.world.chunk.factory.palette.JetChunkPaletteFactory;
 import net.hypejet.jet.server.world.chunk.heightmap.HeightMap;
 import net.hypejet.jet.server.world.chunk.heightmap.HeightMapType;
+import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.section.ChunkSectionList;
+import net.hypejet.jet.world.biome.Biome;
+import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
+import net.hypejet.jet.world.dimension.DimensionType;
 import net.kyori.adventure.key.Key;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.Map;
 
 /**
- * Represents a test of {@linkplain HeightMap a height map}.
+ * A test of {@linkplain HeightMap height maps}.
  *
  * @since 1.0
  * @see HeightMap
  */
 public final class HeightMapTest {
 
-    private static final JetRegistryEntry<Biome> BIOME = ChunkTestUtil.createMockupBiome(Key.key("mockup"));
-    private static final ElementOrder<JetRegistryEntry<Biome>> BIOME_ORDER = new ElementOrder<>(List.of(BIOME));
+    private static final Holder.Reference<Biome> BIOME = new Holder.Reference<>(Key.key("biome", "mockup"));
 
     private static final JetBlockState AIR = ChunkTestUtil.createMockupBlockState(
             Key.key("air"), true, false, false
@@ -48,6 +49,11 @@ public final class HeightMapTest {
     private static final JetBlockState FLUID = ChunkTestUtil.createMockupBlockState(
             Key.key("fluid"), false, true, false
     );
+
+    private static final JetChunkPaletteFactory<BlockState> BLOCK_STATE_PALETTE_FACTORY
+            = new JetChunkPaletteFactory<>(ChunkPaletteType.BLOCK_STATE, new BlockStateIndexSpecification());
+    private static final JetChunkPaletteFactory<Holder.Reference<Biome>> BIOME_PALETTE_FACTORY
+            = new JetChunkPaletteFactory<>(ChunkPaletteType.BIOME, new BiomeIndexSpecification());
 
     @Test
     public void testWorldSurfaceCreation() {
@@ -76,14 +82,11 @@ public final class HeightMapTest {
         ensureOpaque(type, opaqueBlockState);
 
         DimensionType dimensionType = ChunkTestUtil.DIMENSION_TYPE;
-        ElementOrder<JetBlockState> blockStateOrder = new ElementOrder<>(List.of(AIR, opaqueBlockState));
-
-        JetRegistryEntry<Biome> testBiome = ChunkTestUtil.createMockupBiome(Key.key("test"));
-        ElementOrder<JetRegistryEntry<Biome>> biomeOrder = new ElementOrder<>(List.of(testBiome));
-
         JetChunkBuilder chunkBuilder = new JetChunkBuilder(
-                dimensionType, blockStateOrder, biomeOrder,
-                HeightMapTest.AIR, testBiome, null
+                dimensionType,
+                BLOCK_STATE_PALETTE_FACTORY,
+                BIOME_PALETTE_FACTORY,
+                AIR, BIOME, null
         );
 
         Object2IntMap<ByteBytePair> expectedHeights = new Object2IntOpenHashMap<>();
@@ -115,11 +118,10 @@ public final class HeightMapTest {
         ensureAirNotOpaque(type);
         ensureOpaque(type, opaqueBlockState);
 
-        DimensionType dimensionType = ChunkTestUtil.DIMENSION_TYPE;
-        ElementOrder<JetBlockState> blockStateOrder = new ElementOrder<>(List.of(AIR, opaqueBlockState));
-
         JetChunkBuilder chunkBuilder = new JetChunkBuilder(
-                dimensionType, blockStateOrder, BIOME_ORDER,
+                ChunkTestUtil.DIMENSION_TYPE,
+                BLOCK_STATE_PALETTE_FACTORY,
+                BIOME_PALETTE_FACTORY,
                 AIR, BIOME, null
         );
 
@@ -155,6 +157,92 @@ public final class HeightMapTest {
             throw new IllegalArgumentException(
                     "The opaque block state must be considered as opaque by the height map type specified"
             );
+        }
+    }
+
+    /**
+     * A {@linkplain AbstractChunkPalette.IndexSpecification chunk-palette index specification}
+     * providing registry indices of mockup {@linkplain BlockState block states} created for
+     * a {@linkplain HeightMapTest height map test}.
+     *
+     * @since 1.0
+     * @see BlockState
+     * @see AbstractChunkPalette.IndexSpecification
+     */
+    private static final class BlockStateIndexSpecification
+            implements AbstractChunkPalette.IndexSpecification<BlockState> {
+
+        private static final int AIR_INDEX = 0;
+        private static final int SURFACE_INDEX = 1;
+        private static final int MOTION_BLOCKER_INDEX = 2;
+        private static final int FLUID_INDEX = 3;
+
+        @Override
+        public int indexFor(@NonNull BlockState value) {
+            if (value.equals(AIR)) {
+                return AIR_INDEX;
+            } else if (value.equals(SURFACE)) {
+                return SURFACE_INDEX;
+            } else if (value.equals(MOTION_BLOCKER)) {
+                return MOTION_BLOCKER_INDEX;
+            } else if (value.equals(FLUID)) {
+                return FLUID_INDEX;
+            } else {
+                throw new IllegalArgumentException(
+                        "This index specification does not provide an index for the specified block state: " + value
+                );
+            }
+        }
+
+        @Override
+        public @NonNull BlockState valueByIndex(int index) {
+            return switch (index) {
+                case AIR_INDEX -> AIR;
+                case SURFACE_INDEX -> SURFACE;
+                case MOTION_BLOCKER_INDEX -> MOTION_BLOCKER;
+                case FLUID_INDEX -> FLUID;
+                default -> throw new IllegalArgumentException(String.format(
+                        "This index specification does not provide a value for index of %d",
+                        index
+                ));
+            };
+        }
+    }
+
+    /**
+     * A {@linkplain AbstractChunkPalette.IndexSpecification chunk-palette index specification}
+     * providing registry indices of mockup {@linkplain Biome biomes} created for
+     * a {@linkplain HeightMapTest height map test}.
+     *
+     * @since 1.0
+     * @see Biome
+     * @see AbstractChunkPalette.IndexSpecification
+     */
+    private static final class BiomeIndexSpecification
+            implements AbstractChunkPalette.IndexSpecification<Holder.Reference<Biome>> {
+
+        private static final int BIOME_INDEX = 0;
+
+        @Override
+        public int indexFor(Holder.@NonNull Reference<Biome> value) {
+            if (!value.equals(BIOME)) {
+                throw new IllegalArgumentException(String.format(
+                        "This index specification does not provide an index for \"%s\" biome",
+                        value.key()
+                ));
+            }
+            return BIOME_INDEX;
+        }
+
+        @Override
+        public Holder.@NonNull Reference<Biome> valueByIndex(int index) {
+            if (index != BIOME_INDEX) {
+                throw new IllegalArgumentException(String.format(
+                        "This index specification does not provide a value for index of %d",
+                        index
+                ));
+            }
+            return BIOME;
         }
     }
 }

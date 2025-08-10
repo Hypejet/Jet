@@ -5,7 +5,6 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2ShortMap;
 import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
 import net.hypejet.jet.server.util.math.MathUtil;
-import net.hypejet.jet.server.util.order.ElementOrder;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.IndirectChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
@@ -16,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a test of {@linkplain IndirectChunkPalette an indirect chunk palette}.
+ * A test of {@linkplain IndirectChunkPalette indirect chunk palettea}.
  *
  * @since 1.0
  * @see IndirectChunkPalette
@@ -43,8 +42,11 @@ public final class IndirectChunkPaletteTest {
                 elementCountMap.put(element, count);
             }
 
-            ElementOrder<String> elementOrder = new ElementOrder<>(elementList);
-            AbstractChunkPalette<String> palette = AbstractChunkPalette.create(paletteType, elementOrder, elements);
+            AbstractChunkPalette<String> palette = AbstractChunkPalette.create(
+                    paletteType,
+                    new ListIndexSpecification<>(elementList),
+                    elements
+            );
 
             Assertions.assertInstanceOf(IndirectChunkPalette.class, palette);
             Assertions.assertEquals(elements, palette.elements());
@@ -54,7 +56,7 @@ public final class IndirectChunkPaletteTest {
             IntList registryIndices = new IntArrayList(castPalette.registryIndices());
 
             for (String element : elementCountMap.keySet()) {
-                int elementIdentifier = elementOrder.identifierOf(element);
+                int elementIdentifier = elementList.indexOf(element);
                 Assertions.assertTrue(registryIndices.contains(elementIdentifier));
                 registryIndices.rem(elementIdentifier);
             }

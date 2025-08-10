@@ -1,7 +1,6 @@
 package net.hypejet.jet.server.test.world.chunk.palette;
 
 import it.unimi.dsi.fastutil.objects.Object2ShortMaps;
-import net.hypejet.jet.server.util.order.ElementOrder;
 import net.hypejet.jet.server.world.chunk.palette.SingleValuedChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import org.junit.jupiter.api.Assertions;
@@ -11,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a test of {@linkplain SingleValuedChunkPalette a single-valued chunk palette}.
+ * A test of a {@linkplain SingleValuedChunkPalette single-valued chunk palette}.
  *
  * @since 1.0
  * @see SingleValuedChunkPalette
@@ -24,11 +23,15 @@ public final class SingleValuedChunkPaletteTest {
 
         String element = "test-element";
         List<String> elementList = List.of(element);
-        ElementOrder<String> elementOrder = new ElementOrder<>(elementList);
 
-        SingleValuedChunkPalette<String> palette = new SingleValuedChunkPalette<>(paletteType, element, elementOrder);
+        SingleValuedChunkPalette<String> palette = new SingleValuedChunkPalette<>(
+                paletteType,
+                element,
+                new ListIndexSpecification<>(elementList)
+        );
+
         Assertions.assertEquals(element, palette.element());
-        Assertions.assertEquals(elementOrder.identifierOf(element), palette.elementRegistryIndex());
+        Assertions.assertEquals(elementList.indexOf(element), palette.elementRegistryIndex());
 
         List<String> elements = new ArrayList<>(elementCount);
         for (int index = 0; index < elementCount; index++)

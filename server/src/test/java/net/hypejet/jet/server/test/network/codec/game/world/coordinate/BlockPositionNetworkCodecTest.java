@@ -6,7 +6,7 @@ import net.hypejet.jet.world.coordinate.BlockPosition;
 import org.junit.jupiter.api.Test;
 
 /**
- * Represents a test of reading and writing of {@linkplain BlockPositionNetworkCodec a block position network codec}.
+ * A test of serialization of a {@linkplain BlockPositionNetworkCodec block position network-codec}.
  *
  * @since 1.0
  * @see BlockPositionNetworkCodec

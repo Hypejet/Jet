@@ -3,7 +3,6 @@ package net.hypejet.jet.server.test.world.chunk.palette;
 import it.unimi.dsi.fastutil.objects.Object2ShortMap;
 import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
 import net.hypejet.jet.server.util.math.MathUtil;
-import net.hypejet.jet.server.util.order.ElementOrder;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.DirectChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
@@ -14,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a test of {@linkplain DirectChunkPalette a direct chunk palette}.
+ * A test of {@linkplain DirectChunkPalette direct chunk palettea}.
  *
  * @since 1.0
  * @see DirectChunkPalette
@@ -45,7 +44,7 @@ public final class DirectChunkPaletteTest {
 
         AbstractChunkPalette<String> palette = AbstractChunkPalette.create(
                 paletteType,
-                new ElementOrder<>(elementList),
+                new ListIndexSpecification<>(elementList),
                 elements
         );
 

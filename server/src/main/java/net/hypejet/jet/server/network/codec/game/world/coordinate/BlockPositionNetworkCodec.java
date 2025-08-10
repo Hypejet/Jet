@@ -23,7 +23,7 @@ public final class BlockPositionNetworkCodec implements NetworkCodec<BlockPositi
     private static final byte Y_DESERIALIZATION_SHIFT = 2 * X_OR_Z_BITS;
 
     private static final int Y_MASK = MathUtil.power(2, Y_BITS) - 1;
-    private static final int X_OR_Z_MASK = MathUtil.power(2, X_AND_Y_BITS) - 1;
+    private static final int X_OR_Z_MASK = MathUtil.power(2, X_OR_Z_BITS) - 1;
 
     /**
      * An instance of the {@linkplain BlockPositionNetworkCodec block position network codec}.
@@ -40,7 +40,7 @@ public final class BlockPositionNetworkCodec implements NetworkCodec<BlockPositi
 
         int x = (int) (value >>> X_AND_Y_BITS);
         int y = (int) (value << Y_DESERIALIZATION_SHIFT >> Y_DESERIALIZATION_SHIFT);
-        int z = (int) (value << X_OR_Z_BITS >> X_OR_Z_BITS + Y_BITS);
+        int z = (int) (value << X_OR_Z_BITS >> X_AND_Y_BITS);
 
         return BlockPosition.blockPosition(x, y, z);
     }

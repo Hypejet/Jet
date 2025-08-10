@@ -110,6 +110,8 @@ public final class JetWorldManager implements WorldManager {
      *
      * @param blockStateRegistry the block-state registry to get the indices from
      * @since 1.0
+     * @see BlockState
+     * @see AbstractChunkPalette.IndexSpecification
      */
     private record BlockStateIndexSpecification(@NonNull JetBlockStateRegistry blockStateRegistry)
             implements AbstractChunkPalette.IndexSpecification<BlockState> {
@@ -130,6 +132,8 @@ public final class JetWorldManager implements WorldManager {
      *
      * @param biomeRegistry the biome registry to get the indices from
      * @since 1.0
+     * @see Biome
+     * @see AbstractChunkPalette.IndexSpecification
      */
     private record BiomeIndexSpecification(@NonNull JetMinecraftRegistry<Biome> biomeRegistry)
             implements AbstractChunkPalette.IndexSpecification<Holder.Reference<Biome>> {

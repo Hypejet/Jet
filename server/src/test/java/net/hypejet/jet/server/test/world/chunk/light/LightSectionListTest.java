@@ -5,7 +5,6 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2ByteMap;
 import it.unimi.dsi.fastutil.objects.Object2ByteMaps;
 import it.unimi.dsi.fastutil.objects.Object2ByteOpenHashMap;
-import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.server.test.world.chunk.ChunkTestUtil;
 import net.hypejet.jet.server.world.chunk.light.JetLightSection;
 import net.hypejet.jet.server.world.chunk.light.LightSectionList;
@@ -16,6 +15,7 @@ import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.section.ChunkSectionList;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
+import net.hypejet.jet.world.dimension.DimensionType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a test of {@linkplain LightSectionList a light-section list}.
+ * A test of a {@linkplain LightSectionList light-section list}.
  *
  * @since 1.0
  * @see LightSectionList
