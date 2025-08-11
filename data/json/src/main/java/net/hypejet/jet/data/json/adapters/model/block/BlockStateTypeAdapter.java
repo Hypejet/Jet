@@ -26,6 +26,7 @@ final class BlockStateTypeAdapter extends TypeAdapter<JsonBlockState> {
     private static final String IS_AIR_FIELD = "air";
     private static final String HAS_FLUID_STATE_FIELD = "has_fluid_state";
     private static final String BLOCKS_MOTION_FIELD = "blocks_motion";
+    private static final String IS_LEAVES_FIELD = "leaves";
 
     private final Gson gson;
 
@@ -64,6 +65,11 @@ final class BlockStateTypeAdapter extends TypeAdapter<JsonBlockState> {
             out.value(false);
         }
 
+        if (value.isLeaves()) {
+            out.name(IS_LEAVES_FIELD);
+            out.value(true);
+        }
+
         out.endObject();
     }
 
@@ -75,6 +81,7 @@ final class BlockStateTypeAdapter extends TypeAdapter<JsonBlockState> {
         boolean isAir = false;
         boolean hasFluidState = false;
         boolean blockMotion = true;
+        boolean isLeaves = false;
 
         while (in.peek() == JsonToken.NAME) {
             switch (in.nextName()) {
@@ -82,10 +89,11 @@ final class BlockStateTypeAdapter extends TypeAdapter<JsonBlockState> {
                 case IS_AIR_FIELD -> isAir = in.nextBoolean();
                 case HAS_FLUID_STATE_FIELD -> hasFluidState = in.nextBoolean();
                 case BLOCKS_MOTION_FIELD -> blockMotion = in.nextBoolean();
+                case IS_LEAVES_FIELD -> isLeaves = in.nextBoolean();
             }
         }
 
         in.endObject();
-        return new JsonBlockState(properties, isAir, hasFluidState, blockMotion);
+        return new JsonBlockState(properties, isAir, hasFluidState, blockMotion, isLeaves);
     }
 }

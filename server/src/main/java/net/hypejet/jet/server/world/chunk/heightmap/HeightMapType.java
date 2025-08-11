@@ -1,22 +1,21 @@
 package net.hypejet.jet.server.world.chunk.heightmap;
 
-import java.util.Objects;
 import net.hypejet.jet.server.world.block.JetBlockState;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a type of {@linkplain HeightMap a height map}.
+ * A type of {@linkplain HeightMap height map}.
  *
  * @since 1.0
  */
 public enum HeightMapType {
     /**
-     * {@linkplain HeightMapType A height map type} whose heightmaps store the highest height, at which
-     * {@linkplain JetBlockState a block state} is not an air.
+     * A {@linkplain HeightMapType height-map type} whose heightmaps store the highest height at which
+     * a {@linkplain JetBlockState block state} is not an air.
      *
      * @since 1.0
      */
-    WORLD_SURFACE("WORLD_SURFACE") {
+    WORLD_SURFACE(1) {
         @Override
         public boolean isOpaque(@NonNull JetBlockState state) {
             return !state.isAir();
@@ -24,48 +23,60 @@ public enum HeightMapType {
     },
 
     /**
-     * {@linkplain HeightMapType A height map type} whose heightmaps store the highest height, at which
-     * {@linkplain JetBlockState a block state} either is a fluid or blocks motion.
+     * A {@linkplain HeightMapType height-map type} whose heightmaps store the highest height at which
+     * a {@linkplain JetBlockState block state} is either a fluid or blocks motion and is not leaves.
      *
      * @since 1.0
      */
-    MOTION_BLOCKING("MOTION_BLOCKING") {
+    MOTION_BLOCKING(4) {
         @Override
         public boolean isOpaque(@NonNull JetBlockState state) {
             return state.hasFluidState() || state.blocksMotion();
         }
+    },
+
+    /**
+     * A {@linkplain HeightMapType height map type} whose heightmaps store the highest height at which
+     * a {@linkplain JetBlockState block state} is either a fluid or blocks motion.
+     *
+     * @since 1.0
+     */
+    MOTION_BLOCKING_NO_LEAVES(5) {
+        @Override
+        public boolean isOpaque(@NonNull JetBlockState state) {
+            return MOTION_BLOCKING.isOpaque(state) && !state.isLeaves();
+        }
     };
 
-    private final String serializationName;
+    private final int identifier;
 
     /**
      * Constructs the {@linkplain HeightMapType height map type}.
      *
-     * @param serializationName a name that should be used when serializing height maps with the type that
-     *                          is being constructed
+     * @param identifier an identifier that the height map should have, used in serialization
      * @since 1.0
      */
-    HeightMapType(@NonNull String serializationName) {
-        this.serializationName = Objects.requireNonNull(serializationName, "serialization name");
+    HeightMapType(int identifier) {
+        this.identifier = identifier;
     }
 
     /**
-     * Gets a name that should be used when serializing {@linkplain HeightMap height maps} with this type.
+     * Gets an identifier of this {@linkplain HeightMapType height-map type} that should be used in serialization.
      *
-     * @return the name
+     * @return the height-map type identifier
      * @since 1.0
      */
-    public @NonNull String serializationName() {
-        return this.serializationName;
+    public int identifier() {
+        return this.identifier;
     }
 
     /**
-     * Gets whether {@linkplain JetBlockState a block state} specified can be used to be stored
-     * in {@linkplain HeightMap a height map} with this type.
+     * Gets whether the specified {@linkplain JetBlockState block state}
+     * can be stored in {@linkplain HeightMap height maps} with this type.
      *
      * @param state the block state
-     * @return {@code true} if the block state specified can be used to be stored in a height map of this type,
-     *         {@code false} otherwise
+     * @return {@code true} if the specified block state can be used to be stored
+     *          in height maps of this type, {@code false} otherwise
      * @since 1.0
      */
     public abstract boolean isOpaque(@NonNull JetBlockState state);

@@ -61,7 +61,8 @@ public final class JetBlockStateRegistry implements BlockStateRegistry {
             JetBlockState convertedBlockState = new JetBlockState(
                     new Holder.Reference<>(dataEntry.key()),
                     blockState.properties(), blockState.isAir(),
-                    blockState.hasFluidState(), blockState.blocksMotion()
+                    blockState.hasFluidState(), blockState.blocksMotion(),
+                    blockState.isLeaves()
             );
 
             blockStates.add(index, convertedBlockState);

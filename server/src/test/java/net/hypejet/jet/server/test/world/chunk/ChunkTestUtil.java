@@ -38,11 +38,13 @@ public final class ChunkTestUtil {
      * @param hasFluidState whether the block state should be recognised as a block state
      *                      that has a fluid state associated with it
      * @param blockMotion whether the block state should be recognised as a block state that blocks motion
+     * @param isLeaves whether the block state should be recognised as a block state associated with a leaves block
      * @return the block state
      * @since 1.0
      */
     public static @NonNull JetBlockState createMockupBlockState(@NonNull Key key, boolean isAir,
-                                                                boolean hasFluidState, boolean blockMotion) {
-        return new JetBlockState(new Holder.Reference<>(key), Map.of(), isAir, hasFluidState, blockMotion);
+                                                                boolean hasFluidState, boolean blockMotion,
+                                                                boolean isLeaves) {
+        return new JetBlockState(new Holder.Reference<>(key), Map.of(), isAir, hasFluidState, blockMotion, isLeaves);
     }
 }

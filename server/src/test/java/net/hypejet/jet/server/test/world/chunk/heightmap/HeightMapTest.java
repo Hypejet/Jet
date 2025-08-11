@@ -35,19 +35,23 @@ public final class HeightMapTest {
     private static final Holder.Reference<Biome> BIOME = new Holder.Reference<>(Key.key("biome", "mockup"));
 
     private static final JetBlockState AIR = ChunkTestUtil.createMockupBlockState(
-            Key.key("air"), true, false, false
+            Key.key("air"), true, false, false, false
     );
 
     private static final JetBlockState SURFACE = ChunkTestUtil.createMockupBlockState(
-            Key.key("surface"), false, false, false
+            Key.key("surface"), false, false, false, false
     );
 
     private static final JetBlockState MOTION_BLOCKER = ChunkTestUtil.createMockupBlockState(
-            Key.key("motion_blocker"), false, false, true
+            Key.key("motion_blocker"), false, false, true, false
     );
 
     private static final JetBlockState FLUID = ChunkTestUtil.createMockupBlockState(
-            Key.key("fluid"), false, true, false
+            Key.key("fluid"), false, true, false, false
+    );
+
+    private static final JetBlockState LEAVES = ChunkTestUtil.createMockupBlockState(
+            Key.key("leaves"), false, false, true, true
     );
 
     private static final JetChunkPaletteFactory<BlockState> BLOCK_STATE_PALETTE_FACTORY
@@ -58,23 +62,39 @@ public final class HeightMapTest {
     @Test
     public void testWorldSurfaceCreation() {
         testCreation(HeightMapType.WORLD_SURFACE, SURFACE);
+        testCreation(HeightMapType.WORLD_SURFACE, LEAVES);
     }
 
     @Test
     public void testMotionBlockingCreation() {
         testCreation(HeightMapType.MOTION_BLOCKING, MOTION_BLOCKER);
         testCreation(HeightMapType.MOTION_BLOCKING, FLUID);
+        testCreation(HeightMapType.MOTION_BLOCKING, LEAVES);
+    }
+
+    @Test
+    public void testMotionBlockingNoLeavesCreation() {
+        testCreation(HeightMapType.MOTION_BLOCKING_NO_LEAVES, MOTION_BLOCKER);
+        testCreation(HeightMapType.MOTION_BLOCKING_NO_LEAVES, FLUID);
     }
 
     @Test
     public void testWorldSurfaceUpdating() {
         testUpdating(HeightMapType.WORLD_SURFACE, SURFACE);
+        testUpdating(HeightMapType.WORLD_SURFACE, LEAVES);
     }
 
     @Test
     public void testMotionBlockingUpdating() {
         testUpdating(HeightMapType.MOTION_BLOCKING, MOTION_BLOCKER);
         testUpdating(HeightMapType.MOTION_BLOCKING, FLUID);
+        testUpdating(HeightMapType.MOTION_BLOCKING, LEAVES);
+    }
+
+    @Test
+    public void testMotionBlockingNoLeavesUpdating() {
+        testUpdating(HeightMapType.MOTION_BLOCKING_NO_LEAVES, MOTION_BLOCKER);
+        testUpdating(HeightMapType.MOTION_BLOCKING_NO_LEAVES, FLUID);
     }
 
     private static void testCreation(@NonNull HeightMapType type, @NonNull JetBlockState opaqueBlockState) {
@@ -176,6 +196,7 @@ public final class HeightMapTest {
         private static final int SURFACE_INDEX = 1;
         private static final int MOTION_BLOCKER_INDEX = 2;
         private static final int FLUID_INDEX = 3;
+        private static final int LEAVES_INDEX = 4;
 
         @Override
         public int indexFor(@NonNull BlockState value) {
@@ -187,6 +208,8 @@ public final class HeightMapTest {
                 return MOTION_BLOCKER_INDEX;
             } else if (value.equals(FLUID)) {
                 return FLUID_INDEX;
+            } else if (value.equals(LEAVES)) {
+                return LEAVES_INDEX;
             } else {
                 throw new IllegalArgumentException(
                         "This index specification does not provide an index for the specified block state: " + value
@@ -201,6 +224,7 @@ public final class HeightMapTest {
                 case SURFACE_INDEX -> SURFACE;
                 case MOTION_BLOCKER_INDEX -> MOTION_BLOCKER;
                 case FLUID_INDEX -> FLUID;
+                case LEAVES_INDEX -> LEAVES;
                 default -> throw new IllegalArgumentException(String.format(
                         "This index specification does not provide a value for index of %d",
                         index

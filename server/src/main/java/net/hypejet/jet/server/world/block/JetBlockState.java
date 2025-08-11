@@ -18,10 +18,11 @@ import java.util.Objects;
  * @param hasFluidState whether the state has a fluid state associated with it, in other words whether the block state
  *                      represents a fluid
  * @param blocksMotion whether motion of players entering a block with this block state is be blocked
+ * @param isLeaves whether block that this block state is associated with is leaves
  * @since 1.0
  */
 public record JetBlockState(Holder.@NonNull Reference<BlockType> blockType, @NonNull Map<String, String> properties,
-                            boolean isAir, boolean hasFluidState, boolean blocksMotion)
+                            boolean isAir, boolean hasFluidState, boolean blocksMotion, boolean isLeaves)
         implements BlockState {
     /**
      * Constructs the {@linkplain JetBlockState block state implementation}.
@@ -32,6 +33,7 @@ public record JetBlockState(Holder.@NonNull Reference<BlockType> blockType, @Non
      * @param hasFluidState whether the state has a fluid state associated with it, in other words whether the block state
      *                      represents a fluid
      * @param blocksMotion whether motion of players entering a block with this block state is be blocked
+     * @param isLeaves whether block that the block state is going to be associated with is leaves
      * @since 1.0
      */
     public JetBlockState {
