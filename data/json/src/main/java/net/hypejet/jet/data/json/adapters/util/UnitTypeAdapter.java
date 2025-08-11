@@ -26,12 +26,14 @@ final class UnitTypeAdapter extends TypeAdapter<JsonUnit> {
 
     @Override
     public void write(JsonWriter out, JsonUnit value) throws IOException {
-        out.nullValue();
+        out.beginObject();
+        out.endObject();
     }
 
     @Override
     public JsonUnit read(JsonReader in) throws IOException {
-        in.nextNull();
+        in.beginObject();
+        in.endObject();
         return JsonUnit.INSTANCE;
     }
 }

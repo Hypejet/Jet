@@ -32,11 +32,16 @@ public final class JetDataUtil {
      */
     public static <V> @NonNull List<JsonRegistryEntry<V>> deserializeEntries(@NonNull String classpath,
                                                                              @NonNull Type valueType) {
-        try (InputStream stream = JetDataUtil.class.getResourceAsStream(classpath)) {
+        try (InputStream stream = ClassLoader.getSystemResourceAsStream(classpath)) {
             if (stream == null)
                 throw new IllegalArgumentException("Resource file with classpath " + classpath + " does not exist");
-            TypeToken<?> typeToken = TypeToken.getParameterized(List.class, valueType);
-            return DataJson.GSON.fromJson(new InputStreamReader(stream), typeToken.getType());
+            return DataJson.GSON.fromJson(
+                    new InputStreamReader(stream),
+                    TypeToken.getParameterized(
+                            List.class,
+                            TypeToken.getParameterized(JsonRegistryEntry.class, valueType).getType()
+                    ).getType()
+            );
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }

@@ -56,7 +56,7 @@ public final class JsonDataResourceFiles {
      *
      * @since 1.0
      */
-    public static final String PIG_VARIANTS = resourceClasspath("biomes.json");
+    public static final String PIG_VARIANTS = resourceClasspath("pig_variants.json");
 
     /**
      * A resource-directory-relative classpath where frog-variant registry entries are written to.

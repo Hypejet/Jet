@@ -24,7 +24,7 @@ configs = "5.0.1"
 gson = "2.13.1"
 
 # Minecraft-related libraries
-adventure = "4.24.0-SNAPSHOT"
+adventure = "4.25.0-SNAPSHOT"
 brigadier = "1.0.0-SNAPSHOT"
 vanillaGradle = "0.2.1-SNAPSHOT"
 

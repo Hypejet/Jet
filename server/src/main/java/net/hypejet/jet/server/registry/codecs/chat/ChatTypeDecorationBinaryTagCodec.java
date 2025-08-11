@@ -10,6 +10,7 @@ import net.hypejet.jet.server.util.index.IndexUtil;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.kyori.adventure.text.format.Style;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -52,10 +53,11 @@ public final class ChatTypeDecorationBinaryTagCodec implements BinaryTagCodec<Ch
     @Override
     public @NotNull ChatTypeDecoration decode(@NotNull BinaryTag encoded) throws Exception {
         if (encoded instanceof CompoundBinaryTag compound) {
+            BinaryTag styleTag = compound.get(STYLE_FIELD);
             return new ChatTypeDecoration(
                     requiredTag(TRANSLATION_KEY_FIELD, compound, BinaryTagTypes.STRING).value(),
                     PARAMETERS_CODEC.decode(requiredTag(PARAMETERS_FIELD, compound)),
-                    StyleBinaryTagCodec.INSTANCE.decode(requiredTag(STYLE_FIELD, compound))
+                    styleTag == null ? Style.empty() : StyleBinaryTagCodec.INSTANCE.decode(styleTag)
             );
         } else {
             throw new IllegalArgumentException(
@@ -66,10 +68,15 @@ public final class ChatTypeDecorationBinaryTagCodec implements BinaryTagCodec<Ch
 
     @Override
     public @NotNull BinaryTag encode(@NotNull ChatTypeDecoration decoded) throws Exception {
-        return CompoundBinaryTag.builder()
+        CompoundBinaryTag.Builder builder = CompoundBinaryTag.builder()
                 .putString(TRANSLATION_KEY_FIELD, decoded.translationKey())
-                .put(PARAMETERS_FIELD, PARAMETERS_CODEC.encode(decoded.parameters()))
-                .put(STYLE_FIELD, StyleBinaryTagCodec.INSTANCE.encode(decoded.style()))
-                .build();
+                .put(PARAMETERS_FIELD, PARAMETERS_CODEC.encode(decoded.parameters()));
+
+        Style style = decoded.style();
+        if (!style.isEmpty()) {
+            builder.put(STYLE_FIELD, StyleBinaryTagCodec.INSTANCE.encode(style));
+        }
+
+        return builder.build();
     }
 }

@@ -149,7 +149,7 @@ public final class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
      * @since 1.0
      */
     public @Nullable BinaryTagCodec<V> valueCodec() {
-        return valueCodec;
+        return this.valueCodec;
     }
 
     /**

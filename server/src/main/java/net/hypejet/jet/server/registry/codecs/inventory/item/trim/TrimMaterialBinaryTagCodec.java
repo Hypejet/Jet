@@ -13,6 +13,8 @@ import net.kyori.adventure.nbt.StringBinaryTag;
 import net.kyori.adventure.util.Codec;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
+
 import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
 
 /**
@@ -46,10 +48,11 @@ public final class TrimMaterialBinaryTagCodec implements BinaryTagCodec<TrimMate
     @Override
     public @NotNull TrimMaterial decode(@NotNull BinaryTag encoded) throws Exception {
         if (encoded instanceof CompoundBinaryTag compound) {
+            BinaryTag overridesTag = compound.get(OVERRIDES_FIELD);
             return new TrimMaterial(
                     new MaterialAssetGroup(
                             AssetBinaryTagCodec.INSTANCE.decode(requiredTag(BASE_ASSET_FIELD, compound)),
-                            OVERRIDES_CODEC.decode(requiredTag(OVERRIDES_FIELD, compound))
+                            overridesTag == null ? Map.of() : OVERRIDES_CODEC.decode(overridesTag)
                     ),
                     ComponentBinaryTagCodec.INSTANCE.decode(requiredTag(DESCRIPTION_FIELD, compound))
             );
@@ -63,11 +66,16 @@ public final class TrimMaterialBinaryTagCodec implements BinaryTagCodec<TrimMate
     @Override
     public @NotNull BinaryTag encode(@NotNull TrimMaterial decoded) throws Exception {
         MaterialAssetGroup assets = decoded.assets();
-        return CompoundBinaryTag.builder()
+        CompoundBinaryTag.Builder builder = CompoundBinaryTag.builder()
                 .put(BASE_ASSET_FIELD, AssetBinaryTagCodec.INSTANCE.encode(assets.baseAsset()))
-                .put(OVERRIDES_FIELD, OVERRIDES_CODEC.encode(assets.overrides()))
-                .put(DESCRIPTION_FIELD, ComponentBinaryTagCodec.INSTANCE.encode(decoded.description()))
-                .build();
+                .put(DESCRIPTION_FIELD, ComponentBinaryTagCodec.INSTANCE.encode(decoded.description()));
+
+        Map<Key, MaterialAssetGroup.Asset> overrides = assets.overrides();
+        if (!overrides.isEmpty()) {
+            builder.put(OVERRIDES_FIELD, OVERRIDES_CODEC.encode(overrides));
+        }
+
+        return builder.build();
     }
 
     /**

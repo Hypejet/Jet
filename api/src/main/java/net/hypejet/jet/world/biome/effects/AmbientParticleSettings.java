@@ -1,6 +1,6 @@
 package net.hypejet.jet.world.biome.effects;
 
-import net.hypejet.jet.data.model.api.registries.biome.Biome;
+import net.hypejet.jet.world.biome.Biome;
 import net.kyori.adventure.nbt.BinaryTag;
 import org.jspecify.annotations.NonNull;
 

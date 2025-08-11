@@ -34,6 +34,6 @@ public record JukeboxSong(@NonNull Holder<SoundEvent> soundEvent, @NonNull Compo
         Objects.requireNonNull(soundEvent, "sound event");
         Objects.requireNonNull(description, "description");
         RangeUtil.ensureNotNegative(lengthInSeconds);
-        RangeUtil.ensureInRange(comparatorOutput, 0, 15);
+        RangeUtil.ensureInRange(0, 15, comparatorOutput);
     }
 }
