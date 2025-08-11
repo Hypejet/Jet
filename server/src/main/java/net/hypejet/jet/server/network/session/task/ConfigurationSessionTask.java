@@ -264,7 +264,13 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
 
             try (WriteBooleanAcquisition tagsSentAcquisition = this.tagsSent.acquireWrite()) {
                 Set<TagRegistry> tagRegistries = new HashSet<>();
-                registries.forEach(registry -> tagRegistries.add(registry.createTagRegistry()));
+
+                registries.forEach(registry -> {
+                    TagRegistry tagRegistry = registry.createTagRegistry();
+                    if (tagRegistry.tags().isEmpty()) return;
+                    tagRegistries.add(tagRegistry);
+                });
+
                 this.sendPacket(new ServerUpdateTagsPacket(Set.copyOf(tagRegistries)));
                 tagsSentAcquisition.set(true);
             }
