@@ -1,5 +1,7 @@
 package net.hypejet.jet.entity.movement.flag;
 
+import net.hypejet.jet.world.coordinate.Position;
+import net.hypejet.jet.world.coordinate.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Objects;
