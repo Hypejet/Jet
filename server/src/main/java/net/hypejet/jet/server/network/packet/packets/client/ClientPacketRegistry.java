@@ -27,6 +27,7 @@ import net.hypejet.jet.server.network.codec.packet.client.play.ClientCommandSugg
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientConfirmMovementSynchronizationPlayPacketReader;
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientEndTickPlayPacketReader;
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientPlayerInputPlayPacketReader;
+import net.hypejet.jet.server.network.codec.packet.client.play.ClientPlayerLoadedPlayPacketReader;
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientPositionFlagsPlayPacketReader;
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientPositionPlayPacketReader;
 import net.hypejet.jet.server.network.codec.packet.client.play.ClientQueryBlockEntityTagPacketReader;
@@ -306,6 +307,10 @@ public final class ClientPacketRegistry {
                         .put(
                                 ClientPlayPackets.SERVERBOUND_COMMAND_SUGGESTION,
                                 ClientCommandSuggestionsRequestPlayPacketReader.INSTANCE
+                        )
+                        .put(
+                                ClientPlayPackets.SERVERBOUND_PLAYER_LOADED,
+                                ClientPlayerLoadedPlayPacketReader.INSTANCE
                         )
                         .build()
         );
