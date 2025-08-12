@@ -1,6 +1,5 @@
 package net.hypejet.jet.server.world.chunk.light;
 
-import java.util.Objects;
 import net.hypejet.jet.server.world.chunk.light.storage.AbstractLightStorage;
 import net.hypejet.jet.server.world.chunk.light.update.LightStorageUpdate;
 import net.hypejet.jet.world.chunk.light.LightSection;
@@ -8,6 +7,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.Contract;
 
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Represents an implementation of {@linkplain LightSection a light section}.

@@ -1,11 +1,12 @@
 package net.hypejet.jet.server.world.chunk.factory.light;
 
-import java.util.Objects;
 import net.hypejet.jet.server.world.chunk.light.storage.AbstractLightStorage;
 import net.hypejet.jet.server.world.chunk.light.storage.EmptyLightStorage;
 import net.hypejet.jet.util.array.NibbleArray;
 import net.hypejet.jet.world.chunk.factory.light.LightStorageFactory;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents an implementation of {@linkplain LightStorageFactory a light storage factory}.

@@ -1,10 +1,10 @@
 package net.hypejet.jet.server.network.session.data;
 
-import java.util.Objects;
 import net.hypejet.jet.session.login.profile.GameProfileProperty;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 

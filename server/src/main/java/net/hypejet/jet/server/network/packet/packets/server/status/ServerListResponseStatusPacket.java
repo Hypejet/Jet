@@ -1,9 +1,10 @@
 package net.hypejet.jet.server.network.packet.packets.server.status;
 
-import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.util.game.ping.ServerListPing;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ServerPacket a server packet}, which sends a server list response data requested by a client.

@@ -1,12 +1,12 @@
 package net.hypejet.jet.server.network.codec.aggregate.collection;
 
 import io.netty.buffer.ByteBuf;
-import java.util.Objects;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.AggregateNetworkWriter;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Represents {@linkplain AggregateNetworkWriter an aggregate network writer}, which writes

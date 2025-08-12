@@ -6,7 +6,6 @@ import net.hypejet.concurrency.collection.set.SetAcquirable;
 import net.hypejet.concurrency.map.MapAcquirable;
 import net.hypejet.concurrency.map.MapAcquisition;
 import net.hypejet.concurrency.map.hashmap.HashMapAcquirable;
-import java.util.Objects;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerAddResourcePackPacket;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerRemoveResourcePackPacket;
@@ -19,6 +18,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 /**

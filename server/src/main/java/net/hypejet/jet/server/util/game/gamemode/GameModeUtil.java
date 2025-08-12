@@ -1,9 +1,10 @@
 package net.hypejet.jet.server.util.game.gamemode;
 
-import java.util.Objects;
 import net.hypejet.jet.entity.player.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.Objects;
 
 /**
  * Represents a utility for identifying {@linkplain Player.GameMode game modes}.

@@ -1,9 +1,10 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ServerPacket a server packet}, which displays a text on an action bar on a client.

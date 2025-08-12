@@ -1,10 +1,11 @@
 package net.hypejet.jet.server.network.codec.index;
 
 import io.netty.buffer.ByteBuf;
-import java.util.Objects;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.kyori.adventure.util.Index;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * A {@linkplain NetworkCodec network codec} handling serialization using an {@linkplain Index index}.

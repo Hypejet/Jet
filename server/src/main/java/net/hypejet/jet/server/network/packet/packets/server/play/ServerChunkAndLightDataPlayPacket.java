@@ -1,8 +1,5 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import java.util.List;
-import java.util.Objects;
-
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
@@ -23,7 +20,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**

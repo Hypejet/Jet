@@ -1,7 +1,6 @@
 package net.hypejet.jet.server.network.codec.aggregate.collection;
 
 import io.netty.buffer.ByteBuf;
-import java.util.Objects;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.aggregate.AggregateNetworkReader;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -9,6 +8,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents {@linkplain AggregateNetworkReader an aggregate network reader}, which reads

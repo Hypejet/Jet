@@ -2,10 +2,10 @@ package net.hypejet.jet.server.command.argument.writers;
 
 import com.mojang.brigadier.arguments.ArgumentType;
 import io.netty.buffer.ByteBuf;
-import java.util.Objects;
 import net.hypejet.jet.server.command.argument.ArgumentWriter;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 

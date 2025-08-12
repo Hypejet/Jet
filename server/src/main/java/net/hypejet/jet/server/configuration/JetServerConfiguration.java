@@ -1,7 +1,6 @@
 package net.hypejet.jet.server.configuration;
 
 import net.hypejet.jet.configuration.ServerConfiguration;
-import java.util.Objects;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.unparsed.UnparsedServerConfiguration;
 import net.hypejet.jet.server.network.netty.transport.NettyTransportSelector;
@@ -11,6 +10,8 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.common.value.qual.IntRange;
+
+import java.util.Objects;
 
 /**
  * Represents an implementation of the {@linkplain ServerConfiguration server configuration}.

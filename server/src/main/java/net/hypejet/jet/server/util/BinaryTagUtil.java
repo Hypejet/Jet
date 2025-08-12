@@ -1,11 +1,12 @@
 package net.hypejet.jet.server.util;
 
-import java.util.Objects;
 import net.hypejet.jet.server.util.codec.Writer;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.Objects;
 
 /**
  * Represents a utility for management of {@linkplain BinaryTag binary tags}.

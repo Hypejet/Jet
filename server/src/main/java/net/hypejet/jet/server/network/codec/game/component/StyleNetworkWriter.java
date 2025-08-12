@@ -1,12 +1,13 @@
 package net.hypejet.jet.server.network.codec.game.component;
 
 import io.netty.buffer.ByteBuf;
-import java.util.Objects;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.miscellaneous.BinaryTagNetworkWriter;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.serializer.nbt.NBTComponentSerializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain NetworkWriter a network writer} of {@linkplain Style a style}.

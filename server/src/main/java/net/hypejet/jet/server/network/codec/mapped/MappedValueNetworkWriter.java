@@ -1,10 +1,10 @@
 package net.hypejet.jet.server.network.codec.mapped;
 
 import io.netty.buffer.ByteBuf;
-import java.util.Objects;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Objects;
 import java.util.function.Function;
 
 /**

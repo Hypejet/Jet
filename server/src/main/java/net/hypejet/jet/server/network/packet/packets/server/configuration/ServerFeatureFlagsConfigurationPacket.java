@@ -1,12 +1,12 @@
 package net.hypejet.jet.server.network.packet.packets.server.configuration;
 
-import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ServerPacket a server packet}, which sets flags of features that should be enabled on

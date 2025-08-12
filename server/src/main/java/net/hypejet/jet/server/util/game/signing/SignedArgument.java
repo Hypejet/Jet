@@ -1,8 +1,9 @@
 package net.hypejet.jet.server.util.game.signing;
 
-import java.util.Objects;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents an argument of a Minecraft command, which was signed by a client.

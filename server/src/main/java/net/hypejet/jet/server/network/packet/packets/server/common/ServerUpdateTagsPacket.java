@@ -1,7 +1,5 @@
 package net.hypejet.jet.server.network.packet.packets.server.common;
 
-import java.util.Objects;
-
 import com.google.common.primitives.ImmutableIntArray;
 import net.hypejet.jet.registry.MinecraftRegistry;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
@@ -9,6 +7,7 @@ import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 
 /**

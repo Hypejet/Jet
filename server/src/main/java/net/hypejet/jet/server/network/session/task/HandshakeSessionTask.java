@@ -1,13 +1,13 @@
 package net.hypejet.jet.server.network.session.task;
 
 import net.hypejet.concurrency.object.WriteObjectAcquisition;
-import java.util.Objects;
 import net.hypejet.jet.server.network.ProtocolState;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.packet.packets.client.handshake.ClientHandshakePacket;
 import net.hypejet.jet.server.network.session.Session;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Objects;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;

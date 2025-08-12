@@ -1,13 +1,13 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
 import com.mojang.brigadier.arguments.ArgumentType;
-import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 
 /**

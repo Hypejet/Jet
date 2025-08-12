@@ -1,7 +1,6 @@
 package net.hypejet.jet.server.entity;
 
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquirable;
-import java.util.Objects;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.acquisition.world.WriteEntityWorldAcquisition;
 import net.hypejet.jet.entity.movement.acquisition.MovementAcquisition;
@@ -18,6 +17,7 @@ import net.kyori.adventure.pointer.Pointers;
 import net.kyori.adventure.text.event.HoverEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.UnaryOperator;

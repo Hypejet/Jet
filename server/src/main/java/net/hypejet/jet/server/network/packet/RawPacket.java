@@ -1,8 +1,9 @@
 package net.hypejet.jet.server.network.packet;
 
-import java.util.Objects;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents a serialized Minecraft packet.

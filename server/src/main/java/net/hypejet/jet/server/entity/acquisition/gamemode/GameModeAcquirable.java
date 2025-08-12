@@ -2,7 +2,6 @@ package net.hypejet.jet.server.entity.acquisition.gamemode;
 
 import net.hypejet.concurrency.Acquirable;
 import net.hypejet.concurrency.Acquisition;
-import java.util.Objects;
 import net.hypejet.jet.entity.acquisition.gamemode.GameModeAcquisition;
 import net.hypejet.jet.entity.acquisition.gamemode.WriteGameModeAcquisition;
 import net.hypejet.jet.entity.player.Player;
@@ -12,6 +11,8 @@ import net.hypejet.jet.world.event.world.events.ChangeGameModeWorldEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain Acquirable an acquirable}, which guards {@linkplain Player.GameMode a game mode}

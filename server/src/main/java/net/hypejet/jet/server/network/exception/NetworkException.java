@@ -1,9 +1,10 @@
 package net.hypejet.jet.server.network.exception;
 
-import java.util.Objects;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain RuntimeException a runtime exception}, which is thrown when an error

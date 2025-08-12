@@ -1,10 +1,10 @@
 package net.hypejet.jet.server.network.packet.packets.client.common;
 
-import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import net.kyori.adventure.resource.ResourcePackStatus;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**

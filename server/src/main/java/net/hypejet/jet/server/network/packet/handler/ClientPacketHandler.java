@@ -1,9 +1,10 @@
 package net.hypejet.jet.server.network.packet.handler;
 
-import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import net.hypejet.jet.server.network.session.Session;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents something that handles {@linkplain ClientPacket a client packet}.

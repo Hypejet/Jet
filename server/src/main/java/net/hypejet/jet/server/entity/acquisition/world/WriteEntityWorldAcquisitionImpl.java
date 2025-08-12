@@ -2,7 +2,6 @@ package net.hypejet.jet.server.entity.acquisition.world;
 
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.object.notnull.WriteNotNullObjectAcquisition;
-import java.util.Objects;
 import net.hypejet.jet.entity.acquisition.world.WriteEntityWorldAcquisition;
 import net.hypejet.jet.event.events.world.PreWorldSwitchEvent;
 import net.hypejet.jet.event.events.world.WorldSwitchEvent;
@@ -17,6 +16,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 /**
  * Represents an implementation of {@linkplain EntityWorldAcquisition an entity world acquisition}

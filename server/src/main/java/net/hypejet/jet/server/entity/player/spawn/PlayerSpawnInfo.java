@@ -1,11 +1,12 @@
 package net.hypejet.jet.server.entity.player.spawn;
 
-import java.util.Objects;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.world.data.WorldData;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.Objects;
 
 /**
  * Represents a spawn info of {@linkplain Player a player}.

@@ -1,9 +1,10 @@
 package net.hypejet.jet.server.entity.player.spawn;
 
-import java.util.Objects;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents a death location of {@linkplain net.hypejet.jet.entity.player.Player a player}.

@@ -1,6 +1,5 @@
 package net.hypejet.jet.server.plugin;
 
-import java.util.Objects;
 import net.hypejet.jet.plugin.Plugin;
 import net.hypejet.jet.plugin.dependency.PluginDependency;
 import net.hypejet.jet.server.plugin.metadata.PluginMetadata;

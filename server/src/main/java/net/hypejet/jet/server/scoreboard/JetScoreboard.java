@@ -1,6 +1,5 @@
 package net.hypejet.jet.server.scoreboard;
 
-import java.util.Objects;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.scoreboard.Scoreboard;

@@ -1,8 +1,9 @@
 package net.hypejet.jet.server.world.chunk.palette.update;
 
-import java.util.Objects;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents a change that should be done in

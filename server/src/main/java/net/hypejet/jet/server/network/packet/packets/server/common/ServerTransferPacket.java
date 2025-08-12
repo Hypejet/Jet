@@ -1,8 +1,9 @@
 package net.hypejet.jet.server.network.packet.packets.server.common;
 
-import java.util.Objects;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ServerPacket a server packet}, which changes a server that the client is connected to.

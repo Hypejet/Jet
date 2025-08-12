@@ -14,8 +14,6 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Represents an unparsed configuration of {@linkplain net.hypejet.jet.server.JetMinecraftServer a Minecraft server}.

@@ -1,12 +1,12 @@
 package net.hypejet.jet.server.plugin.metadata;
 
-import java.util.Objects;
 import net.hypejet.jet.plugin.Plugin;
 import net.hypejet.jet.plugin.dependency.PluginDependency;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**

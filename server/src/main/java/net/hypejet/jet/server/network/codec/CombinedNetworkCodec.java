@@ -1,8 +1,9 @@
 package net.hypejet.jet.server.network.codec;
 
 import io.netty.buffer.ByteBuf;
-import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain NetworkCodec a network codec}, which uses {@linkplain NetworkReader a network reader}

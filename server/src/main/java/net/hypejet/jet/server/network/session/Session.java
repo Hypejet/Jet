@@ -1,11 +1,12 @@
 package net.hypejet.jet.server.network.session;
 
-import java.util.Objects;
 import net.hypejet.jet.server.network.ProtocolState;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.packet.handler.NetworkDisconnectionHandler;
 import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents something that manages {@linkplain ProtocolState a protocol state} with {@linkplain SessionTask a session

@@ -1,7 +1,6 @@
 package net.hypejet.jet.server.plugin.version;
 
 import com.google.common.collect.Iterators;
-import java.util.Objects;
 import net.hypejet.jet.server.plugin.version.part.NumberVersionPart;
 import net.hypejet.jet.server.plugin.version.part.VersionPart;
 import net.hypejet.jet.server.plugin.version.part.WildcardVersionPart;
@@ -10,6 +9,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a utility for parsing plugin version strings.

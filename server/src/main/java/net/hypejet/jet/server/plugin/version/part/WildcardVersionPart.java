@@ -1,10 +1,10 @@
 package net.hypejet.jet.server.plugin.version.part;
 
-import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 
 /**
  * Represents {@linkplain VersionPart a version part}, which accepts any version part, following the wildcard parts

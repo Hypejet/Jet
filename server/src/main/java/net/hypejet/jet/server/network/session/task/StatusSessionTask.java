@@ -1,6 +1,5 @@
 package net.hypejet.jet.server.network.session.task;
 
-import java.util.Objects;
 import net.hypejet.jet.event.events.serverlist.ServerListPingEvent;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
@@ -18,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;

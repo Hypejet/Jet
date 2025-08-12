@@ -1,8 +1,9 @@
 package net.hypejet.jet.server.util.game.signing;
 
-import java.util.Objects;
 import net.hypejet.jet.util.bitset.UnmodifiableBitSet;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * An information about last seen Minecraft chat messages.

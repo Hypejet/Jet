@@ -2,7 +2,6 @@ package net.hypejet.jet.server.entity.movement.acquisition;
 
 import net.hypejet.concurrency.Acquirable;
 import net.hypejet.concurrency.Acquisition;
-import java.util.Objects;
 import net.hypejet.jet.entity.movement.acquisition.MovementAcquisition;
 import net.hypejet.jet.entity.movement.flag.RelativeFlag;
 import net.hypejet.jet.server.entity.JetEntity;
@@ -15,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 
 /**

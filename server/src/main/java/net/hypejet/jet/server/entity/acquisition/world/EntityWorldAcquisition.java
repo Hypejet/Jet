@@ -1,11 +1,12 @@
 package net.hypejet.jet.server.entity.acquisition.world;
 
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
-import java.util.Objects;
 import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.world.World;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain NotNullObjectAcquisition a not-null object acquisition} of {@linkplain World a world}

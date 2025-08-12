@@ -3,13 +3,14 @@ package net.hypejet.jet.server.network.netty;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
-import java.util.Objects;
 import net.hypejet.jet.network.PlayerConnection;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 /**
  * Represents {@link ChannelInitializer a channel initializer}, which initializes {@linkplain PlayerConnection player

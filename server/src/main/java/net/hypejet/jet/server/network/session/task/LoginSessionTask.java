@@ -3,7 +3,6 @@ package net.hypejet.jet.server.network.session.task;
 import net.hypejet.concurrency.object.WriteObjectAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquirable;
 import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
-import java.util.Objects;
 import net.hypejet.jet.event.events.login.LoginFinishedEvent;
 import net.hypejet.jet.event.events.login.LoginStartEvent;
 import net.hypejet.jet.event.node.EventNode;
@@ -24,6 +23,7 @@ import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CancellationException;

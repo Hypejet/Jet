@@ -1,6 +1,5 @@
 package net.hypejet.jet.server.world.block;
 
-import java.util.Objects;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.block.BlockType;

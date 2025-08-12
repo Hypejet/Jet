@@ -1,9 +1,10 @@
 package net.hypejet.jet.server.network.packet.packets.client.common;
 
-import java.util.Objects;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ClientPacket a client packet} containing settings of a client.
