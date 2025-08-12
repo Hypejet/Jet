@@ -1,12 +1,12 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.entity.player.spawn.PlayerSpawnInfo;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -50,7 +50,7 @@ public record ServerJoinGamePlayPacket(
      * @since 1.0
      */
     public ServerJoinGamePlayPacket {
-        worldKeys = Set.copyOf(NullabilityUtil.requireNonNull(worldKeys, "world keys"));
-        NullabilityUtil.requireNonNull(spawnInfo, "spawn info");
+        worldKeys = Set.copyOf(Objects.requireNonNull(worldKeys, "world keys"));
+        Objects.requireNonNull(spawnInfo, "spawn info");
     }
 }

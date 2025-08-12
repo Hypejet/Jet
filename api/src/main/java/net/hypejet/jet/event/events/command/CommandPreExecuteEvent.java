@@ -2,7 +2,6 @@ package net.hypejet.jet.event.events.command;
 
 import com.mojang.brigadier.ParseResults;
 import net.hypejet.jet.command.CommandSource;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.event.events.CancellableEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -35,9 +34,9 @@ public final class CommandPreExecuteEvent extends CancellableEvent implements Co
      */
     public CommandPreExecuteEvent(@NonNull CommandSource source, @NonNull String input,
                                   @NonNull ParseResults<CommandSource> parseResults) {
-        this.source = NullabilityUtil.requireNonNull(source, "source");
-        this.input = NullabilityUtil.requireNonNull(input, "input");
-        this.parseResults = NullabilityUtil.requireNonNull(parseResults, "parse results");
+        this.source = Objects.requireNonNull(source, "source");
+        this.input = Objects.requireNonNull(input, "input");
+        this.parseResults = Objects.requireNonNull(parseResults, "parse results");
     }
 
     /**

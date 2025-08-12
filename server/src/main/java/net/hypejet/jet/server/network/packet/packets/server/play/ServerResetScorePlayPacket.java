@@ -1,11 +1,12 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.scoreboard.objective.ScoreboardObjective;
 import net.hypejet.jet.scoreboard.score.Score;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ServerPacket a server packet} removing the {@linkplain Score score} of some entity from some
@@ -28,6 +29,6 @@ public record ServerResetScorePlayPacket(@NonNull String entityName, @Nullable S
      * @since 1.0
      */
     public ServerResetScorePlayPacket {
-        NullabilityUtil.requireNonNull(entityName, "entity name");
+        Objects.requireNonNull(entityName, "entity name");
     }
 }

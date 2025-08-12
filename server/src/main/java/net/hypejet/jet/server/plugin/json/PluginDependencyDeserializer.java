@@ -5,7 +5,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.hypejet.jet.data.codecs.util.JsonUtil;
+import com.google.gson.JsonParseException;
 import net.hypejet.jet.plugin.dependency.PluginDependency;
 
 import java.lang.reflect.Type;
@@ -30,16 +30,26 @@ public final class PluginDependencyDeserializer implements JsonDeserializer<Plug
     public PluginDependency deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
         JsonObject object = json.getAsJsonObject();
 
-        JsonArray versionsSupportedJson = JsonUtil.read(VERSIONS_SUPPORTED, JsonArray.class, object, context);
-        Set<String> versionsSupported = new HashSet<>();
+        JsonElement name = object.get(NAME);
+        if (name == null)
+            throw new JsonParseException("The plugin name of plugin dependency has not been specified");
 
+        JsonElement required = object.get(REQUIRED);
+        if (required == null)
+            throw new JsonParseException("It has not been specified whether the plugin dependency is required");
+
+        JsonArray versionsSupportedJson = object.getAsJsonArray(VERSIONS_SUPPORTED);
+        if (versionsSupportedJson == null)
+            throw new JsonParseException("No plugin versions satisfying the plugin dependency have been specified");
+
+        Set<String> versionsSupported = new HashSet<>();
         for (JsonElement element : versionsSupportedJson)
-            versionsSupported.add(context.deserialize(element, String.class));
+            versionsSupported.add(element.getAsString());
 
         return new PluginDependency(
-                JsonUtil.read(NAME, String.class, object, context),
+                name.getAsString(),
                 Set.copyOf(versionsSupported),
-                JsonUtil.read(REQUIRED, boolean.class, object, context)
+                required.getAsBoolean()
         );
     }
 }

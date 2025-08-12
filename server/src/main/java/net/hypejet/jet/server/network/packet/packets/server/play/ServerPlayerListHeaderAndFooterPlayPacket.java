@@ -1,9 +1,10 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ServerPacket a server packet}, which is sent to change text of a header and footer
@@ -24,7 +25,7 @@ public record ServerPlayerListHeaderAndFooterPlayPacket(@NonNull Component heade
      * @since 1.0
      */
     public ServerPlayerListHeaderAndFooterPlayPacket {
-        NullabilityUtil.requireNonNull(headerText, "header text");
-        NullabilityUtil.requireNonNull(footerText, "footer text");
+        Objects.requireNonNull(headerText, "header text");
+        Objects.requireNonNull(footerText, "footer text");
     }
 }

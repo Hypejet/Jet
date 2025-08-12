@@ -5,7 +5,7 @@ import net.hypejet.jet.server.network.codec.aggregate.AggregateNetworkWriter;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents {@linkplain AggregateNetworkWriter an aggregate network writer}, which writes a long array.
+ * An {@linkplain AggregateNetworkWriter aggregate network-writer} writing a long array.
  *
  * @since 1.0
  * @see AggregateNetworkWriter
@@ -13,12 +13,20 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class LongArrayNetworkWriter extends AggregateNetworkWriter<long[]> {
 
     /**
-     * An instance of the {@linkplain LongArrayNetworkWriter long array network writer}, which allows for lengths
-     * up to {@link Integer#MAX_VALUE} and encodes them.
+     * An instance of the {@linkplain LongArrayNetworkWriter long array network-writer}
+     * allowing lengths up to {@link Integer#MAX_VALUE} and encoding them.
      *
      * @since 1.0
      */
     public static final LongArrayNetworkWriter INSTANCE = new LongArrayNetworkWriter(Integer.MAX_VALUE, true);
+
+    /**
+     * An instance of the {@linkplain LongArrayNetworkWriter long array network-writer}
+     * allowing lengths up to {@link Integer#MAX_VALUE} and not encoding them.
+     *
+     * @since 1.0
+     */
+    public static final LongArrayNetworkWriter FIXED_INSTANCE = new LongArrayNetworkWriter(Integer.MAX_VALUE, false);
 
     /**
      * Constructs the {@linkplain LongArrayNetworkWriter a long array network writer}.

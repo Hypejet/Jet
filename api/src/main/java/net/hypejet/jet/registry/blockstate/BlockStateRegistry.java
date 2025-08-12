@@ -1,6 +1,6 @@
 package net.hypejet.jet.registry.blockstate;
 
-import net.hypejet.jet.registry.RegistryEntry;
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.block.BlockType;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -15,23 +15,23 @@ import java.util.Map;
  */
 public interface BlockStateRegistry {
     /**
-     * Gets a default {@linkplain BlockState block state} of {@linkplain BlockType a block type} specified.
+     * Gets a default {@linkplain BlockState block state} of the specified {@linkplain BlockType block type}.
      *
-     * @param blockType a registry entry of the block type
+     * @param blockType the holder referencing to the block type
      * @return the block state
      * @since 1.0
      */
-    @NonNull BlockState defaultBlockState(@NonNull RegistryEntry<? extends BlockType> blockType);
+    @NonNull BlockState defaultBlockState(Holder.@NonNull Reference<BlockType> blockType);
 
     /**
-     * Gets {@linkplain BlockState a block state} of {@linkplain BlockType a block type} specified with properties
-     * specified.
+     * Gets a {@linkplain BlockState block state} (which belongs to the specified {@linkplain BlockType block type})
+     * with the specified properties.
      *
-     * @param blockType a registry entry block type
+     * @param blockType the holder referencing to the block type
      * @param properties the properties
      * @return the block state
      * @since 1.0
      */
-    @NonNull BlockState blockState(@NonNull RegistryEntry<? extends BlockType> blockType,
+    @NonNull BlockState blockState(Holder.@NonNull Reference<BlockType> blockType,
                                    @NonNull Map<String, String> properties);
 }

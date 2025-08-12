@@ -3,12 +3,13 @@ package net.hypejet.jet.server.network.netty.encoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.util.CompressionUtil;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain MessageToByteEncoder a message-to-byte encoder}, which compresses outgoing packets.
@@ -29,7 +30,7 @@ public final class PacketCompressor extends MessageToByteEncoder<ByteBuf> {
      * @since 1.0
      */
     public PacketCompressor(@NonNull SocketPlayerConnection connection, int compressionThreshold) {
-        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
+        this.connection = Objects.requireNonNull(connection, "connection");
         this.compressionThreshold = compressionThreshold;
     }
 

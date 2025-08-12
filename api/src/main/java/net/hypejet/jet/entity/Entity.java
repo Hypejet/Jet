@@ -7,6 +7,8 @@ import net.hypejet.jet.entity.movement.acquisition.WriteMovementAcquisition;
 import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.scoreboard.score.Score;
 import net.hypejet.jet.world.World;
+import net.hypejet.jet.world.coordinate.Position;
+import net.hypejet.jet.world.coordinate.Vector;
 import net.kyori.adventure.identity.Identified;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
@@ -49,8 +51,8 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
 
     /**
      * Creates {@linkplain MovementAcquisition a movement acquisition}
-     * of {@linkplain net.hypejet.jet.data.model.api.coordinate.Position a position}
-     * and {@linkplain net.hypejet.jet.data.model.api.coordinate.Vector a vector}
+     * of {@linkplain Position a position}
+     * and {@linkplain Vector a vector}
      * of this {@linkplain Entity entity}.
      *
      * @return the movement acquisition
@@ -60,8 +62,8 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
 
     /**
      * Creates {@linkplain WriteMovementAcquisition a write movement acquisition}
-     * of {@linkplain net.hypejet.jet.data.model.api.coordinate.Position a position}
-     * and {@linkplain net.hypejet.jet.data.model.api.coordinate.Vector a vector}
+     * of {@linkplain Position a position}
+     * and {@linkplain Vector a vector}
      * of this {@linkplain Entity entity}.
      *
      * @return the write movement acquisition

@@ -2,13 +2,12 @@ package net.hypejet.jet.server.network.codec.packet.server.play;
 
 import com.mojang.brigadier.arguments.ArgumentType;
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.data.codecs.util.mapper.Mapper;
 import net.hypejet.jet.server.command.argument.ArgumentWriter;
 import net.hypejet.jet.server.command.argument.ArgumentWriterRegistry;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.array.varint.VarIntArrayNetworkWriter;
-import net.hypejet.jet.server.network.codec.game.key.PackedKeyNetworkCodec;
-import net.hypejet.jet.server.network.codec.mapper.MapperNetworkCodec;
+import net.hypejet.jet.server.network.codec.game.key.KeyNetworkCodec;
+import net.hypejet.jet.server.network.codec.index.IndexNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket;
@@ -17,6 +16,7 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCo
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.Node;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.RootNode;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.SuggestionsType;
+import net.hypejet.jet.server.util.index.IndexUtil;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -56,14 +56,14 @@ public final class ServerDeclareCommandsPlayPacketWriter implements NetworkWrite
     private static final byte HAS_REDIRECT = 0x08;
     private static final byte HAS_SUGGESTIONS_TYPE = 0x10;
 
-    private static final MapperNetworkCodec<SuggestionsType, Key> SUGGESTIONS_TYPE_CODEC = new MapperNetworkCodec<>(
-            Mapper.builder(SuggestionsType.class, Key.class)
-                    .register(SuggestionsType.ASK_SERVER, Key.key("ask_server"))
-                    .register(SuggestionsType.ALL_RECIPES, Key.key("all_recipes"))
-                    .register(SuggestionsType.AVAILABLE_SOUNDS, Key.key("available_sounds"))
-                    .register(SuggestionsType.SUMMONABLE_ENTITIES, Key.key("summonable_entities"))
-                    .build(),
-            PackedKeyNetworkCodec.INSTANCE
+    private static final IndexNetworkCodec<SuggestionsType, Key> SUGGESTIONS_TYPE_CODEC = new IndexNetworkCodec<>(
+            IndexUtil.fromMap(Map.of(
+                    Key.key("ask_server"), SuggestionsType.ASK_SERVER,
+                    Key.key("all_recipes"), SuggestionsType.ALL_RECIPES,
+                    Key.key("available_sounds"), SuggestionsType.AVAILABLE_SOUNDS,
+                    Key.key("summonable_entities"), SuggestionsType.SUMMONABLE_ENTITIES
+            )),
+            KeyNetworkCodec.INSTANCE
     );
 
     private ServerDeclareCommandsPlayPacketWriter() {}

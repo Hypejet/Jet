@@ -1,9 +1,10 @@
 package net.hypejet.jet.server.network.packet.packets.client.handshake;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.ProtocolState;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ClientPacket a client packet} that provides basic information about a player connection.
@@ -26,8 +27,8 @@ public record ClientHandshakePacket(int protocolVersion, @NonNull String serverA
      * @since 1.0
      */
     public ClientHandshakePacket {
-        NullabilityUtil.requireNonNull(serverAddress, "server address");
-        NullabilityUtil.requireNonNull(intent, "intent");
+        Objects.requireNonNull(serverAddress, "server address");
+        Objects.requireNonNull(intent, "intent");
     }
 
     /**

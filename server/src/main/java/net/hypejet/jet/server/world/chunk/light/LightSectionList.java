@@ -5,17 +5,15 @@ import io.netty.util.collection.IntObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ByteMap;
 import net.hypejet.concurrency.empty.EmptyAcquirable;
 import net.hypejet.concurrency.empty.EmptyAcquisition;
-import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.light.update.LightStorageUpdate;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.section.ChunkSectionList;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import net.hypejet.jet.world.dimension.DimensionType;
 import org.jetbrains.annotations.Contract;
+import org.jspecify.annotations.NonNull;
 
 import javax.annotation.concurrent.GuardedBy;
 import java.util.ArrayList;
@@ -36,7 +34,7 @@ public final class LightSectionList {
     private final DimensionType dimensionType;
     private final List<JetLightSection> sections;
 
-    private @MonotonicNonNull @GuardedBy("serializationDataLock") LightSerializationData serializationData;
+    private @GuardedBy("serializationDataLock") LightSerializationData serializationData;
     private final EmptyAcquirable serializationDataLock = new EmptyAcquirable();
 
     /**
@@ -47,8 +45,8 @@ public final class LightSectionList {
      * @since 1.0
      */
     public LightSectionList(@NonNull DimensionType dimensionType, @NonNull List<JetLightSection> sections) {
-        this.dimensionType = NullabilityUtil.requireNonNull(dimensionType, "dimension type");
-        this.sections = List.copyOf(NullabilityUtil.requireNonNull(sections, "sections"));
+        this.dimensionType = Objects.requireNonNull(dimensionType, "dimension type");
+        this.sections = List.copyOf(Objects.requireNonNull(sections, "sections"));
 
         int expectedSectionCount = createSectionCount(dimensionType);
         int actualSectionCount = this.sections.size();

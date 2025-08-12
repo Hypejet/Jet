@@ -14,6 +14,7 @@ import net.hypejet.jet.data.generator.generator.CodeGenerator;
 import net.hypejet.jet.data.generator.generator.Generator;
 import net.hypejet.jet.data.generator.generator.ResourceGenerator;
 import net.hypejet.jet.data.generator.generator.generators.KeyDefinitionGenerator;
+import net.hypejet.jet.data.generator.generator.generators.PacketIdentifierGenerator;
 import net.hypejet.jet.data.generator.generator.generators.RegistryExtractorResourceGenerator;
 import net.hypejet.jet.data.generator.generator.generators.VersionInfoGenerator;
 import net.hypejet.jet.data.generator.util.FileUtils;
@@ -23,6 +24,7 @@ import net.hypejet.jet.data.json.model.entity.JsonEntityType;
 import net.hypejet.jet.data.json.model.event.JsonGameEvent;
 import net.hypejet.jet.data.json.model.item.JsonItem;
 import net.hypejet.jet.data.json.model.sound.JsonSoundEvent;
+import net.hypejet.jet.data.json.resource.JsonDataResourceFiles;
 import net.hypejet.jet.data.json.util.JsonUnit;
 import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import net.minecraft.SharedConstants;
@@ -32,7 +34,18 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.ProtocolInfo;
 import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.protocol.configuration.ConfigurationPacketTypes;
+import net.minecraft.network.protocol.configuration.ConfigurationProtocols;
+import net.minecraft.network.protocol.game.GamePacketTypes;
+import net.minecraft.network.protocol.game.GameProtocols;
+import net.minecraft.network.protocol.handshake.HandshakePacketTypes;
+import net.minecraft.network.protocol.handshake.HandshakeProtocols;
+import net.minecraft.network.protocol.login.LoginPacketTypes;
+import net.minecraft.network.protocol.login.LoginProtocols;
+import net.minecraft.network.protocol.status.StatusPacketTypes;
+import net.minecraft.network.protocol.status.StatusProtocols;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
@@ -153,117 +166,158 @@ final class Generators {
                 // ------------------------ Data driven registries ------------------------
                 .add(
                         Registries.BIOME, Biome.NETWORK_CODEC, Biomes.class,
-                        Biome.class, Path.of("biomes.json"), "BiomeKeys"
+                        Biome.class, JsonDataResourceFiles.BIOMES, "BiomeKeys"
                 )
                 .add(
                         Registries.CHAT_TYPE, ChatType.DIRECT_CODEC, ChatType.class,
-                        ChatType.class, Path.of("chat-types.json"), "ChatTypeKeys"
+                        ChatType.class, JsonDataResourceFiles.CHAT_TYPES, "ChatTypeKeys"
                 )
                 .add(
                         Registries.TRIM_PATTERN, TrimPattern.DIRECT_CODEC, TrimPatterns.class,
-                        TrimPattern.class, Path.of("trim-patterns.json"), "TrimPatternKeys"
+                        TrimPattern.class, JsonDataResourceFiles.TRIM_PATTERNS, "TrimPatternKeys"
                 )
                 .add(
                         Registries.TRIM_MATERIAL, TrimMaterial.DIRECT_CODEC, TrimMaterials.class,
-                        TrimMaterial.class, Path.of("trim-materials.json"), "TrimMaterialKeys"
+                        TrimMaterial.class, JsonDataResourceFiles.TRIM_MATERIALS, "TrimMaterialKeys"
                 )
                 .add(
                         Registries.WOLF_VARIANT, WolfVariant.NETWORK_CODEC, WolfVariants.class,
-                        WolfVariant.class, Path.of("wolf-variants.json"), "WolfVariantKeys"
+                        WolfVariant.class, JsonDataResourceFiles.WOLF_VARIANTS, "WolfVariantKeys"
                 )
                 .add(
                         Registries.PIG_VARIANT, PigVariant.NETWORK_CODEC, PigVariants.class,
-                        PigVariant.class, Path.of("pig-variants.json"), "PigVariantKeys"
+                        PigVariant.class, JsonDataResourceFiles.PIG_VARIANTS, "PigVariantKeys"
                 )
                 .add(
                         Registries.FROG_VARIANT, FrogVariant.NETWORK_CODEC, FrogVariants.class,
-                        FrogVariant.class, Path.of("frog-variants.json"), "FrogVariantKeys"
+                        FrogVariant.class, JsonDataResourceFiles.FROG_VARIANTS, "FrogVariantKeys"
                 )
                 .add(
                         Registries.CAT_VARIANT, CatVariant.NETWORK_CODEC, CatVariants.class,
-                        CatVariant.class, Path.of("cat-variants.json"), "CatVariantKeys"
+                        CatVariant.class, JsonDataResourceFiles.CAT_VARIANTS, "CatVariantKeys"
                 )
                 .add(
                         Registries.COW_VARIANT, CowVariant.NETWORK_CODEC, CowVariants.class,
-                        CowVariant.class, Path.of("cow-variants.json"), "CowVariantKeys"
+                        CowVariant.class, JsonDataResourceFiles.COW_VARIANTS, "CowVariantKeys"
                 )
                 .add(
                         Registries.DAMAGE_TYPE, DamageType.DIRECT_CODEC, DamageTypes.class,
-                        DamageType.class, Path.of("damage-types.json"), "DamageTypeKeys"
+                        DamageType.class, JsonDataResourceFiles.DAMAGE_TYPES, "DamageTypeKeys"
                 )
                 .add(
                         Registries.JUKEBOX_SONG, JukeboxSong.DIRECT_CODEC, JukeboxSongs.class,
-                        JukeboxSong.class, Path.of("jukebox-songs.json"), "JukeboxSongKeys"
+                        JukeboxSong.class, JsonDataResourceFiles.JUKEBOX_SONGS, "JukeboxSongKeys"
                 )
                 .add(
                         Registries.INSTRUMENT, Instrument.DIRECT_CODEC, Instruments.class,
-                        Instrument.class, Path.of("instruments.json"), "InstrumentKeys"
+                        Instrument.class, JsonDataResourceFiles.INSTRUMENTS, "InstrumentKeys"
                 )
                 .add(
                         Registries.WOLF_SOUND_VARIANT, WolfSoundVariant.NETWORK_CODEC, WolfSoundVariants.class,
-                        WolfSoundVariant.class, Path.of("wolf-sound-variants.json"), "WolfSoundVariantKeys"
+                        WolfSoundVariant.class, JsonDataResourceFiles.WOLF_SOUND_VARIANTS, "WolfSoundVariantKeys"
                 )
                 .add(
                         Registries.CHICKEN_VARIANT, ChickenVariant.NETWORK_CODEC, ChickenVariants.class,
-                        ChickenVariant.class, Path.of("chicken-variants.json"), "ChickenVariantKeys"
+                        ChickenVariant.class, JsonDataResourceFiles.CHICKEN_VARIANTS, "ChickenVariantKeys"
                 )
                 .add(
                         Registries.PAINTING_VARIANT, PaintingVariant.DIRECT_CODEC, PaintingVariants.class,
-                        PaintingVariant.class, Path.of("painting-variants.json"), "PaintingVariantKeys"
+                        PaintingVariant.class, JsonDataResourceFiles.PAINTING_VARIANTS, "PaintingVariantKeys"
                 )
                 .add(
                         Registries.DIMENSION_TYPE, DimensionType.DIRECT_CODEC, BuiltinDimensionTypes.class,
-                        DimensionType.class, Path.of("dimension-types.json"), "DimensionTypeKeys"
+                        DimensionType.class, JsonDataResourceFiles.DIMENSION_TYPES, "DimensionTypeKeys"
                 )
                 .add(
                         Registries.BANNER_PATTERN, BannerPattern.DIRECT_CODEC, BannerPatterns.class,
-                        BannerPattern.class, Path.of("banner-patterns.json"), "BannerPatternKeys"
+                        BannerPattern.class, JsonDataResourceFiles.BANNER_PATTERNS, "BannerPatternKeys"
                 )
                 .add(
                         Registries.ENCHANTMENT, Enchantment.DIRECT_CODEC, Enchantments.class,
-                        Enchantment.class, Path.of("enchantments.json"), "EnchantmentKeys"
+                        Enchantment.class, JsonDataResourceFiles.ENCHANTMENTS, "EnchantmentKeys"
                 )
                 // TODO: Dialogs
                 // ------------------------ Built-in registries ------------------------
                 .add(
                         Registries.ITEM, ItemAdapter::convert, Items.class,
-                        Item.class, JsonItem.class, Path.of("items.json"), "ItemKeys"
+                        Item.class, JsonItem.class, JsonDataResourceFiles.ITEMS, "ItemKeys"
                 )
                 .add(
                         Registries.BLOCK, BlockAdapter::convert, Blocks.class,
-                        Block.class, JsonBlock.class, Path.of("blocks.json"), "BlockKeys"
+                        Block.class, JsonBlock.class, JsonDataResourceFiles.BLOCKS, "BlockKeys"
                 )
                 .add(
                         Registries.ENTITY_TYPE, EntityTypeAdapter::convert, EntityType.class,
-                        EntityType.class, JsonEntityType.class, Path.of("entity-types.json"), "EntityTypeKeys"
+                        EntityType.class, JsonEntityType.class, JsonDataResourceFiles.ENTITY_TYPES, "EntityTypeKeys"
                 )
                 .add(
                         Registries.GAME_EVENT, GameEventAdapter::convert, GameEvent.class,
-                        GameEvent.class, JsonGameEvent.class, Path.of("game-events.json"), "GameEventKeys"
+                        GameEvent.class, JsonGameEvent.class, JsonDataResourceFiles.GAME_EVENTS, "GameEventKeys"
                 )
                 .add(
                         Registries.FLUID, ignored -> JsonUnit.INSTANCE, Fluids.class,
-                        Fluid.class, JsonUnit.class, Path.of("fluids.json"), "FluidKeys"
+                        Fluid.class, JsonUnit.class, JsonDataResourceFiles.FLUIDS, "FluidKeys"
                 )
                 .add(
                         Registries.SOUND_EVENT, SoundEventAdapter::convert, SoundEvents.class,
-                        SoundEvent.class, JsonSoundEvent.class, Path.of("sound-events.json"), "SoundEventKeys"
+                        SoundEvent.class, JsonSoundEvent.class, JsonDataResourceFiles.SOUND_EVENTS, "SoundEventKeys"
                 )
                 .add(
                         Registries.POINT_OF_INTEREST_TYPE, ignored -> JsonUnit.INSTANCE, PoiTypes.class,
-                        PoiType.class, JsonUnit.class, Path.of("point-of-interest-types.json"),
-                        "PointOfInterestTypeKeys"
+                        PoiType.class, JsonUnit.class, JsonDataResourceFiles.POI_TYPES, "PointOfInterestTypeKeys"
                 )
                 .add(
                         Registries.BLOCK_ENTITY_TYPE, value -> BlockEntityTypeAdapter.convert(value, registryAccess),
                         BlockEntityType.class, BlockEntityType.class, JsonBlockEntityType.class,
-                        Path.of("block-entity-types.json"), "BlockEntityTypeKeys"
+                        JsonDataResourceFiles.BLOCK_ENTITY_TYPES, "BlockEntityTypeKeys"
                 )
                 .add(new RegistryExtractorResourceGenerator<>(
                         BlockStateRegistryExtractor.INSTANCE,
                         registryAccess,
-                        Path.of("block-states.json")
+                        JsonDataResourceFiles.BLOCK_STATES
                 ))
+                // ------------------------ Packets ------------------------
+                .add(
+                        "ClientHandshakePackets", HandshakeProtocols.SERVERBOUND_TEMPLATE,
+                        "A definition of identifiers of server-bound handshake packets.",
+                        HandshakePacketTypes.class
+                )
+                .add(
+                        "ServerStatusPackets", StatusProtocols.CLIENTBOUND_TEMPLATE,
+                        "A definition of identifiers of client-bound status packets.",
+                        StatusPacketTypes.class
+                ).add(
+                        "ClientStatusPackets", StatusProtocols.SERVERBOUND_TEMPLATE,
+                        "A definition of identifiers of server-bound status packets.",
+                        StatusPacketTypes.class
+                )
+                .add(
+                        "ServerLoginPackets", LoginProtocols.CLIENTBOUND_TEMPLATE,
+                        "A definition of identifiers of client-bound login packets.",
+                        LoginPacketTypes.class
+                ).add(
+                        "ClientLoginPackets", LoginProtocols.SERVERBOUND_TEMPLATE,
+                        "A definition of identifiers of server-bound login packets.",
+                        LoginPacketTypes.class
+                )
+                .add(
+                        "ServerConfigurationPackets", ConfigurationProtocols.CLIENTBOUND_TEMPLATE,
+                        "A definition of identifiers of client-bound configuration packets.",
+                        ConfigurationPacketTypes.class
+                ).add(
+                        "ClientConfigurationPackets", ConfigurationProtocols.SERVERBOUND_TEMPLATE,
+                        "A definition of identifiers of server-bound configuration packets.",
+                        ConfigurationPacketTypes.class
+                )
+                .add(
+                        "ServerPlayPackets", GameProtocols.CLIENTBOUND_TEMPLATE,
+                        "A definition of identifiers of client-bound play packets.",
+                        GamePacketTypes.class
+                ).add(
+                        "ClientPlayPackets", GameProtocols.SERVERBOUND_TEMPLATE,
+                        "A definition of identifiers of server-bound play packets.",
+                        GamePacketTypes.class
+                )
                 .build();
 
         for (Generator generator : generators) {
@@ -311,7 +365,7 @@ final class Generators {
 
         MinecraftServer.configurePackRepository(
                 packRepository,
-                new WorldDataConfiguration(DataPackConfig.DEFAULT, FeatureFlags.REGISTRY.allFlags()),
+                new WorldDataConfiguration(DataPackConfig.DEFAULT, FeatureFlags.VANILLA_SET),
                 false, true
         );
 
@@ -383,7 +437,7 @@ final class Generators {
          * @param valueCodec a codec handling network serialization of values of the specified registry
          * @param keyDefinitionClass a class containing constants associated with values of the specified registry
          * @param valueClass a class of the registry values
-         * @param resourceFilePath a relative path that output of the registry-extractor resource generator
+         * @param resourceFilePath a relative classpath that output of the registry-extractor resource generator
          *                         should be written to
          * @param className a name of the class that output of the key definition generator should be written to
          * @return this builder
@@ -393,7 +447,7 @@ final class Generators {
         private <V> @NonNull GeneratorsBuilder add(@NonNull ResourceKey<Registry<V>> registryKey,
                                                    @NonNull Codec<V> valueCodec, @NonNull Class<?> keyDefinitionClass,
                                                    @NonNull Class<? super V> valueClass,
-                                                   @NonNull Path resourceFilePath, @NonNull String className) {
+                                                   @NonNull String resourceFilePath, @NonNull String className) {
             return this.add(
                     registryKey,
                     value -> BinaryTagHolder.binaryTagHolder(
@@ -419,7 +473,7 @@ final class Generators {
          * @param keyDefinitionClass a class containing constants associated with values of the specified registry
          * @param unconvertedValueClass a class of the registry values
          * @param convertedValueClass a class of Jet data equivalents of the registry values
-         * @param resourceFilePath a relative path that output of the registry-extractor resource generator
+         * @param resourceFilePath a relative classpath that output of the registry-extractor resource generator
          *                         should be written to
          * @param className a name of the class that output of the key definition generator should be written to
          * @return this builder
@@ -432,7 +486,7 @@ final class Generators {
                                                         @NonNull Class<?> keyDefinitionClass,
                                                         @NonNull Class<? super MV> unconvertedValueClass,
                                                         @NonNull Class<CV> convertedValueClass,
-                                                        @NonNull Path resourceFilePath, @NonNull String className) {
+                                                        @NonNull String resourceFilePath, @NonNull String className) {
             return this
                     .add(new KeyDefinitionGenerator<>(
                             this.registryAccess.lookupOrThrow(registryKey),
@@ -442,6 +496,28 @@ final class Generators {
                             new ConverterRegistryExtractor<>(registryKey, valueConverter, convertedValueClass),
                             this.registryAccess, resourceFilePath
                     ));
+        }
+
+        /**
+         * Creates a {@linkplain PacketIdentifierGenerator packet identifier generator}
+         * with values specified and adds it to this builder.
+         *
+         * @param className a name that the generator output class should have
+         * @param detailsProvider a details provider providing information about
+         *                        packets whose identifiers should be extracted
+         * @param javadocHeader a javadoc header that the generator output class should have
+         * @param keyDefinitionClass a class containing constants associated with
+         *                           packets whose identifiers should be extracted
+         * @return this builder
+         * @since 1.0
+         */
+        private @NonNull GeneratorsBuilder add(
+                @NonNull String className, ProtocolInfo.@NonNull DetailsProvider detailsProvider,
+                @NonNull String javadocHeader, @NonNull Class<?> keyDefinitionClass
+        ) {
+            return this.add(new PacketIdentifierGenerator(
+                    className, detailsProvider, javadocHeader, keyDefinitionClass
+            ));
         }
 
         /**

@@ -4,8 +4,6 @@ import com.google.common.collect.Ordering;
 import net.hypejet.concurrency.empty.EmptyAcquirable;
 import net.hypejet.concurrency.empty.EmptyAcquisition;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
-import net.hypejet.jet.data.model.api.coordinate.Position;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.server.entity.acquisition.world.EntityWorldAcquisition;
 import net.hypejet.jet.server.entity.player.JetPlayer;
@@ -21,14 +19,16 @@ import net.hypejet.jet.server.util.coordinate.ChunkPositionUtil;
 import net.hypejet.jet.server.world.acquisition.worldmap.WriteWorldMapAcquisitionImpl;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.view.ChunkView;
+import net.hypejet.jet.world.coordinate.Position;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
-import net.hypejet.jet.world.event.events.StartWaitingForWorldChunksWorldEvent;
+import net.hypejet.jet.world.event.world.events.StartWaitingForWorldChunksWorldEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -84,8 +84,8 @@ public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnect
      * @since 1.0
      */
     public ChunkBatchHandler(@NonNull JetPlayer player, @NonNull Position position) {
-        this.player = NullabilityUtil.requireNonNull(player, "player");
-        NullabilityUtil.requireNonNull(position, "position");
+        this.player = Objects.requireNonNull(player, "player");
+        Objects.requireNonNull(position, "position");
 
         try (NotNullObjectAcquisition<Player.Settings> settingsAcquisition = this.player.settings()) {
             ChunkPosition centerChunkPosition = ChunkPositionUtil.fromCoordinate(position);
@@ -178,7 +178,7 @@ public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnect
      * @since 1.0
      */
     public void handlePositionUpdate(@NonNull Position position) {
-        NullabilityUtil.requireNonNull(position, "position");
+        Objects.requireNonNull(position, "position");
         ChunkPosition centerChunkPosition = ChunkPositionUtil.fromCoordinate(position);
         this.updateChunkView(chunkView -> new ChunkView(centerChunkPosition, chunkView.viewDistance()));
     }
@@ -269,7 +269,7 @@ public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnect
                    are guarded by the same lock. It may also negatively affect chunk-view updating inside
                    the write world-map acquisition, because we acquire write world-map acquisition just after the
                    lock is being acquired. These cases lead to a deadlock. */
-                EmptyAcquisition ignored = this.lock.acquireWrite();
+                EmptyAcquisition ignored = this.lock.acquireWrite()
         ) {
             if (this.unacknowledgedBatches >= this.maximumUnacknowledgedBatches) return;
             this.chunksToSend = Math.min(this.chunksToSend + this.chunksPerTick, Math.max(1f, this.chunksPerTick));

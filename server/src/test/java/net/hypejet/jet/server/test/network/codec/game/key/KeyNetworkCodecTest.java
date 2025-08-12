@@ -6,7 +6,7 @@ import net.kyori.adventure.key.Key;
 import org.junit.jupiter.api.Test;
 
 /**
- * Represents a test of reading and writing of {@linkplain KeyNetworkCodec a key network codec}.
+ * Represents a test of reading and writing of a {@linkplain KeyNetworkCodec key network codec}.
  *
  * @since 1.0
  * @see KeyNetworkCodec

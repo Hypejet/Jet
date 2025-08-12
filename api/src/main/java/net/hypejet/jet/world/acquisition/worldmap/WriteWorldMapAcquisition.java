@@ -1,10 +1,10 @@
 package net.hypejet.jet.world.acquisition.worldmap;
 
-import net.hypejet.jet.data.model.api.registries.biome.Biome;
-import net.hypejet.jet.registry.RegistryEntry;
+import net.hypejet.jet.registry.holder.Holder;
+import net.hypejet.jet.world.biome.Biome;
 import net.hypejet.jet.world.block.BlockState;
-import net.hypejet.jet.world.coordinate.BiomePosition;
 import net.hypejet.jet.world.coordinate.BlockPosition;
+import net.hypejet.jet.world.coordinate.biome.BiomePosition;
 import net.hypejet.jet.world.update.WorldMapUpdate;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -30,17 +30,17 @@ public interface WriteWorldMapAcquisition extends WorldMapAcquisition {
     @NonNull BlockState getBlockState(@NonNull BlockPosition position);
 
     /**
-     * Gets {@linkplain RegistryEntry a registry entry} of {@linkplain Biome a biome}
-     * at {@linkplain BiomePosition a biome position} specified.
+     * Gets a {@linkplain Holder.Reference holder referencing to} a {@linkplain Biome biome}
+     * present at a {@linkplain BiomePosition biome position} specified.
      *
-     * <p>>If {@linkplain net.hypejet.jet.world.chunk.Chunk a chunk} associated with the biome position
-     * has not been loaded, it is going to be loaded.</p>
+     * <p>If {@linkplain net.hypejet.jet.world.chunk.Chunk a chunk} associated
+     * with the biome position has not been loaded, it is going to be loaded.</p>
      *
      * @param position the biome position
-     * @return the registry entry
+     * @return the biome holder
      * @since 1.0
      */
-    @NonNull RegistryEntry<Biome> getBiome(@NonNull BiomePosition position);
+    Holder.@NonNull Reference<Biome> getBiome(@NonNull BiomePosition position);
 
     /**
      * Gets data of a block entity of a block at {@linkplain BlockPosition a block position} specified

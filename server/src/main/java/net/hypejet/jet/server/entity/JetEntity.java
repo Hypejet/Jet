@@ -1,8 +1,6 @@
 package net.hypejet.jet.server.entity;
 
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquirable;
-import net.hypejet.jet.data.model.api.coordinate.Position;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.acquisition.world.WriteEntityWorldAcquisition;
 import net.hypejet.jet.entity.movement.acquisition.MovementAcquisition;
@@ -12,12 +10,14 @@ import net.hypejet.jet.server.entity.movement.acquisition.InternalWriteMovementA
 import net.hypejet.jet.server.entity.movement.acquisition.MovementAcquirable;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.world.JetWorld;
+import net.hypejet.jet.world.coordinate.Position;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.pointer.Pointers;
 import net.kyori.adventure.text.event.HoverEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.UnaryOperator;
@@ -73,12 +73,12 @@ public class JetEntity implements Entity {
      */
     public JetEntity(@NonNull Key entityType, @NonNull UUID uniqueId, @NonNull Pointers pointers,
                      @NonNull Position position, @NonNull JetWorld world) {
-        this.entityType = NullabilityUtil.requireNonNull(entityType, "entity type");
-        this.identity = Identity.identity(NullabilityUtil.requireNonNull(uniqueId, "unique identifier"));
-        this.pointers = NullabilityUtil.requireNonNull(pointers, "pointers");
+        this.entityType = Objects.requireNonNull(entityType, "entity type");
+        this.identity = Identity.identity(Objects.requireNonNull(uniqueId, "unique identifier"));
+        this.pointers = Objects.requireNonNull(pointers, "pointers");
         this.entityId = NEXT_ENTITY_ID.getAndIncrement();
-        this.movement = new MovementAcquirable(this, NullabilityUtil.requireNonNull(position, "position"));
-        this.world = new NotNullObjectAcquirable<>(NullabilityUtil.requireNonNull(world, "world"));
+        this.movement = new MovementAcquirable(this, Objects.requireNonNull(position, "position"));
+        this.world = new NotNullObjectAcquirable<>(Objects.requireNonNull(world, "world"));
     }
 
     @Override

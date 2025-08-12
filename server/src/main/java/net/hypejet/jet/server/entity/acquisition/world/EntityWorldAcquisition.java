@@ -1,11 +1,12 @@
 package net.hypejet.jet.server.entity.acquisition.world;
 
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.world.World;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain NotNullObjectAcquisition a not-null object acquisition} of {@linkplain World a world}
@@ -29,7 +30,7 @@ public class EntityWorldAcquisition<A extends NotNullObjectAcquisition<JetWorld>
      * @since 1.0
      */
     public EntityWorldAcquisition(@NonNull A acquisition) {
-        this.acquisition = NullabilityUtil.requireNonNull(acquisition, "acquisition");
+        this.acquisition = Objects.requireNonNull(acquisition, "acquisition");
     }
 
     @Override

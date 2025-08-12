@@ -1,17 +1,17 @@
 package net.hypejet.jet.server.world.acquisition.worldmap;
 
 import net.hypejet.concurrency.map.MapAcquisition;
-import net.hypejet.jet.data.model.api.registries.biome.Biome;
-import net.hypejet.jet.registry.RegistryEntry;
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.util.coordinate.ChunkPositionUtil;
 import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.light.LightType;
 import net.hypejet.jet.server.world.update.JetWorldMapUpdate;
 import net.hypejet.jet.world.acquisition.worldmap.WriteWorldMapAcquisition;
+import net.hypejet.jet.world.biome.Biome;
 import net.hypejet.jet.world.block.BlockState;
-import net.hypejet.jet.world.coordinate.BiomePosition;
 import net.hypejet.jet.world.coordinate.BlockPosition;
+import net.hypejet.jet.world.coordinate.biome.BiomePosition;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
 import net.hypejet.jet.world.update.WorldMapUpdate;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
@@ -44,7 +44,7 @@ public final class WriteWorldMapAcquisitionImpl extends WorldMapAcquisitionImpl 
     }
 
     @Override
-    public @NonNull RegistryEntry<Biome> getBiome(@NonNull BiomePosition position) {
+    public Holder.@NonNull Reference<Biome> getBiome(@NonNull BiomePosition position) {
         JetChunk chunk = this.getChunk(ChunkPositionUtil.fromBiomePosition(position));
         return biome(position, chunk);
     }

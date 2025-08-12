@@ -1,7 +1,8 @@
 package net.hypejet.jet.util.game.link.label;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ServerLinkLabel a server link label} that displays a text that is built-in the client.
@@ -87,7 +88,7 @@ public final class BuiltinLabel implements ServerLinkLabel {
     private final String name;
 
     private BuiltinLabel(@NonNull String name) {
-        this.name = NullabilityUtil.requireNonNull(name, "name");
+        this.name = Objects.requireNonNull(name, "name");
     }
 
     /**

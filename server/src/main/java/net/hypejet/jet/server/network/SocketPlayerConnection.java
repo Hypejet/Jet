@@ -13,7 +13,6 @@ import io.netty.util.concurrent.Future;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquirable;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.object.notnull.WriteNotNullObjectAcquisition;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.network.PlayerConnection;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.player.JetPlayer;
@@ -29,7 +28,7 @@ import net.hypejet.jet.server.network.packet.RawPacket;
 import net.hypejet.jet.server.network.packet.handler.NetworkDisconnectionHandler;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry;
-import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry.RegistryPacketSpecification;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry.PacketSpecification;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerDisconnectPacket;
 import net.hypejet.jet.server.network.packet.reader.ClientPacketReader;
 import net.hypejet.jet.server.network.session.Session;
@@ -45,6 +44,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -100,8 +100,8 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
             throw new IllegalArgumentException("The event loop must be a single-threaded event loop");
         }
 
-        this.channel = NullabilityUtil.requireNonNull(channel, "channel");
-        this.server = NullabilityUtil.requireNonNull(server, "server");
+        this.channel = Objects.requireNonNull(channel, "channel");
+        this.server = Objects.requireNonNull(server, "server");
 
         // We update handlers after the instantiation and such an operation require to be executed in an event loop
         this.ensureInEventLoop();
@@ -367,7 +367,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
 
     private static @NonNull RawPacket encode(@NonNull ServerPacket packet, @NonNull ProtocolState state) {
         Class<? extends ServerPacket> packetClass = packet.getClass();
-        RegistryPacketSpecification<?> specification = ServerPacketRegistry.specificationFor(state, packetClass);
+        PacketSpecification<?> specification = ServerPacketRegistry.specificationFor(state, packetClass);
 
         if (specification == null) {
             throw new IllegalArgumentException(String.format(
@@ -385,8 +385,10 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
         }
     }
 
-    private static <P extends ServerPacket> void write(@NonNull RegistryPacketSpecification<P> specification,
-                                                       @NonNull ByteBuf buf, @NonNull ServerPacket packet) {
+    private static <P extends ServerPacket> void write(
+            ServerPacketRegistry.@NonNull PacketSpecification<P> specification,
+            @NonNull ByteBuf buf, @NonNull ServerPacket packet
+    ) {
         specification.packetWriter().write(buf, specification.packetClass().cast(packet));
     }
 
@@ -435,7 +437,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
          * @since 1.0
          */
         private WriteSessionAcquisition {
-            NullabilityUtil.requireNonNull(originalAcquisition, "original acquisition");
+            Objects.requireNonNull(originalAcquisition, "original acquisition");
         }
 
         @Override

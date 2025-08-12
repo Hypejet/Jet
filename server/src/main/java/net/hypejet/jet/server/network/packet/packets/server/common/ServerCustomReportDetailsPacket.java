@@ -1,12 +1,12 @@
 package net.hypejet.jet.server.network.packet.packets.server.common;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.util.game.crash.CrashReportDetails;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ServerPacket a server packet} that adds details that are included in crash reports on the
@@ -26,6 +26,6 @@ public record ServerCustomReportDetailsPacket(@NonNull Collection<CrashReportDet
      * @since 1.0
      */
     public ServerCustomReportDetailsPacket {
-        details = List.copyOf(NullabilityUtil.requireNonNull(details, "details"));
+        details = List.copyOf(Objects.requireNonNull(details, "details"));
     }
 }

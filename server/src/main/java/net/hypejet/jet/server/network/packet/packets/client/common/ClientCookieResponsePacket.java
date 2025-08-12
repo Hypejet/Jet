@@ -1,12 +1,13 @@
 package net.hypejet.jet.server.network.packet.packets.client.common;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerCookieRequestPacket;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ClientPacket a client packet}, which is a response to a cookie request made by a server.
@@ -38,6 +39,6 @@ public record ClientCookieResponsePacket(@NonNull Key key, @Nullable Unmodifiabl
      * @since 1.0
      */
     public ClientCookieResponsePacket {
-        NullabilityUtil.requireNonNull(key, "key");
+        Objects.requireNonNull(key, "key");
     }
 }

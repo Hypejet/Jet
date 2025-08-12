@@ -1,16 +1,7 @@
 package net.hypejet.jet.registry;
 
-import net.hypejet.jet.data.model.api.registries.armor.material.ArmorTrimMaterial;
-import net.hypejet.jet.data.model.api.registries.armor.pattern.ArmorTrimPattern;
-import net.hypejet.jet.data.model.api.registries.banner.BannerPattern;
-import net.hypejet.jet.data.model.api.registries.biome.Biome;
-import net.hypejet.jet.data.model.api.registries.chat.ChatType;
-import net.hypejet.jet.data.model.api.registries.damage.DamageType;
-import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
-import net.hypejet.jet.data.model.api.registries.painting.PaintingVariant;
-import net.hypejet.jet.data.model.api.registries.wolf.WolfVariant;
 import net.hypejet.jet.registry.blockstate.BlockStateRegistry;
-import net.hypejet.jet.world.block.BlockType;
+import net.hypejet.jet.registry.reference.RegistryReference;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -21,89 +12,20 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public interface RegistryManager {
     /**
-     * Gets {@linkplain MinecraftRegistry a registry} of {@linkplain DimensionType dimension types}.
+     * Gets a {@linkplain MinecraftRegistry registry} by its reference.
      *
+     * @param reference the reference to the wanted registry
      * @return the registry
+     * @param <V> the value type of the wanted registry
+     * @throws IllegalArgumentException if the specified registry reference is not recognised by the registry managed
      * @since 1.0
      */
-    @NonNull MinecraftRegistry<DimensionType> dimensionTypeRegistry();
+    <V> @NonNull MinecraftRegistry<V> registry(@NonNull RegistryReference<V> reference);
 
     /**
-     * Gets {@linkplain MinecraftRegistry a registry} of {@linkplain ChatType chat types}.
-     *
-     * @return the registry
-     * @since 1.0
-     */
-    @NonNull MinecraftRegistry<ChatType> chatTypeRegistry();
-
-    /**
-     * Gets {@linkplain MinecraftRegistry a registry} of {@linkplain DamageType damage types}.
-     *
-     * @return the registry
-     * @since 1.0
-     */
-    @NonNull MinecraftRegistry<DamageType> damageTypeRegistry();
-
-    /**
-     * Gets {@linkplain MinecraftRegistry a registry} of {@linkplain BannerPattern banner patterns}.
-     *
-     * @return the registry
-     * @since 1.0
-     */
-    @NonNull MinecraftRegistry<BannerPattern> bannerPatternRegistry();
-
-    /**
-     * Gets {@linkplain MinecraftRegistry a registry} of {@linkplain WolfVariant wolf variants}.
-     *
-     * @return the registry
-     * @since 1.0
-     */
-    @NonNull MinecraftRegistry<WolfVariant> wolfVariantRegistry();
-
-    /**
-     * Gets {@linkplain MinecraftRegistry a registry} of {@linkplain Biome biomes}.
-     *
-     * @return the registry
-     * @since 1.0
-     */
-    @NonNull MinecraftRegistry<Biome> biomeRegistry();
-
-    /**
-     * Gets {@linkplain MinecraftRegistry a registry} of {@linkplain PaintingVariant painting variants}.
-     *
-     * @return the registry
-     * @since 1.0
-     */
-    @NonNull MinecraftRegistry<PaintingVariant> paintingVariantRegistry();
-
-    /**
-     * Gets {@linkplain MinecraftRegistry a registry} of {@linkplain ArmorTrimMaterial armor trim materials}.
-     *
-     * @return the registry
-     * @since 1.0
-     */
-    @NonNull MinecraftRegistry<ArmorTrimMaterial> trimMaterialRegistry();
-
-    /**
-     * Gets {@linkplain MinecraftRegistry a registry} of {@linkplain ArmorTrimPattern armor trim patterns}.
-     *
-     * @return the registry
-     * @since 1.0
-     */
-    @NonNull MinecraftRegistry<ArmorTrimPattern> trimPatternRegistry();
-
-    /**
-     * Gets {@linkplain MinecraftRegistry a registry} of types of Minecraft blocks.
-     *
-     * @return the registry
-     * @since 1.0
-     */
-    @NonNull MinecraftRegistry<? extends BlockType> blockTypeRegistry();
-
-    /**
-     * Gets {@linkplain BlockStateRegistry a block state registry} containing all possible
+     * Gets a {@linkplain BlockStateRegistry block state registry} containing all possible
      * {@linkplain net.hypejet.jet.world.block.BlockState block states} that can be used
-     * on {@linkplain net.hypejet.jet.MinecraftServer a server} associated with this registry manager.
+     * on the {@linkplain net.hypejet.jet.MinecraftServer server} associated with this registry manager.
      *
      * @return the block state registry
      * @since 1.0

@@ -1,6 +1,5 @@
 package net.hypejet.jet.util.array;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Arrays;
@@ -21,7 +20,7 @@ public record UnmodifiableByteArray(byte @NonNull [] array) {
      * @since 1.0
      */
     public UnmodifiableByteArray {
-        array = NullabilityUtil.requireNonNull(array, "array").clone();
+        array = Objects.requireNonNull(array, "array").clone();
     }
 
     @Override

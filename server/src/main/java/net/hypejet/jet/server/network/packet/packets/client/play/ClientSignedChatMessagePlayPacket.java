@@ -1,11 +1,12 @@
 package net.hypejet.jet.server.network.packet.packets.client.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import net.hypejet.jet.server.util.game.signing.SeenMessages;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ClientPacket a client packet}, which is received when a player on a client sends
@@ -48,7 +49,7 @@ public record ClientSignedChatMessagePlayPacket(@NonNull String message, long ti
      * @since 1.0
      */
     public ClientSignedChatMessagePlayPacket {
-        NullabilityUtil.requireNonNull(message, "message");
-        NullabilityUtil.requireNonNull(seenMessages, "seen messages");
+        Objects.requireNonNull(message, "message");
+        Objects.requireNonNull(seenMessages, "seen messages");
     }
 }

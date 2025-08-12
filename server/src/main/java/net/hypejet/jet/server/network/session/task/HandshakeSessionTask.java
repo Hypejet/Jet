@@ -1,13 +1,13 @@
 package net.hypejet.jet.server.network.session.task;
 
 import net.hypejet.concurrency.object.WriteObjectAcquisition;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.ProtocolState;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.packet.packets.client.handshake.ClientHandshakePacket;
 import net.hypejet.jet.server.network.session.Session;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Objects;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -40,7 +40,7 @@ public final class HandshakeSessionTask implements SessionTask {
      */
     public HandshakeSessionTask(@NonNull SocketPlayerConnection connection) {
         // We do not care about the acquisition if it is not null, it is up to user not to provide null values
-        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
+        this.connection = Objects.requireNonNull(connection, "connection");
     }
 
     @Override

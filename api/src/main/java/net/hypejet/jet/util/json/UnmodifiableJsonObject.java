@@ -1,8 +1,9 @@
 package net.hypejet.jet.util.json;
 
 import com.google.gson.JsonObject;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents a holder of {@linkplain JsonObject a json object}, which is intended be unmodifiable. In order to ensure
@@ -19,7 +20,7 @@ public record UnmodifiableJsonObject(@NonNull JsonObject object) {
      * @since 1.0
      */
     public UnmodifiableJsonObject {
-        object = NullabilityUtil.requireNonNull(object, "json object").deepCopy();
+        object = Objects.requireNonNull(object, "json object").deepCopy();
     }
 
     @Override

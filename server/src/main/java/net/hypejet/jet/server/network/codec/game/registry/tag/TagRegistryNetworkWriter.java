@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.codec.game.registry.tag;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
-import net.hypejet.jet.server.network.codec.game.key.PackedKeyNetworkCodec;
+import net.hypejet.jet.server.network.codec.game.key.KeyNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket.TagRegistry;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -35,7 +35,7 @@ public final class TagRegistryNetworkWriter implements NetworkWriter<TagRegistry
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull TagRegistry object) {
-        PackedKeyNetworkCodec.INSTANCE.write(buf, object.key());
+        KeyNetworkCodec.INSTANCE.write(buf, object.key());
         TagNetworkWriter.COLLECTION_WRITER.write(buf, object.tags());
     }
 }

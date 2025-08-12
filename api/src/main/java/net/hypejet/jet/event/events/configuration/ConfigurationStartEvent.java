@@ -1,12 +1,11 @@
 package net.hypejet.jet.event.events.configuration;
 
-import net.hypejet.jet.data.model.api.coordinate.Position;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.network.PlayerConnection;
 import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.session.configuration.ConfigurationManager;
 import net.hypejet.jet.world.World;
+import net.hypejet.jet.world.coordinate.Position;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -41,7 +40,7 @@ public final class ConfigurationStartEvent {
      * @since 1.0
      */
     public ConfigurationStartEvent(@NonNull ConfigurationManager manager) {
-        this.manager = NullabilityUtil.requireNonNull(manager, "manager");
+        this.manager = Objects.requireNonNull(manager, "manager");
         this.initialScoreboard = manager.connection().server().scoreboardManager().defaultScoreboard();
     }
 
@@ -73,7 +72,7 @@ public final class ConfigurationStartEvent {
      * @since 1.0
      */
     public void setSpawningWorld(@NonNull World world) {
-        this.spawningWorld = NullabilityUtil.requireNonNull(world, "world");
+        this.spawningWorld = Objects.requireNonNull(world, "world");
     }
 
     /**
@@ -93,7 +92,7 @@ public final class ConfigurationStartEvent {
      * @since 1.0
      */
     public void setSpawningPosition(@NonNull Position position) {
-        this.spawningPosition = NullabilityUtil.requireNonNull(position, "position");
+        this.spawningPosition = Objects.requireNonNull(position, "position");
     }
 
     /**
@@ -113,7 +112,7 @@ public final class ConfigurationStartEvent {
      * @since 1.0
      */
     public void setPreviousGameMode(Player.@Nullable GameMode previousGameMode) {
-        this.previousGameMode = NullabilityUtil.requireNonNull(previousGameMode, "previous game mode");
+        this.previousGameMode = Objects.requireNonNull(previousGameMode, "previous game mode");
     }
 
     /**
@@ -133,7 +132,7 @@ public final class ConfigurationStartEvent {
      * @since 1.0
      */
     public void setGameMode(Player.@NonNull GameMode gameMode) {
-        this.gameMode = NullabilityUtil.requireNonNull(gameMode, "game mode");
+        this.gameMode = Objects.requireNonNull(gameMode, "game mode");
     }
 
     /**
@@ -153,7 +152,7 @@ public final class ConfigurationStartEvent {
      * @since 1.0
      */
     public void setInitialScoreboard(@NonNull Scoreboard initialScoreboard) {
-        this.initialScoreboard = NullabilityUtil.requireNonNull(initialScoreboard, "initial scoreboard");
+        this.initialScoreboard = Objects.requireNonNull(initialScoreboard, "initial scoreboard");
     }
 
     /**

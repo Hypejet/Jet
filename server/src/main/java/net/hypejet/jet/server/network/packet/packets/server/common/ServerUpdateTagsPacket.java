@@ -1,12 +1,13 @@
 package net.hypejet.jet.server.network.packet.packets.server.common;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import com.google.common.primitives.ImmutableIntArray;
+import net.hypejet.jet.registry.MinecraftRegistry;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
-import net.hypejet.jet.util.array.UnmodifiableIntegerArray;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -26,7 +27,7 @@ public record ServerUpdateTagsPacket(@NonNull Collection<TagRegistry> registries
      * @since 1.0
      */
     public ServerUpdateTagsPacket {
-        registries = Set.copyOf(NullabilityUtil.requireNonNull(registries, "registries"));
+        registries = Set.copyOf(Objects.requireNonNull(registries, "registries"));
     }
 
     /**
@@ -48,41 +49,30 @@ public record ServerUpdateTagsPacket(@NonNull Collection<TagRegistry> registries
          * @since 1.0
          */
         public TagRegistry {
-            NullabilityUtil.requireNonNull(key, "key");
-            tags = Set.copyOf(NullabilityUtil.requireNonNull(tags, "tags"));
+            Objects.requireNonNull(key, "key");
+            tags = Set.copyOf(Objects.requireNonNull(tags, "tags"));
         }
     }
 
     /**
-     * Represents a tag of {@linkplain net.hypejet.jet.registry.RegistryEntry registry entries}.
+     * Represents a tag of {@linkplain MinecraftRegistry registry} values.
      *
-     * @param key a key of the tag
-     * @param entries numeric identifiers of the registry entries
+     * @param key the key of the tag
+     * @param entries an array of indices of registry values that are associated with this tag
      * @since 1.0
-     * @see net.hypejet.jet.registry.RegistryEntry
+     * @see MinecraftRegistry
      */
-    public record Tag(@NonNull Key key, @NonNull UnmodifiableIntegerArray entries) {
+    public record Tag(@NonNull Key key, @NonNull ImmutableIntArray entries) {
         /**
          * Constructs the {@linkplain Tag tag}.
          *
-         * @param key a key of the tag
-         * @param entries numeric IDs of data with type that this tag supports (block, items, etc.)
-         * @since 1.0
-         */
-        public Tag(@NonNull Key key, int @NonNull [] entries) {
-            this(key, new UnmodifiableIntegerArray(entries));
-        }
-
-        /**
-         * Constructs the {@linkplain Tag tag}.
-         *
-         * @param key a key of the tag
-         * @param entries numeric IDs of data with type that this tag supports (block, items, etc.)
+         * @param key the key that the tag should have
+         * @param entries an array of indices of registry values that should be associated with the constructed tag
          * @since 1.0
          */
         public Tag {
-            NullabilityUtil.requireNonNull(key, "key");
-            NullabilityUtil.requireNonNull(entries, "entries");
+            Objects.requireNonNull(key, "key");
+            Objects.requireNonNull(entries, "entries");
         }
     }
 }

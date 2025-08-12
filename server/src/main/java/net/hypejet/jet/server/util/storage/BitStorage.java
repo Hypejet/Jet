@@ -1,6 +1,5 @@
 package net.hypejet.jet.server.util.storage;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.util.math.MathUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.Contract;
@@ -32,7 +31,7 @@ public final class BitStorage {
      * @since 1.0
      */
     public BitStorage(byte bitsPerElement, int @NonNull [] elements) {
-        NullabilityUtil.requireNonNull(elements, "elements");
+        Objects.requireNonNull(elements, "elements");
 
         if (bitsPerElement <= 0)
             throw new IllegalArgumentException("The bit-per-element value cannot be negative or zero");
@@ -71,7 +70,7 @@ public final class BitStorage {
         this.elementsPerDataValue = elementsPerDataValue;
         this.size = size;
         this.maxValue = maxValue;
-        this.data = NullabilityUtil.requireNonNull(data, "data").clone();
+        this.data = Objects.requireNonNull(data, "data").clone();
     }
 
     /**

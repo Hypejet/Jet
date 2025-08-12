@@ -1,10 +1,10 @@
 package net.hypejet.jet.server.plugin.version.part;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 
 /**
  * Represents {@linkplain VersionPart a version part}, which accepts any version part, following the wildcard parts
@@ -22,7 +22,7 @@ public record WildcardVersionPart(@NonNull List<WildcardPart> parts) implements 
      * @since 1.0
      */
     public WildcardVersionPart {
-        parts = List.copyOf(NullabilityUtil.requireNonNull(parts, "parts"));
+        parts = List.copyOf(Objects.requireNonNull(parts, "parts"));
     }
 
     @Override

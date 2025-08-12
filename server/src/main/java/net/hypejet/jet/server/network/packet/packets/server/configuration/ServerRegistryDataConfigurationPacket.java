@@ -1,6 +1,5 @@
 package net.hypejet.jet.server.network.packet.packets.server.configuration;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTag;
@@ -9,6 +8,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ServerPacket a server packet}, which initializes a registry on a client.
@@ -29,7 +29,7 @@ public record ServerRegistryDataConfigurationPacket(@NonNull Key registry, @NonN
      * @since 1.0
      */
     public ServerRegistryDataConfigurationPacket {
-        entries = List.copyOf(NullabilityUtil.requireNonNull(entries, "entries"));
+        entries = List.copyOf(Objects.requireNonNull(entries, "entries"));
     }
 
     /**
@@ -49,7 +49,7 @@ public record ServerRegistryDataConfigurationPacket(@NonNull Key registry, @NonN
          * @since 1.0
          */
         public Entry {
-            NullabilityUtil.requireNonNull(key, "key");
+            Objects.requireNonNull(key, "key");
         }
     }
 }

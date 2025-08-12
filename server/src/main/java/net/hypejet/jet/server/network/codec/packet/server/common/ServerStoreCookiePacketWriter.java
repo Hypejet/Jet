@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.codec.packet.server.common;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
-import net.hypejet.jet.server.network.codec.game.key.PackedKeyNetworkCodec;
+import net.hypejet.jet.server.network.codec.game.key.KeyNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerStoreCookiePacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -33,7 +33,7 @@ public final class ServerStoreCookiePacketWriter implements NetworkWriter<Server
         if (data.length > MAX_COOKIE_LENGTH)
             throw new IllegalArgumentException(String.format("The max length of a cookie is %s", MAX_COOKIE_LENGTH));
 
-        PackedKeyNetworkCodec.INSTANCE.write(buf, object.key());
+        KeyNetworkCodec.INSTANCE.write(buf, object.key());
         buf.writeBytes(data);
     }
 }

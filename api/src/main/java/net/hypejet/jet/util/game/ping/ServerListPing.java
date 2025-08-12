@@ -1,7 +1,6 @@
 package net.hypejet.jet.util.game.ping;
 
 import com.google.gson.JsonObject;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.util.json.UnmodifiableJsonObject;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -13,6 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -62,7 +62,7 @@ public record ServerListPing(@NonNull Version version, @Nullable Players players
      * @since 1.0
      */
     public ServerListPing {
-        NullabilityUtil.requireNonNull(version, "version");
+        Objects.requireNonNull(version, "version");
         if (customData != null && customData.object().isEmpty())
             customData = null;
     }
@@ -83,7 +83,7 @@ public record ServerListPing(@NonNull Version version, @Nullable Players players
          * @since 1.0
          */
         public Version {
-            NullabilityUtil.requireNonNull(versionName, "version name");
+            Objects.requireNonNull(versionName, "version name");
         }
     }
 
@@ -105,7 +105,7 @@ public record ServerListPing(@NonNull Version version, @Nullable Players players
          * @since 1.0
          */
         public Players {
-            players = List.copyOf(NullabilityUtil.requireNonNull(players, "players"));
+            players = List.copyOf(Objects.requireNonNull(players, "players"));
         }
     }
 
@@ -125,8 +125,8 @@ public record ServerListPing(@NonNull Version version, @Nullable Players players
          * @since 1.0
          */
         public PingPlayer {
-            NullabilityUtil.requireNonNull(name, "name");
-            NullabilityUtil.requireNonNull(uniqueId, "unique identifier");
+            Objects.requireNonNull(name, "name");
+            Objects.requireNonNull(uniqueId, "unique identifier");
         }
     }
 
@@ -144,7 +144,7 @@ public record ServerListPing(@NonNull Version version, @Nullable Players players
          * @since 1.0
          */
         public Favicon {
-            NullabilityUtil.requireNonNull(image, "image");
+            Objects.requireNonNull(image, "image");
             try {
                 // Check if the image was encoded with base64 correctly
                 Base64.getDecoder().decode(image);

@@ -2,16 +2,17 @@ package net.hypejet.jet.server.entity.acquisition.gamemode;
 
 import net.hypejet.concurrency.Acquirable;
 import net.hypejet.concurrency.Acquisition;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.acquisition.gamemode.GameModeAcquisition;
 import net.hypejet.jet.entity.acquisition.gamemode.WriteGameModeAcquisition;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerWorldEventPlayPacket;
-import net.hypejet.jet.world.event.events.ChangeGameModeWorldEvent;
+import net.hypejet.jet.world.event.world.events.ChangeGameModeWorldEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain Acquirable an acquirable}, which guards {@linkplain Player.GameMode a game mode}
@@ -40,8 +41,8 @@ public final class GameModeAcquirable
      */
     public GameModeAcquirable(@NonNull JetPlayer player, Player.@NonNull GameMode gameMode,
                               Player.@Nullable GameMode previousGameMode) {
-        this.player = NullabilityUtil.requireNonNull(player, "player");
-        this.gameMode = NullabilityUtil.requireNonNull(gameMode, "game mode");
+        this.player = Objects.requireNonNull(player, "player");
+        this.gameMode = Objects.requireNonNull(gameMode, "game mode");
         this.previousGameMode = previousGameMode;
     }
 
@@ -254,7 +255,7 @@ public final class GameModeAcquirable
         @Override
         default void set(Player.@NotNull GameMode value) {
             this.ensurePermittedAndLocked();
-            NullabilityUtil.requireNonNull(value, "value");
+            Objects.requireNonNull(value, "value");
 
             GameModeAcquirable acquirable = this.acquirable();
             acquirable.player.sendPacket(new ServerWorldEventPlayPacket(new ChangeGameModeWorldEvent(value)));

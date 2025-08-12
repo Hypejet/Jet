@@ -1,346 +1,232 @@
 package net.hypejet.jet.server.registry;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
+import com.google.common.primitives.ImmutableIntArray;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMaps;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.hypejet.concurrency.collection.CollectionAcquisition;
-import net.hypejet.concurrency.map.MapAcquisition;
-import net.hypejet.concurrency.map.hashmap.HashMapAcquirable;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
-import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
-import net.hypejet.jet.data.model.api.pack.PackInfo;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.data.model.server.registry.registries.pack.FeaturePack;
-import net.hypejet.jet.data.model.server.registry.registries.registry.DataRegistryEntry;
 import net.hypejet.jet.registry.MinecraftRegistry;
-import net.hypejet.jet.registry.RegistryEntry;
+import net.hypejet.jet.registry.feature.KnownPack;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.player.JetPlayer;
-import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket;
-import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket.TagRegistry;
 import net.hypejet.jet.server.network.session.Session;
+import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.hypejet.jet.server.registry.function.RegistryTagUpdateFunction;
-import net.hypejet.jet.server.registry.tags.Tags;
-import net.hypejet.jet.server.util.acquisition.BooleanMappedAcquisition;
-import net.hypejet.jet.server.util.acquisition.CollectionMappedAcquisition;
-import net.hypejet.jet.server.util.acquisition.NotNullObjectMappedAcquisition;
-import net.hypejet.jet.server.util.order.ElementOrder;
 import net.kyori.adventure.key.Key;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 
 /**
- * Represents an implementation of {@linkplain MinecraftRegistry a Minecraft registry} using
- * {@linkplain ElementOrder an element order}.
+ * An implementation of {@linkplain MinecraftRegistry Minecraft registry}.
  *
- * @param <V> a type of values of entries of this registry
+ * @param <V> a type of values available in this registry
  * @since 1.0
- * @see ElementOrder
+ * @see MinecraftRegistry
  */
-public class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
-
-    private static final IllegalArgumentException NOT_REGISTERED_EXCEPTION
-            = new IllegalArgumentException("The registry entry specified has not been registered in the registry");
-
-    private final JetMinecraftServer server;
+public final class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
 
     private final Key registryKey;
-    private final Class<V> entryValueClass;
+    private final Object2IntMap<Key> keyToIndexMap;
+    private final Map<Key, Set<Key>> tags = new HashMap<>();
 
-    private final Map<Key, JetRegistryEntry<V>> keyToRegistryEntryMap;
-
-    private final HashMapAcquirable<JetRegistryEntry<V>, Tags> tags;
-    private final ElementOrder<JetRegistryEntry<V>> elementOrder;
+    private final List<RegistrationInfo<V>> registrationInfos;
+    private final BinaryTagCodec<V> valueCodec;
+    private final JetMinecraftServer server;
 
     /**
-     * Constructs the {@linkplain JetSerializableMinecraftRegistry Minecraft registry}.
+     * Constructs the {@linkplain JetMinecraftRegistry Minecraft registry implementation}.
      *
-     * @param registryKey a key of the registry
-     * @param entryValueClass a class of values of entries of the registry
-     * @param server a server, on which the registry is registered
-     * @param entries a list of registry entries, which should be put into the registry, the order is preserved
-     * @param enabledFeaturePacks feature packs, which are enabled on the server
-     * @param entryToTagsMap tags of the registry entries specified
+     * @param registryKey the key that the registry should have
+     * @param registrationInfos an info list of registrations that the registry should have, the order is preserved
+     * @param tags a map associating keys of registry values with keys of tags that these registry values should have
+     * @param server the server that the registry is created for
+     * @param valueCodec a binary tag codec that values of the registry should be written with, {@code null} if
+     *                   values of the registry should not be able to be written to network
      * @since 1.0
      */
-    public JetMinecraftRegistry(@NonNull Key registryKey, @NonNull Class<V> entryValueClass,
-                                @NonNull JetMinecraftServer server, @NonNull List<JetRegistryEntry<V>> entries,
-                                @NonNull Set<FeaturePack> enabledFeaturePacks,
-                                @NonNull Map<JetRegistryEntry<V>, Tags> entryToTagsMap) {
-        NullabilityUtil.requireNonNull(enabledFeaturePacks, "enabled feature packs");
-        NullabilityUtil.requireNonNull(entryToTagsMap, "entry to tags map");
+    public JetMinecraftRegistry(@NonNull Key registryKey, @NonNull List<RegistrationInfo<V>> registrationInfos,
+                                @NonNull Map<Key, Set<Key>> tags, @NonNull JetMinecraftServer server,
+                                @Nullable BinaryTagCodec<V> valueCodec) {
+        this.registryKey = Objects.requireNonNull(registryKey, "registry key");
+        this.server = Objects.requireNonNull(server, "server");
 
-        this.server = NullabilityUtil.requireNonNull(server, "server");
-        this.registryKey = NullabilityUtil.requireNonNull(registryKey, "key");
-        this.entryValueClass = NullabilityUtil.requireNonNull(entryValueClass, "entry value class");
+        Objects.requireNonNull(registrationInfos, "registration infos");
+        this.keyToIndexMap = createKeyToIndexMap(registrationInfos);
+        this.registrationInfos = List.copyOf(registrationInfos);
+        this.valueCodec = valueCodec;
 
-        Set<PackInfo> enabledFeaturePackInfos = new HashSet<>();
-        for (FeaturePack enabledDataPack : enabledFeaturePacks)
-            enabledFeaturePackInfos.add(enabledDataPack.info());
-
-        Map<Key, JetRegistryEntry<V>> keyToRegistryEntryMap = new HashMap<>();
-        Map<JetRegistryEntry<V>, Tags> tags = new HashMap<>();
-
-        for (JetRegistryEntry<V> entry : entries) {
-            PackInfo knownPackInfo = entry.knownPackInfo();
-            if (knownPackInfo != null && !enabledFeaturePackInfos.contains(knownPackInfo)) continue;
-
-            keyToRegistryEntryMap.put(entry.key(), entry);
-            tags.put(entry, entryToTagsMap.get(entry));
-        }
-
-        this.keyToRegistryEntryMap = Map.copyOf(keyToRegistryEntryMap);
-
-        this.tags = new HashMapAcquirable<>(tags);
-        this.elementOrder = new ElementOrder<>(entries);
+        Objects.requireNonNull(tags, "tags");
+        this.tags.putAll(tags);
+        this.tags.replaceAll((key, tagKeys) -> Set.copyOf(tagKeys));
     }
 
     @Override
-    public final @NonNull Key registryKey() {
+    public @Nullable V get(@NonNull Key key) {
+        Objects.requireNonNull(key, "key");
+        if (!this.keyToIndexMap.containsKey(key)) return null;
+        return this.registrationInfos.get(this.keyToIndexMap.getInt(key)).value();
+    }
+
+    @Override
+    public @NonNull Set<Key> keySet() {
+        return this.keyToIndexMap.keySet();
+    }
+
+    @Override
+    public @NonNull Set<Key> tagsFor(@NonNull Key key) {
+        return this.tags.get(this.ensureRegistered(key));
+    }
+
+    @Override
+    public void updateTags(@NonNull Key key, @NonNull UnaryOperator<Set<Key>> tagUnaryOperator) {
+        Objects.requireNonNull(tagUnaryOperator, "tag unary operator");
+
+        this.tags.compute(this.ensureRegistered(key), (ignored, tagSet) -> {
+            Set<Key> updatedTagSet = tagUnaryOperator.apply(tagSet == null ? Set.of() : Set.copyOf(tagSet));
+            if (updatedTagSet.isEmpty()) return null;
+            return Set.copyOf(updatedTagSet);
+        });
+
+        try (CollectionAcquisition<JetPlayer, ?> playersAcquisition = this.server.players()) {
+            ServerUpdateTagsPacket packet = new ServerUpdateTagsPacket(Set.of(this.createTagRegistry())); // TODO: Frame
+            playersAcquisition.collection().forEach(player -> {
+                try (NotNullObjectAcquisition<Session> sessionAcquisition = player.connection().acquireSessionRead()) {
+                    if (sessionAcquisition.get().sessionTask() instanceof RegistryTagUpdateFunction function)
+                        function.updateTags(packet);
+                }
+            });
+        }
+    }
+
+    /**
+     * Gets a registry index of a registry value associated with the specified {@linkplain Key key}.
+     *
+     * @param key the key of the registry value
+     * @return the registry index
+     * @throws IllegalArgumentException if no registry value is associated with the specified key
+     * @since 1.0
+     */
+    public int indexOf(@NonNull Key key) {
+        return this.keyToIndexMap.getInt(this.ensureRegistered(key));
+    }
+
+    /**
+     * Gets {@linkplain List list} of {@linkplain RegistrationInfo registration infos} of all registrations
+     * from this {@linkplain JetMinecraftRegistry registry} with preserved order.
+     *
+     * @return the registration-info list
+     * @since 1.0
+     */
+    public @NonNull List<RegistrationInfo<V>> registrationInfos() {
+        return registrationInfos;
+    }
+
+    /**
+     * Gets a {@linkplain Key key} of this {@linkplain JetMinecraftRegistry registry}.
+     *
+     * @return the registry key
+     * @since 1.0
+     */
+    public @NonNull Key registryKey() {
         return this.registryKey;
     }
 
-    @Override
-    public final @NonNull Class<V> entryValueClass() {
-        return this.entryValueClass;
+    /**
+     * Gets a {@linkplain BinaryTagCodec binary-tag codec} that should write
+     * values of this {@linkplain JetMinecraftRegistry registry}.
+     *
+     * @return the binary-tag codec, {@code null} if values of this registry are not network-serializable
+     * @since 1.0
+     */
+    public @Nullable BinaryTagCodec<V> valueCodec() {
+        return this.valueCodec;
     }
 
-    @Override
-    public final @Nullable JetRegistryEntry<V> get(@NonNull Key key) {
-        return this.keyToRegistryEntryMap.get(NullabilityUtil.requireNonNull(key, "identifier"));
-    }
+    /**
+     * Creates a {@linkplain ServerUpdateTagsPacket.TagRegistry packet tag registry}
+     * containing {@linkplain ServerUpdateTagsPacket.Tag tags} of values registered in this registry.
+     *
+     * @return the created packet tag registry
+     * @since 1.0
+     */
+    public ServerUpdateTagsPacket.@NonNull TagRegistry createTagRegistry() {
+        Map<Key, ImmutableIntArray.Builder> keyToTagMap = new HashMap<>();
 
-    @Override
-    public final @Nullable JetRegistryEntry<V> get(int identifier) {
-        return this.elementOrder.get(identifier);
-    }
-
-    @Override
-    public final boolean isRegistered(@NonNull RegistryEntry<V> entry) {
-        return this.elementOrder.contains(validateEntry(entry));
-    }
-
-    @Override
-    public final int identifierOf(@NonNull RegistryEntry<V> entry) {
-        return this.elementOrder.identifierOf(validateEntry(entry));
-    }
-
-    @Override
-    public final @NonNull List<JetRegistryEntry<V>> entries() {
-        return this.elementOrder.elements();
-    }
-
-    @Override
-    public final @NonNull BooleanAcquisition hasTag(@NonNull RegistryEntry<V> entry, @NonNull Key tag) {
-        NullabilityUtil.requireNonNull(tag, "tag");
-        return new BooleanMappedAcquisition<>(
-                this.tagsFor(entry),
-                acquisition -> acquisition.collection().contains(tag)
-        );
-    }
-
-    @Override
-    public final @NonNull CollectionAcquisition<Key, ?> tagsFor(@NonNull RegistryEntry<V> entry) {
-        JetRegistryEntry<V> validatedEntry = validateEntry(entry);
-        return new CollectionMappedAcquisition<>(this.tags.acquireRead(), acquisition -> {
-            Tags tags = acquisition.map().get(validatedEntry);
-            if (tags == null)
-                throw NOT_REGISTERED_EXCEPTION;
-            return tags.tags();
-        });
-    }
-
-    @Override
-    public final void updateTags(@NonNull RegistryEntry<V> entry, @NonNull UnaryOperator<Collection<Key>> tagUnaryOperator) {
-        JetRegistryEntry<V> validatedEntry = validateEntry(entry);
-
-        try (MapAcquisition<JetRegistryEntry<V>, Tags, ?> tagMapAcquisition = this.tags.acquireWrite()) {
-            Map<JetRegistryEntry<V>, Tags> tagMap = tagMapAcquisition.map();
-
-            Tags tags = tagMap.get(validatedEntry);
-            if (tags == null)
-                throw NOT_REGISTERED_EXCEPTION;
-            tagMap.put(validatedEntry, new Tags(tagUnaryOperator.apply(tags.tags())));
-
-            try (CollectionAcquisition<JetPlayer, ?> playerAcquisition = this.server.players()) {
-                Collection<JetPlayer> players = playerAcquisition.collection();
-                if (players.isEmpty()) return;
-
-                TagRegistry tagRegistry = this.createTagRegistry(tagMap);
-                ServerUpdateTagsPacket updateTagsPacket = new ServerUpdateTagsPacket(Set.of(tagRegistry));
-
-                for (JetPlayer player : players) {
-                    // TODO: Do the session consumption in an another thread to avoid relying on client (HIGH PRIORITY)
-                    SocketPlayerConnection connection = player.connection();
-                    try (NotNullObjectAcquisition<Session> sessionAcquisition = connection.acquireSessionRead()) {
-                        if (!(sessionAcquisition.get().sessionTask() instanceof RegistryTagUpdateFunction function))
-                            continue;
-                        function.updateTags(updateTagsPacket);
-                    }
-                }
+        for (Map.Entry<Key, Set<Key>> entry : this.tags.entrySet()) {
+            for (Key tagKey : entry.getValue()) {
+                int valueIndex = this.indexOf(entry.getKey());
+                keyToTagMap.computeIfAbsent(tagKey, ignored -> ImmutableIntArray.builder()).add(valueIndex);
             }
         }
+
+        Set<ServerUpdateTagsPacket.Tag> tags = new HashSet<>();
+        keyToTagMap.forEach((key, builder) -> tags.add(new ServerUpdateTagsPacket.Tag(key, builder.build())));
+        return new ServerUpdateTagsPacket.TagRegistry(this.registryKey, tags);
     }
 
-    /**
-     * Creates {@linkplain NotNullObjectAcquisition a not-null object acquisition} of
-     * {@linkplain TagRegistry tag registry} of tags attached to entries from this registry.
-     *
-     * @return the tag registry
-     * @since 1.0
-     */
-    public final @NonNull NotNullObjectAcquisition<TagRegistry> createTagRegistry() {
-        return new NotNullObjectMappedAcquisition<>(
-                this.tags.acquireRead(),
-                acquisition -> createTagRegistry(acquisition.map())
-        );
+    private @NonNull Key ensureRegistered(@NonNull Key key) {
+        Objects.requireNonNull(key, "key");
+        if (!this.keyToIndexMap.containsKey(key))
+            throw new IllegalArgumentException("This registry does not contain a value for \"" + key + "\" key");
+        return key;
     }
 
-    /**
-     * Represents {@linkplain ElementOrder an element order} of elements stored
-     * in this {@linkplain JetMinecraftRegistry Minecraft registry}.
-     *
-     * @return the element order
-     * @since 1.0
-     */
-    public @NonNull ElementOrder<JetRegistryEntry<V>> elementOrder() {
-        return this.elementOrder;
-    }
-
-    private @NonNull TagRegistry createTagRegistry(@NonNull Map<JetRegistryEntry<V>, Tags> tags) {
-        Map<Key, TagBuilder> tagMap = new HashMap<>();
-        for (Map.Entry<JetRegistryEntry<V>, Tags> mapEntry : tags.entrySet()) {
-            JetRegistryEntry<V> entry = mapEntry.getKey();
-            for (Key tag : mapEntry.getValue().tags())
-                tagMap.computeIfAbsent(tag, ignoredTagKey -> new TagBuilder()).add(this.identifierOf(entry));
-        }
-
-        Collection<ServerUpdateTagsPacket.Tag> packetTags = new HashSet<>();
-        tagMap.forEach((key, builder) -> packetTags.add(builder.toPacketTag(key)));
-        return new TagRegistry(this.registryKey, Set.copyOf(packetTags));
-    }
-
-    /**
-     * Creates {@linkplain JetMinecraftRegistry a Minecraft registry}.
-     *
-     * @param registryKey a key of the registry
-     * @param entryValueClass a class of values of registry entries
-     * @param server a server that should own registry
-     * @param enabledFeaturePacks a set of feature packs, which are enabled on the server
-     * @param gson a gson, which deserializes the built-in registry entries from a resource file
-     * @param resourceFileName a name of the resource file
-     * @return the serializable Minecraft registry
-     * @param <V> a type of values of the registry entries
-     * @since 1.0
-     */
-    public static <V> @NonNull JetMinecraftRegistry<V> create(
-            @NonNull Key registryKey, @NonNull Class<V> entryValueClass, @NonNull JetMinecraftServer server,
-            @NonNull Set<FeaturePack> enabledFeaturePacks, @NonNull Gson gson, @NonNull String resourceFileName
+    private static <V> @NonNull Object2IntMap<Key> createKeyToIndexMap(
+            @NonNull List<RegistrationInfo<V>> registrationInfos
     ) {
-        List<JetRegistryEntry<V>> entries = new ArrayList<>();
-        Map<JetRegistryEntry<V>, Tags> entryToTagsMap = new HashMap<>();
+        Object2IntMap<Key> keyToIndexMap = new Object2IntOpenHashMap<>();
 
-        for (DataRegistryEntry<?> dataEntry : JetMinecraftRegistry.entries(gson, resourceFileName)) {
-            if (!entryValueClass.isAssignableFrom(dataEntry.value().getClass()))
-                throw new IllegalArgumentException("The data registry entry has incompatible value");
+        for (int index = 0; index < registrationInfos.size(); index++) {
+            RegistrationInfo<V> registrationInfo = registrationInfos.get(index);
+            Key key = registrationInfo.key();
 
-            JetRegistryEntry<V> registryEntry = new JetRegistryEntry<>(dataEntry.key(),
-                    entryValueClass.cast(dataEntry.value()), dataEntry.knownPackInfo());
+            if (keyToIndexMap.containsKey(key)) {
+                throw new IllegalArgumentException(String.format(
+                        "The registry already has a registration info for \"%s\" key",
+                        key
+                ));
+            }
 
-            Collection<Key> tagCollection = dataEntry.tags();
-            if (tagCollection == null)
-                tagCollection = Set.of();
-
-            entries.add(registryEntry);
-            entryToTagsMap.put(registryEntry, new Tags(tagCollection));
+            keyToIndexMap.put(key, index);
         }
 
-        return new JetMinecraftRegistry<>(registryKey, entryValueClass, server, List.copyOf(entries),
-                enabledFeaturePacks, Map.copyOf(entryToTagsMap));
+        return Object2IntMaps.unmodifiable(keyToIndexMap);
     }
 
     /**
-     * Gets {@linkplain List a list} of deserialized {@linkplain DataRegistryEntry data registry entries} from a json
-     * resource file.
+     * An information about a registration that should be or was done in a {@linkplain JetMinecraftRegistry registry}.
      *
-     * @param gson a gson, which should deserialize the data registry entries
-     * @param resourceFileName a name of the json resource file
-     * @return the list
+     * @param key the key that the registration info should be bound to
+     * @param value a registry value that should be associated with the key
+     * @param knownPack an information about a feature pack that can enable the registration without sending
+     *                  the entire registration info to the client, {@code null} if there is no such a feature pack
+     * @param <V> the type of value that should be associated with the key
      * @since 1.0
      */
-    public static @NonNull List<DataRegistryEntry<?>> entries(@NonNull Gson gson, @NonNull String resourceFileName) {
-        InputStream stream = JetRegistryManager.class.getClassLoader().getResourceAsStream(resourceFileName);
-        if (stream == null) {
-            throw new IllegalArgumentException(String.format(
-                    "Could not find a resource file with name of \"%s\"", resourceFileName
-            ));
-        }
-
-        List<DataRegistryEntry<?>> entries = new ArrayList<>();
-
-        try {
-            JsonArray jsonArray = gson.fromJson(new String(stream.readAllBytes()), JsonArray.class);
-            for (JsonElement element : jsonArray)
-                entries.add(gson.fromJson(element, DataRegistryEntry.class));
-            stream.close();
-        } catch (IOException exception) {
-            throw new RuntimeException(exception);
-        }
-
-        return List.copyOf(entries);
-    }
-
-    private static <V> @NonNull JetRegistryEntry<V> validateEntry(@NonNull RegistryEntry<V> entry) {
-        NullabilityUtil.requireNonNull(entry, "entry");
-        if (!(entry instanceof JetRegistryEntry<V> castEntry))
-            throw new IllegalArgumentException("The entry specified is not a valid registry entry");
-        return castEntry;
-    }
-
-    /**
-     * Represents a builder of {@linkplain ServerUpdateTagsPacket.Tag a tag of server update tags packet}.
-     *
-     * @since 1.0
-     * @see ServerUpdateTagsPacket.Tag
-     */
-    private static final class TagBuilder {
-
-        private final List<Integer> identifiers = new ArrayList<>();
-
+    public record RegistrationInfo<V>(@NonNull Key key, @NonNull V value, @Nullable KnownPack knownPack) {
         /**
-         * Adds an identifier of a registry entry that has this tag.
+         * Constructs the {@linkplain RegistrationInfo registration info}.
          *
-         * @param identifier the identifier
+         * @param key the key that the created registration info should be bound to
+         * @param value a registry value that should be associated with the key
+         * @param knownPack an information about a feature pack that should be able to enable the registration
+         *                  (that the registration info is constructed for) without sending the encoded value
+         *                  to the client, {@code null} if there is no such a feature pack
          * @since 1.0
          */
-        private void add(int identifier) {
-            this.identifiers.add(identifier);
-        }
-
-        /**
-         * Builds the {@linkplain ServerUpdateTagsPacket.Tag tag}.
-         *
-         * @param tagKey a key of the tag
-         * @return the tag
-         * @since 1.0
-         */
-        private ServerUpdateTagsPacket.@NonNull Tag toPacketTag(@NonNull Key tagKey) {
-            int[] array = new int[this.identifiers.size()];
-            for (int index = 0; index < this.identifiers.size(); index++)
-                array[index] = this.identifiers.get(index);
-            return new ServerUpdateTagsPacket.Tag(tagKey, array);
+        public RegistrationInfo {
+            Objects.requireNonNull(key, "key");
+            Objects.requireNonNull(value, "value");
         }
     }
 }

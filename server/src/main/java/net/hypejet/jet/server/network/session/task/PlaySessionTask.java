@@ -3,7 +3,6 @@ package net.hypejet.jet.server.network.session.task;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquirable;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
@@ -16,6 +15,7 @@ import net.hypejet.jet.server.registry.function.RegistryTagUpdateFunction;
 import net.kyori.adventure.resource.ResourcePackStatus;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -45,8 +45,8 @@ public final class PlaySessionTask implements SessionTask, RegistryTagUpdateFunc
      * @since 1.0
      */
     public PlaySessionTask(@NonNull SocketPlayerConnection connection, @NonNull ConfigurationData configurationData) {
-        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
-        this.configurationData = NullabilityUtil.requireNonNull(configurationData, "configuration data");
+        this.connection = Objects.requireNonNull(connection, "connection");
+        this.configurationData = Objects.requireNonNull(configurationData, "configuration data");
         this.keepAliveHandler = new KeepAliveHandler(connection, configurationData.loginData().username());
     }
 

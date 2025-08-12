@@ -1,9 +1,10 @@
 package net.hypejet.jet.server.world.chunk.light.update;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.world.chunk.light.storage.AbstractLightStorage;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents an update of {@linkplain AbstractLightStorage a light storage}.
@@ -22,6 +23,6 @@ public record LightStorageUpdate(@NonNull ChunkPaletteRelativePosition position,
      * @since 1.0
      */
     public LightStorageUpdate {
-        NullabilityUtil.requireNonNull(position, "position");
+        Objects.requireNonNull(position, "position");
     }
 }

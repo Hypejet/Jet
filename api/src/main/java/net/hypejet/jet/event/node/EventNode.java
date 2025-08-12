@@ -3,7 +3,6 @@ package net.hypejet.jet.event.node;
 import net.hypejet.concurrency.collection.CollectionAcquirable;
 import net.hypejet.concurrency.collection.CollectionAcquisition;
 import net.hypejet.concurrency.collection.set.HashSetAcquirable;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.event.annotation.Subscribe;
 import net.hypejet.jet.event.listener.EventListener;
 import net.hypejet.jet.event.priority.EventPriority;
@@ -52,8 +51,8 @@ public final class EventNode<E> implements Comparable<EventNode<?>> {
      * @since 1.0
      */
     public EventNode(@NonNull Class<E> eventClass, @NonNull EventPriority priority) {
-        this.eventClass = NullabilityUtil.requireNonNull(eventClass, "event class");
-        this.priority = NullabilityUtil.requireNonNull(priority, "event priority");
+        this.eventClass = Objects.requireNonNull(eventClass, "event class");
+        this.priority = Objects.requireNonNull(priority, "event priority");
     }
 
     /**
@@ -65,7 +64,7 @@ public final class EventNode<E> implements Comparable<EventNode<?>> {
      * @since 1.0
      */
     public @NonNull EventNode<E> addChild(@NonNull EventNode<? extends E> node) {
-        NullabilityUtil.requireNonNull(node, "node");
+        Objects.requireNonNull(node, "node");
         if (!this.eventClass.isAssignableFrom(node.eventClass())) {
             throw new IllegalArgumentException("You cannot add a child to an event node, whose event class is not" +
                     " assignable from an event class of the child");
@@ -90,7 +89,7 @@ public final class EventNode<E> implements Comparable<EventNode<?>> {
      * @since 1.0
      */
     public @NonNull EventNode<E> removeChild(@NonNull EventNode<? extends E> node) {
-        NullabilityUtil.requireNonNull(node, "node");
+        Objects.requireNonNull(node, "node");
         try (CollectionAcquisition<EventNode<? extends E>, ?> acquisition = this.children.acquireWrite()) {
             acquisition.collection().remove(node);
         }
@@ -107,7 +106,7 @@ public final class EventNode<E> implements Comparable<EventNode<?>> {
      * @see EventListener
      */
     public @NonNull EventNode<E> addListener(@NonNull EventListener<? extends E> listener) {
-        NullabilityUtil.requireNonNull(listener, "listener");
+        Objects.requireNonNull(listener, "listener");
 
         if (!this.eventClass.isAssignableFrom(listener.eventClass())) {
             throw new IllegalArgumentException("You cannot add a listener in an event node, of which an event class" +
@@ -134,8 +133,8 @@ public final class EventNode<E> implements Comparable<EventNode<?>> {
      */
     public <T extends E> @NonNull EventListener<T> addListener(@NonNull Consumer<T> eventConsumer,
                                                                @NonNull Class<? extends T> eventClass) {
-        NullabilityUtil.requireNonNull(eventConsumer, "event consumer");
-        NullabilityUtil.requireNonNull(eventClass, "event class");
+        Objects.requireNonNull(eventConsumer, "event consumer");
+        Objects.requireNonNull(eventClass, "event class");
 
         EventListener<T> listener = new EventListener<>(eventConsumer, eventClass);
         this.addListener(listener);
@@ -152,7 +151,7 @@ public final class EventNode<E> implements Comparable<EventNode<?>> {
      */
     public @NonNull EventNode<E> removeListener(@NonNull EventListener<? extends E> listener) {
         try (CollectionAcquisition<EventListener<? extends E>, ?> acquisition = this.listeners.acquireWrite()) {
-            acquisition.collection().remove(NullabilityUtil.requireNonNull(listener, "listener"));
+            acquisition.collection().remove(Objects.requireNonNull(listener, "listener"));
             return this;
         }
     }

@@ -2,8 +2,6 @@ package net.hypejet.jet.server.entity.acquisition.world;
 
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.object.notnull.WriteNotNullObjectAcquisition;
-import net.hypejet.jet.data.model.api.coordinate.Position;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.acquisition.world.WriteEntityWorldAcquisition;
 import net.hypejet.jet.event.events.world.PreWorldSwitchEvent;
 import net.hypejet.jet.event.events.world.WorldSwitchEvent;
@@ -13,10 +11,13 @@ import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.server.world.handler.ChunkBatchHandler;
 import net.hypejet.jet.world.World;
+import net.hypejet.jet.world.coordinate.Position;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 /**
  * Represents an implementation of {@linkplain EntityWorldAcquisition an entity world acquisition}
@@ -47,8 +48,8 @@ public final class WriteEntityWorldAcquisitionImpl
                                            @NonNull InternalWriteMovementAcquisition movementAcquisition,
                                            @NonNull JetEntity entity) {
         super(worldAcquisition);
-        this.movementAcquisition = NullabilityUtil.requireNonNull(movementAcquisition, "movement acquisition");
-        this.entity = NullabilityUtil.requireNonNull(entity, "entity");
+        this.movementAcquisition = Objects.requireNonNull(movementAcquisition, "movement acquisition");
+        this.entity = Objects.requireNonNull(entity, "entity");
     }
 
     @Override

@@ -1,10 +1,9 @@
 package net.hypejet.jet.event.events.world;
 
-import net.hypejet.jet.data.model.api.coordinate.Position;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.CancellableEvent;
 import net.hypejet.jet.world.World;
+import net.hypejet.jet.world.coordinate.Position;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Objects;
@@ -33,12 +32,12 @@ public final class PreWorldSwitchEvent extends CancellableEvent {
      * @param startingPosition a position where the player should be right after the world change
      * @since 1.0
      */
-    public PreWorldSwitchEvent(@NonNull Player player, @NonNull World previousWorld, @NonNull World newWorld,
-                               @NonNull Position startingPosition) {
-        this.player = NullabilityUtil.requireNonNull(player, "player");
-        this.previousWorld = NullabilityUtil.requireNonNull(previousWorld, "previous world");
-        this.newWorld = NullabilityUtil.requireNonNull(newWorld, "new world");
-        this.startingPosition = NullabilityUtil.requireNonNull(startingPosition, "starting position");
+    public PreWorldSwitchEvent(@NonNull Player player, @NonNull World previousWorld,
+                               @NonNull World newWorld, @NonNull Position startingPosition) {
+        this.player = Objects.requireNonNull(player, "player");
+        this.previousWorld = Objects.requireNonNull(previousWorld, "previous world");
+        this.newWorld = Objects.requireNonNull(newWorld, "new world");
+        this.startingPosition = Objects.requireNonNull(startingPosition, "starting position");
     }
 
     /**
@@ -78,7 +77,7 @@ public final class PreWorldSwitchEvent extends CancellableEvent {
      * @since 1.0
      */
     public void setNewWorld(@NonNull World newWorld) {
-        this.newWorld = NullabilityUtil.requireNonNull(newWorld, "new world");
+        this.newWorld = Objects.requireNonNull(newWorld, "new world");
     }
 
     /**
@@ -98,7 +97,7 @@ public final class PreWorldSwitchEvent extends CancellableEvent {
      * @since 1.0
      */
     public void setStartingPosition(@NonNull Position position) {
-        this.startingPosition = NullabilityUtil.requireNonNull(position, "position");
+        this.startingPosition = Objects.requireNonNull(position, "position");
     }
 
     @Override

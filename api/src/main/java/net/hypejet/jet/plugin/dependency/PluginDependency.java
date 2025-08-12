@@ -1,8 +1,8 @@
 package net.hypejet.jet.plugin.dependency;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -27,8 +27,8 @@ public record PluginDependency(@NonNull String pluginName, @NonNull Set<String> 
      * @since 1.0
      */
     public PluginDependency {
-        NullabilityUtil.requireNonNull(pluginName, "plugin name");
-        NullabilityUtil.requireNonNull(versionsSupported, "versions supported");
+        Objects.requireNonNull(pluginName, "plugin name");
+        Objects.requireNonNull(versionsSupported, "versions supported");
 
         if (versionsSupported.isEmpty())
             throw new IllegalArgumentException("The versions supported must not be empty");

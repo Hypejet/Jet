@@ -1,9 +1,10 @@
 package net.hypejet.jet.world.coordinate.chunk;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.common.value.qual.IntRange;
 import org.jetbrains.annotations.Contract;
+
+import java.util.Objects;
 
 /**
  * Represents position of {@linkplain net.hypejet.jet.world.chunk.Chunk a chunk}.
@@ -24,7 +25,7 @@ public record ChunkPosition(int chunkX, int chunkZ) {
      */
     @Contract(pure = true)
     public @IntRange(from = 0) int distanceSquared(@NonNull ChunkPosition position) {
-        NullabilityUtil.requireNonNull(position, "position");
+        Objects.requireNonNull(position, "position");
         int xDistance = distance(this.chunkX, position.chunkX);
         int zDistance = distance(this.chunkZ, position.chunkZ);
         return xDistance * xDistance + zDistance * zDistance;

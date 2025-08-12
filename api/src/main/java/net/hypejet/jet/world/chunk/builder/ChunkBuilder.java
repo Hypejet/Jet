@@ -1,13 +1,13 @@
 package net.hypejet.jet.world.chunk.builder;
 
-import net.hypejet.jet.data.model.api.registries.biome.Biome;
-import net.hypejet.jet.registry.RegistryEntry;
+import net.hypejet.jet.registry.holder.Holder;
+import net.hypejet.jet.world.biome.Biome;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.chunk.Chunk;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Represents a builder of {@linkplain Chunk a chunk}.
@@ -44,14 +44,15 @@ public interface ChunkBuilder {
 
     /**
      * Sets {@linkplain Biome a biome} at {@linkplain ChunkRelativeBiomePosition a chunk-relative biome position}
-     * to be replaced with a biome speciifed.
+     * to be replaced with a biome specified.
      *
      * @param position the chunk-relative biome position
-     * @param biome a registry entry of the biome
+     * @param biome a holder referencing to the biome that should be present at the specified position
      * @return this builder
      * @since 1.0
      */
-    @NonNull ChunkBuilder setBiome(@NonNull ChunkRelativeBiomePosition position, @NonNull RegistryEntry<Biome> biome);
+    @NonNull ChunkBuilder setBiome(@NonNull ChunkRelativeBiomePosition position,
+                                   Holder.@NonNull Reference<Biome> biome);
 
     /**
      * Sets a skylight level at {@linkplain ChunkRelativeBlockPosition a chunk-relative block position} to a value

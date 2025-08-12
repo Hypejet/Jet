@@ -1,9 +1,10 @@
 package net.hypejet.jet.server.network.packet.handler;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import net.hypejet.jet.server.network.session.Session;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents something that handles {@linkplain ClientPacket a client packet}.
@@ -23,7 +24,7 @@ public abstract class ClientPacketHandler<P extends ClientPacket> {
      * @since 1.0
      */
     protected ClientPacketHandler(@NonNull Class<P> packetClass) {
-        this.packetClass = NullabilityUtil.requireNonNull(packetClass, "packet class");
+        this.packetClass = Objects.requireNonNull(packetClass, "packet class");
     }
 
     /**

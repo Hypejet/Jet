@@ -1,28 +1,27 @@
 package net.hypejet.jet.server.network.packet.packets.server.configuration;
 
-import net.hypejet.jet.data.model.api.pack.PackInfo;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.registry.feature.KnownPack;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.util.Collection;
-import java.util.Set;
+import java.util.List;
+import java.util.Objects;
 
 /**
- * Represents {@linkplain ServerPacket a server packet} informing client, which feature packs are enabled
- * on the server.
+ * A {@linkplain ServerPacket server packet} informing the client which feature packs are enabled on the server.
  *
- * @param featurePacks the feature packs
+ * @param knownPacks a list of known packs representing the enabled feature packs
  * @since 1.0
  */
-public record ServerKnownPacksConfigurationPacket(@NonNull Collection<PackInfo> featurePacks) implements ServerPacket {
+// TODO: Add an information about the known-pack list ordering
+public record ServerKnownPacksConfigurationPacket(@NonNull List<KnownPack> knownPacks) implements ServerPacket {
     /**
      * Constructs the {@linkplain ServerKnownPacksConfigurationPacket server known feature packs configuration packet}.
      *
-     * @param featurePacks the feature packs
+     * @param knownPacks a list of known packs representing the enabled feature packs
      * @since 1.0
      */
     public ServerKnownPacksConfigurationPacket {
-        featurePacks = Set.copyOf(NullabilityUtil.requireNonNull(featurePacks, "feature packs"));
+        knownPacks = List.copyOf(Objects.requireNonNull(knownPacks, "known packs"));
     }
 }

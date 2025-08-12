@@ -1,11 +1,12 @@
 package net.hypejet.jet.server.network.session;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.ProtocolState;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.packet.handler.NetworkDisconnectionHandler;
 import net.hypejet.jet.server.network.session.task.SessionTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents something that manages {@linkplain ProtocolState a protocol state} with {@linkplain SessionTask a session
@@ -28,9 +29,9 @@ public record Session(@NonNull ProtocolState protocolState, @NonNull SocketPlaye
      * @since 1.0
      */
     public Session {
-        NullabilityUtil.requireNonNull(protocolState, "protocol state");
-        NullabilityUtil.requireNonNull(connection, "connection");
-        NullabilityUtil.requireNonNull(sessionTask, "session task");
+        Objects.requireNonNull(protocolState, "protocol state");
+        Objects.requireNonNull(connection, "connection");
+        Objects.requireNonNull(sessionTask, "session task");
     }
 
     @Override

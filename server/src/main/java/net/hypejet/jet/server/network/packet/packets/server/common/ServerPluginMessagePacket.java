@@ -1,10 +1,11 @@
 package net.hypejet.jet.server.network.packet.packets.server.common;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ServerPacket a server packet}, which contains a custom data sent by a server.
@@ -35,7 +36,7 @@ public record ServerPluginMessagePacket(@NonNull Key key, @NonNull UnmodifiableB
      * @since 1.0
      */
     public ServerPluginMessagePacket {
-        NullabilityUtil.requireNonNull(key, "key");
-        NullabilityUtil.requireNonNull(data, "data");
+        Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(data, "data");
     }
 }

@@ -1,13 +1,15 @@
 package net.hypejet.jet.server.network.codec.packet.client.play;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.data.codecs.util.mapper.Mapper;
 import net.hypejet.jet.server.network.codec.NetworkReader;
-import net.hypejet.jet.server.network.codec.mapper.MapperNetworkCodec;
+import net.hypejet.jet.server.network.codec.index.IndexNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientRequestActionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientRequestActionPlayPacket.Action;
+import net.hypejet.jet.server.util.index.IndexUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Map;
 
 /**
  * Represents {@linkplain NetworkReader a network reader}, which reads
@@ -26,11 +28,11 @@ public final class ClientRequestActionPlayPacketReader implements NetworkReader<
      */
     public static final ClientRequestActionPlayPacketReader INSTANCE = new ClientRequestActionPlayPacketReader();
 
-    private static final MapperNetworkCodec<Action, Integer> ACTION_CODEC = new MapperNetworkCodec<>(
-            Mapper.builder(Action.class, int.class)
-                    .register(Action.PERFORM_RESPAWN, 0)
-                    .register(Action.REQUEST_STATS, 1)
-                    .build(),
+    private static final IndexNetworkCodec<Action, Integer> ACTION_CODEC = new IndexNetworkCodec<>(
+            IndexUtil.fromMap(Map.of(
+                    0, Action.PERFORM_RESPAWN,
+                    1, Action.REQUEST_STATS
+            )),
             VarIntNetworkCodec.INSTANCE
     );
 

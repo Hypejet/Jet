@@ -3,13 +3,14 @@ package net.hypejet.jet.server.network.netty;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.network.PlayerConnection;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 /**
  * Represents {@link ChannelInitializer a channel initializer}, which initializes {@linkplain PlayerConnection player
@@ -32,7 +33,7 @@ public final class ConnectionInitializer extends ChannelInitializer<SocketChanne
      * @since 1.0
      */
     public ConnectionInitializer(@NonNull JetMinecraftServer server) {
-        this.server = NullabilityUtil.requireNonNull(server, "server");
+        this.server = Objects.requireNonNull(server, "server");
     }
 
     @Override

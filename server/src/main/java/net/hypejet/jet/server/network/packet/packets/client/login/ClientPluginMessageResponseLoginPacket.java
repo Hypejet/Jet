@@ -1,10 +1,11 @@
 package net.hypejet.jet.server.network.packet.packets.client.login;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import net.hypejet.jet.server.network.packet.packets.server.login.ServerPluginMessageRequestLoginPacket;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ClientPacket a client packet}, which is a response of client for a plugin message request
@@ -40,6 +41,6 @@ public record ClientPluginMessageResponseLoginPacket(int messageId, boolean succ
      * @since 1.0
      */
     public ClientPluginMessageResponseLoginPacket {
-        NullabilityUtil.requireNonNull(data, "data");
+        Objects.requireNonNull(data, "data");
     }
 }

@@ -1,8 +1,9 @@
 package net.hypejet.jet.server.network.codec;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain NetworkCodec a network codec}, which uses {@linkplain NetworkReader a network reader}
@@ -27,8 +28,8 @@ public final class CombinedNetworkCodec<T> implements NetworkCodec<T> {
      * @since 1.0
      */
     public CombinedNetworkCodec(@NonNull NetworkReader<T> reader, @NonNull NetworkWriter<T> writer) {
-        this.reader = NullabilityUtil.requireNonNull(reader, "reader");
-        this.writer = NullabilityUtil.requireNonNull(writer, "writer");
+        this.reader = Objects.requireNonNull(reader, "reader");
+        this.writer = Objects.requireNonNull(writer, "writer");
     }
 
     @Override

@@ -3,20 +3,25 @@ package net.hypejet.jet.server.network.codec.packet.server.play;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
+import net.hypejet.jet.server.network.codec.aggregate.array.longs.LongArrayNetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
+import net.hypejet.jet.server.network.codec.aggregate.map.MapNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.miscellaneous.BinaryTagNetworkWriter;
-import net.hypejet.jet.server.network.codec.game.world.chunk.heightmap.HeightMapCollectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.world.chunk.light.LightSerializationDataNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.world.chunk.section.ChunkSectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.world.coordinate.relative.ChunkRelativeBlockPositionNetworkWriter;
+import net.hypejet.jet.server.network.codec.mapped.MappedValueNetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkAndLightDataPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkAndLightDataPlayPacket.BlockEntity;
+import net.hypejet.jet.server.util.storage.BitStorage;
+import net.hypejet.jet.server.world.chunk.heightmap.HeightMapType;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.EnumMap;
 import java.util.Map;
 
 /**
@@ -43,6 +48,11 @@ public final class ServerChunkAndLightDataPlayPacketWriter
     private static final CollectionNetworkWriter<Map.Entry<ChunkRelativeBlockPosition, BlockEntity>>
             BLOCK_ENTITY_ENTRIES_WRITER = new CollectionNetworkWriter<>(new BlockEntityEntryNetworkWriter());
 
+    private static final MapNetworkWriter<HeightMapType, BitStorage> HEIGHT_MAPS_WRITER = new MapNetworkWriter<>(
+            new MappedValueNetworkWriter<>(HeightMapType::identifier, VarIntNetworkCodec.INSTANCE),
+            new MappedValueNetworkWriter<>(BitStorage::data, LongArrayNetworkWriter.INSTANCE)
+    );
+
     private ServerChunkAndLightDataPlayPacketWriter() {}
 
     @Override
@@ -52,7 +62,9 @@ public final class ServerChunkAndLightDataPlayPacketWriter
         buf.writeInt(position.chunkX());
         buf.writeInt(position.chunkZ());
 
-        HeightMapCollectionNetworkWriter.INSTANCE.write(buf, object.heightMaps());
+        Map<HeightMapType, BitStorage> heightMaps = new EnumMap<>(HeightMapType.class);
+        object.heightMaps().forEach(heightMap -> heightMaps.put(heightMap.type(), heightMap.data()));
+        HEIGHT_MAPS_WRITER.write(buf, heightMaps);
 
         ByteBuf sectionBuf = Unpooled.buffer();
         try {
@@ -87,7 +99,7 @@ public final class ServerChunkAndLightDataPlayPacketWriter
             ChunkRelativeBlockPositionNetworkWriter.INSTANCE.write(buf, position);
 
             BlockEntity blockEntity = object.getValue();
-            VarIntNetworkCodec.INSTANCE.write(buf, blockEntity.typeIdentifier());
+            VarIntNetworkCodec.INSTANCE.write(buf, blockEntity.typeRegistryIndex());
             BinaryTagNetworkWriter.INSTANCE.write(buf, blockEntity.data());
         }
     }

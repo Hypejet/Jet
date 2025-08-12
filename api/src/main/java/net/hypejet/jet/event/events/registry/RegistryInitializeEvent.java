@@ -1,121 +1,83 @@
 package net.hypejet.jet.event.events.registry;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.registry.MinecraftRegistry;
+import net.hypejet.jet.registry.feature.KnownPack;
+import net.hypejet.jet.registry.reference.RegistryReference;
 import net.kyori.adventure.key.Key;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 /**
- * Represents an event, which is called when a registry is being initialized.
+ * An event called when a {@linkplain MinecraftRegistry registry} where
+ * custom registrations can be defined is being initialized.
  *
- * @param <E> a type of entries of the registry that is being initialized
+ * @param <V> the value type of the initialized registry
  * @since 1.0
+ * @see MinecraftRegistry
  */
-public final class RegistryInitializeEvent<E> {
+public final class RegistryInitializeEvent<V> {
 
-    private final Key key;
-    private final Class<E> entryClass;
-
-    private final Map<Key, E> entryMap = new HashMap<>();
-    private final Map<Key, E> unmodifiableEntryMapView = Collections.unmodifiableMap(this.entryMap);
+    private final RegistryReference<V> registryReference;
+    private final RegistryAccess<V> registryAccess;
 
     /**
      * Constructs the {@linkplain RegistryInitializeEvent registry initialize event}.
      *
-     * @param key a key of the registry
-     * @param entryClass a class of entries of the registry
+     * @param registryReference a reference to the registry that is being initialized
+     * @param registryAccess access to the registry that is being initialized
      * @since 1.0
      */
-    public RegistryInitializeEvent(@NonNull Key key, @NonNull Class<E> entryClass) {
-        this.key = NullabilityUtil.requireNonNull(key, "key");
-        this.entryClass = NullabilityUtil.requireNonNull(entryClass, "entry class");
+    public RegistryInitializeEvent(@NonNull RegistryReference<V> registryReference,
+                                   @NonNull RegistryAccess<V> registryAccess) {
+        this.registryReference = Objects.requireNonNull(registryReference, "registry reference");
+        this.registryAccess = Objects.requireNonNull(registryAccess, "registry access");
     }
 
     /**
-     * Gets {@linkplain Key a key} of the registry.
+     * Gets a {@linkplain RegistryReference registry reference} to the {@linkplain MinecraftRegistry registry}
+     * that is being initialized.
      *
-     * @return the identifier
+     * @return the registry reference
      * @since 1.0
      */
-    public @NonNull Key key() {
-        return this.key;
+    public @NonNull RegistryReference<V> registryReference() {
+        return this.registryReference;
     }
 
     /**
-     * Gets a {@linkplain Class class} of entries of the registry.
+     * Registers the specified value in the {@linkplain MinecraftRegistry registry} that is being initialized.
      *
-     * @return the class
+     * @param key the key that the value should be associated with
+     * @param value the value to register
+     * @param knownPack an information about a feature pack that can enable the registration without sending
+     *                  the entire registration info to the client, {@code null} if there is no such a feature pack
      * @since 1.0
      */
-    public @NonNull Class<E> entryClass() {
-        return this.entryClass;
+    public void register(@NonNull Key key, @NonNull V value, @Nullable KnownPack knownPack) {
+        this.registryAccess.register(key, value, knownPack);
     }
+
 
     /**
-     * Gets an unmodifiable view of {@linkplain Map a map} of entries, which have been registered during this event.
+     * Access to a {@linkplain MinecraftRegistry registry} that is during initialization process.
      *
-     * @return the map
+     * @param <V> the value type of the registry in initialization process
      * @since 1.0
+     * @see MinecraftRegistry
      */
-    public @NonNull Map<Key, E> entryMap() {
-        return this.unmodifiableEntryMapView;
-    }
-
-    /**
-     * Registers {@linkplain E an entry} that should be added to the registry.
-     *
-     * @param key a key that the entry should be associated with
-     * @param entry the entry
-     * @throws IllegalArgumentException if an entry associated with the same key has been already registered or
-     *                                  the {@linkplain #entryClass entry class} is not assignable from a class of
-     *                                  the entry specified
-     * @since 1.0
-     */
-    public void register(@NonNull Key key, @NonNull E entry) {
-        NullabilityUtil.requireNonNull(key, "key");
-        NullabilityUtil.requireNonNull(entry, "entry");
-
-        if (this.entryMap.containsKey(key)) {
-            throw new IllegalArgumentException(String.format(
-                    "An entry with key of %s has been already registered",
-                    key
-            ));
-        }
-
-        if (!this.entryClass.isAssignableFrom(entry.getClass())) {
-            throw new IllegalArgumentException(String.format(
-                    "The entry specified is not an instance of \"%s\"",
-                    this.entryClass.getSimpleName()
-            ));
-        }
-
-        this.entryMap.put(key, entry);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof RegistryInitializeEvent<?> event)) return false;
-        return Objects.equals(this.key, event.key)
-                && Objects.equals(this.entryClass, event.entryClass)
-                && Objects.equals(this.entryMap, event.entryMap);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.key, this.entryClass, this.entryMap);
-    }
-
-    @Override
-    public String toString() {
-        return "RegistryInitializeEvent{" +
-                "identifier=" + this.key +
-                ", entryClass=" + this.entryClass +
-                ", entryMap=" + this.entryMap +
-                '}';
+    // TODO: Consider initializing tags here
+    public interface RegistryAccess<V> {
+        /**
+         * Registers the specified value in the {@linkplain MinecraftRegistry registry} that is being initialized.
+         *
+         * @param key the key that the value should be associated with
+         * @param value the value to register
+         * @param knownPack an information about a feature pack that can enable the registration without sending
+         *                  the entire registration info to the client, {@code null} if there is no such a feature pack
+         * @since 1.0
+         */
+        void register(@NonNull Key key, @NonNull V value, @Nullable KnownPack knownPack);
     }
 }

@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.world.event;
 
-import net.hypejet.jet.world.event.WorldEvent;
+import net.hypejet.jet.world.event.world.WorldEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

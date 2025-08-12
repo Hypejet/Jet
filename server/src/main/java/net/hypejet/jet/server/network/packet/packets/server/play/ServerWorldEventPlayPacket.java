@@ -1,9 +1,10 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
-import net.hypejet.jet.world.event.WorldEvent;
+import net.hypejet.jet.world.event.world.WorldEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ServerPacket a server packet}, which triggers {@linkplain WorldEvent a world event}.
@@ -20,6 +21,6 @@ public record ServerWorldEventPlayPacket(@NonNull WorldEvent worldEvent) impleme
      * @since 1.0
      */
     public ServerWorldEventPlayPacket {
-        NullabilityUtil.requireNonNull(worldEvent, "world event");
+        Objects.requireNonNull(worldEvent, "world event");
     }
 }

@@ -5,7 +5,6 @@ import io.netty.util.collection.LongObjectMap.PrimitiveEntry;
 import net.hypejet.concurrency.map.MapAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquirable;
 import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.packet.handler.NetworkDisconnectionHandler;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerKeepAlivePacket;
@@ -16,6 +15,7 @@ import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -50,7 +50,7 @@ public final class KeepAliveHandler implements NetworkDisconnectionHandler {
      * @since 1.0
      */
     public KeepAliveHandler(@NonNull SocketPlayerConnection connection, @NonNull String username) {
-        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
+        this.connection = Objects.requireNonNull(connection, "connection");
         this.executorService = Executors.newSingleThreadScheduledExecutor(JetThreadFactory.builder()
                 .name("Keep alive thread #%s - " + username)
                 .threadType(JetThreadFactory.ThreadType.VIRTUAL)

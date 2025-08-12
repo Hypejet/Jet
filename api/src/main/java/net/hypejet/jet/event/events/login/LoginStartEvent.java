@@ -1,9 +1,9 @@
 package net.hypejet.jet.event.events.login;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.session.login.LoginManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -27,8 +27,8 @@ public record LoginStartEvent(@NonNull String username, @NonNull UUID uniqueId, 
      * @since 1.0
      */
     public LoginStartEvent {
-        NullabilityUtil.requireNonNull(username, "username");
-        NullabilityUtil.requireNonNull(uniqueId, "unique identifier");
-        NullabilityUtil.requireNonNull(loginManager, "login manager");
+        Objects.requireNonNull(username, "username");
+        Objects.requireNonNull(uniqueId, "unique identifier");
+        Objects.requireNonNull(loginManager, "login manager");
     }
 }

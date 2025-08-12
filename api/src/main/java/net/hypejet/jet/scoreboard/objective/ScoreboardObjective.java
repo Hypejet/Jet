@@ -1,11 +1,12 @@
 package net.hypejet.jet.scoreboard.objective;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.scoreboard.score.number.NumberFormat;
 import net.hypejet.jet.scoreboard.score.render.RenderType;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.Objects;
 
 /**
  * Represents data of a Minecraft scoreboard objective.
@@ -28,7 +29,7 @@ public record ScoreboardObjective(@NonNull Component displayName, @NonNull Rende
      * @since 1.0
      */
     public ScoreboardObjective {
-        NullabilityUtil.requireNonNull(displayName, "display name");
-        NullabilityUtil.requireNonNull(renderType, "render type");
+        Objects.requireNonNull(displayName, "display name");
+        Objects.requireNonNull(renderType, "render type");
     }
 }

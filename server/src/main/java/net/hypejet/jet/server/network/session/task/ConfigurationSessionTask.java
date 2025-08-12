@@ -3,21 +3,16 @@ package net.hypejet.jet.server.network.session.task;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.hypejet.concurrency.object.WriteObjectAcquisition;
-import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquirable;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
 import net.hypejet.concurrency.object.nullable.WriteNullableObjectAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquirable;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
-import net.hypejet.jet.data.model.api.coordinate.Position;
-import net.hypejet.jet.data.model.api.pack.PackInfo;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.data.model.server.registry.registries.pack.FeaturePack;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.configuration.ConfigurationStartEvent;
 import net.hypejet.jet.network.PlayerConnection;
-import net.hypejet.jet.registry.RegistryEntry;
+import net.hypejet.jet.registry.feature.KnownPack;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.network.ProtocolState;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
@@ -38,7 +33,7 @@ import net.hypejet.jet.server.network.session.data.LoginData;
 import net.hypejet.jet.server.network.session.keepalive.KeepAliveHandler;
 import net.hypejet.jet.server.network.session.pack.ResourcePackHandler;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
-import net.hypejet.jet.server.registry.JetSerializableMinecraftRegistry;
+import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.hypejet.jet.server.registry.function.RegistryTagUpdateFunction;
 import net.hypejet.jet.server.scoreboard.JetScoreboard;
 import net.hypejet.jet.server.util.NetworkUtil;
@@ -47,6 +42,7 @@ import net.hypejet.jet.server.util.unit.Unit;
 import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.session.configuration.ConfigurationManager;
 import net.hypejet.jet.world.World;
+import net.hypejet.jet.world.coordinate.Position;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.resource.ResourcePackStatus;
@@ -59,6 +55,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CancellationException;
@@ -105,8 +102,8 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
      * @since 1.0
      */
     public ConfigurationSessionTask(@NonNull SocketPlayerConnection connection, @NonNull LoginData loginData) {
-        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
-        this.loginData = NullabilityUtil.requireNonNull(loginData, "login data");
+        this.connection = Objects.requireNonNull(connection, "connection");
+        this.loginData = Objects.requireNonNull(loginData, "login data");
         this.keepAliveHandler = new KeepAliveHandler(this.connection, loginData.username());
     }
 
@@ -160,7 +157,7 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
 
     @Override
     public void handleClientBrand(@NonNull String name) {
-        NullabilityUtil.requireNonNull(name, "name");
+        Objects.requireNonNull(name, "name");
         try (WriteNullableObjectAcquisition<String> acquisition = this.clientBrand.acquireWrite()) {
             acquisition.set(name);
         }
@@ -168,7 +165,7 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
 
     @Override
     public void handleClientInformation(Player.@NonNull Settings settings) {
-        NullabilityUtil.requireNonNull(settings, "settings");
+        Objects.requireNonNull(settings, "settings");
         try (WriteNullableObjectAcquisition<Player.Settings> acquisition = this.settings.acquireWrite()) {
             acquisition.set(settings);
         }
@@ -241,47 +238,41 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
         }
 
         this.sendServerBrand();
-        Set<FeaturePack> enabledFeaturePacks = this.connection.server().registryManager().enabledFeaturePacks();
 
-        Set<Key> featureFlags = new HashSet<>();
-        for (FeaturePack featurePack : enabledFeaturePacks)
-            featureFlags.addAll(featurePack.requiredFeatureFlags());
+        // TODO: Implement support for other feature flags
+        this.sendPacket(new ServerFeatureFlagsConfigurationPacket(Set.of(Key.key("vanilla"))));
 
-        this.sendPacket(new ServerFeatureFlagsConfigurationPacket(Set.copyOf(featureFlags)));
-
-        Set<PackInfo> packInfos = new HashSet<>();
-        enabledFeaturePacks.forEach(dataPack -> packInfos.add(dataPack.info()));
-        this.sendPacket(new ServerKnownPacksConfigurationPacket(Set.copyOf(packInfos)));
+        // TODO: Implement support for other feature packs
+        List<KnownPack> serverKnownPacks = List.of(new KnownPack("minecraft", "core", server.versionId()));
+        this.sendPacket(new ServerKnownPacksConfigurationPacket(serverKnownPacks));
 
         try {
             ClientKnownPacksConfigurationPacket packet;
+
             try {
                 packet = this.knownPacksFuture.get(TIME_OUT_DURATION, TIME_OUT_UNIT);
             } catch (TimeoutException exception) {
                 throw new RuntimeException("The known packs packet has not been sent on time", exception);
             }
 
-            Collection<JetMinecraftRegistry<?>> registries = server.registryManager().networkRegistries();
-            for (JetMinecraftRegistry<?> registry : registries) {
-                if (!(registry instanceof JetSerializableMinecraftRegistry<?> serializableRegistry)) continue;
-                sendRegistry(this.connection, serializableRegistry, packet.featurePacks());
-            }
+            Set<KnownPack> commonKnownPacks = packet.knownPacks().equals(serverKnownPacks)
+                    ? Set.copyOf(serverKnownPacks)
+                    : Set.of();
+
+            Collection<JetMinecraftRegistry<?>> registries = server.registryManager().registries();
+            registries.forEach(registry -> sendRegistry(this.connection, registry, commonKnownPacks));
 
             try (WriteBooleanAcquisition tagsSentAcquisition = this.tagsSent.acquireWrite()) {
-                Collection<NotNullObjectAcquisition<TagRegistry>> tagRegistryAcquisitions = new HashSet<>();
-                try {
-                    for (JetMinecraftRegistry<?> registry : registries)
-                        tagRegistryAcquisitions.add(registry.createTagRegistry());
+                Set<TagRegistry> tagRegistries = new HashSet<>();
 
-                    Collection<TagRegistry> tagRegistries = new HashSet<>();
-                    for (NotNullObjectAcquisition<TagRegistry> tagRegistryAcquisition : tagRegistryAcquisitions)
-                        tagRegistries.add(tagRegistryAcquisition.get());
+                registries.forEach(registry -> {
+                    TagRegistry tagRegistry = registry.createTagRegistry();
+                    if (tagRegistry.tags().isEmpty()) return;
+                    tagRegistries.add(tagRegistry);
+                });
 
-                    this.sendPacket(new ServerUpdateTagsPacket(Set.copyOf(tagRegistries)));
-                    tagsSentAcquisition.set(true);
-                } finally {
-                    tagRegistryAcquisitions.forEach(NotNullObjectAcquisition::close);
-                }
+                this.sendPacket(new ServerUpdateTagsPacket(Set.copyOf(tagRegistries)));
+                tagsSentAcquisition.set(true);
             }
 
             if (!this.keepAliveHandler.stopAndAwaitTermination(TIME_OUT_DURATION, TIME_OUT_UNIT)) {
@@ -346,24 +337,29 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
     }
 
     private static <V> void sendRegistry(@NonNull SocketPlayerConnection connection,
-                                         @NonNull JetSerializableMinecraftRegistry<V> registry,
-                                         @NonNull Collection<PackInfo> dataPackResponse) {
-        Key registryKey = registry.registryKey();
+                                         @NonNull JetMinecraftRegistry<V> registry,
+                                         @NonNull Collection<KnownPack> knownPackResponse) {
+        BinaryTagCodec<V> valueCodec = registry.valueCodec();
+        if (valueCodec == null) return;
+
         List<ServerRegistryDataConfigurationPacket.Entry> entries = new ArrayList<>();
+        for (JetMinecraftRegistry.RegistrationInfo<V> registrationInfo : registry.registrationInfos()) {
+            KnownPack knownPack = registrationInfo.knownPack();
+            BinaryTag serializedValue;
 
-        for (RegistryEntry<V> entry : registry.entries()) {
-            Key identifier = entry.key();
-            PackInfo knownPackInfo = entry.knownPackInfo();
+            if (knownPack != null && knownPackResponse.contains(knownPack)) {
+                serializedValue = null; // The client already knows the value by enabling the same feature pack
+            } else {
+                try {
+                    serializedValue = valueCodec.encode(registrationInfo.value());
+                } catch (Exception exception) {
+                    throw new RuntimeException("An error occurred while encoding a registry value", exception);
+                }
+            }
 
-            BinaryTag serializedEntry;
-            if (knownPackInfo == null || !dataPackResponse.contains(knownPackInfo))
-                serializedEntry = registry.binaryTagWriter().write(entry.value());
-            else
-                serializedEntry = null; // The client already knows value of the entry
-
-            entries.add(new ServerRegistryDataConfigurationPacket.Entry(identifier, serializedEntry));
+            entries.add(new ServerRegistryDataConfigurationPacket.Entry(registrationInfo.key(), serializedValue));
         }
 
-        connection.sendPacket(new ServerRegistryDataConfigurationPacket(registryKey, List.copyOf(entries)));
+        connection.sendPacket(new ServerRegistryDataConfigurationPacket(registry.registryKey(), List.copyOf(entries)));
     }
 }

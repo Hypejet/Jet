@@ -1,25 +1,28 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.data.model.server.registry.registries.block.entity.BlockEntityType;
+import net.hypejet.jet.registry.holder.Holder;
+import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
-import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.world.block.JetBlockState;
-import net.hypejet.jet.server.world.block.JetBlockType;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.heightmap.HeightMap;
 import net.hypejet.jet.server.world.chunk.light.LightSerializationData;
 import net.hypejet.jet.server.world.chunk.section.ChunkSectionList;
+import net.hypejet.jet.world.block.BlockType;
+import net.hypejet.jet.world.block.entity.BlockEntityType;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -53,22 +56,36 @@ public record ServerChunkAndLightDataPlayPacket(
      * @since 1.0
      */
     public ServerChunkAndLightDataPlayPacket {
-        NullabilityUtil.requireNonNull(chunkPosition, "chunk position");
-        NullabilityUtil.requireNonNull(heightMaps, "height maps");
-        NullabilityUtil.requireNonNull(chunkSectionList, "chunk-section list");
-        NullabilityUtil.requireNonNull(blockEntities, "block entities");
-        NullabilityUtil.requireNonNull(lightSerializationData, "light serialization data");
+        Objects.requireNonNull(chunkPosition, "chunk position");
+        Objects.requireNonNull(heightMaps, "height maps");
+        Objects.requireNonNull(chunkSectionList, "chunk-section list");
+        Objects.requireNonNull(blockEntities, "block entities");
+        Objects.requireNonNull(lightSerializationData, "light serialization data");
 
         heightMaps = Set.copyOf(heightMaps);
         blockEntities = Map.copyOf(blockEntities);
     }
 
+    /**
+     * Creates a {@linkplain ServerChunkAndLightDataPlayPacket chunk-and-light data play packet}
+     * for the specified {@linkplain JetChunk chunk}.
+     *
+     * @param chunkPosition the position of the chunk that the packet is being created for
+     * @param chunk the chunk that the packet is being created for
+     * @param registryManager a registry manager whose values are used by the chunk
+     * @return the chunk-and-light data play packet
+     * @since 1.0
+     */
     public static @NonNull ServerChunkAndLightDataPlayPacket create(
             @NonNull ChunkPosition chunkPosition, @NonNull JetChunk chunk,
             @NonNull JetRegistryManager registryManager
     ) {
         Map<ChunkRelativeBlockPosition, BlockEntity> blockEntities = new HashMap<>();
-        JetMinecraftRegistry<BlockEntityType> blockEntityTypeRegistry = registryManager.blockEntityTypeRegistry();
+
+        JetMinecraftRegistry<BlockType> blockTypeRegistry = registryManager.registry(RegistryReference.BLOCK);
+        JetMinecraftRegistry<BlockEntityType> blockEntityTypeRegistry = registryManager.registry(
+                RegistryReference.BLOCK_ENTITY_TYPE
+        );
 
         for (Map.Entry<ChunkRelativeBlockPosition, CompoundBinaryTag> entry : chunk.blockEntities().entrySet()) {
             ChunkRelativeBlockPosition position = entry.getKey();
@@ -79,10 +96,21 @@ public record ServerChunkAndLightDataPlayPacket(
                 ));
             }
 
-            JetRegistryEntry<JetBlockType> blockType = blockState.blockType();
-            JetRegistryEntry<BlockEntityType> blockEntityType = blockType.value().blockEntityType();
+            Holder.Reference<BlockType> blockType = blockState.blockType();
+            Key blockEntityTypeKey = null;
 
-            if (blockEntityType == null) {
+            // FIXME: Temporal solution, needs to be replaced with a proper block-entity system
+            for (
+                    JetMinecraftRegistry.RegistrationInfo<BlockEntityType> info
+                    : blockEntityTypeRegistry.registrationInfos()
+            ) {
+                List<Holder<BlockType>> validBlocks = info.value().validBlocks().contents(blockTypeRegistry);
+                if (!validBlocks.contains(blockType)) continue;
+                blockEntityTypeKey = info.key();
+                break;
+            }
+
+            if (blockEntityTypeKey == null) {
                 throw new IllegalArgumentException(String.format(
                         "Block type with key of %s cannot have a block entity",
                         blockType.key()
@@ -90,8 +118,8 @@ public record ServerChunkAndLightDataPlayPacket(
             }
 
             CompoundBinaryTag blockEntityData = entry.getValue();
-            int blockEntityTypeIdentifier = blockEntityTypeRegistry.identifierOf(blockEntityType);
-            blockEntities.put(position, new BlockEntity(blockEntityTypeIdentifier, blockEntityData));
+            int blockEntityTypeRegistryIndex = blockEntityTypeRegistry.indexOf(blockEntityTypeKey);
+            blockEntities.put(position, new BlockEntity(blockEntityTypeRegistryIndex, blockEntityData));
         }
 
         return new ServerChunkAndLightDataPlayPacket(
@@ -101,22 +129,22 @@ public record ServerChunkAndLightDataPlayPacket(
     }
 
     /**
-     * Represents a serialization-ready Minecraft block entity entry.
+     * A serialization-ready Minecraft block entity entry.
      *
-     * @param typeIdentifier an identifier of a block entity type of the block entity
+     * @param typeRegistryIndex a registry index of a block entity type of the block entity
      * @param data data of the block entity
      * @since 1.0
      */
-    public record BlockEntity(int typeIdentifier, @NonNull CompoundBinaryTag data) {
+    public record BlockEntity(int typeRegistryIndex, @NonNull CompoundBinaryTag data) {
         /**
          * Constructs the {@linkplain BlockEntity block entity}.
          *
-         * @param typeIdentifier an identifier of a block entity type of the block entity
+         * @param typeRegistryIndex a registry index of a block entity type of the block entity
          * @param data data of the block entity
          * @since 1.0
          */
         public BlockEntity {
-            NullabilityUtil.requireNonNull(data, "data");
+            Objects.requireNonNull(data, "data");
         }
     }
 }

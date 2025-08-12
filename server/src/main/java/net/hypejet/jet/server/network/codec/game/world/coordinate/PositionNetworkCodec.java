@@ -1,12 +1,12 @@
 package net.hypejet.jet.server.network.codec.game.world.coordinate;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.data.model.api.coordinate.Position;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
+import net.hypejet.jet.world.coordinate.Position;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents {@linkplain NetworkCodec a network codec}, which reads and writes {@linkplain Position a position}.
+ * A {@linkplain NetworkCodec network codec} of {@linkplain Position positions}.
  *
  * @since 1.0
  * @see Position

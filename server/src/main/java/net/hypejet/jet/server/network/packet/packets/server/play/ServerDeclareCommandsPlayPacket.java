@@ -1,13 +1,13 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
 import com.mojang.brigadier.arguments.ArgumentType;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -25,7 +25,7 @@ public record ServerDeclareCommandsPlayPacket(@NonNull RootNode rootNode) implem
      * @since 1.0
      */
     public ServerDeclareCommandsPlayPacket {
-        NullabilityUtil.requireNonNull(rootNode, "root node");
+        Objects.requireNonNull(rootNode, "root node");
     }
 
     /**
@@ -137,7 +137,7 @@ public record ServerDeclareCommandsPlayPacket(@NonNull RootNode rootNode) implem
         public LiteralNode(@Nullable Node redirect, boolean executable, @NonNull String name) {
 
             super(redirect, executable);
-            this.name = NullabilityUtil.requireNonNull(name, "name");
+            this.name = Objects.requireNonNull(name, "name");
         }
 
         /**
@@ -177,8 +177,8 @@ public record ServerDeclareCommandsPlayPacket(@NonNull RootNode rootNode) implem
         public ArgumentNode(@Nullable Node redirect, boolean executable, @NonNull String name,
                             @NonNull ArgumentType<?> argumentType, @Nullable SuggestionsType suggestionsType) {
             super(redirect, executable);
-            this.name = NullabilityUtil.requireNonNull(name, "name");
-            this.argumentType = NullabilityUtil.requireNonNull(argumentType, "argument type");
+            this.name = Objects.requireNonNull(name, "name");
+            this.argumentType = Objects.requireNonNull(argumentType, "argument type");
             this.suggestionsType = suggestionsType;
         }
 

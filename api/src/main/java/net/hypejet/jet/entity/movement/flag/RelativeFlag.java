@@ -1,10 +1,10 @@
 package net.hypejet.jet.entity.movement.flag;
 
-import net.hypejet.jet.data.model.api.coordinate.Position;
-import net.hypejet.jet.data.model.api.coordinate.Vector;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.world.coordinate.Position;
+import net.hypejet.jet.world.coordinate.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -121,7 +121,7 @@ public final class RelativeFlag {
      * @since 1.0
      */
     private RelativeFlag(@NonNull String name) {
-        this.name = NullabilityUtil.requireNonNull(name, "name");
+        this.name = Objects.requireNonNull(name, "name");
     }
 
     /* Methods #equals and #hashCode are not implemented, since this class is intended to be identity-compared only

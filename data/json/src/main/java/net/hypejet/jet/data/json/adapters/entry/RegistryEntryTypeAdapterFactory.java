@@ -29,10 +29,7 @@ public final class RegistryEntryTypeAdapterFactory implements TypeAdapterFactory
 
     @Override
     public <T> TypeAdapter create(Gson gson, TypeToken<T> type) {
-        Class<? super T> rawType = type.getRawType();
-        if (JsonRegistryEntry.FeaturePack.class.isAssignableFrom(rawType)) {
-            return FeaturePackTypeAdapter.INSTANCE;
-        } else if (JsonRegistryEntry.class.isAssignableFrom(rawType)) {
+        if (JsonRegistryEntry.class.isAssignableFrom(type.getRawType())) {
             if (!(type.getType() instanceof ParameterizedType parameterizedType))
                 throw new IllegalArgumentException("The type of registry entry must be a parameterized type");
 

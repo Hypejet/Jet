@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.codec.packet.client.common;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
-import net.hypejet.jet.server.network.codec.game.key.PackedKeyNetworkCodec;
+import net.hypejet.jet.server.network.codec.game.key.KeyNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.common.ClientPluginMessagePacket;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -28,7 +28,9 @@ public final class ClientPluginMessagePacketReader implements NetworkReader<Clie
 
     @Override
     public @NonNull ClientPluginMessagePacket read(@NonNull ByteBuf buf) {
-        return new ClientPluginMessagePacket(PackedKeyNetworkCodec.INSTANCE.read(buf),
-                NetworkUtil.readRemainingBytes(buf));
+        return new ClientPluginMessagePacket(
+                KeyNetworkCodec.INSTANCE.read(buf),
+                NetworkUtil.readRemainingBytes(buf)
+        );
     }
 }

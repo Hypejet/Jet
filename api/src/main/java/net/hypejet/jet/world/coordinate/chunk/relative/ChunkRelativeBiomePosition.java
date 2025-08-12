@@ -1,12 +1,14 @@
 package net.hypejet.jet.world.coordinate.chunk.relative;
 
+import net.hypejet.jet.world.biome.Biome;
+import net.hypejet.jet.world.chunk.Chunk;
+
 /**
- * Represents a position of {@linkplain net.hypejet.jet.data.model.api.registries.biome.Biome a biome}, which
- * is relative to a beginning of {@linkplain net.hypejet.jet.world.chunk.Chunk a chunk}.
+ * A {@linkplain Chunk chunk}-relative position of a {@linkplain Biome biome}.
  *
- * @param relativeX a chunk-relative {@code X} value that the position should have
- * @param absoluteY an absolute {@code Y} value that the position should have
- * @param relativeZ a chunk-relative {@code Z} value that the position should have
+ * @param relativeX a chunk-relative {@code X} axis value of the biome position
+ * @param absoluteY an absolute {@code Y} axis value of the biome position
+ * @param relativeZ a chunk-relative {@code Z} axis value of the biome position
  * @since 1.0
  * @see net.hypejet.jet.world.chunk.Chunk
  */

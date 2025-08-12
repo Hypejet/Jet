@@ -2,11 +2,11 @@ package net.hypejet.jet.server.util.acquisition;
 
 import net.hypejet.concurrency.Acquisition;
 import net.hypejet.concurrency.collection.CollectionAcquisition;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -33,8 +33,8 @@ public final class CollectionMappedAcquisition<OA extends Acquisition, CE, C ext
      * @since 1.0
      */
     public CollectionMappedAcquisition(@NonNull OA originalAcquisition, @NonNull Function<OA, C> mapper) {
-        this.originalAcquisition = NullabilityUtil.requireNonNull(originalAcquisition, "original acquisition");
-        this.mapper = NullabilityUtil.requireNonNull(mapper, "mapper");
+        this.originalAcquisition = Objects.requireNonNull(originalAcquisition, "original acquisition");
+        this.mapper = Objects.requireNonNull(mapper, "mapper");
     }
 
     @Override

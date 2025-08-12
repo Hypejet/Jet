@@ -1,11 +1,12 @@
 package net.hypejet.jet.server.util;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.util.codec.Writer;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.Objects;
 
 /**
  * Represents a utility for management of {@linkplain BinaryTag binary tags}.
@@ -30,9 +31,9 @@ public final class BinaryTagUtil {
     public static <O> void writeOptional(@NonNull String name, @Nullable O object,
                                          CompoundBinaryTag.@NonNull Builder builder,
                                          @NonNull Writer<O, ? extends BinaryTag> writer) {
-        NullabilityUtil.requireNonNull(name, "name");
-        NullabilityUtil.requireNonNull(builder, "builder");
-        NullabilityUtil.requireNonNull(writer, "writer");
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(builder, "builder");
+        Objects.requireNonNull(writer, "writer");
 
         if (object == null) return;
         BinaryTag binaryTag = writer.write(object);

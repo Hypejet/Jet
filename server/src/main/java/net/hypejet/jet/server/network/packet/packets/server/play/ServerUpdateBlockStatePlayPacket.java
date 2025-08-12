@@ -1,17 +1,19 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
+import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Objects;
+
 /**
- * Represents {@linkplain ServerPacket a server packet}, which updates
- * {@linkplain net.hypejet.jet.data.model.server.registry.registries.block.state.BlockState a block state}
- * at {@linkplain BlockPosition a block position} specified.
+ * A {@linkplain ServerPacket server packet} updating a {@linkplain JetBlockState block state}
+ * at the specified {@linkplain BlockPosition block position}.
  *
- * @param position the block position
- * @param blockStateIdentifier an identifier of a new block state which should be at the block position
+ * @param position the block position where the block state should be updated
+ * @param blockStateIdentifier an identifier of a new block state that should be
+ *                             present at the specified block position
  * @since 1.0
  */
 public record ServerUpdateBlockStatePlayPacket(@NonNull BlockPosition position, int blockStateIdentifier)
@@ -19,12 +21,12 @@ public record ServerUpdateBlockStatePlayPacket(@NonNull BlockPosition position, 
     /**
      * Constructs the {@linkplain ServerUpdateBlockStatePlayPacket server update block state play packet}.
      *
-     * @param position the block position
-     * @param blockStateIdentifier an identifier of a new block state which should be at the block position
+     * @param position the block position where the block state should be updated
+     * @param blockStateIdentifier an identifier of a new block state that should be
+     *                             present at the specified block position
      * @since 1.0
      */
     public ServerUpdateBlockStatePlayPacket {
-        NullabilityUtil.requireNonNull(position, "position");
-        NullabilityUtil.requireNonNull(blockStateIdentifier, "block state identifier");
+        Objects.requireNonNull(position, "position");
     }
 }

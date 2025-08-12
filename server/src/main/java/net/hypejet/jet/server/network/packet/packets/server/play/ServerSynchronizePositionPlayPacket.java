@@ -1,13 +1,13 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import net.hypejet.jet.data.model.api.coordinate.Position;
-import net.hypejet.jet.data.model.api.coordinate.Vector;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.movement.flag.RelativeFlag;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
+import net.hypejet.jet.world.coordinate.Position;
+import net.hypejet.jet.world.coordinate.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -35,8 +35,8 @@ public record ServerSynchronizePositionPlayPacket(
      * @since 1.0
      */
     public ServerSynchronizePositionPlayPacket {
-        NullabilityUtil.requireNonNull(position, "position");
-        NullabilityUtil.requireNonNull(deltaMovement, "delta movement");
-        relativeFlags = Set.copyOf(NullabilityUtil.requireNonNull(relativeFlags, "relative flags"));
+        Objects.requireNonNull(position, "position");
+        Objects.requireNonNull(deltaMovement, "delta movement");
+        relativeFlags = Set.copyOf(Objects.requireNonNull(relativeFlags, "relative flags"));
     }
 }

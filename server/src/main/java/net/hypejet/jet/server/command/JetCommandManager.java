@@ -16,7 +16,6 @@ import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.jet.command.CommandManager;
 import net.hypejet.jet.command.CommandSource;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.event.events.command.CommandExecuteEvent;
 import net.hypejet.jet.event.events.command.CommandExecutionFailureEvent;
 import net.hypejet.jet.event.events.command.CommandPreExecuteEvent;
@@ -43,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -70,7 +70,7 @@ public final class JetCommandManager implements CommandManager {
      * @since 1.0
      */
     public JetCommandManager(@NonNull JetMinecraftServer server) {
-        this.server = NullabilityUtil.requireNonNull(server, "server");
+        this.server = Objects.requireNonNull(server, "server");
         this.dispatcher = new NotNullObjectAcquirable<>(new CommandDispatcher<>());
     }
 

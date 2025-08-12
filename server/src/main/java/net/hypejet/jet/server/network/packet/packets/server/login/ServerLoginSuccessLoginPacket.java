@@ -1,12 +1,12 @@
 package net.hypejet.jet.server.network.packet.packets.server.login;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.session.login.profile.GameProfileProperty;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -32,8 +32,8 @@ public record ServerLoginSuccessLoginPacket(@NonNull UUID uniqueId, @NonNull Str
      * @since 1.0
      */
     public ServerLoginSuccessLoginPacket {
-        NullabilityUtil.requireNonNull(uniqueId, "unique id");
-        NullabilityUtil.requireNonNull(username, "username");
-        properties = List.copyOf(NullabilityUtil.requireNonNull(properties, "properties"));
+        Objects.requireNonNull(uniqueId, "unique id");
+        Objects.requireNonNull(username, "username");
+        properties = List.copyOf(Objects.requireNonNull(properties, "properties"));
     }
 }

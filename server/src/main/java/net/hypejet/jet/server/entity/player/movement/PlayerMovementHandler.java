@@ -3,17 +3,17 @@ package net.hypejet.jet.server.entity.player.movement;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquirable;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
 import net.hypejet.concurrency.object.nullable.WriteNullableObjectAcquisition;
-import net.hypejet.jet.data.model.api.coordinate.Position;
-import net.hypejet.jet.data.model.api.coordinate.Vector;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.movement.flag.RelativeFlag;
 import net.hypejet.jet.server.entity.movement.acquisition.InternalWriteMovementAcquisition;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientConfirmMovementSynchronizationPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket;
+import net.hypejet.jet.world.coordinate.Position;
+import net.hypejet.jet.world.coordinate.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.function.UnaryOperator;
 
 /**
@@ -37,19 +37,21 @@ public final class PlayerMovementHandler {
      * @since 1.0
      */
     public PlayerMovementHandler(@NonNull JetPlayer player) {
-        this.player = NullabilityUtil.requireNonNull(player, "player");
+        this.player = Objects.requireNonNull(player, "player");
     }
 
     /**
      * Sends a request to client to synchronize clientside {@linkplain Position position}
-     * and {@linkplain Vector vector} of a delta movement with a value specified.
+     * and delta-movement {@linkplain Vector vector} with the specified values.
      *
-     * @param position the value
+     * @param position the position value
+     * @param deltaMovement the delta-movement vector value
+     * @param flags flags of the position
      * @since 1.0
      */
     public void synchronize(@NonNull Position position, @NonNull Vector deltaMovement,
                             @NonNull Collection<RelativeFlag> flags) {
-        NullabilityUtil.requireNonNull(position, "position");
+        Objects.requireNonNull(position, "position");
         try (WriteNullableObjectAcquisition<Synchronization> acquisition = this.synchronization.acquireWrite()) {
             Synchronization previousSynchronization = acquisition.get();
             int identifier = previousSynchronization == null ? 0 : previousSynchronization.identifier() + 1;
@@ -70,7 +72,7 @@ public final class PlayerMovementHandler {
      * @since 1.0
      */
     public void handleConfirmation(@NonNull ClientConfirmMovementSynchronizationPlayPacket packet) {
-        NullabilityUtil.requireNonNull(packet, "packet");
+        Objects.requireNonNull(packet, "packet");
         try (
                 WriteNullableObjectAcquisition<Synchronization> acquisition = this.synchronization.acquireWrite();
                 InternalWriteMovementAcquisition positionAcquisition = this.player.acquireMovementWrite()
@@ -90,7 +92,7 @@ public final class PlayerMovementHandler {
      * @since 1.0
      */
     public void handleClientMovement(@NonNull UnaryOperator<Position> positionUnaryOperator) {
-        NullabilityUtil.requireNonNull(positionUnaryOperator, "position unary operator");
+        Objects.requireNonNull(positionUnaryOperator, "position unary operator");
         try (
                 NullableObjectAcquisition<Synchronization> acquisition = this.synchronization.acquireRead();
                 InternalWriteMovementAcquisition positionAcquisition = this.player.acquireMovementWrite()
@@ -121,7 +123,7 @@ public final class PlayerMovementHandler {
          * @since 1.0
          */
         private Synchronization {
-            NullabilityUtil.requireNonNull(position, "position");
+            Objects.requireNonNull(position, "position");
         }
     }
 }

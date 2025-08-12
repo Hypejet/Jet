@@ -8,6 +8,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.jspecify.annotations.NonNull;
@@ -60,7 +61,8 @@ public final class BlockStateRegistryExtractor implements RegistryExtractor<Json
                             properties,
                             blockState.isAir(),
                             !blockState.getFluidState().isEmpty(),
-                            blockState.blocksMotion()
+                            blockState.blocksMotion(),
+                            blockState.getBlock() instanceof LeavesBlock
                     ),
                     Set.of(),
                     null

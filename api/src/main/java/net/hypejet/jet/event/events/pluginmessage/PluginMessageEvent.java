@@ -1,10 +1,11 @@
 package net.hypejet.jet.event.events.pluginmessage;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.network.PlayerConnection;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents an event called when a client associated with {@linkplain PlayerConnection a player connection} sends
@@ -27,8 +28,8 @@ public record PluginMessageEvent(@NonNull PlayerConnection connection, @NonNull 
      * @since 1.0
      */
     public PluginMessageEvent {
-        NullabilityUtil.requireNonNull(connection, "connection");
-        NullabilityUtil.requireNonNull(key, "key");
-        NullabilityUtil.requireNonNull(data, "data");
+        Objects.requireNonNull(connection, "connection");
+        Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(data, "data");
     }
 }

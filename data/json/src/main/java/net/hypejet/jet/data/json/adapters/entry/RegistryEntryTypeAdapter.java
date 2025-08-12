@@ -7,6 +7,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import net.hypejet.jet.data.json.entry.JsonRegistryEntry;
+import net.hypejet.jet.data.json.model.feature.JsonKnownPack;
 import net.hypejet.jet.data.json.token.DataJsonTypes;
 import net.kyori.adventure.key.Key;
 import org.jspecify.annotations.NonNull;
@@ -61,10 +62,10 @@ final class RegistryEntryTypeAdapter<V> extends TypeAdapter<JsonRegistryEntry<V>
             this.gson.toJson(value.tags(), DataJsonTypes.KEY_SET, out);
         }
 
-        JsonRegistryEntry.FeaturePack knownPack = value.knownPack();
+        JsonKnownPack knownPack = value.knownPack();
         if (knownPack != null) {
             out.name(KNOWN_PACK_FIELD);
-            this.gson.toJson(knownPack, JsonRegistryEntry.FeaturePack.class, out);
+            this.gson.toJson(knownPack, JsonKnownPack.class, out);
         }
 
         out.endObject();
@@ -75,7 +76,7 @@ final class RegistryEntryTypeAdapter<V> extends TypeAdapter<JsonRegistryEntry<V>
         Key key = null;
         V value = null;
         Set<Key> tags = Set.of();
-        JsonRegistryEntry.FeaturePack knownPack = null;
+        JsonKnownPack knownPack = null;
 
         in.beginObject();
         while (in.peek() == JsonToken.NAME) {
@@ -84,7 +85,7 @@ final class RegistryEntryTypeAdapter<V> extends TypeAdapter<JsonRegistryEntry<V>
                 case KEY_FIELD -> key = this.gson.fromJson(in, Key.class);
                 case VALUE_FIELD -> value = this.gson.fromJson(in, this.valueClass);
                 case TAGS_FIELD -> tags = this.gson.fromJson(in, DataJsonTypes.KEY_SET);
-                case KNOWN_PACK_FIELD -> knownPack = this.gson.fromJson(in, JsonRegistryEntry.FeaturePack.class);
+                case KNOWN_PACK_FIELD -> knownPack = this.gson.fromJson(in, JsonKnownPack.class);
                 default -> throw new JsonParseException("Unknown field: " + name);
             }
         }

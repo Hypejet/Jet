@@ -1,10 +1,11 @@
 package net.hypejet.jet.server.network.packet.packets.server.common;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ServerPacket a server packet}, which stores a cookie on a client.
@@ -35,7 +36,7 @@ public record ServerStoreCookiePacket(@NonNull Key key, @NonNull UnmodifiableByt
      * @since 1.0
      */
     public ServerStoreCookiePacket {
-        NullabilityUtil.requireNonNull(key, "key");
-        NullabilityUtil.requireNonNull(data, "data");
+        Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(data, "data");
     }
 }

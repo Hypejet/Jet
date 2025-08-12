@@ -1,11 +1,11 @@
 package net.hypejet.jet.server.network.packet.packets.client.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
-import net.hypejet.jet.world.coordinate.PositionFlag;
+import net.hypejet.jet.world.coordinate.flag.PositionFlag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -25,6 +25,6 @@ public record ClientPositionFlagsPlayPacket(@NonNull Collection<PositionFlag> fl
      * @since 1.0
      */
     public ClientPositionFlagsPlayPacket {
-        flags = Set.copyOf(NullabilityUtil.requireNonNull(flags, "flags"));
+        flags = Set.copyOf(Objects.requireNonNull(flags, "flags"));
     }
 }

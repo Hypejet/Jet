@@ -4,13 +4,13 @@ import net.hypejet.concurrency.collection.CollectionAcquisition;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.object.notnull.WriteNotNullObjectAcquisition;
 import net.hypejet.jet.MinecraftServer;
-import net.hypejet.jet.data.model.api.coordinate.Position;
-import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
 import net.hypejet.jet.entity.Entity;
-import net.hypejet.jet.registry.RegistryEntry;
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.world.acquisition.worldmap.WorldMapAcquisition;
 import net.hypejet.jet.world.acquisition.worldmap.WriteWorldMapAcquisition;
+import net.hypejet.jet.world.coordinate.Position;
 import net.hypejet.jet.world.data.WorldData;
+import net.hypejet.jet.world.dimension.DimensionType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -20,12 +20,13 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public interface World {
     /**
-     * Gets {@linkplain RegistryEntry a registry entry} of {@link DimensionType a dimension type} that this world uses.
+     * Gets a {@linkplain Holder.Reference holder referencing to}
+     * a {@link DimensionType dimension type} that this world uses.
      *
-     * @return the registry entry
+     * @return the holder reference
      * @since 1.0
      */
-    @NonNull RegistryEntry<DimensionType> dimensionType();
+    Holder.@NonNull Reference<DimensionType> dimensionType();
 
     /**
      * Gets an additional {@linkplain WorldData world data} of this world.

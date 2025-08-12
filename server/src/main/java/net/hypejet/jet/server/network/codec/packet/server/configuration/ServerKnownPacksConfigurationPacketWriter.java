@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.codec.packet.server.configuration;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
-import net.hypejet.jet.server.network.codec.game.pack.PackInfoNetworkCodec;
+import net.hypejet.jet.server.network.codec.game.registry.feature.KnownPackNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerKnownPacksConfigurationPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -30,6 +30,6 @@ public final class ServerKnownPacksConfigurationPacketWriter
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull ServerKnownPacksConfigurationPacket object) {
-        PackInfoNetworkCodec.COLLECTION_CODEC.write(buf, object.featurePacks());
+        KnownPackNetworkCodec.COLLECTION_CODEC.write(buf, object.knownPacks());
     }
 }

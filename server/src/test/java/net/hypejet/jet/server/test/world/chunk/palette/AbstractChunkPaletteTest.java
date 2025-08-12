@@ -1,7 +1,6 @@
 package net.hypejet.jet.server.test.world.chunk.palette;
 
 import net.hypejet.jet.server.util.math.MathUtil;
-import net.hypejet.jet.server.util.order.ElementOrder;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.DirectChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.IndirectChunkPalette;
@@ -18,7 +17,7 @@ import java.util.List;
 import java.util.function.ToIntFunction;
 
 /**
- * Represents a test of {@linkplain AbstractChunkPalette an abstract chunk palette}.
+ * A test of an {@linkplain AbstractChunkPalette abstract chunk palette}.
  *
  * @since 1.0
  * @see AbstractChunkPalette
@@ -48,11 +47,10 @@ public final class AbstractChunkPaletteTest {
     public void testSingleValuedToIndirectUpdate() {
         for (ChunkPaletteType type : ChunkPaletteType.values()) {
             List<String> elementList = createElementList(2);
-            ElementOrder<String> elementOrder = new ElementOrder<>(elementList);
 
             SingleValuedChunkPalette<String> singleValuedPalette = new SingleValuedChunkPalette<>(
                     type, elementList.getFirst(),
-                    elementOrder
+                    new ListIndexSpecification<>(elementList)
             );
 
             Assertions.assertInstanceOf(
@@ -75,15 +73,19 @@ public final class AbstractChunkPaletteTest {
             if (elementListSize <= 1) elementListSize++;
 
             List<String> elementList = createElementList(elementListSize);
-            ElementOrder<String> elementOrder = new ElementOrder<>(elementList);
-
             List<String> indirectElements = new ArrayList<>(elementCount);
+
             for (int index = 0; index < elementCount; index++) {
                 String element = elementList.get(index % 2);
                 indirectElements.add(index, element);
             }
 
-            AbstractChunkPalette<String> palette = AbstractChunkPalette.create(type, elementOrder, indirectElements);
+            AbstractChunkPalette<String> palette = AbstractChunkPalette.create(
+                    type,
+                    new ListIndexSpecification<>(elementList),
+                    indirectElements
+            );
+
             Assertions.assertInstanceOf(IndirectChunkPalette.class, palette);
 
             List<ChunkPaletteUpdate<String>> updates = new ArrayList<>();
@@ -114,9 +116,7 @@ public final class AbstractChunkPaletteTest {
             if (elementListSize <= 1) elementListSize++;
 
             int elementCount = type.elementCount();
-
             List<String> elementList = createElementList(elementListSize);
-            ElementOrder<String> elementOrder = new ElementOrder<>(elementList);
 
             List<String> directElements = new ArrayList<>(elementCount);
             for (int index = 0; index < elementCount; index++) {
@@ -124,15 +124,20 @@ public final class AbstractChunkPaletteTest {
                 directElements.add(index, element);
             }
 
-            AbstractChunkPalette<String> palette = AbstractChunkPalette.create(type, elementOrder, directElements);
-            Assertions.assertInstanceOf(DirectChunkPalette.class, palette);
+            AbstractChunkPalette<String> palette = AbstractChunkPalette.create(
+                    type,
+                    new ListIndexSpecification<>(elementList),
+                    directElements
+            );
 
-            List<ChunkPaletteUpdate<String>> updates = new ArrayList<>();
+            Assertions.assertInstanceOf(DirectChunkPalette.class, palette);
 
             int maximumIndirectElements = MathUtil.power(2, type.maximumIndirectBits()) - 1;
             if (maximumIndirectElements <= 1) maximumIndirectElements++;
 
             byte axisLength = type.axisLength();
+            List<ChunkPaletteUpdate<String>> updates = new ArrayList<>();
+
             for (byte x = 0; x < axisLength; x++) {
                 for (byte y = 0; y < axisLength; y++) {
                     for (byte z = 0; z < axisLength; z++) {
@@ -158,7 +163,6 @@ public final class AbstractChunkPaletteTest {
     public void testIndirectToSingleValuedUpdate() {
         for (ChunkPaletteType type : ChunkPaletteType.values()) {
             List<String> elementList = createElementList(2);
-            ElementOrder<String> elementOrder = new ElementOrder<>(elementList);
 
             int elementCount = type.elementCount();
             List<String> elements = new ArrayList<>(elementCount);
@@ -166,7 +170,12 @@ public final class AbstractChunkPaletteTest {
             for (int index = 0; index < elementCount; index++)
                 elements.add(index, elementList.get(index % 2));
 
-            AbstractChunkPalette<String> palette = AbstractChunkPalette.create(type, elementOrder, elements);
+            AbstractChunkPalette<String> palette = AbstractChunkPalette.create(
+                    type,
+                    new ListIndexSpecification<>(elementList),
+                    elements
+            );
+
             Assertions.assertInstanceOf(IndirectChunkPalette.class, palette);
 
             List<ChunkPaletteUpdate<String>> updates = new ArrayList<>();
@@ -208,7 +217,7 @@ public final class AbstractChunkPaletteTest {
 
             Assertions.assertInstanceOf(
                     expectedType,
-                    AbstractChunkPalette.create(type, new ElementOrder<>(elementList), elements)
+                    AbstractChunkPalette.create(type, new ListIndexSpecification<>(elementList), elements)
             );
         }
     }

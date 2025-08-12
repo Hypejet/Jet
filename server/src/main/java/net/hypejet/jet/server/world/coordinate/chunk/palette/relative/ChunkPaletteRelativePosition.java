@@ -1,12 +1,13 @@
 package net.hypejet.jet.server.world.coordinate.chunk.palette.relative;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents a coordinate relative to {@linkplain AbstractChunkPalette a chunk palette}.
@@ -29,7 +30,7 @@ public record ChunkPaletteRelativePosition(byte x, byte y, byte z, @NonNull Chun
      * @since 1.0
      */
     public ChunkPaletteRelativePosition {
-        NullabilityUtil.requireNonNull(paletteType, "palette type");
+        Objects.requireNonNull(paletteType, "palette type");
         paletteType.validateCoordinateValue(x);
         paletteType.validateCoordinateValue(y);
         paletteType.validateCoordinateValue(z);

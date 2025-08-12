@@ -1,9 +1,10 @@
 package net.hypejet.jet.event.events.brand;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.network.PlayerConnection;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents an event called when a brand name is changed for a client associated
@@ -23,7 +24,7 @@ public record ChangeClientBrandEvent(@NonNull PlayerConnection connection, @NonN
      * @since 1.0
      */
     public ChangeClientBrandEvent {
-        NullabilityUtil.requireNonNull(connection, "connection");
-        NullabilityUtil.requireNonNull(clientBrand, "client brand");
+        Objects.requireNonNull(connection, "connection");
+        Objects.requireNonNull(clientBrand, "client brand");
     }
 }

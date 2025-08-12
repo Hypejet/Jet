@@ -1,7 +1,6 @@
 package net.hypejet.jet.server.network.codec.aggregate.collection;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.aggregate.AggregateNetworkReader;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -9,6 +8,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents {@linkplain AggregateNetworkReader an aggregate network reader}, which reads
@@ -32,7 +32,7 @@ public final class CollectionNetworkReader<E> extends AggregateNetworkReader<Col
      */
     public CollectionNetworkReader(@NonNull NetworkReader<E> elementReader) {
         super(Integer.MAX_VALUE);
-        this.elementReader = NullabilityUtil.requireNonNull(elementReader, "element reader");
+        this.elementReader = Objects.requireNonNull(elementReader, "element reader");
     }
 
     /**
@@ -44,7 +44,7 @@ public final class CollectionNetworkReader<E> extends AggregateNetworkReader<Col
      */
     public CollectionNetworkReader(int maxLength, @NonNull NetworkReader<E> elementReader) {
         super(maxLength);
-        this.elementReader = NullabilityUtil.requireNonNull(elementReader, "element reader");
+        this.elementReader = Objects.requireNonNull(elementReader, "element reader");
     }
 
     @Override

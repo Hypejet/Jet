@@ -1,8 +1,9 @@
 package net.hypejet.jet.server.util.game.signing;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents an argument of a Minecraft command, which was signed by a client.
@@ -31,7 +32,7 @@ public record SignedArgument(@NonNull String name, @NonNull UnmodifiableByteArra
      * @since 1.0
      */
     public SignedArgument {
-        NullabilityUtil.requireNonNull(name, "name");
-        NullabilityUtil.requireNonNull(signature, "signature");
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(signature, "signature");
     }
 }

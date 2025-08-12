@@ -1,9 +1,10 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.scoreboard.score.Score;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ServerPacket a server packet} updating data of some {@linkplain Score score}
@@ -26,8 +27,8 @@ public record ServerUpdateScorePlayPacket(@NonNull String entityName, @NonNull S
      * @since 1.0
      */
     public ServerUpdateScorePlayPacket {
-        NullabilityUtil.requireNonNull(entityName, "entity name");
-        NullabilityUtil.requireNonNull(objectiveName, "objective name");
-        NullabilityUtil.requireNonNull(score, "score");
+        Objects.requireNonNull(entityName, "entity name");
+        Objects.requireNonNull(objectiveName, "objective name");
+        Objects.requireNonNull(score, "score");
     }
 }

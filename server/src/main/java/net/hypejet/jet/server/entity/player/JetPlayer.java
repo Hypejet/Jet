@@ -8,15 +8,12 @@ import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquirable;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
-import net.hypejet.jet.data.model.api.coordinate.Position;
-import net.hypejet.jet.data.model.api.coordinate.Vector;
-import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.acquisition.gamemode.GameModeAcquisition;
 import net.hypejet.jet.entity.acquisition.gamemode.WriteGameModeAcquisition;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.settings.ChangeSettingsEvent;
 import net.hypejet.jet.event.events.world.InitialSpawnEvent;
+import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
@@ -40,14 +37,13 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerSystemMes
 import net.hypejet.jet.server.network.session.data.ConfigurationData;
 import net.hypejet.jet.server.network.session.data.LoginData;
 import net.hypejet.jet.server.network.session.pack.ResourcePackHandler;
-import net.hypejet.jet.server.registry.JetMinecraftRegistry;
-import net.hypejet.jet.server.registry.JetRegistryEntry;
-import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.scoreboard.JetScoreboard;
 import net.hypejet.jet.server.util.game.audience.PacketReceivingCommonAudience;
 import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.handler.ChunkBatchHandler;
+import net.hypejet.jet.world.coordinate.Position;
+import net.hypejet.jet.world.coordinate.Vector;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.key.Key;
@@ -109,19 +105,19 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
                       @Nullable GameMode previousGameMode, @NonNull GameMode gameMode, @NonNull Settings settings,
                       @NonNull String clientBrand, @NonNull JetScoreboard initialScoreboard) {
         super(ENTITY_TYPE, uniqueId, Pointers.builder()
-                .withStatic(Identity.UUID, NullabilityUtil.requireNonNull(uniqueId, "unique identifier"))
-                .withStatic(Identity.NAME, NullabilityUtil.requireNonNull(username, "username"))
+                .withStatic(Identity.UUID, Objects.requireNonNull(uniqueId, "unique identifier"))
+                .withStatic(Identity.NAME, Objects.requireNonNull(username, "username"))
                 .build(), position, world);
 
-        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
+        this.connection = Objects.requireNonNull(connection, "connection");
 
-        this.settings = new NotNullObjectAcquirable<>(NullabilityUtil.requireNonNull(settings, "settings"));
-        this.clientBrand = new NotNullObjectAcquirable<>(NullabilityUtil.requireNonNull(clientBrand, "client brand"));
+        this.settings = new NotNullObjectAcquirable<>(Objects.requireNonNull(settings, "settings"));
+        this.clientBrand = new NotNullObjectAcquirable<>(Objects.requireNonNull(clientBrand, "client brand"));
 
         this.gameMode = new GameModeAcquirable(this, gameMode, previousGameMode);
         this.respawnScreenEnabled = new BooleanAcquirable(enableRespawnScreen);
 
-        this.scoreboard = NullabilityUtil.requireNonNull(initialScoreboard, "initial scoreboard");
+        this.scoreboard = Objects.requireNonNull(initialScoreboard, "initial scoreboard");
         connection.initializePlayer(this);
 
         this.sendJoinGamePacket(world);
@@ -168,8 +164,8 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
 
     @Override
     public void sendPluginMessage(@NonNull Key identifier, byte @NonNull [] data) {
-        NullabilityUtil.requireNonNull(identifier, "identifier");
-        NullabilityUtil.requireNonNull(data, "data");
+        Objects.requireNonNull(identifier, "identifier");
+        Objects.requireNonNull(data, "data");
 
         try (NotNullObjectAcquisition<ProtocolState> acquisition = this.connection.protocolState()) {
             if (!ServerPacketRegistry.isSupported(acquisition.get(), ServerPluginMessagePacket.class))
@@ -210,7 +206,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
 
     @Override
     public @NonNull JetScoreboard setScoreboard(@NonNull Scoreboard scoreboard) {
-        NullabilityUtil.requireNonNull(scoreboard, "scoreboard");
+        Objects.requireNonNull(scoreboard, "scoreboard");
         if (!(scoreboard instanceof JetScoreboard validatedScoreboard))
             throw new IllegalArgumentException("The scoreboard specified is not a valid scoreboard");
 
@@ -303,7 +299,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
      * @since 1.0
      */
     public void setClientBrand(@NonNull String clientBrand) {
-        NullabilityUtil.requireNonNull(clientBrand, "client brand");
+        Objects.requireNonNull(clientBrand, "client brand");
         try (WriteNotNullObjectAcquisition<String> acquisition = this.clientBrand.acquireWrite()) {
             acquisition.set(clientBrand);
         }
@@ -358,8 +354,8 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
      */
     public static @NonNull JetPlayer create(@NonNull SocketPlayerConnection connection,
                                             @NonNull ConfigurationData configurationData) {
-        NullabilityUtil.requireNonNull(connection, "connection");
-        NullabilityUtil.requireNonNull(configurationData, "configuration data");
+        Objects.requireNonNull(connection, "connection");
+        Objects.requireNonNull(configurationData, "configuration data");
 
         LoginData loginData = configurationData.loginData();
 
@@ -415,15 +411,11 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
         if (gameMode == null)
             throw new IllegalArgumentException("The game mode has not been set");
 
-        JetMinecraftServer server = this.server();
-        JetRegistryManager registryManager = server.registryManager();
-
-        JetMinecraftRegistry<DimensionType> dimensionTypeRegistry = registryManager.dimensionTypeRegistry();
-        JetRegistryEntry<DimensionType> dimensionType = world.dimensionType();
-
+        Key dimensionTypeKey = world.dimensionType().key();
         return new PlayerSpawnInfo(
-                dimensionTypeRegistry.identifierOf(dimensionType), dimensionType.key(), world.worldData(),
-                gameMode, previousGameMode, lastDeathLocation, 0 /* TODO: Portal cooldowns */
+                this.server().registryManager().registry(RegistryReference.DIMENSION_TYPE).indexOf(dimensionTypeKey),
+                dimensionTypeKey, world.worldData(), gameMode, previousGameMode, lastDeathLocation,
+                0 // TODO: Portal cooldowns
         );
     }
 }

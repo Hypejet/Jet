@@ -1,19 +1,21 @@
 package net.hypejet.jet.server.network.codec.game.link;
 
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.data.codecs.util.mapper.Mapper;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.component.ComponentNetworkWriter;
-import net.hypejet.jet.server.network.codec.mapper.MapperNetworkCodec;
+import net.hypejet.jet.server.network.codec.index.IndexNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
+import net.hypejet.jet.server.util.index.IndexUtil;
 import net.hypejet.jet.util.game.link.ServerLink;
 import net.hypejet.jet.util.game.link.label.BuiltinLabel;
 import net.hypejet.jet.util.game.link.label.ComponentLabel;
 import net.hypejet.jet.util.game.link.label.ServerLinkLabel;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Map;
 
 /**
  * Represents {@linkplain NetworkWriter a network writer}, which writes {@linkplain ServerLink a server link}.
@@ -24,19 +26,19 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class ServerLinkNetworkWriter implements NetworkWriter<ServerLink> {
 
-    private static final MapperNetworkCodec<BuiltinLabel, Integer> BUILT_IN_LABEL_CODEC = new MapperNetworkCodec<>(
-            Mapper.builder(BuiltinLabel.class, int.class)
-                    .register(BuiltinLabel.BUG_REPORT, 0)
-                    .register(BuiltinLabel.COMMUNITY_GUIDELINES, 1)
-                    .register(BuiltinLabel.SUPPORT, 2)
-                    .register(BuiltinLabel.STATUS, 3)
-                    .register(BuiltinLabel.FEEDBACK, 4)
-                    .register(BuiltinLabel.COMMUNITY, 5)
-                    .register(BuiltinLabel.WEBSITE, 6)
-                    .register(BuiltinLabel.FORUMS, 7)
-                    .register(BuiltinLabel.NEWS, 8)
-                    .register(BuiltinLabel.ANNOUNCEMENTS, 9)
-                    .build(),
+    private static final IndexNetworkCodec<BuiltinLabel, Integer> BUILT_IN_LABEL_CODEC = new IndexNetworkCodec<>(
+            IndexUtil.fromMap(Map.of(
+                    0, BuiltinLabel.BUG_REPORT,
+                    1, BuiltinLabel.COMMUNITY_GUIDELINES,
+                    2, BuiltinLabel.SUPPORT,
+                    3, BuiltinLabel.STATUS,
+                    4, BuiltinLabel.FEEDBACK,
+                    5, BuiltinLabel.COMMUNITY,
+                    6, BuiltinLabel.WEBSITE,
+                    7, BuiltinLabel.FORUMS,
+                    8, BuiltinLabel.NEWS,
+                    9, BuiltinLabel.ANNOUNCEMENTS
+            )),
             VarIntNetworkCodec.INSTANCE
     );
 

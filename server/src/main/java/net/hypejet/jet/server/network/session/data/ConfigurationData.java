@@ -1,12 +1,13 @@
 package net.hypejet.jet.server.network.session.data;
 
-import net.hypejet.jet.data.model.api.coordinate.Position;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.server.scoreboard.JetScoreboard;
 import net.hypejet.jet.server.world.JetWorld;
+import net.hypejet.jet.world.coordinate.Position;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.Objects;
 
 /**
  * Represents a data specified
@@ -46,12 +47,12 @@ public record ConfigurationData(@NonNull LoginData loginData, @NonNull JetWorld 
      * @since 1.0
      */
     public ConfigurationData {
-        NullabilityUtil.requireNonNull(loginData, "login data");
-        NullabilityUtil.requireNonNull(world, "spawning world");
-        NullabilityUtil.requireNonNull(position, "spawning position");
-        NullabilityUtil.requireNonNull(gameMode, "game mode");
-        NullabilityUtil.requireNonNull(settings, "settings");
-        NullabilityUtil.requireNonNull(clientBrand, "client brand");
-        NullabilityUtil.requireNonNull(initialScoreboard, "initial scoreboard");
+        Objects.requireNonNull(loginData, "login data");
+        Objects.requireNonNull(world, "spawning world");
+        Objects.requireNonNull(position, "spawning position");
+        Objects.requireNonNull(gameMode, "game mode");
+        Objects.requireNonNull(settings, "settings");
+        Objects.requireNonNull(clientBrand, "client brand");
+        Objects.requireNonNull(initialScoreboard, "initial scoreboard");
     }
 }

@@ -1,11 +1,12 @@
 package net.hypejet.jet.server.entity.acquisition.respawn;
 
 import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerWorldEventPlayPacket;
-import net.hypejet.jet.world.event.events.EnableRespawnScreenWorldEvent;
+import net.hypejet.jet.world.event.world.events.EnableRespawnScreenWorldEvent;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain WriteBooleanAcquisition a write boolean acquisition}, whose value defines whether respawn
@@ -29,8 +30,8 @@ public final class WriteRespawnScreenEnabledAcquisition implements WriteBooleanA
      */
     public WriteRespawnScreenEnabledAcquisition(@NotNull JetPlayer player,
                                                 @NotNull WriteBooleanAcquisition acquisition) {
-        this.player = NullabilityUtil.requireNonNull(player, "player");
-        this.acquisition = NullabilityUtil.requireNonNull(acquisition, "acquisition");
+        this.player = Objects.requireNonNull(player, "player");
+        this.acquisition = Objects.requireNonNull(acquisition, "acquisition");
     }
 
     @Override

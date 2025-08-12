@@ -1,6 +1,5 @@
 package net.hypejet.jet.server.plugin;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.plugin.Plugin;
 import net.hypejet.jet.plugin.dependency.PluginDependency;
 import net.hypejet.jet.server.plugin.metadata.PluginMetadata;
@@ -33,9 +32,9 @@ public final class JetPlugin implements Plugin {
      * @since 1.0
      */
     public JetPlugin(@NonNull PluginMetadata metadata, @NonNull Object instance, @NonNull URLClassLoader classLoader) {
-        this.metadata = NullabilityUtil.requireNonNull(metadata, "metadata");
-        this.instance = NullabilityUtil.requireNonNull(instance, "instance");
-        this.classLoader = NullabilityUtil.requireNonNull(classLoader, "class loader");
+        this.metadata = Objects.requireNonNull(metadata, "metadata");
+        this.instance = Objects.requireNonNull(instance, "instance");
+        this.classLoader = Objects.requireNonNull(classLoader, "class loader");
     }
 
     @Override

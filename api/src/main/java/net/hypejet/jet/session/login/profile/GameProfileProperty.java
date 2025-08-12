@@ -1,8 +1,9 @@
 package net.hypejet.jet.session.login.profile;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.Objects;
 
 /**
  * Represents a property of a Minecraft game profile.
@@ -33,7 +34,7 @@ public record GameProfileProperty(@NonNull String name, @NonNull String value, @
      * @since 1.0
      */
     public GameProfileProperty {
-        NullabilityUtil.requireNonNull(name, "name");
-        NullabilityUtil.requireNonNull(value, "value");
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(value, "value");
     }
 }

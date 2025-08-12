@@ -1,16 +1,15 @@
 package net.hypejet.jet.world.coordinate;
 
-import net.hypejet.jet.data.model.api.coordinate.Coordinate;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Objects;
 
 /**
- * Represents an implementation of {@linkplain Coordinate a coordinate} representing a position of a Minecraft block.
+ * A {@linkplain Coordinate coordinate} representing position of a Minecraft block.
  *
- * @param blockX an {@code X} value of the position
- * @param blockY an {@code Y} value of the position
- * @param blockZ an {@code Z} value of the position
+ * @param blockX an {@code X} axis value of the block position
+ * @param blockY an {@code Y} axis value of the block position
+ * @param blockZ an {@code Z} axis value of the block position
  * @since 1.0
  * @see Coordinate
  */

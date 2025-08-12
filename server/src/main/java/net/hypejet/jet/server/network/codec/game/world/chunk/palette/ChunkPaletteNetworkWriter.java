@@ -38,9 +38,9 @@ public final class ChunkPaletteNetworkWriter implements NetworkWriter<AbstractCh
             case IndirectChunkPalette<?> palette ->
                     VarIntArrayNetworkWriter.INSTANCE.write(buf, palette.registryIndices());
             case SingleValuedChunkPalette<?> palette ->
-                    VarIntNetworkCodec.INSTANCE.write(buf, palette.elementIdentifier());
+                    VarIntNetworkCodec.INSTANCE.write(buf, palette.elementRegistryIndex());
         }
 
-        LongArrayNetworkWriter.INSTANCE.write(buf, object.data());
+        LongArrayNetworkWriter.FIXED_INSTANCE.write(buf, object.data());
     }
 }

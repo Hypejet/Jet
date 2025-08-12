@@ -1,12 +1,12 @@
 package net.hypejet.jet.server.network.packet.packets.server.common;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.util.game.link.ServerLink;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ServerPacket a server packet}, which changes server links displayed on a client in a pause
@@ -25,6 +25,6 @@ public record ServerCustomLinksPacket(@NonNull Collection<ServerLink> serverLink
      * @since 1.0
      */
     public ServerCustomLinksPacket {
-        serverLinks = List.copyOf(NullabilityUtil.requireNonNull(serverLinks, "server links"));
+        serverLinks = List.copyOf(Objects.requireNonNull(serverLinks, "server links"));
     }
 }

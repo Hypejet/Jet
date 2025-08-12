@@ -1,8 +1,9 @@
 package net.hypejet.jet.server.network.packet;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents a serialized Minecraft packet.
@@ -31,6 +32,6 @@ public record RawPacket(int identifier, @NonNull UnmodifiableByteArray body) {
      * @since 1.0
      */
     public RawPacket {
-        NullabilityUtil.requireNonNull(body, "body");
+        Objects.requireNonNull(body, "body");
     }
 }

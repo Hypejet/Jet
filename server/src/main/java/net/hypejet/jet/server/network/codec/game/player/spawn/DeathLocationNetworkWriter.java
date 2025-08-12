@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.codec.game.player.spawn;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.entity.player.spawn.DeathLocation;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
-import net.hypejet.jet.server.network.codec.game.key.PackedKeyNetworkCodec;
+import net.hypejet.jet.server.network.codec.game.key.KeyNetworkCodec;
 import net.hypejet.jet.server.network.codec.game.world.coordinate.BlockPositionNetworkCodec;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -26,7 +26,7 @@ public final class DeathLocationNetworkWriter implements NetworkWriter<DeathLoca
 
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull DeathLocation object) {
-        PackedKeyNetworkCodec.INSTANCE.write(buf, object.deathDimensionTypeKey());
+        KeyNetworkCodec.INSTANCE.write(buf, object.deathDimensionTypeKey());
         BlockPositionNetworkCodec.INSTANCE.write(buf, object.deathPosition());
     }
 }

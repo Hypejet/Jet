@@ -2,7 +2,6 @@ package net.hypejet.jet.server.world.chunk.light.storage;
 
 import it.unimi.dsi.fastutil.bytes.Byte2ShortMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ShortOpenHashMap;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.world.chunk.light.update.LightStorageUpdate;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
@@ -14,6 +13,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Represents an abstract implementation of {@linkplain LightStorage a light storage}.
@@ -50,7 +50,7 @@ public sealed abstract class AbstractLightStorage implements LightStorage
      */
     @Contract(pure = true)
     public final @NonNull AbstractLightStorage withUpdates(@NonNull Collection<LightStorageUpdate> updates) {
-        NullabilityUtil.requireNonNull(updates, "updates");
+        Objects.requireNonNull(updates, "updates");
         if (updates.isEmpty()) return this;
 
         NibbleArray.Builder arrayBuilder = this.data().toBuilder();
@@ -113,7 +113,7 @@ public sealed abstract class AbstractLightStorage implements LightStorage
      * @since 1.0
      */
     public static @NonNull AbstractLightStorage create(@NonNull NibbleArray array) {
-        NullabilityUtil.requireNonNull(array, "array");
+        Objects.requireNonNull(array, "array");
         long length = array.length();
 
         if (length != DATA_VALUE_COUNT) {

@@ -2,10 +2,7 @@ package net.hypejet.jet.server.world.chunk;
 
 import com.google.common.collect.Maps;
 import it.unimi.dsi.fastutil.objects.Object2ByteMap;
-import net.hypejet.jet.data.model.api.registries.biome.Biome;
-import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.registry.RegistryEntry;
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.heightmap.HeightMap;
 import net.hypejet.jet.server.world.chunk.heightmap.HeightMapType;
@@ -15,10 +12,12 @@ import net.hypejet.jet.server.world.chunk.light.LightSerializationData;
 import net.hypejet.jet.server.world.chunk.section.ChunkSectionList;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
+import net.hypejet.jet.world.biome.Biome;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.chunk.Chunk;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
+import net.hypejet.jet.world.dimension.DimensionType;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -58,11 +57,11 @@ public final class JetChunk implements Chunk {
     private JetChunk(@NonNull ChunkSectionList chunkSectionList,
                      @NonNull LightSectionList lightSectionList, @NonNull Set<HeightMap> heightMaps,
                      @NonNull Map<ChunkRelativeBlockPosition, CompoundBinaryTag> blockEntities) {
-        this.chunkSectionList = NullabilityUtil.requireNonNull(chunkSectionList, "chunk section list");
-        this.lightSectionList = NullabilityUtil.requireNonNull(lightSectionList, "light section list");
+        this.chunkSectionList = Objects.requireNonNull(chunkSectionList, "chunk section list");
+        this.lightSectionList = Objects.requireNonNull(lightSectionList, "light section list");
 
-        NullabilityUtil.requireNonNull(heightMaps, "height maps");
-        NullabilityUtil.requireNonNull(blockEntities, "block entities");
+        Objects.requireNonNull(heightMaps, "height maps");
+        Objects.requireNonNull(blockEntities, "block entities");
 
         EnumMap<HeightMapType, HeightMap> heightMapsMap = new EnumMap<>(HeightMapType.class);
         for (HeightMap heightMap : heightMaps)
@@ -137,8 +136,8 @@ public final class JetChunk implements Chunk {
      *                          that should be present there
      * @param blockEntityUpdates a map which maps chunk-relative block positions to new block entities that blocks
      *                           at these block positions should have
-     * @param biomeUpdates a map which maps chunk-relative biome positions to registry entries of new biomes
-     *                     that should be present there
+     * @param biomeUpdates a map which maps chunk-relative biome positions to holders referencing
+     *                     to new biomes that should be present there
      * @param skyLightUpdates a map which maps chunk-relative block positions to new skylight level values that blocks
      *                        at these block positions should have
      * @param blockLightUpdates a map which maps chunk-relative block positions to new block-light level values
@@ -149,7 +148,7 @@ public final class JetChunk implements Chunk {
     public @NonNull JetChunk withUpdates(
             @NonNull Map<ChunkRelativeBlockPosition, JetBlockState> blockStateUpdates,
             @NonNull Map<ChunkRelativeBlockPosition, CompoundBinaryTag> blockEntityUpdates,
-            @NonNull Map<ChunkRelativeBiomePosition, RegistryEntry<Biome>> biomeUpdates,
+            @NonNull Map<ChunkRelativeBiomePosition, Holder.Reference<Biome>> biomeUpdates,
             @NonNull Object2ByteMap<ChunkRelativeBlockPosition> skyLightUpdates,
             @NonNull Object2ByteMap<ChunkRelativeBlockPosition> blockLightUpdates
     ) {
@@ -186,15 +185,15 @@ public final class JetChunk implements Chunk {
     }
 
     /**
-     * Gets {@linkplain RegistryEntry a registry entry} of {@linkplain Biome a biome} which is in this
+     * Gets a {@linkplain Holder.Reference holder referencing to} a {@linkplain Biome biome} which is in this
      * {@linkplain JetChunk chunk} at {@linkplain ChunkRelativeBiomePosition a chunk-relative biome position}
      * specified.
      *
      * @param position the chunk-relative biome position
-     * @return the registry entry
+     * @return the holder
      * @since 1.0
      */
-    public @NonNull RegistryEntry<Biome> biome(@NonNull ChunkRelativeBiomePosition position) {
+    public Holder.@NonNull Reference<Biome> biome(@NonNull ChunkRelativeBiomePosition position) {
         JetChunkSection chunkSection = this.chunkSectionList.sectionFor(position);
         ChunkPaletteRelativePosition palettePosition = ChunkPaletteRelativePosition.from(position);
         return chunkSection.biomePalette().getElement(palettePosition);
@@ -279,7 +278,7 @@ public final class JetChunk implements Chunk {
     /**
      * Creates {@linkplain JetChunk a chunk}.
      *
-     * @param dimensionType a registry entry of a dimension type of worlds that the chunk is created for
+     * @param dimensionType a dimension type of worlds that the chunk is created for
      * @param chunkSections a list of chunk sections that the chunk should have, where the lowest index is the lowest
      *                      section and the highest index is the highest section
      * @param lightSections a list of light sections that the chunk should have, where the lowest index is the lowest
@@ -294,10 +293,10 @@ public final class JetChunk implements Chunk {
             @NonNull List<JetChunkSection> chunkSections, @NonNull List<JetLightSection> lightSections,
             @NonNull Map<ChunkRelativeBlockPosition, CompoundBinaryTag> blockEntities
     ) {
-        NullabilityUtil.requireNonNull(dimensionType, "dimension type");
-        NullabilityUtil.requireNonNull(chunkSections, "chunk sections");
-        NullabilityUtil.requireNonNull(lightSections, "light sections");
-        NullabilityUtil.requireNonNull(blockEntities, "block entities");
+        Objects.requireNonNull(dimensionType, "dimension type");
+        Objects.requireNonNull(chunkSections, "chunk sections");
+        Objects.requireNonNull(lightSections, "light sections");
+        Objects.requireNonNull(blockEntities, "block entities");
 
         ChunkSectionList chunkSectionList = new ChunkSectionList(dimensionType, chunkSections);
         LightSectionList lightSectionList = new LightSectionList(dimensionType, lightSections);

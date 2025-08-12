@@ -2,10 +2,10 @@ package net.hypejet.jet.server.util.acquisition;
 
 import net.hypejet.concurrency.Acquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
@@ -29,8 +29,8 @@ public final class BooleanMappedAcquisition<OA extends Acquisition> implements B
      * @since 1.0
      */
     public BooleanMappedAcquisition(@NonNull OA originalAcquisition, @NonNull Predicate<OA> mapper) {
-        this.originalAcquisition = NullabilityUtil.requireNonNull(originalAcquisition, "original acquisition");
-        this.mapper = NullabilityUtil.requireNonNull(mapper, "mapper");
+        this.originalAcquisition = Objects.requireNonNull(originalAcquisition, "original acquisition");
+        this.mapper = Objects.requireNonNull(mapper, "mapper");
     }
 
     @Override

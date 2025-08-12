@@ -1,10 +1,11 @@
 package net.hypejet.jet.event.events.world;
 
-import net.hypejet.jet.data.model.api.coordinate.Position;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.world.World;
+import net.hypejet.jet.world.coordinate.Position;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents an event, which is called when an initial {@linkplain World world} has been set
@@ -25,8 +26,8 @@ public record InitialSpawnEvent(@NonNull Player player, @NonNull World world, @N
      * @since 1.0
      */
     public InitialSpawnEvent {
-        NullabilityUtil.requireNonNull(player, "player");
-        NullabilityUtil.requireNonNull(world, "world");
-        NullabilityUtil.requireNonNull(startingPosition, "starting position");
+        Objects.requireNonNull(player, "player");
+        Objects.requireNonNull(world, "world");
+        Objects.requireNonNull(startingPosition, "starting position");
     }
 }

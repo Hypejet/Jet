@@ -1,9 +1,7 @@
 package net.hypejet.jet.server.world.acquisition.worldmap;
 
 import net.hypejet.concurrency.map.MapAcquisition;
-import net.hypejet.jet.data.model.api.registries.biome.Biome;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
-import net.hypejet.jet.registry.RegistryEntry;
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.util.coordinate.ChunkPositionUtil;
 import net.hypejet.jet.server.util.coordinate.ChunkRelativePositionUtil;
 import net.hypejet.jet.server.world.JetWorld;
@@ -14,9 +12,10 @@ import net.hypejet.jet.server.world.chunk.light.storage.AbstractLightStorage;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.world.acquisition.worldmap.WorldMapAcquisition;
+import net.hypejet.jet.world.biome.Biome;
 import net.hypejet.jet.world.block.BlockState;
-import net.hypejet.jet.world.coordinate.BiomePosition;
 import net.hypejet.jet.world.coordinate.BlockPosition;
+import net.hypejet.jet.world.coordinate.biome.BiomePosition;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBiomePosition;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
@@ -24,6 +23,8 @@ import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 /**
  * Represents an implementation of {@linkplain WorldMapAcquisition a world-map acquisition}.
@@ -45,8 +46,8 @@ public class WorldMapAcquisitionImpl implements WorldMapAcquisition {
      */
     public WorldMapAcquisitionImpl(@NonNull JetWorld world,
                                    @NonNull MapAcquisition<ChunkPosition, JetChunk, ?> acquisition) {
-        this.world = NullabilityUtil.requireNonNull(world, "world");
-        this.acquisition = NullabilityUtil.requireNonNull(acquisition, "acquisition");
+        this.world = Objects.requireNonNull(world, "world");
+        this.acquisition = Objects.requireNonNull(acquisition, "acquisition");
     }
 
     @Override
@@ -58,7 +59,7 @@ public class WorldMapAcquisitionImpl implements WorldMapAcquisition {
     }
 
     @Override
-    public final @Nullable RegistryEntry<Biome> getOptionalBiome(@NonNull BiomePosition position) {
+    public final Holder.@Nullable Reference<Biome> getOptionalBiome(@NonNull BiomePosition position) {
         JetChunk chunk = this.chunkOrNull(ChunkPositionUtil.fromBiomePosition(position));
         if (chunk == null)
             return null;
@@ -152,15 +153,15 @@ public class WorldMapAcquisitionImpl implements WorldMapAcquisition {
     }
 
     /**
-     * Gets {@linkplain RegistryEntry a registry entry} of {@linkplain Biome a biome}
-     * at {@linkplain BiomePosition a biome position} specified in {@linkplain JetChunk a chunk} specified.
+     * Gets a {@linkplain Holder.Reference holder referencing to} a {@linkplain Biome biome} present
+     * at a {@linkplain BiomePosition biome position} associated with the specified {@linkplain JetChunk chunk}.
      *
      * @param position the biome position
      * @param chunk the chunk
-     * @return the registry entry
+     * @return the biome holder
      * @since 1.0
      */
-    protected static @NonNull RegistryEntry<Biome> biome(@NonNull BiomePosition position, @NonNull JetChunk chunk) {
+    protected static Holder.@NonNull Reference<Biome> biome(@NonNull BiomePosition position, @NonNull JetChunk chunk) {
         ChunkRelativeBiomePosition chunkRelativePosition = ChunkRelativePositionUtil.from(position);
         ChunkPaletteRelativePosition palettePosition = ChunkPaletteRelativePosition.from(chunkRelativePosition);
         JetChunkSection chunkSection = chunk.chunkSectionList().sectionFor(chunkRelativePosition);
@@ -168,13 +169,13 @@ public class WorldMapAcquisitionImpl implements WorldMapAcquisition {
     }
 
     /**
-     * Gets level of a light with {@linkplain LightType a light type} specified
-     * at {@linkplain BlockPosition a block position} specified in {@linkplain JetChunk a chunk} specified.
+     * Gets the light level of a light with the specified {@linkplain LightType light type} at the specified
+     * {@linkplain BlockPosition block position} associated with the specified {@linkplain JetChunk chunk}.
      *
-     * @param position the block position
+     * @param position the block position to get the light level from
      * @param lightType the light type
-     * @param chunk the chunk
-     * @return the registry entry
+     * @param chunk the chunk associated with the specified block position
+     * @return the light level
      * @since 1.0
      */
     protected static byte lightValue(@NonNull BlockPosition position, @NonNull LightType lightType,

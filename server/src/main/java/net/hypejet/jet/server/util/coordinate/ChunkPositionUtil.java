@@ -1,10 +1,10 @@
 package net.hypejet.jet.server.util.coordinate;
 
-import net.hypejet.jet.data.model.api.coordinate.Coordinate;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.coordinate.chunk.section.ChunkSectionPosition;
-import net.hypejet.jet.world.coordinate.BiomePosition;
+import net.hypejet.jet.world.coordinate.Coordinate;
+import net.hypejet.jet.world.coordinate.biome.BiomePosition;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -19,8 +19,8 @@ public final class ChunkPositionUtil {
     private ChunkPositionUtil() {}
 
     /**
-     * Creates {@linkplain ChunkPosition a chunk position} of {@linkplain JetChunk a chunk}
-     * that {@linkplain Coordinate a coordinate} specified belongs to.
+     * Creates a {@linkplain ChunkPosition chunk position} of a {@linkplain JetChunk chunk}
+     * that the specified {@linkplain Coordinate coordinate} belongs to.
      *
      * @param coordinate the coordinate
      * @return the chunk position

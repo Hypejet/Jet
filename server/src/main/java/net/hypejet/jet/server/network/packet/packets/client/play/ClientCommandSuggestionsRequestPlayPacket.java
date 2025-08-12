@@ -1,8 +1,9 @@
 package net.hypejet.jet.server.network.packet.packets.client.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ClientPacket a client packet}, which requests command suggestions from a server.
@@ -23,6 +24,6 @@ public record ClientCommandSuggestionsRequestPlayPacket(int transactionId, @NonN
      * @since 1.0
      */
     public ClientCommandSuggestionsRequestPlayPacket {
-        NullabilityUtil.requireNonNull(text, "text");
+        Objects.requireNonNull(text, "text");
     }
 }

@@ -1,8 +1,9 @@
 package net.hypejet.jet.server.world.chunk.palette.update;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents a change that should be done in
@@ -22,7 +23,7 @@ public record ChunkPaletteUpdate<E>(@NonNull ChunkPaletteRelativePosition positi
      * @since 1.0
      */
     public ChunkPaletteUpdate {
-        NullabilityUtil.requireNonNull(position, "position");
-        NullabilityUtil.requireNonNull(newElement, "new element");
+        Objects.requireNonNull(position, "position");
+        Objects.requireNonNull(newElement, "new element");
     }
 }

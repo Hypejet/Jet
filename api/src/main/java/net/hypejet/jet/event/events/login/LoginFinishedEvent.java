@@ -1,6 +1,5 @@
 package net.hypejet.jet.event.events.login;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.network.PlayerConnection;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -27,7 +26,7 @@ public final class LoginFinishedEvent {
      * @since 1.0
      */
     public LoginFinishedEvent(@NonNull PlayerConnection connection) {
-        this.connection = NullabilityUtil.requireNonNull(connection, "connection");
+        this.connection = Objects.requireNonNull(connection, "connection");
     }
 
     /**
@@ -57,7 +56,7 @@ public final class LoginFinishedEvent {
      * @since 1.0
      */
     public void setResult(@NonNull Result result) {
-        this.result = NullabilityUtil.requireNonNull(result, "result");
+        this.result = Objects.requireNonNull(result, "result");
     }
 
     @Override
@@ -101,7 +100,7 @@ public final class LoginFinishedEvent {
              * @since 1.0
              */
             public Fail {
-                NullabilityUtil.requireNonNull(disconnectReason, "disconnect reason");
+                Objects.requireNonNull(disconnectReason, "disconnect reason");
             }
         }
 

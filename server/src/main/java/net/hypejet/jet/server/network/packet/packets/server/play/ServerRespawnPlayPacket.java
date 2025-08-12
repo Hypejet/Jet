@@ -1,9 +1,10 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.entity.player.spawn.PlayerSpawnInfo;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ServerPacket a server packet}, which is sent to a client to spawn
@@ -26,6 +27,6 @@ public record ServerRespawnPlayPacket(@NonNull PlayerSpawnInfo spawnInfo, boolea
      * @since 1.0
      */
     public ServerRespawnPlayPacket {
-        NullabilityUtil.requireNonNull(spawnInfo, "spawn info");
+        Objects.requireNonNull(spawnInfo, "spawn info");
     }
 }

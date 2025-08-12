@@ -8,22 +8,22 @@ import net.hypejet.concurrency.map.hashmap.HashMapAcquirable;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquirable;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.object.notnull.WriteNotNullObjectAcquisition;
-import net.hypejet.jet.data.model.api.coordinate.Position;
-import net.hypejet.jet.data.model.api.registries.dimension.DimensionType;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.player.JetPlayer;
-import net.hypejet.jet.server.registry.JetRegistryEntry;
 import net.hypejet.jet.server.world.acquisition.worldmap.WorldMapAcquisitionImpl;
 import net.hypejet.jet.server.world.acquisition.worldmap.WriteWorldMapAcquisitionImpl;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.world.World;
 import net.hypejet.jet.world.chunk.ChunkLoader;
+import net.hypejet.jet.world.coordinate.Position;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
 import net.hypejet.jet.world.data.WorldData;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import net.hypejet.jet.world.dimension.DimensionType;
+import org.jspecify.annotations.NonNull;
 
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -34,7 +34,7 @@ import java.util.Set;
  */
 public final class JetWorld implements World {
 
-    private final JetRegistryEntry<DimensionType> dimensionType;
+    private final Holder.Reference<DimensionType> dimensionType;
     private final WorldData worldData;
 
     private final ChunkLoader chunkLoader;
@@ -48,23 +48,23 @@ public final class JetWorld implements World {
     /**
      * Constructs the {@linkplain JetWorld world}.
      *
-     * @param dimensionType a dimension type, of which type the world should be
+     * @param dimensionType a holder referencing to a dimension type, of which type the world should be
      * @param worldData an additional world data that the world should have
      * @param chunkLoader a chunk loader that should be used for loading and saving chunks of the world
      * @param server a server that should own the world
      * @since 1.0
      */
-    public JetWorld(@NonNull JetRegistryEntry<DimensionType> dimensionType, @NonNull WorldData worldData,
+    public JetWorld(Holder.@NonNull Reference<DimensionType> dimensionType, @NonNull WorldData worldData,
                     @NonNull ChunkLoader chunkLoader, @NonNull JetMinecraftServer server) {
-        this.dimensionType = NullabilityUtil.requireNonNull(dimensionType, "dimension type");
-        this.worldData = NullabilityUtil.requireNonNull(worldData, "world data");
-        this.chunkLoader = NullabilityUtil.requireNonNull(chunkLoader, "chunk loader");
-        this.server = NullabilityUtil.requireNonNull(server, "server");
+        this.dimensionType = Objects.requireNonNull(dimensionType, "dimension type");
+        this.worldData = Objects.requireNonNull(worldData, "world data");
+        this.chunkLoader = Objects.requireNonNull(chunkLoader, "chunk loader");
+        this.server = Objects.requireNonNull(server, "server");
         this.defaultSpawnPosition = new NotNullObjectAcquirable<>(new Position(0, 0, 0, 0f, 0f));
     }
 
     @Override
-    public @NonNull JetRegistryEntry<DimensionType> dimensionType() {
+    public Holder.@NonNull Reference<DimensionType> dimensionType() {
         return this.dimensionType;
     }
 
@@ -121,7 +121,7 @@ public final class JetWorld implements World {
      * @since 1.0
      */
     public void addPlayer(@NonNull JetPlayer player) {
-        NullabilityUtil.requireNonNull(player, "player");
+        Objects.requireNonNull(player, "player");
         try (CollectionAcquisition<?, Set<JetEntity>> entitiesAcquisition = this.entities.acquireWrite()) {
             Set<JetEntity> entities = entitiesAcquisition.collection();
             if (!entities.add(player))
@@ -136,7 +136,7 @@ public final class JetWorld implements World {
      * @since 1.0
      */
     public void removePlayer(@NonNull JetPlayer player) {
-        NullabilityUtil.requireNonNull(player, "player");
+        Objects.requireNonNull(player, "player");
         try (CollectionAcquisition<?, Set<JetEntity>> entitiesAcquisition = this.entities.acquireWrite()) {
             Set<JetEntity> entities = entitiesAcquisition.collection();
             if (!entities.remove(player))

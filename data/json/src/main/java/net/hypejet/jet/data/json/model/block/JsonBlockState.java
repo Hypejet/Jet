@@ -13,10 +13,11 @@ import java.util.Objects;
  * @param hasFluidState whether this block state has a fluid state associated with it, in other words whether
  *                      the block state represents a fluid
  * @param blocksMotion whether this block state blocks motion of players entering it
+ * @param isLeaves whether block that this block state is associated with is leaves
  * @since 1.0
  */
 public record JsonBlockState(@NonNull Map<String, String> properties, boolean isAir,
-                             boolean hasFluidState, boolean blocksMotion) {
+                             boolean hasFluidState, boolean blocksMotion, boolean isLeaves) {
     /**
      * Constructs the {@linkplain JsonBlockState block state}.
      *
@@ -25,6 +26,7 @@ public record JsonBlockState(@NonNull Map<String, String> properties, boolean is
      * @param hasFluidState whether this block state has a fluid state associated with it, in other words whether
      *                      the block state represents a fluid
      * @param blocksMotion whether this block state blocks motion of players entering it
+     * @param isLeaves whether block that the block state is going to be associated with is leaves
      * @since 1.0
      */
     public JsonBlockState {

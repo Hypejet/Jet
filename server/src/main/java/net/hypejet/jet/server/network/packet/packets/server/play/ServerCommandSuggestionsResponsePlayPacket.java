@@ -1,6 +1,5 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -8,6 +7,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ServerPacket a server packet}, which responds to a command suggestion request of a client.
@@ -33,7 +33,7 @@ public record ServerCommandSuggestionsResponsePlayPacket(int transactionId, int 
      * @since 1.0
      */
     public ServerCommandSuggestionsResponsePlayPacket {
-        suggestions = List.copyOf(NullabilityUtil.requireNonNull(suggestions, "suggestions"));
+        suggestions = List.copyOf(Objects.requireNonNull(suggestions, "suggestions"));
     }
 
     /**
@@ -55,8 +55,8 @@ public record ServerCommandSuggestionsResponsePlayPacket(int transactionId, int 
          * @since 1.0
          */
         public Suggestion {
-            NullabilityUtil.requireNonNull(text, "text");
-            NullabilityUtil.requireNonNull(tooltip, "tooltip");
+            Objects.requireNonNull(text, "text");
+            Objects.requireNonNull(tooltip, "tooltip");
         }
     }
 }

@@ -1,8 +1,9 @@
 package net.hypejet.jet.util.game.link;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.util.game.link.label.ServerLinkLabel;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents a server link, that a Minecraft client displays in a menu available in a pause-menu.
@@ -21,7 +22,7 @@ public record ServerLink(@NonNull ServerLinkLabel label, @NonNull String url) {
      * @since 1.0
      */
     public ServerLink {
-        NullabilityUtil.requireNonNull(label, "label");
-        NullabilityUtil.requireNonNull(url, "URL");
+        Objects.requireNonNull(label, "label");
+        Objects.requireNonNull(url, "URL");
     }
 }

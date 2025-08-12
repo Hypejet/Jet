@@ -4,7 +4,7 @@ import com.google.common.hash.Hashing;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.entity.player.spawn.PlayerSpawnInfo;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
-import net.hypejet.jet.server.network.codec.game.key.PackedKeyNetworkCodec;
+import net.hypejet.jet.server.network.codec.game.key.KeyNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.hypejet.jet.server.util.game.gamemode.GameModeUtil;
@@ -31,7 +31,7 @@ public final class PlayerSpawnInfoNetworkWriter implements NetworkWriter<PlayerS
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull PlayerSpawnInfo object) {
         VarIntNetworkCodec.INSTANCE.write(buf, object.dimensionTypeIdentifier());
-        PackedKeyNetworkCodec.INSTANCE.write(buf, object.dimensionTypeKey());
+        KeyNetworkCodec.INSTANCE.write(buf, object.dimensionTypeKey());
 
         WorldData worldData = object.worldData();
         buf.writeLong(Hashing.sha256().hashLong(worldData.seed()).asLong());

@@ -5,7 +5,6 @@ import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.command.CommandSource;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.acquisition.gamemode.GameModeAcquisition;
 import net.hypejet.jet.entity.acquisition.gamemode.WriteGameModeAcquisition;
@@ -16,6 +15,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -155,7 +155,7 @@ public interface Player extends Entity, CommandSource, CommonAudience {
         private final String name;
 
         private ChatMode(@NonNull String name) {
-            this.name = NullabilityUtil.requireNonNull(name, "name");
+            this.name = Objects.requireNonNull(name, "name");
         }
 
         /**
@@ -241,7 +241,7 @@ public interface Player extends Entity, CommandSource, CommonAudience {
         private final String name;
 
         private SkinPart(@NonNull String name) {
-            this.name = NullabilityUtil.requireNonNull(name, "name");
+            this.name = Objects.requireNonNull(name, "name");
         }
 
         /**
@@ -306,7 +306,7 @@ public interface Player extends Entity, CommandSource, CommonAudience {
         private final String name;
 
         private GameMode(@NonNull String name) {
-            this.name = NullabilityUtil.requireNonNull(name, "name");
+            this.name = Objects.requireNonNull(name, "name");
         }
 
         /**
@@ -365,7 +365,7 @@ public interface Player extends Entity, CommandSource, CommonAudience {
         private final String name;
 
         private ParticleStatus(@NonNull String name) {
-            this.name = NullabilityUtil.requireNonNull(name, "name");
+            this.name = Objects.requireNonNull(name, "name");
         }
 
         /**

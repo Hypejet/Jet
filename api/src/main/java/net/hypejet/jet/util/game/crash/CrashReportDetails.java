@@ -1,7 +1,8 @@
 package net.hypejet.jet.util.game.crash;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents details of a Minecraft crash report.
@@ -19,7 +20,7 @@ public record CrashReportDetails(@NonNull String title, @NonNull String descript
      * @since 1.0
      */
     public CrashReportDetails {
-        NullabilityUtil.requireNonNull(title, "title");
-        NullabilityUtil.requireNonNull(description, "description");
+        Objects.requireNonNull(title, "title");
+        Objects.requireNonNull(description, "description");
     }
 }

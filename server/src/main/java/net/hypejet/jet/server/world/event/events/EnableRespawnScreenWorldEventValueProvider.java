@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.world.event.events;
 
 import net.hypejet.jet.server.world.event.BooleanWorldEventValueProvider;
-import net.hypejet.jet.world.event.events.EnableRespawnScreenWorldEvent;
+import net.hypejet.jet.world.event.world.events.EnableRespawnScreenWorldEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

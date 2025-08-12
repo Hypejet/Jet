@@ -1,9 +1,9 @@
 package net.hypejet.jet.world.chunk.section;
 
-import net.hypejet.jet.data.model.api.registries.biome.Biome;
-import net.hypejet.jet.registry.RegistryEntry;
+import net.hypejet.jet.registry.holder.Holder;
+import net.hypejet.jet.world.biome.Biome;
 import net.hypejet.jet.world.block.BlockState;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Represents section of block and biome data of {@linkplain net.hypejet.jet.world.chunk.Chunk a chunk}.
@@ -26,5 +26,5 @@ public interface ChunkSection {
      * @return the chunk palette
      * @since 1.0
      */
-    @NonNull ChunkPalette<RegistryEntry<Biome>> biomePalette();
+    @NonNull ChunkPalette<Holder.Reference<Biome>> biomePalette();
 }

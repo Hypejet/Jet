@@ -1,10 +1,11 @@
 package net.hypejet.jet.server.network.packet.packets.server.play;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.scoreboard.position.ScoreboardPosition;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ServerPacket a server packet} that requests a client to replace a scoreboard objective
@@ -25,6 +26,6 @@ public record ServerSetObjectiveDisplayedPlayPacket(@NonNull ScoreboardPosition 
      * @since 1.0
      */
     public ServerSetObjectiveDisplayedPlayPacket {
-        NullabilityUtil.requireNonNull(position, "position");
+        Objects.requireNonNull(position, "position");
     }
 }

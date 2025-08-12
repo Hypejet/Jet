@@ -2,10 +2,10 @@ package net.hypejet.jet.server.command.argument.writers;
 
 import com.mojang.brigadier.arguments.ArgumentType;
 import io.netty.buffer.ByteBuf;
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.command.argument.ArgumentWriter;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -48,13 +48,13 @@ public final class NumberArgumentWriter<N extends Number, A extends ArgumentType
                                 @NonNull Function<A, N> minimumValueGetter, @NonNull Function<A, N> maximumValueGetter,
                                 @NonNull N minimumValue, @NonNull N maximumValue) {
         super(parserId, argumentTypeClass);
-        this.writeFunction = NullabilityUtil.requireNonNull(writeFunction, "write function");
+        this.writeFunction = Objects.requireNonNull(writeFunction, "write function");
 
-        this.minimumValueGetter = NullabilityUtil.requireNonNull(minimumValueGetter, "minimum value getter");
-        this.maximumValueGetter = NullabilityUtil.requireNonNull(maximumValueGetter, "maximum value getter");
+        this.minimumValueGetter = Objects.requireNonNull(minimumValueGetter, "minimum value getter");
+        this.maximumValueGetter = Objects.requireNonNull(maximumValueGetter, "maximum value getter");
 
-        this.minValue = NullabilityUtil.requireNonNull(minimumValue, "minimum value");
-        this.maxValue = NullabilityUtil.requireNonNull(maximumValue, "maximum value");
+        this.minValue = Objects.requireNonNull(minimumValue, "minimum value");
+        this.maxValue = Objects.requireNonNull(maximumValue, "maximum value");
     }
 
     @Override

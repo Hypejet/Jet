@@ -1,10 +1,11 @@
 package net.hypejet.jet.server.network.packet.packets.client.login;
 
-import net.hypejet.jet.data.model.api.utils.NullabilityUtil;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import net.hypejet.jet.server.network.packet.packets.server.login.ServerEncryptionRequestLoginPacket;
 import net.hypejet.jet.util.array.UnmodifiableByteArray;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Objects;
 
 /**
  * Represents {@linkplain ClientPacket a client packet}, which is a response to an encryption request sent by a server.
@@ -36,7 +37,7 @@ public record ClientEncryptionResponseLoginPacket(@NonNull UnmodifiableByteArray
      * @since 1.0
      */
     public ClientEncryptionResponseLoginPacket {
-        NullabilityUtil.requireNonNull(sharedSecret, "shared secret");
-        NullabilityUtil.requireNonNull(verifyToken, "verify token");
+        Objects.requireNonNull(sharedSecret, "shared secret");
+        Objects.requireNonNull(verifyToken, "verify token");
     }
 }

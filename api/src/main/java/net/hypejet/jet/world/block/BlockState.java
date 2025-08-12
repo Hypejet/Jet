@@ -1,6 +1,6 @@
 package net.hypejet.jet.world.block;
 
-import net.hypejet.jet.registry.RegistryEntry;
+import net.hypejet.jet.registry.holder.Holder;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Map;
@@ -12,16 +12,15 @@ import java.util.Map;
  */
 public interface BlockState {
     /**
-     * Gets {@linkplain RegistryEntry a registry entry} of {@linkplain BlockType a block type}
-     * that this block state belongs to.
+     * Gets a {@linkplain Holder holder} of a {@linkplain BlockType block type} that this block state belongs to.
      *
-     * @return the block type
+     * @return the block type holder
      * @since 1.0
      */
-    @NonNull RegistryEntry<? extends BlockType> blockType();
+    @NonNull Holder<BlockType> blockType();
 
     /**
-     * Gets {@linkplain Map a map} of properties of this block state.
+     * Gets a {@linkplain Map map} of properties of this block state.
      *
      * @return the map
      * @since 1.0
