@@ -2,14 +2,13 @@ package net.hypejet.jet.server.network.codec.game.signing;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
-import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkReader;
+import net.hypejet.jet.server.network.codec.aggregate.array.bytes.FixedByteArrayNetworkReader;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
-import net.hypejet.jet.server.util.NetworkUtil;
 import net.hypejet.jet.server.util.game.signing.SignedArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents {@linkplain NetworkReader a network reader}, which reads {@linkplain SignedArgument a signed argument}.
+ * A {@linkplain NetworkReader network-reader} reading {@linkplain SignedArgument signed arguments}.
  *
  * @since 1.0
  * @see SignedArgument
@@ -17,21 +16,14 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class SignedArgumentNetworkReader implements NetworkReader<SignedArgument> {
 
-    private static final int ARGUMENT_SIGNATURE_LENGTH = 256;
+    private static final FixedByteArrayNetworkReader SIGNATURE_READER = new FixedByteArrayNetworkReader(256);
 
     /**
-     * An instance of the {@linkplain SignedArgumentNetworkReader signed argument network reader}.
+     * An instance of the {@linkplain SignedArgumentNetworkReader signed argument network-reader}.
      *
      * @since 1.0
      */
     public static final SignedArgumentNetworkReader INSTANCE = new SignedArgumentNetworkReader();
-
-    /**
-     * An instance of the {@linkplain CollectionNetworkReader collection network reader}, which reads elements
-     * with a type of {@linkplain SignedArgument signed argument}.
-     */
-    public static final CollectionNetworkReader<SignedArgument> COLLECTION_READER =
-            new CollectionNetworkReader<>(INSTANCE);
 
     private SignedArgumentNetworkReader() {}
 
@@ -39,7 +31,7 @@ public final class SignedArgumentNetworkReader implements NetworkReader<SignedAr
     public @NonNull SignedArgument read(@NonNull ByteBuf buf) {
         return new SignedArgument(
                 StringNetworkCodec.MAX_16_INSTANCE.read(buf),
-                NetworkUtil.readBytes(buf, ARGUMENT_SIGNATURE_LENGTH)
+                SIGNATURE_READER.read(buf)
         );
     }
 }

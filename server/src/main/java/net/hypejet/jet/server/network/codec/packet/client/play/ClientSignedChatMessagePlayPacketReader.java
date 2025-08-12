@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.codec.packet.client.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
-import net.hypejet.jet.server.network.codec.aggregate.array.bytes.ByteArrayNetworkReader;
+import net.hypejet.jet.server.network.codec.aggregate.array.bytes.FixedByteArrayNetworkReader;
 import net.hypejet.jet.server.network.codec.game.signing.SeenMessagesNetworkReader;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientSignedChatMessagePlayPacket;
@@ -10,8 +10,8 @@ import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents {@linkplain NetworkReader a network reader}, which reads
- * {@linkplain ClientSignedChatMessagePlayPacket a signed chat message play packet}.
+ * A {@linkplain NetworkReader network-reader}
+ * of {@linkplain ClientSignedChatMessagePlayPacket signed chat message play packets}.
  *
  * @since 1.0
  * @see ClientSignedChatMessagePlayPacket
@@ -20,25 +20,27 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class ClientSignedChatMessagePlayPacketReader
         implements NetworkReader<ClientSignedChatMessagePlayPacket> {
 
+    private static final StringNetworkCodec MESSAGE_CODEC = StringNetworkCodec.create(256);
+    private static final FixedByteArrayNetworkReader SIGNATURE_READER = new FixedByteArrayNetworkReader(256);
+
     /**
-     * An instance of the {@linkplain ClientSignedChatMessagePlayPacketReader client signed chat message play packet
-     * reader}.
+     * An instance of
+     * the {@linkplain ClientSignedChatMessagePlayPacketReader client signed chat message play packet-reader}.
      *
      * @since 1.0
      */
     public static final ClientSignedChatMessagePlayPacketReader
             INSTANCE = new ClientSignedChatMessagePlayPacketReader();
 
-    private static final StringNetworkCodec MESSAGE_CODEC = StringNetworkCodec.create(256);
-    private static final ByteArrayNetworkReader SIGNATURE_READER = new ByteArrayNetworkReader(256);
-
     private ClientSignedChatMessagePlayPacketReader() {}
 
     @Override
     public @NonNull ClientSignedChatMessagePlayPacket read(@NonNull ByteBuf buf) {
         return new ClientSignedChatMessagePlayPacket(
-                MESSAGE_CODEC.read(buf), buf.readLong(),
-                buf.readLong(), NetworkUtil.readOptional(SIGNATURE_READER, buf),
+                MESSAGE_CODEC.read(buf),
+                buf.readLong(),
+                buf.readLong(),
+                NetworkUtil.readOptional(SIGNATURE_READER, buf),
                 SeenMessagesNetworkReader.INSTANCE.read(buf)
         );
     }
