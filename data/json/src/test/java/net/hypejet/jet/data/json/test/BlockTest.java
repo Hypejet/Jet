@@ -23,7 +23,7 @@ final class BlockTest {
 
     @Test
     void testBlockState() {
-        TestUtil.test(new JsonBlockState(Map.of("property", "value", "this", "is-a-test"), false, true, true));
+        TestUtil.test(new JsonBlockState(Map.of("property", "value", "this", "is-a-test"), true, true, false, true));
     }
 
     @Test
