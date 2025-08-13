@@ -4,11 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import net.hypejet.jet.MinecraftServer;
+import com.google.inject.TypeLiteral;
+import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.plugin.Plugin;
 import net.hypejet.jet.plugin.PluginManager;
 import net.hypejet.jet.plugin.dependency.PluginDependency;
-import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.plugin.json.PluginDependencyDeserializer;
 import net.hypejet.jet.server.plugin.json.PluginMetadataDeserializer;
 import net.hypejet.jet.server.plugin.metadata.PluginMetadata;
@@ -40,7 +40,7 @@ import java.util.StringJoiner;
 import java.util.stream.Stream;
 
 /**
- * Represents an implementation of the {@linkplain PluginManager plugin manager}.
+ * An implementation of the {@linkplain PluginManager plugin manager}.
  *
  * @since 1.0
  * @see PluginManager
@@ -58,21 +58,23 @@ public final class JetPluginManager implements PluginManager {
             .registerTypeAdapter(PluginMetadata.class, new PluginMetadataDeserializer())
             .create();
 
-    private final JetMinecraftServer server;
-
     private final Map<String, JetPlugin> nameToPluginMap;
     private final Map<Object, JetPlugin> instanceToPluginMap;
 
     /**
      * Constructs the {@linkplain JetPluginManager plugin manager}.
      *
-     * @param server the server that the plugin manager is constructed for
+     * @param eventNode an event node that should be passed as an injection argument to plugins when instantiating them
      * @since 1.0
      */
-    public JetPluginManager(@NonNull JetMinecraftServer server) {
-        this.server = Objects.requireNonNull(server, "The server must not be null");
-        Injector injector = Guice.createInjector(binder -> binder.bind(MinecraftServer.class)
-                .toInstance(server));
+    public JetPluginManager(@NonNull EventNode<Object> eventNode) {
+        Objects.requireNonNull(eventNode, "event node");
+
+        Injector injector = Guice.createInjector(
+                binder -> binder
+                        .bind(new TypeLiteral<EventNode<Object>>() {})
+                        .toInstance(eventNode)
+        );
 
         try {
             Map<String, PluginPair> pluginPairs = loadPluginPairs();

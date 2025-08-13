@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Represents an implementation of the {@linkplain MinecraftServer Minecraft server}.
+ * An implementation of the {@linkplain MinecraftServer Minecraft server}.
  *
  * @since 1.0
  * @see MinecraftServer
@@ -51,16 +51,15 @@ public final class JetMinecraftServer implements MinecraftServer {
      * @since 1.0
      */
     JetMinecraftServer() {
-        // FIXME: Initialization of managers is done wrongly, plugins and managers receive not fully initialized server
+        this.pluginManager = new JetPluginManager(this.eventNode);
         this.configuration = JetServerConfiguration.parse(this, UnparsedServerConfiguration.create());
         this.commandManager = new JetCommandManager(this);
         this.registryManager = new JetRegistryManager(this);
         this.worldManager = new JetWorldManager(this);
         this.scoreboardManager = new JetScoreboardManager();
-        this.pluginManager = new JetPluginManager(this);
         this.networkManager = new NetworkManager(this);
-        this.eventNode.call(new ServerReadyEvent());
         this.ticker = new Ticker(this);
+        this.eventNode.call(new ServerReadyEvent(this));
     }
 
     @Override
