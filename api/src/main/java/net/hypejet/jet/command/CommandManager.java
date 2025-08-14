@@ -1,64 +1,51 @@
 package net.hypejet.jet.command;
 
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import net.hypejet.concurrency.collection.CollectionAcquisition;
-import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
-import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Collection;
 
 /**
- * Represents something that manages registration of Minecraft commands.
+ * Something managing registration of Minecraft commands.
  *
  * @since 1.0
  * @see LiteralCommandNode
  */
 public interface CommandManager {
     /**
-     * Registers a command.
+     * Registers a command. If a command with the same name already exists, the commands are merged.
      *
-     * @param node a literal command node representing the command
+     * @param node a literal command node that should represent the command
      * @since 1.0
      */
     void register(@NonNull LiteralCommandNode<CommandSource> node);
 
     /**
-     * Unregisters a command, does nothing if the command has not been registered.
+     * Unregisters a command with the specified name.
      *
-     * @param name a name of the command
-     */
-    void unregister(@NonNull String name);
-
-    /**
-     * Creates {@linkplain BooleanAcquisition a boolean acquisition}, whose state represents whether a command
-     * with a name specified has been registered.
-     *
-     * @param name a name of the command
-     * @return the boolean acquisition, whose state is {@code true} if a command with the name specified has been
-     *         registered, {@code false} otherwise
-     */
-    @NonNull BooleanAcquisition isRegistered(@NonNull String name);
-
-    /**
-     * Creates {@linkplain NotNullObjectAcquisition an not-null object acquisition} holding
-     * {@linkplain LiteralCommandNode a literal command node} representing a command, which was registered in this
-     * command manager.
-     *
-     * <p>The {@linkplain NotNullObjectAcquisition#get() not-null object acquisition get method} throws
-     * {@linkplain IllegalArgumentException an illegal argument exception} if no command with the name specified has
-     * been registered.</p>
-     *
-     * @param name a name of the command
-     * @return the object acquisition
+     * @param name the name of the command to unregister
+     * @return a literal command node representing the removed command, {@code null} if no command
+     *         with the specified name was registered in this command manager
      * @since 1.0
      */
-    @NonNull NotNullObjectAcquisition<LiteralCommandNode<CommandSource>> get(@NonNull String name);
+    @Nullable LiteralCommandNode<CommandSource> unregister(@NonNull String name);
 
     /**
-     * Creates {@linkplain CollectionAcquisition a collection acquisition} of commands, which have been registered
-     * in this command manager.
+     * Gets a {@linkplain LiteralCommandNode literal command node} of a command with the specified name.
+     *
+     * @param name the command name
+     * @return the command node, {@code null} if no command with the specified name was registered
+     * @since 1.0
+     */
+    @Nullable LiteralCommandNode<CommandSource> get(@NonNull String name);
+
+    /**
+     * Gets a copy of a {@linkplain Collection collection} of {@linkplain LiteralCommandNode literal command nodes}
+     * representing commands registered in this {@linkplain CommandManager command manager}.
      *
      * @return the collection
      * @since 1.0
      */
-    @NonNull CollectionAcquisition<LiteralCommandNode<CommandSource>, ?> commands();
+    @NonNull Collection<LiteralCommandNode<CommandSource>> commands();
 }

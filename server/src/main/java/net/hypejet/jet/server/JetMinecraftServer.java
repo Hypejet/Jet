@@ -24,8 +24,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * An implementation of the {@linkplain MinecraftServer Minecraft server}.
@@ -50,7 +51,7 @@ public final class JetMinecraftServer implements MinecraftServer {
     private final NetworkManager networkManager;
     private final Ticker ticker;
 
-    private final Set<JetPlayer> players = new HashSet<>();
+    private final Set<JetPlayer> players = ConcurrentHashMap.newKeySet();
 
     /**
      * Constructs the {@linkplain JetMinecraftServer Minecraft server}.
@@ -58,9 +59,10 @@ public final class JetMinecraftServer implements MinecraftServer {
      * @since 1.0
      */
     JetMinecraftServer() {
+        Set<JetPlayer> unmodifiablePlayersView = Collections.unmodifiableSet(this.players);
         this.pluginManager = new JetPluginManager(this.eventNode);
         this.configuration = JetServerConfiguration.parse(this, UnparsedServerConfiguration.create());
-        this.commandManager = new JetCommandManager(this);
+        this.commandManager = new JetCommandManager(this.eventNode, unmodifiablePlayersView);
         this.registryManager = new JetRegistryManager(this);
         this.worldManager = new JetWorldManager(this);
         this.scoreboardManager = new JetScoreboardManager();
