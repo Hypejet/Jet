@@ -12,12 +12,14 @@ import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.server.world.handler.ChunkBatchHandler;
 import net.hypejet.jet.world.World;
 import net.hypejet.jet.world.coordinate.Position;
+import net.hypejet.jet.world.coordinate.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Represents an implementation of {@linkplain EntityWorldAcquisition an entity world acquisition}
@@ -98,11 +100,11 @@ public final class WriteEntityWorldAcquisitionImpl
         }
 
         /* We are going to synchronize the position manually using
-           the sendSpawnPackets method if the entity is a player. */
+           the movement handler if the entity is a player. */
         this.movementAcquisition.setPosition(position);
 
         if (this.entity instanceof JetPlayer player) {
-            player.sendSpawnPackets(validatedWorld, position);
+            player.movementHandler().synchronize(position, Vector.zero(), Set.of()); // TODO: Ensure integrity with vanilla
             player.server().eventNode().call(new WorldSwitchEvent(player, previousWorld, world, position));
         }
 

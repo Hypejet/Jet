@@ -1,24 +1,31 @@
 package net.hypejet.jet.server;
 
-import net.hypejet.concurrency.collection.CollectionAcquisition;
-import net.hypejet.concurrency.collection.set.HashSetAcquirable;
 import net.hypejet.jet.MinecraftServer;
+import net.hypejet.jet.entity.movement.acquisition.MovementAcquisition;
 import net.hypejet.jet.event.events.server.ServerReadyEvent;
 import net.hypejet.jet.event.events.server.ServerShutdownEvent;
+import net.hypejet.jet.event.events.world.InitialSpawnEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.server.command.JetCommandManager;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.configuration.unparsed.UnparsedServerConfiguration;
+import net.hypejet.jet.server.entity.acquisition.world.EntityWorldAcquisition;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.NetworkManager;
 import net.hypejet.jet.server.plugin.JetPluginManager;
 import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.scoreboard.JetScoreboardManager;
 import net.hypejet.jet.server.tick.Ticker;
+import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.server.world.JetWorldManager;
+import net.hypejet.jet.world.coordinate.Position;
+import net.hypejet.jet.world.coordinate.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * An implementation of the {@linkplain MinecraftServer Minecraft server}.
@@ -34,16 +41,16 @@ public final class JetMinecraftServer implements MinecraftServer {
     private final EventNode<Object> eventNode = new EventNode<>(Object.class);
     private final JetServerConfiguration configuration;
 
-    private final NetworkManager networkManager;
-
     private final JetCommandManager commandManager;
     private final JetRegistryManager registryManager;
     private final JetPluginManager pluginManager;
     private final JetWorldManager worldManager;
     private final JetScoreboardManager scoreboardManager;
 
-    private final HashSetAcquirable<JetPlayer> players = new HashSetAcquirable<>();
+    private final NetworkManager networkManager;
     private final Ticker ticker;
+
+    private final Set<JetPlayer> players = new HashSet<>();
 
     /**
      * Constructs the {@linkplain JetMinecraftServer Minecraft server}.
@@ -98,8 +105,8 @@ public final class JetMinecraftServer implements MinecraftServer {
     }
 
     @Override
-    public @NonNull CollectionAcquisition<JetPlayer, ?> players() {
-        return this.players.acquireRead();
+    public @NonNull Set<JetPlayer> players() {
+        return Set.copyOf(this.players);
     }
 
     @Override
@@ -148,30 +155,50 @@ public final class JetMinecraftServer implements MinecraftServer {
     }
 
     /**
-     * Registers a player on the server.
+     * Registers the specified {@linkplain JetPlayer player} on the server.
      *
-     * @param player the player
+     * @param player the player to register
      * @since 1.0
      */
     public void registerPlayer(@NonNull JetPlayer player) {
-        try (CollectionAcquisition<JetPlayer, ?> acquisition = this.players.acquireWrite()) {
-            /* A call outside event loop is safe in this case, when a player gets disconnected, the unregister method
-               is going to be called, and that method also creates a write acquisition, so no race conditions should
-               happen. */
-            if (player.connection().isActive())
-                acquisition.collection().add(player);
+        this.ticker.ensureRunsInTickLoop();
+
+        /* A call outside the event loop is safe in this case. When a player gets disconnected, the unregister method
+           is going to be called and that method also runs in a tick loop. It means that the unregister method
+           cannot be called until this method stops running, therefore no race conditions should happen. */
+        if (!player.connection().isActive()) return;
+
+        player.sendJoinGamePacket();
+        // TODO: Difficulty packets, ability packets, held slot packets, etc.
+        player.getScoreboard().addViewer(player);
+
+        try (
+                MovementAcquisition movementAcquisition = player.acquireMovementRead();
+                EntityWorldAcquisition<?> worldAcquisition = player.acquireWorldRead()
+        ) {
+            Position position = movementAcquisition.position();
+            player.movementHandler().synchronize(position, Vector.zero(), Set.of());
+
+            this.players.add(player);
+
+            // TODO: Send other world data
+            player.chunkBatchHandler().scheduleTask(); // TODO: Ensure that it produces the same behaviour as vanilla
+
+            JetWorld world = worldAcquisition.get();
+            world.addPlayer(player);
+
+            this.eventNode.call(new InitialSpawnEvent(player, world, position));
         }
     }
 
     /**
-     * Unregisters a player from the server.
+     * Unregisters the specified {@linkplain JetPlayer player} from the server.
      *
-     * @param player the player
+     * @param player the player to unregister
      * @since 1.0
      */
     public void unregisterPlayer(@NonNull JetPlayer player) {
-        try (CollectionAcquisition<JetPlayer, ?> acquisition = this.players.acquireWrite()) {
-            acquisition.collection().remove(player);
-        }
+        this.ticker.ensureRunsInTickLoop();
+        this.players.remove(player);
     }
 }

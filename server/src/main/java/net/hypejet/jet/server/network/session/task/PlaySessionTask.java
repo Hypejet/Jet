@@ -59,7 +59,7 @@ public final class PlaySessionTask implements SessionTask, RegistryTagUpdateFunc
             commandsSentAcquisition.set(true);
         }
 
-        this.playerFuture.complete(JetPlayer.create(this.connection, this.configurationData));
+        JetPlayer.create(this.connection, this.configurationData, this.playerFuture);
     }
 
     @Override

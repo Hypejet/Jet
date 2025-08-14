@@ -317,7 +317,6 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
             if (this.player != null)
                 throw new IllegalArgumentException("The player has been already initialized");
             this.player = player;
-            this.server.registerPlayer(player);
         } finally {
             this.playerLock.writeLock().unlock();
         }
