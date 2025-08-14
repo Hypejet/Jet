@@ -9,7 +9,7 @@ import java.util.Objects;
 
 /**
  * An event called when the {@linkplain PluginManager plugin manager} of the {@linkplain MinecraftServer server}
- * is initialized, meaning that all {@linkplain Plugin plugins} have been loaded.
+ * has been initialized, meaning that all {@linkplain Plugin plugins} have been loaded.
  *
  * @param pluginManager the initialized plugin manager
  * @since 1.0

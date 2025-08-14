@@ -15,6 +15,7 @@ import net.hypejet.jet.command.CommandManager;
 import net.hypejet.jet.command.CommandSource;
 import net.hypejet.jet.event.events.command.CommandExecuteEvent;
 import net.hypejet.jet.event.events.command.CommandExecutionFailureEvent;
+import net.hypejet.jet.event.events.command.CommandManagerLoadEvent;
 import net.hypejet.jet.event.events.command.CommandPreExecuteEvent;
 import net.hypejet.jet.event.events.command.CommandPreParseEvent;
 import net.hypejet.jet.event.node.EventNode;
@@ -72,6 +73,7 @@ public final class JetCommandManager implements CommandManager {
     public JetCommandManager(@NonNull EventNode<Object> eventNode, @NonNull Set<JetPlayer> players) {
         this.eventNode = Objects.requireNonNull(eventNode, "event node");
         this.players = Objects.requireNonNull(players, "players");
+        eventNode.call(new CommandManagerLoadEvent(this));
     }
 
     @Override
