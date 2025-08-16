@@ -12,6 +12,7 @@ import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.world.acquisition.worldmap.WorldMapAcquisitionImpl;
 import net.hypejet.jet.server.world.acquisition.worldmap.WriteWorldMapAcquisitionImpl;
 import net.hypejet.jet.server.world.chunk.JetChunk;
@@ -38,7 +39,7 @@ public final class JetWorld implements World {
     private final WorldData worldData;
 
     private final ChunkLoader chunkLoader;
-    private final JetMinecraftServer server;
+    private final JetRegistryManager registryManager;
 
     private final NotNullObjectAcquirable<Position> defaultSpawnPosition;
 
@@ -51,15 +52,15 @@ public final class JetWorld implements World {
      * @param dimensionType a holder referencing to a dimension type, of which type the world should be
      * @param worldData an additional world data that the world should have
      * @param chunkLoader a chunk loader that should be used for loading and saving chunks of the world
-     * @param server a server that should own the world
+     * @param registryManager a registry manager of the server that the world is being constructed for
      * @since 1.0
      */
     public JetWorld(Holder.@NonNull Reference<DimensionType> dimensionType, @NonNull WorldData worldData,
-                    @NonNull ChunkLoader chunkLoader, @NonNull JetMinecraftServer server) {
+                    @NonNull ChunkLoader chunkLoader, @NonNull JetRegistryManager registryManager) {
         this.dimensionType = Objects.requireNonNull(dimensionType, "dimension type");
         this.worldData = Objects.requireNonNull(worldData, "world data");
         this.chunkLoader = Objects.requireNonNull(chunkLoader, "chunk loader");
-        this.server = Objects.requireNonNull(server, "server");
+        this.registryManager = Objects.requireNonNull(registryManager, "registry manager");
         this.defaultSpawnPosition = new NotNullObjectAcquirable<>(new Position(0, 0, 0, 0f, 0f));
     }
 
@@ -98,11 +99,6 @@ public final class JetWorld implements World {
         return new WriteWorldMapAcquisitionImpl(this, this.chunks.acquireWrite());
     }
 
-    @Override
-    public @NonNull JetMinecraftServer server() {
-        return this.server;
-    }
-
     /**
      * Gets {@linkplain ChunkLoader a chunk loader}, which should be used for loading and saving
      * {@linkplain net.hypejet.jet.world.chunk.Chunk chunks} of this world.
@@ -112,6 +108,17 @@ public final class JetWorld implements World {
      */
     public @NonNull ChunkLoader chunkLoader() {
         return this.chunkLoader;
+    }
+
+    /**
+     * Gets a {@linkplain JetRegistryManager registry manager} of the {@linkplain JetMinecraftServer server}
+     * that this {@linkplain JetWorld world} was created for.
+     *
+     * @return the registry manager
+     * @since 1.0
+     */
+    public @NonNull JetRegistryManager registryManager() {
+        return this.registryManager;
     }
 
     /**
