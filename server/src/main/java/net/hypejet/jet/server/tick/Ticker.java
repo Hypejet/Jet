@@ -39,7 +39,7 @@ public final class Ticker {
                     LOGGER.error("An error occurred in the main ticking thread", throwable);
                     server.shutdown();
                 })
-                .start(this::loop);
+                .unstarted(this::loop);
     }
 
     /**
@@ -69,6 +69,18 @@ public final class Ticker {
     public void ensureRunsInTickLoop() {
         if (Thread.currentThread() != this.thread)
             throw new IllegalStateException("The current thread is not the main tick loop thread");
+    }
+
+    /**
+     * Schedules the game logic loop to start.
+     *
+     * @throws IllegalStateException if the ticker was already started
+     * @since 1.0
+     */
+    public void start() {
+        if (this.thread.isAlive())
+            throw new IllegalStateException("The ticker was already started");
+        this.thread.start();
     }
 
     /**

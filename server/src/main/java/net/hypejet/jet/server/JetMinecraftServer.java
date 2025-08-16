@@ -59,19 +59,20 @@ public final class JetMinecraftServer implements MinecraftServer {
      * @since 1.0
      */
     JetMinecraftServer() {
-        Set<JetPlayer> unmodifiablePlayersView = Collections.unmodifiableSet(this.players);
-
         this.configuration = JetServerConfiguration.parse(this, UnparsedServerConfiguration.create());
+
         this.networkManager = new NetworkManager(this);
+        this.ticker = new Ticker(this);
 
         this.pluginManager = new JetPluginManager(this.eventNode);
-        this.commandManager = new JetCommandManager(this.eventNode, unmodifiablePlayersView);
+        this.commandManager = new JetCommandManager(this.eventNode, Collections.unmodifiableSet(this.players));
         this.registryManager = new JetRegistryManager(this.eventNode, this.networkManager);
         this.worldManager = new JetWorldManager(this.registryManager);
         this.scoreboardManager = new JetScoreboardManager();
-        this.ticker = new Ticker(this);
 
+        this.ticker.start();
         this.networkManager.bind();
+
         this.eventNode.call(new ServerReadyEvent(this));
     }
 
