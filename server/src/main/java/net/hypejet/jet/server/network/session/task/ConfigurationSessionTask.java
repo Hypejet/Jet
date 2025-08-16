@@ -6,9 +6,6 @@ import net.hypejet.concurrency.object.WriteObjectAcquisition;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquirable;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
 import net.hypejet.concurrency.object.nullable.WriteNullableObjectAcquisition;
-import net.hypejet.concurrency.primitive.booleans.BooleanAcquirable;
-import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
-import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.configuration.ConfigurationStartEvent;
 import net.hypejet.jet.network.PlayerConnection;
@@ -34,7 +31,7 @@ import net.hypejet.jet.server.network.session.keepalive.KeepAliveHandler;
 import net.hypejet.jet.server.network.session.pack.ResourcePackHandler;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
 import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
-import net.hypejet.jet.server.registry.function.RegistryTagUpdateFunction;
+import net.hypejet.jet.server.registry.function.SynchronizeRegistryTagsFunction;
 import net.hypejet.jet.server.scoreboard.JetScoreboard;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.hypejet.jet.server.util.game.audience.PacketReceivingCommonAudience;
@@ -63,6 +60,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Represents {@linkplain SessionTask a session task}, which handles
@@ -72,8 +70,8 @@ import java.util.concurrent.TimeoutException;
  * @see ProtocolState#CONFIGURATION
  * @see SessionTask
  */
-public final class ConfigurationSessionTask implements SessionTask, RegistryTagUpdateFunction, ConfigurationManager,
-        CommonSessionPacketHandler, PacketReceivingCommonAudience {
+public final class ConfigurationSessionTask implements SessionTask, SynchronizeRegistryTagsFunction,
+        ConfigurationManager, CommonSessionPacketHandler, PacketReceivingCommonAudience {
 
     private static final Key SERVER_BRAND_PLUGIN_MESSAGE_KEY = Key.key("brand");
 
@@ -84,15 +82,16 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
 
     private final SocketPlayerConnection connection;
     private final LoginData loginData;
-
     private final KeepAliveHandler keepAliveHandler;
-    private final BooleanAcquirable tagsSent = new BooleanAcquirable();
 
     private final CompletableFuture<ClientKnownPacksConfigurationPacket> knownPacksFuture = new CompletableFuture<>();
     private final CompletableFuture<Unit> acknowledgeFuture = new CompletableFuture<>();
 
     private final NullableObjectAcquirable<Player.Settings> settings = new NullableObjectAcquirable<>();
     private final NullableObjectAcquirable<String> clientBrand = new NullableObjectAcquirable<>();
+
+    private final ReentrantReadWriteLock tagsSentLock = new ReentrantReadWriteLock();
+    private boolean tagsSent;
 
     /**
      * Constructs the {@linkplain ConfigurationSessionTask configuration session task}.
@@ -130,14 +129,6 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
     @Override
     public void handleResourcePackStatus(@NonNull UUID uniqueId, @NonNull ResourcePackStatus status) {
         this.resourcePackHandler().handleState(uniqueId, status, this);
-    }
-
-    @Override
-    public void updateTags(@NonNull ServerUpdateTagsPacket packet) {
-        try (BooleanAcquisition tagsSentAcquisition = this.tagsSent.acquireWrite()) {
-            if (!tagsSentAcquisition.get()) return;
-            this.sendPacket(packet);
-        }
     }
 
     @Override
@@ -179,6 +170,19 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
     @Override
     public void sendPacket(@NonNull ServerPacket packet) {
         this.connection.sendPacket(packet);
+    }
+
+    @Override
+    public void synchronizeTags(@NonNull ServerUpdateTagsPacket packet) {
+        try {
+            this.tagsSentLock.readLock().lock();
+            /* Synchronization is not needed as tags have not been initialized yet. The tags
+               are going to be initialized for the client with acknowledged tag updates. */
+            if (!this.tagsSent) return;
+            this.connection.sendPacket(packet);
+        } finally {
+            this.tagsSentLock.readLock().unlock();
+        }
     }
 
     /**
@@ -262,17 +266,25 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
             Collection<JetMinecraftRegistry<?>> registries = server.registryManager().registries();
             registries.forEach(registry -> sendRegistry(this.connection, registry, commonKnownPacks));
 
-            try (WriteBooleanAcquisition tagsSentAcquisition = this.tagsSent.acquireWrite()) {
+            try {
+                this.tagsSentLock.writeLock().lock();
                 Set<TagRegistry> tagRegistries = new HashSet<>();
 
                 registries.forEach(registry -> {
+                    /* We can safely create tag registries without tag locking mechanism as no race conditions
+                       happen thanks to the "tagsSentLock". If tags of the registry are modified, the lock
+                       is still held and the tag update method will attempt to update tags using the "synchronizeTags"
+                       method, which uses the same lock. */
+                    // FIXME: Sometimes updating may lead to unnecessary sending tag registries with the same contents
                     TagRegistry tagRegistry = registry.createTagRegistry();
                     if (tagRegistry.tags().isEmpty()) return;
                     tagRegistries.add(tagRegistry);
                 });
 
-                this.sendPacket(new ServerUpdateTagsPacket(Set.copyOf(tagRegistries)));
-                tagsSentAcquisition.set(true);
+                this.sendPacket(new ServerUpdateTagsPacket(tagRegistries));
+                this.tagsSent = true;
+            } finally {
+                this.tagsSentLock.writeLock().unlock();
             }
 
             if (!this.keepAliveHandler.stopAndAwaitTermination(TIME_OUT_DURATION, TIME_OUT_UNIT)) {

@@ -7,7 +7,6 @@ import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collection;
 import java.util.Set;
-import java.util.function.UnaryOperator;
 
 /**
  * Represents a Minecraft registry.
@@ -50,10 +49,10 @@ public interface MinecraftRegistry<V> {
      * Updates tags for a registry value associated with the specified {@linkplain Key key}.
      *
      * @param key the key of the registry value
-     * @param tagUnaryOperator a unary operator to update the tags with, the provided set
-     *                         is a set of current tags, the returned set is a set of new tags
+     * @param tagKeys keys of tags that should be associated with the specified registry value, {@code null}
+     *                or {@link Set#of()} removes all tags from being associated with the specified registry value
      * @throws IllegalArgumentException if no registry value is associated with the specified key
      * @since 1.0
      */
-    void updateTags(@NonNull Key key, @NonNull UnaryOperator<Set<Key>> tagUnaryOperator);
+    void updateTags(@NonNull Key key, @Nullable Set<Key> tagKeys);
 }

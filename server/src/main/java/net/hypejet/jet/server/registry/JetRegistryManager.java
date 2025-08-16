@@ -11,14 +11,15 @@ import net.hypejet.jet.data.json.model.sound.JsonSoundEvent;
 import net.hypejet.jet.data.json.resource.JsonDataResourceFiles;
 import net.hypejet.jet.data.json.util.JsonUnit;
 import net.hypejet.jet.event.events.registry.RegistryInitializeEvent;
+import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.registry.MinecraftRegistry;
 import net.hypejet.jet.registry.RegistryManager;
 import net.hypejet.jet.registry.feature.KnownPack;
 import net.hypejet.jet.registry.reference.RegistryReference;
-import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntityType;
 import net.hypejet.jet.server.entity.ai.JetPoiType;
 import net.hypejet.jet.server.inventory.item.JetItem;
+import net.hypejet.jet.server.network.NetworkManager;
 import net.hypejet.jet.server.registry.blockstate.JetBlockStateRegistry;
 import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.chat.ChatTypeBinaryTagCodec;
@@ -61,7 +62,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 /**
- * Represents an implementation of {@linkplain RegistryManager a registry manager}.
+ * An implementation of the {@linkplain RegistryManager registry manager}.
  *
  * @since 1.0
  * @see RegistryManager
@@ -74,11 +75,12 @@ public final class JetRegistryManager implements RegistryManager {
     /**
      * Constructs the {@linkplain JetRegistryManager registry manager}.
      *
-     * @param server the server that the registry manager is constructed for
+     * @param eventNode an event node that registry events should be called in
+     * @param networkManager a network manager of the server that the registry manager is being constructed for
      * @since 1.0
      */
-    public JetRegistryManager(@NonNull JetMinecraftServer server) {
-        this.registries = new RegistryMapBuilder(server)
+    public JetRegistryManager(@NonNull EventNode<Object> eventNode, @NonNull NetworkManager networkManager) {
+        this.registries = new RegistryMapBuilder(eventNode, networkManager)
                 .dataDriven(
                         RegistryReference.BIOME, Key.key("worldgen/biome"),
                         JsonDataResourceFiles.BIOMES, BiomeBinaryTagCodec.INSTANCE
@@ -233,17 +235,21 @@ public final class JetRegistryManager implements RegistryManager {
      */
     private static final class RegistryMapBuilder {
 
-        private final JetMinecraftServer server;
+        private final EventNode<Object> eventNode;
+        private final NetworkManager networkManager;
+
         private final Map<RegistryReference<?>, JetMinecraftRegistry<?>> registries = new HashMap<>();
 
         /**
          * Constructs the {@linkplain RegistryMapBuilder registry-map builder}.
          *
-         * @param server the server that the constructed builder should create the registry map for
+         * @param eventNode an event node that registry events should be called in
+         * @param networkManager a network manager of the server that the registry map is being created for
          * @since 1.0
          */
-        private RegistryMapBuilder(@NonNull JetMinecraftServer server) {
-            this.server = Objects.requireNonNull(server, "server");
+        private RegistryMapBuilder(@NonNull EventNode<Object> eventNode, @NonNull NetworkManager networkManager) {
+            this.eventNode = Objects.requireNonNull(eventNode, "event node");
+            this.networkManager = Objects.requireNonNull(networkManager, "network manager");
         }
 
         /**
@@ -361,11 +367,11 @@ public final class JetRegistryManager implements RegistryManager {
             JetMinecraftRegistry<CV> registry;
 
             if (valueCodec == null) {
-                registry = new JetMinecraftRegistry<>(registryKey, registrations, tags, this.server, null);
+                registry = new JetMinecraftRegistry<>(registryKey, registrations, tags, this.networkManager, null);
             } else {
                 NetworkableRegistryBuilder<CV> registryBuilder = new NetworkableRegistryBuilder<>(registrations, tags);
-                this.server.eventNode().call(new RegistryInitializeEvent<>(reference, registryBuilder));
-                registry = registryBuilder.build(registryKey, valueCodec, this.server);
+                this.eventNode.call(new RegistryInitializeEvent<>(reference, registryBuilder));
+                registry = registryBuilder.build(registryKey, valueCodec, this.networkManager);
             }
 
             this.registries.put(reference, registry);
@@ -427,17 +433,17 @@ public final class JetRegistryManager implements RegistryManager {
              *
              * @param registryKey the key that the registry should have
              * @param valueCodec a binary tag codec that values of the registry should be written with
-             * @param server a server that the registry should be created for
+             * @param networkManager a network manager of the server that the registry is being created for
              * @return the created registry
              * @since 1.0
              */
             private @NonNull JetMinecraftRegistry<V> build(@NonNull Key registryKey,
                                                            @NonNull BinaryTagCodec<V> valueCodec,
-                                                           @NonNull JetMinecraftServer server) {
+                                                           @NonNull NetworkManager networkManager) {
                 this.registryCreated = true;
                 return new JetMinecraftRegistry<>(
                         registryKey, List.copyOf(this.registrations),
-                        this.tags, server, valueCodec
+                        this.tags, networkManager, valueCodec
                 );
             }
         }

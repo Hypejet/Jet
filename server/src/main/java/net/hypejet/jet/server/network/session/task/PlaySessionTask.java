@@ -11,7 +11,7 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCo
 import net.hypejet.jet.server.network.session.common.CommonSessionPacketHandler;
 import net.hypejet.jet.server.network.session.data.ConfigurationData;
 import net.hypejet.jet.server.network.session.keepalive.KeepAliveHandler;
-import net.hypejet.jet.server.registry.function.RegistryTagUpdateFunction;
+import net.hypejet.jet.server.registry.function.SynchronizeRegistryTagsFunction;
 import net.kyori.adventure.resource.ResourcePackStatus;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -27,7 +27,7 @@ import java.util.concurrent.CompletableFuture;
  * @see net.hypejet.jet.server.network.ProtocolState#PLAY
  * @see SessionTask
  */
-public final class PlaySessionTask implements SessionTask, RegistryTagUpdateFunction, CommonSessionPacketHandler {
+public final class PlaySessionTask implements SessionTask, SynchronizeRegistryTagsFunction, CommonSessionPacketHandler {
 
     private final SocketPlayerConnection connection;
     private final ConfigurationData configurationData;
@@ -68,7 +68,7 @@ public final class PlaySessionTask implements SessionTask, RegistryTagUpdateFunc
     }
 
     @Override
-    public void updateTags(@NonNull ServerUpdateTagsPacket packet) {
+    public void synchronizeTags(@NonNull ServerUpdateTagsPacket packet) {
         this.connection.sendPacket(packet);
     }
 
