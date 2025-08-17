@@ -1,6 +1,8 @@
 package net.hypejet.jet.server.configuration;
 
-import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.MinecraftVersion;
+import net.hypejet.jet.server.configuration.unparsed.UnparsedServerConfiguration;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.TagPattern;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -9,51 +11,43 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.Objects;
 
 /**
- * Represents a placeholder of an unparsed {@linkplain net.kyori.adventure.text.Component component}
- * of {@linkplain net.hypejet.jet.server.configuration.unparsed.UnparsedServerConfiguration an unparsed server
- * configuration}.
+ * A placeholder of an unparsed {@linkplain Component component}
+ * from an {@linkplain UnparsedServerConfiguration unparsed server configuration}.
  *
  * @since 1.0
- * @see net.kyori.adventure.text.Component
- * @see net.hypejet.jet.server.configuration.unparsed.UnparsedServerConfiguration
+ * @see Component
+ * @see UnparsedServerConfiguration
  */
 public enum ConfigurationPlaceholder {
     /**
-     * {@linkplain ConfigurationPlaceholder A configuration placeholder}, which is replaced with a name of a Minecraft
-     * version that the servers runs on.
+     * A {@linkplain ConfigurationPlaceholder configuration placeholder}
+     * that is replaced with a name of a Minecraft version that the servers runs on.
      *
      * @since 1.0
      */
-    MINECRAFT_VERSION_NAME("minecraft-version-name") {
-        @Override
-        @NonNull String value(@NonNull JetMinecraftServer server) {
-            return server.minecraftVersion();
-        }
-    },
+    MINECRAFT_VERSION_NAME("minecraft-version-name", MinecraftVersion.VERSION_NAME),
 
     /**
-     * {@linkplain ConfigurationPlaceholder A configuration placeholder}, which is replaced with a protocol version of
-     * a Minecraft version that the servers runs on.
+     * A {@linkplain ConfigurationPlaceholder configuration placeholder}
+     * that is replaced with a protocol version of a Minecraft version that the servers supports.
      *
      * @since 1.0
      */
-    MINECRAFT_PROTOCOL_VERSION("minecraft-protocol-version") {
-        @Override
-        @NonNull String value(@NonNull JetMinecraftServer server) {
-            return String.valueOf(server.protocolVersion());
-        }
-    };
+    MINECRAFT_PROTOCOL_VERSION("minecraft-protocol-version", String.valueOf(MinecraftVersion.PROTOCOL_VERSION));
 
-    private final @NonNull @TagPattern String placeholderName;
+    private final @TagPattern String placeholderName;
+    private final String value;
 
     /**
      * Constructs the {@linkplain ConfigurationPlaceholder configuration placeholder}.
      *
      * @param placeholderName a name that the placeholder should have
+     * @param value a value that the placeholder should have
      * @since 1.0
      */
-    ConfigurationPlaceholder(@NonNull @TagPattern String placeholderName) {
+    ConfigurationPlaceholder(@NonNull @TagPattern String placeholderName, @NonNull String value) {
         this.placeholderName = Objects.requireNonNull(placeholderName, "name");
+        this.value = Objects.requireNonNull(value, "value");
     }
 
     /**
@@ -67,30 +61,19 @@ public enum ConfigurationPlaceholder {
     }
 
     /**
-     * Gets value of the placeholder for {@linkplain JetMinecraftServer a Minecraft server specified}.
+     * Creates an array of {@linkplain TagResolver tag resolvers}
+     * resolving {@linkplain ConfigurationPlaceholder configuration placeholders}.
      *
-     * @param server the Minecraft server
-     * @return the value
+     * @return the tag resolver array
      * @since 1.0
      */
-    abstract @NonNull String value(@NonNull JetMinecraftServer server);
+    public static @NonNull TagResolver @NonNull [] createTagResolvers() {
+        ConfigurationPlaceholder[] placeholders = values();
+        TagResolver[] tagResolvers = new TagResolver[placeholders.length];
 
-    /**
-     * Creates {@linkplain TagResolver tag resolvers} for each
-     * {@linkplain ConfigurationPlaceholder configuration placeholder} for
-     * {@linkplain JetMinecraftServer a Minecraft server} specified.
-     *
-     * @param server the Minecraft server
-     * @return an array of the tag resolvers
-     * @since 1.0
-     */
-    public static @NonNull TagResolver @NonNull [] createTagResolvers(@NonNull JetMinecraftServer server) {
-        ConfigurationPlaceholder[] values = values();
-        TagResolver[] tagResolvers = new TagResolver[values.length];
-
-        for (int index = 0; index < values.length; index++) {
-            ConfigurationPlaceholder value = values[index];
-            tagResolvers[index] = Placeholder.unparsed(value.placeholderName(), value.value(server));
+        for (int index = 0; index < placeholders.length; index++) {
+            ConfigurationPlaceholder placeholder = placeholders[index];
+            tagResolvers[index] = Placeholder.unparsed(placeholder.placeholderName(), placeholder.value);
         }
 
         return tagResolvers;

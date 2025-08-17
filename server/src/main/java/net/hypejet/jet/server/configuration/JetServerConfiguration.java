@@ -1,7 +1,6 @@
 package net.hypejet.jet.server.configuration;
 
 import net.hypejet.jet.configuration.ServerConfiguration;
-import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.configuration.unparsed.UnparsedServerConfiguration;
 import net.hypejet.jet.server.network.netty.transport.NettyTransportSelector;
 import net.hypejet.jet.server.world.handler.ChunkBatchHandler;
@@ -14,7 +13,7 @@ import org.checkerframework.common.value.qual.IntRange;
 import java.util.Objects;
 
 /**
- * Represents an implementation of the {@linkplain ServerConfiguration server configuration}.
+ * An implementation of the {@linkplain ServerConfiguration server configuration}.
  *
  * @param address an address that the sever should bind to
  * @param port a port that the server should bind to
@@ -90,17 +89,15 @@ public record JetServerConfiguration(
     }
 
     /**
-     * Parses {@linkplain UnparsedServerConfiguration an unparsed server configuration} specified for
-     * {@linkplain JetMinecraftServer a Minecraft server} specified.
+     * Creates the {@linkplain ServerConfiguration server configuration}
+     * by creating and parsing an {@linkplain UnparsedServerConfiguration unparsed server configuration}.
      *
-     * @param server the unparsed server configuration
-     * @param unparsed the Minecraft server
-     * @return a configuration that has been parsed
+     * @return the created server configuration
      * @since 1.0
      */
-    public static @NonNull JetServerConfiguration parse(@NonNull JetMinecraftServer server,
-                                                        @NonNull UnparsedServerConfiguration unparsed) {
-        TagResolver[] tagResolvers = ConfigurationPlaceholder.createTagResolvers(server);
+    public static @NonNull JetServerConfiguration create() {
+        UnparsedServerConfiguration unparsed = UnparsedServerConfiguration.create();
+        TagResolver[] tagResolvers = ConfigurationPlaceholder.createTagResolvers();
         return new JetServerConfiguration(
                 unparsed.address(), unparsed.port(), unparsed.compressionThreshold(), unparsed.transportSelector(),
                 deserialize(unparsed.unsupportedVersionMessage(), tagResolvers),

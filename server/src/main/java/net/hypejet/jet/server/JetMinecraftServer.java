@@ -7,7 +7,6 @@ import net.hypejet.jet.event.events.lifecycle.ServerShutdownEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.server.command.JetCommandManager;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
-import net.hypejet.jet.server.configuration.unparsed.UnparsedServerConfiguration;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.entity.player.PlayerList;
 import net.hypejet.jet.server.network.NetworkManager;
@@ -34,12 +33,12 @@ public final class JetMinecraftServer implements MinecraftServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(JetMinecraftServer.class);
 
     private final EventNode<Object> eventNode = new EventNode<>(Object.class);
+    private final JetServerConfiguration configuration = JetServerConfiguration.create();
 
     private final NetworkManager networkManager;
     private final Ticker ticker;
     private final PlayerList playerList;
 
-    private final JetServerConfiguration configuration;
     private final JetCommandManager commandManager;
     private final JetRegistryManager registryManager;
     private final JetPluginManager pluginManager;
@@ -52,8 +51,6 @@ public final class JetMinecraftServer implements MinecraftServer {
      * @since 1.0
      */
     JetMinecraftServer() {
-        this.configuration = JetServerConfiguration.parse(this, UnparsedServerConfiguration.create());
-
         this.networkManager = new NetworkManager(this);
         this.ticker = new Ticker(this);
         this.playerList = new PlayerList(this.eventNode, this.ticker);
