@@ -21,6 +21,7 @@ import net.hypejet.jet.event.events.command.CommandPreParseEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.server.command.exceptions.CommandParseException;
 import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.entity.player.PlayerList;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.ArgumentNode;
@@ -57,7 +58,7 @@ public final class JetCommandManager implements CommandManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(JetCommandManager.class);
 
     private final EventNode<Object> eventNode;
-    private final Set<JetPlayer> players;
+    private final PlayerList playerList;
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final CommandDispatcher<CommandSource> dispatcher = new CommandDispatcher<>();
@@ -66,13 +67,12 @@ public final class JetCommandManager implements CommandManager {
      * Constructs the {@linkplain JetCommandManager command manager}.
      *
      * @param eventNode an event node that command events should be called in
-     * @param players an unmodifiable view of set of players connected
-     *                to the server that the command manager is being constructed for
+     * @param playerList a player list of the server that the command manager is being constructed for
      * @since 1.0
      */
-    public JetCommandManager(@NonNull EventNode<Object> eventNode, @NonNull Set<JetPlayer> players) {
+    public JetCommandManager(@NonNull EventNode<Object> eventNode, @NonNull PlayerList playerList) {
         this.eventNode = Objects.requireNonNull(eventNode, "event node");
-        this.players = Objects.requireNonNull(players, "players");
+        this.playerList = Objects.requireNonNull(playerList, "player list");
         eventNode.call(new CommandManagerLoadEvent(this));
     }
 
@@ -224,7 +224,7 @@ public final class JetCommandManager implements CommandManager {
 
     private void broadcastDeclarationPacket() {
         ServerDeclareCommandsPlayPacket declarationPacket = this.createDeclarationPacket();
-        for (JetPlayer player : this.players) {
+        for (JetPlayer player : this.playerList.players()) {
             try (NotNullObjectAcquisition<Session> sessionAcquisition = player.connection().acquireSessionRead()) {
                 if (!(sessionAcquisition.get().sessionTask() instanceof PlaySessionTask playSessionTask)) return;
                 playSessionTask.updateCommands(declarationPacket);

@@ -228,7 +228,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     public void handleDisconnection() {
         this.chunkBatchHandler.handleDisconnection();
         // TODO: Move disconnection handling and player unregistering to a tick thread
-        this.server().ticker().scheduleTask(() -> this.server().unregisterPlayer(this));
+        this.server().ticker().scheduleTask(() -> this.server().playerList().unregisterPlayer(this));
     }
 
     @Override
@@ -343,7 +343,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
 
         server.ticker().scheduleTask(() -> {
             connection.initializePlayer(player);
-            server.registerPlayer(player);
+            server.playerList().registerPlayer(player);
             playerFuture.complete(player);
         });
     }

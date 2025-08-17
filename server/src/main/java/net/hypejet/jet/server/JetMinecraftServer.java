@@ -1,32 +1,25 @@
 package net.hypejet.jet.server;
 
 import net.hypejet.jet.MinecraftServer;
-import net.hypejet.jet.entity.movement.acquisition.MovementAcquisition;
 import net.hypejet.jet.event.events.server.ServerReadyEvent;
 import net.hypejet.jet.event.events.server.ServerShutdownEvent;
-import net.hypejet.jet.event.events.world.InitialSpawnEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.server.command.JetCommandManager;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.configuration.unparsed.UnparsedServerConfiguration;
-import net.hypejet.jet.server.entity.acquisition.world.EntityWorldAcquisition;
 import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.entity.player.PlayerList;
 import net.hypejet.jet.server.network.NetworkManager;
 import net.hypejet.jet.server.plugin.JetPluginManager;
 import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.scoreboard.JetScoreboardManager;
 import net.hypejet.jet.server.tick.Ticker;
-import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.server.world.JetWorldManager;
-import net.hypejet.jet.world.coordinate.Position;
-import net.hypejet.jet.world.coordinate.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * An implementation of the {@linkplain MinecraftServer Minecraft server}.
@@ -40,18 +33,17 @@ public final class JetMinecraftServer implements MinecraftServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(JetMinecraftServer.class);
 
     private final EventNode<Object> eventNode = new EventNode<>(Object.class);
-    private final JetServerConfiguration configuration;
 
+    private final NetworkManager networkManager;
+    private final Ticker ticker;
+    private final PlayerList playerList;
+
+    private final JetServerConfiguration configuration;
     private final JetCommandManager commandManager;
     private final JetRegistryManager registryManager;
     private final JetPluginManager pluginManager;
     private final JetWorldManager worldManager;
     private final JetScoreboardManager scoreboardManager;
-
-    private final NetworkManager networkManager;
-    private final Ticker ticker;
-
-    private final Set<JetPlayer> players = ConcurrentHashMap.newKeySet();
 
     /**
      * Constructs the {@linkplain JetMinecraftServer Minecraft server}.
@@ -63,9 +55,10 @@ public final class JetMinecraftServer implements MinecraftServer {
 
         this.networkManager = new NetworkManager(this);
         this.ticker = new Ticker(this);
+        this.playerList = new PlayerList(this.eventNode, this.ticker);
 
         this.pluginManager = new JetPluginManager(this.eventNode);
-        this.commandManager = new JetCommandManager(this.eventNode, Collections.unmodifiableSet(this.players));
+        this.commandManager = new JetCommandManager(this.eventNode, this.playerList);
         this.registryManager = new JetRegistryManager(this.eventNode, this.networkManager);
         this.worldManager = new JetWorldManager(this.registryManager);
         this.scoreboardManager = new JetScoreboardManager();
@@ -113,7 +106,7 @@ public final class JetMinecraftServer implements MinecraftServer {
 
     @Override
     public @NonNull Set<JetPlayer> players() {
-        return Set.copyOf(this.players);
+        return this.playerList.players();
     }
 
     @Override
@@ -162,50 +155,12 @@ public final class JetMinecraftServer implements MinecraftServer {
     }
 
     /**
-     * Registers the specified {@linkplain JetPlayer player} on the server.
+     * Gets a {@linkplain PlayerList player list} of the server.
      *
-     * @param player the player to register
+     * @return the player list
      * @since 1.0
      */
-    public void registerPlayer(@NonNull JetPlayer player) {
-        this.ticker.ensureRunsInTickLoop();
-
-        /* A call outside the event loop is safe in this case. When a player gets disconnected, the unregister method
-           is going to be called and that method also runs in a tick loop. It means that the unregister method
-           cannot be called until this method stops running, therefore no race conditions should happen. */
-        if (!player.connection().isActive()) return;
-
-        player.sendJoinGamePacket();
-        // TODO: Difficulty packets, ability packets, held slot packets, etc.
-        player.getScoreboard().addViewer(player);
-
-        try (
-                MovementAcquisition movementAcquisition = player.acquireMovementRead();
-                EntityWorldAcquisition<?> worldAcquisition = player.acquireWorldRead()
-        ) {
-            Position position = movementAcquisition.position();
-            player.movementHandler().synchronize(position, Vector.zero(), Set.of());
-
-            this.players.add(player);
-
-            // TODO: Send other world data
-            player.chunkBatchHandler().scheduleTask(); // TODO: Ensure that it produces the same behaviour as vanilla
-
-            JetWorld world = worldAcquisition.get();
-            world.addPlayer(player);
-
-            this.eventNode.call(new InitialSpawnEvent(player, world, position));
-        }
-    }
-
-    /**
-     * Unregisters the specified {@linkplain JetPlayer player} from the server.
-     *
-     * @param player the player to unregister
-     * @since 1.0
-     */
-    public void unregisterPlayer(@NonNull JetPlayer player) {
-        this.ticker.ensureRunsInTickLoop();
-        this.players.remove(player);
+    public @NonNull PlayerList playerList() {
+        return this.playerList;
     }
 }
