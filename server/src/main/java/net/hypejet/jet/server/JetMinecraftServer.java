@@ -1,8 +1,8 @@
 package net.hypejet.jet.server;
 
 import net.hypejet.jet.MinecraftServer;
-import net.hypejet.jet.event.events.server.ServerReadyEvent;
-import net.hypejet.jet.event.events.server.ServerShutdownEvent;
+import net.hypejet.jet.event.events.lifecycle.ServerReadyEvent;
+import net.hypejet.jet.event.events.lifecycle.ServerShutdownEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.server.command.JetCommandManager;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
@@ -60,8 +60,8 @@ public final class JetMinecraftServer implements MinecraftServer {
         this.pluginManager = new JetPluginManager(this.eventNode);
         this.commandManager = new JetCommandManager(this.eventNode, this.playerList);
         this.registryManager = new JetRegistryManager(this.eventNode, this.networkManager);
-        this.worldManager = new JetWorldManager(this.registryManager);
-        this.scoreboardManager = new JetScoreboardManager();
+        this.worldManager = new JetWorldManager(this.eventNode, this.registryManager);
+        this.scoreboardManager = new JetScoreboardManager(this.eventNode);
 
         this.ticker.start();
         this.networkManager.bind();

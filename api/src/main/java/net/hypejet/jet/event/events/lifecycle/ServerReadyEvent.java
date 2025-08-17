@@ -1,4 +1,4 @@
-package net.hypejet.jet.event.events.server;
+package net.hypejet.jet.event.events.lifecycle;
 
 import net.hypejet.jet.MinecraftServer;
 import org.checkerframework.checker.nullness.qual.NonNull;

@@ -1,4 +1,4 @@
-package net.hypejet.jet.event.events.command;
+package net.hypejet.jet.event.events.lifecycle;
 
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.command.CommandManager;

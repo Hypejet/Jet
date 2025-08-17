@@ -1,4 +1,6 @@
 package net.hypejet.jet.server.world;
+import net.hypejet.jet.event.events.lifecycle.WorldManagerLoadEvent;
+import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
@@ -41,10 +43,12 @@ public final class JetWorldManager implements WorldManager {
     /**
      * Constructs the {@linkplain JetWorldManager world manager implementation}.
      *
+     * @param eventNode an event node of the server that the world manager is being constructed for
      * @param registryManager a registry manager of the server that the world manager is being constructed for
      * @since 1.0
      */
-    public JetWorldManager(@NonNull JetRegistryManager registryManager) {
+    public JetWorldManager(@NonNull EventNode<Object> eventNode, @NonNull JetRegistryManager registryManager) {
+        Objects.requireNonNull(eventNode, "event node");
         this.registryManager = Objects.requireNonNull(registryManager, "registry manager");
 
         this.blockStateChunkPaletteFactory = new JetChunkPaletteFactory<>(
@@ -62,6 +66,8 @@ public final class JetWorldManager implements WorldManager {
                 this.blockStateChunkPaletteFactory,
                 this.biomeChunkPaletteFactory
         );
+
+        eventNode.call(new WorldManagerLoadEvent(this));
     }
 
     @Override

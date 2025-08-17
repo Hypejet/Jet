@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
-import net.hypejet.jet.event.events.plugin.PluginManagerLoadEvent;
+import net.hypejet.jet.event.events.lifecycle.PluginManagerLoadEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.plugin.Plugin;
 import net.hypejet.jet.plugin.PluginManager;

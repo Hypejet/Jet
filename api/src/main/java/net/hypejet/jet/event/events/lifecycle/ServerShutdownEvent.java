@@ -1,4 +1,4 @@
-package net.hypejet.jet.event.events.server;
+package net.hypejet.jet.event.events.lifecycle;
 
 /**
  * Represents an event called when the server is being shut down.
