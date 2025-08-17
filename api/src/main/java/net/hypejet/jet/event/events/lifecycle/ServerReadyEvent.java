@@ -6,8 +6,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.Objects;
 
 /**
- * An event called when a {@linkplain MinecraftServer server} has been fully initialized
- * and is listening for connections.
+ * An event called when the {@linkplain MinecraftServer server}
+ * has been fully initialized and is listening for connections.
  *
  * @param server the server that is ready
  * @since 1.0

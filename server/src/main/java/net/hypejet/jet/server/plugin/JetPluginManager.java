@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
-import net.hypejet.jet.event.events.lifecycle.PluginManagerLoadEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.plugin.Plugin;
 import net.hypejet.jet.plugin.PluginManager;
@@ -101,8 +100,6 @@ public final class JetPluginManager implements PluginManager {
         } catch (Throwable throwable) {
             throw new RuntimeException("An error occurred while loading plugins", throwable);
         }
-
-        eventNode.call(new PluginManagerLoadEvent(this));
     }
 
     @Override
