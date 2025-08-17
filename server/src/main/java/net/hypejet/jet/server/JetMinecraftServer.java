@@ -20,6 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Set;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 /**
  * An implementation of the {@linkplain MinecraftServer Minecraft server}.
@@ -45,6 +48,9 @@ public final class JetMinecraftServer implements MinecraftServer {
     private final JetWorldManager worldManager;
     private final JetScoreboardManager scoreboardManager;
 
+    private final CompletableFuture<Void> serverReadyFuture = new CompletableFuture<>();
+    private final Thread shutdownThread = this.createShutdownThread();
+
     /**
      * Constructs the {@linkplain JetMinecraftServer Minecraft server}.
      *
@@ -60,11 +66,19 @@ public final class JetMinecraftServer implements MinecraftServer {
         this.registryManager = new JetRegistryManager(this.eventNode, this.networkManager);
         this.worldManager = new JetWorldManager(this.registryManager);
         this.scoreboardManager = new JetScoreboardManager();
-        this.eventNode.call(new ServerInitializedEvent(this));
 
-        this.ticker.start();
-        this.networkManager.bind();
-        this.eventNode.call(new ServerReadyEvent(this));
+        try {
+            Runtime.getRuntime().addShutdownHook(this.shutdownThread);
+            this.eventNode.call(new ServerInitializedEvent(this));
+            this.ticker.start();
+            this.networkManager.bind();
+            this.eventNode.call(new ServerReadyEvent(this));
+            this.serverReadyFuture.complete(null);
+        } catch (Throwable throwable) {
+            LOGGER.error("An error occurred while making the server ready", throwable);
+            this.serverReadyFuture.completeExceptionally(throwable);
+            this.shutdown();
+        }
     }
 
     @Override
@@ -90,16 +104,6 @@ public final class JetMinecraftServer implements MinecraftServer {
     @Override
     public @NonNull JetServerConfiguration configuration() {
         return this.configuration;
-    }
-
-    @Override
-    public void shutdown() {
-        LOGGER.info("Shutting down the server...");
-        this.eventNode.call(new ServerShutdownEvent());
-        this.ticker.shutdown();
-        this.networkManager.shutdown();
-        this.pluginManager.shutdown();
-        LOGGER.info("Successfully shut down the server");
     }
 
     @Override
@@ -132,6 +136,15 @@ public final class JetMinecraftServer implements MinecraftServer {
         return this.scoreboardManager;
     }
 
+    @Override
+    public void shutdown() {
+        try {
+            this.shutdownThread.start();
+        } catch (IllegalThreadStateException exception) {
+            // The shutdown has already been scheduled
+        }
+    }
+
     /**
      * Gets an identifier of a Minecraft version that the server runs on.
      *
@@ -160,5 +173,36 @@ public final class JetMinecraftServer implements MinecraftServer {
      */
     public @NonNull PlayerList playerList() {
         return this.playerList;
+    }
+
+    private @NonNull Thread createShutdownThread() {
+        return Thread.ofVirtual()
+                .name("Server shutdown thread")
+                // TODO: Replace single-char names with underscores when JDK 25 releases
+                .uncaughtExceptionHandler((t, e) -> LOGGER.error("An error occurred while shutting down the server"))
+                .unstarted(() -> {
+                    try {
+                        this.serverReadyFuture.join();
+                    } catch (CancellationException | CompletionException exception) {
+                        // The server start error exception has already been thrown inside the main thread
+                    }
+
+                    LOGGER.info("Shutting down the server...");
+                    this.eventNode.call(new ServerShutdownEvent());
+                    this.ticker.shutdown();
+                    this.networkManager.shutdown();
+                    this.pluginManager.shutdown();
+                    LOGGER.info("Successfully shut down the server");
+                });
+    }
+
+    /**
+     * Runs the {@linkplain JetMinecraftServer Minecraft server}.
+     *
+     * @param args arguments that the server application should start with
+     * @since 1.0
+     */
+    public static void main(String[] args) {
+        new JetMinecraftServer();
     }
 }

@@ -18,7 +18,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("net.hypejet.jet.server.JetServerEntrypoint")
+    mainClass.set("net.hypejet.jet.server.JetMinecraftServer")
 }
 
 val generatedSourcesRoot = layout.projectDirectory.dir("src").dir("generated")

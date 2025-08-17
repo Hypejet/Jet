@@ -59,13 +59,6 @@ public interface MinecraftServer {
     @NonNull ServerConfiguration configuration();
 
     /**
-     * Shuts down the server.
-     *
-     * @since 1.0
-     */
-    void shutdown();
-
-    /**
      * Gets a copy of a {@linkplain Set set} of {@linkplain Player players} that are currently connected to the server.
      *
      * @return the set of connected players
@@ -112,4 +105,11 @@ public interface MinecraftServer {
      * @since 1.0
      */
     @NonNull ScoreboardManager scoreboardManager();
+
+    /**
+     * Schedules the server to shut down.
+     *
+     * @since 1.0
+     */
+    void shutdown();
 }

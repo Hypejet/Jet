@@ -87,18 +87,16 @@ public final class NetworkManager extends ChannelInitializer<SocketChannel> {
     }
 
     /**
-     * Shuts down the {@linkplain NetworkManager network manager}.
+     * Shuts down the {@linkplain NetworkManager network manager}. Nothing happens if the network manager
+     * has already been shut down or has not been started.
      *
      * @since 1.0
      */
     public void shutdown() {
-        if (this.channel == null)
-            throw new IllegalStateException("The network manager is not started");
-
+        if (this.channel == null) return;
         this.channel.close().awaitUninterruptibly();
         this.bossGroup.shutdownGracefully();
         this.workerGroup.shutdownGracefully();
-
         this.channel = null;
     }
 
