@@ -209,6 +209,7 @@ public final class JetCommandManager implements CommandManager {
      * for the specified {@linkplain PlaySessionTask play session task}.
      *
      * @param sessionTask the play session task tha the commands should be initialized for
+     * @throws IllegalStateException if the commands have already been initialized for the specified play session task
      * @since 1.0
      */
     public void initializeCommands(@NonNull PlaySessionTask sessionTask) {

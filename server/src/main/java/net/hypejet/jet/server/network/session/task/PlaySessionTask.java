@@ -88,6 +88,8 @@ public final class PlaySessionTask implements SessionTask, CommonSessionPacketHa
      *
      * @param packet the packet to send
      * @param initializing whether this is command initialization rather than an update
+     * @throws IllegalStateException if this is a command initialization and the commands
+     *                               have already been initialized for this play session task
      * @since 1.0
      */
     public void sendCommands(@NonNull ServerDeclareCommandsPlayPacket packet, boolean initializing) {
