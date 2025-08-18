@@ -21,7 +21,6 @@ import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.server.command.exceptions.CommandParseException;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.entity.player.PlayerList;
-import net.hypejet.jet.server.network.SocketPlayerConnection;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.ArgumentNode;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.LiteralNode;
@@ -79,7 +78,7 @@ public final class JetCommandManager implements CommandManager {
         try {
             this.lock.writeLock().lock();
             this.dispatcher.getRoot().addChild(node);
-            this.broadcastDeclarationPacket();
+            this.broadcastCommandUpdate();
         } finally {
             this.lock.writeLock().unlock();
         }
@@ -95,7 +94,7 @@ public final class JetCommandManager implements CommandManager {
             if (node == null) return null;
 
             rootNode.removeChildByName(name);
-            this.broadcastDeclarationPacket();
+            this.broadcastCommandUpdate();
 
             if (!(node instanceof LiteralCommandNode<CommandSource> castNode))
                 throw NOT_LITERAL_EXCEPTION;
@@ -205,27 +204,27 @@ public final class JetCommandManager implements CommandManager {
     }
 
     /**
-     * Creates and sends a {@linkplain ServerDeclareCommandsPlayPacket server declare commands play packet}
-     * to the specified {@linkplain SocketPlayerConnection player connection}.
+     * Initializes commands from this {@linkplain JetCommandManager command manager}
+     * for the specified {@linkplain PlaySessionTask play session task}.
      *
-     * @param connection the player connection to send the packet to
+     * @param sessionTask the play session task tha the commands should be initialized for
      * @since 1.0
      */
-    public void sendDeclarationPacket(@NonNull SocketPlayerConnection connection) {
+    public void initializeCommands(@NonNull PlaySessionTask sessionTask) {
         try {
             this.lock.readLock().lock();
-            connection.sendPacket(this.createDeclarationPacket());
+            sessionTask.sendCommands(this.createDeclarationPacket(), true);
         } finally {
             this.lock.readLock().unlock();
         }
     }
 
-    private void broadcastDeclarationPacket() {
+    private void broadcastCommandUpdate() {
         ServerDeclareCommandsPlayPacket declarationPacket = this.createDeclarationPacket();
         for (JetPlayer player : this.playerList.players()) {
             try (NotNullObjectAcquisition<Session> sessionAcquisition = player.connection().acquireSessionRead()) {
                 if (!(sessionAcquisition.get().sessionTask() instanceof PlaySessionTask playSessionTask)) return;
-                playSessionTask.updateCommands(declarationPacket);
+                playSessionTask.sendCommands(declarationPacket, false);
             }
         }
     }
