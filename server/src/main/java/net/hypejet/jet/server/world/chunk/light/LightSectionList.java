@@ -15,7 +15,6 @@ import net.hypejet.jet.world.dimension.DimensionType;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NonNull;
 
-import javax.annotation.concurrent.GuardedBy;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -34,7 +33,7 @@ public final class LightSectionList {
     private final DimensionType dimensionType;
     private final List<JetLightSection> sections;
 
-    private @GuardedBy("serializationDataLock") LightSerializationData serializationData;
+    private LightSerializationData serializationData;
     private final EmptyAcquirable serializationDataLock = new EmptyAcquirable();
 
     /**

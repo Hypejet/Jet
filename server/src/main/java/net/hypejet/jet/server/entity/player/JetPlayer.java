@@ -12,7 +12,6 @@ import net.hypejet.jet.entity.acquisition.gamemode.GameModeAcquisition;
 import net.hypejet.jet.entity.acquisition.gamemode.WriteGameModeAcquisition;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.settings.ChangeSettingsEvent;
-import net.hypejet.jet.event.events.world.InitialSpawnEvent;
 import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.server.JetMinecraftServer;
@@ -20,6 +19,7 @@ import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.acquisition.gamemode.GameModeAcquirable;
 import net.hypejet.jet.server.entity.acquisition.respawn.WriteRespawnScreenEnabledAcquisition;
+import net.hypejet.jet.server.entity.acquisition.world.EntityWorldAcquisition;
 import net.hypejet.jet.server.entity.player.movement.PlayerMovementHandler;
 import net.hypejet.jet.server.entity.player.spawn.DeathLocation;
 import net.hypejet.jet.server.entity.player.spawn.PlayerSpawnInfo;
@@ -43,7 +43,6 @@ import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.handler.ChunkBatchHandler;
 import net.hypejet.jet.world.coordinate.Position;
-import net.hypejet.jet.world.coordinate.Vector;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.key.Key;
@@ -56,6 +55,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Represents an implementation of {@linkplain Player a player}.
@@ -108,28 +108,13 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
                 .withStatic(Identity.UUID, Objects.requireNonNull(uniqueId, "unique identifier"))
                 .withStatic(Identity.NAME, Objects.requireNonNull(username, "username"))
                 .build(), position, world);
-
         this.connection = Objects.requireNonNull(connection, "connection");
-
         this.settings = new NotNullObjectAcquirable<>(Objects.requireNonNull(settings, "settings"));
         this.clientBrand = new NotNullObjectAcquirable<>(Objects.requireNonNull(clientBrand, "client brand"));
-
         this.gameMode = new GameModeAcquirable(this, gameMode, previousGameMode);
         this.respawnScreenEnabled = new BooleanAcquirable(enableRespawnScreen);
-
         this.scoreboard = Objects.requireNonNull(initialScoreboard, "initial scoreboard");
-        connection.initializePlayer(this);
-
-        this.sendJoinGamePacket(world);
-        world.addPlayer(this);
-
-        this.scoreboard.addViewer(this);
-
         this.chunkBatchHandler = new ChunkBatchHandler(this, position);
-        this.chunkBatchHandler.scheduleTask();
-
-        this.sendSpawnPackets(world, position);
-        this.server().eventNode().call(new InitialSpawnEvent(this, world, position));
     }
 
     @Override
@@ -242,7 +227,8 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     @Override
     public void handleDisconnection() {
         this.chunkBatchHandler.handleDisconnection();
-        this.server().unregisterPlayer(this);
+        // TODO: Move disconnection handling and player unregistering to a tick thread
+        this.server().ticker().scheduleTask(() -> this.server().playerList().unregisterPlayer(this));
     }
 
     @Override
@@ -331,40 +317,35 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     }
 
     /**
-     * Sends additional packets about {@linkplain JetWorld world}, {@linkplain Position position} and a server
-     * that this {@linkplain JetPlayer player} should spawn in.
-     *
-     * @param world the world
-     * @param position the position
-     * @since 1.0
-     */
-    public void sendSpawnPackets(@NonNull JetWorld world, @NonNull Position position) {
-        // TODO
-        this.movementHandler.synchronize(position, Vector.zero(), Set.of());
-    }
-
-    /**
-     * Creates {@linkplain JetPlayer a player} with {@linkplain SocketPlayerConnection a player connection}
-     * and {@linkplain ConfigurationData a configuration data} specified.
+     * Creates a {@linkplain JetPlayer player} that should be associated with
+     * the specified {@linkplain SocketPlayerConnection player connection}.
      *
      * @param connection the player connection
-     * @param configurationData the configuration data
-     * @return the player
+     * @param configurationData a data gathered during a configuration state of the specified player connection
+     * @param playerFuture the completable future that should be completed when the player is created
      * @since 1.0
      */
-    public static @NonNull JetPlayer create(@NonNull SocketPlayerConnection connection,
-                                            @NonNull ConfigurationData configurationData) {
+    public static void create(@NonNull SocketPlayerConnection connection,
+                              @NonNull ConfigurationData configurationData,
+                              @NonNull CompletableFuture<JetPlayer> playerFuture) {
         Objects.requireNonNull(connection, "connection");
         Objects.requireNonNull(configurationData, "configuration data");
 
+        JetMinecraftServer server = connection.server();
         LoginData loginData = configurationData.loginData();
 
-        return new JetPlayer(
+        JetPlayer player = new JetPlayer(
                 loginData.uniqueId(), loginData.username(), connection, configurationData.world(),
                 configurationData.position(), configurationData.enableRespawnScreen(),
                 configurationData.previousGameMode(), configurationData.gameMode(), configurationData.settings(),
                 configurationData.clientBrand(), configurationData.initialScoreboard()
         );
+
+        server.ticker().scheduleTask(() -> {
+            connection.initializePlayer(player);
+            server.playerList().registerPlayer(player);
+            playerFuture.complete(player);
+        });
     }
 
     /**
@@ -382,12 +363,21 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
         return validatedPlayer;
     }
 
-    private void sendJoinGamePacket(@NonNull JetWorld world) {
+    /**
+     * Sends a {@linkplain ServerJoinGamePlayPacket server join game play packet}
+     * to this {@linkplain JetPlayer player}.
+     *
+     * @since 1.0
+     * @see ServerJoinGamePlayPacket
+     */
+    // TODO: Move to JetMinecraftServer#addPlayer
+    public void sendJoinGamePacket() {
         JetServerConfiguration configuration = this.server().configuration();
         try (
                 BooleanAcquisition enableRespawnScreenAcquisition = this.acquireRespawnScreenEnabledRead();
                 GameModeAcquisition gameModeAcquisition = this.gameMode.acquireRead();
-                NullableObjectAcquisition<DeathLocation> lastDeathLocation = this.lastDeathLocation.acquireRead()
+                NullableObjectAcquisition<DeathLocation> lastDeathLocation = this.lastDeathLocation.acquireRead();
+                EntityWorldAcquisition<?> worldAcquisition = this.acquireWorldRead()
         ) {
             this.sendPacket(new ServerJoinGamePlayPacket(
                     this.entityId(), configuration.hardcore(), Set.of() /* TODO: Permanent worlds */,
@@ -395,7 +385,8 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
                     configuration.simulationDistance(), configuration.reducedDebugInfo(),
                     enableRespawnScreenAcquisition.get(), configuration.showUnlockedRecipesOnly(),
                     this.createSpawnInfo(
-                            world, gameModeAcquisition.get(),
+                            worldAcquisition.get(),
+                            gameModeAcquisition.get(),
                             gameModeAcquisition.previous(),
                             lastDeathLocation.get()
                     ),

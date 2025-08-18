@@ -1,9 +1,7 @@
 package net.hypejet.jet.server.world;
 
-import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.reference.RegistryReference;
-import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
 import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.registry.blockstate.JetBlockStateRegistry;
@@ -34,7 +32,7 @@ import java.util.Objects;
  */
 public final class JetWorldManager implements WorldManager {
 
-    private final JetMinecraftServer server;
+    private final JetRegistryManager registryManager;
 
     private final JetChunkPaletteFactory<BlockState> blockStateChunkPaletteFactory;
     private final JetChunkPaletteFactory<Holder.Reference<Biome>> biomeChunkPaletteFactory;
@@ -44,12 +42,11 @@ public final class JetWorldManager implements WorldManager {
     /**
      * Constructs the {@linkplain JetWorldManager world manager implementation}.
      *
-     * @param server a server that should own the world manager
+     * @param registryManager a registry manager of the server that the world manager is being constructed for
      * @since 1.0
      */
-    public JetWorldManager(@NonNull JetMinecraftServer server) {
-        this.server = Objects.requireNonNull(server, "server");
-        JetRegistryManager registryManager = server.registryManager();
+    public JetWorldManager(@NonNull JetRegistryManager registryManager) {
+        this.registryManager = Objects.requireNonNull(registryManager, "registry manager");
 
         this.blockStateChunkPaletteFactory = new JetChunkPaletteFactory<>(
                 ChunkPaletteType.BLOCK_STATE,
@@ -62,7 +59,7 @@ public final class JetWorldManager implements WorldManager {
         );
 
         this.chunkFactory = new JetChunkFactory(
-                server,
+                registryManager,
                 this.blockStateChunkPaletteFactory,
                 this.biomeChunkPaletteFactory
         );
@@ -71,7 +68,7 @@ public final class JetWorldManager implements WorldManager {
     @Override
     public @NonNull JetWorld createWorld(Holder.@NonNull Reference<DimensionType> dimensionType,
                                          @NonNull WorldData worldData, @NonNull ChunkLoader chunkLoader) {
-        return new JetWorld(dimensionType, worldData, chunkLoader, this.server);
+        return new JetWorld(dimensionType, worldData, chunkLoader, this.registryManager);
     }
 
     @Override
@@ -97,11 +94,6 @@ public final class JetWorldManager implements WorldManager {
     @Override
     public @NonNull ChunkFactory chunkFactory() {
         return this.chunkFactory;
-    }
-
-    @Override
-    public @NonNull MinecraftServer server() {
-        return this.server;
     }
 
     /**

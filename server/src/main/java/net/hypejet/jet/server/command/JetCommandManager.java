@@ -10,10 +10,7 @@ import com.mojang.brigadier.tree.ArgumentCommandNode;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
-import net.hypejet.concurrency.collection.CollectionAcquisition;
-import net.hypejet.concurrency.object.notnull.NotNullObjectAcquirable;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
-import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.jet.command.CommandManager;
 import net.hypejet.jet.command.CommandSource;
 import net.hypejet.jet.event.events.command.CommandExecuteEvent;
@@ -21,10 +18,9 @@ import net.hypejet.jet.event.events.command.CommandExecutionFailureEvent;
 import net.hypejet.jet.event.events.command.CommandPreExecuteEvent;
 import net.hypejet.jet.event.events.command.CommandPreParseEvent;
 import net.hypejet.jet.event.node.EventNode;
-import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.command.exceptions.CommandParseException;
 import net.hypejet.jet.server.entity.player.JetPlayer;
-import net.hypejet.jet.server.network.SocketPlayerConnection;
+import net.hypejet.jet.server.entity.player.PlayerList;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.ArgumentNode;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.LiteralNode;
@@ -32,10 +28,8 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCo
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.RootNode;
 import net.hypejet.jet.server.network.session.Session;
 import net.hypejet.jet.server.network.session.task.PlaySessionTask;
-import net.hypejet.jet.server.util.acquisition.BooleanMappedAcquisition;
-import net.hypejet.jet.server.util.acquisition.CollectionMappedAcquisition;
-import net.hypejet.jet.server.util.acquisition.NotNullObjectMappedAcquisition;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,9 +39,11 @@ import java.util.IdentityHashMap;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * Represents an implementation of the {@linkplain CommandManager command manager}.
+ * An implementation of the {@linkplain CommandManager command manager}.
  *
  * @since 1.0
  * @see CommandManager
@@ -55,210 +51,201 @@ import java.util.concurrent.CompletableFuture;
 public final class JetCommandManager implements CommandManager {
 
     private static final IllegalArgumentException NOT_LITERAL_EXCEPTION
-            = new IllegalArgumentException("Root command node cannot contain command nodes other than literals");
+            = new IllegalArgumentException("The root command node contained non-literal command node");
     private static final char COMMAND_PREFIX = '/';
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JetCommandManager.class);
 
-    private final JetMinecraftServer server;
-    private final NotNullObjectAcquirable<CommandDispatcher<CommandSource>> dispatcher;
+    private final EventNode<Object> eventNode;
+    private final PlayerList playerList;
+
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private final CommandDispatcher<CommandSource> dispatcher = new CommandDispatcher<>();
 
     /**
      * Constructs the {@linkplain JetCommandManager command manager}.
      *
-     * @param server a server, on which the commands should be managed
+     * @param eventNode an event node that command events should be called in
+     * @param playerList a player list of the server that the command manager is being constructed for
      * @since 1.0
      */
-    public JetCommandManager(@NonNull JetMinecraftServer server) {
-        this.server = Objects.requireNonNull(server, "server");
-        this.dispatcher = new NotNullObjectAcquirable<>(new CommandDispatcher<>());
+    public JetCommandManager(@NonNull EventNode<Object> eventNode, @NonNull PlayerList playerList) {
+        this.eventNode = Objects.requireNonNull(eventNode, "event node");
+        this.playerList = Objects.requireNonNull(playerList, "player list");
     }
 
     @Override
     public void register(@NonNull LiteralCommandNode<CommandSource> node) {
-        try (
-                NotNullObjectAcquisition<CommandDispatcher<CommandSource>>
-                        dispatcherAcquisition = this.dispatcher.acquireWrite();
-                CollectionAcquisition<JetPlayer, ?> playersAcquisition = this.server.players()
-        ) {
-            CommandDispatcher<CommandSource> dispatcher = dispatcherAcquisition.get();
-            dispatcherAcquisition.get().getRoot().addChild(node);
-            updateCommands(playersAcquisition.collection(), dispatcher);
+        try {
+            this.lock.writeLock().lock();
+            this.dispatcher.getRoot().addChild(node);
+            this.broadcastCommandUpdate();
+        } finally {
+            this.lock.writeLock().unlock();
         }
     }
 
     @Override
-    public void unregister(@NonNull String name) {
-        try (
-                NotNullObjectAcquisition<CommandDispatcher<CommandSource>>
-                        dispatcherAcquisition = this.dispatcher.acquireWrite();
-                CollectionAcquisition<JetPlayer, ?> playersAcquisition = this.server.players()
-        ) {
-            CommandDispatcher<CommandSource> dispatcher = dispatcherAcquisition.get();
-            dispatcher.getRoot().removeChildByName(name);
-            updateCommands(playersAcquisition.collection(), dispatcher);
-        }
-    }
-
-    @Override
-    public @NonNull BooleanAcquisition isRegistered(@NonNull String name) {
-        return new BooleanMappedAcquisition<>(
-                this.dispatcher.acquireRead(),
-                acquisition -> acquisition.get().getRoot().getChild(name) != null
-        );
-    }
-
-    @Override
-    public @NonNull NotNullObjectAcquisition<LiteralCommandNode<CommandSource>> get(@NonNull String name) {
-        return new NotNullObjectMappedAcquisition<>(this.dispatcher.acquireRead(), acquisition -> {
-            RootCommandNode<CommandSource> rootNode = acquisition.get().getRoot();
+    public @Nullable LiteralCommandNode<CommandSource> unregister(@NonNull String name) {
+        try {
+            this.lock.writeLock().lock();
+            RootCommandNode<CommandSource> rootNode = this.dispatcher.getRoot();
 
             CommandNode<CommandSource> node = rootNode.getChild(name);
-            if (node == null) {
-                throw new IllegalArgumentException(String.format(
-                        "No command node with name of \"%s\" was registered",
-                        name
-                ));
-            }
+            if (node == null) return null;
 
-            if (!(rootNode.getChild(name) instanceof LiteralCommandNode<CommandSource> literalNode))
+            rootNode.removeChildByName(name);
+            this.broadcastCommandUpdate();
+
+            if (!(node instanceof LiteralCommandNode<CommandSource> castNode))
                 throw NOT_LITERAL_EXCEPTION;
-            return literalNode;
-        });
+            return castNode;
+        } finally {
+            this.lock.writeLock().unlock();
+        }
     }
 
     @Override
-    public @NonNull CollectionAcquisition<LiteralCommandNode<CommandSource>, ?> commands() {
-        return new CollectionMappedAcquisition<>(this.dispatcher.acquireRead(), acquisition -> {
+    public @Nullable LiteralCommandNode<CommandSource> get(@NonNull String name) {
+        try {
+            this.lock.readLock().lock();
+            RootCommandNode<CommandSource> rootNode = this.dispatcher.getRoot();
+
+            CommandNode<CommandSource> node = rootNode.getChild(name);
+            if (node == null) return null;
+
+            if (!(rootNode.getChild(name) instanceof LiteralCommandNode<CommandSource> castNode))
+                throw NOT_LITERAL_EXCEPTION;
+            return castNode;
+        } finally {
+            this.lock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public @NonNull Collection<LiteralCommandNode<CommandSource>> commands() {
+        try {
+            this.lock.readLock().lock();
             Set<LiteralCommandNode<CommandSource>> nodes = new HashSet<>();
 
-            for (CommandNode<CommandSource> child : acquisition.get().getRoot().getChildren()) {
-                if (!(child instanceof LiteralCommandNode<CommandSource> literalNode))
+            for (CommandNode<CommandSource> child : this.dispatcher.getRoot().getChildren()) {
+                if (!(child instanceof LiteralCommandNode<CommandSource> castNode))
                     throw NOT_LITERAL_EXCEPTION;
-                nodes.add(literalNode);
+                nodes.add(castNode);
             }
 
             return Set.copyOf(nodes);
-        });
+        } finally {
+            this.lock.readLock().unlock();
+        }
     }
 
     /**
-     * Executes a command.
+     * Executes a command with the specified input.
      *
-     * @param input a raw command string input
-     * @param source a sender of the command input
+     * @param input the command input
+     * @param source the command source that sent the specified command input
      * @since 1.0
      */
     public void execute(@NonNull String input, @NonNull CommandSource source) {
-        try (NotNullObjectAcquisition<CommandDispatcher<CommandSource>> acquisition = this.dispatcher.acquireRead()) {
-            CommandDispatcher<CommandSource> dispatcher = acquisition.get();
-            EventNode<Object> eventNode = this.server.eventNode();
+        try {
+            this.lock.readLock().lock();
 
             CommandPreParseEvent preParseEvent = new CommandPreParseEvent(source, input);
-            eventNode.call(preParseEvent);
+            this.eventNode.call(preParseEvent);
             if (preParseEvent.isCancelled()) return;
 
             input = preParseEvent.getInput();
-            ParseResults<CommandSource> parseResults = parse(new StringReader(input), source, dispatcher);
+            ParseResults<CommandSource> parseResults = this.parse(new StringReader(input), source);
 
             CommandPreExecuteEvent preExecuteEvent = new CommandPreExecuteEvent(source, input, parseResults);
-            eventNode.call(preExecuteEvent);
-            if (preParseEvent.isCancelled()) return;
+            this.eventNode.call(preExecuteEvent);
+            if (preExecuteEvent.isCancelled()) return;
 
             int executionResult;
 
             try {
-                executionResult = dispatcher.execute(parseResults);
+                executionResult = this.dispatcher.execute(parseResults);
             } catch (CommandSyntaxException exception) {
-                eventNode.call(new CommandExecutionFailureEvent(source, exception));
+                this.eventNode.call(new CommandExecutionFailureEvent(source, exception));
                 return;
             } catch (Throwable throwable) {
                 LOGGER.error("An error occurred while executing a command", throwable);
                 return;
             }
 
-            eventNode.call(new CommandExecuteEvent(source, input, parseResults, executionResult));
+            this.eventNode.call(new CommandExecuteEvent(source, input, parseResults, executionResult));
+        } finally {
+            this.lock.readLock().unlock();
         }
     }
 
     /**
-     * Creates {@linkplain CompletableFuture a completable future}, whose result are
-     * {@linkplain Suggestions suggestions} for a raw command string input specified.
+     * A {@linkplain CompletableFuture completable future} whose result are
+     * {@linkplain Suggestions suggestions} for the command input string specified.
      *
-     * @param input the raw command string input
-     * @param source a sender of the command input
+     * @param input the command input string to create the suggestions for
+     * @param source the source which typed the specified command input
      * @return the completable future
      * @since 1.0
      */
     public @NonNull CompletableFuture<Suggestions> suggest(@NonNull String input, @NonNull CommandSource source) {
-        try (NotNullObjectAcquisition<CommandDispatcher<CommandSource>> acquisition = this.dispatcher.acquireRead()) {
+        try {
+            this.lock.readLock().lock();
+
             StringReader reader = new StringReader(input);
             if (reader.canRead() && reader.peek() == COMMAND_PREFIX)
                 reader.skip();
 
-            CommandDispatcher<CommandSource> dispatcher = acquisition.get();
-            ParseResults<CommandSource> parseResults = parse(reader, source, dispatcher);
-
-            return acquisition.get().getCompletionSuggestions(parseResults);
+            ParseResults<CommandSource> parseResults = this.parse(reader, source);
+            return this.dispatcher.getCompletionSuggestions(parseResults);
+        } finally {
+            this.lock.readLock().unlock();
         }
     }
 
     /**
-     * Creates and sends {@linkplain ServerDeclareCommandsPlayPacket a server declare commands play packet}
-     * to a player associated with {@linkplain SocketPlayerConnection a player connection} specified.
+     * Initializes commands from this {@linkplain JetCommandManager command manager}
+     * for the specified {@linkplain PlaySessionTask play session task}.
      *
-     * @param connection the player connection
+     * @param sessionTask the play session task tha the commands should be initialized for
+     * @throws IllegalStateException if the commands have already been initialized for the specified play session task
      * @since 1.0
      */
-    public void sendDeclarationPacket(@NonNull SocketPlayerConnection connection) {
-        try (NotNullObjectAcquisition<CommandDispatcher<CommandSource>> acquisition = this.dispatcher.acquireRead()) {
-            connection.sendPacket(createDeclarationPacket(acquisition.get()));
+    public void initializeCommands(@NonNull PlaySessionTask sessionTask) {
+        try {
+            this.lock.readLock().lock();
+            sessionTask.sendCommands(this.createDeclarationPacket(), true);
+        } finally {
+            this.lock.readLock().unlock();
         }
     }
 
-    private static void updateCommands(@NonNull Collection<JetPlayer> playerCollection,
-                                       @NonNull CommandDispatcher<CommandSource> dispatcher) {
-        if (playerCollection.isEmpty()) return;
-        ServerDeclareCommandsPlayPacket declarationPacket = createDeclarationPacket(dispatcher);
-
-        for (JetPlayer player : playerCollection) {
+    private void broadcastCommandUpdate() {
+        ServerDeclareCommandsPlayPacket declarationPacket = this.createDeclarationPacket();
+        for (JetPlayer player : this.playerList.players()) {
             try (NotNullObjectAcquisition<Session> sessionAcquisition = player.connection().acquireSessionRead()) {
                 if (!(sessionAcquisition.get().sessionTask() instanceof PlaySessionTask playSessionTask)) return;
-                playSessionTask.updateCommands(declarationPacket);
+                playSessionTask.sendCommands(declarationPacket, false);
             }
         }
     }
 
-    private static @NonNull ServerDeclareCommandsPlayPacket createDeclarationPacket(
-            @NonNull CommandDispatcher<CommandSource> dispatcher
-    ) {
-        if (!(getOrConvert(dispatcher.getRoot(), new IdentityHashMap<>()) instanceof RootNode rootNode))
-            throw new IllegalArgumentException("The node converted is not a root node");
+    private @NonNull ServerDeclareCommandsPlayPacket createDeclarationPacket() {
+        if (!(getOrConvert(this.dispatcher.getRoot(), new IdentityHashMap<>()) instanceof RootNode rootNode))
+            throw new IllegalStateException("The converted node is not a root node");
         return new ServerDeclareCommandsPlayPacket(rootNode);
     }
 
-    private static @NonNull ParseResults<CommandSource> parse(@NonNull StringReader reader,
-                                                              @NonNull CommandSource source,
-                                                              @NonNull CommandDispatcher<CommandSource> dispatcher) {
+    private @NonNull ParseResults<CommandSource> parse(@NonNull StringReader reader, @NonNull CommandSource source) {
         try {
-            return dispatcher.parse(reader, source);
+            return this.dispatcher.parse(reader, source);
         } catch (Throwable throwable) {
             // A throwable can be thrown during parsing while checking if the command source can use the command node
-            throw new CommandParseException("An error occurred while parsing a command input", throwable);
+            throw new CommandParseException("An error occurred while parsing the command input", throwable);
         }
     }
 
-    /**
-     * Gets a converted {@linkplain Node node} from the node map specified.
-     *
-     * <p>If it is not present the {@linkplain CommandNode command node} is being converted and put into the node
-     * map.</p>
-     *
-     * @param node the command node to get or convert
-     * @param nodes a map of nodes, which have been already converted
-     * @return the got or converted node
-     * @since 1.0
-     */
     private static @NonNull Node getOrConvert(@NonNull CommandNode<?> node,
                                               @NonNull IdentityHashMap<CommandNode<?>, Node> nodes) {
         if (nodes.containsKey(node))
@@ -270,10 +257,21 @@ public final class JetCommandManager implements CommandManager {
         if (unconvertedRedirect != null)
             redirect = getOrConvert(unconvertedRedirect, nodes);
 
+        // Put the node before children initialization to allow for children redirecting to it
+        Node convertedNode = convertNode(node, redirect);
+        nodes.put(node, convertedNode);
+
+        Set<Node> children = new HashSet<>();
+        node.getChildren().forEach(child -> children.add(getOrConvert(child, nodes)));
+        convertedNode.initializeChildren(children);
+
+        return convertedNode;
+    }
+
+    private static @NonNull Node convertNode(@NonNull CommandNode<?> node, @Nullable Node redirect) {
         String name = node.getName();
         boolean executable = node.getCommand() != null;
-
-        Node convertedNode = switch (node) {
+        return switch (node) {
             case RootCommandNode<?> ignored -> new RootNode(redirect, executable);
             case LiteralCommandNode<?> ignored -> new LiteralNode(redirect, executable, name);
             case ArgumentCommandNode<?, ?> argumentNode -> {
@@ -287,14 +285,5 @@ public final class JetCommandManager implements CommandManager {
             }
             default -> throw new IllegalStateException("Unknown command node: " + node);
         };
-
-        // Put the node before children initialization to allow for children redirecting to it
-        nodes.put(node, convertedNode);
-
-        Set<Node> children = new HashSet<>();
-        node.getChildren().forEach(child -> children.add(getOrConvert(child, nodes)));
-        convertedNode.initializeChildren(children);
-
-        return convertedNode;
     }
 }

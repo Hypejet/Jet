@@ -1,15 +1,14 @@
 package net.hypejet.jet.server;
 
-import net.hypejet.concurrency.collection.CollectionAcquisition;
-import net.hypejet.concurrency.collection.set.HashSetAcquirable;
 import net.hypejet.jet.MinecraftServer;
-import net.hypejet.jet.event.events.server.ServerReadyEvent;
-import net.hypejet.jet.event.events.server.ServerShutdownEvent;
+import net.hypejet.jet.event.events.lifecycle.ServerInitializedEvent;
+import net.hypejet.jet.event.events.lifecycle.ServerReadyEvent;
+import net.hypejet.jet.event.events.lifecycle.ServerShutdownEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.server.command.JetCommandManager;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
-import net.hypejet.jet.server.configuration.unparsed.UnparsedServerConfiguration;
 import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.entity.player.PlayerList;
 import net.hypejet.jet.server.network.NetworkManager;
 import net.hypejet.jet.server.plugin.JetPluginManager;
 import net.hypejet.jet.server.registry.JetRegistryManager;
@@ -20,8 +19,13 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Set;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+
 /**
- * Represents an implementation of the {@linkplain MinecraftServer Minecraft server}.
+ * An implementation of the {@linkplain MinecraftServer Minecraft server}.
  *
  * @since 1.0
  * @see MinecraftServer
@@ -32,9 +36,11 @@ public final class JetMinecraftServer implements MinecraftServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(JetMinecraftServer.class);
 
     private final EventNode<Object> eventNode = new EventNode<>(Object.class);
-    private final JetServerConfiguration configuration;
+    private final JetServerConfiguration configuration = JetServerConfiguration.create();
 
     private final NetworkManager networkManager;
+    private final Ticker ticker;
+    private final PlayerList playerList;
 
     private final JetCommandManager commandManager;
     private final JetRegistryManager registryManager;
@@ -42,8 +48,8 @@ public final class JetMinecraftServer implements MinecraftServer {
     private final JetWorldManager worldManager;
     private final JetScoreboardManager scoreboardManager;
 
-    private final HashSetAcquirable<JetPlayer> players = new HashSetAcquirable<>();
-    private final Ticker ticker;
+    private final CompletableFuture<Void> serverReadyFuture = new CompletableFuture<>();
+    private final Thread shutdownThread = this.createShutdownThread();
 
     /**
      * Constructs the {@linkplain JetMinecraftServer Minecraft server}.
@@ -51,16 +57,28 @@ public final class JetMinecraftServer implements MinecraftServer {
      * @since 1.0
      */
     JetMinecraftServer() {
-        // FIXME: Initialization of managers is done wrongly, plugins and managers receive not fully initialized server
-        this.configuration = JetServerConfiguration.parse(this, UnparsedServerConfiguration.create());
-        this.commandManager = new JetCommandManager(this);
-        this.registryManager = new JetRegistryManager(this);
-        this.worldManager = new JetWorldManager(this);
-        this.scoreboardManager = new JetScoreboardManager();
-        this.pluginManager = new JetPluginManager(this);
         this.networkManager = new NetworkManager(this);
-        this.eventNode.call(new ServerReadyEvent());
         this.ticker = new Ticker(this);
+        this.playerList = new PlayerList(this.eventNode, this.ticker);
+
+        this.pluginManager = new JetPluginManager(this.eventNode);
+        this.commandManager = new JetCommandManager(this.eventNode, this.playerList);
+        this.registryManager = new JetRegistryManager(this.eventNode, this.networkManager);
+        this.worldManager = new JetWorldManager(this.registryManager);
+        this.scoreboardManager = new JetScoreboardManager();
+
+        try {
+            Runtime.getRuntime().addShutdownHook(this.shutdownThread);
+            this.eventNode.call(new ServerInitializedEvent(this));
+            this.ticker.start();
+            this.networkManager.bind();
+            this.eventNode.call(new ServerReadyEvent(this));
+            this.serverReadyFuture.complete(null);
+        } catch (Throwable throwable) {
+            LOGGER.error("An error occurred while making the server ready", throwable);
+            this.serverReadyFuture.completeExceptionally(throwable);
+            this.shutdown();
+        }
     }
 
     @Override
@@ -89,18 +107,8 @@ public final class JetMinecraftServer implements MinecraftServer {
     }
 
     @Override
-    public void shutdown() {
-        LOGGER.info("Shutting down the server...");
-        this.eventNode.call(new ServerShutdownEvent());
-        this.ticker.shutdown();
-        this.networkManager.shutdown();
-        this.pluginManager.shutdown();
-        LOGGER.info("Successfully shut down the server");
-    }
-
-    @Override
-    public @NonNull CollectionAcquisition<JetPlayer, ?> players() {
-        return this.players.acquireRead();
+    public @NonNull Set<JetPlayer> players() {
+        return this.playerList.players();
     }
 
     @Override
@@ -128,6 +136,15 @@ public final class JetMinecraftServer implements MinecraftServer {
         return this.scoreboardManager;
     }
 
+    @Override
+    public void shutdown() {
+        try {
+            this.shutdownThread.start();
+        } catch (IllegalThreadStateException exception) {
+            // The shutdown has already been scheduled
+        }
+    }
+
     /**
      * Gets an identifier of a Minecraft version that the server runs on.
      *
@@ -149,30 +166,43 @@ public final class JetMinecraftServer implements MinecraftServer {
     }
 
     /**
-     * Registers a player on the server.
+     * Gets a {@linkplain PlayerList player list} of the server.
      *
-     * @param player the player
+     * @return the player list
      * @since 1.0
      */
-    public void registerPlayer(@NonNull JetPlayer player) {
-        try (CollectionAcquisition<JetPlayer, ?> acquisition = this.players.acquireWrite()) {
-            /* A call outside event loop is safe in this case, when a player gets disconnected, the unregister method
-               is going to be called, and that method also creates a write acquisition, so no race conditions should
-               happen. */
-            if (player.connection().isActive())
-                acquisition.collection().add(player);
-        }
+    public @NonNull PlayerList playerList() {
+        return this.playerList;
+    }
+
+    private @NonNull Thread createShutdownThread() {
+        return Thread.ofVirtual()
+                .name("Server shutdown thread")
+                // TODO: Replace single-char names with underscores when JDK 25 releases
+                .uncaughtExceptionHandler((t, e) -> LOGGER.error("An error occurred while shutting down the server"))
+                .unstarted(() -> {
+                    try {
+                        this.serverReadyFuture.join();
+                    } catch (CancellationException | CompletionException exception) {
+                        // The server start error exception has already been thrown inside the main thread
+                    }
+
+                    LOGGER.info("Shutting down the server...");
+                    this.eventNode.call(new ServerShutdownEvent());
+                    this.ticker.shutdown();
+                    this.networkManager.shutdown();
+                    this.pluginManager.shutdown();
+                    LOGGER.info("Successfully shut down the server");
+                });
     }
 
     /**
-     * Unregisters a player from the server.
+     * Runs the {@linkplain JetMinecraftServer Minecraft server}.
      *
-     * @param player the player
+     * @param args arguments that the server application should start with
      * @since 1.0
      */
-    public void unregisterPlayer(@NonNull JetPlayer player) {
-        try (CollectionAcquisition<JetPlayer, ?> acquisition = this.players.acquireWrite()) {
-            acquisition.collection().remove(player);
-        }
+    public static void main(String[] args) {
+        new JetMinecraftServer();
     }
 }

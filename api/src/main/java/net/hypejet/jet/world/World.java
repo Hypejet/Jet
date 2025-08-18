@@ -3,7 +3,6 @@ package net.hypejet.jet.world;
 import net.hypejet.concurrency.collection.CollectionAcquisition;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.object.notnull.WriteNotNullObjectAcquisition;
-import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.world.acquisition.worldmap.WorldMapAcquisition;
@@ -80,12 +79,4 @@ public interface World {
      * @since 1.0
      */
     @NonNull WriteWorldMapAcquisition acquireWorldMapWrite();
-
-    /**
-     * Gets {@linkplain MinecraftServer a server} that this world belongs to.
-     *
-     * @return the server
-     * @since 1.0
-     */
-    @NonNull MinecraftServer server();
 }

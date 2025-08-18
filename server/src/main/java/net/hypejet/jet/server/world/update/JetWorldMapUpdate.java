@@ -403,7 +403,7 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
                 return List.of();
             }
 
-            JetRegistryManager registryManager = this.acquisition.world().server().registryManager();
+            JetRegistryManager registryManager = this.acquisition.world().registryManager();
             JetMinecraftRegistry<BlockType> blockTypeRegistry = registryManager.registry(RegistryReference.BLOCK);
 
             JetMinecraftRegistry<BlockEntityType> blockEntityTypeRegistry = registryManager.registry(

@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.keys.BiomeKeys;
 import net.hypejet.jet.registry.keys.BlockKeys;
-import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.world.block.JetBlockState;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.builder.JetChunkBuilder;
@@ -34,24 +34,24 @@ import java.util.Objects;
  */
 public final class JetChunkFactory implements ChunkFactory {
 
-    private final JetMinecraftServer server;
+    private final JetRegistryManager registryManager;
     private final JetChunkPaletteFactory<BlockState> blockStatePaletteFactory;
     private final JetChunkPaletteFactory<Holder.Reference<Biome>> biomePaletteFactory;
 
     /**
      * Constructs the {@linkplain JetChunkFactory chunk factory implementation}.
      *
-     * @param server a server that should own chunks created by the factory
+     * @param registryManager a registry manager of the server that the chunk factory is being constructed for
      * @param blockStatePaletteFactory a chunk-palette factory that chunk builders created by the constructed factory
      *                                 should use for block state chunk-palette creation
      * @param biomePaletteFactory a chunk-palette factory that chunk builders created by the constructed factory
      *                            should use for biome chunk-palette creation
      * @since 1.0
      */
-    public JetChunkFactory(@NonNull JetMinecraftServer server,
+    public JetChunkFactory(@NonNull JetRegistryManager registryManager,
                            @NonNull JetChunkPaletteFactory<BlockState> blockStatePaletteFactory,
                            @NonNull JetChunkPaletteFactory<Holder.Reference<Biome>> biomePaletteFactory) {
-        this.server = Objects.requireNonNull(server, "server");
+        this.registryManager = Objects.requireNonNull(registryManager, "registry manager");
         this.blockStatePaletteFactory = Objects.requireNonNull(
                 blockStatePaletteFactory,
                 "block state palette factory"
@@ -74,9 +74,7 @@ public final class JetChunkFactory implements ChunkFactory {
     public @NonNull JetChunkBuilder createChunkBuilder(@NonNull DimensionType dimensionType) {
         return this.createChunkBuilder(
                 dimensionType,
-                this.server.registryManager()
-                        .blockStateRegistry()
-                        .defaultBlockState(new Holder.Reference<>(BlockKeys.AIR)),
+                this.registryManager.blockStateRegistry().defaultBlockState(new Holder.Reference<>(BlockKeys.AIR)),
                 new Holder.Reference<>(BiomeKeys.PLAINS),
                 null
         );

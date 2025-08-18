@@ -1,41 +1,40 @@
 package net.hypejet.jet.server.network.session.task;
 
-import net.hypejet.concurrency.primitive.booleans.BooleanAcquirable;
-import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
-import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.network.ProtocolState;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
-import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket;
 import net.hypejet.jet.server.network.session.common.CommonSessionPacketHandler;
 import net.hypejet.jet.server.network.session.data.ConfigurationData;
 import net.hypejet.jet.server.network.session.keepalive.KeepAliveHandler;
-import net.hypejet.jet.server.registry.function.RegistryTagUpdateFunction;
 import net.kyori.adventure.resource.ResourcePackStatus;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * Represents {@linkplain SessionTask a session task}, which handles
- * {@linkplain net.hypejet.jet.server.network.ProtocolState#PLAY a play protocol state}.
+ * A {@linkplain SessionTask session task} handling the {@linkplain ProtocolState#PLAY play protocol state}.
  *
  * @since 1.0
- * @see net.hypejet.jet.server.network.ProtocolState#PLAY
+ * @see ProtocolState#PLAY
  * @see SessionTask
  */
-public final class PlaySessionTask implements SessionTask, RegistryTagUpdateFunction, CommonSessionPacketHandler {
+public final class PlaySessionTask implements SessionTask, CommonSessionPacketHandler {
 
     private final SocketPlayerConnection connection;
     private final ConfigurationData configurationData;
 
     private final KeepAliveHandler keepAliveHandler;
-    private final BooleanAcquirable commandsSent = new BooleanAcquirable();
-
     private final CompletableFuture<JetPlayer> playerFuture = new CompletableFuture<>();
+
+    private final ReadWriteLock commandsInitializedLock = new ReentrantReadWriteLock();
+    private boolean commandsInitialized;
 
     /**
      * Constructs the {@linkplain PlaySessionTask play session task}.
@@ -53,23 +52,13 @@ public final class PlaySessionTask implements SessionTask, RegistryTagUpdateFunc
     @Override
     public void start() {
         this.keepAliveHandler.schedule();
-
-        try (WriteBooleanAcquisition commandsSentAcquisition = this.commandsSent.acquireWrite()) {
-            this.connection.server().commandManager().sendDeclarationPacket(this.connection);
-            commandsSentAcquisition.set(true);
-        }
-
-        this.playerFuture.complete(JetPlayer.create(this.connection, this.configurationData));
+        this.connection.server().commandManager().initializeCommands(this);
+        JetPlayer.create(this.connection, this.configurationData, this.playerFuture);
     }
 
     @Override
     public void handleDisconnection() {
         this.keepAliveHandler.handleDisconnection();
-    }
-
-    @Override
-    public void updateTags(@NonNull ServerUpdateTagsPacket packet) {
-        this.connection.sendPacket(packet);
     }
 
     @Override
@@ -93,16 +82,30 @@ public final class PlaySessionTask implements SessionTask, RegistryTagUpdateFunc
     }
 
     /**
-     * Updates commands for {@linkplain JetPlayer a player} that the task is handled for.
+     * Sends the specified {@linkplain ServerDeclareCommandsPlayPacket server declare commands play packet}
+     * to the {@linkplain SocketPlayerConnection player connection} associated
+     * with this {@linkplain PlaySessionTask play session task}.
      *
-     * @param packet a packet representing the command update
+     * @param packet the packet to send
+     * @param initializing whether this is command initialization rather than an update
+     * @throws IllegalStateException if this is a command initialization and the commands
+     *                               have already been initialized for this play session task
      * @since 1.0
      */
-    public void updateCommands(@NonNull ServerDeclareCommandsPlayPacket packet) {
-        try (BooleanAcquisition commandsSentAcquisition = this.commandsSent.acquireRead()) {
-            // Commands have not been sent yet, so the update will be taken into account when commands are sent
-            if (!commandsSentAcquisition.get()) return;
+    public void sendCommands(@NonNull ServerDeclareCommandsPlayPacket packet, boolean initializing) {
+        Lock lock = initializing ? this.commandsInitializedLock.writeLock() : this.commandsInitializedLock.readLock();
+        try {
+            lock.lock();
+            if (initializing) {
+                if (this.commandsInitialized)
+                    throw new IllegalStateException("The commands have already been initialized");
+                this.commandsInitialized = true;
+            } else if (!this.commandsInitialized) {
+                return;
+            }
             this.connection.sendPacket(packet);
+        } finally {
+            lock.unlock();
         }
     }
 }

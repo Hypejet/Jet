@@ -6,9 +6,6 @@ import net.hypejet.concurrency.object.WriteObjectAcquisition;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquirable;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
 import net.hypejet.concurrency.object.nullable.WriteNullableObjectAcquisition;
-import net.hypejet.concurrency.primitive.booleans.BooleanAcquirable;
-import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
-import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.configuration.ConfigurationStartEvent;
 import net.hypejet.jet.network.PlayerConnection;
@@ -20,7 +17,6 @@ import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.configuration.ClientKnownPacksConfigurationPacket;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket;
-import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket.TagRegistry;
 import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerFeatureFlagsConfigurationPacket;
 import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerFinishConfigurationPacket;
 import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerKnownPacksConfigurationPacket;
@@ -33,8 +29,8 @@ import net.hypejet.jet.server.network.session.data.LoginData;
 import net.hypejet.jet.server.network.session.keepalive.KeepAliveHandler;
 import net.hypejet.jet.server.network.session.pack.ResourcePackHandler;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
-import net.hypejet.jet.server.registry.function.RegistryTagUpdateFunction;
 import net.hypejet.jet.server.scoreboard.JetScoreboard;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.hypejet.jet.server.util.game.audience.PacketReceivingCommonAudience;
@@ -53,7 +49,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -63,16 +58,19 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * Represents {@linkplain SessionTask a session task}, which handles
- * {@linkplain ProtocolState#CONFIGURATION a configuration protocol state}.
+ * A {@linkplain SessionTask session task} handling
+ * a {@linkplain ProtocolState#CONFIGURATION configuration protocol state}.
  *
  * @since 1.0
  * @see ProtocolState#CONFIGURATION
  * @see SessionTask
  */
-public final class ConfigurationSessionTask implements SessionTask, RegistryTagUpdateFunction, ConfigurationManager,
+public final class ConfigurationSessionTask implements SessionTask, ConfigurationManager,
         CommonSessionPacketHandler, PacketReceivingCommonAudience {
 
     private static final Key SERVER_BRAND_PLUGIN_MESSAGE_KEY = Key.key("brand");
@@ -84,15 +82,16 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
 
     private final SocketPlayerConnection connection;
     private final LoginData loginData;
-
     private final KeepAliveHandler keepAliveHandler;
-    private final BooleanAcquirable tagsSent = new BooleanAcquirable();
 
     private final CompletableFuture<ClientKnownPacksConfigurationPacket> knownPacksFuture = new CompletableFuture<>();
     private final CompletableFuture<Unit> acknowledgeFuture = new CompletableFuture<>();
 
     private final NullableObjectAcquirable<Player.Settings> settings = new NullableObjectAcquirable<>();
     private final NullableObjectAcquirable<String> clientBrand = new NullableObjectAcquirable<>();
+
+    private final ReadWriteLock tagsInitializedLock = new ReentrantReadWriteLock();
+    private boolean tagsInitialized;
 
     /**
      * Constructs the {@linkplain ConfigurationSessionTask configuration session task}.
@@ -130,14 +129,6 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
     @Override
     public void handleResourcePackStatus(@NonNull UUID uniqueId, @NonNull ResourcePackStatus status) {
         this.resourcePackHandler().handleState(uniqueId, status, this);
-    }
-
-    @Override
-    public void updateTags(@NonNull ServerUpdateTagsPacket packet) {
-        try (BooleanAcquisition tagsSentAcquisition = this.tagsSent.acquireWrite()) {
-            if (!tagsSentAcquisition.get()) return;
-            this.sendPacket(packet);
-        }
     }
 
     @Override
@@ -207,6 +198,34 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
         this.connection.clientPacketReader().pausePacketReading();
     }
 
+    /**
+     * Sends the specified {@linkplain ServerUpdateTagsPacket server update tags packet}
+     * to the {@linkplain SocketPlayerConnection player connection} associated
+     * with this {@linkplain ConfigurationSessionTask configuration session task}.
+     *
+     * @param packet the packet to send
+     * @param initializing whether this is a tag initialization rather than an update
+     * @throws IllegalStateException if this is a tag initialization and the tags have already
+     *                               been initialized for this configuration session task
+     * @since 1.0
+     */
+    public void sendTags(@NonNull ServerUpdateTagsPacket packet, boolean initializing) {
+        Lock lock = initializing ? this.tagsInitializedLock.writeLock() : this.tagsInitializedLock.readLock();
+        try {
+            lock.lock();
+            if (initializing) {
+                if (this.tagsInitialized)
+                    throw new IllegalStateException("The tags have already been initialized");
+                this.tagsInitialized = true;
+            } else if (!this.tagsInitialized) {
+                return;
+            }
+            this.connection.sendPacket(packet);
+        } finally {
+            lock.unlock();
+        }
+    }
+
     private void runVirtualThreadTask() {
         this.keepAliveHandler.schedule();
         JetMinecraftServer server = this.connection.server();
@@ -259,21 +278,10 @@ public final class ConfigurationSessionTask implements SessionTask, RegistryTagU
                     ? Set.copyOf(serverKnownPacks)
                     : Set.of();
 
-            Collection<JetMinecraftRegistry<?>> registries = server.registryManager().registries();
-            registries.forEach(registry -> sendRegistry(this.connection, registry, commonKnownPacks));
-
-            try (WriteBooleanAcquisition tagsSentAcquisition = this.tagsSent.acquireWrite()) {
-                Set<TagRegistry> tagRegistries = new HashSet<>();
-
-                registries.forEach(registry -> {
-                    TagRegistry tagRegistry = registry.createTagRegistry();
-                    if (tagRegistry.tags().isEmpty()) return;
-                    tagRegistries.add(tagRegistry);
-                });
-
-                this.sendPacket(new ServerUpdateTagsPacket(Set.copyOf(tagRegistries)));
-                tagsSentAcquisition.set(true);
-            }
+            JetRegistryManager registryManager = server.registryManager();
+            for (JetMinecraftRegistry<?> registry : registryManager.registries())
+                sendRegistry(this.connection, registry, commonKnownPacks);
+            registryManager.initializeTags(this);
 
             if (!this.keepAliveHandler.stopAndAwaitTermination(TIME_OUT_DURATION, TIME_OUT_UNIT)) {
                 this.connection.close(); // The keep alive handler has timed out

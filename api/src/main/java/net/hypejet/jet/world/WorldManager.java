@@ -81,12 +81,4 @@ public interface WorldManager {
      * @since 1.0
      */
     @NonNull ChunkFactory chunkFactory();
-
-    /**
-     * Gets {@linkplain MinecraftServer a server} that this world manager was created for.
-     *
-     * @return the server
-     * @since 1.0
-     */
-    @NonNull MinecraftServer server();
 }

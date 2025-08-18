@@ -1,6 +1,5 @@
 package net.hypejet.jet;
 
-import net.hypejet.concurrency.collection.CollectionAcquisition;
 import net.hypejet.jet.command.CommandManager;
 import net.hypejet.jet.configuration.ServerConfiguration;
 import net.hypejet.jet.entity.player.Player;
@@ -10,6 +9,8 @@ import net.hypejet.jet.registry.RegistryManager;
 import net.hypejet.jet.scoreboard.ScoreboardManager;
 import net.hypejet.jet.world.WorldManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Set;
 
 /**
  * Represents a Minecraft server.
@@ -58,20 +59,12 @@ public interface MinecraftServer {
     @NonNull ServerConfiguration configuration();
 
     /**
-     * Shuts down the server.
+     * Gets a copy of a {@linkplain Set set} of {@linkplain Player players} that are currently connected to the server.
      *
+     * @return the set of connected players
      * @since 1.0
      */
-    void shutdown();
-
-    /**
-     * Creates {@linkplain CollectionAcquisition a collection acquisition} of all players, which are connected to the
-     * server.
-     *
-     * @return the acquisition
-     * @since 1.0
-     */
-    @NonNull CollectionAcquisition<? extends Player, ?> players();
+    @NonNull Set<? extends Player> players();
 
     /**
      * Gets {@linkplain CommandManager a command manager} of the server.
@@ -112,4 +105,11 @@ public interface MinecraftServer {
      * @since 1.0
      */
     @NonNull ScoreboardManager scoreboardManager();
+
+    /**
+     * Schedules the server to shut down.
+     *
+     * @since 1.0
+     */
+    void shutdown();
 }

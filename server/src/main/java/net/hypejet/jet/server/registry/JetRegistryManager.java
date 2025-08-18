@@ -1,5 +1,8 @@
 package net.hypejet.jet.server.registry;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.jet.data.json.entry.JsonRegistryEntry;
 import net.hypejet.jet.data.json.model.block.JsonBlock;
 import net.hypejet.jet.data.json.model.block.JsonBlockEntityType;
@@ -11,14 +14,19 @@ import net.hypejet.jet.data.json.model.sound.JsonSoundEvent;
 import net.hypejet.jet.data.json.resource.JsonDataResourceFiles;
 import net.hypejet.jet.data.json.util.JsonUnit;
 import net.hypejet.jet.event.events.registry.RegistryInitializeEvent;
+import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.registry.MinecraftRegistry;
 import net.hypejet.jet.registry.RegistryManager;
 import net.hypejet.jet.registry.feature.KnownPack;
 import net.hypejet.jet.registry.reference.RegistryReference;
-import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntityType;
 import net.hypejet.jet.server.entity.ai.JetPoiType;
 import net.hypejet.jet.server.inventory.item.JetItem;
+import net.hypejet.jet.server.network.NetworkManager;
+import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket;
+import net.hypejet.jet.server.network.session.Session;
+import net.hypejet.jet.server.network.session.task.ConfigurationSessionTask;
+import net.hypejet.jet.server.network.session.task.PlaySessionTask;
 import net.hypejet.jet.server.registry.blockstate.JetBlockStateRegistry;
 import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.chat.ChatTypeBinaryTagCodec;
@@ -54,31 +62,41 @@ import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 
 /**
- * Represents an implementation of {@linkplain RegistryManager a registry manager}.
+ * An implementation of the {@linkplain RegistryManager registry manager}.
  *
  * @since 1.0
  * @see RegistryManager
  */
 public final class JetRegistryManager implements RegistryManager {
 
+    private final NetworkManager networkManager;
     private final Map<RegistryReference<?>, JetMinecraftRegistry<?>> registries;
     private final JetBlockStateRegistry blockStateRegistry;
+
+    private final ReadWriteLock tagsLock = new ReentrantReadWriteLock();
 
     /**
      * Constructs the {@linkplain JetRegistryManager registry manager}.
      *
-     * @param server the server that the registry manager is constructed for
+     * @param eventNode an event node that registry events should be called in
+     * @param networkManager a network manager of the server that the registry manager is being constructed for
      * @since 1.0
      */
-    public JetRegistryManager(@NonNull JetMinecraftServer server) {
-        this.registries = new RegistryMapBuilder(server)
+    public JetRegistryManager(@NonNull EventNode<Object> eventNode, @NonNull NetworkManager networkManager) {
+        Objects.requireNonNull(eventNode, "event node");
+        this.networkManager = Objects.requireNonNull(networkManager, "network manager");
+
+        this.registries = new RegistryMapBuilder(eventNode, this.tagsLock)
                 .dataDriven(
                         RegistryReference.BIOME, Key.key("worldgen/biome"),
                         JsonDataResourceFiles.BIOMES, BiomeBinaryTagCodec.INSTANCE
@@ -198,6 +216,7 @@ public final class JetRegistryManager implements RegistryManager {
 
     @Override
     public @NonNull <V> JetMinecraftRegistry<V> registry(@NonNull RegistryReference<V> reference) {
+        Objects.requireNonNull(reference, "registry reference");
         if (!this.registries.containsKey(reference)) {
             throw new IllegalArgumentException(
                     "The specified registry reference is not recognised by the registry managed"
@@ -212,6 +231,29 @@ public final class JetRegistryManager implements RegistryManager {
         return this.blockStateRegistry;
     }
 
+    @Override
+    public void updateTags(@NonNull Map<RegistryReference<?>, Multimap<Key, Key>> tags) {
+        Objects.requireNonNull(tags, "tags");
+        try {
+            this.tagsLock.writeLock().lock();
+            tags.forEach((reference, tagToKeysMultimap) -> this.registry(reference).updateTags(tagToKeysMultimap));
+
+            ServerUpdateTagsPacket updatePacket = this.createTagsPacket(); // TODO: Cache
+            this.networkManager.connections().forEach(connection -> {
+                try (NotNullObjectAcquisition<Session> acquisition = connection.acquireSessionRead()) {
+                    switch (acquisition.get().sessionTask()) {
+                        case ConfigurationSessionTask sessionTask -> sessionTask.sendTags(updatePacket, false);
+                        // TODO: Replace "ignoredSessionTask" with underscore when JDK 25 releases
+                        case PlaySessionTask ignoredSessionTask -> connection.sendPacket(updatePacket);
+                        default -> {}
+                    }
+                }
+            });
+        } finally {
+            this.tagsLock.writeLock().unlock();
+        }
+    }
+
     /**
      * Gets a {@linkplain Collection collection} of all registered {@linkplain JetMinecraftRegistry registries}.
      *
@@ -220,6 +262,31 @@ public final class JetRegistryManager implements RegistryManager {
      */
     public @NonNull Collection<JetMinecraftRegistry<?>> registries() {
         return this.registries.values();
+    }
+
+    /**
+     * Initializes tags of {@linkplain JetMinecraftRegistry registries}
+     * from this {@linkplain JetRegistryManager registry manager}
+     * for the specified {@linkplain ConfigurationSessionTask configuration session task}.
+     *
+     * @param sessionTask the configuration session task that the tags should be initialized for
+     * @throws IllegalStateException if the tags have already been initialized
+     *                               for the specified configuration session task
+     * @since 1.0
+     */
+    public void initializeTags(@NonNull ConfigurationSessionTask sessionTask) {
+        try {
+            this.tagsLock.readLock().lock();
+            sessionTask.sendTags(this.createTagsPacket(), true);
+        } finally {
+            this.tagsLock.readLock().unlock();
+        }
+    }
+
+    private @NonNull ServerUpdateTagsPacket createTagsPacket() {
+        Set<ServerUpdateTagsPacket.TagRegistry> tagRegistries = new HashSet<>();
+        this.registries().forEach(registry -> tagRegistries.add(registry.createTagRegistry()));
+        return new ServerUpdateTagsPacket(tagRegistries);
     }
 
     /**
@@ -233,17 +300,22 @@ public final class JetRegistryManager implements RegistryManager {
      */
     private static final class RegistryMapBuilder {
 
-        private final JetMinecraftServer server;
+        private final EventNode<Object> eventNode;
+        private final ReadWriteLock tagsLock;
+
         private final Map<RegistryReference<?>, JetMinecraftRegistry<?>> registries = new HashMap<>();
 
         /**
          * Constructs the {@linkplain RegistryMapBuilder registry-map builder}.
          *
-         * @param server the server that the constructed builder should create the registry map for
+         * @param eventNode an event node that registry events should be called in
+         * @param tagsLock a read-write lock that should be acquired while working with tags
+         *                 of registries added to the registry-map builder that is being constructed
          * @since 1.0
          */
-        private RegistryMapBuilder(@NonNull JetMinecraftServer server) {
-            this.server = Objects.requireNonNull(server, "server");
+        private RegistryMapBuilder(@NonNull EventNode<Object> eventNode, @NonNull ReadWriteLock tagsLock) {
+            this.eventNode = Objects.requireNonNull(eventNode, "event node");
+            this.tagsLock = Objects.requireNonNull(tagsLock, "tags lock");
         }
 
         /**
@@ -331,7 +403,7 @@ public final class JetRegistryManager implements RegistryManager {
             }
 
             List<JetMinecraftRegistry.RegistrationInfo<CV>> registrations = new ArrayList<>();
-            Map<Key, Set<Key>> tags = new HashMap<>();
+            Multimap<Key, Key> tags = HashMultimap.create();
 
             List<JsonRegistryEntry<DV>> dataEntries = JetDataUtil.deserializeEntries(resourceFileClasspath, valueType);
             for (JsonRegistryEntry<DV> dataEntry : dataEntries) {
@@ -355,17 +427,17 @@ public final class JetRegistryManager implements RegistryManager {
                         convertedKnownPack
                 ));
 
-                tags.put(key, dataEntry.tags());
+                dataEntry.tags().forEach(tag -> tags.put(tag, key));
             }
 
             JetMinecraftRegistry<CV> registry;
 
             if (valueCodec == null) {
-                registry = new JetMinecraftRegistry<>(registryKey, registrations, tags, this.server, null);
+                registry = new JetMinecraftRegistry<>(registryKey, registrations, tags, this.tagsLock, null);
             } else {
-                NetworkableRegistryBuilder<CV> registryBuilder = new NetworkableRegistryBuilder<>(registrations, tags);
-                this.server.eventNode().call(new RegistryInitializeEvent<>(reference, registryBuilder));
-                registry = registryBuilder.build(registryKey, valueCodec, this.server);
+                NetworkableRegistryBuilder<CV> registryBuilder = new NetworkableRegistryBuilder<>(registrations);
+                this.eventNode.call(new RegistryInitializeEvent<>(reference, registryBuilder));
+                registry = registryBuilder.build(registryKey, tags, this.tagsLock, valueCodec);
             }
 
             this.registries.put(reference, registry);
@@ -391,8 +463,7 @@ public final class JetRegistryManager implements RegistryManager {
          */
         private static final class NetworkableRegistryBuilder<V> implements RegistryInitializeEvent.RegistryAccess<V> {
 
-            private final List<JetMinecraftRegistry.RegistrationInfo<V>> registrations = new ArrayList<>();
-            private final Map<Key, Set<Key>> tags = new HashMap<>();
+            private final List<JetMinecraftRegistry.RegistrationInfo<V>> registrations;
 
             private boolean registryCreated;
 
@@ -401,16 +472,12 @@ public final class JetRegistryManager implements RegistryManager {
              *
              * @param initialRegistrations an info list of initial registrations that the registry should have,
              *                             the order is preserved
-             * @param initialTags a map associating keys of initial values that the registry should have
-             *                    with initial tags that these values should be associated with
              * @since 1.0
              */
             private NetworkableRegistryBuilder(
-                    @NonNull List<JetMinecraftRegistry.RegistrationInfo<V>> initialRegistrations,
-                    @NonNull Map<Key, Set<Key>> initialTags
+                    @NonNull List<JetMinecraftRegistry.RegistrationInfo<V>> initialRegistrations
             ) {
-                this.registrations.addAll(initialRegistrations);
-                this.tags.putAll(initialTags);
+                this.registrations = new ArrayList<>(initialRegistrations);
             }
 
             @Override
@@ -426,18 +493,22 @@ public final class JetRegistryManager implements RegistryManager {
              * Builds the "networkable" {@linkplain JetMinecraftRegistry registry}.
              *
              * @param registryKey the key that the registry should have
+             * @param tagToKeysMultimap a multimap associating keys of tags with keys of registry
+             *                          values that should be associated with these tags
+             * @param tagsLock a read-write lock that should be acquired while working with tags
+             *                 of the registry that is being created
              * @param valueCodec a binary tag codec that values of the registry should be written with
-             * @param server a server that the registry should be created for
              * @return the created registry
              * @since 1.0
              */
             private @NonNull JetMinecraftRegistry<V> build(@NonNull Key registryKey,
-                                                           @NonNull BinaryTagCodec<V> valueCodec,
-                                                           @NonNull JetMinecraftServer server) {
+                                                           @NonNull Multimap<Key, Key> tagToKeysMultimap,
+                                                           @NonNull ReadWriteLock tagsLock,
+                                                           @NonNull BinaryTagCodec<V> valueCodec) {
                 this.registryCreated = true;
                 return new JetMinecraftRegistry<>(
                         registryKey, List.copyOf(this.registrations),
-                        this.tags, server, valueCodec
+                        tagToKeysMultimap, tagsLock, valueCodec
                 );
             }
         }

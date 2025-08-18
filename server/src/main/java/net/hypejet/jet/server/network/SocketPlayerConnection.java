@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -79,7 +80,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     private final SocketChannel channel;
     private final JetMinecraftServer server;
 
-    private final ReentrantReadWriteLock playerLock = new ReentrantReadWriteLock();
+    private final ReadWriteLock playerLock = new ReentrantReadWriteLock();
     private JetPlayer player;
 
     private final NotNullObjectAcquirable<Session> session;
@@ -165,7 +166,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     @Override
     public void uncaughtException(Thread t, Throwable e) {
         if (e instanceof NetworkException)
-            return; // The exception has been already handled
+            return; // The exception has already been handled
         this.close(); // Close the connection to avoid more issues
 
         NetworkException networkException = new NetworkException(this, e);
@@ -317,7 +318,6 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
             if (this.player != null)
                 throw new IllegalArgumentException("The player has been already initialized");
             this.player = player;
-            this.server.registerPlayer(player);
         } finally {
             this.playerLock.writeLock().unlock();
         }

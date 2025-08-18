@@ -11,6 +11,7 @@ dependencies {
     implementation(project(":data:json"))
     implementation(libs.netty)
     implementation(libs.logback)
+    implementation(libs.guava)
     implementation(libs.fastutil)
     implementation(libs.bundles.configs)
     testImplementation(libs.junit.jupiter)
@@ -18,7 +19,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("net.hypejet.jet.server.JetServerEntrypoint")
+    mainClass.set("net.hypejet.jet.server.JetMinecraftServer")
 }
 
 val generatedSourcesRoot = layout.projectDirectory.dir("src").dir("generated")

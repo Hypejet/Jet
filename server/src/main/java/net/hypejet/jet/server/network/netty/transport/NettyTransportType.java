@@ -10,14 +10,16 @@ import io.netty.channel.kqueue.KQueueServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import net.hypejet.jet.server.network.NetworkManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.function.Supplier;
 
 /**
- * Represents a transport type, which should be used by netty.
+ * A netty transport type to be used by a {@linkplain NetworkManager network manager}.
  *
  * @since 1.0
+ * @see NetworkManager
  */
 public enum NettyTransportType {
     /**
@@ -74,13 +76,13 @@ public enum NettyTransportType {
     }
 
     /**
-     * Gets a class of type of {@linkplain ServerSocketChannel a server socket channel} that this transport supports.
+     * Gets a {@linkplain ServerSocketChannel server socket channel} implementation that this transport supports.
      *
      * @return the class
      * @since 1.0
      */
-    public @NonNull Class<? extends ServerSocketChannel> getSocketChannel() {
-        return socketChannel;
+    public @NonNull Class<? extends ServerSocketChannel> getSocketChannelClass() {
+        return this.socketChannel;
     }
 
     /**
