@@ -12,6 +12,11 @@ Jet, unlike many already existing options:
 - Cares about code simplicity, readability and consistency, without compromising on the performance
 - Is designed to be friendly to developers, as well as normal users, thanks to the plugin system
 
+## Use cases
+Jet was designed for servers that want to introduce their own - heavily modified or custom - behaviour.
+Because of that, it is perfect for most of networks with minigames or custom gamemodes.
+However, it is generally **not** recommended for someone who needs to utilize most vanilla features, for example to run a survival server.
+
 ## Building
 > [!IMPORTANT]
 > This project uses a [modified version](https://github.com/Codestech1/adventure/tree/feat/nbt-text-serializer) of [Adventure](https://github.com/KyoriPowered/adventure).
