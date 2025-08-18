@@ -39,6 +39,7 @@ import java.util.IdentityHashMap;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -58,7 +59,7 @@ public final class JetCommandManager implements CommandManager {
     private final EventNode<Object> eventNode;
     private final PlayerList playerList;
 
-    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private final CommandDispatcher<CommandSource> dispatcher = new CommandDispatcher<>();
 
     /**

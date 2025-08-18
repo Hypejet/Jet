@@ -2,13 +2,12 @@ package net.hypejet.jet.server.network.session.task;
 
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.network.ProtocolState;
 import net.hypejet.jet.server.network.SocketPlayerConnection;
-import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket;
 import net.hypejet.jet.server.network.session.common.CommonSessionPacketHandler;
 import net.hypejet.jet.server.network.session.data.ConfigurationData;
 import net.hypejet.jet.server.network.session.keepalive.KeepAliveHandler;
-import net.hypejet.jet.server.registry.function.SynchronizeRegistryTagsFunction;
 import net.kyori.adventure.resource.ResourcePackStatus;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -16,17 +15,17 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * Represents {@linkplain SessionTask a session task}, which handles
- * {@linkplain net.hypejet.jet.server.network.ProtocolState#PLAY a play protocol state}.
+ * A {@linkplain SessionTask session task} handling the {@linkplain ProtocolState#PLAY play protocol state}.
  *
  * @since 1.0
- * @see net.hypejet.jet.server.network.ProtocolState#PLAY
+ * @see ProtocolState#PLAY
  * @see SessionTask
  */
-public final class PlaySessionTask implements SessionTask, SynchronizeRegistryTagsFunction, CommonSessionPacketHandler {
+public final class PlaySessionTask implements SessionTask, CommonSessionPacketHandler {
 
     private final SocketPlayerConnection connection;
     private final ConfigurationData configurationData;
@@ -34,7 +33,7 @@ public final class PlaySessionTask implements SessionTask, SynchronizeRegistryTa
     private final KeepAliveHandler keepAliveHandler;
     private final CompletableFuture<JetPlayer> playerFuture = new CompletableFuture<>();
 
-    private final ReentrantReadWriteLock commandsInitializedLock = new ReentrantReadWriteLock();
+    private final ReadWriteLock commandsInitializedLock = new ReentrantReadWriteLock();
     private boolean commandsInitialized;
 
     /**
@@ -60,11 +59,6 @@ public final class PlaySessionTask implements SessionTask, SynchronizeRegistryTa
     @Override
     public void handleDisconnection() {
         this.keepAliveHandler.handleDisconnection();
-    }
-
-    @Override
-    public void synchronizeTags(@NonNull ServerUpdateTagsPacket packet) {
-        this.connection.sendPacket(packet);
     }
 
     @Override

@@ -11,6 +11,7 @@ dependencies {
     implementation(project(":data:json"))
     implementation(libs.netty)
     implementation(libs.logback)
+    implementation(libs.guava)
     implementation(libs.fastutil)
     implementation(libs.bundles.configs)
     testImplementation(libs.junit.jupiter)

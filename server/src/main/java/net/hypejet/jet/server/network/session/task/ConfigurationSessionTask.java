@@ -17,7 +17,6 @@ import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.configuration.ClientKnownPacksConfigurationPacket;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket;
-import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket.TagRegistry;
 import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerFeatureFlagsConfigurationPacket;
 import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerFinishConfigurationPacket;
 import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerKnownPacksConfigurationPacket;
@@ -30,8 +29,8 @@ import net.hypejet.jet.server.network.session.data.LoginData;
 import net.hypejet.jet.server.network.session.keepalive.KeepAliveHandler;
 import net.hypejet.jet.server.network.session.pack.ResourcePackHandler;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
-import net.hypejet.jet.server.registry.function.SynchronizeRegistryTagsFunction;
 import net.hypejet.jet.server.scoreboard.JetScoreboard;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.hypejet.jet.server.util.game.audience.PacketReceivingCommonAudience;
@@ -50,7 +49,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -60,18 +58,20 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * Represents {@linkplain SessionTask a session task}, which handles
- * {@linkplain ProtocolState#CONFIGURATION a configuration protocol state}.
+ * A {@linkplain SessionTask session task} handling
+ * a {@linkplain ProtocolState#CONFIGURATION configuration protocol state}.
  *
  * @since 1.0
  * @see ProtocolState#CONFIGURATION
  * @see SessionTask
  */
-public final class ConfigurationSessionTask implements SessionTask, SynchronizeRegistryTagsFunction,
-        ConfigurationManager, CommonSessionPacketHandler, PacketReceivingCommonAudience {
+public final class ConfigurationSessionTask implements SessionTask, ConfigurationManager,
+        CommonSessionPacketHandler, PacketReceivingCommonAudience {
 
     private static final Key SERVER_BRAND_PLUGIN_MESSAGE_KEY = Key.key("brand");
 
@@ -90,8 +90,8 @@ public final class ConfigurationSessionTask implements SessionTask, SynchronizeR
     private final NullableObjectAcquirable<Player.Settings> settings = new NullableObjectAcquirable<>();
     private final NullableObjectAcquirable<String> clientBrand = new NullableObjectAcquirable<>();
 
-    private final ReentrantReadWriteLock tagsSentLock = new ReentrantReadWriteLock();
-    private boolean tagsSent;
+    private final ReadWriteLock tagsInitializedLock = new ReentrantReadWriteLock();
+    private boolean tagsInitialized;
 
     /**
      * Constructs the {@linkplain ConfigurationSessionTask configuration session task}.
@@ -172,19 +172,6 @@ public final class ConfigurationSessionTask implements SessionTask, SynchronizeR
         this.connection.sendPacket(packet);
     }
 
-    @Override
-    public void synchronizeTags(@NonNull ServerUpdateTagsPacket packet) {
-        try {
-            this.tagsSentLock.readLock().lock();
-            /* Synchronization is not needed as tags have not been initialized yet. The tags
-               are going to be initialized for the client with acknowledged tag updates. */
-            if (!this.tagsSent) return;
-            this.connection.sendPacket(packet);
-        } finally {
-            this.tagsSentLock.readLock().unlock();
-        }
-    }
-
     /**
      * Handles a client response for {@linkplain ServerKnownPacksConfigurationPacket a known packs packet}.
      *
@@ -209,6 +196,34 @@ public final class ConfigurationSessionTask implements SessionTask, SynchronizeR
 
         // Ensure that no packet from the further session is handled
         this.connection.clientPacketReader().pausePacketReading();
+    }
+
+    /**
+     * Sends the specified {@linkplain ServerUpdateTagsPacket server update tags packet}
+     * to the {@linkplain SocketPlayerConnection player connection} associated
+     * with this {@linkplain ConfigurationSessionTask configuration session task}.
+     *
+     * @param packet the packet to send
+     * @param initializing whether this is a tag initialization rather than an update
+     * @throws IllegalStateException if this is a tag initialization and the tags have already
+     *                               been initialized for this configuration session task
+     * @since 1.0
+     */
+    public void sendTags(@NonNull ServerUpdateTagsPacket packet, boolean initializing) {
+        Lock lock = initializing ? this.tagsInitializedLock.writeLock() : this.tagsInitializedLock.readLock();
+        try {
+            lock.lock();
+            if (initializing) {
+                if (this.tagsInitialized)
+                    throw new IllegalStateException("The tags have already been initialized");
+                this.tagsInitialized = true;
+            } else if (!this.tagsInitialized) {
+                return;
+            }
+            this.connection.sendPacket(packet);
+        } finally {
+            lock.unlock();
+        }
     }
 
     private void runVirtualThreadTask() {
@@ -263,29 +278,10 @@ public final class ConfigurationSessionTask implements SessionTask, SynchronizeR
                     ? Set.copyOf(serverKnownPacks)
                     : Set.of();
 
-            Collection<JetMinecraftRegistry<?>> registries = server.registryManager().registries();
-            registries.forEach(registry -> sendRegistry(this.connection, registry, commonKnownPacks));
-
-            try {
-                this.tagsSentLock.writeLock().lock();
-                Set<TagRegistry> tagRegistries = new HashSet<>();
-
-                registries.forEach(registry -> {
-                    /* We can safely create tag registries without tag locking mechanism as no race conditions
-                       happen thanks to the "tagsSentLock". If tags of the registry are modified, the lock
-                       is still held and the tag update method will attempt to update tags using the "synchronizeTags"
-                       method, which uses the same lock. */
-                    // FIXME: Sometimes updating may lead to unnecessary sending tag registries with the same contents
-                    TagRegistry tagRegistry = registry.createTagRegistry();
-                    if (tagRegistry.tags().isEmpty()) return;
-                    tagRegistries.add(tagRegistry);
-                });
-
-                this.sendPacket(new ServerUpdateTagsPacket(tagRegistries));
-                this.tagsSent = true;
-            } finally {
-                this.tagsSentLock.writeLock().unlock();
-            }
+            JetRegistryManager registryManager = server.registryManager();
+            for (JetMinecraftRegistry<?> registry : registryManager.registries())
+                sendRegistry(this.connection, registry, commonKnownPacks);
+            registryManager.initializeTags(this);
 
             if (!this.keepAliveHandler.stopAndAwaitTermination(TIME_OUT_DURATION, TIME_OUT_UNIT)) {
                 this.connection.close(); // The keep alive handler has timed out
