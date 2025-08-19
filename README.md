@@ -1,46 +1,35 @@
 # ✈️ Jet
-[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
-> [!NOTE]
-> Jet is still during development. It should **NOT** be used for normal servers yet.
+> [!WARNING]
+> Jet is still under development and it is not recommended to use it by normal servers yet.
 
-A brand-new Minecraft server software made from scratch that aims to be multithreaded, user-friendly and to have a modern API.
+A high performance, multithreaded Minecraft server software which aims on high customizability without need to manually use packets. Designed for servers with custom behaviour, such as minigame servers.
 
-Jet does not have any vanilla features reimplemented, such as combat or fluids, making it good for simple minigame servers.
+## Goals
+Jet, unlike many already existing options:
+- Has a goal to provide high customizability and control via API without need to use packets
+- Produces similar packet results to vanilla to be compatible with most of already existing plugins, libraries and clients
+- Cares about code simplicity, readability and consistency, without compromising on the performance
+- Is designed to be friendly to developers, as well as normal users, thanks to the plugin system
 
-## Background
-What does Jet do over other servers?
+## Use cases
+Jet was designed for servers that want to introduce their own - heavily modified or custom - behaviour.
+Because of that, it is perfect for most of networks with minigames or custom gamemodes.
+However, it is generally **not** recommended for someone who needs to utilize most vanilla features, for example to run a survival server.
 
-### (Craft-)Bukkit based software (Spigot/Paper)
-Minecraft minigame servers are popular for a long time. The oldest ones started from simple minigame servers and ended up with a large server networks.
+## Building
+> [!IMPORTANT]
+> This project uses a [modified version](https://github.com/Codestech1/adventure/tree/feat/nbt-text-serializer) of [Adventure](https://github.com/KyoriPowered/adventure).
+> This is because the [NBT Component serializer pull request](https://github.com/KyoriPowered/adventure/pull/1084) has not been merged yet by original project maintainers.
+> You need firstly to publish it to maven local to make Jet compile properly.
 
-Since Minecraft release, a lot of features were added, affecting server performance. However, minigame servers don't need all of those features. Some servers may also want to have a multi-threaded solution, which Minecraft doesn't have. That's why server software like Jet and Minestom came up.
+Jet uses [Gradle](https://gradle.org/) as a build tool.
+The simpliest and most common way to build Jet is executing `./gradlew build` command in the root project directory.
 
-Jet doesn't have any vanilla features re-implemented by default, allowing for developers to implement their own mechanics and vanilla mechanics, but only these, which they need.
-
-Our server software isn't ideal. We recommend it for people, for which it's faster to add vanilla mechanics that they need than removing existing mechanics from (Craft-)Bukkit bassed software.
-### Minestom
-- **Simplicity** Unlike Minestom, Jet uses an approach more similar to that of Spigot and Paper, the server is just a `.jar` that you download and run like a normal application, and after which add plugins to. One downside of this is that it can often lead to clashes between plugins and generally make it harder to develop for, Jet aims to solve this with multiple approaches that you will see below.
-- **Customizability** As mentioned Jet will use multiple ways to better integrate your plugin with the server:
-  - **Everything is an event** In Jet everything is an event, as you may know from other APIs, events have priorities like `FIRST`, `NORMAL` and `LATE`. Some features utilizing events are: _world loading_ and simple features like _inventories_, _commands_ etc.
-- **Quality of Life** Jet includes many QoL features that you may or may not have seen in other servers.
-
-## Install
-To install Jet you need to download a server jar file from GitHub, which you run like a normal java application.
-
-## Usage
-Using Jet is not very different from CraftBukkit-based software, except for not having vanilla features and their properties.
-
-You have a basic configuration file, which contains the most important settings for the server.
-
-If you want to implement features on your server, you need to make plugins using our [API](https://github.com/Hypejet/Jet/tree/ver/1.0/api), which you put into a `plugins` subdirectory.
-
-## Contributing
-You can contribute to Jet easily by creating pull requests, without any other needs.
-
-To not waste your time, make sure to join our [Discord server](https://discord.com/invite/kS4CuPvYD2) and ask if your contribution would be merged or not. You can also make that via an issue, however it may take longer to get a response.
+## Running
+To run Jet, you firstly need to build it as specified in the [building section](#building).
+When you get it done, you can copy the jar with `-all` suffix from the `server/build/libs` directory and run it as a normal terminal Java application.
+It is recommended to create a special directory for running a Jet server because it generates configuration files at startup.
 
 ## License
-All Jet components (except of API) are licensed under an AGPL 3.0 license.
-
-License of the API however is a MIT license, allowing plugins freedom of licensing or even being close-sourced. 
+This project is mainly licensed under the [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.en.html) license, however the API is licensed under the [MIT](https://en.wikipedia.org/wiki/MIT_License) license to allow plugins freedom of licensing and even being close-sourced.
