@@ -32,4 +32,4 @@ When you get it done, you can copy the jar with `-all` suffix from the `server/b
 It is recommended to create a special directory for running a Jet server because it generates configuration files at a startup.
 
 ## License
-This project is mainly licensed under the [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.en.html) license, however the API is licensed under the [MIT](https://en.wikipedia.org/wiki/MIT_License) license.
+This project is mainly licensed under the [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.en.html) license, however the API is licensed under the [MIT](https://en.wikipedia.org/wiki/MIT_License) license to allow plugins freedom of licensing and even being close-sourced.
