@@ -27,9 +27,9 @@ Jet uses [Gradle](https://gradle.org/) as a build tool.
 The simpliest and most common way to build Jet is executing `./gradlew build` command in the root project directory.
 
 ## Running
-To run Jet, you firsty need to build it as specified in the [building section](#building).
+To run Jet, you firstly need to build it as specified in the [building section](#building).
 When you get it done, you can copy the jar with `-all` suffix from the `server/build/libs` directory and run it as a normal terminal Java application.
-It is recommended to create a special directory for running a Jet server because it generates configuration files at startup which let you configure the server.
+It is recommended to create a special directory for running a Jet server because it generates configuration files at a startup.
 
 ## License
 This project is mainly licensed under the [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.en.html) license, however the API is licensed under the [MIT](https://en.wikipedia.org/wiki/MIT_License) license.
