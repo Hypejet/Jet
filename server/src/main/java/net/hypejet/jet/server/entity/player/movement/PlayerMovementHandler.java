@@ -3,7 +3,7 @@ package net.hypejet.jet.server.entity.player.movement;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquirable;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
 import net.hypejet.concurrency.object.nullable.WriteNullableObjectAcquisition;
-import net.hypejet.jet.entity.movement.flag.RelativeFlag;
+import net.hypejet.jet.world.coordinate.flag.RelativeFlag;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientConfirmMovementSynchronizationPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket;

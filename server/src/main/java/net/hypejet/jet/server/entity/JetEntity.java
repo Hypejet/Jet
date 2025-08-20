@@ -3,7 +3,7 @@ package net.hypejet.jet.server.entity;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquirable;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.acquisition.world.WriteEntityWorldAcquisition;
-import net.hypejet.jet.entity.movement.flag.RelativeFlag;
+import net.hypejet.jet.world.coordinate.flag.RelativeFlag;
 import net.hypejet.jet.server.entity.acquisition.world.EntityWorldAcquisition;
 import net.hypejet.jet.server.entity.acquisition.world.WriteEntityWorldAcquisitionImpl;
 import net.hypejet.jet.server.entity.player.JetPlayer;
@@ -133,16 +133,16 @@ public class JetEntity implements Entity {
                 initialPitch + (flags.contains(RelativeFlag.PITCH) ? this.position.pitch() : 0f)
         );
 
-        if (flags.contains(RelativeFlag.ROTATE_DELTA)) {
+        if (flags.contains(RelativeFlag.ROTATE_VELOCITY)) {
             float pitchRotationAngle = (float) Math.toRadians(initialPitch - this.position.pitch());
             float yawRotationAngle = (float) Math.toRadians(initialYaw - this.position.yaw());
             this.velocity = this.velocity.rotateAroundX(pitchRotationAngle).rotateAroundY(yawRotationAngle);
         }
 
         this.velocity = velocity.add(
-                flags.contains(RelativeFlag.DELTA_X) ? this.velocity.x() : 0D,
-                flags.contains(RelativeFlag.DELTA_Y) ? this.velocity.y() : 0D,
-                flags.contains(RelativeFlag.DELTA_Z) ? this.velocity.z() : 0D
+                flags.contains(RelativeFlag.VELOCITY_X) ? this.velocity.x() : 0D,
+                flags.contains(RelativeFlag.VELOCITY_Y) ? this.velocity.y() : 0D,
+                flags.contains(RelativeFlag.VELOCITY_Z) ? this.velocity.z() : 0D
         );
 
         // TODO: Send update to viewers

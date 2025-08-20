@@ -3,7 +3,7 @@ package net.hypejet.jet.entity;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.entity.acquisition.world.WriteEntityWorldAcquisition;
-import net.hypejet.jet.entity.movement.flag.RelativeFlag;
+import net.hypejet.jet.world.coordinate.flag.RelativeFlag;
 import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.scoreboard.score.Score;
 import net.hypejet.jet.world.World;
