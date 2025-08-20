@@ -4,7 +4,6 @@ import net.hypejet.concurrency.object.nullable.NullableObjectAcquirable;
 import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
 import net.hypejet.concurrency.object.nullable.WriteNullableObjectAcquisition;
 import net.hypejet.jet.entity.movement.flag.RelativeFlag;
-import net.hypejet.jet.server.entity.movement.acquisition.InternalWriteMovementAcquisition;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientConfirmMovementSynchronizationPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket;
@@ -25,6 +24,7 @@ import java.util.function.UnaryOperator;
  * @see Vector
  * @see JetPlayer
  */
+// TODO: Vanilla-like synchronization
 public final class PlayerMovementHandler {
 
     private final JetPlayer player;
@@ -73,13 +73,10 @@ public final class PlayerMovementHandler {
      */
     public void handleConfirmation(@NonNull ClientConfirmMovementSynchronizationPlayPacket packet) {
         Objects.requireNonNull(packet, "packet");
-        try (
-                WriteNullableObjectAcquisition<Synchronization> acquisition = this.synchronization.acquireWrite();
-                InternalWriteMovementAcquisition positionAcquisition = this.player.acquireMovementWrite()
-        ) {
+        try (WriteNullableObjectAcquisition<Synchronization> acquisition = this.synchronization.acquireWrite()) {
             Synchronization synchronization = acquisition.get();
             if (synchronization == null || synchronization.identifier() != packet.identifier()) return;
-            positionAcquisition.setPosition(synchronization.position());
+            this.player.setPosition(synchronization.position());
             acquisition.set(null);
         }
     }
@@ -93,13 +90,9 @@ public final class PlayerMovementHandler {
      */
     public void handleClientMovement(@NonNull UnaryOperator<Position> positionUnaryOperator) {
         Objects.requireNonNull(positionUnaryOperator, "position unary operator");
-        try (
-                NullableObjectAcquisition<Synchronization> acquisition = this.synchronization.acquireRead();
-                InternalWriteMovementAcquisition positionAcquisition = this.player.acquireMovementWrite()
-        ) {
+        try (NullableObjectAcquisition<Synchronization> acquisition = this.synchronization.acquireRead()) {
             if (acquisition.get() != null) return;
-            Position newPosition = positionUnaryOperator.apply(positionAcquisition.position());
-            positionAcquisition.setPosition(newPosition);
+            this.player.setPosition(positionUnaryOperator.apply(this.player.position()));
         }
     }
 

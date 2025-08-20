@@ -3,27 +3,28 @@ package net.hypejet.jet.server.entity;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquirable;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.acquisition.world.WriteEntityWorldAcquisition;
-import net.hypejet.jet.entity.movement.acquisition.MovementAcquisition;
+import net.hypejet.jet.entity.movement.flag.RelativeFlag;
 import net.hypejet.jet.server.entity.acquisition.world.EntityWorldAcquisition;
 import net.hypejet.jet.server.entity.acquisition.world.WriteEntityWorldAcquisitionImpl;
-import net.hypejet.jet.server.entity.movement.acquisition.InternalWriteMovementAcquisition;
-import net.hypejet.jet.server.entity.movement.acquisition.MovementAcquirable;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.world.coordinate.Position;
+import net.hypejet.jet.world.coordinate.Vector;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.pointer.Pointers;
 import net.kyori.adventure.text.event.HoverEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Collection;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.UnaryOperator;
 
 /**
- * Represents an implementation of {@linkplain Entity an entity}.
+ * An implementation the {@linkplain Entity entity}.
  *
  * @since 1.0
  * @see Entity
@@ -38,7 +39,9 @@ public class JetEntity implements Entity {
     private final Identity identity;
     private final Pointers pointers;
 
-    private final MovementAcquirable movement;
+    private @NonNull Position position;
+    private @NonNull Vector velocity = Vector.zero();
+
     private final NotNullObjectAcquirable<JetWorld> world;
 
     /**
@@ -77,7 +80,7 @@ public class JetEntity implements Entity {
         this.identity = Identity.identity(Objects.requireNonNull(uniqueId, "unique identifier"));
         this.pointers = Objects.requireNonNull(pointers, "pointers");
         this.entityId = NEXT_ENTITY_ID.getAndIncrement();
-        this.movement = new MovementAcquirable(this, Objects.requireNonNull(position, "position"));
+        this.position = Objects.requireNonNull(position, "position");
         this.world = new NotNullObjectAcquirable<>(Objects.requireNonNull(world, "world"));
     }
 
@@ -97,13 +100,56 @@ public class JetEntity implements Entity {
     }
 
     @Override
-    public @NonNull MovementAcquisition acquireMovementRead() {
-        return this.movement.acquireRead();
+    public @NonNull Position position() {
+        return this.position;
     }
 
     @Override
-    public @NonNull InternalWriteMovementAcquisition acquireMovementWrite() {
-        return this.movement.acquireWrite();
+    public @NonNull Vector velocity() {
+        return this.velocity;
+    }
+
+    @Override
+    public void updatePosition(@NonNull Position position, @NonNull Vector velocity,
+                               @NonNull RelativeFlag @NonNull ... flags) {
+        this.updatePosition(position, velocity, Set.of(flags));
+    }
+
+    @Override
+    public void updatePosition(@NonNull Position position, @NonNull Vector velocity,
+                               @NonNull Collection<RelativeFlag> flags) {
+        Objects.requireNonNull(position, "position");
+        Objects.requireNonNull(velocity, "velocity");
+        Objects.requireNonNull(flags, "relative flags");
+
+        float initialYaw = this.position.yaw();
+        float initialPitch = this.position.pitch();
+
+        this.position = Position.create(
+                position.x() + (flags.contains(RelativeFlag.X) ? this.position.x() : 0D),
+                position.y() + (flags.contains(RelativeFlag.Y) ? this.position.y() : 0D),
+                position.z() + (flags.contains(RelativeFlag.Z) ? this.position.z() : 0D),
+                initialYaw + (flags.contains(RelativeFlag.YAW) ? this.position.yaw() : 0f),
+                initialPitch + (flags.contains(RelativeFlag.PITCH) ? this.position.pitch() : 0f)
+        );
+
+        if (flags.contains(RelativeFlag.ROTATE_DELTA)) {
+            float pitchRotationAngle = (float) Math.toRadians(initialPitch - this.position.pitch());
+            float yawRotationAngle = (float) Math.toRadians(initialYaw - this.position.yaw());
+            this.velocity = this.velocity.rotateAroundX(pitchRotationAngle).rotateAroundY(yawRotationAngle);
+        }
+
+        this.velocity = velocity.add(
+                flags.contains(RelativeFlag.DELTA_X) ? this.velocity.x() : 0D,
+                flags.contains(RelativeFlag.DELTA_Y) ? this.velocity.y() : 0D,
+                flags.contains(RelativeFlag.DELTA_Z) ? this.velocity.z() : 0D
+        );
+
+        // TODO: Send update to viewers
+
+        if (this instanceof JetPlayer player) {
+            player.movementHandler().synchronize(position, velocity, flags);
+        }
     }
 
     @Override
@@ -113,9 +159,7 @@ public class JetEntity implements Entity {
 
     @Override
     public @NonNull WriteEntityWorldAcquisition acquireWorldWrite() {
-        return new WriteEntityWorldAcquisitionImpl(
-                this.world.acquireWrite(), this.movement.acquireWrite(), this
-        );
+        return new WriteEntityWorldAcquisitionImpl(this.world.acquireWrite(), this);
     }
 
     @Override
@@ -143,5 +187,16 @@ public class JetEntity implements Entity {
     public @NonNull HoverEvent<HoverEvent.ShowEntity> asHoverEvent(@NonNull UnaryOperator<HoverEvent.ShowEntity> op) {
         // TODO: Custom names
         return HoverEvent.showEntity(op.apply(HoverEvent.ShowEntity.showEntity(this.entityType, this.uniqueId())));
+    }
+
+    /**
+     * Sets a {@linkplain Position position} of this {@linkplain JetEntity entity}
+     * without sending any updates to clients.
+     *
+     * @param position the position where the entity should be
+     * @since 1.0
+     */
+    public void setPosition(@NonNull Position position) {
+        this.position = Objects.requireNonNull(position, "position");
     }
 }

@@ -1,6 +1,5 @@
 package net.hypejet.jet.server.entity.player;
 
-import net.hypejet.jet.entity.movement.acquisition.MovementAcquisition;
 import net.hypejet.jet.event.events.world.InitialSpawnEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.server.JetMinecraftServer;
@@ -69,11 +68,8 @@ public final class PlayerList {
         // TODO: Difficulty packets, ability packets, held slot packets, etc.
         player.getScoreboard().addViewer(player);
 
-        try (
-                MovementAcquisition movementAcquisition = player.acquireMovementRead();
-                EntityWorldAcquisition<?> worldAcquisition = player.acquireWorldRead()
-        ) {
-            Position position = movementAcquisition.position();
+        try (EntityWorldAcquisition<?> worldAcquisition = player.acquireWorldRead()) {
+            Position position = player.position();
             player.movementHandler().synchronize(position, Vector.zero(), Set.of());
 
             this.players.add(player);

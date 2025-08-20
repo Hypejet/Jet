@@ -6,7 +6,6 @@ import net.hypejet.jet.entity.acquisition.world.WriteEntityWorldAcquisition;
 import net.hypejet.jet.event.events.world.PreWorldSwitchEvent;
 import net.hypejet.jet.event.events.world.WorldSwitchEvent;
 import net.hypejet.jet.server.entity.JetEntity;
-import net.hypejet.jet.server.entity.movement.acquisition.InternalWriteMovementAcquisition;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.server.world.handler.ChunkBatchHandler;
@@ -34,23 +33,18 @@ public final class WriteEntityWorldAcquisitionImpl
         implements WriteEntityWorldAcquisition {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WriteEntityWorldAcquisitionImpl.class);
-
-    private final InternalWriteMovementAcquisition movementAcquisition;
     private final JetEntity entity;
 
     /**
      * Constructs the {@linkplain WriteEntityWorldAcquisitionImpl write entity world acquisition implementation}.
      *
      * @param worldAcquisition a world acquisition that the entity world acquisition should wrap
-     * @param movementAcquisition a movement acquisition of the entity
      * @param entity the entity
      * @since 1.0
      */
     public WriteEntityWorldAcquisitionImpl(@NonNull WriteNotNullObjectAcquisition<JetWorld> worldAcquisition,
-                                           @NonNull InternalWriteMovementAcquisition movementAcquisition,
                                            @NonNull JetEntity entity) {
         super(worldAcquisition);
-        this.movementAcquisition = Objects.requireNonNull(movementAcquisition, "movement acquisition");
         this.entity = Objects.requireNonNull(entity, "entity");
     }
 
@@ -101,7 +95,7 @@ public final class WriteEntityWorldAcquisitionImpl
 
         /* We are going to synchronize the position manually using
            the movement handler if the entity is a player. */
-        this.movementAcquisition.setPosition(position);
+        this.entity.setPosition(position);
 
         if (this.entity instanceof JetPlayer player) {
             player.movementHandler().synchronize(position, Vector.zero(), Set.of()); // TODO: Ensure integrity with vanilla

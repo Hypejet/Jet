@@ -16,6 +16,7 @@ import java.util.Set;
  *
  * @since 1.0
  */
+// TODO: Rename fields containing "delta" to "velocity"
 public final class RelativeFlag {
     /**
      * {@linkplain RelativeFlag A relative flag} indicating that {@linkplain Position#x() an X position value}
