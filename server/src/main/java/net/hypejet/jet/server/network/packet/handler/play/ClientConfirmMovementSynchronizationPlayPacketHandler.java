@@ -29,6 +29,6 @@ public final class ClientConfirmMovementSynchronizationPlayPacketHandler
     @Override
     public void handle(@NonNull ClientConfirmMovementSynchronizationPlayPacket packet, @NonNull Session session) {
         JetPlayer player = session.connection().playerOrThrow();
-        player.movementHandler().handleConfirmation(packet);
+        player.movementSynchronizer().handleConfirmation(packet);
     }
 }

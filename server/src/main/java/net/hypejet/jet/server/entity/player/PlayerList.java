@@ -70,7 +70,7 @@ public final class PlayerList {
 
         try (EntityWorldAcquisition<?> worldAcquisition = player.acquireWorldRead()) {
             Position position = player.position();
-            player.movementHandler().synchronize(position, Vector.zero(), Set.of());
+            player.movementSynchronizer().synchronize(position, Vector.zero(), Set.of());
 
             this.players.add(player);
 

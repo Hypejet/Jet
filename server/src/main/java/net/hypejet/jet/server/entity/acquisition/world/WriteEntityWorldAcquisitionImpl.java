@@ -21,8 +21,8 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Represents an implementation of {@linkplain EntityWorldAcquisition an entity world acquisition}
- * and {@linkplain WriteEntityWorldAcquisition a write entity world acquisition}.
+ * An implementation of an {@linkplain EntityWorldAcquisition entity world acquisition}
+ * and a {@linkplain WriteEntityWorldAcquisition write entity world acquisition}.
  *
  * @since 1.0
  * @see EntityWorldAcquisition
@@ -94,13 +94,12 @@ public final class WriteEntityWorldAcquisitionImpl
             chunkBatchHandler.scheduleTask();
         }
 
-        /* We are going to synchronize the position manually using
-           the movement handler if the entity is a player. */
-        this.entity.updateRawPositionAndVelocity(position, Vector.zero(), Set.of());
-
         if (this.entity instanceof JetPlayer player) {
-            player.movementHandler().synchronize(position, Vector.zero(), Set.of());
+            // The "synchronize" method is going to apply field changes by itself
+            player.movementSynchronizer().synchronize(position, Vector.zero(), Set.of());
             player.server().eventNode().call(new WorldSwitchEvent(player, previousWorld, world, position));
+        } else {
+            this.entity.updateRawPositionAndVelocity(position, Vector.zero(), Set.of());
         }
 
         this.acquisition.set(validatedWorld);

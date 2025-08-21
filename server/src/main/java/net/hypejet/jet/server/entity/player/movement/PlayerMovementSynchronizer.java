@@ -22,7 +22,7 @@ import java.util.function.UnaryOperator;
  * @see JetPlayer
  */
 // TODO: Make this something async?
-public final class PlayerMovementHandler {
+public final class PlayerMovementSynchronizer {
 
     private final JetPlayer player;
 
@@ -34,12 +34,12 @@ public final class PlayerMovementHandler {
     private int tickCount; // Same as above, currently unused, but we will need that
 
     /**
-     * Constructs the {@linkplain PlayerMovementHandler player movement handler}.
+     * Constructs the {@linkplain PlayerMovementSynchronizer player movement synchronizer}.
      *
      * @param player the player that the synchronization should be handled for
      * @since 1.0
      */
-    public PlayerMovementHandler(@NonNull JetPlayer player) {
+    public PlayerMovementSynchronizer(@NonNull JetPlayer player) {
         this.player = Objects.requireNonNull(player, "player");
     }
 
@@ -76,7 +76,7 @@ public final class PlayerMovementHandler {
 
     /**
      * Handles a client confirmation to a synchronization request
-     * made by this {@linkplain PlayerMovementHandler player movement handler}.
+     * made by this {@linkplain PlayerMovementSynchronizer player movement synchronizer}.
      *
      * @param packet the packet that the client sent to confirm the synchronization
      * @since 1.0

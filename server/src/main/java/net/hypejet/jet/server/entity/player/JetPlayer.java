@@ -20,7 +20,7 @@ import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.acquisition.gamemode.GameModeAcquirable;
 import net.hypejet.jet.server.entity.acquisition.respawn.WriteRespawnScreenEnabledAcquisition;
 import net.hypejet.jet.server.entity.acquisition.world.EntityWorldAcquisition;
-import net.hypejet.jet.server.entity.player.movement.PlayerMovementHandler;
+import net.hypejet.jet.server.entity.player.movement.PlayerMovementSynchronizer;
 import net.hypejet.jet.server.entity.player.spawn.DeathLocation;
 import net.hypejet.jet.server.entity.player.spawn.PlayerSpawnInfo;
 import net.hypejet.jet.server.network.ProtocolState;
@@ -74,7 +74,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     private final SocketPlayerConnection connection;
 
     private final ChunkBatchHandler chunkBatchHandler;
-    private final PlayerMovementHandler movementHandler = new PlayerMovementHandler(this);
+    private final PlayerMovementSynchronizer movementSynchronizer = new PlayerMovementSynchronizer(this);
 
     private final NotNullObjectAcquirable<Settings> settings;
     private final NotNullObjectAcquirable<String> clientBrand;
@@ -214,7 +214,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
         Objects.requireNonNull(velocity, "velocity");
         Objects.requireNonNull(flags, "relative flags");
         // The "synchronize" method is going to apply field changes by itself
-        this.movementHandler.synchronize(position, velocity, flags);
+        this.movementSynchronizer.synchronize(position, velocity, flags);
     }
 
     @Override
@@ -260,13 +260,14 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     }
 
     /**
-     * Gets {@linkplain PlayerMovementHandler a player movement handler} of this {@linkplain JetPlayer player}.
+     * Gets a {@linkplain PlayerMovementSynchronizer player movement synchronizer}
+     * of this {@linkplain JetPlayer player}.
      *
-     * @return the player movement handler
+     * @return the player movement synchronizer
      * @since 1.0
      */
-    public @NonNull PlayerMovementHandler movementHandler() {
-        return this.movementHandler;
+    public @NonNull PlayerMovementSynchronizer movementSynchronizer() {
+        return this.movementSynchronizer;
     }
 
     /**

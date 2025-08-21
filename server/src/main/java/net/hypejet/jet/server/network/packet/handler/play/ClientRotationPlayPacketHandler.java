@@ -27,7 +27,7 @@ public final class ClientRotationPlayPacketHandler extends ClientPacketHandler<C
     @Override
     public void handle(@NonNull ClientRotationPlayPacket packet, @NonNull Session session) {
         JetPlayer player = session.connection().playerOrThrow();
-        player.movementHandler().handleClientMovement(position -> position.withView(packet.yaw(), packet.pitch()));
+        player.movementSynchronizer().handleClientMovement(position -> position.withView(packet.yaw(), packet.pitch()));
         // TODO: Handle flags
     }
 }
