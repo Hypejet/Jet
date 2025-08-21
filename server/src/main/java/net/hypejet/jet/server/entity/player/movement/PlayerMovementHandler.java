@@ -1,8 +1,5 @@
 package net.hypejet.jet.server.entity.player.movement;
 
-import net.hypejet.concurrency.object.nullable.NullableObjectAcquirable;
-import net.hypejet.concurrency.object.nullable.NullableObjectAcquisition;
-import net.hypejet.concurrency.object.nullable.WriteNullableObjectAcquisition;
 import net.hypejet.jet.world.coordinate.flag.RelativeFlag;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientConfirmMovementSynchronizationPlayPacket;
@@ -16,24 +13,30 @@ import java.util.Objects;
 import java.util.function.UnaryOperator;
 
 /**
- * Represents something that synchronizes {@linkplain Position a position} and {@linkplain Vector vector}
- * of a delta movement of {@linkplain JetPlayer a player} with a client associated with it.
+ * Something synchronizing {@linkplain Position position} and velocity {@linkplain Vector vector}
+ * of a {@linkplain JetPlayer player} with the client associated with that player.
  *
  * @since 1.0
  * @see Position
  * @see Vector
  * @see JetPlayer
  */
-// TODO: Vanilla-like synchronization
+// TODO: Make this something async?
 public final class PlayerMovementHandler {
 
     private final JetPlayer player;
-    private final NullableObjectAcquirable<Synchronization> synchronization = new NullableObjectAcquirable<>();
+
+    private int synchronizationId;
+    // Currently unused, but we will need that when we implement vanilla-like client movement handling
+    private int synchronizationTickEpoch;
+    private Vector positionInSynchronization;
+
+    private int tickCount; // Same as above, currently unused, but we will need that
 
     /**
      * Constructs the {@linkplain PlayerMovementHandler player movement handler}.
      *
-     * @param player a player that the position and delta movement synchronization should be handled for
+     * @param player the player that the synchronization should be handled for
      * @since 1.0
      */
     public PlayerMovementHandler(@NonNull JetPlayer player) {
@@ -41,82 +44,65 @@ public final class PlayerMovementHandler {
     }
 
     /**
-     * Sends a request to client to synchronize clientside {@linkplain Position position}
-     * and delta-movement {@linkplain Vector vector} with the specified values.
+     * Sends a request to the client to synchronize clientside {@linkplain Position position}
+     * and velocity {@linkplain Vector vector} with the specified values.
      *
-     * @param position the position value
-     * @param deltaMovement the delta-movement vector value
-     * @param flags flags of the position
+     * @param position the position value that the clientside position should be synchronized with
+     * @param velocity the velocity vector that the clientside velocity should be synchronized with
+     * @param flags relative flags of the specified position and velocity,
+     *              indicate that a value is relative to the previous one
      * @since 1.0
      */
-    public void synchronize(@NonNull Position position, @NonNull Vector deltaMovement,
+    public void synchronize(@NonNull Position position, @NonNull Vector velocity,
                             @NonNull Collection<RelativeFlag> flags) {
-        Objects.requireNonNull(position, "position");
-        try (WriteNullableObjectAcquisition<Synchronization> acquisition = this.synchronization.acquireWrite()) {
-            Synchronization previousSynchronization = acquisition.get();
-            int identifier = previousSynchronization == null ? 0 : previousSynchronization.identifier() + 1;
+        this.synchronizationTickEpoch = this.tickCount;
 
-            acquisition.set(new Synchronization(identifier, position));
-
-            this.player.sendPacket(new ServerSynchronizePositionPlayPacket(
-                    identifier, position, deltaMovement, flags
-            ));
+        if (this.synchronizationId == Integer.MAX_VALUE) {
+            this.synchronizationId = 0;
+        } else {
+            this.synchronizationId++;
         }
+
+        this.positionInSynchronization = new Vector(position.x(), position.y(), position.z());
+        this.player.updateRawPositionAndVelocity(position, velocity, flags);
+
+        this.player.sendPacket(new ServerSynchronizePositionPlayPacket(
+                this.synchronizationId,
+                position,
+                velocity,
+                flags
+        ));
     }
 
     /**
-     * Handles a client confirmation to synchronization of {@linkplain Position a position}
-     * and {@linkplain Vector vector} of a delta movement.
+     * Handles a client confirmation to a synchronization request
+     * made by this {@linkplain PlayerMovementHandler player movement handler}.
      *
-     * @param packet a packet that the client sent to confirm the synchronization
+     * @param packet the packet that the client sent to confirm the synchronization
      * @since 1.0
      */
     public void handleConfirmation(@NonNull ClientConfirmMovementSynchronizationPlayPacket packet) {
-        Objects.requireNonNull(packet, "packet");
-        try (WriteNullableObjectAcquisition<Synchronization> acquisition = this.synchronization.acquireWrite()) {
-            Synchronization synchronization = acquisition.get();
-            if (synchronization == null || synchronization.identifier() != packet.identifier()) return;
-            this.player.setPosition(synchronization.position());
-            acquisition.set(null);
-        }
+        this.player.server().ticker().scheduleTask(() -> {
+            if (packet.identifier() != this.synchronizationId) return;
+            if (this.positionInSynchronization == null) return; // We are more lenient than vanilla
+            this.player.updateRawPosition(this.player.position().withValues(this.positionInSynchronization));
+            this.positionInSynchronization = null;
+        });
     }
 
     /**
-     * Handles a clientside change of {@linkplain Position a position} of the {@linkplain JetPlayer player}.
+     * Handles a clientside change of a {@linkplain Position position} of the {@linkplain JetPlayer player}.
      *
-     * @param positionUnaryOperator a unary operator that provides a new position of the player by accepting their
-     *                              current position
+     * @param positionUnaryOperator a unary operator that provides a new position
+     *                              of the player by consuming their current position
      * @since 1.0
      */
     public void handleClientMovement(@NonNull UnaryOperator<Position> positionUnaryOperator) {
-        Objects.requireNonNull(positionUnaryOperator, "position unary operator");
-        try (NullableObjectAcquisition<Synchronization> acquisition = this.synchronization.acquireRead()) {
-            if (acquisition.get() != null) return;
-            this.player.setPosition(positionUnaryOperator.apply(this.player.position()));
-        }
-    }
-
-
-    /**
-     * Represents a pending synchronization request of {@linkplain Position a position}
-     * of {@linkplain JetPlayer a player} with a client associated with it.
-     *
-     * @param identifier an identifier of the synchronization
-     * @param position a value that clientside position should be set to
-     * @since 1.0
-     * @see Position
-     * @see JetPlayer
-     */
-    private record Synchronization(int identifier, @NonNull Position position) {
-        /**
-         * Constructs the {@linkplain Synchronization synchronization}.
-         *
-         * @param identifier an identifier of the synchronization
-         * @param position a value that clientside position should be set to
-         * @since 1.0
-         */
-        private Synchronization {
-            Objects.requireNonNull(position, "position");
-        }
+        this.player.server().ticker().scheduleTask(() -> {
+            /* TODO: Make a vanilla-like implementation, currently we blindly trust the client,
+               but entity system is not completed yet, therefore it is impossible to make
+               a vanilla-like implementation for now. */
+            this.player.updateRawPosition(positionUnaryOperator.apply(this.player.position()));
+        });
     }
 }

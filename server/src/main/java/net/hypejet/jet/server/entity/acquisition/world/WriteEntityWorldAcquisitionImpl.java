@@ -28,6 +28,7 @@ import java.util.Set;
  * @see EntityWorldAcquisition
  * @see WriteEntityWorldAcquisition
  */
+// TODO: Ensure integrity with vanilla of this class
 public final class WriteEntityWorldAcquisitionImpl
         extends EntityWorldAcquisition<WriteNotNullObjectAcquisition<JetWorld>>
         implements WriteEntityWorldAcquisition {
@@ -95,10 +96,10 @@ public final class WriteEntityWorldAcquisitionImpl
 
         /* We are going to synchronize the position manually using
            the movement handler if the entity is a player. */
-        this.entity.setPosition(position);
+        this.entity.updateRawPositionAndVelocity(position, Vector.zero(), Set.of());
 
         if (this.entity instanceof JetPlayer player) {
-            player.movementHandler().synchronize(position, Vector.zero(), Set.of()); // TODO: Ensure integrity with vanilla
+            player.movementHandler().synchronize(position, Vector.zero(), Set.of());
             player.server().eventNode().call(new WorldSwitchEvent(player, previousWorld, world, position));
         }
 

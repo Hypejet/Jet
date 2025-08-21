@@ -112,6 +112,7 @@ public class JetEntity implements Entity {
     @Override
     public void updatePosition(@NonNull Position position, @NonNull Vector velocity,
                                @NonNull RelativeFlag @NonNull ... flags) {
+        Objects.requireNonNull(flags, "relative flags");
         this.updatePosition(position, velocity, Set.of(flags));
     }
 
@@ -121,35 +122,7 @@ public class JetEntity implements Entity {
         Objects.requireNonNull(position, "position");
         Objects.requireNonNull(velocity, "velocity");
         Objects.requireNonNull(flags, "relative flags");
-
-        float initialYaw = this.position.yaw();
-        float initialPitch = this.position.pitch();
-
-        this.position = Position.create(
-                position.x() + (flags.contains(RelativeFlag.X) ? this.position.x() : 0D),
-                position.y() + (flags.contains(RelativeFlag.Y) ? this.position.y() : 0D),
-                position.z() + (flags.contains(RelativeFlag.Z) ? this.position.z() : 0D),
-                initialYaw + (flags.contains(RelativeFlag.YAW) ? this.position.yaw() : 0f),
-                initialPitch + (flags.contains(RelativeFlag.PITCH) ? this.position.pitch() : 0f)
-        );
-
-        if (flags.contains(RelativeFlag.ROTATE_VELOCITY)) {
-            float pitchRotationAngle = (float) Math.toRadians(initialPitch - this.position.pitch());
-            float yawRotationAngle = (float) Math.toRadians(initialYaw - this.position.yaw());
-            this.velocity = this.velocity.rotateAroundX(pitchRotationAngle).rotateAroundY(yawRotationAngle);
-        }
-
-        this.velocity = velocity.add(
-                flags.contains(RelativeFlag.VELOCITY_X) ? this.velocity.x() : 0D,
-                flags.contains(RelativeFlag.VELOCITY_Y) ? this.velocity.y() : 0D,
-                flags.contains(RelativeFlag.VELOCITY_Z) ? this.velocity.z() : 0D
-        );
-
-        // TODO: Send update to viewers
-
-        if (this instanceof JetPlayer player) {
-            player.movementHandler().synchronize(position, velocity, flags);
-        }
+        this.updateRawPositionAndVelocity(position, velocity, flags);
     }
 
     @Override
@@ -190,13 +163,49 @@ public class JetEntity implements Entity {
     }
 
     /**
-     * Sets a {@linkplain Position position} of this {@linkplain JetEntity entity}
-     * without sending any updates to clients.
+     * Updates a {@linkplain Position position} and a velocity {@linkplain Vector vector}
+     * of this {@linkplain JetEntity entity} without sending any updates to clients.
      *
-     * @param position the position where the entity should be
+     * @param position the position that the entity should have
+     * @param velocity the velocity that the entity should have
+     * @param flags the relative flags specifying which values of the specified position
+     *              and velocity should be recognised as relative to current ones
      * @since 1.0
      */
-    public void setPosition(@NonNull Position position) {
+    public final void updateRawPositionAndVelocity(@NonNull Position position, @NonNull Vector velocity,
+                                             @NonNull Collection<RelativeFlag> flags) {
+        float initialYaw = this.position.yaw();
+        float initialPitch = this.position.pitch();
+
+        this.position = Position.create(
+                position.x() + (flags.contains(RelativeFlag.X) ? this.position.x() : 0D),
+                position.y() + (flags.contains(RelativeFlag.Y) ? this.position.y() : 0D),
+                position.z() + (flags.contains(RelativeFlag.Z) ? this.position.z() : 0D),
+                initialYaw + (flags.contains(RelativeFlag.YAW) ? this.position.yaw() : 0f),
+                initialPitch + (flags.contains(RelativeFlag.PITCH) ? this.position.pitch() : 0f)
+        );
+
+        if (flags.contains(RelativeFlag.ROTATE_VELOCITY)) {
+            float pitchRotationAngle = (float) Math.toRadians(initialPitch - this.position.pitch());
+            float yawRotationAngle = (float) Math.toRadians(initialYaw - this.position.yaw());
+            this.velocity = this.velocity.rotateAroundX(pitchRotationAngle).rotateAroundY(yawRotationAngle);
+        }
+
+        this.velocity = velocity.add(
+                flags.contains(RelativeFlag.VELOCITY_X) ? this.velocity.x() : 0D,
+                flags.contains(RelativeFlag.VELOCITY_Y) ? this.velocity.y() : 0D,
+                flags.contains(RelativeFlag.VELOCITY_Z) ? this.velocity.z() : 0D
+        );
+    }
+
+    /**
+     * Updates a {@linkplain Position position} of this {@linkplain JetEntity entity}
+     * without sending any updates to clients.
+     *
+     * @param position the position that the entity should have
+     * @since 1.0
+     */
+    public final void updateRawPosition(@NonNull Position position) {
         this.position = Objects.requireNonNull(position, "position");
     }
 }

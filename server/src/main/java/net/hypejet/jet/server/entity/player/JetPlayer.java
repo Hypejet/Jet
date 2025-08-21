@@ -43,6 +43,8 @@ import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.handler.ChunkBatchHandler;
 import net.hypejet.jet.world.coordinate.Position;
+import net.hypejet.jet.world.coordinate.Vector;
+import net.hypejet.jet.world.coordinate.flag.RelativeFlag;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.key.Key;
@@ -52,17 +54,17 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Represents an implementation of {@linkplain Player a player}.
+ * An implementation of the {@linkplain Player player}.
  *
  * @since 1.0
  * @see Player
- * @see JetEntity
  */
 public final class JetPlayer extends JetEntity implements Player, NetworkDisconnectionHandler,
         PacketReceivingCommonAudience {
@@ -203,6 +205,16 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
 
         this.scoreboard = validatedScoreboard;
         return currentScoreboard;
+    }
+
+    @Override
+    public void updatePosition(@NonNull Position position, @NonNull Vector velocity,
+                               @NonNull Collection<RelativeFlag> flags) {
+        Objects.requireNonNull(position, "position");
+        Objects.requireNonNull(velocity, "velocity");
+        Objects.requireNonNull(flags, "relative flags");
+        // The "synchronize" method is going to apply field changes by itself
+        this.movementHandler.synchronize(position, velocity, flags);
     }
 
     @Override
