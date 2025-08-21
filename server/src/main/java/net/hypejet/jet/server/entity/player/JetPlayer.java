@@ -1,5 +1,6 @@
 package net.hypejet.jet.server.entity.player;
 
+import it.unimi.dsi.fastutil.Pair;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquirable;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.object.notnull.WriteNotNullObjectAcquisition;
@@ -12,6 +13,8 @@ import net.hypejet.jet.entity.acquisition.gamemode.GameModeAcquisition;
 import net.hypejet.jet.entity.acquisition.gamemode.WriteGameModeAcquisition;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.settings.ChangeSettingsEvent;
+import net.hypejet.jet.event.events.world.PreWorldSwitchEvent;
+import net.hypejet.jet.event.events.world.WorldSwitchEvent;
 import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.server.JetMinecraftServer;
@@ -19,7 +22,6 @@ import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.acquisition.gamemode.GameModeAcquirable;
 import net.hypejet.jet.server.entity.acquisition.respawn.WriteRespawnScreenEnabledAcquisition;
-import net.hypejet.jet.server.entity.acquisition.world.EntityWorldAcquisition;
 import net.hypejet.jet.server.entity.player.movement.PlayerMovementSynchronizer;
 import net.hypejet.jet.server.entity.player.spawn.DeathLocation;
 import net.hypejet.jet.server.entity.player.spawn.PlayerSpawnInfo;
@@ -53,6 +55,8 @@ import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -70,6 +74,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
         PacketReceivingCommonAudience {
 
     private static final Key ENTITY_TYPE = Key.key("player");
+    private static final Logger LOGGER = LoggerFactory.getLogger(JetPlayer.class);
 
     private final SocketPlayerConnection connection;
 
@@ -248,6 +253,35 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
         this.connection.sendPacket(packet);
     }
 
+    @Override
+    protected @NonNull Pair<JetWorld, Position> preWorldChange(@NonNull JetWorld newWorld,
+                                                               @NonNull Position initialPosition) {
+        this.chunkBatchHandler.cancelTask();
+        this.world().removePlayer(this);
+
+        PreWorldSwitchEvent preSwitchEvent = new PreWorldSwitchEvent(this, this.world(), newWorld, initialPosition);
+        this.server().eventNode().call(preSwitchEvent);
+
+        if (preSwitchEvent.getNewWorld() instanceof JetWorld validatedWorld) {
+            newWorld = validatedWorld;
+        } else {
+            LOGGER.warn("An invalid world has been specified in a pre-world-switch event," +
+                    "falling back to the initially specified world");
+        }
+
+        return Pair.of(newWorld, preSwitchEvent.getStartingPosition());
+    }
+
+    @Override
+    protected void postWorldChange(@NonNull JetWorld previousWorld, @NonNull Position initialPosition,
+                                   boolean keepAttributes, boolean keepMetadata) {
+        this.sendRespawnPacket(this.world(), keepAttributes, keepMetadata);
+        this.world().addPlayer(this);
+        this.chunkBatchHandler.scheduleTask();
+        this.movementSynchronizer.synchronize(initialPosition, Vector.zero(), Set.of());
+        this.server().eventNode().call(new WorldSwitchEvent(this, previousWorld, this.world(), initialPosition));
+    }
+
     /**
      * Gets {@linkplain ChunkBatchHandler a chunk batch handler}, which sends
      * {@linkplain JetChunk chunks} to this {@linkplain JetPlayer player}.
@@ -383,22 +417,22 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
      * @since 1.0
      * @see ServerJoinGamePlayPacket
      */
-    // TODO: Move to JetMinecraftServer#addPlayer
+    // TODO: Move to PlayerList#addPlayer
     public void sendJoinGamePacket() {
-        JetServerConfiguration configuration = this.server().configuration();
+        this.server().ticker().ensureRunsInTickLoop();
         try (
                 BooleanAcquisition enableRespawnScreenAcquisition = this.acquireRespawnScreenEnabledRead();
                 GameModeAcquisition gameModeAcquisition = this.gameMode.acquireRead();
-                NullableObjectAcquisition<DeathLocation> lastDeathLocation = this.lastDeathLocation.acquireRead();
-                EntityWorldAcquisition<?> worldAcquisition = this.acquireWorldRead()
+                NullableObjectAcquisition<DeathLocation> lastDeathLocation = this.lastDeathLocation.acquireRead()
         ) {
+            JetServerConfiguration configuration = this.server().configuration();
             this.sendPacket(new ServerJoinGamePlayPacket(
                     this.entityId(), configuration.hardcore(), Set.of() /* TODO: Permanent worlds */,
                     configuration.maximumPlayers(), configuration.maximumViewDistance(),
                     configuration.simulationDistance(), configuration.reducedDebugInfo(),
                     enableRespawnScreenAcquisition.get(), configuration.showUnlockedRecipesOnly(),
                     this.createSpawnInfo(
-                            worldAcquisition.get(),
+                            this.world(),
                             gameModeAcquisition.get(),
                             gameModeAcquisition.previous(),
                             lastDeathLocation.get()

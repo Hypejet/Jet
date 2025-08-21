@@ -5,9 +5,6 @@ import net.hypejet.concurrency.collection.CollectionAcquisition;
 import net.hypejet.concurrency.collection.set.HashSetAcquirable;
 import net.hypejet.concurrency.map.MapAcquirable;
 import net.hypejet.concurrency.map.hashmap.HashMapAcquirable;
-import net.hypejet.concurrency.object.notnull.NotNullObjectAcquirable;
-import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
-import net.hypejet.concurrency.object.notnull.WriteNotNullObjectAcquisition;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
@@ -41,10 +38,10 @@ public final class JetWorld implements World {
     private final ChunkLoader chunkLoader;
     private final JetRegistryManager registryManager;
 
-    private final NotNullObjectAcquirable<Position> defaultSpawnPosition;
-
     private final MapAcquirable<ChunkPosition, JetChunk, ?> chunks = new HashMapAcquirable<>();
     private final CollectionAcquirable<JetEntity, Set<JetEntity>> entities = new HashSetAcquirable<>();
+
+    private Position defaultSpawnPosition = Position.zero();
 
     /**
      * Constructs the {@linkplain JetWorld world}.
@@ -61,7 +58,6 @@ public final class JetWorld implements World {
         this.worldData = Objects.requireNonNull(worldData, "world data");
         this.chunkLoader = Objects.requireNonNull(chunkLoader, "chunk loader");
         this.registryManager = Objects.requireNonNull(registryManager, "registry manager");
-        this.defaultSpawnPosition = new NotNullObjectAcquirable<>(new Position(0, 0, 0, 0f, 0f));
     }
 
     @Override
@@ -75,18 +71,18 @@ public final class JetWorld implements World {
     }
 
     @Override
+    public @NonNull Position defaultSpawnPosition() {
+        return this.defaultSpawnPosition;
+    }
+
+    @Override
+    public void defaultSpawnPosition(@NonNull Position position) {
+        this.defaultSpawnPosition = Objects.requireNonNull(position, "position");
+    }
+
+    @Override
     public @NonNull CollectionAcquisition<JetEntity, ?> entities() {
         return this.entities.acquireRead();
-    }
-
-    @Override
-    public @NonNull NotNullObjectAcquisition<Position> acquireDefaultSpawnPositionRead() {
-        return this.defaultSpawnPosition.acquireRead();
-    }
-
-    @Override
-    public @NonNull WriteNotNullObjectAcquisition<Position> acquireDefaultSpawnPositionWrite() {
-        return this.defaultSpawnPosition.acquireWrite();
     }
 
     @Override

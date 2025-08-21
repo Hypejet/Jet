@@ -3,9 +3,7 @@ package net.hypejet.jet.server.entity.player;
 import net.hypejet.jet.event.events.world.InitialSpawnEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.entity.acquisition.world.EntityWorldAcquisition;
 import net.hypejet.jet.server.tick.Ticker;
-import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.world.coordinate.Position;
 import net.hypejet.jet.world.coordinate.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -68,20 +66,15 @@ public final class PlayerList {
         // TODO: Difficulty packets, ability packets, held slot packets, etc.
         player.getScoreboard().addViewer(player);
 
-        try (EntityWorldAcquisition<?> worldAcquisition = player.acquireWorldRead()) {
-            Position position = player.position();
-            player.movementSynchronizer().synchronize(position, Vector.zero(), Set.of());
+        Position position = player.position();
+        player.movementSynchronizer().synchronize(position, Vector.zero(), Set.of());
 
-            this.players.add(player);
+        this.players.add(player);
 
-            // TODO: Send other world data
-            player.chunkBatchHandler().scheduleTask(); // TODO: Ensure that it produces the same behaviour as vanilla
-
-            JetWorld world = worldAcquisition.get();
-            world.addPlayer(player);
-
-            this.eventNode.call(new InitialSpawnEvent(player, world, position));
-        }
+        // TODO: Send other world data
+        player.chunkBatchHandler().scheduleTask(); // TODO: Ensure that it produces the same behaviour as vanilla
+        player.world().addPlayer(player);
+        this.eventNode.call(new InitialSpawnEvent(player, player.world(), position));
     }
 
     /**

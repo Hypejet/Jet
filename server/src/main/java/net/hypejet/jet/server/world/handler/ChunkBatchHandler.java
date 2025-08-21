@@ -5,7 +5,6 @@ import net.hypejet.concurrency.empty.EmptyAcquirable;
 import net.hypejet.concurrency.empty.EmptyAcquisition;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.jet.entity.player.Player;
-import net.hypejet.jet.server.entity.acquisition.world.EntityWorldAcquisition;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.handler.NetworkDisconnectionHandler;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerCenterChunkPlayPacket;
@@ -46,6 +45,7 @@ import java.util.function.UnaryOperator;
  * @since 1.0
  * @see JetChunk
  */
+// TODO: Run in the main ticking thread
 public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnectionHandler {
 
     /**
@@ -155,6 +155,7 @@ public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnect
             }
 
             this.chunksScheduled.clear();
+            this.future = null;
         }
     }
 
@@ -262,8 +263,7 @@ public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnect
 
     private void tick() {
         try (
-                EntityWorldAcquisition<?> worldAcquisition = this.player.acquireWorldRead();
-                WriteWorldMapAcquisitionImpl worldMapAcquisition = worldAcquisition.get().acquireWorldMapWrite();
+                WriteWorldMapAcquisitionImpl worldMapAcquisition = this.player.world().acquireWorldMapWrite();
                 /* The lock acquired after the world-map, because write world-map acquisitions during a world-map
                    update consume chunk-views of all players that are connected to the server, and the chunk-views
                    are guarded by the same lock. It may also negatively affect chunk-view updating inside

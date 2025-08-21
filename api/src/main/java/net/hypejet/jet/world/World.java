@@ -1,8 +1,6 @@
 package net.hypejet.jet.world;
 
 import net.hypejet.concurrency.collection.CollectionAcquisition;
-import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
-import net.hypejet.concurrency.object.notnull.WriteNotNullObjectAcquisition;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.world.acquisition.worldmap.WorldMapAcquisition;
@@ -36,6 +34,24 @@ public interface World {
     @NonNull WorldData worldData();
 
     /**
+     * Gets the default {@linkplain Position position} where {@linkplain Entity entities} should spawn
+     * when teleporting to this {@linkplain World world} without initial position explicitly set.
+     *
+     * @return the default spawn position
+     * @since 1.0
+     */
+    @NonNull Position defaultSpawnPosition();
+
+    /**
+     * Sets the default {@linkplain Position position} where {@linkplain Entity entities} should spawn
+     * when teleporting to this {@linkplain World world} without initial position explicitly set.
+     *
+     * @param position the default spawn position that the world should have
+     * @since 1.0
+     */
+    void defaultSpawnPosition(@NonNull Position position);
+
+    /**
      * Creates {@linkplain CollectionAcquisition a collection acquisition} of {@linkplain Entity entities} which
      * are in this world.
      *
@@ -43,26 +59,6 @@ public interface World {
      * @since 1.0
      */
     @NonNull CollectionAcquisition<? extends Entity, ?> entities();
-
-    /**
-     * Creates {@linkplain NotNullObjectAcquisition a not-null object acquisition} of {@linkplain Position a position}
-     * that {@linkplain net.hypejet.jet.entity.Entity entities} spawning in this world without a spawn position
-     * specified should spawn at.
-     *
-     * @return the not-null object acquisition
-     * @since 1.0
-     */
-    @NonNull NotNullObjectAcquisition<Position> acquireDefaultSpawnPositionRead();
-
-    /**
-     * Creates {@linkplain WriteNotNullObjectAcquisition a write not-null object acquisition}
-     * of {@linkplain Position a position} that {@linkplain net.hypejet.jet.entity.Entity entities} spawning
-     * in this world without a spawn position specified should spawn at.
-     *
-     * @return the not-null object acquisition
-     * @since 1.0
-     */
-    @NonNull WriteNotNullObjectAcquisition<Position> acquireDefaultSpawnPositionWrite();
 
     /**
      * Creates {@linkplain WorldMapAcquisition a world-map acquisition} of contents this world.

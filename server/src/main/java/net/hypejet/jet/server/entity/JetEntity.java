@@ -1,11 +1,9 @@
 package net.hypejet.jet.server.entity;
 
-import net.hypejet.concurrency.object.notnull.NotNullObjectAcquirable;
+import it.unimi.dsi.fastutil.Pair;
 import net.hypejet.jet.entity.Entity;
-import net.hypejet.jet.entity.acquisition.world.WriteEntityWorldAcquisition;
+import net.hypejet.jet.world.World;
 import net.hypejet.jet.world.coordinate.flag.RelativeFlag;
-import net.hypejet.jet.server.entity.acquisition.world.EntityWorldAcquisition;
-import net.hypejet.jet.server.entity.acquisition.world.WriteEntityWorldAcquisitionImpl;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.world.coordinate.Position;
@@ -39,10 +37,9 @@ public class JetEntity implements Entity {
     private final Identity identity;
     private final Pointers pointers;
 
+    private @NonNull JetWorld world;
     private @NonNull Position position;
     private @NonNull Vector velocity = Vector.zero();
-
-    private final NotNullObjectAcquirable<JetWorld> world;
 
     /**
      * Constructs the {@linkplain JetEntity entity}.
@@ -81,7 +78,7 @@ public class JetEntity implements Entity {
         this.pointers = Objects.requireNonNull(pointers, "pointers");
         this.entityId = NEXT_ENTITY_ID.getAndIncrement();
         this.position = Objects.requireNonNull(position, "position");
-        this.world = new NotNullObjectAcquirable<>(Objects.requireNonNull(world, "world"));
+        this.world = Objects.requireNonNull(world, "world");
     }
 
     @Override
@@ -126,13 +123,39 @@ public class JetEntity implements Entity {
     }
 
     @Override
-    public @NonNull EntityWorldAcquisition<?> acquireWorldRead() {
-        return new EntityWorldAcquisition<>(this.world.acquireRead());
+    public final @NonNull JetWorld world() {
+        return this.world;
     }
 
     @Override
-    public @NonNull WriteEntityWorldAcquisition acquireWorldWrite() {
-        return new WriteEntityWorldAcquisitionImpl(this.world.acquireWrite(), this);
+    public final void teleport(@NonNull World world) {
+        Objects.requireNonNull(world, "world");
+        this.teleport(world, world.defaultSpawnPosition());
+    }
+
+    @Override
+    public final void teleport(@NonNull World world, @NonNull Position position) {
+        this.teleport(world, position, true, true);
+    }
+
+    @Override
+    public final void teleport(@NonNull World world, @NonNull Position position,
+                               boolean keepAttributes, boolean keepMetadata) {
+        // TODO: Ensure integrity with vanilla
+        Objects.requireNonNull(world, "world");
+        Objects.requireNonNull(position, "position");
+
+        if (!(world instanceof JetWorld validatedWorld))
+            throw new IllegalArgumentException("The specified world is not a valid world");
+        JetWorld initialWorld = this.world;
+
+        Pair<JetWorld, Position> finalTeleportData = this.preWorldChange(validatedWorld, position);
+        position = finalTeleportData.second();
+        this.world = finalTeleportData.first();
+
+        // TODO: Handle "keepAttributes" and "keepMetadata" fields when entity system is implemented
+
+        this.postWorldChange(initialWorld, position, keepAttributes, keepMetadata);
     }
 
     @Override
@@ -173,7 +196,7 @@ public class JetEntity implements Entity {
      * @since 1.0
      */
     public final void updateRawPositionAndVelocity(@NonNull Position position, @NonNull Vector velocity,
-                                             @NonNull Collection<RelativeFlag> flags) {
+                                                   @NonNull Collection<RelativeFlag> flags) {
         float initialYaw = this.position.yaw();
         float initialPitch = this.position.pitch();
 
@@ -207,5 +230,37 @@ public class JetEntity implements Entity {
      */
     public final void updateRawPosition(@NonNull Position position) {
         this.position = Objects.requireNonNull(position, "position");
+    }
+
+    /**
+     * Executes additional tasks that should be executed just before this {@linkplain JetEntity entity}
+     * switches to a different {@linkplain JetWorld world}. This also gets a final {@linkplain JetWorld world}
+     * and a final {@linkplain Position position} where the entity should spawn at.
+     *
+     * @param newWorld the world that the entity is being teleported to
+     * @param initialPosition a position where the entity should spawn at after the world change
+     * @return a pair containing the final world that the entity should be teleported to
+     *         and the final position where the entity should spawn at after the world change
+     * @since 1.0
+     */
+    protected @NonNull Pair<JetWorld, Position> preWorldChange(@NonNull JetWorld newWorld,
+                                                               @NonNull Position initialPosition) {
+        return Pair.of(newWorld, initialPosition);
+    }
+
+    /**
+     * Executes additional tasks that should be executed just after this {@linkplain JetEntity entity}
+     * switches to a different {@linkplain JetWorld world}. This also changes {@linkplain Position position}
+     * of the entity to the initial position that was specified for the entity to spawn after the world change.
+     *
+     * @param previousWorld the previous world that the entity was in just before the world change
+     * @param initialPosition a position that was specified for the entity to spawn at after the world change
+     * @param keepAttributes whether it was specified to keep attributes of the entity after the world change
+     * @param keepMetadata whether it was specified to keep metadata of the entity after the world change
+     * @since 1.0
+     */
+    protected void postWorldChange(@NonNull JetWorld previousWorld, @NonNull Position initialPosition,
+                                   boolean keepAttributes, boolean keepMetadata) {
+        this.updateRawPositionAndVelocity(initialPosition, Vector.zero(), Set.of());
     }
 }

@@ -1,8 +1,6 @@
 package net.hypejet.jet.entity;
 
-import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.jet.MinecraftServer;
-import net.hypejet.jet.entity.acquisition.world.WriteEntityWorldAcquisition;
 import net.hypejet.jet.world.coordinate.flag.RelativeFlag;
 import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.scoreboard.score.Score;
@@ -15,7 +13,7 @@ import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.pointer.Pointered;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.event.HoverEventSource;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -100,22 +98,48 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
                         @NonNull Collection<RelativeFlag> flags);
 
     /**
-     * Creates {@linkplain NotNullObjectAcquisition a not-null object acquisition} of {@linkplain World a world}
-     * of this {@linkplain Entity entity}.
+     * Gets a {@linkplain World world} where this {@linkplain Entity entity} is.
      *
-     * @return the not-null object acquisition
+     * @return the world of the entity
      * @since 1.0
      */
-    @NonNull NotNullObjectAcquisition<World> acquireWorldRead();
+    @NonNull World world();
 
     /**
-     * Creates {@linkplain WriteEntityWorldAcquisition a write entity world acquisition} of {@linkplain World a world}
-     * of this {@linkplain Entity entity}.
+     * Teleports this {@linkplain Entity entity} to the specified {@linkplain World world}.
      *
-     * @return the write entity world acquisition
+     * <p>The initial position of the entity is going
+     * to be the {@linkplain World#defaultSpawnPosition() default spawn position}
+     * of the world that the entity is being teleported to.</p>
+     *
+     * <p>Attributes and metadata of the entity are kept after the world change.</p>
+     *
+     * @param world the world that this entity should be teleported to
      * @since 1.0
      */
-    @NonNull WriteEntityWorldAcquisition acquireWorldWrite();
+    void teleport(@NonNull World world);
+
+    /**
+     * Teleports this {@linkplain Entity entity} to the specified {@linkplain World world}.
+     *
+     * <p>Attributes and metadata of the entity are kept after the world change.</p>
+     *
+     * @param world the world that this entity should be teleported to
+     * @param position an initial position where the entity should spawn after the world change
+     * @since 1.0
+     */
+    void teleport(@NonNull World world, @NonNull Position position);
+
+    /**
+     * Teleports this {@linkplain Entity entity} to the specified {@linkplain World world}.
+     *
+     * @param world the world that this entity should be teleported to
+     * @param position an initial position where the entity should spawn after the world change
+     * @param keepAttributes whether attributes of the entity should be kept after the world change
+     * @param keepMetadata whether metadata of the entity should be kept after the world change
+     * @since 1.0
+     */
+    void teleport(@NonNull World world, @NonNull Position position, boolean keepAttributes, boolean keepMetadata);
 
     /**
      * Gets a name that this {@linkplain Entity entity} uses in {@linkplain Score score} management
