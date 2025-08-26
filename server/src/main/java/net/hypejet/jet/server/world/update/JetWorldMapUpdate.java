@@ -6,11 +6,8 @@ import it.unimi.dsi.fastutil.objects.Object2ByteMap;
 import it.unimi.dsi.fastutil.objects.Object2ByteOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.hypejet.concurrency.collection.CollectionAcquisition;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.reference.RegistryReference;
-import net.hypejet.jet.server.entity.JetEntity;
-import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateBiomesPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateBlockEntityPlayPacket;
@@ -154,40 +151,36 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
         for (ChunkUpdateBuilder updateBuilder : this.updateBuilders.values())
             this.acquisition.setChunk(updateBuilder.chunkPosition, updateBuilder.createUpdatedChunk());
 
-        try (CollectionAcquisition<JetEntity, ?> entitiesAcquisition = this.acquisition.world().entities()) {
-            Map<ChunkView, ServerUpdateBiomesPlayPacket> biomeUpdatePackets = new HashMap<>(); // TODO: Frame
-            Multimap<ChunkPosition, ServerPacket> blockAndLightUpdatePackets = ArrayListMultimap.create(); // TODO: Frame
+        Map<ChunkView, ServerUpdateBiomesPlayPacket> biomeUpdatePackets = new HashMap<>(); // TODO: Frame
+        Multimap<ChunkPosition, ServerPacket> blockAndLightUpdatePackets = ArrayListMultimap.create(); // TODO: Frame
 
-            for (JetEntity entity : entitiesAcquisition.collection()) {
-                if (!(entity instanceof JetPlayer player)) continue;
+        this.acquisition.world().players().forEach(player -> {
+            ChunkBatchHandler chunkBatchHandler = player.chunkBatchHandler();
+            ChunkView chunkView = chunkBatchHandler.chunkView();
+            if (chunkView == null) return;
 
-                ChunkBatchHandler chunkBatchHandler = player.chunkBatchHandler();
-                ChunkView chunkView = chunkBatchHandler.chunkView();
-                if (chunkView == null) continue;
+            chunkView.forEach(chunkPosition -> {
+                if (chunkBatchHandler.isPending(chunkPosition)) return;
 
-                chunkView.forEach(chunkPosition -> {
-                    if (chunkBatchHandler.isPending(chunkPosition)) return;
+                if (!blockAndLightUpdatePackets.containsKey(chunkPosition)) {
+                    blockAndLightUpdatePackets.putAll(
+                            chunkPosition,
+                            this.updateBuilder(chunkPosition).createBlockAndLightUpdatePackets()
+                    );
+                }
 
-                    if (!blockAndLightUpdatePackets.containsKey(chunkPosition)) {
-                        blockAndLightUpdatePackets.putAll(
-                                chunkPosition,
-                                this.updateBuilder(chunkPosition).createBlockAndLightUpdatePackets()
-                        );
-                    }
+                blockAndLightUpdatePackets.get(chunkPosition).forEach(player::sendPacket);
+            });
 
-                    blockAndLightUpdatePackets.get(chunkPosition).forEach(player::sendPacket);
-                });
+            // FIXME: Biome cache is used while the cache might have been created when certain chunks are pending
+            ServerUpdateBiomesPlayPacket packet = biomeUpdatePackets.computeIfAbsent(
+                    chunkView,
+                    this::createBiomeUpdatePacket
+            );
 
-                // FIXME: Biome cache is used while the cache might have been created when certain chunks are pending
-                ServerUpdateBiomesPlayPacket packet = biomeUpdatePackets.computeIfAbsent(
-                        chunkView,
-                        this::createBiomeUpdatePacket
-                );
-
-                if (packet == null) continue;
-                player.sendPacket(packet);
-            }
-        }
+            if (packet == null) return;
+            player.sendPacket(packet);
+        });
     }
 
     private @Nullable ServerUpdateBiomesPlayPacket createBiomeUpdatePacket(@NonNull ChunkView chunkView) {

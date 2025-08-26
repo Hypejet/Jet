@@ -72,7 +72,7 @@ public final class PlayerList {
         this.players.add(player);
 
         // TODO: Send other world data
-        player.world().addPlayer(player);
+        player.world().addEntity(player);
         player.chunkBatchHandler().resetChunkView();
         this.eventNode.call(new PlayerJoinEvent(player));
     }

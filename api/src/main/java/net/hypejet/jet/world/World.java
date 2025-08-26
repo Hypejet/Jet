@@ -1,20 +1,23 @@
 package net.hypejet.jet.world;
 
-import net.hypejet.concurrency.collection.CollectionAcquisition;
 import net.hypejet.jet.entity.Entity;
+import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.world.acquisition.worldmap.WorldMapAcquisition;
 import net.hypejet.jet.world.acquisition.worldmap.WriteWorldMapAcquisition;
 import net.hypejet.jet.world.coordinate.Position;
 import net.hypejet.jet.world.data.WorldData;
 import net.hypejet.jet.world.dimension.DimensionType;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jspecify.annotations.NullMarked;
+
+import java.util.Set;
 
 /**
- * Represents a Minecraft world.
+ * A Minecraft world.
  *
  * @since 1.0
  */
+@NullMarked
 public interface World {
     /**
      * Gets a {@linkplain Holder.Reference holder referencing to}
@@ -23,7 +26,7 @@ public interface World {
      * @return the holder reference
      * @since 1.0
      */
-    Holder.@NonNull Reference<DimensionType> dimensionType();
+    Holder.Reference<DimensionType> dimensionType();
 
     /**
      * Gets an additional {@linkplain WorldData world data} of this world.
@@ -31,7 +34,7 @@ public interface World {
      * @return the world data
      * @since 1.0
      */
-    @NonNull WorldData worldData();
+    WorldData worldData();
 
     /**
      * Gets the default {@linkplain Position position} where {@linkplain Entity entities} should spawn
@@ -40,7 +43,7 @@ public interface World {
      * @return the default spawn position
      * @since 1.0
      */
-    @NonNull Position defaultSpawnPosition();
+    Position defaultSpawnPosition();
 
     /**
      * Sets the default {@linkplain Position position} where {@linkplain Entity entities} should spawn
@@ -49,16 +52,7 @@ public interface World {
      * @param position the default spawn position that the world should have
      * @since 1.0
      */
-    void defaultSpawnPosition(@NonNull Position position);
-
-    /**
-     * Creates {@linkplain CollectionAcquisition a collection acquisition} of {@linkplain Entity entities} which
-     * are in this world.
-     *
-     * @return the collection acquisition
-     * @since 1.0
-     */
-    @NonNull CollectionAcquisition<? extends Entity, ?> entities();
+    void defaultSpawnPosition(Position position);
 
     /**
      * Creates {@linkplain WorldMapAcquisition a world-map acquisition} of contents this world.
@@ -66,7 +60,7 @@ public interface World {
      * @return the world-map acquisition
      * @since 1.0
      */
-    @NonNull WorldMapAcquisition acquireWorldMapRead();
+    WorldMapAcquisition acquireWorldMapRead();
 
     /**
      * Creates {@linkplain WriteWorldMapAcquisition a write world-map acquisition} of contents of this world.
@@ -74,5 +68,23 @@ public interface World {
      * @return the write world-map acquisition
      * @since 1.0
      */
-    @NonNull WriteWorldMapAcquisition acquireWorldMapWrite();
+    WriteWorldMapAcquisition acquireWorldMapWrite();
+
+    /**
+     * Gets a copy of a {@linkplain Set set} of {@linkplain Entity entities}
+     * that are currently in this {@linkplain World world}.
+     *
+     * @return the entity set copy
+     * @since 1.0
+     */
+    Set<? extends Entity> entities();
+
+    /**
+     * Gets a copy of a {@linkplain Set set} of {@linkplain Player players}
+     * that are currently in this {@linkplain World world}.
+     *
+     * @return the player set copy
+     * @since 1.0
+     */
+    Set<? extends Player> players();
 }

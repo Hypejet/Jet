@@ -1,6 +1,5 @@
 package net.hypejet.jet.server.entity;
 
-import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.event.events.entity.world.EntityPreWorldChangeEvent;
 import net.hypejet.jet.event.events.entity.world.EntityWorldChangeEvent;
@@ -68,6 +67,7 @@ public class JetEntity implements Entity {
                         .build(),
                 position, world, server
         );
+        // TODO: Add this entity to world entity set, but only if it not a player
     }
 
     /**
@@ -171,13 +171,14 @@ public class JetEntity implements Entity {
         }
 
         position = preChangeEvent.getStartingPosition();
-        this.preWorldChange(validatedWorld, position);
 
+        this.world.removeEntity(this);
         this.world = validatedWorld;
 
         // TODO: Handle "keepAttributes" and "keepMetadata" fields when entity system is implemented
 
         this.postWorldChange(initialWorld, position, keepAttributes, keepMetadata);
+        this.world.addEntity(this);
         this.server.eventNode().call(new EntityWorldChangeEvent(this, initialWorld));
     }
 
@@ -188,22 +189,22 @@ public class JetEntity implements Entity {
     }
 
     @Override
-    public @NonNull MinecraftServer server() {
+    public final @NonNull JetMinecraftServer server() {
         return this.server;
     }
 
     @Override
-    public @NonNull Identity identity() {
+    public final @NonNull Identity identity() {
         return this.identity;
     }
 
     @Override
-    public @NonNull Pointers pointers() {
+    public final @NonNull Pointers pointers() {
         return this.pointers;
     }
 
     @Override
-    public @NonNull Key key() {
+    public final @NonNull Key key() {
         return this.entityType.key();
     }
 
@@ -258,18 +259,6 @@ public class JetEntity implements Entity {
      */
     protected final void updateRawPosition(@NonNull Position position) {
         this.position = Objects.requireNonNull(position, "position");
-    }
-
-    /**
-     * Executes additional tasks that should be executed just before
-     * a {@linkplain JetWorld world} is changed for this {@linkplain JetEntity entity}.
-     *
-     * @param newWorld the world that the entity is going to be teleported to
-     * @param initialPosition a position where the entity is going to spawn after the world change
-     * @since 1.0
-     */
-    protected void preWorldChange(@NonNull JetWorld newWorld, @NonNull Position initialPosition) {
-        // NOOP
     }
 
     /**

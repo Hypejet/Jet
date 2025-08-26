@@ -146,11 +146,6 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     }
 
     @Override
-    public @NonNull JetMinecraftServer server() {
-        return this.connection.server();
-    }
-
-    @Override
     public void sendPluginMessage(@NonNull Key identifier, byte @NonNull [] data) {
         Objects.requireNonNull(identifier, "identifier");
         Objects.requireNonNull(data, "data");
@@ -250,15 +245,9 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     }
 
     @Override
-    protected void preWorldChange(@NonNull JetWorld newWorld, @NonNull Position initialPosition) {
-        this.world().removePlayer(this);
-    }
-
-    @Override
     protected void postWorldChange(@NonNull JetWorld previousWorld, @NonNull Position initialPosition,
                                    boolean keepAttributes, boolean keepMetadata) {
         this.sendRespawnPacket(this.world(), keepAttributes, keepMetadata);
-        this.world().addPlayer(this);
         this.movementSynchronizer.synchronize(initialPosition, Vector.zero(), Set.of());
         this.chunkBatchHandler().resetChunkView();
     }

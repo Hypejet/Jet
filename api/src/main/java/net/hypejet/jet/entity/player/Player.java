@@ -3,7 +3,6 @@ package net.hypejet.jet.entity.player;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
-import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.command.CommandSource;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.acquisition.gamemode.GameModeAcquisition;
@@ -58,14 +57,6 @@ public interface Player extends Entity, CommandSource, CommonAudience {
      * @since 1.0
      */
     @NonNull NotNullObjectAcquisition<String> clientBrand();
-
-    /**
-     * Gets {@linkplain MinecraftServer a Minecraft server} that the player is connected to.
-     *
-     * @return the Minecraft server
-     * @since 1.0
-     */
-    @NonNull MinecraftServer server();
 
     /**
      * Creates {@linkplain GameModeAcquisition a game mode acquisition} of {@linkplain GameMode a game mode}
