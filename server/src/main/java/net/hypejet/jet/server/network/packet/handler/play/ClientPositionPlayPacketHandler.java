@@ -28,7 +28,7 @@ public final class ClientPositionPlayPacketHandler extends ClientPacketHandler<C
     @Override
     public void handle(@NonNull ClientPositionPlayPacket packet, @NonNull Session session) {
         JetPlayer player = session.connection().playerOrThrow();
-        player.movementHandler().handleClientMovement(position -> position.withValues(packet.vector()));
+        player.movementSynchronizer().handleClientMovement(position -> position.withValues(packet.vector()));
         // TODO: Handle flags
     }
 }

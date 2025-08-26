@@ -143,4 +143,55 @@ public sealed interface Coordinate<C extends Coordinate<C>> permits BlockPositio
     default @NonNull C divide(double x, double y, double z) {
         return this.withValues(this.x() / x, this.y() / y, this.z() / z);
     }
+
+    /**
+     * Creates a copy of this {@linkplain Coordinate coordinate} rotated around {@code X} axis.
+     *
+     * @param angle an angle by which the coordinate should be rotated, in radians
+     * @return the copied coordinate
+     * @since 1.0
+     */
+    default @NonNull C rotateAroundX(double angle) {
+        double sine = Math.sin(angle);
+        double cosine = Math.cos(angle);
+        return this.withValues(
+                this.x(),
+                this.y() * cosine + this.z() * sine,
+                this.z() * cosine - this.y() * sine
+        );
+    }
+
+    /**
+     * Creates a copy of this {@linkplain Coordinate coordinate} rotated around {@code Y} axis.
+     *
+     * @param angle an angle by which the coordinate should be rotated, in radians
+     * @return the copied coordinate
+     * @since 1.0
+     */
+    default @NonNull C rotateAroundY(double angle) {
+        double sine = Math.sin(angle);
+        double cosine = Math.cos(angle);
+        return this.withValues(
+                this.x() * cosine + this.z() * sine,
+                this.y(),
+                this.z() * cosine - this.x() * sine
+        );
+    }
+
+    /**
+     * Creates a copy of this {@linkplain Coordinate coordinate} rotated around {@code Z} axis.
+     *
+     * @param angle an angle by which the coordinate should be rotated, in radians
+     * @return the copied coordinate
+     * @since 1.0
+     */
+    default @NonNull C rotateAroundZ(double angle) {
+        double sine = Math.sin(angle);
+        double cosine = Math.cos(angle);
+        return this.withValues(
+                this.x() * cosine + this.y() * sine,
+                this.y() * cosine - this.x() * sine,
+                this.z()
+        );
+    }
 }

@@ -1,9 +1,7 @@
 package net.hypejet.jet.entity;
 
-import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
-import net.hypejet.jet.entity.acquisition.world.WriteEntityWorldAcquisition;
-import net.hypejet.jet.entity.movement.acquisition.MovementAcquisition;
-import net.hypejet.jet.entity.movement.acquisition.WriteMovementAcquisition;
+import net.hypejet.jet.MinecraftServer;
+import net.hypejet.jet.world.coordinate.flag.RelativeFlag;
 import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.scoreboard.score.Score;
 import net.hypejet.jet.world.World;
@@ -15,26 +13,28 @@ import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.pointer.Pointered;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.event.HoverEventSource;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jspecify.annotations.NonNull;
 
+import java.util.Collection;
 import java.util.UUID;
 
 /**
- * Represents a Minecraft entity.
+ * A Minecraft entity.
  *
  * @since 1.0
  */
 public interface Entity extends Identified, Pointered, HoverEventSource<HoverEvent.ShowEntity>, Keyed {
     /**
-     * Gets a key of type of the entity.
+     * Gets the {@linkplain Key} of type of this {@linkplain Entity entity}.
      *
-     * @return the key
+     * @return the entity type key
      * @since 1.0
      */
     @NonNull Key entityType();
 
     /**
-     * Gets an identifier of the entity, which is unique to server.
+     * Gets a numeric identifier of this {@linkplain Entity entity}, unique to
+     * a {@linkplain MinecraftServer server} that this {@linkplain Entity entity} is in.
      *
      * @return the identifier
      * @since 1.0
@@ -42,7 +42,7 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
     int entityId();
 
     /**
-     * Gets {@linkplain UUID a unique identifier} of the entity.
+     * Gets a {@linkplain UUID unique identifier} of this {@linkplain Entity entity}.
      *
      * @return the unique identifier
      * @since 1.0
@@ -50,44 +50,96 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
     @NonNull UUID uniqueId();
 
     /**
-     * Creates {@linkplain MovementAcquisition a movement acquisition}
-     * of {@linkplain Position a position}
-     * and {@linkplain Vector a vector}
-     * of this {@linkplain Entity entity}.
+     * Gets current {@linkplain Position position} of this {@linkplain Entity entity}.
      *
-     * @return the movement acquisition
+     * @return the position where this entity currently is
      * @since 1.0
      */
-    @NonNull MovementAcquisition acquireMovementRead();
+    @NonNull Position position();
 
     /**
-     * Creates {@linkplain WriteMovementAcquisition a write movement acquisition}
-     * of {@linkplain Position a position}
-     * and {@linkplain Vector a vector}
-     * of this {@linkplain Entity entity}.
+     * Gets a {@linkplain Vector} of current velocity of this {@linkplain Entity entity}.
      *
-     * @return the write movement acquisition
+     * @return the velocity vector
      * @since 1.0
      */
-    @NonNull WriteMovementAcquisition acquireMovementWrite();
+    @NonNull Vector velocity();
 
     /**
-     * Creates {@linkplain NotNullObjectAcquisition a not-null object acquisition} of {@linkplain World a world}
+     * Updates {@linkplain Position position} and velocity {@linkplain Vector vector}
      * of this {@linkplain Entity entity}.
      *
-     * @return the not-null object acquisition
+     * <p>Specifying a {@linkplain RelativeFlag relative flag} makes a value
+     * associated with that flag relative to the current one.</p>
+     *
+     * @param position the position that the entity should have
+     * @param velocity the velocity that the entity should have
+     * @param flags the relative flags specifying which values of the specified position
+     *              and velocity should be recognised as relative to current ones
      * @since 1.0
      */
-    @NonNull NotNullObjectAcquisition<World> acquireWorldRead();
+    void updatePosition(@NonNull Position position, @NonNull Vector velocity,
+                        @NonNull RelativeFlag @NonNull ... flags);
 
     /**
-     * Creates {@linkplain WriteEntityWorldAcquisition a write entity world acquisition} of {@linkplain World a world}
+     * Updates {@linkplain Position position} and velocity {@linkplain Vector vector}
      * of this {@linkplain Entity entity}.
      *
-     * @return the write entity world acquisition
+     * <p>Specifying a {@linkplain RelativeFlag relative flag} makes a value
+     * associated with that flag relative to the current one.</p>
+     *
+     * @param position the position that the entity should have
+     * @param velocity the velocity that the entity should have
+     * @param flags the relative flags specifying which values of the specified position
+     *              and velocity should be recognised as relative to current ones
      * @since 1.0
      */
-    @NonNull WriteEntityWorldAcquisition acquireWorldWrite();
+    void updatePosition(@NonNull Position position, @NonNull Vector velocity,
+                        @NonNull Collection<RelativeFlag> flags);
+
+    /**
+     * Gets a {@linkplain World world} where this {@linkplain Entity entity} is.
+     *
+     * @return the world of the entity
+     * @since 1.0
+     */
+    @NonNull World world();
+
+    /**
+     * Teleports this {@linkplain Entity entity} to the specified {@linkplain World world}.
+     *
+     * <p>The initial position of the entity is going
+     * to be the {@linkplain World#defaultSpawnPosition() default spawn position}
+     * of the world that the entity is being teleported to.</p>
+     *
+     * <p>Attributes and metadata of the entity are kept after the world change.</p>
+     *
+     * @param world the world that this entity should be teleported to
+     * @since 1.0
+     */
+    void teleport(@NonNull World world);
+
+    /**
+     * Teleports this {@linkplain Entity entity} to the specified {@linkplain World world}.
+     *
+     * <p>Attributes and metadata of the entity are kept after the world change.</p>
+     *
+     * @param world the world that this entity should be teleported to
+     * @param position an initial position where the entity should spawn after the world change
+     * @since 1.0
+     */
+    void teleport(@NonNull World world, @NonNull Position position);
+
+    /**
+     * Teleports this {@linkplain Entity entity} to the specified {@linkplain World world}.
+     *
+     * @param world the world that this entity should be teleported to
+     * @param position an initial position where the entity should spawn after the world change
+     * @param keepAttributes whether attributes of the entity should be kept after the world change
+     * @param keepMetadata whether metadata of the entity should be kept after the world change
+     * @since 1.0
+     */
+    void teleport(@NonNull World world, @NonNull Position position, boolean keepAttributes, boolean keepMetadata);
 
     /**
      * Gets a name that this {@linkplain Entity entity} uses in {@linkplain Score score} management
@@ -97,6 +149,14 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
      * @since 1.0
      */
     @NonNull String scoreboardName();
+
+    /**
+     * Gets a {@linkplain MinecraftServer server} that this {@linkplain Entity entity} is part of.
+     *
+     * @return the server
+     * @since 1.0
+     */
+    @NonNull MinecraftServer server();
 
     /**
      * Represents a hand of an entity.

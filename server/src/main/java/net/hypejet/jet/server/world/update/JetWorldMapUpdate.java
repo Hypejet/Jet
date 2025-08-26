@@ -6,11 +6,8 @@ import it.unimi.dsi.fastutil.objects.Object2ByteMap;
 import it.unimi.dsi.fastutil.objects.Object2ByteOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.hypejet.concurrency.collection.CollectionAcquisition;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.reference.RegistryReference;
-import net.hypejet.jet.server.entity.JetEntity;
-import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateBiomesPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateBlockEntityPlayPacket;
@@ -34,6 +31,7 @@ import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.server.world.chunk.view.ChunkView;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
 import net.hypejet.jet.server.world.coordinate.chunk.section.ChunkSectionPosition;
+import net.hypejet.jet.server.world.handler.ChunkBatchHandler;
 import net.hypejet.jet.world.biome.Biome;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.block.BlockType;
@@ -153,60 +151,54 @@ public final class JetWorldMapUpdate implements WorldMapUpdate {
         for (ChunkUpdateBuilder updateBuilder : this.updateBuilders.values())
             this.acquisition.setChunk(updateBuilder.chunkPosition, updateBuilder.createUpdatedChunk());
 
-        try (CollectionAcquisition<JetEntity, ?> entitiesAcquisition = this.acquisition.world().entities()) {
-            Map<ChunkView, ServerUpdateBiomesPlayPacket> biomeUpdatePackets = new HashMap<>(); // TODO: Frame
-            Multimap<ChunkPosition, ServerPacket> blockAndLightUpdatePackets = ArrayListMultimap.create(); // TODO: Frame
+        Map<ChunkView, ServerUpdateBiomesPlayPacket> biomeUpdatePackets = new HashMap<>(); // TODO: Frame
+        Multimap<ChunkPosition, ServerPacket> blockAndLightUpdatePackets = ArrayListMultimap.create(); // TODO: Frame
 
-            for (JetEntity entity : entitiesAcquisition.collection()) {
-                if (!(entity instanceof JetPlayer player)) continue;
-                player.chunkBatchHandler().consumeChunkData((chunkView, scheduledChunks) -> {
-                    for (int chunkX = chunkView.minimumChunkX(); chunkX <= chunkView.maximumChunkX(); chunkX++) {
-                        for (int chunkZ = chunkView.minimumChunkZ(); chunkZ <= chunkView.maximumChunkZ(); chunkZ++) {
-                            ChunkPosition chunkPosition = new ChunkPosition(chunkX, chunkZ);
-                            if (scheduledChunks.contains(chunkPosition)) continue;
+        this.acquisition.world().players().forEach(player -> {
+            ChunkBatchHandler chunkBatchHandler = player.chunkBatchHandler();
+            ChunkView chunkView = chunkBatchHandler.chunkView();
+            if (chunkView == null) return;
 
-                            if (!blockAndLightUpdatePackets.containsKey(chunkPosition)) {
-                                blockAndLightUpdatePackets.putAll(
-                                        chunkPosition,
-                                        this.updateBuilder(chunkPosition).createBlockAndLightUpdatePackets()
-                                );
-                            }
+            chunkView.forEach(chunkPosition -> {
+                if (chunkBatchHandler.isPending(chunkPosition)) return;
 
-                            blockAndLightUpdatePackets.get(chunkPosition).forEach(player::sendPacket);
-                        }
-                    }
-
-                    ServerUpdateBiomesPlayPacket packet = biomeUpdatePackets.computeIfAbsent(
-                            chunkView,
-                            this::createBiomeUpdatePacket
+                if (!blockAndLightUpdatePackets.containsKey(chunkPosition)) {
+                    blockAndLightUpdatePackets.putAll(
+                            chunkPosition,
+                            this.updateBuilder(chunkPosition).createBlockAndLightUpdatePackets()
                     );
+                }
 
-                    if (packet == null) return;
-                    player.sendPacket(packet);
-                });
-            }
-        }
+                blockAndLightUpdatePackets.get(chunkPosition).forEach(player::sendPacket);
+            });
+
+            // FIXME: Biome cache is used while the cache might have been created when certain chunks are pending
+            ServerUpdateBiomesPlayPacket packet = biomeUpdatePackets.computeIfAbsent(
+                    chunkView,
+                    this::createBiomeUpdatePacket
+            );
+
+            if (packet == null) return;
+            player.sendPacket(packet);
+        });
     }
 
     private @Nullable ServerUpdateBiomesPlayPacket createBiomeUpdatePacket(@NonNull ChunkView chunkView) {
         Set<ServerUpdateBiomesPlayPacket.BiomeData> biomeData = new HashSet<>();
 
-        for (int chunkX = chunkView.minimumChunkX(); chunkX <= chunkView.maximumChunkX(); chunkX++) {
-            for (int chunkZ = chunkView.minimumChunkZ(); chunkZ <= chunkView.maximumChunkZ(); chunkZ++) {
-                ChunkPosition chunkPosition = new ChunkPosition(chunkX, chunkZ);
-                ChunkUpdateBuilder updateBuilder = this.updateBuilders.get(chunkPosition);
+        chunkView.forEach(chunkPosition -> {
+            ChunkUpdateBuilder updateBuilder = this.updateBuilders.get(chunkPosition);
 
-                if (updateBuilder == null) continue;
-                if (updateBuilder.biomeUpdates.isEmpty()) continue;
+            if (updateBuilder == null) return;
+            if (updateBuilder.biomeUpdates.isEmpty()) return;
 
-                JetChunk chunk = this.acquisition.getChunk(chunkPosition);
-                List<AbstractChunkPalette<Holder.Reference<Biome>>> palettes = new ArrayList<>();
+            JetChunk chunk = this.acquisition.getChunk(chunkPosition);
+            List<AbstractChunkPalette<Holder.Reference<Biome>>> palettes = new ArrayList<>();
 
-                for (JetChunkSection section : chunk.sections())
-                    palettes.add(section.biomePalette());
-                biomeData.add(new ServerUpdateBiomesPlayPacket.BiomeData(chunkPosition, palettes));
-            }
-        }
+            for (JetChunkSection section : chunk.sections())
+                palettes.add(section.biomePalette());
+            biomeData.add(new ServerUpdateBiomesPlayPacket.BiomeData(chunkPosition, palettes));
+        });
 
         if (biomeData.isEmpty()) return null;
         return new ServerUpdateBiomesPlayPacket(biomeData);

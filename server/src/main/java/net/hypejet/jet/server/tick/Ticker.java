@@ -19,6 +19,7 @@ public final class Ticker {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Ticker.class);
 
+    private final JetMinecraftServer server;
     private final Thread thread;
     private final long tickNanos;
 
@@ -32,6 +33,7 @@ public final class Ticker {
      * @since 1.0
      */
     public Ticker(@NonNull JetMinecraftServer server) {
+        this.server = server;
         this.tickNanos = server.configuration().tickDuration() * 1_000_000;
         this.thread = Thread.ofPlatform()
                 .name("Main ticking thread")
@@ -97,6 +99,9 @@ public final class Ticker {
         long nextTickNanos = System.nanoTime();
         while (this.running) {
             // TODO: Run the other tick logic
+
+            // TODO: Split chunk batch handling to multiple threads
+            this.server.playerList().players().forEach(player -> player.chunkBatchHandler().tick());
 
             while (true) {
                 Runnable task = this.tasks.poll();

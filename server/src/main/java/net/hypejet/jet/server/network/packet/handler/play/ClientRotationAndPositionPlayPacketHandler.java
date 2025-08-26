@@ -30,7 +30,7 @@ public final class ClientRotationAndPositionPlayPacketHandler
     @Override
     public void handle(@NonNull ClientRotationAndPositionPlayPacket packet, @NonNull Session session) {
         JetPlayer player = session.connection().playerOrThrow();
-        player.movementHandler().handleClientMovement(position -> packet.position());
+        player.movementSynchronizer().handleClientMovement(position -> packet.position());
         // TODO: Handle flags
     }
 }

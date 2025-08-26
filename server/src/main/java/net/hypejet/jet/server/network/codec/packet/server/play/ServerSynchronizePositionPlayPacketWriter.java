@@ -3,7 +3,7 @@ package net.hypejet.jet.server.network.codec.packet.server.play;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.hypejet.jet.entity.movement.flag.RelativeFlag;
+import net.hypejet.jet.world.coordinate.flag.RelativeFlag;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.world.coordinate.VectorNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
@@ -74,10 +74,10 @@ public final class ServerSynchronizePositionPlayPacketWriter
             FLAG_MASKS.put(RelativeFlag.Z, 0x04);
             FLAG_MASKS.put(RelativeFlag.YAW, 0x08);
             FLAG_MASKS.put(RelativeFlag.PITCH, 0x10);
-            FLAG_MASKS.put(RelativeFlag.DELTA_X, 0x20);
-            FLAG_MASKS.put(RelativeFlag.DELTA_Y, 0x40);
-            FLAG_MASKS.put(RelativeFlag.DELTA_Z, 0x80);
-            FLAG_MASKS.put(RelativeFlag.ROTATE_DELTA, 0x100);
+            FLAG_MASKS.put(RelativeFlag.VELOCITY_X, 0x20);
+            FLAG_MASKS.put(RelativeFlag.VELOCITY_Y, 0x40);
+            FLAG_MASKS.put(RelativeFlag.VELOCITY_Z, 0x80);
+            FLAG_MASKS.put(RelativeFlag.ROTATE_VELOCITY, 0x100);
         }
 
         @Override

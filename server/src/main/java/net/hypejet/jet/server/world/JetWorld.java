@@ -1,17 +1,12 @@
 package net.hypejet.jet.server.world;
 
-import net.hypejet.concurrency.collection.CollectionAcquirable;
-import net.hypejet.concurrency.collection.CollectionAcquisition;
-import net.hypejet.concurrency.collection.set.HashSetAcquirable;
 import net.hypejet.concurrency.map.MapAcquirable;
 import net.hypejet.concurrency.map.hashmap.HashMapAcquirable;
-import net.hypejet.concurrency.object.notnull.NotNullObjectAcquirable;
-import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
-import net.hypejet.concurrency.object.notnull.WriteNotNullObjectAcquisition;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerWorldEventPlayPacket;
 import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.world.acquisition.worldmap.WorldMapAcquisitionImpl;
 import net.hypejet.jet.server.world.acquisition.worldmap.WriteWorldMapAcquisitionImpl;
@@ -22,17 +17,20 @@ import net.hypejet.jet.world.coordinate.Position;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
 import net.hypejet.jet.world.data.WorldData;
 import net.hypejet.jet.world.dimension.DimensionType;
-import org.jspecify.annotations.NonNull;
+import net.hypejet.jet.world.event.world.events.StartWaitingForWorldChunksWorldEvent;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Represents an implementation of {@linkplain World a world}.
+ * An implementation of the {@linkplain World world}.
  *
  * @since 1.0
  * @see World
  */
+@NullMarked
 public final class JetWorld implements World {
 
     private final Holder.Reference<DimensionType> dimensionType;
@@ -41,10 +39,12 @@ public final class JetWorld implements World {
     private final ChunkLoader chunkLoader;
     private final JetRegistryManager registryManager;
 
-    private final NotNullObjectAcquirable<Position> defaultSpawnPosition;
-
     private final MapAcquirable<ChunkPosition, JetChunk, ?> chunks = new HashMapAcquirable<>();
-    private final CollectionAcquirable<JetEntity, Set<JetEntity>> entities = new HashSetAcquirable<>();
+
+    private final Set<JetEntity> entities = ConcurrentHashMap.newKeySet();
+    private final Set<JetPlayer> players = ConcurrentHashMap.newKeySet();
+
+    private Position defaultSpawnPosition = Position.zero();
 
     /**
      * Constructs the {@linkplain JetWorld world}.
@@ -55,48 +55,52 @@ public final class JetWorld implements World {
      * @param registryManager a registry manager of the server that the world is being constructed for
      * @since 1.0
      */
-    public JetWorld(Holder.@NonNull Reference<DimensionType> dimensionType, @NonNull WorldData worldData,
-                    @NonNull ChunkLoader chunkLoader, @NonNull JetRegistryManager registryManager) {
+    public JetWorld(Holder.Reference<DimensionType> dimensionType, WorldData worldData,
+                    ChunkLoader chunkLoader, JetRegistryManager registryManager) {
         this.dimensionType = Objects.requireNonNull(dimensionType, "dimension type");
         this.worldData = Objects.requireNonNull(worldData, "world data");
         this.chunkLoader = Objects.requireNonNull(chunkLoader, "chunk loader");
         this.registryManager = Objects.requireNonNull(registryManager, "registry manager");
-        this.defaultSpawnPosition = new NotNullObjectAcquirable<>(new Position(0, 0, 0, 0f, 0f));
     }
 
     @Override
-    public Holder.@NonNull Reference<DimensionType> dimensionType() {
+    public Holder.Reference<DimensionType> dimensionType() {
         return this.dimensionType;
     }
 
     @Override
-    public @NonNull WorldData worldData() {
+    public WorldData worldData() {
         return this.worldData;
     }
 
     @Override
-    public @NonNull CollectionAcquisition<JetEntity, ?> entities() {
-        return this.entities.acquireRead();
+    public Position defaultSpawnPosition() {
+        return this.defaultSpawnPosition;
     }
 
     @Override
-    public @NonNull NotNullObjectAcquisition<Position> acquireDefaultSpawnPositionRead() {
-        return this.defaultSpawnPosition.acquireRead();
+    public void defaultSpawnPosition(Position position) {
+        this.defaultSpawnPosition = Objects.requireNonNull(position, "position");
     }
 
     @Override
-    public @NonNull WriteNotNullObjectAcquisition<Position> acquireDefaultSpawnPositionWrite() {
-        return this.defaultSpawnPosition.acquireWrite();
-    }
-
-    @Override
-    public @NonNull WorldMapAcquisitionImpl acquireWorldMapRead() {
+    public WorldMapAcquisitionImpl acquireWorldMapRead() {
         return new WorldMapAcquisitionImpl(this, this.chunks.acquireRead());
     }
 
     @Override
-    public @NonNull WriteWorldMapAcquisitionImpl acquireWorldMapWrite() {
+    public WriteWorldMapAcquisitionImpl acquireWorldMapWrite() {
         return new WriteWorldMapAcquisitionImpl(this, this.chunks.acquireWrite());
+    }
+
+    @Override
+    public Set<JetEntity> entities() {
+        return Set.copyOf(this.entities);
+    }
+
+    @Override
+    public Set<JetPlayer> players() {
+        return Set.copyOf(this.players);
     }
 
     /**
@@ -106,7 +110,7 @@ public final class JetWorld implements World {
      * @return the chunk provider
      * @since 1.0
      */
-    public @NonNull ChunkLoader chunkLoader() {
+    public ChunkLoader chunkLoader() {
         return this.chunkLoader;
     }
 
@@ -117,37 +121,40 @@ public final class JetWorld implements World {
      * @return the registry manager
      * @since 1.0
      */
-    public @NonNull JetRegistryManager registryManager() {
+    public JetRegistryManager registryManager() {
         return this.registryManager;
     }
 
     /**
-     * Adds {@linkplain JetPlayer a player} specified into this {@linkplain JetWorld world}.
+     * Adds the specified {@linkplain JetEntity entity} to this {@linkplain JetWorld world}.
      *
-     * @param player the player
+     * @param entity the entity to add to this world
+     * @throws IllegalArgumentException if the specified entity has already been added to this world
      * @since 1.0
      */
-    public void addPlayer(@NonNull JetPlayer player) {
-        Objects.requireNonNull(player, "player");
-        try (CollectionAcquisition<?, Set<JetEntity>> entitiesAcquisition = this.entities.acquireWrite()) {
-            Set<JetEntity> entities = entitiesAcquisition.collection();
-            if (!entities.add(player))
-                throw new IllegalArgumentException("The player specified has been already initialized in this world");
+    public void addEntity(JetEntity entity) {
+        entity.server().ticker().ensureRunsInTickLoop();
+        if (!this.entities.add(entity))
+            throw new IllegalArgumentException("The specified entity has already been added to this world");
+
+        if (entity instanceof JetPlayer player) {
+            this.players.add(player);
+            player.sendPacket(new ServerWorldEventPlayPacket(StartWaitingForWorldChunksWorldEvent.INSTANCE));
         }
     }
 
     /**
-     * Removes {@linkplain JetPlayer a player} specified from this {@linkplain JetWorld world}.
+     * Removes the specified {@linkplain JetEntity entity} from this {@linkplain JetWorld world}.
      *
-     * @param player the player
+     * @param entity the entity to remove from this world
+     * @throws IllegalArgumentException if the specified entity has not been previously added to this world
      * @since 1.0
      */
-    public void removePlayer(@NonNull JetPlayer player) {
-        Objects.requireNonNull(player, "player");
-        try (CollectionAcquisition<?, Set<JetEntity>> entitiesAcquisition = this.entities.acquireWrite()) {
-            Set<JetEntity> entities = entitiesAcquisition.collection();
-            if (!entities.remove(player))
-                throw new IllegalArgumentException("The player specified has not been initialized in this world");
-        }
+    public void removeEntity(JetEntity entity) {
+        entity.server().ticker().ensureRunsInTickLoop();
+        if (!this.entities.remove(entity))
+            throw new IllegalArgumentException("The specified entity has not been added to this world");
+        if (entity instanceof JetPlayer player)
+            this.players.remove(player);
     }
 }

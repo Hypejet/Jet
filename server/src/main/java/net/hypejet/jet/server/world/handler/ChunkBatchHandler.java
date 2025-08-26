@@ -1,19 +1,11 @@
 package net.hypejet.jet.server.world.handler;
 
-import com.google.common.collect.Ordering;
-import net.hypejet.concurrency.empty.EmptyAcquirable;
-import net.hypejet.concurrency.empty.EmptyAcquisition;
-import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
-import net.hypejet.jet.entity.player.Player;
-import net.hypejet.jet.server.entity.acquisition.world.EntityWorldAcquisition;
 import net.hypejet.jet.server.entity.player.JetPlayer;
-import net.hypejet.jet.server.network.packet.handler.NetworkDisconnectionHandler;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerCenterChunkPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkAndLightDataPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkBatchFinishedPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkBatchStartPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerInvalidateChunkPlayPacket;
-import net.hypejet.jet.server.network.packet.packets.server.play.ServerWorldEventPlayPacket;
 import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.coordinate.ChunkPositionUtil;
 import net.hypejet.jet.server.world.acquisition.worldmap.WriteWorldMapAcquisitionImpl;
@@ -21,32 +13,27 @@ import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.view.ChunkView;
 import net.hypejet.jet.world.coordinate.Position;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
-import net.hypejet.jet.world.event.world.events.StartWaitingForWorldChunksWorldEvent;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.function.BiConsumer;
-import java.util.function.UnaryOperator;
 
 /**
- * Represents something that handles sending batches of {@linkplain JetChunk chunks} to a client.
+ * Something sending {@linkplain JetChunk chunks} in batches to the client.
  *
  * @since 1.0
  * @see JetChunk
  */
-public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnectionHandler {
+@NullMarked
+public final class ChunkBatchHandler {
+
+    private static final float MINIMUM_CHUNKS_PER_TICK = 0.01f;
+    private static final float MAXIMUM_CHUNKS_PER_TICK = 64f;
 
     /**
      * A minimum view distance that {@linkplain JetPlayer a player} can have.
@@ -55,26 +42,16 @@ public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnect
      */
     public static final byte MINIMUM_VIEW_DISTANCE = 2;
 
-    private static final float MINIMUM_CHUNKS_PER_TICK = 0.01f;
-    private static final float MAXIMUM_CHUNKS_PER_TICK = 64f;
-
-    private static final byte SHUTDOWN_TIMEOUT = 20;
-    private static final TimeUnit SHUTDOWN_TIMEOUT_UNIT = TimeUnit.SECONDS;
-
     private final JetPlayer player;
-    private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-
-    private final EmptyAcquirable lock = new EmptyAcquirable();
     private final Set<ChunkPosition> chunksScheduled = new HashSet<>();
 
-    private @NonNull ChunkView chunkView;
-    private @Nullable ScheduledFuture<?> future;
+    private @Nullable ChunkView chunkView;
 
     private float chunksPerTick = 9f;
     private float maximumUnacknowledgedBatches = 1f;
 
-    private float chunksToSend = 0f;
-    private float unacknowledgedBatches = 0f;
+    private float chunksToSend;
+    private float unacknowledgedBatches;
 
     /**
      * Constructs the {@linkplain ChunkBatchHandler chunk batch handler}.
@@ -83,226 +60,153 @@ public final class ChunkBatchHandler implements AutoCloseable, NetworkDisconnect
      * @param position an initial position of the player
      * @since 1.0
      */
-    public ChunkBatchHandler(@NonNull JetPlayer player, @NonNull Position position) {
+    public ChunkBatchHandler(JetPlayer player, Position position) {
         this.player = Objects.requireNonNull(player, "player");
         Objects.requireNonNull(position, "position");
-
-        try (NotNullObjectAcquisition<Player.Settings> settingsAcquisition = this.player.settings()) {
-            ChunkPosition centerChunkPosition = ChunkPositionUtil.fromCoordinate(position);
-            byte viewDistance = this.createViewDistance(settingsAcquisition.get().viewDistance());
-            this.chunkView = new ChunkView(centerChunkPosition, viewDistance);
-        }
     }
 
     /**
-     * Consumes {@linkplain ChunkView a chunk view} and {@linkplain Set a set}
-     * of {@linkplain ChunkPosition chunk positions} of {@linkplain JetChunk chunks} that are pending to be sent
-     * to a client.
+     * Gets a {@linkplain ChunkView chunk view} currently used
+     * by this {@linkplain ChunkBatchHandler chunk batch handler} for sending the {@linkplain JetChunk chunks}.
      *
-     * @param consumer a bi-consumer to consume the data with
+     * @return the chunk view used by this chunk batch handler, {@code null} if it has not been initialized yet
      * @since 1.0
      */
-    public void consumeChunkData(@NonNull BiConsumer<ChunkView, Set<ChunkPosition>> consumer) {
-        try (EmptyAcquisition ignored = this.lock.acquireRead()) {
-            consumer.accept(this.chunkView, this.chunksScheduled);
-        }
+    public @Nullable ChunkView chunkView() {
+        return this.chunkView;
     }
 
     /**
-     * Schedules a task, which sends chunks to the player.
+     * Gets whether a {@linkplain JetChunk chunk}
+     * at the specified {@linkplain ChunkPosition chunk position}
+     * has been scheduled to be sent to the client.
      *
-     * @throws IllegalStateException if the task has been already scheduled or settings of the play have not been set
+     * @param chunkPosition the position of the chunk to check whether it has been scheduled
+     * @return {@code true} if the chunk position has been scheduled to be sent by this chunk batch handler,
+     *         {@code false} if it is not within the used chunk view, or it has already been sent
      * @since 1.0
      */
-    public void scheduleTask() {
-        try (EmptyAcquisition ignored = this.lock.acquireWrite()) {
-            if (this.future != null)
-                throw new IllegalStateException("The task has been already scheduled");
-
-            this.player.sendPacket(new ServerWorldEventPlayPacket(StartWaitingForWorldChunksWorldEvent.INSTANCE));
-            this.scheduleChunks(null);
-
-            this.future = this.executorService.scheduleAtFixedRate(
-                    this::tick,
-                    0L, 50L,
-                    TimeUnit.MILLISECONDS
-            ); // TODO: Replace with a tick system when it gets implemented
-        }
+    public boolean isPending(ChunkPosition chunkPosition) {
+        return this.chunksScheduled.contains(chunkPosition);
     }
 
     /**
-     * Stops a task, which sends chunks to the player, then awaits for when the task is fully stopped. Finally, all
-     * chunks are removed from {@linkplain java.util.Collection collection} of scheduled chunks. Does nothing
-     * if the task has not been scheduled.
+     * Re-initializes the {@linkplain ChunkView chunk view} used
+     * by this {@linkplain ChunkBatchHandler chunk batch handler} and re-sends all chunks
+     * within that {@linkplain ChunkView chunk view} without invalidating already sent chunks.
      *
-     * @throws IllegalStateException if a future handling the task has been completed successfully
      * @since 1.0
      */
-    public void cancelTask() {
-        try (EmptyAcquisition ignored = this.lock.acquireWrite()) {
-            if (this.future == null) return;
-            this.future.cancel(false);
+    public void resetChunkView() {
+        this.chunkView = null;
+        this.updateChunkView();
+    }
 
-            try {
-                this.future.get();
-                throw new IllegalStateException("The future has been completed successfully, which is not expected");
-            } catch (InterruptedException exception) {
-                Thread.currentThread().interrupt(); // Restore the interrupted status
-            } catch (ExecutionException exception) {
-                // The task has failed, so it is already stopped
-            } catch (CancellationException exception) {
-                // Do nothing, this result is expected
+    /**
+     * Updates {@linkplain ChunkView chunk view} used by this {@linkplain ChunkBatchHandler chunk batch handler}
+     * with latest data of the {@linkplain JetPlayer player} associated with this handler.
+     *
+     * @since 1.0
+     */
+    public void updateChunkView() {
+        ChunkPosition centerChunk = ChunkPositionUtil.fromCoordinate(this.player.position());
+        byte viewDistance = this.viewDistance();
+
+        if (
+                this.chunkView != null
+                        && this.chunkView.centerChunk().equals(centerChunk)
+                        && this.chunkView.viewDistance() == viewDistance
+        ) {
+            return;
+        }
+
+        ChunkView newView = new ChunkView(centerChunk, viewDistance);
+        if (!(this.chunkView != null && this.chunkView.centerChunk().equals(centerChunk))) {
+            this.player.sendPacket(new ServerCenterChunkPlayPacket(centerChunk));
+        }
+
+        newView.forEach(chunkPosition -> {
+            if (this.chunkView != null && this.chunkView.isInView(chunkPosition)) return;
+            this.chunksScheduled.add(chunkPosition);
+        });
+
+        if (this.chunkView != null) {
+            this.chunkView.forEach(chunkPosition -> {
+                // TODO: Do not send invalidate chunk packets if the player is respawning or changing worlds
+                if (newView.isInView(chunkPosition) || this.chunksScheduled.remove(chunkPosition)) return;
+                this.player.sendPacket(new ServerInvalidateChunkPlayPacket(chunkPosition));
+            });
+        }
+
+        this.chunkView = newView;
+    }
+
+    /**
+     * Runs a cycle of this {@linkplain ChunkBatchHandler chunk batch handler}.
+     *
+     * <p>{@linkplain ChunkBatchHandler Chunk batch handler} cycles collect {@linkplain JetChunk chunks}
+     * placed closest to the {@linkplain JetPlayer player} associated with the same chunk batch handler
+     * and sends them to that player.</p>
+     *
+     * @since 1.0
+     */
+    public void tick() {
+        try (WriteWorldMapAcquisitionImpl worldMapAcquisition = this.player.world().acquireWorldMapWrite()) {
+            if (this.unacknowledgedBatches >= this.maximumUnacknowledgedBatches) return;
+            this.chunksToSend = Math.min(this.chunksToSend + this.chunksPerTick, Math.max(1f, this.chunksPerTick));
+
+            if (this.chunksToSend < 1f) return;
+            if (this.chunksScheduled.isEmpty()) return;
+
+            ChunkPosition centerChunk = ChunkPositionUtil.fromCoordinate(this.player.position());
+            List<ChunkPosition> chunksToSend = new ArrayList<>(this.chunksScheduled);
+            chunksToSend.sort(Comparator.comparingInt(centerChunk::distanceSquared));
+            chunksToSend = chunksToSend.subList(0, Math.min(chunksToSend.size(), (int) Math.floor(this.chunksToSend)));
+
+            if (chunksToSend.isEmpty()) return;
+            this.player.sendPacket(new ServerChunkBatchStartPlayPacket());
+
+            JetRegistryManager registryManager = this.player.server().registryManager();
+            for (ChunkPosition position : chunksToSend) {
+                JetChunk chunk = worldMapAcquisition.getChunk(position);
+                this.player.sendPacket(ServerChunkAndLightDataPlayPacket.create(position, chunk, registryManager));
+                this.chunksScheduled.remove(position);
             }
 
-            this.chunksScheduled.clear();
+            int batchSize = chunksToSend.size();
+            this.player.sendPacket(new ServerChunkBatchFinishedPlayPacket(batchSize));
+
+            this.chunksToSend -= batchSize;
+            this.unacknowledgedBatches++;
         }
     }
 
     /**
-     * Handles an update of a view distance of {@linkplain JetPlayer a player}. Does nothing if the task sending
-     * chunks to the player has not been scheduled.
+     * Handles a client response to a batch of {@linkplain JetChunk chunks}.
      *
-     * @param viewDistance the new view distance
-     * @since 1.0
-     */
-    public void handleViewDistanceUpdate(byte viewDistance) {
-        byte clampedViewDistance = this.createViewDistance(viewDistance);
-        this.updateChunkView(chunkView -> new ChunkView(chunkView.centerChunk(), clampedViewDistance));
-    }
-
-    /**
-     * Handles an update of {@linkplain Position a position} of {@linkplain JetPlayer a player}. Does nothing if
-     * the task sending chunks to the player has not been scheduled.
+     * <p>It is safe to call this after a world has been changed, since there is no data
+     * that could break and the unacknowledged batch count does not change.</p>
      *
-     * @param position the position
-     * @since 1.0
-     */
-    public void handlePositionUpdate(@NonNull Position position) {
-        Objects.requireNonNull(position, "position");
-        ChunkPosition centerChunkPosition = ChunkPositionUtil.fromCoordinate(position);
-        this.updateChunkView(chunkView -> new ChunkView(centerChunkPosition, chunkView.viewDistance()));
-    }
-
-    /**
-     * Handles a response to a batch of {@linkplain JetChunk chunks} from the client.
-     *
-     * <p>It is safe to call this after a world has been changed, since there is no data that could break
-     * and the unacknowledged batch count does not change.</p>
-     *
-     * @param chunksPerTick a number of chunks that should be sent per tick, which is desired by the client
+     * @param chunksPerTick a client-desired number of chunks that should be sent per tick
      * @since 1.0
      */
     public void handleChunkBatchReceived(float chunksPerTick) {
-        try (EmptyAcquisition ignored = this.lock.acquireWrite()) {
-            this.unacknowledgedBatches -= 1;
-            this.chunksPerTick = Math.clamp(chunksPerTick, MINIMUM_CHUNKS_PER_TICK, MAXIMUM_CHUNKS_PER_TICK);
+        this.player.server().ticker().scheduleTask(() -> {
+            this.unacknowledgedBatches--;
+
+            this.chunksPerTick = Float.isNaN(chunksPerTick)
+                    ? MINIMUM_CHUNKS_PER_TICK
+                    : Math.clamp(chunksPerTick, MINIMUM_CHUNKS_PER_TICK, MAXIMUM_CHUNKS_PER_TICK);
 
             if (this.unacknowledgedBatches == 0f)
                 this.chunksToSend = 1f;
             this.maximumUnacknowledgedBatches = 10f;
-        }
+        });
     }
 
-    @Override
-    public void handleDisconnection() {
-        this.close();
-    }
-
-    @Override
-    public void close() {
-        try {
-            this.executorService.shutdown();
-            if (!this.executorService.awaitTermination(SHUTDOWN_TIMEOUT, SHUTDOWN_TIMEOUT_UNIT)) {
-                throw new RuntimeException(new TimeoutException(
-                        "The chunk batch handler has not been terminated on time"
-                ));
-            }
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt(); // Restore the interrupted status
-        }
-    }
-
-    private void updateChunkView(@NonNull UnaryOperator<ChunkView> chunkViewUnaryOperator) {
-        try (EmptyAcquisition ignored = this.lock.acquireWrite()) {
-            ChunkView previousView = this.chunkView;
-            this.chunkView = chunkViewUnaryOperator.apply(this.chunkView);
-            this.scheduleChunks(previousView);
-        }
-    }
-
-    private void scheduleChunks(@Nullable ChunkView previousView) {
-        try (EmptyAcquisition ignored = this.lock.acquireWrite()) {
-            boolean previousChunkViewPresent = previousView != null;
-            if (previousChunkViewPresent && this.chunkView.equals(previousView)) return;
-
-            ChunkPosition centerChunkPosition = this.chunkView.centerChunk();
-            if (!previousChunkViewPresent || !centerChunkPosition.equals(previousView.centerChunk()))
-                this.player.sendPacket(new ServerCenterChunkPlayPacket(centerChunkPosition));
-
-            for (int chunkX = this.chunkView.minimumChunkX(); chunkX <= this.chunkView.maximumChunkX(); chunkX++) {
-                for (int chunkZ = this.chunkView.minimumChunkZ(); chunkZ <= this.chunkView.maximumChunkZ(); chunkZ++) {
-                    ChunkPosition chunkPosition = new ChunkPosition(chunkX, chunkZ);
-                    if (previousChunkViewPresent && previousView.isInView(chunkPosition))
-                        continue;
-                    this.chunksScheduled.add(chunkPosition);
-                }
-            }
-
-            if (!previousChunkViewPresent) return;
-            for (int chunkX = previousView.minimumChunkX(); chunkX <= previousView.maximumChunkX(); chunkX++) {
-                for (int chunkZ = previousView.minimumChunkZ(); chunkZ <= previousView.maximumChunkZ(); chunkZ++) {
-                    ChunkPosition chunkPosition = new ChunkPosition(chunkX, chunkZ);
-                    if (this.chunkView.isInView(chunkPosition) || this.chunksScheduled.remove(chunkPosition))
-                        continue;
-                    this.player.sendPacket(new ServerInvalidateChunkPlayPacket(chunkPosition));
-                }
-            }
-        }
-    }
-
-    private void tick() {
-        try (
-                EntityWorldAcquisition<?> worldAcquisition = this.player.acquireWorldRead();
-                WriteWorldMapAcquisitionImpl worldMapAcquisition = worldAcquisition.get().acquireWorldMapWrite();
-                /* The lock acquired after the world-map, because write world-map acquisitions during a world-map
-                   update consume chunk-views of all players that are connected to the server, and the chunk-views
-                   are guarded by the same lock. It may also negatively affect chunk-view updating inside
-                   the write world-map acquisition, because we acquire write world-map acquisition just after the
-                   lock is being acquired. These cases lead to a deadlock. */
-                EmptyAcquisition ignored = this.lock.acquireWrite()
-        ) {
-            if (this.unacknowledgedBatches >= this.maximumUnacknowledgedBatches) return;
-            this.chunksToSend = Math.min(this.chunksToSend + this.chunksPerTick, Math.max(1f, this.chunksPerTick));
-
-            if (this.chunksToSend >= 1f) {
-                if (this.chunksScheduled.isEmpty()) return;
-
-                ChunkPosition centerChunkPosition = this.chunkView.centerChunk();
-                Comparator<ChunkPosition> comparator = Comparator.comparingInt(centerChunkPosition::distanceSquared);
-
-                List<ChunkPosition> chunksToSendPositions = Ordering.from(comparator)
-                        .leastOf(this.chunksScheduled, (int) Math.floor(chunksToSend));
-
-                this.player.sendPacket(new ServerChunkBatchStartPlayPacket());
-
-                JetRegistryManager registryManager = this.player.server().registryManager();
-                for (ChunkPosition position : chunksToSendPositions) {
-                    JetChunk chunk = worldMapAcquisition.getChunk(position);
-                    this.player.sendPacket(ServerChunkAndLightDataPlayPacket.create(position, chunk, registryManager));
-                    this.chunksScheduled.remove(position);
-                }
-
-                int batchSize = chunksToSendPositions.size();
-                this.player.sendPacket(new ServerChunkBatchFinishedPlayPacket(batchSize));
-
-                this.chunksToSend -= batchSize;
-                this.unacknowledgedBatches++;
-            }
-        }
-    }
-
-    private byte createViewDistance(byte clientViewDistance) {
+    // TODO: Clamp when receiving settings instead
+    private byte viewDistance() {
         byte maximumViewDistance = this.player.server().configuration().maximumViewDistance();
-        return (byte) Math.clamp(clientViewDistance, MINIMUM_VIEW_DISTANCE, maximumViewDistance);
+        return (byte) Math.clamp(this.player.settings().viewDistance(), MINIMUM_VIEW_DISTANCE, maximumViewDistance);
     }
 }

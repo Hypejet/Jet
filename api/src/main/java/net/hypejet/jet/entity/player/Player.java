@@ -3,7 +3,6 @@ package net.hypejet.jet.entity.player;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.primitive.booleans.BooleanAcquisition;
 import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
-import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.command.CommandSource;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.acquisition.gamemode.GameModeAcquisition;
@@ -19,7 +18,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Represents {@linkplain Entity an entity}, which is connected via {@linkplain PlayerConnection player connection}.
+ * A player {@linkplain Entity entity} backed by a {@linkplain PlayerConnection player connection}.
  *
  * @since 1.0
  * @see Entity
@@ -35,7 +34,7 @@ public interface Player extends Entity, CommandSource, CommonAudience {
     @NonNull String username();
 
     /**
-     * Gets {@linkplain PlayerConnection a player connection} of the player.
+     * Gets a {@linkplain PlayerConnection player connection} that this {@linkplain Player player} is backed by.
      *
      * @return the player connection
      * @since 1.0
@@ -43,13 +42,12 @@ public interface Player extends Entity, CommandSource, CommonAudience {
     @NonNull PlayerConnection connection();
 
     /**
-     * Creates {@linkplain NotNullObjectAcquisition a not-null object acquisition} of clientside
-     * {@linkplain Settings settings} of the player.
+     * Gets clientside {@linkplain Settings settings} of this {@linkplain Player player}.
      *
-     * @return the not-null object acquisition
+     * @return the clientside settings
      * @since 1.0
      */
-    @NonNull NotNullObjectAcquisition<Settings> settings();
+    @NonNull Settings settings();
 
     /**
      * Creates {@linkplain NotNullObjectAcquisition a not-null object acquisition} of a brand name of a client
@@ -59,14 +57,6 @@ public interface Player extends Entity, CommandSource, CommonAudience {
      * @since 1.0
      */
     @NonNull NotNullObjectAcquisition<String> clientBrand();
-
-    /**
-     * Gets {@linkplain MinecraftServer a Minecraft server} that the player is connected to.
-     *
-     * @return the Minecraft server
-     * @since 1.0
-     */
-    @NonNull MinecraftServer server();
 
     /**
      * Creates {@linkplain GameModeAcquisition a game mode acquisition} of {@linkplain GameMode a game mode}

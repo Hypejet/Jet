@@ -11,7 +11,6 @@ import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.entity.acquisition.gamemode.GameModeAcquisition;
 import net.hypejet.jet.entity.acquisition.gamemode.WriteGameModeAcquisition;
 import net.hypejet.jet.entity.player.Player;
-import net.hypejet.jet.event.events.settings.ChangeSettingsEvent;
 import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.server.JetMinecraftServer;
@@ -19,8 +18,7 @@ import net.hypejet.jet.server.configuration.JetServerConfiguration;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.acquisition.gamemode.GameModeAcquirable;
 import net.hypejet.jet.server.entity.acquisition.respawn.WriteRespawnScreenEnabledAcquisition;
-import net.hypejet.jet.server.entity.acquisition.world.EntityWorldAcquisition;
-import net.hypejet.jet.server.entity.player.movement.PlayerMovementHandler;
+import net.hypejet.jet.server.entity.player.movement.PlayerMovementSynchronizer;
 import net.hypejet.jet.server.entity.player.spawn.DeathLocation;
 import net.hypejet.jet.server.entity.player.spawn.PlayerSpawnInfo;
 import net.hypejet.jet.server.network.ProtocolState;
@@ -43,6 +41,8 @@ import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.handler.ChunkBatchHandler;
 import net.hypejet.jet.world.coordinate.Position;
+import net.hypejet.jet.world.coordinate.Vector;
+import net.hypejet.jet.world.coordinate.flag.RelativeFlag;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.key.Key;
@@ -51,30 +51,32 @@ import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Represents an implementation of {@linkplain Player a player}.
+ * An implementation of the {@linkplain Player player}.
  *
  * @since 1.0
  * @see Player
- * @see JetEntity
  */
 public final class JetPlayer extends JetEntity implements Player, NetworkDisconnectionHandler,
         PacketReceivingCommonAudience {
 
     private static final Key ENTITY_TYPE = Key.key("player");
+    private static final Logger LOGGER = LoggerFactory.getLogger(JetPlayer.class);
 
     private final SocketPlayerConnection connection;
 
     private final ChunkBatchHandler chunkBatchHandler;
-    private final PlayerMovementHandler movementHandler = new PlayerMovementHandler(this);
+    private final PlayerMovementSynchronizer movementSynchronizer = new PlayerMovementSynchronizer(this);
 
-    private final NotNullObjectAcquirable<Settings> settings;
     private final NotNullObjectAcquirable<String> clientBrand;
 
     private final GameModeAcquirable gameMode;
@@ -83,6 +85,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     private final NullableObjectAcquirable<DeathLocation> lastDeathLocation = new NullableObjectAcquirable<>(); // TODO: Updating
 
     private @NonNull JetScoreboard scoreboard;
+    private @NonNull Settings settings;
 
     /**
      * Constructs the {@linkplain JetPlayer player}.
@@ -107,9 +110,9 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
         super(ENTITY_TYPE, uniqueId, Pointers.builder()
                 .withStatic(Identity.UUID, Objects.requireNonNull(uniqueId, "unique identifier"))
                 .withStatic(Identity.NAME, Objects.requireNonNull(username, "username"))
-                .build(), position, world);
+                .build(), position, world, connection.server());
         this.connection = Objects.requireNonNull(connection, "connection");
-        this.settings = new NotNullObjectAcquirable<>(Objects.requireNonNull(settings, "settings"));
+        this.settings = Objects.requireNonNull(settings, "settings");
         this.clientBrand = new NotNullObjectAcquirable<>(Objects.requireNonNull(clientBrand, "client brand"));
         this.gameMode = new GameModeAcquirable(this, gameMode, previousGameMode);
         this.respawnScreenEnabled = new BooleanAcquirable(enableRespawnScreen);
@@ -133,18 +136,13 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     }
 
     @Override
-    public @NonNull NotNullObjectAcquisition<Settings> settings() {
-        return this.settings.acquireRead();
+    public @NonNull Settings settings() {
+        return this.settings;
     }
 
     @Override
     public @NonNull NotNullObjectAcquisition<String> clientBrand() {
         return this.clientBrand.acquireRead();
-    }
-
-    @Override
-    public @NonNull JetMinecraftServer server() {
-        return this.connection.server();
     }
 
     @Override
@@ -206,6 +204,17 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     }
 
     @Override
+    public void updatePosition(@NonNull Position position, @NonNull Vector velocity,
+                               @NonNull Collection<RelativeFlag> flags) {
+        Objects.requireNonNull(position, "position");
+        Objects.requireNonNull(velocity, "velocity");
+        Objects.requireNonNull(flags, "relative flags");
+        // The "synchronize" method is going to apply field changes by itself
+        this.movementSynchronizer.synchronize(position, velocity, flags);
+        this.chunkBatchHandler.updateChunkView();
+    }
+
+    @Override
     public void sendMessage(@NotNull Identity source, @NotNull Component message, @NotNull MessageType type) {
         ServerPacket packet = switch (type) {
             case CHAT -> throw new IllegalArgumentException("Non-system messages are not supported yet");
@@ -226,7 +235,6 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
 
     @Override
     public void handleDisconnection() {
-        this.chunkBatchHandler.handleDisconnection();
         // TODO: Move disconnection handling and player unregistering to a tick thread
         this.server().ticker().scheduleTask(() -> this.server().playerList().unregisterPlayer(this));
     }
@@ -234,6 +242,14 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     @Override
     public void sendPacket(@NonNull ServerPacket packet) {
         this.connection.sendPacket(packet);
+    }
+
+    @Override
+    protected void postWorldChange(@NonNull JetWorld previousWorld, @NonNull Position initialPosition,
+                                   boolean keepAttributes, boolean keepMetadata) {
+        this.sendRespawnPacket(this.world(), keepAttributes, keepMetadata);
+        this.movementSynchronizer.synchronize(initialPosition, Vector.zero(), Set.of());
+        this.chunkBatchHandler().resetChunkView();
     }
 
     /**
@@ -248,34 +264,28 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     }
 
     /**
-     * Gets {@linkplain PlayerMovementHandler a player movement handler} of this {@linkplain JetPlayer player}.
+     * Gets a {@linkplain PlayerMovementSynchronizer player movement synchronizer}
+     * of this {@linkplain JetPlayer player}.
      *
-     * @return the player movement handler
+     * @return the player movement synchronizer
      * @since 1.0
      */
-    public @NonNull PlayerMovementHandler movementHandler() {
-        return this.movementHandler;
+    public @NonNull PlayerMovementSynchronizer movementSynchronizer() {
+        return this.movementSynchronizer;
     }
 
     /**
-     * Updates {@linkplain Settings settings} of the player.
+     * Handles an update of clientside {@linkplain Settings settings} of this {@linkplain JetPlayer player}.
      *
-     * @param settings the new settings
+     * @param settings the new clientside settings that the player has
      * @since 1.0
      */
     public void setSettings(@NonNull Settings settings) {
-        Objects.requireNonNull(settings, "The settings must not be null");
-        try (WriteNotNullObjectAcquisition<Settings> acquisition = this.settings.acquireWrite()) {
-            Settings previousSettings = acquisition.get();
-            acquisition.set(settings);
-
-            ChangeSettingsEvent event = new ChangeSettingsEvent(this, settings);
-            this.server().eventNode().call(event);
-
-            byte viewDistance = settings.viewDistance();
-            if (previousSettings.viewDistance() != viewDistance)
-                this.chunkBatchHandler.handleViewDistanceUpdate(viewDistance);
-        }
+        Objects.requireNonNull(settings, "settings");
+        this.server().ticker().scheduleTask(() -> {
+            this.settings = settings;
+            this.chunkBatchHandler.updateChunkView();
+        });
     }
 
     /**
@@ -349,6 +359,51 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     }
 
     /**
+     * Sends a {@linkplain ServerJoinGamePlayPacket server join game play packet}
+     * to this {@linkplain JetPlayer player}.
+     *
+     * @since 1.0
+     * @see ServerJoinGamePlayPacket
+     */
+    // TODO: Move to PlayerList#addPlayer
+    public void sendJoinGamePacket() {
+        this.server().ticker().ensureRunsInTickLoop();
+        try (
+                BooleanAcquisition enableRespawnScreenAcquisition = this.acquireRespawnScreenEnabledRead();
+                GameModeAcquisition gameModeAcquisition = this.gameMode.acquireRead();
+                NullableObjectAcquisition<DeathLocation> lastDeathLocation = this.lastDeathLocation.acquireRead()
+        ) {
+            JetServerConfiguration configuration = this.server().configuration();
+            this.sendPacket(new ServerJoinGamePlayPacket(
+                    this.entityId(), configuration.hardcore(), Set.of() /* TODO: Permanent worlds */,
+                    configuration.maximumPlayers(), configuration.maximumViewDistance(),
+                    configuration.simulationDistance(), configuration.reducedDebugInfo(),
+                    enableRespawnScreenAcquisition.get(), configuration.showUnlockedRecipesOnly(),
+                    this.createSpawnInfo(
+                            this.world(),
+                            gameModeAcquisition.get(),
+                            gameModeAcquisition.previous(),
+                            lastDeathLocation.get()
+                    ),
+                    configuration.enforceSecureProfile()
+            ));
+        }
+
+    }
+
+    /**
+     * Updates {@linkplain Position position} of this {@linkplain JetPlayer player}
+     * with the specified value, which comes from the client.
+     *
+     * @param position the client position value
+     * @since 1.0
+     */
+    public void handlePositionFromClient(@NonNull Position position) {
+        this.updateRawPosition(position);
+        this.chunkBatchHandler.updateChunkView();
+    }
+
+    /**
      * Tries to cast {@linkplain Player a player} specified to {@linkplain JetPlayer a player implementation}.
      * If it fails, throws an exception with a detailed message.
      *
@@ -361,39 +416,6 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
         if (!(player instanceof JetPlayer validatedPlayer))
             throw new IllegalArgumentException("The player specified is not a valid player");
         return validatedPlayer;
-    }
-
-    /**
-     * Sends a {@linkplain ServerJoinGamePlayPacket server join game play packet}
-     * to this {@linkplain JetPlayer player}.
-     *
-     * @since 1.0
-     * @see ServerJoinGamePlayPacket
-     */
-    // TODO: Move to JetMinecraftServer#addPlayer
-    public void sendJoinGamePacket() {
-        JetServerConfiguration configuration = this.server().configuration();
-        try (
-                BooleanAcquisition enableRespawnScreenAcquisition = this.acquireRespawnScreenEnabledRead();
-                GameModeAcquisition gameModeAcquisition = this.gameMode.acquireRead();
-                NullableObjectAcquisition<DeathLocation> lastDeathLocation = this.lastDeathLocation.acquireRead();
-                EntityWorldAcquisition<?> worldAcquisition = this.acquireWorldRead()
-        ) {
-            this.sendPacket(new ServerJoinGamePlayPacket(
-                    this.entityId(), configuration.hardcore(), Set.of() /* TODO: Permanent worlds */,
-                    configuration.maximumPlayers(), configuration.maximumViewDistance(),
-                    configuration.simulationDistance(), configuration.reducedDebugInfo(),
-                    enableRespawnScreenAcquisition.get(), configuration.showUnlockedRecipesOnly(),
-                    this.createSpawnInfo(
-                            worldAcquisition.get(),
-                            gameModeAcquisition.get(),
-                            gameModeAcquisition.previous(),
-                            lastDeathLocation.get()
-                    ),
-                    configuration.enforceSecureProfile()
-            ));
-        }
-
     }
 
     private @NotNull PlayerSpawnInfo createSpawnInfo(@NotNull JetWorld world, @Nullable GameMode gameMode,
