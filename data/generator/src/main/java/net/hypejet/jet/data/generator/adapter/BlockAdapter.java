@@ -1,4 +1,4 @@
-package net.hypejet.jet.data.generator.adpater;
+package net.hypejet.jet.data.generator.adapter;
 
 import com.google.common.primitives.ImmutableIntArray;
 import net.hypejet.jet.data.json.model.block.JsonBlock;

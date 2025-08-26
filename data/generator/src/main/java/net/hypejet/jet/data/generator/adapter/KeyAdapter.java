@@ -1,4 +1,4 @@
-package net.hypejet.jet.data.generator.adpater;
+package net.hypejet.jet.data.generator.adapter;
 
 import net.kyori.adventure.key.Key;
 import net.minecraft.resources.ResourceLocation;

@@ -2,12 +2,12 @@ package net.hypejet.jet.data.generator;
 
 import com.mojang.serialization.Codec;
 import com.palantir.javapoet.JavaFile;
-import net.hypejet.jet.data.generator.adpater.BlockAdapter;
-import net.hypejet.jet.data.generator.adpater.BlockEntityTypeAdapter;
-import net.hypejet.jet.data.generator.adpater.EntityTypeAdapter;
-import net.hypejet.jet.data.generator.adpater.GameEventAdapter;
-import net.hypejet.jet.data.generator.adpater.ItemAdapter;
-import net.hypejet.jet.data.generator.adpater.SoundEventAdapter;
+import net.hypejet.jet.data.generator.adapter.BlockAdapter;
+import net.hypejet.jet.data.generator.adapter.BlockEntityTypeAdapter;
+import net.hypejet.jet.data.generator.adapter.EntityTypeAdapter;
+import net.hypejet.jet.data.generator.adapter.GameEventAdapter;
+import net.hypejet.jet.data.generator.adapter.ItemAdapter;
+import net.hypejet.jet.data.generator.adapter.SoundEventAdapter;
 import net.hypejet.jet.data.generator.extractor.BlockStateRegistryExtractor;
 import net.hypejet.jet.data.generator.extractor.ConverterRegistryExtractor;
 import net.hypejet.jet.data.generator.generator.CodeGenerator;

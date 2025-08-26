@@ -1,4 +1,4 @@
-package net.hypejet.jet.data.generator.adpater;
+package net.hypejet.jet.data.generator.adapter;
 
 import net.hypejet.jet.data.json.model.item.JsonItem;
 import net.minecraft.world.flag.FeatureFlags;

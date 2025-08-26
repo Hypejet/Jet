@@ -1,4 +1,4 @@
-package net.hypejet.jet.data.generator.adpater;
+package net.hypejet.jet.data.generator.adapter;
 
 import net.hypejet.jet.data.json.model.event.JsonGameEvent;
 import net.minecraft.world.level.gameevent.GameEvent;

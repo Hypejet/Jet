@@ -1,6 +1,6 @@
 package net.hypejet.jet.data.generator.extractor;
 
-import net.hypejet.jet.data.generator.adpater.KeyAdapter;
+import net.hypejet.jet.data.generator.adapter.KeyAdapter;
 import net.hypejet.jet.data.json.entry.JsonRegistryEntry;
 import net.hypejet.jet.data.json.model.feature.JsonKnownPack;
 import net.kyori.adventure.key.Key;

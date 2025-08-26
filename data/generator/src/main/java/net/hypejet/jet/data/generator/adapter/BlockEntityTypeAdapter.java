@@ -1,4 +1,4 @@
-package net.hypejet.jet.data.generator.adpater;
+package net.hypejet.jet.data.generator.adapter;
 
 import net.hypejet.jet.data.json.model.block.JsonBlockEntityType;
 import net.kyori.adventure.key.Key;
