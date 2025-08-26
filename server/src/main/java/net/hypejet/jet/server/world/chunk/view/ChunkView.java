@@ -1,67 +1,78 @@
 package net.hypejet.jet.server.world.chunk.view;
 
+import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jspecify.annotations.NullMarked;
+
+import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
- * Represents a range of {@linkplain ChunkPosition chunk positions}.
+ * An area of {@linkplain JetChunk chunks} visible to a {@linkplain JetPlayer player}.
  *
- * @param centerChunk a center chunk position that should be in the range
- * @param viewDistance a half of edge length of a square that should represent the range
+ * @param centerChunk a chunk position of the center chunk of the area
+ * @param viewDistance a number of chunks in each direction from the center that are visible to the player
  * @since 1.0
+ * @see JetChunk
+ * @see JetPlayer
  */
-public record ChunkView(@NonNull ChunkPosition centerChunk, byte viewDistance) {
+@NullMarked
+public record ChunkView(ChunkPosition centerChunk, byte viewDistance) {
     /**
-     * Gets a minimum {@code X} value of {@linkplain ChunkPosition a chunk position}, which can be in this view.
+     * Constructs the {@linkplain ChunkView chunk view}.
      *
-     * @return the value
+     * @param centerChunk a chunk position of the chunk that should be center of the area
+     * @param viewDistance a number of chunks in each direction from the center that should be visible to the player
      * @since 1.0
      */
-    public int minimumChunkX() {
+    public ChunkView {
+        Objects.requireNonNull(centerChunk, "center chunk");
+    }
+
+    /**
+     * Consumes {@linkplain ChunkPosition chunk positions} of {@linkplain JetChunk chunks}
+     * that need to be sent to the client to make it have the same {@linkplain ChunkView chunk view} as this.
+     *
+     * @param consumer the consumer to consume the chunk positions with
+     * @since 1.0
+     */
+    public void forEach(Consumer<ChunkPosition> consumer) {
+        for (int chunkX = this.minimumChunkX(); chunkX <= this.maximumChunkX(); chunkX++) {
+            for (int chunkZ = this.minimumChunkZ(); chunkZ <= this.maximumChunkZ(); chunkZ++) {
+                consumer.accept(new ChunkPosition(chunkX, chunkZ));
+            }
+        }
+    }
+
+    /**
+     * Gets whether the specified {@linkplain ChunkPosition chunk position}
+     * is within this {@linkplain ChunkView chunk view}.
+     *
+     * @param position the chunk position to check whether it is within this chunk view
+     * @return {@code true} if the specified chunk position is within this chunk view, {@code false} otherwise
+     * @since 1.0
+     */
+    public boolean isInView(ChunkPosition position) {
+        for (int chunkX = this.minimumChunkX(); chunkX <= this.maximumChunkX(); chunkX++)
+            for (int chunkZ = this.minimumChunkZ(); chunkZ <= this.maximumChunkZ(); chunkZ++)
+                if (position.chunkX() == chunkX && position.chunkZ() == chunkZ) return true;
+        return false;
+    }
+
+    private int minimumChunkX() {
         return this.centerChunk.chunkX() - this.viewDistance - 1;
     }
 
-    /**
-     * Gets a minimum {@code Z} value of {@linkplain ChunkPosition a chunk position}, which can be in this view.
-     *
-     * @return the value
-     * @since 1.0
-     */
-    public int minimumChunkZ() {
+    private int minimumChunkZ() {
         return this.centerChunk.chunkZ() - this.viewDistance - 1;
     }
 
-    /**
-     * Gets a maximum {@code X} value of {@linkplain ChunkPosition a chunk position}, which can be in this view.
-     *
-     * @return the value
-     * @since 1.0
-     */
-    public int maximumChunkX() {
+    private int maximumChunkX() {
         return this.centerChunk.chunkX() + this.viewDistance + 1;
     }
 
-    /**
-     * Gets a maximum {@code Z} value of {@linkplain ChunkPosition a chunk position}, which can be in this view.
-     *
-     * @return the value
-     * @since 1.0
-     */
-    public int maximumChunkZ() {
+    private int maximumChunkZ() {
         return this.centerChunk.chunkZ() + this.viewDistance + 1;
-    }
-
-    /**
-     * Gets whether {@linkplain ChunkPosition a chunk position} specified is within this chunk view.
-     *
-     * @param position the chunk position
-     * @return {@code true} fi the chunk position specified is within this chunk view, {@code false} otherwise
-     * @since 1.0
-     */
-    public boolean isInView(@NonNull ChunkPosition position) {
-        int chunkX = position.chunkX();
-        int chunkZ = position.chunkZ();
-        return chunkX <= this.maximumChunkX() && chunkX >= this.minimumChunkX()
-                && chunkZ <= this.maximumChunkZ() && chunkZ >= this.minimumChunkZ();
     }
 }

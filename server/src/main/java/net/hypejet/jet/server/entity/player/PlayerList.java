@@ -72,8 +72,8 @@ public final class PlayerList {
         this.players.add(player);
 
         // TODO: Send other world data
-        player.chunkBatchHandler().scheduleTask(); // TODO: Ensure that it produces the same behaviour as vanilla
         player.world().addPlayer(player);
+        player.chunkBatchHandler().resetChunkView();
         this.eventNode.call(new InitialSpawnEvent(player, player.world(), position));
     }
 

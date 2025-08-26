@@ -63,8 +63,8 @@ public final class PlayerMovementSynchronizer {
             this.synchronizationId++;
         }
 
-        this.positionInSynchronization = new Vector(position.x(), position.y(), position.z());
         this.player.updateRawPositionAndVelocity(position, velocity, flags);
+        this.positionInSynchronization = Vector.from(this.player.position());
 
         this.player.sendPacket(new ServerSynchronizePositionPlayPacket(
                 this.synchronizationId,
@@ -85,7 +85,7 @@ public final class PlayerMovementSynchronizer {
         this.player.server().ticker().scheduleTask(() -> {
             if (packet.identifier() != this.synchronizationId) return;
             if (this.positionInSynchronization == null) return; // We are more lenient than vanilla
-            this.player.updateRawPosition(this.player.position().withValues(this.positionInSynchronization));
+            this.player.handlePositionFromClient(this.player.position().withValues(this.positionInSynchronization));
             this.positionInSynchronization = null;
         });
     }
@@ -102,7 +102,7 @@ public final class PlayerMovementSynchronizer {
             /* TODO: Make a vanilla-like implementation, currently we blindly trust the client,
                but entity system is not completed yet, therefore it is impossible to make
                a vanilla-like implementation for now. */
-            this.player.updateRawPosition(positionUnaryOperator.apply(this.player.position()));
+            this.player.handlePositionFromClient(positionUnaryOperator.apply(this.player.position()));
         });
     }
 }

@@ -200,13 +200,13 @@ public class JetEntity implements Entity {
         float initialYaw = this.position.yaw();
         float initialPitch = this.position.pitch();
 
-        this.position = Position.create(
+        this.updateRawPosition(Position.create(
                 position.x() + (flags.contains(RelativeFlag.X) ? this.position.x() : 0D),
                 position.y() + (flags.contains(RelativeFlag.Y) ? this.position.y() : 0D),
                 position.z() + (flags.contains(RelativeFlag.Z) ? this.position.z() : 0D),
                 initialYaw + (flags.contains(RelativeFlag.YAW) ? this.position.yaw() : 0f),
                 initialPitch + (flags.contains(RelativeFlag.PITCH) ? this.position.pitch() : 0f)
-        );
+        ));
 
         if (flags.contains(RelativeFlag.ROTATE_VELOCITY)) {
             float pitchRotationAngle = (float) Math.toRadians(initialPitch - this.position.pitch());
@@ -228,7 +228,7 @@ public class JetEntity implements Entity {
      * @param position the position that the entity should have
      * @since 1.0
      */
-    public final void updateRawPosition(@NonNull Position position) {
+    protected final void updateRawPosition(@NonNull Position position) {
         this.position = Objects.requireNonNull(position, "position");
     }
 

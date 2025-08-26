@@ -12,7 +12,6 @@ import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.entity.acquisition.gamemode.GameModeAcquisition;
 import net.hypejet.jet.entity.acquisition.gamemode.WriteGameModeAcquisition;
 import net.hypejet.jet.entity.player.Player;
-import net.hypejet.jet.event.events.settings.ChangeSettingsEvent;
 import net.hypejet.jet.event.events.world.PreWorldSwitchEvent;
 import net.hypejet.jet.event.events.world.WorldSwitchEvent;
 import net.hypejet.jet.registry.reference.RegistryReference;
@@ -81,7 +80,6 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     private final ChunkBatchHandler chunkBatchHandler;
     private final PlayerMovementSynchronizer movementSynchronizer = new PlayerMovementSynchronizer(this);
 
-    private final NotNullObjectAcquirable<Settings> settings;
     private final NotNullObjectAcquirable<String> clientBrand;
 
     private final GameModeAcquirable gameMode;
@@ -90,6 +88,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     private final NullableObjectAcquirable<DeathLocation> lastDeathLocation = new NullableObjectAcquirable<>(); // TODO: Updating
 
     private @NonNull JetScoreboard scoreboard;
+    private @NonNull Settings settings;
 
     /**
      * Constructs the {@linkplain JetPlayer player}.
@@ -116,7 +115,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
                 .withStatic(Identity.NAME, Objects.requireNonNull(username, "username"))
                 .build(), position, world);
         this.connection = Objects.requireNonNull(connection, "connection");
-        this.settings = new NotNullObjectAcquirable<>(Objects.requireNonNull(settings, "settings"));
+        this.settings = Objects.requireNonNull(settings, "settings");
         this.clientBrand = new NotNullObjectAcquirable<>(Objects.requireNonNull(clientBrand, "client brand"));
         this.gameMode = new GameModeAcquirable(this, gameMode, previousGameMode);
         this.respawnScreenEnabled = new BooleanAcquirable(enableRespawnScreen);
@@ -140,8 +139,8 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     }
 
     @Override
-    public @NonNull NotNullObjectAcquisition<Settings> settings() {
-        return this.settings.acquireRead();
+    public @NonNull Settings settings() {
+        return this.settings;
     }
 
     @Override
@@ -220,6 +219,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
         Objects.requireNonNull(flags, "relative flags");
         // The "synchronize" method is going to apply field changes by itself
         this.movementSynchronizer.synchronize(position, velocity, flags);
+        this.chunkBatchHandler.updateChunkView();
     }
 
     @Override
@@ -243,7 +243,6 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
 
     @Override
     public void handleDisconnection() {
-        this.chunkBatchHandler.handleDisconnection();
         // TODO: Move disconnection handling and player unregistering to a tick thread
         this.server().ticker().scheduleTask(() -> this.server().playerList().unregisterPlayer(this));
     }
@@ -256,7 +255,6 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     @Override
     protected @NonNull Pair<JetWorld, Position> preWorldChange(@NonNull JetWorld newWorld,
                                                                @NonNull Position initialPosition) {
-        this.chunkBatchHandler.cancelTask();
         this.world().removePlayer(this);
 
         PreWorldSwitchEvent preSwitchEvent = new PreWorldSwitchEvent(this, this.world(), newWorld, initialPosition);
@@ -277,8 +275,8 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
                                    boolean keepAttributes, boolean keepMetadata) {
         this.sendRespawnPacket(this.world(), keepAttributes, keepMetadata);
         this.world().addPlayer(this);
-        this.chunkBatchHandler.scheduleTask();
         this.movementSynchronizer.synchronize(initialPosition, Vector.zero(), Set.of());
+        this.chunkBatchHandler().resetChunkView();
         this.server().eventNode().call(new WorldSwitchEvent(this, previousWorld, this.world(), initialPosition));
     }
 
@@ -305,24 +303,17 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     }
 
     /**
-     * Updates {@linkplain Settings settings} of the player.
+     * Handles an update of clientside {@linkplain Settings settings} of this {@linkplain JetPlayer player}.
      *
-     * @param settings the new settings
+     * @param settings the new clientside settings that the player has
      * @since 1.0
      */
     public void setSettings(@NonNull Settings settings) {
-        Objects.requireNonNull(settings, "The settings must not be null");
-        try (WriteNotNullObjectAcquisition<Settings> acquisition = this.settings.acquireWrite()) {
-            Settings previousSettings = acquisition.get();
-            acquisition.set(settings);
-
-            ChangeSettingsEvent event = new ChangeSettingsEvent(this, settings);
-            this.server().eventNode().call(event);
-
-            byte viewDistance = settings.viewDistance();
-            if (previousSettings.viewDistance() != viewDistance)
-                this.chunkBatchHandler.handleViewDistanceUpdate(viewDistance);
-        }
+        Objects.requireNonNull(settings, "settings");
+        this.server().ticker().scheduleTask(() -> {
+            this.settings = settings;
+            this.chunkBatchHandler.updateChunkView();
+        });
     }
 
     /**
@@ -396,21 +387,6 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     }
 
     /**
-     * Tries to cast {@linkplain Player a player} specified to {@linkplain JetPlayer a player implementation}.
-     * If it fails, throws an exception with a detailed message.
-     *
-     * @param player the player
-     * @return the player implementation
-     * @throws IllegalArgumentException if the player could not be cast to a player implementation
-     * @since 1.0
-     */
-    public static @NonNull JetPlayer cast(@NonNull Player player) {
-        if (!(player instanceof JetPlayer validatedPlayer))
-            throw new IllegalArgumentException("The player specified is not a valid player");
-        return validatedPlayer;
-    }
-
-    /**
      * Sends a {@linkplain ServerJoinGamePlayPacket server join game play packet}
      * to this {@linkplain JetPlayer player}.
      *
@@ -441,6 +417,33 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
             ));
         }
 
+    }
+
+    /**
+     * Updates {@linkplain Position position} of this {@linkplain JetPlayer player}
+     * with the specified value, which comes from the client.
+     *
+     * @param position the client position value
+     * @since 1.0
+     */
+    public void handlePositionFromClient(@NonNull Position position) {
+        this.updateRawPosition(position);
+        this.chunkBatchHandler.updateChunkView();
+    }
+
+    /**
+     * Tries to cast {@linkplain Player a player} specified to {@linkplain JetPlayer a player implementation}.
+     * If it fails, throws an exception with a detailed message.
+     *
+     * @param player the player
+     * @return the player implementation
+     * @throws IllegalArgumentException if the player could not be cast to a player implementation
+     * @since 1.0
+     */
+    public static @NonNull JetPlayer cast(@NonNull Player player) {
+        if (!(player instanceof JetPlayer validatedPlayer))
+            throw new IllegalArgumentException("The player specified is not a valid player");
+        return validatedPlayer;
     }
 
     private @NotNull PlayerSpawnInfo createSpawnInfo(@NotNull JetWorld world, @Nullable GameMode gameMode,

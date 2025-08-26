@@ -9,6 +9,7 @@ import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.player.JetPlayer;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerWorldEventPlayPacket;
 import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.world.acquisition.worldmap.WorldMapAcquisitionImpl;
 import net.hypejet.jet.server.world.acquisition.worldmap.WriteWorldMapAcquisitionImpl;
@@ -19,13 +20,14 @@ import net.hypejet.jet.world.coordinate.Position;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
 import net.hypejet.jet.world.data.WorldData;
 import net.hypejet.jet.world.dimension.DimensionType;
+import net.hypejet.jet.world.event.world.events.StartWaitingForWorldChunksWorldEvent;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
 import java.util.Set;
 
 /**
- * Represents an implementation of {@linkplain World a world}.
+ * An implementation of the {@linkplain World world}.
  *
  * @since 1.0
  * @see World
@@ -125,10 +127,13 @@ public final class JetWorld implements World {
      */
     public void addPlayer(@NonNull JetPlayer player) {
         Objects.requireNonNull(player, "player");
+        player.server().ticker().ensureRunsInTickLoop();
+
         try (CollectionAcquisition<?, Set<JetEntity>> entitiesAcquisition = this.entities.acquireWrite()) {
             Set<JetEntity> entities = entitiesAcquisition.collection();
             if (!entities.add(player))
                 throw new IllegalArgumentException("The player specified has been already initialized in this world");
+            player.sendPacket(new ServerWorldEventPlayPacket(StartWaitingForWorldChunksWorldEvent.INSTANCE));
         }
     }
 
@@ -140,6 +145,8 @@ public final class JetWorld implements World {
      */
     public void removePlayer(@NonNull JetPlayer player) {
         Objects.requireNonNull(player, "player");
+        player.server().ticker().ensureRunsInTickLoop();
+
         try (CollectionAcquisition<?, Set<JetEntity>> entitiesAcquisition = this.entities.acquireWrite()) {
             Set<JetEntity> entities = entitiesAcquisition.collection();
             if (!entities.remove(player))

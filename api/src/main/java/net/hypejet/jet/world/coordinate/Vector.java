@@ -25,6 +25,18 @@ public record Vector(double x, double y, double z) implements Coordinate<Vector>
     }
 
     /**
+     * Creates a {@linkplain Vector vector} using values from the specified {@linkplain Coordinate coordinate}.
+     *
+     * @param coordinate the vector to create the vector from
+     * @return the created vector, or the specified coordinate if it is a vector
+     * @since 1.0
+     */
+    public static @NonNull Vector from(@NonNull Coordinate<?> coordinate) {
+        if (coordinate instanceof Vector vector) return vector;
+        return create(coordinate.x(), coordinate.y(), coordinate.z());
+    }
+
+    /**
      * Creates a {@linkplain Vector vector} with the specified {@code X}, {@code Y} and {@code Z} axis values.
      *
      * @param x the {@code X} axis value that the vector should have
