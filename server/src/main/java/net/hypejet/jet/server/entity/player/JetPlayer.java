@@ -28,6 +28,7 @@ import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerPluginMessagePacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerActionBarPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityAnimationPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerRespawnPlayPacket;
@@ -201,6 +202,12 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
 
         this.scoreboard = validatedScoreboard;
         return currentScoreboard;
+    }
+
+    @Override
+    public void playAnimation(@NonNull Animation animation) {
+        Objects.requireNonNull(animation, "animation");
+        this.connection.sendPacket(new ServerEntityAnimationPlayPacket(this.entityId(), animation.id()));
     }
 
     @Override
