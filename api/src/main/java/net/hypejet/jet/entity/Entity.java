@@ -151,6 +151,14 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
     @NonNull String scoreboardName();
 
     /**
+     * Gets a {@linkplain MinecraftServer server} that this {@linkplain Entity entity} is part of.
+     *
+     * @return the server
+     * @since 1.0
+     */
+    @NonNull MinecraftServer server();
+
+    /**
      * Represents a hand of an entity.
      *
      * <p>Contents of this enum depend on Minecraft, however it is safe to keep it an enum, since it is very unlikely

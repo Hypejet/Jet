@@ -1,6 +1,5 @@
 package net.hypejet.jet.server.entity.player;
 
-import it.unimi.dsi.fastutil.Pair;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquirable;
 import net.hypejet.concurrency.object.notnull.NotNullObjectAcquisition;
 import net.hypejet.concurrency.object.notnull.WriteNotNullObjectAcquisition;
@@ -12,8 +11,6 @@ import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.entity.acquisition.gamemode.GameModeAcquisition;
 import net.hypejet.jet.entity.acquisition.gamemode.WriteGameModeAcquisition;
 import net.hypejet.jet.entity.player.Player;
-import net.hypejet.jet.event.events.world.PreWorldSwitchEvent;
-import net.hypejet.jet.event.events.world.WorldSwitchEvent;
 import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.server.JetMinecraftServer;
@@ -113,7 +110,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
         super(ENTITY_TYPE, uniqueId, Pointers.builder()
                 .withStatic(Identity.UUID, Objects.requireNonNull(uniqueId, "unique identifier"))
                 .withStatic(Identity.NAME, Objects.requireNonNull(username, "username"))
-                .build(), position, world);
+                .build(), position, world, connection.server());
         this.connection = Objects.requireNonNull(connection, "connection");
         this.settings = Objects.requireNonNull(settings, "settings");
         this.clientBrand = new NotNullObjectAcquirable<>(Objects.requireNonNull(clientBrand, "client brand"));
@@ -253,21 +250,8 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     }
 
     @Override
-    protected @NonNull Pair<JetWorld, Position> preWorldChange(@NonNull JetWorld newWorld,
-                                                               @NonNull Position initialPosition) {
+    protected void preWorldChange(@NonNull JetWorld newWorld, @NonNull Position initialPosition) {
         this.world().removePlayer(this);
-
-        PreWorldSwitchEvent preSwitchEvent = new PreWorldSwitchEvent(this, this.world(), newWorld, initialPosition);
-        this.server().eventNode().call(preSwitchEvent);
-
-        if (preSwitchEvent.getNewWorld() instanceof JetWorld validatedWorld) {
-            newWorld = validatedWorld;
-        } else {
-            LOGGER.warn("An invalid world has been specified in a pre-world-switch event," +
-                    "falling back to the initially specified world");
-        }
-
-        return Pair.of(newWorld, preSwitchEvent.getStartingPosition());
     }
 
     @Override
@@ -277,7 +261,6 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
         this.world().addPlayer(this);
         this.movementSynchronizer.synchronize(initialPosition, Vector.zero(), Set.of());
         this.chunkBatchHandler().resetChunkView();
-        this.server().eventNode().call(new WorldSwitchEvent(this, previousWorld, this.world(), initialPosition));
     }
 
     /**

@@ -1,7 +1,10 @@
 package net.hypejet.jet.server.entity;
 
-import it.unimi.dsi.fastutil.Pair;
+import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.entity.Entity;
+import net.hypejet.jet.event.events.entity.world.EntityPreWorldChangeEvent;
+import net.hypejet.jet.event.events.entity.world.EntityWorldChangeEvent;
+import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.world.World;
 import net.hypejet.jet.world.coordinate.flag.RelativeFlag;
 import net.hypejet.jet.server.entity.player.JetPlayer;
@@ -13,6 +16,8 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.pointer.Pointers;
 import net.kyori.adventure.text.event.HoverEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -30,6 +35,9 @@ import java.util.function.UnaryOperator;
 public class JetEntity implements Entity {
 
     private static final AtomicInteger NEXT_ENTITY_ID = new AtomicInteger(); // FIXME: Not the best solution
+    private static final Logger LOGGER = LoggerFactory.getLogger(JetEntity.class);
+
+    private final JetMinecraftServer server;
 
     private final Key entityType;
     private final int entityId;
@@ -48,16 +56,17 @@ public class JetEntity implements Entity {
      * @param uniqueId a unique identifier of the entity
      * @param position an initial position that the entity should spawn at
      * @param world an initial world that the entity should spawn in
+     * @param server the server that the entity should be part of
      * @since 1.0
      */
-    public JetEntity(@NonNull Key entityType, @NonNull UUID uniqueId,
-                     @NonNull Position position, @NonNull JetWorld world) {
+    public JetEntity(@NonNull Key entityType, @NonNull UUID uniqueId, @NonNull Position position,
+                     @NonNull JetWorld world, @NonNull JetMinecraftServer server) {
         this(
                 entityType, uniqueId,
                 Pointers.builder()
                         .withStatic(Identity.UUID, uniqueId)
                         .build(),
-                position, world
+                position, world, server
         );
     }
 
@@ -69,16 +78,18 @@ public class JetEntity implements Entity {
      * @param pointers a pointers of the entity
      * @param position an initial position that the entity should spawn at
      * @param world an initial world that the entity should spawn in
+     * @param server the server that the entity should be part of
      * @since 1.0
      */
     public JetEntity(@NonNull Key entityType, @NonNull UUID uniqueId, @NonNull Pointers pointers,
-                     @NonNull Position position, @NonNull JetWorld world) {
+                     @NonNull Position position, @NonNull JetWorld world, @NonNull JetMinecraftServer server) {
         this.entityType = Objects.requireNonNull(entityType, "entity type");
         this.identity = Identity.identity(Objects.requireNonNull(uniqueId, "unique identifier"));
         this.pointers = Objects.requireNonNull(pointers, "pointers");
         this.entityId = NEXT_ENTITY_ID.getAndIncrement();
         this.position = Objects.requireNonNull(position, "position");
         this.world = Objects.requireNonNull(world, "world");
+        this.server = Objects.requireNonNull(server, "server");
     }
 
     @Override
@@ -149,19 +160,36 @@ public class JetEntity implements Entity {
             throw new IllegalArgumentException("The specified world is not a valid world");
         JetWorld initialWorld = this.world;
 
-        Pair<JetWorld, Position> finalTeleportData = this.preWorldChange(validatedWorld, position);
-        position = finalTeleportData.second();
-        this.world = finalTeleportData.first();
+        EntityPreWorldChangeEvent preChangeEvent = new EntityPreWorldChangeEvent(this, this.world(), position);
+        this.server.eventNode().call(preChangeEvent);
+
+        if (preChangeEvent.getWorld() instanceof JetWorld validatedEventWorld) {
+            validatedWorld = validatedEventWorld;
+        } else {
+            LOGGER.warn("An invalid world has been specified in an entity" +
+                    " pre-world-change event, falling back to the initially specified world");
+        }
+
+        position = preChangeEvent.getStartingPosition();
+        this.preWorldChange(validatedWorld, position);
+
+        this.world = validatedWorld;
 
         // TODO: Handle "keepAttributes" and "keepMetadata" fields when entity system is implemented
 
         this.postWorldChange(initialWorld, position, keepAttributes, keepMetadata);
+        this.server.eventNode().call(new EntityWorldChangeEvent(this, initialWorld));
     }
 
     @Override
     public final @NonNull String scoreboardName() {
         // TODO: Check entity type instead of the entity being an instance of player
         return this instanceof JetPlayer player ? player.username() : this.uniqueId().toString();
+    }
+
+    @Override
+    public @NonNull MinecraftServer server() {
+        return this.server;
     }
 
     @Override
@@ -233,24 +261,20 @@ public class JetEntity implements Entity {
     }
 
     /**
-     * Executes additional tasks that should be executed just before this {@linkplain JetEntity entity}
-     * switches to a different {@linkplain JetWorld world}. This also gets a final {@linkplain JetWorld world}
-     * and a final {@linkplain Position position} where the entity should spawn at.
+     * Executes additional tasks that should be executed just before
+     * a {@linkplain JetWorld world} is changed for this {@linkplain JetEntity entity}.
      *
-     * @param newWorld the world that the entity is being teleported to
-     * @param initialPosition a position where the entity should spawn at after the world change
-     * @return a pair containing the final world that the entity should be teleported to
-     *         and the final position where the entity should spawn at after the world change
+     * @param newWorld the world that the entity is going to be teleported to
+     * @param initialPosition a position where the entity is going to spawn after the world change
      * @since 1.0
      */
-    protected @NonNull Pair<JetWorld, Position> preWorldChange(@NonNull JetWorld newWorld,
-                                                               @NonNull Position initialPosition) {
-        return Pair.of(newWorld, initialPosition);
+    protected void preWorldChange(@NonNull JetWorld newWorld, @NonNull Position initialPosition) {
+        // NOOP
     }
 
     /**
-     * Executes additional tasks that should be executed just after this {@linkplain JetEntity entity}
-     * switches to a different {@linkplain JetWorld world}. This also changes {@linkplain Position position}
+     * Executes additional tasks that should be executed just after a {@linkplain JetWorld world}
+     * has been changed for this {@linkplain JetEntity entity}. This also changes {@linkplain Position position}
      * of the entity to the initial position that was specified for the entity to spawn after the world change.
      *
      * @param previousWorld the previous world that the entity was in just before the world change

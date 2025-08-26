@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.entity.player;
 
-import net.hypejet.jet.event.events.world.InitialSpawnEvent;
+import net.hypejet.jet.event.events.entity.player.PlayerJoinEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.tick.Ticker;
@@ -74,7 +74,7 @@ public final class PlayerList {
         // TODO: Send other world data
         player.world().addPlayer(player);
         player.chunkBatchHandler().resetChunkView();
-        this.eventNode.call(new InitialSpawnEvent(player, player.world(), position));
+        this.eventNode.call(new PlayerJoinEvent(player));
     }
 
     /**
