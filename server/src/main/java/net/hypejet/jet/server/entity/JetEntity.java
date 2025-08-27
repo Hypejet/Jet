@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.UnaryOperator;
 
 /**
@@ -33,7 +32,6 @@ import java.util.function.UnaryOperator;
  */
 public class JetEntity implements Entity {
 
-    private static final AtomicInteger NEXT_ENTITY_ID = new AtomicInteger(); // FIXME: Not the best solution
     private static final Logger LOGGER = LoggerFactory.getLogger(JetEntity.class);
 
     private final JetMinecraftServer server;
@@ -84,9 +82,9 @@ public class JetEntity implements Entity {
     public JetEntity(@NonNull Key entityType, @NonNull UUID uniqueId, @NonNull Pointers pointers,
                      @NonNull Position position, @NonNull JetWorld world, @NonNull JetMinecraftServer server) {
         this.entityType = Objects.requireNonNull(entityType, "entity type");
+        this.entityId = server.nextEntityId();
         this.identity = Identity.identity(Objects.requireNonNull(uniqueId, "unique identifier"));
         this.pointers = Objects.requireNonNull(pointers, "pointers");
-        this.entityId = NEXT_ENTITY_ID.getAndIncrement();
         this.position = Objects.requireNonNull(position, "position");
         this.world = Objects.requireNonNull(world, "world");
         this.server = Objects.requireNonNull(server, "server");
@@ -95,11 +93,6 @@ public class JetEntity implements Entity {
     @Override
     public @NonNull Key entityType() {
         return this.entityType;
-    }
-
-    @Override
-    public int entityId() {
-        return this.entityId;
     }
 
     @Override
@@ -212,6 +205,16 @@ public class JetEntity implements Entity {
     public @NonNull HoverEvent<HoverEvent.ShowEntity> asHoverEvent(@NonNull UnaryOperator<HoverEvent.ShowEntity> op) {
         // TODO: Custom names
         return HoverEvent.showEntity(op.apply(HoverEvent.ShowEntity.showEntity(this.entityType, this.uniqueId())));
+    }
+
+    /**
+     * Gets an identifier of this {@linkplain JetEntity entity}.
+     *
+     * @return the entity identifier
+     * @since 1.0
+     */
+    public int entityId() {
+        return this.entityId;
     }
 
     /**

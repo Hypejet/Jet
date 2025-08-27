@@ -1,6 +1,7 @@
 package net.hypejet.jet.server;
 
 import net.hypejet.jet.MinecraftServer;
+import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.event.events.lifecycle.ServerInitializedEvent;
 import net.hypejet.jet.event.events.lifecycle.ServerReadyEvent;
 import net.hypejet.jet.event.events.lifecycle.ServerShutdownEvent;
@@ -23,6 +24,7 @@ import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * An implementation of the {@linkplain MinecraftServer Minecraft server}.
@@ -50,6 +52,8 @@ public final class JetMinecraftServer implements MinecraftServer {
 
     private final CompletableFuture<Void> serverReadyFuture = new CompletableFuture<>();
     private final Thread shutdownThread = this.createShutdownThread();
+
+    private final AtomicInteger entityIdCounter = new AtomicInteger();
 
     /**
      * Constructs the {@linkplain JetMinecraftServer Minecraft server}.
@@ -173,6 +177,16 @@ public final class JetMinecraftServer implements MinecraftServer {
      */
     public @NonNull PlayerList playerList() {
         return this.playerList;
+    }
+
+    /**
+     * Gets a next available identifier to be associated with an {@linkplain Entity entity}.
+     *
+     * @return the entity identifier
+     * @since 1.0
+     */
+    public int nextEntityId() {
+        return this.entityIdCounter.getAndIncrement();
     }
 
     private @NonNull Thread createShutdownThread() {

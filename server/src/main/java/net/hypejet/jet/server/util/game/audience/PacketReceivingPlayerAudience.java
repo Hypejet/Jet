@@ -1,6 +1,7 @@
 package net.hypejet.jet.server.util.game.audience;
 
 import net.hypejet.jet.entity.Entity;
+import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityAnimationPlayPacket;
 import net.hypejet.jet.util.game.audience.PlayerAudience;
 import org.jspecify.annotations.NullMarked;
@@ -21,6 +22,8 @@ public interface PacketReceivingPlayerAudience extends PacketReceivingCommonAudi
     default void animate(Entity entity, Entity.Animation animation) {
         Objects.requireNonNull(entity, "entity");
         Objects.requireNonNull(animation, "animation");
-        this.sendPacket(new ServerEntityAnimationPlayPacket(entity.entityId(), animation));
+        if (!(entity instanceof JetEntity validatedEntity))
+            throw new IllegalArgumentException("The specified entity is not a valid entity");
+        this.sendPacket(new ServerEntityAnimationPlayPacket(validatedEntity.entityId(), animation));
     }
 }

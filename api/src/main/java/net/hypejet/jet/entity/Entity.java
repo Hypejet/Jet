@@ -1,7 +1,6 @@
 package net.hypejet.jet.entity;
 
 import net.hypejet.jet.MinecraftServer;
-import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.world.coordinate.flag.RelativeFlag;
 import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.scoreboard.score.Score;
@@ -33,15 +32,6 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
      * @since 1.0
      */
     @NonNull Key entityType();
-
-    /**
-     * Gets a numeric identifier of this {@linkplain Entity entity}, unique to
-     * a {@linkplain MinecraftServer server} that this {@linkplain Entity entity} is in.
-     *
-     * @return the identifier
-     * @since 1.0
-     */
-    int entityId();
 
     /**
      * Gets a {@linkplain UUID unique identifier} of this {@linkplain Entity entity}.
