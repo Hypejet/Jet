@@ -28,7 +28,6 @@ import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerPluginMessagePacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerActionBarPlayPacket;
-import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityAnimationPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerRespawnPlayPacket;
@@ -37,7 +36,7 @@ import net.hypejet.jet.server.network.session.data.ConfigurationData;
 import net.hypejet.jet.server.network.session.data.LoginData;
 import net.hypejet.jet.server.network.session.pack.ResourcePackHandler;
 import net.hypejet.jet.server.scoreboard.JetScoreboard;
-import net.hypejet.jet.server.util.game.audience.PacketReceivingCommonAudience;
+import net.hypejet.jet.server.util.game.audience.PacketReceivingPlayerAudience;
 import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.handler.ChunkBatchHandler;
@@ -52,8 +51,6 @@ import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -68,10 +65,9 @@ import java.util.concurrent.CompletableFuture;
  * @see Player
  */
 public final class JetPlayer extends JetEntity implements Player, NetworkDisconnectionHandler,
-        PacketReceivingCommonAudience {
+        PacketReceivingPlayerAudience {
 
     private static final Key ENTITY_TYPE = Key.key("player");
-    private static final Logger LOGGER = LoggerFactory.getLogger(JetPlayer.class);
 
     private final SocketPlayerConnection connection;
 
@@ -202,12 +198,6 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
 
         this.scoreboard = validatedScoreboard;
         return currentScoreboard;
-    }
-
-    @Override
-    public void playAnimation(@NonNull Animation animation) {
-        Objects.requireNonNull(animation, "animation");
-        this.connection.sendPacket(new ServerEntityAnimationPlayPacket(this.entityId(), animation.id()));
     }
 
     @Override

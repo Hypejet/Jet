@@ -1,6 +1,7 @@
 package net.hypejet.jet.entity;
 
 import net.hypejet.jet.MinecraftServer;
+import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.world.coordinate.flag.RelativeFlag;
 import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.scoreboard.score.Score;
@@ -16,6 +17,7 @@ import net.kyori.adventure.text.event.HoverEventSource;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -179,5 +181,62 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
          * @since 1.0
          */
         RIGHT
+    }
+
+    /**
+     * An {@linkplain Entity entity} animation.
+     *
+     * <p>This is not an enum, since it depends on Minecraft.
+     * Adding an enum entry could break enum switch cases for example.</p>
+     *
+     * @since 1.0
+     * @see Entity
+     */
+    final class Animation {
+        /**
+         * An {@linkplain Animation animation} swinging the main hand.
+         *
+         * @since 1.0
+         */
+        public static final Animation SWING_MAIN_HAND = new Animation("swing_main_hand");
+
+        /**
+         * An {@linkplain Animation animation} showing the leave bed effect.
+         *
+         * @since 1.0
+         */
+        public static final Animation LEAVE_BED = new Animation("leave_bed");
+
+        /**
+         * An {@linkplain Animation animation} swinging the offhand.
+         *
+         * @since 1.0
+         */
+        public static final Animation SWING_OFFHAND = new Animation("swing_offhand");
+
+        /**
+         * An {@linkplain Animation animation} showing the critical hit effect.
+         *
+         * @since 1.0
+         */
+        public static final Animation CRITICAL_HIT = new Animation("critical_hit");
+
+        /**
+         * An {@linkplain Animation animation} showing the magic critical hit effect.
+         *
+         * @since 1.0
+         */
+        public static final Animation MAGIC_CRITICAL_HIT = new Animation("magic_critical_hit");
+
+        private final String name;
+
+        private Animation(@NonNull String name) {
+            this.name = Objects.requireNonNull(name, "name");
+        }
+
+        @Override
+        public String toString() {
+            return "Animation{name=" + this.name + "}";
+        }
     }
 }

@@ -3,42 +3,42 @@ package net.hypejet.jet.server.network.packet.packets.server.play;
 import java.util.Objects;
 import java.util.UUID;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
+import net.hypejet.jet.server.entity.JetEntity;
+import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.world.coordinate.Position;
 import net.hypejet.jet.world.coordinate.Vector;
+import org.jspecify.annotations.NullMarked;
 
 /**
- * Represents {@linkplain ServerPacket a server packet} that requests a client
- * to spawn an entity in the world.
+ * A {@linkplain ServerPacket server packet} requesting a client to spawn
+ * an {@linkplain JetEntity entity} in the {@linkplain JetWorld world}.
  *
- * @param entityId the entity ID
- * @param uniqueId the unique UUID of the entity
- * @param type the entity type ID
- * @param position the initial spawn {@linkplain Position position} of the entity
- * @param headYaw the initial yaw (rotation) of the entity's head
- * @param data additional entity-specific data
- * @param velocity the initial {@linkplain Vector velocity} of the entity
+ * @param entityId an identifier of the entity that is being spawned
+ * @param uniqueId a unique identifier of the entity that is being spawned
+ * @param type an identifier of type of the entity that is being spawned
+ * @param position an initial position that the entity should spawn at
+ * @param headYaw an initial head yaw that the entity should have
+ * @param data an additional entity-specific data
+ * @param velocity an initial velocity vector that the entity should have
  * @since 1.0
+ * @see JetEntity
+ * @see JetWorld
  * @see ServerPacket
  */
-public record ServerSpawnEntityPlayPacket(
-        int entityId, @NonNull UUID uniqueId, int type,
-        @NonNull Position position, float headYaw, int data,
-        @NonNull Vector velocity
-) implements ServerPacket {
-
+@NullMarked
+public record ServerSpawnEntityPlayPacket(int entityId, UUID uniqueId, int type, Position position,
+                                          float headYaw, int data, Vector velocity) implements ServerPacket {
     /**
      * Constructs the {@linkplain ServerSpawnEntityPlayPacket server spawn entity play packet}.
      *
-     * @param entityId the entity ID
-     * @param uniqueId the unique UUID of the entity
-     * @param type the entity type ID
-     * @param position the initial spawn {@linkplain Position position} of the entity
-     * @param headYaw the initial yaw (rotation) of the entity's head
-     * @param data additional entity-specific data
-     * @param velocity the initial {@linkplain Vector velocity} of the entity
+     * @param entityId an identifier of the entity that is being spawned
+     * @param uniqueId a unique identifier of the entity that is being spawned
+     * @param type an identifier of type of the entity that is being spawned
+     * @param position an initial position that the entity should spawn at
+     * @param headYaw an initial head yaw that the entity should have
+     * @param data an additional entity-specific data
+     * @param velocity an initial velocity vector that the entity should have
      * @since 1.0
      */
     public ServerSpawnEntityPlayPacket {

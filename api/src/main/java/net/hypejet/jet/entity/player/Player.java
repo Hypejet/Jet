@@ -9,7 +9,7 @@ import net.hypejet.jet.entity.acquisition.gamemode.GameModeAcquisition;
 import net.hypejet.jet.entity.acquisition.gamemode.WriteGameModeAcquisition;
 import net.hypejet.jet.network.PlayerConnection;
 import net.hypejet.jet.scoreboard.Scoreboard;
-import net.hypejet.jet.util.game.audience.CommonAudience;
+import net.hypejet.jet.util.game.audience.PlayerAudience;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -24,7 +24,7 @@ import java.util.Set;
  * @see Entity
  * @see PlayerConnection
  */
-public interface Player extends Entity, CommandSource, CommonAudience {
+public interface Player extends Entity, CommandSource, PlayerAudience {
     /**
      * Gets a username of the player.
      *
@@ -110,8 +110,6 @@ public interface Player extends Entity, CommandSource, CommonAudience {
      * @since 1.0
      */
     @NonNull Scoreboard setScoreboard(@NonNull Scoreboard scoreboard);
-
-    void playAnimation(@NonNull Animation animation);
 
     /**
      * Represents a Minecraft chat mode setting of {@linkplain Player a player}.
@@ -415,73 +413,6 @@ public interface Player extends Entity, CommandSource, CommonAudience {
          */
         public Settings {
             enabledSkinParts = Set.copyOf(enabledSkinParts);
-        }
-    }
-
-    /**
-     * Represents a player animation in Minecraft.
-     *
-     * <p>This is not an enum, since it depends on Minecraft. Adding an enum entry could break enum switch cases for
-     * example.</p>
-     *
-     * @since 1.0
-     * @see Player
-     */
-    final class Animation {
-        /**
-         * Animation for swinging the main hand.
-         *
-         * @since 1.0
-         */
-        public static final Animation SWING_MAIN_ARM = new Animation(0);
-    
-        /**
-         * Animation for leaving a bed.
-         *
-         * @since 1.0
-         */
-        public static final Animation LEAVE_BED = new Animation(2);
-    
-        /**
-         * Animation for swinging the offhand.
-         *
-         * @since 1.0
-         */
-        public static final Animation SWING_OFFHAND = new Animation(3);
-    
-        /**
-         * Animation for critical hit effect.
-         *
-         * @since 1.0
-         */
-        public static final Animation CRITICAL_EFFECT = new Animation(4);
-    
-        /**
-         * Animation for magic critical hit effect.
-         *
-         * @since 1.0
-         */
-        public static final Animation MAGIC_CRITICAL_EFFECT = new Animation(5);
-    
-        private final int id;
-    
-        private Animation(int id) {
-            this.id = id;
-        }
-    
-        /**
-         * Gets the ID of this animation.
-         *
-         * @return the animation ID
-         * @since 1.0
-         */
-        public int id() {
-            return this.id;
-        }
-    
-        @Override
-        public String toString() {
-            return "Animation{id=" + id + "}";
         }
     }
 }

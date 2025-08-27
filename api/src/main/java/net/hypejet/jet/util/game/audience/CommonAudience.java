@@ -9,9 +9,7 @@ import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.UUID;
 
 /**
@@ -99,44 +97,4 @@ public interface CommonAudience extends Audience {
 
     @Override
     void clearResourcePacks();
-
-    /**
-     * Gets {@linkplain CommonAudience a common audience} that does nothing.
-     *
-     * @return the common audience
-     * @since 1.0
-     */
-    static @NonNull CommonAudience empty() {
-        return (ForwardingCommonAudience) Collections::emptySet;
-    }
-
-    /**
-     * Creates {@linkplain CommonAudience a common audience} that forwards to other
-     * {@linkplain CommonAudience common audiences}.
-     *
-     * @param audiences the common audiences
-     * @return the common forwarding audience
-     * @since 1.0
-     * @see ForwardingCommonAudience
-     */
-    static @NonNull CommonAudience audience(@NonNull CommonAudience @NonNull ... audiences) {
-        return switch (audiences.length) {
-            case 0 -> empty();
-            case 1 -> audiences[0];
-            default -> audience(Arrays.asList(audiences));
-        };
-    }
-
-    /**
-     * Creates {@linkplain CommonAudience a common audience} that forwards to other
-     * {@linkplain CommonAudience common audiences}.
-     *
-     * @param audiences the common audiences
-     * @return the common forwarding audience
-     * @since 1.0
-     * @see ForwardingCommonAudience
-     */
-    static @NonNull ForwardingCommonAudience audience(@NonNull Iterable<CommonAudience> audiences) {
-        return () -> audiences;
-    }
 }
