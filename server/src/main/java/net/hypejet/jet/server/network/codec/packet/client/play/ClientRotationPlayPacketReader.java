@@ -2,7 +2,7 @@ package net.hypejet.jet.server.network.codec.packet.client.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
-import net.hypejet.jet.server.network.codec.game.world.coordinate.PositionFlagsNetworkReader;
+import net.hypejet.jet.server.network.codec.game.world.coordinate.position.PositionFlagsNetworkReader;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientRotationPlayPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

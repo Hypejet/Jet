@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.test.network.codec.game.world.coordinate;
 
-import net.hypejet.jet.server.network.codec.game.world.coordinate.VectorNetworkCodec;
+import net.hypejet.jet.server.network.codec.game.world.coordinate.vector.VectorNetworkCodec;
 import net.hypejet.jet.server.test.network.codec.NetworkCodecTestUtil;
 import net.hypejet.jet.world.coordinate.Vector;
 import org.junit.jupiter.api.Test;
