@@ -37,6 +37,7 @@ import net.hypejet.jet.server.network.codec.packet.server.play.ServerPlayerListH
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerResetScorePlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerRespawnPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSetObjectiveDisplayedPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerSpawnEntityPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizePositionPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizeRotationPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSystemMessagePlayPacketWriter;
@@ -89,6 +90,7 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerPlayerLis
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerResetScorePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerRespawnPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSetObjectiveDisplayedPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerSpawnEntityPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizeRotationPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSystemMessagePlayPacket;
@@ -458,6 +460,11 @@ public final class ServerPacketRegistry {
                                 ServerPlayPackets.CLIENTBOUND_ANIMATE,
                                 ServerEntityAnimationPlayPacket.class,
                                 ServerEntityAnimationPlayPacketWriter.INSTANCE
+                        )
+                        .add(
+                                ServerPlayPackets.CLIENTBOUND_ADD_ENTITY,
+                                ServerSpawnEntityPlayPacket.class,
+                                ServerSpawnEntityPlayPacketWriter.INSTANCE
                         )
                         .build()
         );
