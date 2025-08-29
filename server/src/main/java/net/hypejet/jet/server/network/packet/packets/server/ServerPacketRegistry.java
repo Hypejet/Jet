@@ -39,6 +39,7 @@ import net.hypejet.jet.server.network.codec.packet.server.play.ServerInvalidateC
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerJoinGamePlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerObjectiveActionPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerPlayerListHeaderAndFooterPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerRemoveEntitiesPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerResetScorePlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerRespawnPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSetObjectiveDisplayedPlayPacketWriter;
@@ -98,6 +99,7 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerInvalidat
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerObjectiveActionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerRemoveEntitiesPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerResetScorePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerRespawnPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSetObjectiveDisplayedPlayPacket;
@@ -507,6 +509,11 @@ public final class ServerPacketRegistry {
                                 ServerPlayPackets.CLIENTBOUND_SET_ENTITY_MOTION,
                                 ServerEntityVelocityPlayPacket.class,
                                 ServerEntityVelocityPlayPacketWriter.INSTANCE
+                        )
+                        .add(
+                                ServerPlayPackets.CLIENTBOUND_REMOVE_ENTITIES,
+                                ServerRemoveEntitiesPlayPacket.class,
+                                ServerRemoveEntitiesPlayPacketWriter.INSTANCE
                         )
                         .build()
         );

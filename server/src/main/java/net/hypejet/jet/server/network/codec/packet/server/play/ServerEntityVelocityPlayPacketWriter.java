@@ -9,7 +9,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A {@linkplain NetworkWriter network writer}
- * of {@linkplain ServerEntityVelocityPlayPacket server entity velocity play packet}.
+ * of {@linkplain ServerEntityVelocityPlayPacket server entity velocity play packets}.
  *
  * @since 1.0
  * @see ServerEntityVelocityPlayPacket
