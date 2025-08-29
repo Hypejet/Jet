@@ -39,6 +39,7 @@ import net.hypejet.jet.server.network.codec.packet.server.play.ServerResetScoreP
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerRespawnPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSetObjectiveDisplayedPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSpawnEntityPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizeEntityPositionPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizePositionPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizeRotationPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSystemMessagePlayPacketWriter;
@@ -93,6 +94,7 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerResetScor
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerRespawnPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSetObjectiveDisplayedPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSpawnEntityPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizeEntityPositionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizeRotationPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSystemMessagePlayPacket;
@@ -472,6 +474,11 @@ public final class ServerPacketRegistry {
                                 ServerPlayPackets.CLIENTBOUND_ENTITY_EVENT,
                                 ServerEntityEventPlayPacket.class,
                                 ServerEntityEventPlayPacketWriter.INSTANCE
+                        )
+                        .add(
+                                ServerPlayPackets.CLIENTBOUND_ENTITY_POSITION_SYNC,
+                                ServerSynchronizeEntityPositionPlayPacket.class,
+                                ServerSynchronizeEntityPositionPlayPacketWriter.INSTANCE
                         )
                         .build()
         );
