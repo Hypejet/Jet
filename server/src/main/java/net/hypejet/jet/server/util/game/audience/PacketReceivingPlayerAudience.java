@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.util.game.audience;
 
 import net.hypejet.jet.entity.Entity;
-import net.hypejet.jet.entity.Entity.Status;
+import net.hypejet.jet.entity.Entity.Event;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityAnimationPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityEventPlayPacket;
@@ -30,11 +30,11 @@ public interface PacketReceivingPlayerAudience extends PacketReceivingCommonAudi
     }
 
     @Override
-    default void status(Entity entity, Status status) {
+    default void triggerEvent(Entity entity, Event event) {
         Objects.requireNonNull(entity, "entity");
-        Objects.requireNonNull(status, "status");
+        Objects.requireNonNull(event, "event");
         if (!(entity instanceof JetEntity validatedEntity))
             throw new IllegalArgumentException("The specified entity is not a valid entity");
-        this.sendPacket(new ServerEntityEventPlayPacket(validatedEntity.entityId(), status));
+        this.sendPacket(new ServerEntityEventPlayPacket(validatedEntity.entityId(), event));
     }
 }

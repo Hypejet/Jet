@@ -23,12 +23,12 @@ public interface PlayerAudience extends CommonAudience {
     void animate(Entity entity, Entity.Animation animation);
     
     /**
-     * Triggers an status of the specified {@linkplain Entity entity}
+     * Triggers an event on the specified {@linkplain Entity entity}
      * for this {@linkplain PlayerAudience player audience}.
      *
-     * @param entity the entity that the status should be triggered on
-     * @param status the status to trigger
+     * @param entity the entity that the event should be triggered on
+     * @param event the event to trigger
      * @since 1.0
      */
-    void status(Entity entity, Entity.Status status);
+    void triggerEvent(Entity entity, Entity.Event event);
 }

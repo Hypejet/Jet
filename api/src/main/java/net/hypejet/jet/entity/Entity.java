@@ -231,7 +231,7 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
     }
     
     /**
-     * An {@linkplain Entity entity} animation.
+     * An {@linkplain Entity entity} event.
      *
      * <p>This is not an enum, since it depends on Minecraft.
      * Adding an enum entry could break enum switch cases for example.</p>
@@ -239,422 +239,382 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
      * @since 1.0
      * @see Entity
      */
-    final class Status {    
+    final class Event {
         /**
-         * A {@linkplain Status status} that spawns tipped arrow particle effects.
+         * An {@linkplain Event event} that spawns tipped arrow particle effects.
          *
          * @since 1.0
          */
-        public static final Status ARROW_TIP = new Status("arrow_tip");
-    
+        public static final Event ARROW_TIP = new Event("arrow_tip");
+
         /**
-         * A {@linkplain Status status} that makes a rabbit play its jump animation.
+         * An {@linkplain Event event} that makes a rabbit play its jump animation.
          *
          * @since 1.0
          */
-        public static final Status RABBIT_JUMP = new Status("rabbit_jump");
-    
+        public static final Event RABBIT_JUMP = new Event("rabbit_jump");
+
         /**
-         * A {@linkplain Status status} that displays particles on eggs or living entities when a projectile hits.
+         * An {@linkplain Event event} that plays the death animation for living entities.
          *
          * @since 1.0
          */
-        public static final Status PROJECTILE_HIT = new Status("projectile_hit");
-    
+        public static final Event DEATH_ANIMATION = new Event("death_animation");
+
         /**
-         * A {@linkplain Status status} that plays the attack animation for golems, hoglins, ravagers, wardens and zoglins.
+         * An {@linkplain Event event} that plays the attack animation
+         * for golems, hoglins, ravagers, wardens and zoglins.
          *
          * @since 1.0
          */
-        public static final Status ATTACK = new Status("attack");
-    
+        public static final Event START_ATTACKING = new Event("start_attacking");
+
         /**
-         * A {@linkplain Status status} that spawns smoke particles when taming fails.
+         * An {@linkplain Event event} that spawns smoke particles when taming fails.
          *
          * @since 1.0
          */
-        public static final Status TAMING_FAIL = new Status("taming_fail");
-    
+        public static final Event TAMING_FAILED = new Event("taming_failed");
+
         /**
-         * A {@linkplain Status status} that spawns heart particles when taming succeeds.
+         * An {@linkplain Event event} that spawns heart particles when taming succeeds.
          *
          * @since 1.0
          */
-        public static final Status TAMING_SUCCESS = new Status("taming_success");
-    
+        public static final Event TAMING_SUCCEEDED = new Event("taming_succeeded");
+
         /**
-         * A {@linkplain Status status} that plays the wolf shaking water animation.
+         * An {@linkplain Event event} that starts playing the wolf shaking-water animation.
          *
          * @since 1.0
          */
-        public static final Status WOLF_SHAKE = new Status("wolf_shake");
-    
+        public static final Event WETNESS_SHAKING_START = new Event("wetness_shaking_start");
+
         /**
-         * A {@linkplain Status status} that marks item use as finished for players.
+         * An {@linkplain Event event} that stops playing the wolf shaking-water animation.
          *
          * @since 1.0
          */
-        public static final Status PLAYER_ITEM_USE_FINISH = new Status("player_item_use_finish");
-    
+        public static final Event WETNESS_SHAKING_STOP = new Event("wetness_shaking_stop");
+
         /**
-         * A {@linkplain Status status} that makes sheep play the eating-grass animation.
+         * An {@linkplain Event event} that marks player item usage finished.
          *
          * @since 1.0
          */
-        public static final Status SHEEP_EAT = new Status("sheep_eat");
-    
+        public static final Event ITEM_USAGE_FINISHED = new Event("item_usage_finished");
+
         /**
-         * A {@linkplain Status status} that makes an Iron Golem hold out a poppy.
+         * An {@linkplain Event event} that makes an entity play the eating-grass animation
+         * or ignites TNT inside the minecart, depending on type of the entity.
          *
          * @since 1.0
          */
-        public static final Status GOLEM_HOLD_POPPY = new Status("golem_hold_poppy");
-    
+        public static final Event EAT_GRASS_OR_IGNITE = new Event("eat_grass_or_ignite");
+
         /**
-         * A {@linkplain Status status} that spawns villager mating heart particles.
+         * An {@linkplain Event event} that makes an iron golem hold out a poppy.
          *
          * @since 1.0
          */
-        public static final Status VILLAGER_MATING = new Status("villager_mating");
-    
+        public static final Event START_OFFERING_POPPY = new Event("start_offering_poppy");
+
         /**
-         * A {@linkplain Status status} that spawns villager angry particles.
+         * An {@linkplain Event event} that puts away poppy held by an iron golem.
          *
          * @since 1.0
          */
-        public static final Status VILLAGER_ANGRY = new Status("villager_angry");
-    
+        public static final Event STOP_OFFERING_POPPY = new Event("stop_offering_poppy");
+
         /**
-         * A {@linkplain Status status} that spawns villager happy particles.
+         * An {@linkplain Event event} that spawns villager mating heart particles.
          *
          * @since 1.0
          */
-        public static final Status VILLAGER_HAPPY = new Status("villager_happy");
-    
+        public static final Event MATING = new Event("mating");
+
         /**
-         * A {@linkplain Status status} that spawns witch magic particles.
+         * An {@linkplain Event event} that spawns villager angry particles.
          *
          * @since 1.0
          */
-        public static final Status WITCH_MAGIC = new Status("witch_magic");
-    
+        public static final Event VILLAGER_ANGRY = new Event("villager_angry");
+
         /**
-         * A {@linkplain Status status} that plays the Zombie Villager cure sound.
+         * An {@linkplain Event event} that spawns villager happy particles.
          *
          * @since 1.0
          */
-        public static final Status ZOMBIE_VILLAGER_CURE = new Status("zombie_villager_cure");
-    
+        public static final Event VILLAGER_HAPPY = new Event("villager_happy");
+
         /**
-         * A {@linkplain Status status} that triggers a firework explosion effect.
+         * An {@linkplain Event event} that spawns witch magic particles.
          *
          * @since 1.0
          */
-        public static final Status FIREWORK_EXPLODE = new Status("firework_explode");
-    
+        public static final Event WITCH_MAGIC = new Event("witch_magic");
+
         /**
-         * A {@linkplain Status status} that spawns love-mode heart particles for animals or Allay.
+         * An {@linkplain Event event} that plays the Zombie Villager cure sound.
          *
          * @since 1.0
          */
-        public static final Status ANIMAL_LOVE = new Status("animal_love");
-    
+        public static final Event ZOMBIE_VILLAGER_CURE = new Event("zombie_villager_cure");
+
         /**
-         * A {@linkplain Status status} that resets a squid's rotation to 0 radians.
+         * An {@linkplain Event event} that triggers a firework explosion effect.
          *
          * @since 1.0
          */
-        public static final Status SQUID_ROTATION_RESET = new Status("squid_rotation_reset");
-    
+        public static final Event FIREWORK_EXPLODE = new Event("firework_explode");
+
         /**
-         * A {@linkplain Status status} that spawns an explosion particle for mobs.
+         * An {@linkplain Event event} that spawns love-mode heart particles for animals or Allay.
          *
          * @since 1.0
          */
-        public static final Status MOB_EXPLOSION = new Status("mob_explosion");
-    
+        public static final Event ANIMAL_LOVE = new Event("animal_love");
+
         /**
-         * A {@linkplain Status status} that plays a guardian attack sound.
+         * An {@linkplain Event event} that resets rotation of a squid to 0 radians.
          *
          * @since 1.0
          */
-        public static final Status GUARDIAN_ATTACK = new Status("guardian_attack");
-    
+        public static final Event SQUID_ROTATION_RESET = new Event("squid_rotation_reset");
+
         /**
-         * A {@linkplain Status status} that enables reduced debug screen information for players.
+         * An {@linkplain Event event} that spawns an explosion particle for mobs.
          *
          * @since 1.0
          */
-        public static final Status PLAYER_DEBUG_REDUCED = new Status("player_debug_reduced");
-    
+        public static final Event SPAWN_EXPLOSION_PARTICLES = new Event("spawn_explosion_particles");
+
         /**
-         * A {@linkplain Status status} that disables reduced debug screen information for players.
+         * An {@linkplain Event event} that plays a guardian attack sound.
          *
          * @since 1.0
          */
-        public static final Status PLAYER_DEBUG_NORMAL = new Status("player_debug_normal");
-    
+        public static final Event GUARDIAN_ATTACK = new Event("guardian_attack");
+
         /**
-         * A {@linkplain Status status} that sets player op level to 0.
+         * An {@linkplain Event event} that enables reduced debug screen information for players.
          *
          * @since 1.0
          */
-        public static final Status PLAYER_OP_0 = new Status("player_op_0");
-    
+        public static final Event REDUCED_DEBUG_INFO = new Event("reduced_debug_info");
+
         /**
-         * A {@linkplain Status status} that sets player op level to 1.
+         * An {@linkplain Event event} that disables reduced debug screen information for players.
          *
          * @since 1.0
          */
-        public static final Status PLAYER_OP_1 = new Status("player_op_1");
-    
+        public static final Event FULL_DEBUG_INFO = new Event("full_debug_info");
+
         /**
-         * A {@linkplain Status status} that sets player op level to 2.
+         * An {@linkplain Event event} that sets player op level to 0.
          *
          * @since 1.0
          */
-        public static final Status PLAYER_OP_2 = new Status("player_op_2");
-    
+        public static final Event PERMISSION_LEVEL_0 = new Event("permission_level_0");
+
         /**
-         * A {@linkplain Status status} that sets player op level to 3.
+         * An {@linkplain Event event} that sets player permission level to 1.
          *
          * @since 1.0
          */
-        public static final Status PLAYER_OP_3 = new Status("player_op_3");
-    
+        public static final Event PERMISSION_LEVEL_1 = new Event("permission_level_1");
+
         /**
-         * A {@linkplain Status status} that sets player op level to 4.
+         * An {@linkplain Event event} that sets player permission level to 2.
          *
          * @since 1.0
          */
-        public static final Status PLAYER_OP_4 = new Status("player_op_4");
-    
+        public static final Event PERMISSION_LEVEL_2 = new Event("permission_level_2");
+
         /**
-         * A {@linkplain Status status} that plays the death animation for living entities.
+         * An {@linkplain Event event} that sets player permission level to 3.
          *
          * @since 1.0
          */
-        public static final Status DEATH_ANIMATION = new Status("death_animation");
-    
+        public static final Event PERMISSION_LEVEL_3 = new Event("permission_level_3");
+
         /**
-         * A {@linkplain Status status} that plays the shield block animation/sound for living entities.
+         * An {@linkplain Event event} that sets player permission level to 4.
          *
          * @since 1.0
          */
-        public static final Status SHIELD_BLOCK = new Status("shield_block");
-    
+        public static final Event PERMISSION_LEVEL_4 = new Event("permission_level_4");
+
         /**
-         * A {@linkplain Status status} that plays a shield break sound for living entities.
+         * An {@linkplain Event event} that pulls an entity caught by a fishing hook.
          *
          * @since 1.0
          */
-        public static final Status SHIELD_BREAK = new Status("shield_break");
-    
+        public static final Event FISHING_ROD_PULL_ENTITY = new Event("fishing_rod_pull_entity");
+
         /**
-         * A {@linkplain Status status} that pulls a player caught by a fishing hook.
+         * An {@linkplain Event event} that plays a hit sound and resets hit cooldown for an Armor Stand.
          *
          * @since 1.0
          */
-        public static final Status FISHING_PULL_PLAYER = new Status("fishing_pull_player");
-    
+        public static final Event ARMOR_STAND_HIT = new Event("armor_stand_hit");
+
         /**
-         * A {@linkplain Status status} that plays a hit sound and resets cooldown for an Armor Stand.
+         * An {@linkplain Event event} that plays the totem of undying animation and sound.
          *
          * @since 1.0
          */
-        public static final Status ARMOR_STAND_HIT = new Status("armor_stand_hit");
-    
+        public static final Event TOTEM_OF_UNDYING_PROTECT = new Event("totem_of_undying_protect");
+
         /**
-         * A {@linkplain Status status} that puts away an Iron Golem's poppy.
+         * An {@linkplain Event event} that causes a dolphin to play a treasure locating effect.
          *
          * @since 1.0
          */
-        public static final Status GOLEM_PUTAWAY_POPPY = new Status("golem_putaway_poppy");
-    
+        public static final Event DOLPHIN_LOOK_FOR_TREASURE = new Event("dolphin_look_for_treasure");
+
         /**
-         * A {@linkplain Status status} that plays the totem of undying animation.
+         * An {@linkplain Event event} that marks a ravager as stunned.
          *
          * @since 1.0
          */
-        public static final Status TOTEM_OF_UNDYING = new Status("totem_of_undying");
-    
+        public static final Event RAVAGER_STUNNED = new Event("ravager_stunned");
+
         /**
-         * A {@linkplain Status status} that causes dolphins to display happy villager particles.
+         * An {@linkplain Event event} that spawns smoke particles when ocelot taming fails.
          *
          * @since 1.0
          */
-        public static final Status DOLPHIN_HAPPY = new Status("dolphin_happy");
-    
+        public static final Event TRUSTING_FAILED = new Event("trusting_failed");
+
         /**
-         * A {@linkplain Status status} that marks a ravager as stunned.
+         * An {@linkplain Event event} that spawns heart particles when ocelot taming succeeds.
          *
          * @since 1.0
          */
-        public static final Status RAVAGER_STUNNED = new Status("ravager_stunned");
-    
+        public static final Event TRUSTING_SUCCEEDED = new Event("trusting_succeeded");
+
         /**
-         * A {@linkplain Status status} that spawns smoke particles when ocelot taming fails.
+         * An {@linkplain Event event} that spawns villager "sweat" particles during a raid.
          *
          * @since 1.0
          */
-        public static final Status OCELOT_TAMING_FAIL = new Status("ocelot_taming_fail");
-    
+        public static final Event VILLAGER_SWEAT = new Event("villager_sweat");
+
         /**
-         * A {@linkplain Status status} that spawns heart particles when ocelot taming succeeds.
+         * An {@linkplain Event event} that spawns fox eating particles.
          *
          * @since 1.0
          */
-        public static final Status OCELOT_TAMING_SUCCESS = new Status("ocelot_taming_success");
-    
+        public static final Event FOX_CHEW = new Event("fox_chew");
+
         /**
-         * A {@linkplain Status status} that spawns villager splash particles during a raid.
+         * An {@linkplain Event event} that spawns portal particles for teleporting entities.
          *
          * @since 1.0
          */
-        public static final Status VILLAGER_SPLASH = new Status("villager_splash");
-    
+        public static final Event PORTAL_PARTICLES = new Event("portal_particles");
+
         /**
-         * A {@linkplain Status status} that spawns cloud particles when a player's Bad Omen effect is removed.
+         * An {@linkplain Event event} that spawns honey block slide particles.
          *
          * @since 1.0
          */
-        public static final Status PLAYER_BAD_OMEN_CLOUD = new Status("player_bad_omen_cloud");
-    
+        public static final Event HONEY_BLOCK_SLIDE = new Event("honey_block_slide");
+
         /**
-         * A {@linkplain Status status} that spawns particles based on the fox's held item.
+         * An {@linkplain Event event} that spawns honey block fall particles.
          *
          * @since 1.0
          */
-        public static final Status FOX_CHEW = new Status("fox_chew");
-    
+        public static final Event HONEY_BLOCK_FALL = new Event("honey_block_fall");
+
         /**
-         * A {@linkplain Status status} that spawns portal particles for teleporting entities.
+         * An {@linkplain Event event} that swaps hand items for an entity.
          *
          * @since 1.0
          */
-        public static final Status PORTAL_PARTICLES = new Status("portal_particles");
-    
+        public static final Event SWAP_HANDS = new Event("swap_hands");
+
         /**
-         * A {@linkplain Status status} that plays equipment break sound and spawns break particles (main hand).
+         * An {@linkplain Event event} that lowers head of a goat for ramming.
          *
          * @since 1.0
          */
-        public static final Status MAIN_HAND_BREAK = new Status("main_hand_break");
-    
+        public static final Event START_RAM = new Event("start_ram");
+
         /**
-         * A {@linkplain Status status} that plays equipment break sound and spawns break particles (off hand).
+         * An {@linkplain Event event} that stops the goat lowering its head while ramming.
          *
          * @since 1.0
          */
-        public static final Status OFF_HAND_BREAK = new Status("off_hand_break");
-    
+        public static final Event STOP_RAM = new Event("stop_ram");
+
         /**
-         * A {@linkplain Status status} that plays equipment break sound and spawns break particles (head slot).
+         * An {@linkplain Event event} that spawns death smoke particles.
          *
          * @since 1.0
          */
-        public static final Status HEAD_BREAK = new Status("head_break");
-    
+        public static final Event DEATH_SMOKE = new Event("death_smoke");
+
         /**
-         * A {@linkplain Status status} that plays equipment break sound and spawns break particles (chest slot).
+         * An {@linkplain Event event} that performs tendril shaking animation for a warden entity.
          *
          * @since 1.0
          */
-        public static final Status CHEST_BREAK = new Status("chest_break");
-    
+        public static final Event TENDRIL_SHAKE = new Event("tendril_shake");
+
         /**
-         * A {@linkplain Status status} that plays equipment break sound and spawns break particles (legs slot).
+         * An {@linkplain Event event} that performs the sonic boom attack animation for a warden entity.
          *
          * @since 1.0
          */
-        public static final Status LEGS_BREAK = new Status("legs_break");
-    
+        public static final Event SONIC_BOOM = new Event("sonic_boom");
+
         /**
-         * A {@linkplain Status status} that plays equipment break sound and spawns break particles (feet slot).
+         * An {@linkplain Event event} that plays a digging animation for a sniffer entity.
          *
          * @since 1.0
          */
-        public static final Status FEET_BREAK = new Status("feet_break");
-    
+        public static final Event SNIFFER_DIG = new Event("sniffer_dig");
+
         /**
-         * A {@linkplain Status status} that spawns honey block slide particles.
+         * An {@linkplain Event event} that plays a peek animation for an armadillo entity.
          *
          * @since 1.0
          */
-        public static final Status HONEY_BLOCK_SLIDE = new Status("honey_block_slide");
-    
+        public static final Event ARMADILLO_SCARED = new Event("armadillo_scared");
+        
         /**
-         * A {@linkplain Status status} that spawns honey block fall particles.
+         * An {@linkplain Event event} that plays a twitch animation for a creaking entity.
          *
          * @since 1.0
          */
-        public static final Status HONEY_BLOCK_FALL = new Status("honey_block_fall");
-    
+        public static final Event SHAKE = new Event("shake");
+
         /**
-         * A {@linkplain Status status} that swaps the entity's hand items.
+         * An {@linkplain Event event} that plays drowning particles on a living entity.
          *
          * @since 1.0
          */
-        public static final Status SWAP_HANDS = new Status("swap_hands");
-    
+        public static final Event DROWNING_PARTICLES = new Event("drowning_particles");
+
         /**
-         * A {@linkplain Status status} that stops the wolf shaking-water animation.
+         * An {@linkplain Event event} playing a ravager roar sound.
          *
          * @since 1.0
          */
-        public static final Status WOLF_SHAKE_STOP = new Status("wolf_shake_stop");
-    
-        /**
-         * A {@linkplain Status status} that lowers a goat's head for ramming.
-         *
-         * @since 1.0
-         */
-        public static final Status GOAT_RAM = new Status("goat_ram");
-    
-        /**
-         * A {@linkplain Status status} that stops the goat lowering its head.
-         *
-         * @since 1.0
-         */
-        public static final Status GOAT_STOP_RAM = new Status("goat_stop_ram");
-    
-        /**
-         * A {@linkplain Status status} that spawns death smoke particles.
-         *
-         * @since 1.0
-         */
-        public static final Status DEATH_SMOKE = new Status("death_smoke");
-    
-        /**
-         * A {@linkplain Status status} that performs tendril shaking animation for the Warden.
-         *
-         * @since 1.0
-         */
-        public static final Status WARDEN_TENDRIL_SHAKE = new Status("warden_tendril_shake");
-    
-        /**
-         * A {@linkplain Status status} that performs the sonic boom attack animation for the Warden.
-         *
-         * @since 1.0
-         */
-        public static final Status WARDEN_SONIC_BOOM = new Status("warden_sonic_boom");
-    
-        /**
-         * A {@linkplain Status status} that plays a digging animation sound for the Sniffer.
-         *
-         * @since 1.0
-         */
-        public static final Status SNIFFER_DIG = new Status("sniffer_dig");
+        public static final Event RAVAGER_ROAR = new Event("ravager_roar");
     
         private final String name;
     
-        private Status(@NonNull String name) {
+        private Event(@NonNull String name) {
             this.name = Objects.requireNonNull(name, "name");
         }
     
         @Override
         public String toString() {
-            return "Status{name=" + this.name + "}";
+            return "Event{name=" + this.name + "}";
         }
     }
 }
