@@ -11,7 +11,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A {@linkplain NetworkWriter network writer}
- * of a {@linkplain ServerSynchronizeEntityPositionPlayPacket server synchronize entity position play packet}.
+ * of {@linkplain ServerSynchronizeEntityPositionPlayPacket server synchronize entity position play packets}.
  *
  * @since 1.0
  * @see ServerSynchronizeEntityPositionPlayPacket

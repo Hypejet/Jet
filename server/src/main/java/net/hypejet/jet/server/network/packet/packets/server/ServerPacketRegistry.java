@@ -31,6 +31,9 @@ import net.hypejet.jet.server.network.codec.packet.server.play.ServerCommandSugg
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerDeclareCommandsPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityAnimationPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityEventPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityPositionAndRotationPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityPositionPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityRotationPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerInvalidateChunkPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerJoinGamePlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerObjectiveActionPlayPacketWriter;
@@ -86,6 +89,9 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerCommandSu
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityAnimationPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityEventPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityPositionAndRotationPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityPositionPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityRotationPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerInvalidateChunkPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerObjectiveActionPlayPacket;
@@ -479,6 +485,21 @@ public final class ServerPacketRegistry {
                                 ServerPlayPackets.CLIENTBOUND_ENTITY_POSITION_SYNC,
                                 ServerSynchronizeEntityPositionPlayPacket.class,
                                 ServerSynchronizeEntityPositionPlayPacketWriter.INSTANCE
+                        )
+                        .add(
+                                ServerPlayPackets.CLIENTBOUND_MOVE_ENTITY_POS,
+                                ServerEntityPositionPlayPacket.class,
+                                ServerEntityPositionPlayPacketWriter.INSTANCE
+                        )
+                        .add(
+                                ServerPlayPackets.CLIENTBOUND_MOVE_ENTITY_POS_ROT,
+                                ServerEntityPositionAndRotationPlayPacket.class,
+                                ServerEntityPositionAndRotationPlayPacketWriter.INSTANCE
+                        )
+                        .add(
+                                ServerPlayPackets.CLIENTBOUND_MOVE_ENTITY_ROT,
+                                ServerEntityRotationPlayPacket.class,
+                                ServerEntityRotationPlayPacketWriter.INSTANCE
                         )
                         .build()
         );
