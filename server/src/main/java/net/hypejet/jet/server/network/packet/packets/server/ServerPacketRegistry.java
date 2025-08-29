@@ -34,6 +34,7 @@ import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityEvent
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityPositionAndRotationPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityPositionPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityRotationPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityVelocityPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerInvalidateChunkPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerJoinGamePlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerObjectiveActionPlayPacketWriter;
@@ -92,6 +93,7 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityEve
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityPositionAndRotationPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityPositionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityRotationPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityVelocityPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerInvalidateChunkPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerObjectiveActionPlayPacket;
@@ -500,6 +502,11 @@ public final class ServerPacketRegistry {
                                 ServerPlayPackets.CLIENTBOUND_MOVE_ENTITY_ROT,
                                 ServerEntityRotationPlayPacket.class,
                                 ServerEntityRotationPlayPacketWriter.INSTANCE
+                        )
+                        .add(
+                                ServerPlayPackets.CLIENTBOUND_SET_ENTITY_MOTION,
+                                ServerEntityVelocityPlayPacket.class,
+                                ServerEntityVelocityPlayPacketWriter.INSTANCE
                         )
                         .build()
         );
