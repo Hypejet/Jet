@@ -14,7 +14,7 @@ import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.pointer.Pointers;
 import net.kyori.adventure.text.event.HoverEvent;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +30,7 @@ import java.util.function.UnaryOperator;
  * @since 1.0
  * @see Entity
  */
+@NullMarked
 public class JetEntity implements Entity {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JetEntity.class);
@@ -42,9 +43,9 @@ public class JetEntity implements Entity {
     private final Identity identity;
     private final Pointers pointers;
 
-    private @NonNull JetWorld world;
-    private @NonNull Position position;
-    private @NonNull Vector velocity = Vector.zero();
+    private JetWorld world;
+    private Position position;
+    private Vector velocity = Vector.zero();
 
     /**
      * Constructs the {@linkplain JetEntity entity}.
@@ -56,8 +57,7 @@ public class JetEntity implements Entity {
      * @param server the server that the entity should be part of
      * @since 1.0
      */
-    public JetEntity(@NonNull Key entityType, @NonNull UUID uniqueId, @NonNull Position position,
-                     @NonNull JetWorld world, @NonNull JetMinecraftServer server) {
+    public JetEntity(Key entityType, UUID uniqueId, Position position, JetWorld world, JetMinecraftServer server) {
         this(
                 entityType, uniqueId,
                 Pointers.builder()
@@ -79,8 +79,8 @@ public class JetEntity implements Entity {
      * @param server the server that the entity should be part of
      * @since 1.0
      */
-    public JetEntity(@NonNull Key entityType, @NonNull UUID uniqueId, @NonNull Pointers pointers,
-                     @NonNull Position position, @NonNull JetWorld world, @NonNull JetMinecraftServer server) {
+    public JetEntity(Key entityType, UUID uniqueId, Pointers pointers,
+                     Position position, JetWorld world, JetMinecraftServer server) {
         this.entityType = Objects.requireNonNull(entityType, "entity type");
         this.entityId = server.nextEntityId();
         this.identity = Identity.identity(Objects.requireNonNull(uniqueId, "unique identifier"));
@@ -91,35 +91,33 @@ public class JetEntity implements Entity {
     }
 
     @Override
-    public @NonNull Key entityType() {
+    public Key entityType() {
         return this.entityType;
     }
 
     @Override
-    public @NonNull UUID uniqueId() {
+    public UUID uniqueId() {
         return this.identity.uuid();
     }
 
     @Override
-    public @NonNull Position position() {
+    public Position position() {
         return this.position;
     }
 
     @Override
-    public @NonNull Vector velocity() {
+    public Vector velocity() {
         return this.velocity;
     }
 
     @Override
-    public void updatePosition(@NonNull Position position, @NonNull Vector velocity,
-                               @NonNull RelativeFlag @NonNull ... flags) {
+    public void updatePosition(Position position, Vector velocity, RelativeFlag... flags) {
         Objects.requireNonNull(flags, "relative flags");
         this.updatePosition(position, velocity, Set.of(flags));
     }
 
     @Override
-    public void updatePosition(@NonNull Position position, @NonNull Vector velocity,
-                               @NonNull Collection<RelativeFlag> flags) {
+    public void updatePosition(Position position, Vector velocity, Collection<RelativeFlag> flags) {
         Objects.requireNonNull(position, "position");
         Objects.requireNonNull(velocity, "velocity");
         Objects.requireNonNull(flags, "relative flags");
@@ -127,24 +125,23 @@ public class JetEntity implements Entity {
     }
 
     @Override
-    public final @NonNull JetWorld world() {
+    public final JetWorld world() {
         return this.world;
     }
 
     @Override
-    public final void teleport(@NonNull World world) {
+    public final void teleport(World world) {
         Objects.requireNonNull(world, "world");
         this.teleport(world, world.defaultSpawnPosition());
     }
 
     @Override
-    public final void teleport(@NonNull World world, @NonNull Position position) {
+    public final void teleport(World world, Position position) {
         this.teleport(world, position, true, true);
     }
 
     @Override
-    public final void teleport(@NonNull World world, @NonNull Position position,
-                               boolean keepAttributes, boolean keepMetadata) {
+    public final void teleport(World world, Position position, boolean keepAttributes, boolean keepMetadata) {
         // TODO: Ensure integrity with vanilla
         Objects.requireNonNull(world, "world");
         Objects.requireNonNull(position, "position");
@@ -176,33 +173,33 @@ public class JetEntity implements Entity {
     }
 
     @Override
-    public final @NonNull String scoreboardName() {
+    public final String scoreboardName() {
         // TODO: Check entity type instead of the entity being an instance of player
         return this instanceof JetPlayer player ? player.username() : this.uniqueId().toString();
     }
 
     @Override
-    public final @NonNull JetMinecraftServer server() {
+    public final JetMinecraftServer server() {
         return this.server;
     }
 
     @Override
-    public final @NonNull Identity identity() {
+    public final Identity identity() {
         return this.identity;
     }
 
     @Override
-    public final @NonNull Pointers pointers() {
+    public final Pointers pointers() {
         return this.pointers;
     }
 
     @Override
-    public final @NonNull Key key() {
+    public final Key key() {
         return this.entityType.key();
     }
 
     @Override
-    public @NonNull HoverEvent<HoverEvent.ShowEntity> asHoverEvent(@NonNull UnaryOperator<HoverEvent.ShowEntity> op) {
+    public HoverEvent<HoverEvent.ShowEntity> asHoverEvent(UnaryOperator<HoverEvent.ShowEntity> op) {
         // TODO: Custom names
         return HoverEvent.showEntity(op.apply(HoverEvent.ShowEntity.showEntity(this.entityType, this.uniqueId())));
     }
@@ -227,8 +224,8 @@ public class JetEntity implements Entity {
      *              and velocity should be recognised as relative to current ones
      * @since 1.0
      */
-    public final void updateRawPositionAndVelocity(@NonNull Position position, @NonNull Vector velocity,
-                                                   @NonNull Collection<RelativeFlag> flags) {
+    public final void updateRawPositionAndVelocity(Position position, Vector velocity,
+                                                   Collection<RelativeFlag> flags) {
         float initialYaw = this.position.yaw();
         float initialPitch = this.position.pitch();
 
@@ -260,7 +257,7 @@ public class JetEntity implements Entity {
      * @param position the position that the entity should have
      * @since 1.0
      */
-    protected final void updateRawPosition(@NonNull Position position) {
+    protected final void updateRawPosition(Position position) {
         this.position = Objects.requireNonNull(position, "position");
     }
 
@@ -275,7 +272,7 @@ public class JetEntity implements Entity {
      * @param keepMetadata whether it was specified to keep metadata of the entity after the world change
      * @since 1.0
      */
-    protected void postWorldChange(@NonNull JetWorld previousWorld, @NonNull Position initialPosition,
+    protected void postWorldChange(JetWorld previousWorld, Position initialPosition,
                                    boolean keepAttributes, boolean keepMetadata) {
         this.updateRawPositionAndVelocity(initialPosition, Vector.zero(), Set.of());
     }

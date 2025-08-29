@@ -13,7 +13,7 @@ import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.pointer.Pointered;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.event.HoverEventSource;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -24,6 +24,7 @@ import java.util.UUID;
  *
  * @since 1.0
  */
+@NullMarked
 public interface Entity extends Identified, Pointered, HoverEventSource<HoverEvent.ShowEntity>, Keyed {
     /**
      * Gets the {@linkplain Key} of type of this {@linkplain Entity entity}.
@@ -31,7 +32,7 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
      * @return the entity type key
      * @since 1.0
      */
-    @NonNull Key entityType();
+    Key entityType();
 
     /**
      * Gets a {@linkplain UUID unique identifier} of this {@linkplain Entity entity}.
@@ -39,7 +40,7 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
      * @return the unique identifier
      * @since 1.0
      */
-    @NonNull UUID uniqueId();
+    UUID uniqueId();
 
     /**
      * Gets current {@linkplain Position position} of this {@linkplain Entity entity}.
@@ -47,7 +48,7 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
      * @return the position where this entity currently is
      * @since 1.0
      */
-    @NonNull Position position();
+    Position position();
 
     /**
      * Gets a {@linkplain Vector} of current velocity of this {@linkplain Entity entity}.
@@ -55,7 +56,7 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
      * @return the velocity vector
      * @since 1.0
      */
-    @NonNull Vector velocity();
+    Vector velocity();
 
     /**
      * Updates {@linkplain Position position} and velocity {@linkplain Vector vector}
@@ -70,8 +71,7 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
      *              and velocity should be recognised as relative to current ones
      * @since 1.0
      */
-    void updatePosition(@NonNull Position position, @NonNull Vector velocity,
-                        @NonNull RelativeFlag @NonNull ... flags);
+    void updatePosition(Position position, Vector velocity, RelativeFlag... flags);
 
     /**
      * Updates {@linkplain Position position} and velocity {@linkplain Vector vector}
@@ -86,8 +86,7 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
      *              and velocity should be recognised as relative to current ones
      * @since 1.0
      */
-    void updatePosition(@NonNull Position position, @NonNull Vector velocity,
-                        @NonNull Collection<RelativeFlag> flags);
+    void updatePosition(Position position, Vector velocity, Collection<RelativeFlag> flags);
 
     /**
      * Gets a {@linkplain World world} where this {@linkplain Entity entity} is.
@@ -95,7 +94,7 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
      * @return the world of the entity
      * @since 1.0
      */
-    @NonNull World world();
+    World world();
 
     /**
      * Teleports this {@linkplain Entity entity} to the specified {@linkplain World world}.
@@ -109,7 +108,7 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
      * @param world the world that this entity should be teleported to
      * @since 1.0
      */
-    void teleport(@NonNull World world);
+    void teleport(World world);
 
     /**
      * Teleports this {@linkplain Entity entity} to the specified {@linkplain World world}.
@@ -120,7 +119,7 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
      * @param position an initial position where the entity should spawn after the world change
      * @since 1.0
      */
-    void teleport(@NonNull World world, @NonNull Position position);
+    void teleport(World world, Position position);
 
     /**
      * Teleports this {@linkplain Entity entity} to the specified {@linkplain World world}.
@@ -131,7 +130,7 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
      * @param keepMetadata whether metadata of the entity should be kept after the world change
      * @since 1.0
      */
-    void teleport(@NonNull World world, @NonNull Position position, boolean keepAttributes, boolean keepMetadata);
+    void teleport(World world, Position position, boolean keepAttributes, boolean keepMetadata);
 
     /**
      * Gets a name that this {@linkplain Entity entity} uses in {@linkplain Score score} management
@@ -140,7 +139,7 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
      * @return the name
      * @since 1.0
      */
-    @NonNull String scoreboardName();
+    String scoreboardName();
 
     /**
      * Gets a {@linkplain MinecraftServer server} that this {@linkplain Entity entity} is part of.
@@ -148,7 +147,7 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
      * @return the server
      * @since 1.0
      */
-    @NonNull MinecraftServer server();
+    MinecraftServer server();
 
     /**
      * Represents a hand of an entity.
@@ -220,7 +219,7 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
 
         private final String name;
 
-        private Animation(@NonNull String name) {
+        private Animation(String name) {
             this.name = Objects.requireNonNull(name, "name");
         }
 
@@ -608,7 +607,7 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
     
         private final String name;
     
-        private Event(@NonNull String name) {
+        private Event(String name) {
             this.name = Objects.requireNonNull(name, "name");
         }
     
