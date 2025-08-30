@@ -39,6 +39,7 @@ import net.hypejet.jet.server.network.session.data.LoginData;
 import net.hypejet.jet.server.network.session.pack.ResourcePackHandler;
 import net.hypejet.jet.server.scoreboard.JetScoreboard;
 import net.hypejet.jet.server.util.game.audience.PacketReceivingPlayerAudience;
+import net.hypejet.jet.server.util.viewable.JetViewable;
 import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.handler.ChunkBatchHandler;
@@ -58,6 +59,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -86,6 +89,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     private final BooleanAcquirable respawnScreenEnabled;
 
     private final NullableObjectAcquirable<DeathLocation> lastDeathLocation = new NullableObjectAcquirable<>(); // TODO: Updating
+    private final Set<JetViewable> viewedObjects = new HashSet<>();
 
     private @NonNull JetWorld world;
     private @NonNull JetScoreboard scoreboard;
@@ -447,6 +451,55 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     public void handlePositionFromClient(@NonNull Position position) {
         this.updateRawPosition(position);
         this.chunkBatchHandler.updateChunkView();
+    }
+
+    /**
+     * Adds the specified {@linkplain JetViewable viewable object} to a {@linkplain Set set}
+     * of {@linkplain JetViewable viewable objects} viewed by this {@linkplain JetPlayer player}.
+     *
+     * @param viewable the viewable object to add to the viewed object set
+     * @throws IllegalStateException if the viewed object set already contains the specified viewable object
+     * @since 1.0
+     */
+    public void addViewedObject(@NonNull JetViewable viewable) {
+        this.server().ticker().ensureRunsInTickLoop();
+        if (!this.viewedObjects.add(viewable))
+            throw new IllegalStateException("This player is already a viewer of the viewable object");
+    }
+
+    /**
+     * Removes the specified {@linkplain JetViewable viewable object} from a {@linkplain Set set}
+     * of {@linkplain JetViewable viewable objects} viewed by this {@linkplain JetPlayer player}.
+     *
+     * @param viewable the viewable object to remove from the viewed object set
+     * @throws IllegalStateException if the viewed object set already does not contain the specified viewable object
+     * @since 1.0
+     */
+    public void removeViewedObject(@NonNull JetViewable viewable) {
+        this.server().ticker().ensureRunsInTickLoop();
+        if (!this.viewedObjects.remove(viewable))
+            throw new IllegalStateException("This player is already not a viewer of the specified viewable object");
+    }
+
+    /**
+     * Handles a removal of this {@linkplain JetPlayer player}
+     * from the {@linkplain JetMinecraftServer server} associated with it.
+     *
+     * @since 1.0
+     */
+    public void handleRemoval() {
+        this.server().ticker().ensureRunsInTickLoop();
+
+        Iterator<JetViewable> viewedObjectsIterator = this.viewedObjects.iterator();
+        while (viewedObjectsIterator.hasNext()) {
+            JetViewable viewedObject = viewedObjectsIterator.next();
+            viewedObject.handleViewerRemoval(this);
+            viewedObjectsIterator.remove();
+        }
+
+        this.world.removePlayer(this);
+        this.scoreboard.removeViewer(this);
+        // TODO: Mark this player as removed by a field
     }
 
     /**

@@ -1,6 +1,7 @@
 package net.hypejet.jet.entity;
 
 import net.hypejet.jet.MinecraftServer;
+import net.hypejet.jet.util.view.Viewable;
 import net.hypejet.jet.world.coordinate.flag.RelativeFlag;
 import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.scoreboard.score.Score;
@@ -24,7 +25,7 @@ import java.util.UUID;
  * @since 1.0
  */
 @NullMarked
-public interface Entity extends Identified, Pointered, HoverEventSource<HoverEvent.ShowEntity>, Keyed {
+public interface Entity extends Identified, Pointered, Keyed, Viewable, HoverEventSource<HoverEvent.ShowEntity> {
     /**
      * Gets the {@linkplain Key} of type of this {@linkplain Entity entity}.
      *

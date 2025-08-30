@@ -1,7 +1,12 @@
 package net.hypejet.jet.server.entity;
 
 import net.hypejet.jet.entity.Entity;
+import net.hypejet.jet.entity.player.Player;
+import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerRemoveEntitiesPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerSpawnEntityPlayPacket;
+import net.hypejet.jet.server.util.viewable.JetViewable;
 import net.hypejet.jet.world.coordinate.flag.RelativeFlag;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.world.coordinate.Position;
@@ -16,6 +21,7 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.UnaryOperator;
 
 /**
@@ -25,7 +31,7 @@ import java.util.function.UnaryOperator;
  * @see Entity
  */
 @NullMarked
-public class JetEntity implements Entity {
+public class JetEntity implements Entity, JetViewable {
 
     private final JetMinecraftServer server;
 
@@ -34,6 +40,8 @@ public class JetEntity implements Entity {
 
     private final Identity identity;
     private final Pointers pointers;
+
+    private final Set<JetPlayer> viewers = ConcurrentHashMap.newKeySet();
 
     private Position position;
     private Vector velocity = Vector.zero();
@@ -122,6 +130,44 @@ public class JetEntity implements Entity {
     }
 
     @Override
+    public final Set<JetPlayer> viewers() {
+        return Set.copyOf(this.viewers);
+    }
+
+    @Override
+    public final boolean addViewer(Player player) {
+        Objects.requireNonNull(player, "player");
+        JetPlayer castPlayer = JetPlayer.cast(player);
+        this.server.ticker().ensureRunsInTickLoop();
+
+        if (!this.viewers.add(castPlayer))
+            return false;
+
+        castPlayer.addViewedObject(this);
+        castPlayer.sendPacket(this.spawnPacket());
+        return true;
+    }
+
+    @Override
+    public final boolean removeViewer(Player player) {
+        Objects.requireNonNull(player, "player");
+        JetPlayer castPlayer = JetPlayer.cast(player);
+        this.server.ticker().ensureRunsInTickLoop();
+
+        if (!this.viewers.remove(castPlayer))
+            return false;
+
+        castPlayer.removeViewedObject(this);
+        castPlayer.sendPacket(new ServerRemoveEntitiesPlayPacket(this.entityId));
+        return true;
+    }
+
+    @Override
+    public final void handleViewerRemoval(JetPlayer player) {
+        this.viewers.remove(player);
+    }
+
+    @Override
     public final Identity identity() {
         return this.identity;
     }
@@ -148,7 +194,7 @@ public class JetEntity implements Entity {
      * @return the entity identifier
      * @since 1.0
      */
-    public int entityId() {
+    public final int entityId() {
         return this.entityId;
     }
 
@@ -197,5 +243,20 @@ public class JetEntity implements Entity {
      */
     protected final void updateRawPosition(Position position) {
         this.position = Objects.requireNonNull(position, "position");
+    }
+
+    private ServerSpawnEntityPlayPacket spawnPacket() {
+        // TODO: Cache
+        return new ServerSpawnEntityPlayPacket(
+                this.entityId,
+                this.uniqueId(),
+                this.server.registryManager()
+                        .registry(RegistryReference.ENTITY_TYPE)
+                        .indexOf(this.entityType),
+                this.position,
+                0f /* TODO */,
+                0 /* TODO */,
+                this.velocity
+        );
     }
 }

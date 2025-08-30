@@ -86,5 +86,6 @@ public final class PlayerList {
     public void unregisterPlayer(@NonNull JetPlayer player) {
         this.ticker.ensureRunsInTickLoop();
         this.players.remove(player);
+        player.handleRemoval();
     }
 }
