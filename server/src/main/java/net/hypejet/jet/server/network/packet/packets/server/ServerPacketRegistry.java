@@ -31,6 +31,7 @@ import net.hypejet.jet.server.network.codec.packet.server.play.ServerCommandSugg
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerDeclareCommandsPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityAnimationPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityEventPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityMetadataPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityPositionAndRotationPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityPositionPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityRotationPlayPacketWriter;
@@ -92,6 +93,7 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerCommandSu
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityAnimationPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityEventPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityMetadataPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityPositionAndRotationPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityPositionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityRotationPlayPacket;
@@ -510,6 +512,11 @@ public final class ServerPacketRegistry {
                                 ServerPlayPackets.CLIENTBOUND_REMOVE_ENTITIES,
                                 ServerRemoveEntitiesPlayPacket.class,
                                 ServerRemoveEntitiesPlayPacketWriter.INSTANCE
+                        )
+                        .add(
+                                ServerPlayPackets.CLIENTBOUND_SET_ENTITY_DATA,
+                                ServerEntityMetadataPlayPacket.class,
+                                ServerEntityMetadataPlayPacketWriter.INSTANCE
                         )
                         .add(
                                 ServerPlayPackets.CLIENTBOUND_BUNDLE_DELIMITER,
