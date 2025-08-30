@@ -8,6 +8,7 @@ import net.hypejet.jet.event.events.lifecycle.ServerShutdownEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.server.command.JetCommandManager;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
+import net.hypejet.jet.server.entity.JetEntityManager;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.entity.player.PlayerList;
 import net.hypejet.jet.server.network.NetworkManager;
@@ -48,6 +49,7 @@ public final class JetMinecraftServer implements MinecraftServer {
     private final JetRegistryManager registryManager;
     private final JetPluginManager pluginManager;
     private final JetWorldManager worldManager;
+    private final JetEntityManager entityManager;
     private final JetScoreboardManager scoreboardManager;
 
     private final CompletableFuture<Void> serverReadyFuture = new CompletableFuture<>();
@@ -69,6 +71,7 @@ public final class JetMinecraftServer implements MinecraftServer {
         this.commandManager = new JetCommandManager(this.eventNode, this.playerList);
         this.registryManager = new JetRegistryManager(this.eventNode, this.networkManager);
         this.worldManager = new JetWorldManager(this.registryManager);
+        this.entityManager = new JetEntityManager(this);
         this.scoreboardManager = new JetScoreboardManager();
 
         try {
@@ -133,6 +136,11 @@ public final class JetMinecraftServer implements MinecraftServer {
     @Override
     public @NonNull JetWorldManager worldManager() {
         return this.worldManager;
+    }
+
+    @Override
+    public @NonNull JetEntityManager entityManager() {
+        return this.entityManager;
     }
 
     @Override
