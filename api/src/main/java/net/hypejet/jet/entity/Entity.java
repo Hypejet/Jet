@@ -42,6 +42,23 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
     UUID uniqueId();
 
     /**
+     * Gets a {@linkplain MinecraftServer server} that this {@linkplain Entity entity} is part of.
+     *
+     * @return the server
+     * @since 1.0
+     */
+    MinecraftServer server();
+
+    /**
+     * Gets a name that this {@linkplain Entity entity} uses in {@linkplain Score score} management
+     * of {@linkplain Scoreboard scoreboards}.
+     *
+     * @return the name
+     * @since 1.0
+     */
+    String scoreboardName();
+
+    /**
      * Gets current {@linkplain Position position} of this {@linkplain Entity entity}.
      *
      * @return the position where this entity currently is
@@ -86,23 +103,6 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
      * @since 1.0
      */
     void updatePosition(Position position, Vector velocity, Collection<RelativeFlag> flags);
-
-    /**
-     * Gets a name that this {@linkplain Entity entity} uses in {@linkplain Score score} management
-     * of {@linkplain Scoreboard scoreboards}.
-     *
-     * @return the name
-     * @since 1.0
-     */
-    String scoreboardName();
-
-    /**
-     * Gets a {@linkplain MinecraftServer server} that this {@linkplain Entity entity} is part of.
-     *
-     * @return the server
-     * @since 1.0
-     */
-    MinecraftServer server();
 
     /**
      * Represents a hand of an entity.
