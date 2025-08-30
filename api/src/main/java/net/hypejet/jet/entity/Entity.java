@@ -4,7 +4,6 @@ import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.world.coordinate.flag.RelativeFlag;
 import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.scoreboard.score.Score;
-import net.hypejet.jet.world.World;
 import net.hypejet.jet.world.coordinate.Position;
 import net.hypejet.jet.world.coordinate.Vector;
 import net.kyori.adventure.identity.Identified;
@@ -87,50 +86,6 @@ public interface Entity extends Identified, Pointered, HoverEventSource<HoverEve
      * @since 1.0
      */
     void updatePosition(Position position, Vector velocity, Collection<RelativeFlag> flags);
-
-    /**
-     * Gets a {@linkplain World world} where this {@linkplain Entity entity} is.
-     *
-     * @return the world of the entity
-     * @since 1.0
-     */
-    World world();
-
-    /**
-     * Teleports this {@linkplain Entity entity} to the specified {@linkplain World world}.
-     *
-     * <p>The initial position of the entity is going
-     * to be the {@linkplain World#defaultSpawnPosition() default spawn position}
-     * of the world that the entity is being teleported to.</p>
-     *
-     * <p>Attributes and metadata of the entity are kept after the world change.</p>
-     *
-     * @param world the world that this entity should be teleported to
-     * @since 1.0
-     */
-    void teleport(World world);
-
-    /**
-     * Teleports this {@linkplain Entity entity} to the specified {@linkplain World world}.
-     *
-     * <p>Attributes and metadata of the entity are kept after the world change.</p>
-     *
-     * @param world the world that this entity should be teleported to
-     * @param position an initial position where the entity should spawn after the world change
-     * @since 1.0
-     */
-    void teleport(World world, Position position);
-
-    /**
-     * Teleports this {@linkplain Entity entity} to the specified {@linkplain World world}.
-     *
-     * @param world the world that this entity should be teleported to
-     * @param position an initial position where the entity should spawn after the world change
-     * @param keepAttributes whether attributes of the entity should be kept after the world change
-     * @param keepMetadata whether metadata of the entity should be kept after the world change
-     * @since 1.0
-     */
-    void teleport(World world, Position position, boolean keepAttributes, boolean keepMetadata);
 
     /**
      * Gets a name that this {@linkplain Entity entity} uses in {@linkplain Score score} management

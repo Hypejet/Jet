@@ -10,6 +10,8 @@ import net.hypejet.jet.entity.acquisition.gamemode.WriteGameModeAcquisition;
 import net.hypejet.jet.network.PlayerConnection;
 import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.util.game.audience.PlayerAudience;
+import net.hypejet.jet.world.World;
+import net.hypejet.jet.world.coordinate.Position;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -93,6 +95,49 @@ public interface Player extends Entity, CommandSource, PlayerAudience {
      * @since 1.0
      */
     @NonNull WriteBooleanAcquisition acquireRespawnScreenEnabledWrite();
+
+    /**
+     * Gets a {@linkplain World world} where this {@linkplain Player player} is.
+     *
+     * @return the world of the player
+     * @since 1.0
+     */
+    World world();
+
+    /**
+     * Teleports this {@linkplain Player player} to the specified {@linkplain World world}.
+     *
+     * <p>The initial position of the player is going
+     * to be the {@linkplain World#defaultSpawnPosition() default spawn position}
+     * of the world that the player is being teleported to.</p>
+     *
+     * <p>Attributes and metadata of the player are kept after the world change.</p>
+     *
+     * @param world the world that this player should be teleported to
+     * @since 1.0
+     */
+    void teleport(World world);
+
+    /**
+     * Teleports this {@linkplain Player player} to the specified {@linkplain World world}.
+     *
+     * <p>Attributes and metadata of the player are kept after the world change.</p>
+     *
+     * @param world the world that this player should be teleported to
+     * @param position an initial position where the player should spawn after the world change
+     * @since 1.0
+     */
+    void teleport(World world, Position position);
+    /**
+     * Teleports this {@linkplain Player player} to the specified {@linkplain World world}.
+     *
+     * @param world the world that this player should be teleported to
+     * @param position an initial position where the player should spawn after the world change
+     * @param keepAttributes whether attributes of the player should be kept after the world change
+     * @param keepMetadata whether metadata of the player should be kept after the world change
+     * @since 1.0
+     */
+    void teleport(World world, Position position, boolean keepAttributes, boolean keepMetadata);
 
     /**
      * Gets {@linkplain Scoreboard a scoreboard} displayed for this {@linkplain Player player}.

@@ -4,7 +4,6 @@ import net.hypejet.concurrency.map.MapAcquirable;
 import net.hypejet.concurrency.map.hashmap.HashMapAcquirable;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerWorldEventPlayPacket;
 import net.hypejet.jet.server.registry.JetRegistryManager;
@@ -40,8 +39,6 @@ public final class JetWorld implements World {
     private final JetRegistryManager registryManager;
 
     private final MapAcquirable<ChunkPosition, JetChunk, ?> chunks = new HashMapAcquirable<>();
-
-    private final Set<JetEntity> entities = ConcurrentHashMap.newKeySet();
     private final Set<JetPlayer> players = ConcurrentHashMap.newKeySet();
 
     private Position defaultSpawnPosition = Position.zero();
@@ -94,11 +91,6 @@ public final class JetWorld implements World {
     }
 
     @Override
-    public Set<JetEntity> entities() {
-        return Set.copyOf(this.entities);
-    }
-
-    @Override
     public Set<JetPlayer> players() {
         return Set.copyOf(this.players);
     }
@@ -126,35 +118,29 @@ public final class JetWorld implements World {
     }
 
     /**
-     * Adds the specified {@linkplain JetEntity entity} to this {@linkplain JetWorld world}.
+     * Adds the specified {@linkplain JetPlayer player} to this {@linkplain JetWorld world}.
      *
-     * @param entity the entity to add to this world
-     * @throws IllegalArgumentException if the specified entity has already been added to this world
+     * @param player the player to add to this world
+     * @throws IllegalArgumentException if the specified player has already been added to this world
      * @since 1.0
      */
-    public void addEntity(JetEntity entity) {
-        entity.server().ticker().ensureRunsInTickLoop();
-        if (!this.entities.add(entity))
-            throw new IllegalArgumentException("The specified entity has already been added to this world");
-
-        if (entity instanceof JetPlayer player) {
-            this.players.add(player);
-            player.sendPacket(new ServerWorldEventPlayPacket(StartWaitingForWorldChunksWorldEvent.INSTANCE));
-        }
+    public void addPlayer(JetPlayer player) {
+        player.server().ticker().ensureRunsInTickLoop();
+        if (!this.players.add(player))
+            throw new IllegalArgumentException("The specified player has already been added to this world");
+        player.sendPacket(new ServerWorldEventPlayPacket(StartWaitingForWorldChunksWorldEvent.INSTANCE));
     }
 
     /**
-     * Removes the specified {@linkplain JetEntity entity} from this {@linkplain JetWorld world}.
+     * Removes the specified {@linkplain JetPlayer player} from this {@linkplain JetWorld world}.
      *
-     * @param entity the entity to remove from this world
-     * @throws IllegalArgumentException if the specified entity has not been previously added to this world
+     * @param player the player to remove from this world
+     * @throws IllegalArgumentException if the specified player has not been previously added to this world
      * @since 1.0
      */
-    public void removeEntity(JetEntity entity) {
-        entity.server().ticker().ensureRunsInTickLoop();
-        if (!this.entities.remove(entity))
+    public void removePlayer(JetPlayer player) {
+        player.server().ticker().ensureRunsInTickLoop();
+        if (!this.players.remove(player))
             throw new IllegalArgumentException("The specified entity has not been added to this world");
-        if (entity instanceof JetPlayer player)
-            this.players.remove(player);
     }
 }

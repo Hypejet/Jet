@@ -11,6 +11,8 @@ import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.entity.acquisition.gamemode.GameModeAcquisition;
 import net.hypejet.jet.entity.acquisition.gamemode.WriteGameModeAcquisition;
 import net.hypejet.jet.entity.player.Player;
+import net.hypejet.jet.event.events.entity.player.PlayerPreWorldChangeEvent;
+import net.hypejet.jet.event.events.entity.player.PlayerWorldChangeEvent;
 import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.server.JetMinecraftServer;
@@ -40,6 +42,7 @@ import net.hypejet.jet.server.util.game.audience.PacketReceivingPlayerAudience;
 import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.handler.ChunkBatchHandler;
+import net.hypejet.jet.world.World;
 import net.hypejet.jet.world.coordinate.Position;
 import net.hypejet.jet.world.coordinate.Vector;
 import net.hypejet.jet.world.coordinate.flag.RelativeFlag;
@@ -51,6 +54,8 @@ import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -68,6 +73,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
         PacketReceivingPlayerAudience {
 
     private static final Key ENTITY_TYPE = Key.key("player");
+    private static final Logger LOGGER = LoggerFactory.getLogger(JetPlayer.class);
 
     private final SocketPlayerConnection connection;
 
@@ -81,6 +87,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
 
     private final NullableObjectAcquirable<DeathLocation> lastDeathLocation = new NullableObjectAcquirable<>(); // TODO: Updating
 
+    private @NonNull JetWorld world;
     private @NonNull JetScoreboard scoreboard;
     private @NonNull Settings settings;
 
@@ -107,12 +114,13 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
         super(ENTITY_TYPE, uniqueId, Pointers.builder()
                 .withStatic(Identity.UUID, Objects.requireNonNull(uniqueId, "unique identifier"))
                 .withStatic(Identity.NAME, Objects.requireNonNull(username, "username"))
-                .build(), position, world, connection.server());
+                .build(), position, connection.server());
         this.connection = Objects.requireNonNull(connection, "connection");
         this.settings = Objects.requireNonNull(settings, "settings");
         this.clientBrand = new NotNullObjectAcquirable<>(Objects.requireNonNull(clientBrand, "client brand"));
         this.gameMode = new GameModeAcquirable(this, gameMode, previousGameMode);
         this.respawnScreenEnabled = new BooleanAcquirable(enableRespawnScreen);
+        this.world = Objects.requireNonNull(world, "world");
         this.scoreboard = Objects.requireNonNull(initialScoreboard, "initial scoreboard");
         this.chunkBatchHandler = new ChunkBatchHandler(this, position);
     }
@@ -180,6 +188,55 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     }
 
     @Override
+    public JetWorld world() {
+        return this.world;
+    }
+
+    @Override
+    public void teleport(World world) {
+        Objects.requireNonNull(world, "world");
+        this.teleport(world, world.defaultSpawnPosition());
+    }
+
+    @Override
+    public void teleport(World world, Position position) {
+        this.teleport(world, position, true, true);
+    }
+
+    @Override
+    public void teleport(World world, Position position, boolean keepAttributes, boolean keepMetadata) {
+        // TODO: Ensure integrity with vanilla
+        Objects.requireNonNull(world, "world");
+        Objects.requireNonNull(position, "position");
+
+        if (!(world instanceof JetWorld validatedWorld))
+            throw new IllegalArgumentException("The specified world is not a valid world");
+        JetWorld initialWorld = this.world;
+
+        PlayerPreWorldChangeEvent preChangeEvent = new PlayerPreWorldChangeEvent(this, this.world, position);
+        this.server().eventNode().call(preChangeEvent);
+
+        if (preChangeEvent.world() instanceof JetWorld validatedEventWorld) {
+            validatedWorld = validatedEventWorld;
+        } else {
+            LOGGER.warn("An invalid world has been specified in an entity" +
+                    " pre-world-change event, falling back to the initially specified world");
+        }
+
+        this.world.removePlayer(this);
+        this.world = validatedWorld;
+
+        // TODO: Handle "keepAttributes" and "keepMetadata" fields when entity system is implemented
+
+        this.sendRespawnPacket(this.world, keepAttributes, keepMetadata);
+        this.movementSynchronizer.synchronize(preChangeEvent.getStartingPosition(), Vector.zero(), Set.of());
+        this.chunkBatchHandler.resetChunkView();
+
+        this.world.addPlayer(this);
+        this.server().eventNode().call(new PlayerWorldChangeEvent(this, initialWorld));
+    }
+
+    @Override
     public @NonNull JetScoreboard getScoreboard() {
         return this.scoreboard;
     }
@@ -239,14 +296,6 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     @Override
     public void sendPacket(@NonNull ServerPacket packet) {
         this.connection.sendPacket(packet);
-    }
-
-    @Override
-    protected void postWorldChange(@NonNull JetWorld previousWorld, @NonNull Position initialPosition,
-                                   boolean keepAttributes, boolean keepMetadata) {
-        this.sendRespawnPacket(this.world(), keepAttributes, keepMetadata);
-        this.movementSynchronizer.synchronize(initialPosition, Vector.zero(), Set.of());
-        this.chunkBatchHandler().resetChunkView();
     }
 
     /**
