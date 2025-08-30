@@ -499,7 +499,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
 
         this.world.removePlayer(this);
         this.scoreboard.removeViewer(this);
-        // TODO: Mark this player as removed by a field
+        // TODO: Use a field to mark this player as removed
     }
 
     /**
