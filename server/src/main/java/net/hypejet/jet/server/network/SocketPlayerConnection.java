@@ -30,6 +30,7 @@ import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacketRegistry.PacketSpecification;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerDisconnectPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerBundleDelimiterPlayPacket;
 import net.hypejet.jet.server.network.packet.reader.ClientPacketReader;
 import net.hypejet.jet.server.network.session.Session;
 import net.hypejet.jet.server.network.session.pack.ResourcePackHandler;
@@ -75,6 +76,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
             RAW_PACKET_HANDLER
     );
 
+    private static final ServerBundleDelimiterPlayPacket DELIMITER_PACKET = new ServerBundleDelimiterPlayPacket();
     private static final Logger LOGGER = LoggerFactory.getLogger(SocketPlayerConnection.class);
 
     private final SocketChannel channel;
@@ -335,6 +337,23 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     }
 
     /**
+     * Sends the specified {@linkplain ServerPacket server packets}
+     * to this {@linkplain SocketPlayerConnection socket player connection} in a bundle with preserved order.
+     * This means that all of these packets are going to be processed by the client in the same tick.
+     *
+     * @param packets the server packets that the packet bundle should consist of
+     * @since 1.0
+     */
+    public void sendPacketBundle(ServerPacket @NonNull ... packets) {
+        EventLoop eventLoop = this.channel.eventLoop();
+        if (eventLoop.inEventLoop()) {
+            this.sendPacketBundleImmediately(packets);
+        } else {
+            eventLoop.submit(() -> this.sendPacketBundleImmediately(packets));
+        }
+    }
+
+    /**
      * Updates {@linkplain ChannelHandler channel handlers} of {@linkplain SocketChannel a socket channel} of this
      * connection.
      *
@@ -363,6 +382,13 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
         if (compressionThreshold < 0) return; // The compression is disabled
         pipeline.addBefore(RAW_PACKET_DECODER, PACKET_DECOMPRESSOR, new PacketDecompressor(this));
         pipeline.addBefore(RAW_PACKET_ENCODER, PACKET_COMPRESSOR, new PacketCompressor(this, compressionThreshold));
+    }
+
+    private void sendPacketBundleImmediately(ServerPacket @NonNull ... packets) {
+        this.sendPacket(DELIMITER_PACKET);
+        for (ServerPacket packet : packets)
+            this.sendPacket(packet);
+        this.sendPacket(DELIMITER_PACKET);
     }
 
     private static @NonNull RawPacket encode(@NonNull ServerPacket packet, @NonNull ProtocolState state) {

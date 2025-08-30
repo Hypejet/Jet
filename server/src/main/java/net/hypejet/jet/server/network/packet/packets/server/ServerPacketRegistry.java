@@ -83,6 +83,7 @@ import net.hypejet.jet.server.network.packet.packets.server.login.ServerEncrypti
 import net.hypejet.jet.server.network.packet.packets.server.login.ServerLoginSuccessLoginPacket;
 import net.hypejet.jet.server.network.packet.packets.server.login.ServerPluginMessageRequestLoginPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerActionBarPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerBundleDelimiterPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerCenterChunkPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkAndLightDataPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkBatchFinishedPlayPacket;
@@ -466,11 +467,6 @@ public final class ServerPacketRegistry {
                                 ServerUpdateChunkSectionBlockStatesPlayPacketWriter.INSTANCE
                         )
                         .add(
-                                ServerPlayPackets.CLIENTBOUND_CHUNK_BATCH_START,
-                                ServerChunkBatchStartPlayPacket.class,
-                                (buf, object) -> {}
-                        )
-                        .add(
                                 ServerPlayPackets.CLIENTBOUND_ANIMATE,
                                 ServerEntityAnimationPlayPacket.class,
                                 ServerEntityAnimationPlayPacketWriter.INSTANCE
@@ -514,6 +510,16 @@ public final class ServerPacketRegistry {
                                 ServerPlayPackets.CLIENTBOUND_REMOVE_ENTITIES,
                                 ServerRemoveEntitiesPlayPacket.class,
                                 ServerRemoveEntitiesPlayPacketWriter.INSTANCE
+                        )
+                        .add(
+                                ServerPlayPackets.CLIENTBOUND_BUNDLE_DELIMITER,
+                                ServerBundleDelimiterPlayPacket.class,
+                                (buf, object) -> {}
+                        )
+                        .add(
+                                ServerPlayPackets.CLIENTBOUND_CHUNK_BATCH_START,
+                                ServerChunkBatchStartPlayPacket.class,
+                                (buf, object) -> {}
                         )
                         .build()
         );
