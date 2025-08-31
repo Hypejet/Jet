@@ -15,7 +15,7 @@ import org.jspecify.annotations.NullMarked;
  * @see WritableLevelData
  */
 @NullMarked
-final class MockupLevelData implements WritableLevelData {
+final class MockLevelData implements WritableLevelData {
 
     private BlockPos spawnPos = BlockPos.ZERO;
 

@@ -51,7 +51,7 @@ import java.util.List;
  * @see Level
  */
 @NullMarked
-public final class MockupLevel extends Level {
+public final class MockLevel extends Level {
 
     private final FeatureFlagSet enabledFeatures;
 
@@ -66,16 +66,16 @@ public final class MockupLevel extends Level {
             entityStorage = new TransientEntitySectionManager<>(Entity.class, new EmptyLevelCallback<>());
 
     /**
-     * Constructs the {@linkplain MockupLevel mockup level}.
+     * Constructs the {@linkplain MockLevel mock level}.
      *
      * @param registryAccess access to all Minecraft registries
      * @param enabledFeatures feature flags that are enabled for environment
      *                        that the mockup level is being constructed for
      * @since 1.0
      */
-    public MockupLevel(RegistryAccess registryAccess, FeatureFlagSet enabledFeatures) {
+    public MockLevel(RegistryAccess registryAccess, FeatureFlagSet enabledFeatures) {
         super(
-                new MockupLevelData(),
+                new MockLevelData(),
                 Registries.levelStemToLevel(LevelStem.OVERWORLD),
                 registryAccess,
                 registryAccess.lookupOrThrow(Registries.DIMENSION_TYPE).getOrThrow(BuiltinDimensionTypes.OVERWORLD),
@@ -88,7 +88,7 @@ public final class MockupLevel extends Level {
         this.enabledFeatures = enabledFeatures;
         this.potionBrewing = PotionBrewing.bootstrap(enabledFeatures);
         this.fuelValues = FuelValues.vanillaBurnTimes(registryAccess, enabledFeatures);
-        this.chunkSource = new MockupChunkSource(this, registryAccess);
+        this.chunkSource = new MockChunkSource(this, registryAccess);
     }
 
     @Override

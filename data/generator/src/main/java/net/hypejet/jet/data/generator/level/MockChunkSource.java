@@ -26,20 +26,20 @@ import java.util.function.BooleanSupplier;
  * @see ChunkSource
  */
 @NullMarked
-final class MockupChunkSource extends ChunkSource {
+final class MockChunkSource extends ChunkSource {
 
     private final Level level;
     private final RegistryAccess registryAccess;
     private final LevelLightEngine lightEngine;
 
     /**
-     * Constructs the {@linkplain MockupChunkSource mockup chunk source}.
+     * Constructs the {@linkplain MockChunkSource mock chunk source}.
      *
      * @param level a level that the mockup chunk source is being constructed for
      * @param registryAccess access to all Minecraft registries
      * @since 1.0
      */
-    MockupChunkSource(Level level, RegistryAccess registryAccess) {
+    MockChunkSource(Level level, RegistryAccess registryAccess) {
         this.level = level;
         this.registryAccess = registryAccess;
         this.lightEngine = new LevelLightEngine(this, true, level.dimensionType().hasSkyLight());
