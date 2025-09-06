@@ -1,7 +1,6 @@
 package net.hypejet.jet.data.generator.adapter;
 
 import net.kyori.adventure.key.Key;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jspecify.annotations.NonNull;
 
@@ -17,18 +16,6 @@ import java.util.Set;
 public final class KeyAdapter {
 
     private KeyAdapter() {}
-
-    /**
-     * Converts the {@linkplain ResourceLocation resource location}
-     * of the specified {@linkplain ResourceKey resource key} to a {@linkplain Key key}.
-     *
-     * @param key the resource key whose resource location should be converted
-     * @return the key
-     * @since 1.0
-     */
-    public static @NonNull Key convert(@NonNull ResourceKey<?> key) {
-        return convert(key.location());
-    }
 
     /**
      * Converts the specified {@linkplain ResourceLocation resource location} to a {@linkplain Key key}.
