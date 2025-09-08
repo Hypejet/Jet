@@ -1,7 +1,9 @@
 package net.hypejet.jet.server.entity;
 
 import net.hypejet.jet.entity.Entity;
+import net.hypejet.jet.entity.EntityType;
 import net.hypejet.jet.entity.player.Player;
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerRemoveEntitiesPlayPacket;
@@ -35,7 +37,7 @@ public class JetEntity implements Entity, JetViewable {
 
     private final JetMinecraftServer server;
 
-    private final Key entityType;
+    private final Holder.Reference<EntityType> entityType;
     private final int entityId;
 
     private final Identity identity;
@@ -49,13 +51,14 @@ public class JetEntity implements Entity, JetViewable {
     /**
      * Constructs the {@linkplain JetEntity entity}.
      *
-     * @param entityType an identifier of a type of the entity
+     * @param entityType a holder referencing to an entity type of which the entity should be
      * @param uniqueId a unique identifier of the entity
      * @param position an initial position that the entity should spawn at
      * @param server the server that the entity should be part of
      * @since 1.0
      */
-    public JetEntity(Key entityType, UUID uniqueId, Position position, JetMinecraftServer server) {
+    public JetEntity(Holder.Reference<EntityType> entityType, UUID uniqueId,
+                     Position position, JetMinecraftServer server) {
         this(
                 entityType, uniqueId,
                 Pointers.builder()
@@ -68,14 +71,15 @@ public class JetEntity implements Entity, JetViewable {
     /**
      * Constructs an {@linkplain JetEntity entity}.
      *
-     * @param entityType an identifier of a type of the entity
+     * @param entityType a holder referencing to an entity type of which the entity should be
      * @param uniqueId a unique identifier of the entity
      * @param pointers a pointers of the entity
      * @param position an initial position that the entity should spawn at
      * @param server the server that the entity should be part of
      * @since 1.0
      */
-    public JetEntity(Key entityType, UUID uniqueId, Pointers pointers, Position position, JetMinecraftServer server) {
+    public JetEntity(Holder.Reference<EntityType> entityType, UUID uniqueId,
+                     Pointers pointers, Position position, JetMinecraftServer server) {
         this.entityType = Objects.requireNonNull(entityType, "entity type");
         this.entityId = server.nextEntityId();
         this.identity = Identity.identity(Objects.requireNonNull(uniqueId, "unique identifier"));
@@ -85,7 +89,7 @@ public class JetEntity implements Entity, JetViewable {
     }
 
     @Override
-    public Key entityType() {
+    public Holder.Reference<EntityType> entityType() {
         return this.entityType;
     }
 
@@ -185,7 +189,10 @@ public class JetEntity implements Entity, JetViewable {
     @Override
     public HoverEvent<HoverEvent.ShowEntity> asHoverEvent(UnaryOperator<HoverEvent.ShowEntity> op) {
         // TODO: Custom names
-        return HoverEvent.showEntity(op.apply(HoverEvent.ShowEntity.showEntity(this.entityType, this.uniqueId())));
+        return HoverEvent.showEntity(op.apply(HoverEvent.ShowEntity.showEntity(
+                this.entityType.key(),
+                this.uniqueId()
+        )));
     }
 
     /**
@@ -196,6 +203,23 @@ public class JetEntity implements Entity, JetViewable {
      */
     public final int entityId() {
         return this.entityId;
+    }
+
+    /**
+     * Gets a validated value of {@linkplain JetEntityType entity type} of this {@linkplain JetEntity entity}.
+     *
+     * @return the validated entity type value
+     * @since 1.0
+     */
+    public final JetEntityType entityTypeValue() {
+        EntityType entityType = this.entityType.value(this.server()
+                .registryManager()
+                .registry(RegistryReference.ENTITY_TYPE));
+
+        if (!(entityType instanceof JetEntityType validatedEntityType))
+            throw new IllegalArgumentException("Entity type of this entity is not a valid entity type");
+
+        return validatedEntityType;
     }
 
     /**

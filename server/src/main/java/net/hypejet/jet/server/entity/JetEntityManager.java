@@ -43,6 +43,6 @@ public final class JetEntityManager implements EntityManager {
 
     @Override
     public JetEntity createEntity(Holder.Reference<EntityType> entityType, UUID uniqueId, Position position) {
-        return new JetEntity(entityType.key(), uniqueId, position, this.server);
+        return new JetEntity(entityType, uniqueId, position, this.server);
     }
 }

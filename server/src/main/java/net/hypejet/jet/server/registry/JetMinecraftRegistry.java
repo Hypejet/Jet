@@ -8,6 +8,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.hypejet.jet.registry.MinecraftRegistry;
 import net.hypejet.jet.registry.feature.KnownPack;
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket;
 import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.kyori.adventure.key.Key;
@@ -86,6 +87,20 @@ public final class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
         } finally {
             this.tagsLock.readLock().unlock();
         }
+    }
+
+    /**
+     * Gets a registry index of a registry value that the specified
+     * {@linkplain Holder.Reference holder} references to.
+     *
+     * @param reference the holder referencing to the registry value whose registry index should be returned
+     * @return the registry index
+     * @throws IllegalArgumentException if this registry does not contain a registry value
+     *                                  that the specified holder references to
+     * @since 1.0
+     */
+    public int indexOf(Holder.@NonNull Reference<V> reference) {
+        return this.indexOf(reference.key());
     }
 
     /**

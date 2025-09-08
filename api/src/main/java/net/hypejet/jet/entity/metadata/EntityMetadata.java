@@ -2,6 +2,7 @@ package net.hypejet.jet.entity.metadata;
 
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.pose.Pose;
+import net.hypejet.jet.plugin.Plugin;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -127,153 +128,163 @@ public interface EntityMetadata {
     int ticksFrozen();
 
     /**
-     * Creates an {@linkplain EntityMetadata.Builder entity metadata builder}
-     * initially filled with values from this {@linkplain EntityMetadata entity metadata}.
+     * Creates a {@linkplain Update builder of update} that should be performed
+     * on this {@linkplain EntityMetadata entity metadata}.
      *
-     * @return the created entity metadata builder
+     * <p>The created update builder is not tracked by the server, meaning that the update can be safely aborted
+     * by {@linkplain Plugin plugins} by not {@linkplain Update#performUpdate() performing the update}.</p>
+     *
+     * @return the created update builder
      * @since 1.0
+     * @see Update
      */
-    Builder toBuilder();
+    Update createUpdateBuilder();
 
     /**
-     * A builder of an {@linkplain EntityMetadata entity metadata}.
+     * A builder of an update of an {@linkplain EntityMetadata entity metadata}.
+     *
+     * <p>Each method of this class is not thread-safe and throws an exception
+     * if it is not being executed in the thread running the game logic loop.</p>
      *
      * @since 1.0
      * @see EntityMetadata
      */
-    interface Builder {
+    interface Update {
         /**
          * Sets whether the {@linkplain Entity entity} should be set on fire.
          *
          * @param value {@code true} if the entity should be set on fire, {@code false} otherwise
-         * @return this builder
+         * @return this update builder
          * @since 1.0
          */
-        Builder onFire(boolean value);
+        Update onFire(boolean value);
 
         /**
          * Sets whether name tag of the {@linkplain Entity entity} should be hidden due to sneaking.
          *
          * @param value {@code true} if the name tag should be hidden, {@code false} otherwise
-         * @return this builder
+         * @return this update builder
          * @since 1.0
          */
-        Builder sneaking(boolean value);
+        Update sneaking(boolean value);
 
         /**
          * Sets whether the {@linkplain Entity entity} should play sprinting particles.
          *
          * @param value {@code true} if the entity should play sprinting particles, {@code false} otherwise
-         * @return this builder
+         * @return this update builder
          * @since 1.0
          */
-        Builder sprinting(boolean value);
+        Update sprinting(boolean value);
 
         /**
          * Sets whether the {@linkplain Entity entity} should be swimming.
          *
          * @param value {@code true} if the entity should be swimming, {@code false} otherwise
-         * @return this builder
+         * @return this update builder
          * @since 1.0
          */
-        Builder swimming(boolean value);
+        Update swimming(boolean value);
 
         /**
          * Sets whether the {@linkplain Entity entity} should be invisible.
          *
          * @param value {@code true} if the entity should be invisible, {@code false} otherwise
-         * @return this builder
+         * @return this update builder
          * @since 1.0
          */
-        Builder invisible(boolean value);
+        Update invisible(boolean value);
 
         /**
          * Sets whether the {@linkplain Entity entity} should have the glowing effect.
          *
          * @param value {@code true} if the entity should have the glowing effect, {@code false} otherwise
-         * @return this builder
+         * @return this update builder
          * @since 1.0
          */
-        Builder glowing(boolean value);
+        Update glowing(boolean value);
 
         /**
          * Sets whether the {@linkplain Entity entity} should be gliding.
          *
          * @param value {@code true} if the entity should be gliding, {@code false} otherwise
-         * @return this builder
+         * @return this update builder
          * @since 1.0
          */
-        Builder gliding(boolean value);
+        Update gliding(boolean value);
 
         /**
          * Sets number of remaining air supply for the {@linkplain Entity entity}.
          *
          * @param value the remaining air supply that the entity should have
-         * @return this builder
+         * @return this update builder
          * @since 1.0
          */
-        Builder airSupply(int value);
+        Update airSupply(int value);
 
         /**
          * Sets whether custom name of the {@linkplain Entity entity} should be visible.
          *
          * @param value {@code true} if the custom name should be visible, {@code false} otherwise
-         * @return this builder
+         * @return this update builder
          * @since 1.0
          */
-        Builder customNameVisible(boolean value);
+        Update customNameVisible(boolean value);
 
         /**
          * Sets custom name for the {@linkplain Entity entity}.
          *
          * @param value the custom name that the entity should have
-         * @return this builder
+         * @return this update builder
          * @since 1.0
          */
-        Builder customName(@Nullable Component value);
+        Update customName(@Nullable Component value);
 
         /**
          * Sets whether the {@linkplain Entity entity} should be silent, meaning that it does not play any sounds.
          *
          * @param value {@code true} if the entity should be silent, {@code false} otherwise
-         * @return this builder
+         * @return this update builder
          * @since 1.0
          */
-        Builder silent(boolean value);
+        Update silent(boolean value);
 
         /**
          * Sets whether the {@linkplain Entity entity} should have no gravity.
          *
          * @param value {@code true} if the entity should have no gravity, {@code false} otherwise
-         * @return this builder
+         * @return this update builder
          * @since 1.0
          */
-        Builder hasNoGravity(boolean value);
+        Update hasNoGravity(boolean value);
 
         /**
          * Sets pose for the {@linkplain Entity entity}.
          *
          * @param value the pose that the entity should have
-         * @return this builder
+         * @return this update builder
          * @since 1.0
          */
-        Builder pose(Pose value);
+        Update pose(Pose value);
 
         /**
          * Sets the number of ticks for which the {@linkplain Entity entity} has been frozen.
          *
          * @param value the number of ticks for which the entity has been frozen
-         * @return this builder
+         * @return this update builder
          * @since 1.0
          */
-        Builder ticksFrozen(int value);
+        Update ticksFrozen(int value);
 
         /**
-         * Builds the {@linkplain EntityMetadata entity metadata}.
+         * Builds and performs the {@linkplain Update entity metadata update}.
          *
-         * @return the created entity metadata
+         * <p>After performing the update this builder can be safely reused
+         * as the updated value map is being cleared after performing the update.</p>
+         *
+         * @return this update builder
          * @since 1.0
          */
-        EntityMetadata build();
+        Update performUpdate();
     }
 }

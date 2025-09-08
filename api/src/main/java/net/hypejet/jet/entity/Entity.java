@@ -1,6 +1,7 @@
 package net.hypejet.jet.entity;
 
 import net.hypejet.jet.MinecraftServer;
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.util.view.Viewable;
 import net.hypejet.jet.world.coordinate.flag.RelativeFlag;
 import net.hypejet.jet.scoreboard.Scoreboard;
@@ -8,7 +9,6 @@ import net.hypejet.jet.scoreboard.score.Score;
 import net.hypejet.jet.world.coordinate.Position;
 import net.hypejet.jet.world.coordinate.Vector;
 import net.kyori.adventure.identity.Identified;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.pointer.Pointered;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -27,12 +27,12 @@ import java.util.UUID;
 @NullMarked
 public interface Entity extends Identified, Pointered, Keyed, Viewable, HoverEventSource<HoverEvent.ShowEntity> {
     /**
-     * Gets the {@linkplain Key} of type of this {@linkplain Entity entity}.
+     * Gets the {@linkplain Holder.Reference holder referencing} to the type of this {@linkplain Entity entity}.
      *
      * @return the entity type key
      * @since 1.0
      */
-    Key entityType();
+    Holder.Reference<EntityType> entityType();
 
     /**
      * Gets a {@linkplain UUID unique identifier} of this {@linkplain Entity entity}.

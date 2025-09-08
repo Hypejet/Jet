@@ -13,6 +13,8 @@ import net.hypejet.jet.entity.acquisition.gamemode.WriteGameModeAcquisition;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.events.entity.player.PlayerPreWorldChangeEvent;
 import net.hypejet.jet.event.events.entity.player.PlayerWorldChangeEvent;
+import net.hypejet.jet.registry.holder.Holder;
+import net.hypejet.jet.registry.keys.EntityTypeKeys;
 import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.server.JetMinecraftServer;
@@ -75,7 +77,6 @@ import java.util.concurrent.CompletableFuture;
 public final class JetPlayer extends JetEntity implements Player, NetworkDisconnectionHandler,
         PacketReceivingPlayerAudience {
 
-    private static final Key ENTITY_TYPE = Key.key("player");
     private static final Logger LOGGER = LoggerFactory.getLogger(JetPlayer.class);
 
     private final SocketPlayerConnection connection;
@@ -115,7 +116,7 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
                       @NonNull JetWorld world, @NonNull Position position, boolean enableRespawnScreen,
                       @Nullable GameMode previousGameMode, @NonNull GameMode gameMode, @NonNull Settings settings,
                       @NonNull String clientBrand, @NonNull JetScoreboard initialScoreboard) {
-        super(ENTITY_TYPE, uniqueId, Pointers.builder()
+        super(new Holder.Reference<>(EntityTypeKeys.PLAYER), uniqueId, Pointers.builder()
                 .withStatic(Identity.UUID, Objects.requireNonNull(uniqueId, "unique identifier"))
                 .withStatic(Identity.NAME, Objects.requireNonNull(username, "username"))
                 .build(), position, connection.server());

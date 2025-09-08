@@ -1,11 +1,11 @@
 package net.hypejet.jet.server.entity.metadata;
 
-import io.netty.util.collection.IntCollections;
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
 import net.hypejet.jet.entity.metadata.EntityMetadata;
 import net.hypejet.jet.entity.pose.Pose;
-import net.hypejet.jet.server.entity.JetEntityType;
+import net.hypejet.jet.server.entity.JetEntity;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityMetadataPlayPacket;
 import net.hypejet.jet.server.util.collection.IntObjectMapBuilder;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NullMarked;
@@ -37,39 +37,30 @@ public class JetEntityMetadata implements EntityMetadata {
     private static final int GLOWING_FLAG_INDEX = 6;
     private static final int GLIDING_FLAG_INDEX = 7;
 
-    private final IntObjectMap<EntityMetadataValue> values;
+    private final JetEntity entity;
+    private final IntObjectMap<EntityMetadataValue> values = new IntObjectHashMap<>();
 
     /**
      * Constructs the {@linkplain JetEntityMetadata entity metadata} with default values.
      *
-     * @param entityType the entity type of entity that the entity metadata is being constructed for
+     * @param entity the entity that the entity metadata is being constructed for
      * @since 1.0
      */
-    public JetEntityMetadata(JetEntityType entityType) {
-        IntObjectMapBuilder<EntityMetadataValue> valuesBuilder = new IntObjectMapBuilder<EntityMetadataValue>()
+    public JetEntityMetadata(JetEntity entity) {
+        this.entity = entity;
+
+        IntObjectMapBuilder<EntityMetadataValue> defaultsBuilder = new IntObjectMapBuilder<EntityMetadataValue>()
                 .put(SHARED_FLAGS_INDEX, new EntityMetadataValue.Byte((byte) 0))
-                .put(AIR_SUPPLY_INDEX, new EntityMetadataValue.Int(entityType.maxAirSupply()))
+                .put(AIR_SUPPLY_INDEX, new EntityMetadataValue.Int(entity.entityTypeValue().maxAirSupply()))
                 .put(CUSTOM_NAME_VISIBLE_INDEX, new EntityMetadataValue.Boolean(false))
                 .put(CUSTOM_NAME_INDEX, new EntityMetadataValue.OptionalComponentValue(null))
                 .put(SILENT_INDEX, new EntityMetadataValue.Boolean(false))
                 .put(HAS_NO_GRAVITY_INDEX, new EntityMetadataValue.Boolean(false))
                 .put(POSE_INDEX, new EntityMetadataValue.PoseValue(Pose.STANDING))
                 .put(TICKS_FROZEN_INDEX, new EntityMetadataValue.Int(0));
-        this.defineDefaults(valuesBuilder);
-        this.values = valuesBuilder.build();
-    }
 
-    /**
-     * Constructs the {@linkplain JetEntityMetadata entity metadata} with values
-     * from the specified {@linkplain Builder entity metadata builder}.
-     *
-     * @param builder the entity metadata builder whose values the entity metadata should have
-     * @since 1.0
-     */
-    protected JetEntityMetadata(Builder builder) {
-        IntObjectMap<EntityMetadataValue> values = new IntObjectHashMap<>(builder.values.size());
-        values.putAll(builder.values);
-        this.values = IntCollections.unmodifiableMap(values);
+        this.defineDefaults(defaultsBuilder);
+        this.values.putAll(defaultsBuilder.build());
     }
 
     @Override
@@ -143,8 +134,8 @@ public class JetEntityMetadata implements EntityMetadata {
     }
 
     @Override
-    public EntityMetadata.Builder toBuilder() {
-        return new Builder(this);
+    public EntityMetadata.Update createUpdateBuilder() {
+        return new JetEntityMetadata.Update(this);
     }
 
     /**
@@ -166,20 +157,21 @@ public class JetEntityMetadata implements EntityMetadata {
      * @since 1.0
      */
     protected final <T extends EntityMetadataValue> T value(int index, Class<T> valueType) {
-        return value(index, valueType, this.values);
+        T value = value(index, valueType, this.values);
+        if (value == null)
+            throw new IllegalStateException("No metadata value present at index: " + index);
+        return value;
     }
 
     private boolean sharedFlag(int index) {
-        byte sharedFlags = value(index, EntityMetadataValue.Byte.class, this.values).value();
+        byte sharedFlags = this.value(index, EntityMetadataValue.Byte.class).value();
         return (sharedFlags & (1 << index)) != 0;
     }
 
-    private static <T extends EntityMetadataValue> T value(int index, Class<T> valueType,
-                                                           IntObjectMap<EntityMetadataValue> values) {
+    private static <T extends EntityMetadataValue> @Nullable T value(int index, Class<T> valueType,
+                                                                     IntObjectMap<EntityMetadataValue> values) {
         EntityMetadataValue value = values.get(index);
-        // noinspection ConstantValue ; the value actually is nullable
-        if (value == null)
-            throw new IllegalStateException("No metadata value present at index: " + index);
+        if (value == null) return null;
 
         if (!valueType.isAssignableFrom(value.getClass())) {
             throw new IllegalArgumentException(String.format(
@@ -192,99 +184,112 @@ public class JetEntityMetadata implements EntityMetadata {
     }
 
     /**
-     * An implementation of the {@linkplain EntityMetadata.Builder entity metadata builder}.
+     * An implementation of the {@linkplain EntityMetadata.Update entity metadata update}.
      *
      * @since 1.0
-     * @see EntityMetadata.Builder
+     * @see EntityMetadata.Update
      */
-    public static class Builder implements EntityMetadata.Builder {
+    public static class Update implements EntityMetadata.Update {
 
-        private final IntObjectMap<EntityMetadataValue> values;
+        private final JetEntityMetadata entityMetadata;
+        private final IntObjectMap<EntityMetadataValue> updatedValues = new IntObjectHashMap<>();
 
         /**
-         * Constructs the {@linkplain Builder entity metadata builder}.
+         * Constructs the {@linkplain Update entity metadata update implementation}.
          *
          * @param entityMetadata the entity metadata that should be a base for the modified version
          * @since 1.0
          */
-        protected Builder(JetEntityMetadata entityMetadata) {
-            this.values = new IntObjectHashMap<>(entityMetadata.values.size());
-            this.values.putAll(entityMetadata.values);
+        protected Update(JetEntityMetadata entityMetadata) {
+            this.entityMetadata = entityMetadata;
         }
 
         @Override
-        public final EntityMetadata.Builder onFire(boolean value) {
+        public final EntityMetadata.Update onFire(boolean value) {
             return this.updateSharedFlag(ON_FIRE_FLAG_INDEX, value);
         }
 
         @Override
-        public final EntityMetadata.Builder sneaking(boolean value) {
+        public final EntityMetadata.Update sneaking(boolean value) {
             return this.updateSharedFlag(SNEAKING_FLAG_INDEX, value);
         }
 
         @Override
-        public final EntityMetadata.Builder sprinting(boolean value) {
+        public final EntityMetadata.Update sprinting(boolean value) {
             return this.updateSharedFlag(SPRINTING_FLAG_INDEX, value);
         }
 
         @Override
-        public final EntityMetadata.Builder swimming(boolean value) {
+        public final EntityMetadata.Update swimming(boolean value) {
             return this.updateSharedFlag(SWIMMING_FLAG_INDEX, value);
         }
 
         @Override
-        public final EntityMetadata.Builder invisible(boolean value) {
+        public final EntityMetadata.Update invisible(boolean value) {
             return this.updateSharedFlag(INVISIBLE_FLAG_INDEX, value);
         }
 
         @Override
-        public final EntityMetadata.Builder glowing(boolean value) {
+        public final EntityMetadata.Update glowing(boolean value) {
             return this.updateSharedFlag(GLOWING_FLAG_INDEX, value);
         }
 
         @Override
-        public final EntityMetadata.Builder gliding(boolean value) {
+        public final EntityMetadata.Update gliding(boolean value) {
             return this.updateSharedFlag(GLIDING_FLAG_INDEX, value);
         }
 
         @Override
-        public final EntityMetadata.Builder airSupply(int value) {
+        public final EntityMetadata.Update airSupply(int value) {
             return this.updateValue(AIR_SUPPLY_INDEX, new EntityMetadataValue.Int(value));
         }
 
         @Override
-        public final EntityMetadata.Builder customNameVisible(boolean value) {
+        public final EntityMetadata.Update customNameVisible(boolean value) {
             return this.updateValue(CUSTOM_NAME_VISIBLE_INDEX, new EntityMetadataValue.Boolean(value));
         }
 
         @Override
-        public final EntityMetadata.Builder customName(@Nullable Component value) {
+        public final EntityMetadata.Update customName(@Nullable Component value) {
             return this.updateValue(CUSTOM_NAME_INDEX, new EntityMetadataValue.OptionalComponentValue(value));
         }
 
         @Override
-        public final EntityMetadata.Builder silent(boolean value) {
+        public final EntityMetadata.Update silent(boolean value) {
             return this.updateValue(SILENT_INDEX, new EntityMetadataValue.Boolean(value));
         }
 
         @Override
-        public final EntityMetadata.Builder hasNoGravity(boolean value) {
+        public final EntityMetadata.Update hasNoGravity(boolean value) {
             return this.updateValue(HAS_NO_GRAVITY_INDEX, new EntityMetadataValue.Boolean(value));
         }
 
         @Override
-        public final EntityMetadata.Builder pose(Pose value) {
+        public final EntityMetadata.Update pose(Pose value) {
             return this.updateValue(POSE_INDEX, new EntityMetadataValue.PoseValue(value));
         }
 
         @Override
-        public final EntityMetadata.Builder ticksFrozen(int value) {
+        public final EntityMetadata.Update ticksFrozen(int value) {
             return this.updateValue(TICKS_FROZEN_INDEX, new EntityMetadataValue.Int(value));
         }
 
         @Override
-        public EntityMetadata build() {
-            return new JetEntityMetadata(this);
+        public final EntityMetadata.Update performUpdate() {
+            JetEntity entity = this.entityMetadata.entity;
+            entity.server().ticker().ensureRunsInTickLoop();
+
+            if (this.updatedValues.isEmpty()) return this;
+            this.entityMetadata.values.putAll(this.updatedValues);
+
+            ServerEntityMetadataPlayPacket packet = new ServerEntityMetadataPlayPacket(
+                    entity.entityId(),
+                    this.updatedValues
+            ); // TODO: Cache
+
+            entity.viewers().forEach(player -> player.sendPacket(packet));
+            this.updatedValues.clear();
+            return this;
         }
 
         /**
@@ -292,16 +297,28 @@ public class JetEntityMetadata implements EntityMetadata {
          * 
          * @param index the index to update the entity metadata value at
          * @param value the new entity metadata value that should be at the specified index
-         * @return this builder
+         * @return this update builder
+         * @throws IllegalStateException if the current thread is not the thread that runs the game logic loop
          * @since 1.0
          */
-        protected final EntityMetadata.Builder updateValue(int index, EntityMetadataValue value) {
-            this.values.put(index, value);
+        protected final EntityMetadata.Update updateValue(int index, EntityMetadataValue value) {
+            /* Certain methods updating fields depend on current values of these fields, meaning that these methods
+               are not atomic, this is why we check whether the current thread is the main ticking thread.
+               Additionally, we compare the current value with the specified value to avoid unnecessary updates,
+               which is also not a thread-safe operation. */
+            this.entityMetadata.entity.server().ticker().ensureRunsInTickLoop();
+            if (this.currentValue(index, value.getClass()).equals(value)) return this;
+            this.updatedValues.put(index, value);
             return this;
         }
 
         /**
-         * Gets current {@linkplain EntityMetadataValue entity metadata value} set at the specified index.
+         * Gets current {@linkplain EntityMetadataValue entity metadata value}
+         * set at the specified index in this {@linkplain Update update builder}.
+         *
+         * <p>If this {@linkplain Update update builder} does not contain an updated value
+         * at the specified index, the value from the {@linkplain JetEntityMetadata entity metadata}
+         * (for which the update builder was created) is returned.</p>
          *
          * @param index the index that the metadata value is bound to
          * @param valueType the expected class of the metadata value
@@ -310,10 +327,12 @@ public class JetEntityMetadata implements EntityMetadata {
          * @since 1.0
          */
         protected final <T extends EntityMetadataValue> T currentValue(int index, Class<T> valueType) {
-            return value(index, valueType, this.values);
+            T value = value(index, valueType, this.updatedValues);
+            if (value == null) return this.entityMetadata.value(index, valueType);
+            return value;
         }
 
-        private EntityMetadata.Builder updateSharedFlag(int index, boolean value) {
+        private EntityMetadata.Update updateSharedFlag(int index, boolean value) {
             byte sharedFlags = this.currentValue(index, EntityMetadataValue.Byte.class).value();
             if (value) {
                 sharedFlags |= (byte) (1 << index);
