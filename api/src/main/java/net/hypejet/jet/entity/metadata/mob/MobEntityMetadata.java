@@ -31,6 +31,7 @@ public interface MobEntityMetadata extends LivingEntityMetadata {
      * Gets whether the {@linkplain Entity entity} is left-handed.
      *
      * @return {@code true} if the entity is left-handed, {@code false} otherwise
+     * @since 1.0
      */
     boolean leftHanded();
 
