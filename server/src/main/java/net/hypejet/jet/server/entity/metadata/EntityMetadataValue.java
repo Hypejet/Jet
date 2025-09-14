@@ -17,14 +17,16 @@ import net.hypejet.jet.entity.villager.VillagerType;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.inventory.item.JetItemStack;
 import net.hypejet.jet.server.world.block.JetBlockState;
+import net.hypejet.jet.util.range.RangeUtil;
 import net.hypejet.jet.world.coordinate.BlockPosition;
-import net.hypejet.jet.world.coordinate.Vector;
-import net.hypejet.jet.world.coordinate.rotation.Quaternion;
+import net.hypejet.jet.world.coordinate.floats.FloatQuaternion;
+import net.hypejet.jet.world.coordinate.floats.FloatVector;
 import net.hypejet.jet.world.coordinate.rotation.Rotations;
 import net.hypejet.jet.world.direction.Direction;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Range;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -369,7 +371,7 @@ public sealed interface EntityMetadataValue {
 
     /**
      * An {@linkplain EntityMetadataValue entity metadata value} representing
-     * an optional positive {@linkplain Integer integer}.
+     * an optional non-negative {@linkplain Integer integer}.
      *
      * @param value the integer value that this entity metadata value represents,
      *              {@code null} if the integer is unspecified
@@ -377,7 +379,21 @@ public sealed interface EntityMetadataValue {
      * @see Integer
      * @see EntityMetadataValue
      */
-    record OptionalUnsignedInt(@Nullable Integer value) implements EntityMetadataValue {}
+    record OptionalUnsignedInt(@Range(from = 0, to = Integer.MAX_VALUE) @Nullable Integer value)
+            implements EntityMetadataValue {
+        /**
+         * Constructs the {@linkplain OptionalUnsignedInt optional unsigned int entity metadata value}.
+         *
+         * @param value the integer value that the constructed entity metadata value
+         *              should represent, {@code null} if the integer should be unspecified
+         * @throws IllegalArgumentException if the specified int value is negative
+         * @since 1.0
+         */
+        public OptionalUnsignedInt {
+            if (value != null)
+                RangeUtil.ensureNotNegative(value);
+        }
+    }
 
     /**
      * An {@linkplain EntityMetadataValue entity metadata value} representing a {@linkplain Pose pose}.
@@ -618,18 +634,18 @@ public sealed interface EntityMetadataValue {
     }
 
     /**
-     * An {@linkplain EntityMetadataValue entity metadata value} representing a {@linkplain Vector vector}.
+     * An {@linkplain EntityMetadataValue entity metadata value} representing a {@linkplain FloatVector float vector}.
      *
-     * @param value the vector that this entity metadata value represents
+     * @param value the float vector that this entity metadata value represents
      * @since 1.0
-     * @see Vector
+     * @see FloatVector
      * @see EntityMetadataValue
      */
-    record VectorValue(Vector value) implements EntityMetadataValue {
+    record VectorValue(FloatVector value) implements EntityMetadataValue {
         /**
          * Constructs the {@linkplain VectorValue vector entity metadata value}.
          *
-         * @param value the vector that the constructed entity metadata value should represent
+         * @param value the float vector that the constructed entity metadata value should represent
          * @since 1.0
          */
         public VectorValue {
@@ -638,18 +654,19 @@ public sealed interface EntityMetadataValue {
     }
 
     /**
-     * An {@linkplain EntityMetadataValue entity metadata value} representing a {@linkplain Quaternion quaternion}.
+     * An {@linkplain EntityMetadataValue entity metadata value}
+     * representing a {@linkplain FloatQuaternion float quaternion}.
      *
-     * @param value the quaternion that this entity metadata value represents
+     * @param value the float quaternion that this entity metadata value represents
      * @since 1.0
-     * @see Quaternion
+     * @see FloatQuaternion
      * @see EntityMetadataValue
      */
-    record QuaternionValue(Quaternion value) implements EntityMetadataValue {
+    record QuaternionValue(FloatQuaternion value) implements EntityMetadataValue {
         /**
          * Constructs the {@linkplain QuaternionValue quaternion entity metadata value}.
          *
-         * @param value the quaternion that the constructed entity metadata value should represent
+         * @param value the float quaternion that the constructed entity metadata value should represent
          * @since 1.0
          */
         public QuaternionValue {
