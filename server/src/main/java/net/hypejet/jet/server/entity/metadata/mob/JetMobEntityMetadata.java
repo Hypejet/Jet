@@ -23,6 +23,7 @@ public class JetMobEntityMetadata extends JetLivingEntityMetadata implements Mob
     private static final int NO_AI_FLAG_INDEX = 0;
     private static final int LEFT_HANDED_FLAG_INDEX = 1;
     private static final int AGGRESSIVE_FLAG_INDEX = 2;
+
     /**
      * Constructs the {@linkplain JetMobEntityMetadata mob entity metadata}.
      *
