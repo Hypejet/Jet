@@ -4,6 +4,7 @@ import net.hypejet.jet.entity.metadata.mob.BatEntityMetadata;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
 import net.hypejet.jet.server.entity.metadata.JetEntityMetadata;
+import net.hypejet.jet.server.util.collection.IntObjectMapBuilder;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -38,6 +39,12 @@ public class JetBatEntityMetadata extends JetMobEntityMetadata implements BatEnt
     @Override
     public Update<?> createUpdateBuilder() {
         return new Update<>(this);
+    }
+
+    @Override
+    protected void defineDefaults(IntObjectMapBuilder<EntityMetadataValue> valuesBuilder) {
+        super.defineDefaults(valuesBuilder);
+        valuesBuilder.put(BAT_FLAGS_INDEX, new EntityMetadataValue.Byte(FLAGS_NOT_RESTING));
     }
 
     /**
