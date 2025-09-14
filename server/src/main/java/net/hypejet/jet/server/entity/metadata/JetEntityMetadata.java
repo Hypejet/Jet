@@ -7,6 +7,7 @@ import net.hypejet.jet.entity.pose.Pose;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityMetadataPlayPacket;
 import net.hypejet.jet.server.util.collection.IntObjectMapBuilder;
+import net.hypejet.jet.server.util.number.ByteUtil;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -134,8 +135,8 @@ public class JetEntityMetadata implements EntityMetadata {
     }
 
     @Override
-    public EntityMetadata.Update createUpdateBuilder() {
-        return new JetEntityMetadata.Update(this);
+    public Update<?> createUpdateBuilder() {
+        return new Update<>(this);
     }
 
     /**
@@ -165,7 +166,7 @@ public class JetEntityMetadata implements EntityMetadata {
 
     private boolean sharedFlag(int index) {
         byte sharedFlags = this.value(index, EntityMetadataValue.Byte.class).value();
-        return (sharedFlags & (1 << index)) != 0;
+        return ByteUtil.bitSet(sharedFlags, index);
     }
 
     private static <T extends EntityMetadataValue> @Nullable T value(int index, Class<T> valueType,
@@ -186,10 +187,11 @@ public class JetEntityMetadata implements EntityMetadata {
     /**
      * An implementation of the {@linkplain EntityMetadata.Update entity metadata update}.
      *
+     * @param <U> the type of this entity metadata update
      * @since 1.0
      * @see EntityMetadata.Update
      */
-    public static class Update implements EntityMetadata.Update {
+    public static class Update<U extends Update<U>> implements EntityMetadata.Update<U> {
 
         private final JetEntityMetadata entityMetadata;
         private final IntObjectMap<EntityMetadataValue> updatedValues = new IntObjectHashMap<>();
@@ -205,81 +207,81 @@ public class JetEntityMetadata implements EntityMetadata {
         }
 
         @Override
-        public final EntityMetadata.Update onFire(boolean value) {
+        public final U onFire(boolean value) {
             return this.updateSharedFlag(ON_FIRE_FLAG_INDEX, value);
         }
 
         @Override
-        public final EntityMetadata.Update sneaking(boolean value) {
+        public final U sneaking(boolean value) {
             return this.updateSharedFlag(SNEAKING_FLAG_INDEX, value);
         }
 
         @Override
-        public final EntityMetadata.Update sprinting(boolean value) {
+        public final U sprinting(boolean value) {
             return this.updateSharedFlag(SPRINTING_FLAG_INDEX, value);
         }
 
         @Override
-        public final EntityMetadata.Update swimming(boolean value) {
+        public final U swimming(boolean value) {
             return this.updateSharedFlag(SWIMMING_FLAG_INDEX, value);
         }
 
         @Override
-        public final EntityMetadata.Update invisible(boolean value) {
+        public final U invisible(boolean value) {
             return this.updateSharedFlag(INVISIBLE_FLAG_INDEX, value);
         }
 
         @Override
-        public final EntityMetadata.Update glowing(boolean value) {
+        public final U glowing(boolean value) {
             return this.updateSharedFlag(GLOWING_FLAG_INDEX, value);
         }
 
         @Override
-        public final EntityMetadata.Update gliding(boolean value) {
+        public final U gliding(boolean value) {
             return this.updateSharedFlag(GLIDING_FLAG_INDEX, value);
         }
 
         @Override
-        public final EntityMetadata.Update airSupply(int value) {
+        public final U airSupply(int value) {
             return this.updateValue(AIR_SUPPLY_INDEX, new EntityMetadataValue.Int(value));
         }
 
         @Override
-        public final EntityMetadata.Update customNameVisible(boolean value) {
+        public final U customNameVisible(boolean value) {
             return this.updateValue(CUSTOM_NAME_VISIBLE_INDEX, new EntityMetadataValue.Boolean(value));
         }
 
         @Override
-        public final EntityMetadata.Update customName(@Nullable Component value) {
+        public final U customName(@Nullable Component value) {
             return this.updateValue(CUSTOM_NAME_INDEX, new EntityMetadataValue.OptionalComponentValue(value));
         }
 
         @Override
-        public final EntityMetadata.Update silent(boolean value) {
+        public final U silent(boolean value) {
             return this.updateValue(SILENT_INDEX, new EntityMetadataValue.Boolean(value));
         }
 
         @Override
-        public final EntityMetadata.Update hasNoGravity(boolean value) {
+        public final U hasNoGravity(boolean value) {
             return this.updateValue(HAS_NO_GRAVITY_INDEX, new EntityMetadataValue.Boolean(value));
         }
 
         @Override
-        public final EntityMetadata.Update pose(Pose value) {
+        public final U pose(Pose value) {
             return this.updateValue(POSE_INDEX, new EntityMetadataValue.PoseValue(value));
         }
 
         @Override
-        public final EntityMetadata.Update ticksFrozen(int value) {
+        public final U ticksFrozen(int value) {
             return this.updateValue(TICKS_FROZEN_INDEX, new EntityMetadataValue.Int(value));
         }
 
         @Override
-        public final EntityMetadata.Update performUpdate() {
+        public final U performUpdate() {
             JetEntity entity = this.entityMetadata.entity;
             entity.server().ticker().ensureRunsInTickLoop();
 
-            if (this.updatedValues.isEmpty()) return this;
+            if (this.updatedValues.isEmpty()) return this.castUpdate();
             this.entityMetadata.values.putAll(this.updatedValues);
 
             ServerEntityMetadataPlayPacket packet = new ServerEntityMetadataPlayPacket(
@@ -289,7 +291,7 @@ public class JetEntityMetadata implements EntityMetadata {
 
             entity.viewers().forEach(player -> player.sendPacket(packet));
             this.updatedValues.clear();
-            return this;
+            return this.castUpdate();
         }
 
         /**
@@ -301,15 +303,15 @@ public class JetEntityMetadata implements EntityMetadata {
          * @throws IllegalStateException if the current thread is not the thread that runs the game logic loop
          * @since 1.0
          */
-        protected final EntityMetadata.Update updateValue(int index, EntityMetadataValue value) {
+        protected final U updateValue(int index, EntityMetadataValue value) {
             /* Certain methods updating fields depend on current values of these fields, meaning that these methods
                are not atomic, this is why we check whether the current thread is the main ticking thread.
                Additionally, we compare the current value with the specified value to avoid unnecessary updates,
                which is also not a thread-safe operation. */
             this.entityMetadata.entity.server().ticker().ensureRunsInTickLoop();
-            if (this.currentValue(index, value.getClass()).equals(value)) return this;
+            if (this.currentValue(index, value.getClass()).equals(value)) return this.castUpdate();
             this.updatedValues.put(index, value);
-            return this;
+            return this.castUpdate();
         }
 
         /**
@@ -332,14 +334,14 @@ public class JetEntityMetadata implements EntityMetadata {
             return value;
         }
 
-        private EntityMetadata.Update updateSharedFlag(int index, boolean value) {
+        private U updateSharedFlag(int index, boolean value) {
             byte sharedFlags = this.currentValue(index, EntityMetadataValue.Byte.class).value();
-            if (value) {
-                sharedFlags |= (byte) (1 << index);
-            } else {
-                sharedFlags &= (byte) ~(1 << index);
-            }
-            return this.updateValue(index, new EntityMetadataValue.Byte(sharedFlags));
+            return this.updateValue(index, new EntityMetadataValue.Byte(ByteUtil.withBit(sharedFlags, index, value)));
+        }
+
+        private U castUpdate() {
+            // noinspection unchecked ; it is expected that the type parameter refers to type of this class
+            return (U) this;
         }
     }
 }

@@ -108,8 +108,8 @@ public interface Entity extends Identified, Pointered, Keyed, Viewable, HoverEve
     /**
      * Represents a hand of an entity.
      *
-     * <p>Contents of this enum depend on Minecraft, however it is safe to keep it an enum, since it is very unlikely
-     * to change.</p>
+     * <p>Contents of this enum depend on Minecraft, however it is safe to keep
+     * it an enum, since it is very unlikely to change.</p>
      *
      * @since 1.0
      */
@@ -126,6 +126,30 @@ public interface Entity extends Identified, Pointered, Keyed, Viewable, HoverEve
          * @since 1.0
          */
         RIGHT
+    }
+
+    /**
+     * A hand an {@linkplain Entity entity} can interact with.
+     *
+     * <p>Contents of this enum depend on Minecraft, however it is safe to keep
+     * it an enum, since it is very unlikely to change.</p>
+     *
+     * @since 1.0
+     * @see Entity
+     */
+    enum InteractionHand {
+        /**
+         * The main hand.
+         *
+         * @since 1.0
+         */
+        MAIN_HAND,
+        /**
+         * The offhand.
+         *
+         * @since 1.0
+         */
+        OFFHAND
     }
 
     /**

@@ -138,7 +138,7 @@ public interface EntityMetadata {
      * @since 1.0
      * @see Update
      */
-    Update createUpdateBuilder();
+    Update<?> createUpdateBuilder();
 
     /**
      * A builder of an update of an {@linkplain EntityMetadata entity metadata}.
@@ -146,10 +146,11 @@ public interface EntityMetadata {
      * <p>Each method of this class is not thread-safe and throws an exception
      * if it is not being executed in the thread running the game logic loop.</p>
      *
+     * @param <U> the type of this entity metadata update
      * @since 1.0
      * @see EntityMetadata
      */
-    interface Update {
+    interface Update<U extends Update<U>> {
         /**
          * Sets whether the {@linkplain Entity entity} should be set on fire.
          *
@@ -157,7 +158,7 @@ public interface EntityMetadata {
          * @return this update builder
          * @since 1.0
          */
-        Update onFire(boolean value);
+        U onFire(boolean value);
 
         /**
          * Sets whether name tag of the {@linkplain Entity entity} should be hidden due to sneaking.
@@ -166,7 +167,7 @@ public interface EntityMetadata {
          * @return this update builder
          * @since 1.0
          */
-        Update sneaking(boolean value);
+        U sneaking(boolean value);
 
         /**
          * Sets whether the {@linkplain Entity entity} should play sprinting particles.
@@ -175,7 +176,7 @@ public interface EntityMetadata {
          * @return this update builder
          * @since 1.0
          */
-        Update sprinting(boolean value);
+        U sprinting(boolean value);
 
         /**
          * Sets whether the {@linkplain Entity entity} should be swimming.
@@ -184,7 +185,7 @@ public interface EntityMetadata {
          * @return this update builder
          * @since 1.0
          */
-        Update swimming(boolean value);
+        U swimming(boolean value);
 
         /**
          * Sets whether the {@linkplain Entity entity} should be invisible.
@@ -193,7 +194,7 @@ public interface EntityMetadata {
          * @return this update builder
          * @since 1.0
          */
-        Update invisible(boolean value);
+        U invisible(boolean value);
 
         /**
          * Sets whether the {@linkplain Entity entity} should have the glowing effect.
@@ -202,7 +203,7 @@ public interface EntityMetadata {
          * @return this update builder
          * @since 1.0
          */
-        Update glowing(boolean value);
+        U glowing(boolean value);
 
         /**
          * Sets whether the {@linkplain Entity entity} should be gliding.
@@ -211,7 +212,7 @@ public interface EntityMetadata {
          * @return this update builder
          * @since 1.0
          */
-        Update gliding(boolean value);
+        U gliding(boolean value);
 
         /**
          * Sets number of remaining air supply for the {@linkplain Entity entity}.
@@ -220,7 +221,7 @@ public interface EntityMetadata {
          * @return this update builder
          * @since 1.0
          */
-        Update airSupply(int value);
+        U airSupply(int value);
 
         /**
          * Sets whether custom name of the {@linkplain Entity entity} should be visible.
@@ -229,7 +230,7 @@ public interface EntityMetadata {
          * @return this update builder
          * @since 1.0
          */
-        Update customNameVisible(boolean value);
+        U customNameVisible(boolean value);
 
         /**
          * Sets custom name for the {@linkplain Entity entity}.
@@ -238,7 +239,7 @@ public interface EntityMetadata {
          * @return this update builder
          * @since 1.0
          */
-        Update customName(@Nullable Component value);
+        U customName(@Nullable Component value);
 
         /**
          * Sets whether the {@linkplain Entity entity} should be silent, meaning that it does not play any sounds.
@@ -247,7 +248,7 @@ public interface EntityMetadata {
          * @return this update builder
          * @since 1.0
          */
-        Update silent(boolean value);
+        U silent(boolean value);
 
         /**
          * Sets whether the {@linkplain Entity entity} should have no gravity.
@@ -256,7 +257,7 @@ public interface EntityMetadata {
          * @return this update builder
          * @since 1.0
          */
-        Update hasNoGravity(boolean value);
+        U hasNoGravity(boolean value);
 
         /**
          * Sets pose for the {@linkplain Entity entity}.
@@ -265,7 +266,7 @@ public interface EntityMetadata {
          * @return this update builder
          * @since 1.0
          */
-        Update pose(Pose value);
+        U pose(Pose value);
 
         /**
          * Sets the number of ticks for which the {@linkplain Entity entity} has been frozen.
@@ -274,7 +275,7 @@ public interface EntityMetadata {
          * @return this update builder
          * @since 1.0
          */
-        Update ticksFrozen(int value);
+        U ticksFrozen(int value);
 
         /**
          * Builds and performs the {@linkplain Update entity metadata update}.
@@ -285,6 +286,6 @@ public interface EntityMetadata {
          * @return this update builder
          * @since 1.0
          */
-        Update performUpdate();
+        U performUpdate();
     }
 }
