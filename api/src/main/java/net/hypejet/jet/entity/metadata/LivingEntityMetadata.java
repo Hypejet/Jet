@@ -102,7 +102,7 @@ public interface LivingEntityMetadata extends EntityMetadata {
 
     /**
      * An {@linkplain EntityMetadata.Update entity metadata update}
-     * of a {@linkplain LivingEntityMetadata living entity metadata}.
+     * of {@linkplain LivingEntityMetadata living entity metadata}.
      *
      * @param <U> the type of this entity metadata update
      * @since 1.0

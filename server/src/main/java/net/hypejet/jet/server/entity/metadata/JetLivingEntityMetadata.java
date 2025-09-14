@@ -122,7 +122,7 @@ public class JetLivingEntityMetadata extends JetEntityMetadata implements Living
             extends JetEntityMetadata.Update<U>
             implements LivingEntityMetadata.Update<U> {
         /**
-         * Constructs the {@linkplain JetEntityMetadata.Update living entity metadata update implementation}.
+         * Constructs the {@linkplain Update living entity metadata update implementation}.
          *
          * @param entityMetadata the entity metadata that should be a base for the modified version
          * @since 1.0
