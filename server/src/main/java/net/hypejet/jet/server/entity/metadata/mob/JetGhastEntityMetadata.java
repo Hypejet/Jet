@@ -8,10 +8,7 @@ import net.hypejet.jet.server.util.collection.IntObjectMapBuilder;
 
 public class JetGhastEntityMetadata extends JetMobEntityMetadata implements GhastEntityMetadata {
 
-    private static final int GHAST_FLAGS_INDEX = 16;
-
-    private static final boolean FLAGS_NOT_ATTACKING = false;
-    private static final boolean FLAGS_ATTACKING = true;
+    private static final int GHAST_ATTACKING_INDEX = 16;
 
     /**
      * Constructs the {@linkplain JetGhastEntityMetadata ghast entity metadata}.
@@ -25,7 +22,7 @@ public class JetGhastEntityMetadata extends JetMobEntityMetadata implements Ghas
 
     @Override
     public final boolean attacking() {
-        return this.value(GHAST_FLAGS_INDEX, EntityMetadataValue.Boolean.class).value();
+        return this.value(GHAST_ATTACKING_INDEX, EntityMetadataValue.Boolean.class).value();
     }
 
     @Override
@@ -36,7 +33,7 @@ public class JetGhastEntityMetadata extends JetMobEntityMetadata implements Ghas
     @Override
     protected void defineDefaults(IntObjectMapBuilder<EntityMetadataValue> valuesBuilder) {
         super.defineDefaults(valuesBuilder);
-        valuesBuilder.put(GHAST_FLAGS_INDEX, new EntityMetadataValue.Boolean(FLAGS_NOT_ATTACKING));
+        valuesBuilder.put(GHAST_ATTACKING_INDEX, new EntityMetadataValue.Boolean(false));
     }
 
     /**
@@ -49,6 +46,7 @@ public class JetGhastEntityMetadata extends JetMobEntityMetadata implements Ghas
     public static class Update<U extends Update<U>>
             extends JetMobEntityMetadata.Update<U>
             implements GhastEntityMetadata.Update<U> {
+
         /**
          * Constructs the {@linkplain Update ghast entity metadata update implementation}.
          *
@@ -61,10 +59,7 @@ public class JetGhastEntityMetadata extends JetMobEntityMetadata implements Ghas
 
         @Override
         public U attacking(boolean value) {
-            return this.updateValue(
-                    GHAST_FLAGS_INDEX,
-                    new EntityMetadataValue.Boolean(value ? FLAGS_ATTACKING : FLAGS_NOT_ATTACKING)
-            );
+            return this.updateValue(GHAST_ATTACKING_INDEX, new EntityMetadataValue.Boolean(value));
         }
     }
 }
