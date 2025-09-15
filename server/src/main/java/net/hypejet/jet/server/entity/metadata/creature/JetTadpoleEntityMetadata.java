@@ -1,11 +1,12 @@
-package net.hypejet.jet.server.entity.metadata.mob;
+package net.hypejet.jet.server.entity.metadata.creature;
 
 import org.jspecify.annotations.NullMarked;
 
-import net.hypejet.jet.entity.metadata.mob.TadpoleEntityMetadata;
+import net.hypejet.jet.entity.metadata.creature.TadpoleEntityMetadata;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
 import net.hypejet.jet.server.entity.metadata.JetEntityMetadata;
+import net.hypejet.jet.server.entity.metadata.mob.JetMobEntityMetadata;
 import net.hypejet.jet.server.util.collection.IntObjectMapBuilder;
 
 /**
@@ -15,7 +16,7 @@ import net.hypejet.jet.server.util.collection.IntObjectMapBuilder;
  * @see TadpoleEntityMetadata
  */
 @NullMarked
-public class JetTadpoleEntityMetadata extends JetCreatureEntityMetadata implements TadpoleEntityMetadata {
+public class JetTadpoleEntityMetadata extends JetMobEntityMetadata implements TadpoleEntityMetadata {
 
     private static final int TADPOLE_FROM_BUCKET_INDEX = 16;
 

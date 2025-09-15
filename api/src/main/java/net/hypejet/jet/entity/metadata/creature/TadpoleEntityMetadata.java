@@ -1,6 +1,8 @@
-package net.hypejet.jet.entity.metadata.mob;
+package net.hypejet.jet.entity.metadata.creature;
 
 import org.jspecify.annotations.NullMarked;
+
+import net.hypejet.jet.entity.metadata.mob.MobEntityMetadata;
 
 /**
  * A metadata of a tadpole {@linkplain Entity entity}.
@@ -9,7 +11,7 @@ import org.jspecify.annotations.NullMarked;
  * @see Entity
  */
 @NullMarked
-public interface TadpoleEntityMetadata extends CreatureEntityMetadata {
+public interface TadpoleEntityMetadata extends MobEntityMetadata {
     /**
      * {@inheritDoc}
      */
