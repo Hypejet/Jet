@@ -26,7 +26,7 @@ public interface GhastEntityMetadata extends MobEntityMetadata {
 
     /**
      * An {@linkplain EntityMetadata.Update entity metadata update}
-     * of {@linkplain BatEntityMetadata ghast entity metadata}.
+     * of {@linkplain GhastEntityMetadata ghast entity metadata}.
      *
      * @param <U> the type of this entity metadata update
      * @since 1.0
