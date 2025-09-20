@@ -27,7 +27,7 @@ public class JetPufferfishEntityMetadata extends JetMobEntityMetadata implements
     private static final int PUFFERFISH_FROM_BUCKET_INDEX = 16;
     private static final int PUFFERFISH_STATE_INDEX = 17;
 
-    public static final @NonNull Index<PufferfishState, Integer> PUFFERFISH_STATE =
+    private static final @NonNull Index<PufferfishState, Integer> PUFFERFISH_STATE =
         IndexUtil.fromMap(Map.of(
             0, PufferfishState.SMALL,
             1, PufferfishState.PARTIALLY_PUFFED,
