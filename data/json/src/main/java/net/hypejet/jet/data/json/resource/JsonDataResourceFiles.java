@@ -196,6 +196,14 @@ public final class JsonDataResourceFiles {
     public static final String POI_TYPES = resourceClasspath("poi_types.json");
 
     /**
+     * A resource-directory-relative classpath where
+     * particle registry entries are written to.
+     *
+     * @since 1.0
+     */
+    public static final String PARTICLES = resourceClasspath("particles.json");
+
+    /**
      * A resource-directory-relative classpath where {@linkplain JsonBlockEntityType block-entity-type}
      * registry entries are written to.
      *
