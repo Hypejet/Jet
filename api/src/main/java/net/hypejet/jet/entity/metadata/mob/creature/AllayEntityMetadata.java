@@ -3,6 +3,7 @@ package net.hypejet.jet.entity.metadata.mob.creature;
 import org.jspecify.annotations.NullMarked;
 
 import net.hypejet.jet.entity.Entity;
+import net.hypejet.jet.entity.metadata.EntityMetadata;
 import net.hypejet.jet.entity.metadata.mob.MobEntityMetadata;
 
 /**

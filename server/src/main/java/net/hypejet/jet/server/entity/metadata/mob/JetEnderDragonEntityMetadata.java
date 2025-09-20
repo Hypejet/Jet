@@ -51,7 +51,7 @@ public final class JetEnderDragonEntityMetadata extends JetMobEntityMetadata imp
     }
 
     @Override
-    public EnderDragonPhase phase() {
+    public final EnderDragonPhase phase() {
         int phaseId = this.value(ENDER_DRAGON_PHASE_INDEX, EntityMetadataValue.Int.class).value();
         return ENDER_DRAGON_PHASE.key(phaseId);
     }
