@@ -46,7 +46,7 @@ public interface AllayEntityMetadata extends MobEntityMetadata {
      * @see EntityMetadata.Update
      */
     interface Update<U extends Update<U>> extends MobEntityMetadata.Update<U> {        
-        /**;:w
+        /**
          *
          * Sets whether the allay {@linkplain Entity entity} should be dancing.
          *
