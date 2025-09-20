@@ -2,6 +2,9 @@ package net.hypejet.jet.entity.metadata.mob;
 
 import org.jspecify.annotations.NullMarked;
 
+import net.hypejet.jet.entity.Entity;
+import net.hypejet.jet.entity.metadata.EntityMetadata;
+
 /**
  * A metadata of a ghast {@linkplain Entity entity}.
  *

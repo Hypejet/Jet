@@ -1,8 +1,8 @@
-package net.hypejet.jet.server.entity.metadata.creature;
+package net.hypejet.jet.server.entity.metadata.mob.creature;
 
 import org.jspecify.annotations.NullMarked;
 
-import net.hypejet.jet.entity.metadata.creature.TadpoleEntityMetadata;
+import net.hypejet.jet.entity.metadata.mob.creature.TadpoleEntityMetadata;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
 import net.hypejet.jet.server.entity.metadata.JetEntityMetadata;

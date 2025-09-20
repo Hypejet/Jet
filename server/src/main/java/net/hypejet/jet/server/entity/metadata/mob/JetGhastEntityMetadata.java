@@ -1,11 +1,20 @@
 package net.hypejet.jet.server.entity.metadata.mob;
 
+import org.jspecify.annotations.NullMarked;
+
 import net.hypejet.jet.entity.metadata.mob.GhastEntityMetadata;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
 import net.hypejet.jet.server.entity.metadata.JetEntityMetadata;
 import net.hypejet.jet.server.util.collection.IntObjectMapBuilder;
 
+/**
+ * An implementation of the {@linkplain GhastEntityMetadata ghast entity metadata}.
+ *
+ * @since 1.0
+ * @see GhastEntityMetadata
+ */
+@NullMarked
 public class JetGhastEntityMetadata extends JetMobEntityMetadata implements GhastEntityMetadata {
 
     private static final int GHAST_ATTACKING_INDEX = 16;
