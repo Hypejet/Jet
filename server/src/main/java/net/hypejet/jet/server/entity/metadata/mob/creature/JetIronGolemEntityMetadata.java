@@ -34,7 +34,7 @@ public class JetIronGolemEntityMetadata extends JetMobEntityMetadata implements 
     }
 
     @Override
-    public boolean playerCreated() {
+    public final boolean playerCreated() {
         return this.value(IRON_GOLEM_FLAGS_INDEX, EntityMetadataValue.Byte.class).value() == FLAGS_PLAYER_CREATED;
     }
 
@@ -70,7 +70,7 @@ public class JetIronGolemEntityMetadata extends JetMobEntityMetadata implements 
         }
 
         @Override
-        public final U playerCreated(boolean value) {
+        public U playerCreated(boolean value) {
             return this.updateValue(
                     IRON_GOLEM_FLAGS_INDEX,
                     new EntityMetadataValue.Byte(value ? FLAGS_PLAYER_CREATED : FLAGS_NOT_PLAYER_CREATED)

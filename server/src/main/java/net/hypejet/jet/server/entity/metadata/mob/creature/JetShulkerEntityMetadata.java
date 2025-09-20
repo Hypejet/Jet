@@ -70,18 +70,18 @@ public class JetShulkerEntityMetadata extends JetMobEntityMetadata implements Sh
     }
 
     @Override
-    public Direction attachFace() {
+    public final Direction attachFace() {
         int attachId = this.value(SHULKER_ATTACH_FACE_INDEX, EntityMetadataValue.Int.class).value();
         return SHULKER_ATTACH_FACE.key(attachId);
     }
 
     @Override
-    public int shieldHeight() {
+    public final int shieldHeight() {
         return this.value(SHULKER_SHIELD_HEIGHT_INDEX, EntityMetadataValue.Int.class).value(); 
     }
 
     @Override
-    public NamedTextColor color() {
+    public final NamedTextColor color() {
         int colorId = this.value(SHULKER_COLOR_INDEX, EntityMetadataValue.Int.class).value();
         return SHULKER_COLOR.key(colorId);
     }

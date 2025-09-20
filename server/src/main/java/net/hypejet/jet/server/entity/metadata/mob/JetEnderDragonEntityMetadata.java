@@ -77,7 +77,6 @@ public final class JetEnderDragonEntityMetadata extends JetMobEntityMetadata imp
     public static class Update<U extends Update<U>>
             extends JetMobEntityMetadata.Update<U>
             implements EnderDragonEntityMetadata.Update<U> {
-
         /**
          * Constructs the {@linkplain Update ender dragon entity metadata update implementation}.
          *

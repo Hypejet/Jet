@@ -77,7 +77,6 @@ public class JetPufferfishEntityMetadata extends JetMobEntityMetadata implements
     public static class Update<U extends Update<U>>
             extends JetMobEntityMetadata.Update<U>
             implements PufferfishEntityMetadata.Update<U> {
-
         /**
          * Constructs the {@linkplain Update pufferfish entity metadata update implementation}.
          *

@@ -55,7 +55,6 @@ public class JetGhastEntityMetadata extends JetMobEntityMetadata implements Ghas
     public static class Update<U extends Update<U>>
             extends JetMobEntityMetadata.Update<U>
             implements GhastEntityMetadata.Update<U> {
-
         /**
          * Constructs the {@linkplain Update ghast entity metadata update implementation}.
          *
