@@ -272,7 +272,7 @@ final class Generators {
                 .add(
                         Registries.PARTICLE_TYPE, type -> JsonUnit.INSTANCE,
                         ParticleTypes.class, ParticleType.class, JsonUnit.class,
-                        JsonDataResourceFiles.PARTICLES, "ParticleKeys"
+                        JsonDataResourceFiles.PARTICLES, "ParticleTypeKeys"
                 )
                 .add(
                         Registries.ENTITY_TYPE, value -> EntityTypeAdapter.convert(value, level),

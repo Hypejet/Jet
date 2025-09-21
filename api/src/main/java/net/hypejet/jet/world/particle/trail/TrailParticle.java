@@ -1,23 +1,23 @@
 package net.hypejet.jet.world.particle.trail;
 
 import net.hypejet.jet.world.coordinate.Vector;
-import net.hypejet.jet.world.particle.ParticleOptions;
+import net.hypejet.jet.world.particle.Particle;
 import net.kyori.adventure.util.RGBLike;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
 /**
- * {@linkplain ParticleOptions Particle options} of the trail particle.
+ * A trial {@linkplain Particle particle}.
  *
  * @since 1.0
- * @see ParticleOptions
+ * @see Particle
  */
 // TODO: Replace RGBLike with custom color record implementing RGBLike?
 @ApiStatus.NonExtendable
 @NullMarked
-public interface TrailParticleOptions extends ParticleOptions {
+public interface TrailParticle extends Particle {
     /**
-     * Gets the destination that the trail particle should start travelling to after spawning.
+     * Gets the destination that this trail particle should start travelling to after spawning.
      *
      * @return the destination, as vector
      * @since 1.0
@@ -25,7 +25,7 @@ public interface TrailParticleOptions extends ParticleOptions {
     Vector target();
 
     /**
-     * Gets the color of the trail particle.
+     * Gets the color of this trail particle.
      *
      * @return the trail particle color
      * @since 1.0
@@ -33,7 +33,7 @@ public interface TrailParticleOptions extends ParticleOptions {
     RGBLike color();
 
     /**
-     * Gets the time that it takes for the particle to travel
+     * Gets the time that it takes for this particle to travel
      * from the starting position to the destination.
      *
      * @return the particle travel time, in ticks
@@ -42,21 +42,20 @@ public interface TrailParticleOptions extends ParticleOptions {
     int duration();
 
     /**
-     * A {@linkplain ParticleOptions.Builder particle options builder}
-     * of {@linkplain TrailParticleOptions trail particle options}.
+     * A {@linkplain Particle.Builder particle builder} of a {@linkplain TrailParticle trail particle}.
      *
-     * @param <O> the type of the particle options that the builder is going to create
-     * @param <B> the type of this particle options builder
+     * @param <P> the type of the particle that the builder is going to create
+     * @param <B> the type of this particle builder
      * @since 1.0
-     * @see TrailParticleOptions
-     * @see ParticleOptions.Builder
+     * @see TrailParticle
+     * @see Particle.Builder
      */
-    interface Builder<O extends TrailParticleOptions, B extends Builder<O, B>> extends ParticleOptions.Builder<O> {
+    interface Builder<P extends TrailParticle, B extends Builder<P, B>> extends Particle.Builder<P> {
         /**
          * Sets the destination that the trail particle should start travelling to after spawning.
          *
          * @param value the destination, as vector
-         * @return this particle options builder
+         * @return this particle builder
          */
         B target(Vector value);
 
@@ -64,7 +63,7 @@ public interface TrailParticleOptions extends ParticleOptions {
          * Sets the color that the trail particle should have.
          *
          * @param value the trail particle color
-         * @return this particle options builder
+         * @return this particle builder
          * @since 1.0
          */
         B color(RGBLike value);
@@ -73,7 +72,7 @@ public interface TrailParticleOptions extends ParticleOptions {
          * Sets the time that it should take for the particle to travel from the starting position to the destination.
          *
          * @param value the particle travel time, in ticks
-         * @return this particle options builder
+         * @return this particle builder
          * @since 1.0
          */
         B duration(int value);

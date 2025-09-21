@@ -1,22 +1,22 @@
 package net.hypejet.jet.world.particle.vibration;
 
 import net.hypejet.jet.world.coordinate.source.PositionSource;
-import net.hypejet.jet.world.particle.ParticleOptions;
+import net.hypejet.jet.world.particle.Particle;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
 /**
- * {@linkplain ParticleOptions Particle options} of a vibration particle.
+ * A vibration {@linkplain Particle particle}.
  *
  * @since 1.0
- * @see ParticleOptions
+ * @see Particle
  */
 @ApiStatus.NonExtendable
 @NullMarked
-public interface VibrationParticleOptions extends ParticleOptions {
+public interface VibrationParticle extends Particle {
     /**
      * Gets a {@linkplain PositionSource position source} providing the destination
-     * that the vibration particle should start travelling to after spawning.
+     * that this vibration particle should start travelling to after spawning.
      *
      * @return the position source
      * @since 1.0
@@ -24,7 +24,7 @@ public interface VibrationParticleOptions extends ParticleOptions {
     PositionSource destination();
 
     /**
-     * Gets the time that it takes for the vibration particle to travel
+     * Gets the time that it takes for this vibration particle to travel
      * from the starting position to the specified destination.
      *
      * @return the particle travel time, in ticks
@@ -33,22 +33,21 @@ public interface VibrationParticleOptions extends ParticleOptions {
     int arrivalDuration();
 
     /**
-     * A {@linkplain ParticleOptions.Builder particle options builder}
-     * of {@linkplain VibrationParticleOptions vibration particle options}.
+     * A {@linkplain Particle.Builder particle builder} of a {@linkplain VibrationParticle vibration particle}.
      *
-     * @param <O> the type of the particle options that the builder is going to create
-     * @param <B> the type of this particle options builder
+     * @param <P> the type of the particle that the builder is going to create
+     * @param <B> the type of this particle builder
      * @since 1.0
-     * @see VibrationParticleOptions
-     * @see ParticleOptions.Builder
+     * @see VibrationParticle
+     * @see Particle.Builder
      */
-    interface Builder<O extends VibrationParticleOptions, B extends Builder<O, B>> extends ParticleOptions.Builder<O> {
+    interface Builder<P extends VibrationParticle, B extends Builder<P, B>> extends Particle.Builder<P> {
         /**
          * Sets the {@linkplain PositionSource position source} providing the destination
          * that the vibration particle should start travelling to after spawning.
          *
          * @param value the position source providing the destination
-         * @return this particle options builder
+         * @return this particle builder
          * @since 1.0
          */
         B destination(PositionSource value);
@@ -58,7 +57,7 @@ public interface VibrationParticleOptions extends ParticleOptions {
          * to travel from the starting position to the specified destination.
          *
          * @param value the particle travel time, in ticks
-         * @return this particle options builder
+         * @return this particle builder
          * @since 1.0
          */
         B arrivalDuration(int value);
