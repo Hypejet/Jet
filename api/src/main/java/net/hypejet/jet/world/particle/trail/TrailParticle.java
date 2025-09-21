@@ -1,8 +1,8 @@
 package net.hypejet.jet.world.particle.trail;
 
+import net.hypejet.jet.util.color.RGBColor;
 import net.hypejet.jet.world.coordinate.Vector;
 import net.hypejet.jet.world.particle.Particle;
-import net.kyori.adventure.util.RGBLike;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
@@ -12,7 +12,6 @@ import org.jspecify.annotations.NullMarked;
  * @since 1.0
  * @see Particle
  */
-// TODO: Replace RGBLike with custom color record implementing RGBLike?
 @ApiStatus.NonExtendable
 @NullMarked
 public interface TrailParticle extends Particle {
@@ -30,7 +29,7 @@ public interface TrailParticle extends Particle {
      * @return the trail particle color
      * @since 1.0
      */
-    RGBLike color();
+    RGBColor color();
 
     /**
      * Gets the time that it takes for this particle to travel
@@ -66,7 +65,7 @@ public interface TrailParticle extends Particle {
          * @return this particle builder
          * @since 1.0
          */
-        B color(RGBLike value);
+        B color(RGBColor value);
 
         /**
          * Sets the time that it should take for the particle to travel from the starting position to the destination.

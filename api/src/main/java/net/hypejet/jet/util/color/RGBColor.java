@@ -10,7 +10,7 @@ import org.jspecify.annotations.NonNull;
  * @param value the packed RGB {@code int} value
  * @since 1.0
  */
-public record Color(int value) implements RGBLike {
+public record RGBColor(int value) implements RGBLike {
 
     private static final byte RED_SHIFT = Byte.SIZE * 2;
     private static final byte GREEN_SHIFT = Byte.SIZE;
@@ -32,18 +32,18 @@ public record Color(int value) implements RGBLike {
     }
 
     /**
-     * Creates a {@linkplain Color color} from RGB values specified.
+     * Creates an {@linkplain RGBColor RGB color} from RGB values specified.
      *
      * @param red the red value
      * @param green the green value
      * @param blue the blue value
-     * @return the created color
+     * @return the created RGB color
      * @since 1.0
      */
-    public static @NonNull Color fromRGB(int red, int green, int blue) {
+    public static @NonNull RGBColor fromRGB(int red, int green, int blue) {
         int value = (red << RED_SHIFT) & MAX_RGB_VALUE;
         value |= (green << GREEN_SHIFT) & MAX_RGB_VALUE;
         value |= blue & MAX_RGB_VALUE;
-        return new Color(value);
+        return new RGBColor(value);
     }
 }

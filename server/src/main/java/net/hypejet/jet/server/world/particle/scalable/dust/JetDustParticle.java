@@ -2,10 +2,9 @@ package net.hypejet.jet.server.world.particle.scalable.dust;
 
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.world.particle.scalable.JetScalableParticle;
-import net.hypejet.jet.util.color.Color;
+import net.hypejet.jet.util.color.RGBColor;
 import net.hypejet.jet.world.particle.ParticleType;
 import net.hypejet.jet.world.particle.scalable.dust.DustParticle;
-import net.kyori.adventure.util.RGBLike;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
@@ -19,7 +18,7 @@ import java.util.Objects;
 @NullMarked
 public final class JetDustParticle extends JetScalableParticle implements DustParticle {
 
-    private final RGBLike color;
+    private final RGBColor color;
 
     /**
      * Constructs the {@linkplain JetDustParticle dust particle implementation}.
@@ -28,13 +27,13 @@ public final class JetDustParticle extends JetScalableParticle implements DustPa
      * @param scale the scale that the particle should have
      * @since 1.0
      */
-    JetDustParticle(Holder.Reference<ParticleType> particleType, float scale, RGBLike color) {
+    JetDustParticle(Holder.Reference<ParticleType> particleType, float scale, RGBColor color) {
         super(particleType, scale);
         this.color = Objects.requireNonNull(color, "color");
     }
 
     @Override
-    public RGBLike color() {
+    public RGBColor color() {
         return this.color;
     }
 
@@ -51,7 +50,7 @@ public final class JetDustParticle extends JetScalableParticle implements DustPa
         private final Holder.Reference<ParticleType> particleType;
 
         private float scale = 1f;
-        private RGBLike color = Color.fromRGB(255, 255, 255);
+        private RGBColor color = RGBColor.fromRGB(255, 255, 255);
 
         /**
          * Constructs the {@linkplain Builder dust particle builder implementation}.
@@ -64,7 +63,7 @@ public final class JetDustParticle extends JetScalableParticle implements DustPa
         }
 
         @Override
-        public Builder color(RGBLike value) {
+        public Builder color(RGBColor value) {
             this.color = Objects.requireNonNull(value, "value");
             return this;
         }

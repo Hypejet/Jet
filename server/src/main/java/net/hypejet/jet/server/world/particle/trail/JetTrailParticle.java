@@ -2,11 +2,10 @@ package net.hypejet.jet.server.world.particle.trail;
 
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.world.particle.JetParticle;
-import net.hypejet.jet.util.color.Color;
+import net.hypejet.jet.util.color.RGBColor;
 import net.hypejet.jet.world.coordinate.Vector;
 import net.hypejet.jet.world.particle.ParticleType;
 import net.hypejet.jet.world.particle.trail.TrailParticle;
-import net.kyori.adventure.util.RGBLike;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
@@ -21,7 +20,7 @@ import java.util.Objects;
 public final class JetTrailParticle extends JetParticle implements TrailParticle {
 
     private final Vector target;
-    private final RGBLike color;
+    private final RGBColor color;
     private final int travelDuration;
 
     /**
@@ -33,7 +32,7 @@ public final class JetTrailParticle extends JetParticle implements TrailParticle
      * @param travelDuration the particle travel time, in ticks
      * @since 1.0
      */
-    JetTrailParticle(Holder.Reference<ParticleType> particleType, Vector target, RGBLike color, int travelDuration) {
+    JetTrailParticle(Holder.Reference<ParticleType> particleType, Vector target, RGBColor color, int travelDuration) {
         super(particleType);
         this.target = Objects.requireNonNull(target, "target");
         this.color = Objects.requireNonNull(color, "color");
@@ -46,7 +45,7 @@ public final class JetTrailParticle extends JetParticle implements TrailParticle
     }
 
     @Override
-    public RGBLike color() {
+    public RGBColor color() {
         return this.color;
     }
 
@@ -68,7 +67,7 @@ public final class JetTrailParticle extends JetParticle implements TrailParticle
         private final Holder.Reference<ParticleType> particleType;
 
         private Vector target = Vector.zero();
-        private RGBLike color = Color.fromRGB(255, 255, 255);
+        private RGBColor color = RGBColor.fromRGB(255, 255, 255);
         private int travelDuration;
 
         /**
@@ -88,7 +87,7 @@ public final class JetTrailParticle extends JetParticle implements TrailParticle
         }
 
         @Override
-        public Builder color(RGBLike value) {
+        public Builder color(RGBColor value) {
             this.color = Objects.requireNonNull(value);
             return this;
         }

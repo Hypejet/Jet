@@ -1,28 +1,27 @@
 package net.hypejet.jet.world.particle.color;
 
+import net.hypejet.jet.util.color.ARGBColor;
 import net.hypejet.jet.world.particle.Particle;
-import net.kyori.adventure.util.ARGBLike;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
 /**
- * A {@linkplain Particle particle} containing an {@linkplain ARGBLike ARGB-like color}.
+ * A {@linkplain Particle particle} containing an {@linkplain ARGBColor ARGB color}.
  *
  * @since 1.0
- * @see ARGBLike
+ * @see ARGBColor
  * @see Particle
  */
-// TODO: Replace RGBLike with custom color record implementing ARGBLike?
 @ApiStatus.NonExtendable
 @NullMarked
 public interface ColorParticle extends Particle {
     /**
-     * Gets the {@linkplain ARGBLike ARGB-like color} of this particle.
+     * Gets the {@linkplain ARGBColor ARGB color} of this particle.
      *
-     * @return the ARGB-like color
+     * @return the ARGB color
      * @since 1.0
      */
-    ARGBLike color();
+    ARGBColor color();
 
     /**
      * A {@linkplain Particle.Builder particle builder} of a {@linkplain ColorParticle color particle}.
@@ -35,12 +34,12 @@ public interface ColorParticle extends Particle {
      */
     interface Builder<P extends ColorParticle, B extends Builder<P, B>> extends Particle.Builder<P> {
         /**
-         * Sets {@linkplain ARGBLike ARGB-like color} that the particle should have.
+         * Sets {@linkplain ARGBColor ARGB color} that the particle should have.
          *
-         * @param value the ARGB-like color
+         * @param value the ARGB color
          * @return this particle builder
          * @since 1.0
          */
-        B color(ARGBLike value);
+        B color(ARGBColor value);
     }
 }

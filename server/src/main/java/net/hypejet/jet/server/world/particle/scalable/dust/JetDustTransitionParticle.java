@@ -2,10 +2,9 @@ package net.hypejet.jet.server.world.particle.scalable.dust;
 
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.world.particle.scalable.JetScalableParticle;
-import net.hypejet.jet.util.color.Color;
+import net.hypejet.jet.util.color.RGBColor;
 import net.hypejet.jet.world.particle.ParticleType;
 import net.hypejet.jet.world.particle.scalable.dust.DustTransitionParticle;
-import net.kyori.adventure.util.RGBLike;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
@@ -19,8 +18,8 @@ import java.util.Objects;
 @NullMarked
 public final class JetDustTransitionParticle extends JetScalableParticle implements DustTransitionParticle {
 
-    private final RGBLike fromColor;
-    private final RGBLike toColor;
+    private final RGBColor fromColor;
+    private final RGBColor toColor;
 
     /**
      * Constructs the {@linkplain JetDustTransitionParticle dust transition particle implementation}.
@@ -32,19 +31,19 @@ public final class JetDustTransitionParticle extends JetScalableParticle impleme
      * @since 1.0
      */
     JetDustTransitionParticle(Holder.Reference<ParticleType> particleType, float scale,
-                              RGBLike fromColor, RGBLike toColor) {
+                              RGBColor fromColor, RGBColor toColor) {
         super(particleType, scale);
         this.fromColor = Objects.requireNonNull(fromColor, "from color");
         this.toColor = Objects.requireNonNull(toColor, "to color");
     }
 
     @Override
-    public RGBLike fromColor() {
+    public RGBColor fromColor() {
         return this.fromColor;
     }
 
     @Override
-    public RGBLike toColor() {
+    public RGBColor toColor() {
         return this.toColor;
     }
 
@@ -61,8 +60,8 @@ public final class JetDustTransitionParticle extends JetScalableParticle impleme
         private final Holder.Reference<ParticleType> particleType;
 
         private float scale = 1f;
-        private RGBLike fromColor = Color.fromRGB(255, 255, 255);
-        private RGBLike toColor = Color.fromRGB(255, 255, 255);
+        private RGBColor fromColor = RGBColor.fromRGB(255, 255, 255);
+        private RGBColor toColor = RGBColor.fromRGB(255, 255, 255);
 
         /**
          * Constructs the {@linkplain Builder dust transition particle builder implementation}.
@@ -75,13 +74,13 @@ public final class JetDustTransitionParticle extends JetScalableParticle impleme
         }
 
         @Override
-        public Builder fromColor(RGBLike value) {
+        public Builder fromColor(RGBColor value) {
             this.fromColor = Objects.requireNonNull(value, "value");
             return this;
         }
 
         @Override
-        public Builder toColor(RGBLike value) {
+        public Builder toColor(RGBColor value) {
             this.toColor = Objects.requireNonNull(value, "value");
             return this;
         }

@@ -1,8 +1,8 @@
 package net.hypejet.jet.world.particle.scalable.dust;
 
+import net.hypejet.jet.util.color.RGBColor;
 import net.hypejet.jet.world.particle.Particle;
 import net.hypejet.jet.world.particle.scalable.ScalableParticle;
-import net.kyori.adventure.util.RGBLike;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
@@ -12,7 +12,6 @@ import org.jspecify.annotations.NullMarked;
  * @since 1.0
  * @see Particle
  */
-// TODO: Replace RGBLike with custom color record implementing RGBLike?
 @ApiStatus.NonExtendable
 @NullMarked
 public interface DustParticle extends ScalableParticle {
@@ -22,7 +21,7 @@ public interface DustParticle extends ScalableParticle {
      * @return the dust particle color
      * @since 1.0
      */
-    RGBLike color();
+    RGBColor color();
 
     /**
      * A {@linkplain Particle.Builder particle builder} of a {@linkplain DustParticle dust particle}.
@@ -42,6 +41,6 @@ public interface DustParticle extends ScalableParticle {
          * @return this particle builder
          * @since 1.0
          */
-        B color(RGBLike value);
+        B color(RGBColor value);
     }
 }
