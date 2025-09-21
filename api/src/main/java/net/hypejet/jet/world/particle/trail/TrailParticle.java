@@ -39,7 +39,7 @@ public interface TrailParticle extends Particle {
      * @return the particle travel time, in ticks
      * @since 1.0
      */
-    int duration();
+    int travelDuration();
 
     /**
      * A {@linkplain Particle.Builder particle builder} of a {@linkplain TrailParticle trail particle}.
@@ -75,6 +75,6 @@ public interface TrailParticle extends Particle {
          * @return this particle builder
          * @since 1.0
          */
-        B duration(int value);
+        B travelDuration(int value);
     }
 }

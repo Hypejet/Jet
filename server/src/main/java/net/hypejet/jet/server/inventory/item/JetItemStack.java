@@ -1,6 +1,7 @@
 package net.hypejet.jet.server.inventory.item;
 
 import net.hypejet.jet.inventory.item.Item;
+import net.hypejet.jet.inventory.item.ItemStack;
 import net.hypejet.jet.registry.holder.Holder;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.serializer.nbt.NBTDataComponentValue;
@@ -21,7 +22,8 @@ import java.util.Objects;
 // TODO: Reference inventory in javadocs when the inventory system is implemented
 // TODO: Replace NBT data component values with high-level data component values
 @NullMarked
-public record JetItemStack(Holder.Reference<Item> item, int count, Map<Key, NBTDataComponentValue> components) {
+public record JetItemStack(Holder.Reference<Item> item, int count, Map<Key, NBTDataComponentValue> components)
+        implements ItemStack {
     /**
      * Constructs the {@linkplain JetItemStack item stack}.
      *
