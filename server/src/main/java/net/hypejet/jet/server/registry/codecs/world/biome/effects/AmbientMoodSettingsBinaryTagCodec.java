@@ -1,12 +1,13 @@
 package net.hypejet.jet.server.registry.codecs.world.biome.effects;
 
-import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
+import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.util.codec.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.world.sound.SoundEventBinaryTagCodec;
 import net.hypejet.jet.world.biome.effects.AmbientMoodSettings;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
 
@@ -17,6 +18,7 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @see AmbientMoodSettings
  * @see BinaryTagCodec
  */
+@NullMarked
 public final class AmbientMoodSettingsBinaryTagCodec implements BinaryTagCodec<AmbientMoodSettings> {
 
     private static final String SOUND_FIELD = "sound";
@@ -34,10 +36,10 @@ public final class AmbientMoodSettingsBinaryTagCodec implements BinaryTagCodec<A
     private AmbientMoodSettingsBinaryTagCodec() {}
 
     @Override
-    public @NotNull AmbientMoodSettings decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof CompoundBinaryTag compound) {
+    public AmbientMoodSettings decode(BinaryTag binaryTag, JetMinecraftServer server) {
+        if (binaryTag instanceof CompoundBinaryTag compound) {
             return new AmbientMoodSettings(
-                    SoundEventBinaryTagCodec.HOLDER_CODEC.decode(requiredTag(SOUND_FIELD, compound)),
+                    SoundEventBinaryTagCodec.HOLDER_CODEC.decode(requiredTag(SOUND_FIELD, compound), server),
                     requiredTag(TICK_DELAY_FIELD, compound, BinaryTagTypes.INT).value(),
                     requiredTag(BLOCK_SEARCH_EXTENT_FIELD, compound, BinaryTagTypes.INT).value(),
                     requiredTag(OFFSET_FIELD, compound, BinaryTagTypes.DOUBLE).value()
@@ -50,12 +52,12 @@ public final class AmbientMoodSettingsBinaryTagCodec implements BinaryTagCodec<A
     }
 
     @Override
-    public @NotNull BinaryTag encode(@NotNull AmbientMoodSettings decoded) throws Exception {
+    public BinaryTag encode(AmbientMoodSettings value, JetMinecraftServer server) {
         return CompoundBinaryTag.builder()
-                .put(SOUND_FIELD, SoundEventBinaryTagCodec.HOLDER_CODEC.encode(decoded.soundEvent()))
-                .putInt(TICK_DELAY_FIELD, decoded.tickDelay())
-                .putInt(BLOCK_SEARCH_EXTENT_FIELD, decoded.blockSearchExtent())
-                .putDouble(OFFSET_FIELD, decoded.soundPositionOffset())
+                .put(SOUND_FIELD, SoundEventBinaryTagCodec.HOLDER_CODEC.encode(value.soundEvent(), server))
+                .putInt(TICK_DELAY_FIELD, value.tickDelay())
+                .putInt(BLOCK_SEARCH_EXTENT_FIELD, value.blockSearchExtent())
+                .putDouble(OFFSET_FIELD, value.soundPositionOffset())
                 .build();
     }
 }

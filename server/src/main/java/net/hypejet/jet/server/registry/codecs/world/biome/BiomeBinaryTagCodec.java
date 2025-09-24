@@ -1,6 +1,7 @@
 package net.hypejet.jet.server.registry.codecs.world.biome;
 
-import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
+import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.util.codec.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.adventure.IndexBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.primitive.StringBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.world.biome.effects.SpecialEffectsBinaryTagCodec;
@@ -11,7 +12,7 @@ import net.hypejet.jet.world.biome.climate.TemperatureModifier;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Map;
 
@@ -25,6 +26,7 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @see Biome
  * @see BinaryTagCodec
  */
+@NullMarked
 public final class BiomeBinaryTagCodec implements BinaryTagCodec<Biome> {
 
     private static final String HAS_PRECIPITATION_FIELD = "has_precipitation";
@@ -51,8 +53,8 @@ public final class BiomeBinaryTagCodec implements BinaryTagCodec<Biome> {
     private BiomeBinaryTagCodec() {}
 
     @Override
-    public @NotNull Biome decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof CompoundBinaryTag compound) {
+    public Biome decode(BinaryTag binaryTag, JetMinecraftServer server) {
+        if (binaryTag instanceof CompoundBinaryTag compound) {
             BinaryTag temperatureModifierTag = compound.get(TEMPERATURE_MODIFIER_FIELD);
             return new Biome(
                     new ClimateSettings(
@@ -60,10 +62,10 @@ public final class BiomeBinaryTagCodec implements BinaryTagCodec<Biome> {
                             requiredTag(TEMPERATURE_FIELD, compound, BinaryTagTypes.FLOAT).value(),
                             temperatureModifierTag == null
                                     ? TemperatureModifier.NONE
-                                    : TEMPERATURE_MODIFIER_CODEC.decode(temperatureModifierTag),
+                                    : TEMPERATURE_MODIFIER_CODEC.decode(temperatureModifierTag, server),
                             requiredTag(DOWNFALL_FIELD, compound, BinaryTagTypes.FLOAT).value()
                     ),
-                    SpecialEffectsBinaryTagCodec.INSTANCE.decode(requiredTag(SPECIAL_EFFECTS_FIELD, compound))
+                    SpecialEffectsBinaryTagCodec.INSTANCE.decode(requiredTag(SPECIAL_EFFECTS_FIELD, compound), server)
             );
         } else {
             throw new IllegalArgumentException("The encoded tag type must be of compound type to decode it to biome");
@@ -71,18 +73,21 @@ public final class BiomeBinaryTagCodec implements BinaryTagCodec<Biome> {
     }
 
     @Override
-    public @NotNull BinaryTag encode(@NotNull Biome decoded) throws Exception {
-        ClimateSettings climateSettings = decoded.climateSettings();
+    public BinaryTag encode(Biome value, JetMinecraftServer server) {
+        ClimateSettings climateSettings = value.climateSettings();
         CompoundBinaryTag.Builder builder = CompoundBinaryTag.builder()
                 .putBoolean(HAS_PRECIPITATION_FIELD, climateSettings.hasPrecipitation())
                 .putFloat(TEMPERATURE_FIELD, climateSettings.temperature())
                 .putFloat(DOWNFALL_FIELD, climateSettings.downfall())
-                .put(SPECIAL_EFFECTS_FIELD, SpecialEffectsBinaryTagCodec.INSTANCE.encode(decoded.specialEffects()));
+                .put(
+                        SPECIAL_EFFECTS_FIELD,
+                        SpecialEffectsBinaryTagCodec.INSTANCE.encode(value.specialEffects(), server)
+                );
 
 
         TemperatureModifier temperatureModifier = climateSettings.temperatureModifier();
         if (temperatureModifier != TemperatureModifier.NONE) {
-            builder.put(TEMPERATURE_MODIFIER_FIELD, TEMPERATURE_MODIFIER_CODEC.encode(temperatureModifier));
+            builder.put(TEMPERATURE_MODIFIER_FIELD, TEMPERATURE_MODIFIER_CODEC.encode(temperatureModifier, server));
         }
 
         return builder.build();

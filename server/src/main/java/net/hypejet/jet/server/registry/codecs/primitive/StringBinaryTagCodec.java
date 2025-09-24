@@ -1,9 +1,10 @@
 package net.hypejet.jet.server.registry.codecs.primitive;
 
-import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
+import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.util.codec.BinaryTagCodec;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.StringBinaryTag;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A {@linkplain BinaryTagCodec binary tag codec} of {@linkplain String strings}.
@@ -12,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
  * @see String
  * @see BinaryTagCodec
  */
+@NullMarked
 public final class StringBinaryTagCodec implements BinaryTagCodec<String> {
     /**
      * An instance of the {@linkplain StringBinaryTagCodec string binary tag codec}.
@@ -23,8 +25,8 @@ public final class StringBinaryTagCodec implements BinaryTagCodec<String> {
     private StringBinaryTagCodec() {}
 
     @Override
-    public @NotNull String decode(@NotNull BinaryTag encoded) {
-        if (encoded instanceof StringBinaryTag tag) {
+    public String decode(BinaryTag binaryTag, JetMinecraftServer server) {
+        if (binaryTag instanceof StringBinaryTag tag) {
             return tag.value();
         } else {
             throw new IllegalArgumentException("The encoded tag must be of string type to decode it to a string");
@@ -32,7 +34,7 @@ public final class StringBinaryTagCodec implements BinaryTagCodec<String> {
     }
 
     @Override
-    public @NotNull BinaryTag encode(@NotNull String decoded) {
-        return StringBinaryTag.stringBinaryTag(decoded);
+    public BinaryTag encode(String value, JetMinecraftServer server) {
+        return StringBinaryTag.stringBinaryTag(value);
     }
 }

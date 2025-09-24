@@ -10,7 +10,7 @@ import net.hypejet.jet.registry.MinecraftRegistry;
 import net.hypejet.jet.registry.feature.KnownPack;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket;
-import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
+import net.hypejet.jet.server.util.codec.BinaryTagCodec;
 import net.kyori.adventure.key.Key;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;

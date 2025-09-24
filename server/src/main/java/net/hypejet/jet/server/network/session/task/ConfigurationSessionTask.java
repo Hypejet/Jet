@@ -30,7 +30,7 @@ import net.hypejet.jet.server.network.session.keepalive.KeepAliveHandler;
 import net.hypejet.jet.server.network.session.pack.ResourcePackHandler;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
 import net.hypejet.jet.server.registry.JetRegistryManager;
-import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
+import net.hypejet.jet.server.util.codec.BinaryTagCodec;
 import net.hypejet.jet.server.scoreboard.JetScoreboard;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.hypejet.jet.server.util.game.audience.PacketReceivingCommonAudience;
@@ -359,7 +359,7 @@ public final class ConfigurationSessionTask implements SessionTask, Configuratio
                 serializedValue = null; // The client already knows the value by enabling the same feature pack
             } else {
                 try {
-                    serializedValue = valueCodec.encode(registrationInfo.value());
+                    serializedValue = valueCodec.encode(registrationInfo.value(), connection.server());
                 } catch (Exception exception) {
                     throw new RuntimeException("An error occurred while encoding a registry value", exception);
                 }

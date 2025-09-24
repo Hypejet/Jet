@@ -1,10 +1,11 @@
 package net.hypejet.jet.server.registry.codecs.chat;
 
 import net.hypejet.jet.chat.ChatType;
-import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
+import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.util.codec.BinaryTagCodec;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
 
@@ -15,6 +16,7 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @see ChatType
  * @see BinaryTagCodec
  */
+@NullMarked
 public final class ChatTypeBinaryTagCodec implements BinaryTagCodec<ChatType> {
 
     private static final String CHAT_FIELD = "chat";
@@ -30,11 +32,11 @@ public final class ChatTypeBinaryTagCodec implements BinaryTagCodec<ChatType> {
     private ChatTypeBinaryTagCodec() {}
 
     @Override
-    public @NotNull ChatType decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof CompoundBinaryTag compound) {
+    public ChatType decode(BinaryTag binaryTag, JetMinecraftServer server) {
+        if (binaryTag instanceof CompoundBinaryTag compound) {
             return new ChatType(
-                    ChatTypeDecorationBinaryTagCodec.INSTANCE.decode(requiredTag(CHAT_FIELD, compound)),
-                    ChatTypeDecorationBinaryTagCodec.INSTANCE.decode(requiredTag(NARRATION_FIELD, compound))
+                    ChatTypeDecorationBinaryTagCodec.INSTANCE.decode(requiredTag(CHAT_FIELD, compound), server),
+                    ChatTypeDecorationBinaryTagCodec.INSTANCE.decode(requiredTag(NARRATION_FIELD, compound), server)
             );
         } else {
             throw new IllegalArgumentException("The encoded tag must be of compound type to decode it to a chat type");
@@ -42,10 +44,10 @@ public final class ChatTypeBinaryTagCodec implements BinaryTagCodec<ChatType> {
     }
 
     @Override
-    public @NotNull BinaryTag encode(@NotNull ChatType decoded) throws Exception {
+    public BinaryTag encode(ChatType value, JetMinecraftServer server) {
         return CompoundBinaryTag.builder()
-                .put(CHAT_FIELD, ChatTypeDecorationBinaryTagCodec.INSTANCE.encode(decoded.chat()))
-                .put(NARRATION_FIELD, ChatTypeDecorationBinaryTagCodec.INSTANCE.encode(decoded.narration()))
+                .put(CHAT_FIELD, ChatTypeDecorationBinaryTagCodec.INSTANCE.encode(value.chat(), server))
+                .put(NARRATION_FIELD, ChatTypeDecorationBinaryTagCodec.INSTANCE.encode(value.narration(), server))
                 .build();
     }
 }

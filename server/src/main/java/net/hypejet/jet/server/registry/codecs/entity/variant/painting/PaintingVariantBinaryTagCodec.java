@@ -1,14 +1,15 @@
 package net.hypejet.jet.server.registry.codecs.entity.variant.painting;
 
 import net.hypejet.jet.entity.variant.painting.PaintingVariant;
-import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
+import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.util.codec.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.adventure.ComponentBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.adventure.KeyBinaryTagCodec;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
 
@@ -19,6 +20,7 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @see PaintingVariant
  * @see BinaryTagCodec
  */
+@NullMarked
 public final class PaintingVariantBinaryTagCodec implements BinaryTagCodec<PaintingVariant> {
 
     private static final String WIDTH_FIELD = "width";
@@ -37,16 +39,16 @@ public final class PaintingVariantBinaryTagCodec implements BinaryTagCodec<Paint
     private PaintingVariantBinaryTagCodec() {}
 
     @Override
-    public @NotNull PaintingVariant decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof CompoundBinaryTag compound) {
+    public PaintingVariant decode(BinaryTag binaryTag, JetMinecraftServer server) {
+        if (binaryTag instanceof CompoundBinaryTag compound) {
             BinaryTag titleTag = compound.get(TITLE_FIELD);
             BinaryTag authorTag = compound.get(AUTHOR_FIELD);
             return new PaintingVariant(
                     requiredTag(WIDTH_FIELD, compound, BinaryTagTypes.INT).value(),
                     requiredTag(HEIGHT_FIELD, compound, BinaryTagTypes.INT).value(),
-                    KeyBinaryTagCodec.INSTANCE.decode(requiredTag(ASSET_FIELD, compound)),
-                    titleTag == null ? null : ComponentBinaryTagCodec.INSTANCE.decode(titleTag),
-                    authorTag == null ? null : ComponentBinaryTagCodec.INSTANCE.decode(authorTag)
+                    KeyBinaryTagCodec.INSTANCE.decode(requiredTag(ASSET_FIELD, compound), server),
+                    titleTag == null ? null : ComponentBinaryTagCodec.INSTANCE.decode(titleTag, server),
+                    authorTag == null ? null : ComponentBinaryTagCodec.INSTANCE.decode(authorTag, server)
             );
         } else {
             throw new IllegalArgumentException(
@@ -56,20 +58,20 @@ public final class PaintingVariantBinaryTagCodec implements BinaryTagCodec<Paint
     }
 
     @Override
-    public @NotNull BinaryTag encode(@NotNull PaintingVariant decoded) throws Exception {
+    public BinaryTag encode(PaintingVariant value, JetMinecraftServer server) {
         CompoundBinaryTag.Builder builder = CompoundBinaryTag.builder()
-                .putInt(WIDTH_FIELD, decoded.width())
-                .putInt(HEIGHT_FIELD, decoded.height())
-                .put(ASSET_FIELD, KeyBinaryTagCodec.INSTANCE.encode(decoded.asset()));
+                .putInt(WIDTH_FIELD, value.width())
+                .putInt(HEIGHT_FIELD, value.height())
+                .put(ASSET_FIELD, KeyBinaryTagCodec.INSTANCE.encode(value.asset(), server));
 
-        Component title = decoded.title();
+        Component title = value.title();
         if (title != null) {
-            builder.put(TITLE_FIELD, ComponentBinaryTagCodec.INSTANCE.encode(title));
+            builder.put(TITLE_FIELD, ComponentBinaryTagCodec.INSTANCE.encode(title, server));
         }
 
-        Component author = decoded.author();
+        Component author = value.author();
         if (author != null) {
-            builder.put(AUTHOR_FIELD, ComponentBinaryTagCodec.INSTANCE.encode(author));
+            builder.put(AUTHOR_FIELD, ComponentBinaryTagCodec.INSTANCE.encode(author, server));
         }
 
         return builder.build();

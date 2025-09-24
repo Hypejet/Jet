@@ -2,13 +2,13 @@ package net.hypejet.jet.server.registry.codecs.registry;
 
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.holder.HolderSet;
-import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
+import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.util.codec.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.adventure.KeyBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.primitive.ListBinaryTagCodec;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTag;
-import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Iterator;
 import java.util.List;
@@ -22,6 +22,7 @@ import java.util.Objects;
  * @see HolderSet
  * @see BinaryTagCodec
  */
+@NullMarked
 public final class HolderSetBinaryTagCodec<V> implements BinaryTagCodec<HolderSet<V>> {
 
     private final BinaryTagCodec<List<Holder<V>>> holderListCodec;
@@ -32,7 +33,7 @@ public final class HolderSetBinaryTagCodec<V> implements BinaryTagCodec<HolderSe
      * @param holderCodec a binary-tag codec that should handle serialization of direct holder definitions
      * @since 1.0
      */
-    public HolderSetBinaryTagCodec(@NonNull BinaryTagCodec<Holder<V>> holderCodec) {
+    public HolderSetBinaryTagCodec(BinaryTagCodec<Holder<V>> holderCodec) {
         this(holderCodec, true);
     }
 
@@ -43,32 +44,31 @@ public final class HolderSetBinaryTagCodec<V> implements BinaryTagCodec<HolderSe
      * @param compact whether the binary-tag codec serializing holder lists should support compact lists
      * @since 1.0
      */
-    public HolderSetBinaryTagCodec(@NonNull BinaryTagCodec<Holder<V>> holderCodec, boolean compact) {
+    public HolderSetBinaryTagCodec(BinaryTagCodec<Holder<V>> holderCodec, boolean compact) {
         this.holderListCodec = new ListBinaryTagCodec<>(Objects.requireNonNull(holderCodec, "holder codec"), compact);
     }
 
     @Override
-    public @NotNull HolderSet<V> decode(@NotNull BinaryTag encoded) throws Exception {
+    public HolderSet<V> decode(BinaryTag binaryTag, JetMinecraftServer server) {
         try {
-            return new HolderSet.Named<>(KeyBinaryTagCodec.HASHED_INSTANCE.decode(encoded));
+            return new HolderSet.Named<>(KeyBinaryTagCodec.HASHED_INSTANCE.decode(binaryTag, server));
         } catch (Exception exception) {
-            List<Holder<V>> contents = this.holderListCodec.decode(encoded);
+            List<Holder<V>> contents = this.holderListCodec.decode(binaryTag, server);
             return new HolderSet.Direct<>(validateList(contents));
         }
     }
 
     @Override
-    public @NotNull BinaryTag encode(@NotNull HolderSet<V> decoded) throws Exception {
-        return switch (decoded) {
-            case HolderSet.Named<V>(Key tagKey) -> KeyBinaryTagCodec.HASHED_INSTANCE.encode(tagKey);
-            case HolderSet.Direct<V>(List<Holder<V>> contents) -> this.holderListCodec.encode(validateList(contents));
-            default -> throw new IllegalStateException(
-                    "Unknown holder set class: " + decoded.getClass().getSimpleName()
-            );
+    public BinaryTag encode(HolderSet<V> value, JetMinecraftServer server) {
+        return switch (value) {
+            case HolderSet.Named<V>(Key tagKey) -> KeyBinaryTagCodec.HASHED_INSTANCE.encode(tagKey, server);
+            case HolderSet.Direct<V>(List<Holder<V>> contents) ->
+                    this.holderListCodec.encode(validateList(contents), server);
+            default -> throw new IllegalStateException("Unknown holder set class: " + value.getClass().getName());
         };
     }
 
-    private static <V> @NotNull List<Holder<V>> validateList(@NonNull List<Holder<V>> list) {
+    private static <V> List<Holder<V>> validateList(List<Holder<V>> list) {
         Iterator<Holder<V>> iterator = list.iterator();
         if (iterator.hasNext()) {
             Class<?> firstValueClass = iterator.next().getClass();

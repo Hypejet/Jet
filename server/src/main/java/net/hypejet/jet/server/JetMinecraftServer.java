@@ -69,7 +69,7 @@ public final class JetMinecraftServer implements MinecraftServer {
 
         this.pluginManager = new JetPluginManager(this.eventNode);
         this.commandManager = new JetCommandManager(this.eventNode, this.playerList);
-        this.registryManager = new JetRegistryManager(this.eventNode, this.networkManager);
+        this.registryManager = new JetRegistryManager(this);
         this.worldManager = new JetWorldManager(this.registryManager);
         this.entityManager = new JetEntityManager(this);
         this.scoreboardManager = new JetScoreboardManager();
@@ -155,6 +155,16 @@ public final class JetMinecraftServer implements MinecraftServer {
         } catch (IllegalThreadStateException exception) {
             // The shutdown has already been scheduled
         }
+    }
+
+    /**
+     * Gets a {@linkplain NetworkManager network manager} of this {@linkplain JetMinecraftServer server}.
+     *
+     * @return the network manager
+     * @since 1.0
+     */
+    public @NonNull NetworkManager networkManager() {
+        return this.networkManager;
     }
 
     /**

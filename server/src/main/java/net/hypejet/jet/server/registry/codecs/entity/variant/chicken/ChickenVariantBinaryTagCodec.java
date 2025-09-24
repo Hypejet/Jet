@@ -1,14 +1,15 @@
 package net.hypejet.jet.server.registry.codecs.entity.variant.chicken;
 
 import net.hypejet.jet.entity.variant.chicken.ChickenVariant;
-import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
+import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.util.codec.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.adventure.IndexBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.adventure.KeyBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.primitive.StringBinaryTagCodec;
 import net.hypejet.jet.server.util.index.IndexUtil;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Map;
 
@@ -21,6 +22,7 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @see ChickenVariant
  * @see BinaryTagCodec
  */
+@NullMarked
 public final class ChickenVariantBinaryTagCodec implements BinaryTagCodec<ChickenVariant> {
 
     private static final String MODEL_TYPE_FIELD = "model";
@@ -44,12 +46,14 @@ public final class ChickenVariantBinaryTagCodec implements BinaryTagCodec<Chicke
     private ChickenVariantBinaryTagCodec() {}
 
     @Override
-    public @NotNull ChickenVariant decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof CompoundBinaryTag compound) {
+    public ChickenVariant decode(BinaryTag binaryTag, JetMinecraftServer server) {
+        if (binaryTag instanceof CompoundBinaryTag compound) {
             BinaryTag modelTypeTag = compound.get(MODEL_TYPE_FIELD);
             return new ChickenVariant(
-                    modelTypeTag == null ? ChickenVariant.ModelType.NORMAL : MODEL_TYPE_CODEC.decode(modelTypeTag),
-                    KeyBinaryTagCodec.INSTANCE.decode(requiredTag(ASSET_FIELD, compound))
+                    modelTypeTag == null
+                            ? ChickenVariant.ModelType.NORMAL
+                            : MODEL_TYPE_CODEC.decode(modelTypeTag, server),
+                    KeyBinaryTagCodec.INSTANCE.decode(requiredTag(ASSET_FIELD, compound), server)
             );
         } else {
             throw new IllegalArgumentException(
@@ -59,13 +63,13 @@ public final class ChickenVariantBinaryTagCodec implements BinaryTagCodec<Chicke
     }
 
     @Override
-    public @NotNull BinaryTag encode(@NotNull ChickenVariant decoded) throws Exception {
+    public BinaryTag encode(ChickenVariant value, JetMinecraftServer server) {
         CompoundBinaryTag.Builder builder = CompoundBinaryTag.builder()
-                .put(ASSET_FIELD, KeyBinaryTagCodec.INSTANCE.encode(decoded.asset()));
+                .put(ASSET_FIELD, KeyBinaryTagCodec.INSTANCE.encode(value.asset(), server));
 
-        ChickenVariant.ModelType modelType = decoded.modelType();
+        ChickenVariant.ModelType modelType = value.modelType();
         if (modelType != ChickenVariant.ModelType.NORMAL) {
-            builder.put(MODEL_TYPE_FIELD, MODEL_TYPE_CODEC.encode(modelType));
+            builder.put(MODEL_TYPE_FIELD, MODEL_TYPE_CODEC.encode(modelType, server));
         }
 
         return builder.build();

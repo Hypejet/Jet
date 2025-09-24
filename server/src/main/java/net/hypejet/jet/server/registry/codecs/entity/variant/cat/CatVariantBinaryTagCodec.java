@@ -1,11 +1,12 @@
 package net.hypejet.jet.server.registry.codecs.entity.variant.cat;
 
 import net.hypejet.jet.entity.variant.cat.CatVariant;
-import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
+import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.util.codec.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.adventure.KeyBinaryTagCodec;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
 
@@ -16,6 +17,7 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @see CatVariant
  * @see BinaryTagCodec
  */
+@NullMarked
 public final class CatVariantBinaryTagCodec implements BinaryTagCodec<CatVariant> {
 
     private static final String ASSET_FIELD = "asset_id";
@@ -30,9 +32,9 @@ public final class CatVariantBinaryTagCodec implements BinaryTagCodec<CatVariant
     private CatVariantBinaryTagCodec() {}
 
     @Override
-    public @NotNull CatVariant decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof CompoundBinaryTag compound) {
-            return new CatVariant(KeyBinaryTagCodec.INSTANCE.decode(requiredTag(ASSET_FIELD, compound)));
+    public CatVariant decode(BinaryTag binaryTag, JetMinecraftServer server) {
+        if (binaryTag instanceof CompoundBinaryTag compound) {
+            return new CatVariant(KeyBinaryTagCodec.INSTANCE.decode(requiredTag(ASSET_FIELD, compound), server));
         } else {
             throw new IllegalArgumentException(
                     "The encoded tag must be of compound type to decode it to a cat variant"
@@ -41,9 +43,9 @@ public final class CatVariantBinaryTagCodec implements BinaryTagCodec<CatVariant
     }
 
     @Override
-    public @NotNull BinaryTag encode(@NotNull CatVariant decoded) throws Exception {
+    public BinaryTag encode(CatVariant value, JetMinecraftServer server) {
         return CompoundBinaryTag.builder()
-                .put(ASSET_FIELD, KeyBinaryTagCodec.INSTANCE.encode(decoded.asset()))
+                .put(ASSET_FIELD, KeyBinaryTagCodec.INSTANCE.encode(value.asset(), server))
                 .build();
     }
 }
