@@ -4,7 +4,6 @@ import org.jspecify.annotations.NullMarked;
 
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.metadata.EntityMetadata;
-import net.hypejet.jet.entity.metadata.mob.MobEntityMetadata;
 
 /**
  * A metadata of a dolphin {@linkplain Entity entity}.
@@ -13,7 +12,7 @@ import net.hypejet.jet.entity.metadata.mob.MobEntityMetadata;
  * @see Entity
  */
 @NullMarked
-public interface DolphinEntityMetadata extends MobEntityMetadata {
+public interface DolphinEntityMetadata extends AgeableMobEntityMetadata {
     /**
      * {@inheritDoc}
      */
@@ -45,7 +44,7 @@ public interface DolphinEntityMetadata extends MobEntityMetadata {
      * @see AgeableMobEntityMetadata
      * @see EntityMetadata.Update
      */
-    interface Update<U extends Update<U>> extends MobEntityMetadata.Update<U> {        
+    interface Update<U extends Update<U>> extends AgeableMobEntityMetadata.Update<U> {        
         /**
          * Sets whether the dolphin {@linkplain Entity entity} should be holding a fish.
          *
