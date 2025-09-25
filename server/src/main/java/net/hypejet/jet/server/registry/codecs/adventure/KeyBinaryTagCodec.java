@@ -4,7 +4,7 @@ import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.StringBinaryTag;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -14,6 +14,7 @@ import org.jspecify.annotations.Nullable;
  * @see Key
  * @see BinaryTagCodec
  */
+@NullMarked
 public final class KeyBinaryTagCodec implements BinaryTagCodec<Key> {
 
     /**
@@ -30,7 +31,7 @@ public final class KeyBinaryTagCodec implements BinaryTagCodec<Key> {
      */
     public static final KeyBinaryTagCodec HASHED_INSTANCE = new KeyBinaryTagCodec('#');
 
-    private final Character prefix;
+    private final @Nullable Character prefix;
 
     /**
      * Constructs the {@linkplain KeyBinaryTagCodec key binary-tag codec}.
@@ -43,8 +44,8 @@ public final class KeyBinaryTagCodec implements BinaryTagCodec<Key> {
     }
 
     @Override
-    public @NotNull Key decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof StringBinaryTag tag) {
+    public Key decode(BinaryTag binaryTag) {
+        if (binaryTag instanceof StringBinaryTag tag) {
             String value = tag.value();
             if (this.prefix != null) {
                 if (value.startsWith(String.valueOf(this.prefix))) {
@@ -63,10 +64,10 @@ public final class KeyBinaryTagCodec implements BinaryTagCodec<Key> {
     }
 
     @Override
-    public @NotNull BinaryTag encode(@NotNull Key decoded) throws Exception {
-        String value = decoded.asString();
+    public BinaryTag encode(Key value) {
+        String stringValue = value.asString();
         if (this.prefix != null)
-            value = this.prefix + value;
-        return StringBinaryTag.stringBinaryTag(value);
+            stringValue = this.prefix + stringValue;
+        return StringBinaryTag.stringBinaryTag(stringValue);
     }
 }

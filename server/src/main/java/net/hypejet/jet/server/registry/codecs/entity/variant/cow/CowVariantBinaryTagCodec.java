@@ -8,7 +8,7 @@ import net.hypejet.jet.server.registry.codecs.primitive.StringBinaryTagCodec;
 import net.hypejet.jet.server.util.index.IndexUtil;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Map;
 
@@ -21,6 +21,7 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @see CowVariant
  * @see BinaryTagCodec
  */
+@NullMarked
 public final class CowVariantBinaryTagCodec implements BinaryTagCodec<CowVariant> {
 
     private static final String MODEL_TYPE_FIELD = "model";
@@ -45,8 +46,8 @@ public final class CowVariantBinaryTagCodec implements BinaryTagCodec<CowVariant
     private CowVariantBinaryTagCodec() {}
 
     @Override
-    public @NotNull CowVariant decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof CompoundBinaryTag compound) {
+    public CowVariant decode(BinaryTag binaryTag) {
+        if (binaryTag instanceof CompoundBinaryTag compound) {
             BinaryTag modelTypeTag = compound.get(MODEL_TYPE_FIELD);
             return new CowVariant(
                     modelTypeTag == null ? CowVariant.ModelType.NORMAL : MODEL_TYPE_CODEC.decode(modelTypeTag),
@@ -60,11 +61,11 @@ public final class CowVariantBinaryTagCodec implements BinaryTagCodec<CowVariant
     }
 
     @Override
-    public @NotNull BinaryTag encode(@NotNull CowVariant decoded) throws Exception {
+    public BinaryTag encode(CowVariant value) {
         CompoundBinaryTag.Builder builder = CompoundBinaryTag.builder()
-                .put(ASSET_FIELD, KeyBinaryTagCodec.INSTANCE.encode(decoded.asset()));
+                .put(ASSET_FIELD, KeyBinaryTagCodec.INSTANCE.encode(value.asset()));
 
-        CowVariant.ModelType modelType = decoded.modelType();
+        CowVariant.ModelType modelType = value.modelType();
         if (modelType != CowVariant.ModelType.NORMAL) {
             builder.put(MODEL_TYPE_FIELD, MODEL_TYPE_CODEC.encode(modelType));
         }
