@@ -1,11 +1,10 @@
 package net.hypejet.jet.server.registry.codecs.adventure;
 
-import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.util.codec.BinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.StringBinaryTag;
-import org.jspecify.annotations.NullMarked;
+import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -15,7 +14,6 @@ import org.jspecify.annotations.Nullable;
  * @see Key
  * @see BinaryTagCodec
  */
-@NullMarked
 public final class KeyBinaryTagCodec implements BinaryTagCodec<Key> {
 
     /**
@@ -32,7 +30,7 @@ public final class KeyBinaryTagCodec implements BinaryTagCodec<Key> {
      */
     public static final KeyBinaryTagCodec HASHED_INSTANCE = new KeyBinaryTagCodec('#');
 
-    private final @Nullable Character prefix;
+    private final Character prefix;
 
     /**
      * Constructs the {@linkplain KeyBinaryTagCodec key binary-tag codec}.
@@ -45,8 +43,8 @@ public final class KeyBinaryTagCodec implements BinaryTagCodec<Key> {
     }
 
     @Override
-    public Key decode(BinaryTag binaryTag, JetMinecraftServer server) {
-        if (binaryTag instanceof StringBinaryTag tag) {
+    public @NotNull Key decode(@NotNull BinaryTag encoded) throws Exception {
+        if (encoded instanceof StringBinaryTag tag) {
             String value = tag.value();
             if (this.prefix != null) {
                 if (value.startsWith(String.valueOf(this.prefix))) {
@@ -65,10 +63,10 @@ public final class KeyBinaryTagCodec implements BinaryTagCodec<Key> {
     }
 
     @Override
-    public BinaryTag encode(Key value, JetMinecraftServer server) {
-        String stringValue = value.asString();
+    public @NotNull BinaryTag encode(@NotNull Key decoded) throws Exception {
+        String value = decoded.asString();
         if (this.prefix != null)
-            stringValue = this.prefix + stringValue;
-        return StringBinaryTag.stringBinaryTag(stringValue);
+            value = this.prefix + value;
+        return StringBinaryTag.stringBinaryTag(value);
     }
 }

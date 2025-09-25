@@ -4,15 +4,14 @@ import net.hypejet.jet.entity.damage.type.DamageEffects;
 import net.hypejet.jet.entity.damage.type.DamageScalingType;
 import net.hypejet.jet.entity.damage.type.DamageType;
 import net.hypejet.jet.entity.damage.type.DeathMessageType;
-import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.util.codec.BinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.adventure.IndexBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.primitive.StringBinaryTagCodec;
 import net.hypejet.jet.server.util.index.IndexUtil;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import org.jspecify.annotations.NullMarked;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -25,7 +24,6 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @see DamageType
  * @see BinaryTagCodec
  */
-@NullMarked
 public final class DamageTypeBinaryTagCodec implements BinaryTagCodec<DamageType> {
 
     private static final String MESSAGE_ID_FIELD = "message_id";
@@ -74,20 +72,20 @@ public final class DamageTypeBinaryTagCodec implements BinaryTagCodec<DamageType
     private DamageTypeBinaryTagCodec() {}
 
     @Override
-    public DamageType decode(BinaryTag binaryTag, JetMinecraftServer server) {
-        if (binaryTag instanceof CompoundBinaryTag compound) {
+    public @NotNull DamageType decode(@NotNull BinaryTag encoded) throws Exception {
+        if (encoded instanceof CompoundBinaryTag compound) {
             BinaryTag effectsTag = compound.get(EFFECTS_FIELD);
             BinaryTag deathMessageTypeTag = compound.get(DEATH_MESSAGE_TYPE_FIELD);
             return new DamageType(
                     requiredTag(MESSAGE_ID_FIELD, compound, BinaryTagTypes.STRING).value(),
-                    SCALING_TYPE_CODEC.decode(requiredTag(SCALING_TYPE_FIELD, compound), server),
+                    SCALING_TYPE_CODEC.decode(requiredTag(SCALING_TYPE_FIELD, compound)),
                     requiredTag(EXHAUSTION_FIELD, compound, BinaryTagTypes.FLOAT).value(),
                     effectsTag == null
                             ? DamageEffects.HURT
-                            : DAMAGE_EFFECTS_CODEC.decode(effectsTag, server),
+                            : DAMAGE_EFFECTS_CODEC.decode(effectsTag),
                     deathMessageTypeTag == null
                             ? DeathMessageType.DEFAULT
-                            : DEATH_MESSAGE_TYPE_CODEC.decode(deathMessageTypeTag, server)
+                            : DEATH_MESSAGE_TYPE_CODEC.decode(deathMessageTypeTag)
             );
         } else {
             throw new IllegalArgumentException(
@@ -97,20 +95,20 @@ public final class DamageTypeBinaryTagCodec implements BinaryTagCodec<DamageType
     }
 
     @Override
-    public BinaryTag encode(DamageType value, JetMinecraftServer server) {
+    public @NotNull BinaryTag encode(@NotNull DamageType decoded) throws Exception {
         CompoundBinaryTag.Builder builder = CompoundBinaryTag.builder()
-                .putString(MESSAGE_ID_FIELD, value.messageId())
-                .put(SCALING_TYPE_FIELD, SCALING_TYPE_CODEC.encode(value.scalingType(), server))
-                .putFloat(EXHAUSTION_FIELD, value.exhaustion());
+                .putString(MESSAGE_ID_FIELD, decoded.messageId())
+                .put(SCALING_TYPE_FIELD, SCALING_TYPE_CODEC.encode(decoded.scalingType()))
+                .putFloat(EXHAUSTION_FIELD, decoded.exhaustion());
 
-        DamageEffects effects = value.effects();
+        DamageEffects effects = decoded.effects();
         if (effects != DamageEffects.HURT) {
-            builder.put(EFFECTS_FIELD, DAMAGE_EFFECTS_CODEC.encode(effects, server));
+            builder.put(EFFECTS_FIELD, DAMAGE_EFFECTS_CODEC.encode(effects));
         }
 
-        DeathMessageType deathMessageType = value.deathMessageType();
+        DeathMessageType deathMessageType = decoded.deathMessageType();
         if (deathMessageType != DeathMessageType.DEFAULT) {
-            builder.put(DEATH_MESSAGE_TYPE_FIELD, DEATH_MESSAGE_TYPE_CODEC.encode(deathMessageType, server));
+            builder.put(DEATH_MESSAGE_TYPE_FIELD, DEATH_MESSAGE_TYPE_CODEC.encode(deathMessageType));
         }
 
         return builder.build();

@@ -1,7 +1,6 @@
 package net.hypejet.jet.server.registry.codecs.world.sound;
 
-import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.util.codec.BinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.adventure.KeyBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.registry.HolderBinaryTagCodec;
 import net.hypejet.jet.world.sound.SoundEvent;
@@ -9,7 +8,7 @@ import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.FloatBinaryTag;
-import org.jspecify.annotations.NullMarked;
+import org.jetbrains.annotations.NotNull;
 
 import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.optionalTag;
 import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
@@ -21,7 +20,6 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @see SoundEvent
  * @see BinaryTagCodec
  */
-@NullMarked
 public final class SoundEventBinaryTagCodec implements BinaryTagCodec<SoundEvent> {
     /**
      * An instance of the {@linkplain SoundEventBinaryTagCodec sound event binary tag codec}.
@@ -45,11 +43,11 @@ public final class SoundEventBinaryTagCodec implements BinaryTagCodec<SoundEvent
     private SoundEventBinaryTagCodec() {}
 
     @Override
-    public SoundEvent decode(BinaryTag binaryTag, JetMinecraftServer server) {
-        if (binaryTag instanceof CompoundBinaryTag compound) {
+    public @NotNull SoundEvent decode(@NotNull BinaryTag encoded) throws Exception {
+        if (encoded instanceof CompoundBinaryTag compound) {
             FloatBinaryTag rangeTag = optionalTag(RANGE_FIELD, compound, BinaryTagTypes.FLOAT);
             return new SoundEvent(
-                    KeyBinaryTagCodec.INSTANCE.decode(requiredTag(SOUND_KEY_FIELD, compound), server),
+                    KeyBinaryTagCodec.INSTANCE.decode(requiredTag(SOUND_KEY_FIELD, compound)),
                     rangeTag == null ? null : rangeTag.value()
             );
         } else {
@@ -60,11 +58,11 @@ public final class SoundEventBinaryTagCodec implements BinaryTagCodec<SoundEvent
     }
 
     @Override
-    public BinaryTag encode(SoundEvent value, JetMinecraftServer server) {
+    public @NotNull BinaryTag encode(@NotNull SoundEvent decoded) throws Exception {
         CompoundBinaryTag.Builder builder = CompoundBinaryTag.builder()
-                .put(SOUND_KEY_FIELD, KeyBinaryTagCodec.INSTANCE.encode(value.sound(), server));
+                .put(SOUND_KEY_FIELD, KeyBinaryTagCodec.INSTANCE.encode(decoded.sound()));
 
-        Float range = value.range();
+        Float range = decoded.range();
         if (range != null) {
             builder.putFloat(RANGE_FIELD, range);
         }

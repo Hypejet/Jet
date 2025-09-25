@@ -1,11 +1,11 @@
 package net.hypejet.jet.server.registry.codecs.registry;
 
 import net.hypejet.jet.registry.holder.Holder;
-import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.util.codec.BinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.adventure.KeyBinaryTagCodec;
 import net.kyori.adventure.nbt.BinaryTag;
-import org.jspecify.annotations.NullMarked;
+import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -16,10 +16,9 @@ import org.jspecify.annotations.Nullable;
  * @see Holder
  * @see BinaryTagCodec
  */
-@NullMarked
 public final class HolderBinaryTagCodec<V> implements BinaryTagCodec<Holder<V>> {
 
-    private final @Nullable BinaryTagCodec<V> valueCodec;
+    private final BinaryTagCodec<V> valueCodec;
     private final boolean allowInline;
 
     /**
@@ -47,26 +46,26 @@ public final class HolderBinaryTagCodec<V> implements BinaryTagCodec<Holder<V>> 
     }
 
     @Override
-    public Holder<V> decode(BinaryTag binaryTag, JetMinecraftServer server) {
+    public @NotNull Holder<V> decode(@NotNull BinaryTag encoded) throws Exception {
         try {
-            return new Holder.Reference<>(KeyBinaryTagCodec.INSTANCE.decode(binaryTag, server));
+            return new Holder.Reference<>(KeyBinaryTagCodec.INSTANCE.decode(encoded));
         } catch (Exception exception) {
             if (!this.allowInline)
                 throw new IllegalArgumentException("Inline definitions are not allowed here");
-            return new Holder.Direct<>(this.valueCodecOrThrow().decode(binaryTag, server));
+            return new Holder.Direct<>(this.valueCodecOrThrow().decode(encoded));
         }
     }
 
     @Override
-    public BinaryTag encode(Holder<V> value, JetMinecraftServer server) {
-        return switch (value) {
-            case Holder.Direct<V> direct -> this.valueCodecOrThrow().encode(direct.value(), server);
-            case Holder.Reference<V> reference -> KeyBinaryTagCodec.INSTANCE.encode(reference.key(), server);
-            default -> throw new IllegalArgumentException("Unknown holder class: " + value.getClass().getName());
+    public @NotNull BinaryTag encode(@NotNull Holder<V> decoded) throws Exception {
+        return switch (decoded) {
+            case Holder.Direct<V> direct -> this.valueCodecOrThrow().encode(direct.value());
+            case Holder.Reference<V> reference -> KeyBinaryTagCodec.INSTANCE.encode(reference.key());
+            default -> throw new IllegalArgumentException("Unknown holder: " + decoded);
         };
     }
 
-    private BinaryTagCodec<V> valueCodecOrThrow() {
+    private @NonNull BinaryTagCodec<V> valueCodecOrThrow() {
         if (this.valueCodec == null)
             throw new IllegalArgumentException("Direct holder serialization is not supported by this codec");
         return this.valueCodec;

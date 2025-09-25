@@ -1,7 +1,6 @@
 package net.hypejet.jet.server.registry.codecs.util.game.number;
 
-import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.util.codec.BinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.adventure.KeyBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.primitive.ListBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.util.game.random.WeightedBinaryTagCodec;
@@ -14,7 +13,7 @@ import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.IntBinaryTag;
 import net.kyori.adventure.util.Index;
-import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,6 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @see IntProvider
  * @see BinaryTagCodec
  */
-@NullMarked
 public final class IntProviderBinaryTagCodec implements BinaryTagCodec<IntProvider> {
 
     /**
@@ -65,17 +63,17 @@ public final class IntProviderBinaryTagCodec implements BinaryTagCodec<IntProvid
     private IntProviderBinaryTagCodec() {}
 
     @Override
-    public IntProvider decode(BinaryTag binaryTag, JetMinecraftServer server) {
-        if (binaryTag instanceof IntBinaryTag tag)
+    public @NonNull IntProvider decode(@NonNull BinaryTag encoded) throws Exception {
+        if (encoded instanceof IntBinaryTag tag)
             return new IntProvider.Constant(tag.value());
 
-        if (!(binaryTag instanceof CompoundBinaryTag compound)) {
+        if (!(encoded instanceof CompoundBinaryTag compound)) {
             throw new IllegalArgumentException(
                     "The encoded tag must be of either int or compound type to decode it to an int provider"
             );
         }
 
-        Key typeKey = KeyBinaryTagCodec.INSTANCE.decode(requiredTag(TYPE_FIELD, compound), server);
+        Key typeKey = KeyBinaryTagCodec.INSTANCE.decode(requiredTag(TYPE_FIELD, compound));
         Class<? extends IntProvider> providerClass = KEY_INDEX.valueOrThrow(typeKey);
 
         if (IntProvider.Constant.class.isAssignableFrom(providerClass)) {
@@ -92,13 +90,13 @@ public final class IntProviderBinaryTagCodec implements BinaryTagCodec<IntProvid
             );
         } else if (IntProvider.Clamped.class.isAssignableFrom(providerClass)) {
             return new IntProvider.Clamped(
-                    INSTANCE.decode(requiredTag(SOURCE_FIELD, compound), server),
+                    INSTANCE.decode(requiredTag(SOURCE_FIELD, compound)),
                     requiredTag(MINIMUM_FIELD, compound, BinaryTagTypes.INT).value(),
                     requiredTag(MAXIMUM_FIELD, compound, BinaryTagTypes.INT).value()
             );
         } else if (IntProvider.WeightedRandom.class.isAssignableFrom(providerClass)) {
             return new IntProvider.WeightedRandom(
-                    DISTRIBUTION_CODEC.decode(requiredTag(DISTRIBUTION_FIELD, compound), server)
+                    DISTRIBUTION_CODEC.decode(requiredTag(DISTRIBUTION_FIELD, compound))
             );
         } else if (IntProvider.ClampedNormal.class.isAssignableFrom(providerClass)) {
             return new IntProvider.ClampedNormal(
@@ -113,15 +111,15 @@ public final class IntProviderBinaryTagCodec implements BinaryTagCodec<IntProvid
     }
 
     @Override
-    public BinaryTag encode(IntProvider value, JetMinecraftServer server) {
-        if (value instanceof IntProvider.Constant(int constantValue))
-            return IntBinaryTag.intBinaryTag(constantValue);
+    public @NonNull BinaryTag encode(@NonNull IntProvider decoded) throws Exception {
+        if (decoded instanceof IntProvider.Constant(int value))
+            return IntBinaryTag.intBinaryTag(value);
 
-        Class<? extends IntProvider> providerClass = value.getClass();
+        Class<? extends IntProvider> providerClass = decoded.getClass();
         CompoundBinaryTag.Builder builder = CompoundBinaryTag.builder();
-        builder.put(TYPE_FIELD, KeyBinaryTagCodec.INSTANCE.encode(KEY_INDEX.keyOrThrow(providerClass), server));
+        builder.put(TYPE_FIELD, KeyBinaryTagCodec.INSTANCE.encode(KEY_INDEX.keyOrThrow(providerClass)));
 
-        switch (value) {
+        switch (decoded) {
             case IntProvider.Uniform(int minimum, int maximum) -> {
                 builder.putInt(MINIMUM_FIELD, minimum);
                 builder.putInt(MAXIMUM_FIELD, maximum);
@@ -131,7 +129,7 @@ public final class IntProviderBinaryTagCodec implements BinaryTagCodec<IntProvid
                 builder.putInt(MAXIMUM_FIELD, maximum);
             }
             case IntProvider.Clamped(IntProvider source, int minimum, int maximum) -> {
-                builder.put(SOURCE_FIELD, INSTANCE.encode(source, server));
+                builder.put(SOURCE_FIELD, INSTANCE.encode(source));
                 builder.putInt(MINIMUM_FIELD, minimum);
                 builder.putInt(MAXIMUM_FIELD, maximum);
             }
@@ -142,14 +140,14 @@ public final class IntProviderBinaryTagCodec implements BinaryTagCodec<IntProvid
                 builder.putInt(MAXIMUM_FIELD, maximum);
             }
             case IntProvider.WeightedRandom(List<Weighted<IntProvider>> distribution) ->
-                    builder.put(DISTRIBUTION_FIELD, DISTRIBUTION_CODEC.encode(distribution, server));
+                    builder.put(DISTRIBUTION_FIELD, DISTRIBUTION_CODEC.encode(distribution));
             default -> throw unknownProviderClass(providerClass);
         }
 
         return builder.build();
     }
 
-    private static IllegalArgumentException unknownProviderClass(Class<?> providerClass) {
+    private static @NonNull IllegalArgumentException unknownProviderClass(@NonNull Class<?> providerClass) {
         return new IllegalArgumentException("Unknown int provider class: " + providerClass.getSimpleName());
     }
 }

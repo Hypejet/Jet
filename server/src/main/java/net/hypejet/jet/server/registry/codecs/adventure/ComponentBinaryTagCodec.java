@@ -1,11 +1,11 @@
 package net.hypejet.jet.server.registry.codecs.adventure;
 
-import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.util.codec.BinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.nbt.NBTComponentSerializer;
-import org.jspecify.annotations.NullMarked;
+import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
 
@@ -16,7 +16,6 @@ import java.util.Objects;
  * @see Component
  * @see BinaryTagCodec
  */
-@NullMarked
 public final class ComponentBinaryTagCodec implements BinaryTagCodec<Component> {
     /**
      * An instance of the {@linkplain ComponentBinaryTagCodec component binary tag codec}
@@ -29,17 +28,17 @@ public final class ComponentBinaryTagCodec implements BinaryTagCodec<Component> 
 
     private final NBTComponentSerializer serializer;
 
-    private ComponentBinaryTagCodec(NBTComponentSerializer serializer) {
+    private ComponentBinaryTagCodec(@NonNull NBTComponentSerializer serializer) {
         this.serializer = Objects.requireNonNull(serializer, "serializer");
     }
 
     @Override
-    public Component decode(BinaryTag binaryTag, JetMinecraftServer server) {
-        return this.serializer.deserialize(binaryTag);
+    public @NotNull Component decode(@NotNull BinaryTag encoded) {
+        return this.serializer.deserialize(encoded);
     }
 
     @Override
-    public BinaryTag encode(Component value, JetMinecraftServer server) {
-        return this.serializer.serialize(value);
+    public @NotNull BinaryTag encode(@NotNull Component decoded) {
+        return this.serializer.serialize(decoded);
     }
 }

@@ -1,14 +1,13 @@
 package net.hypejet.jet.server.registry.codecs.world.block.jukebox;
 
-import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.util.codec.BinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.adventure.ComponentBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.world.sound.SoundEventBinaryTagCodec;
 import net.hypejet.jet.world.block.jukebox.JukeboxSong;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import org.jspecify.annotations.NullMarked;
+import org.jetbrains.annotations.NotNull;
 
 import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
 
@@ -19,7 +18,6 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @see JukeboxSong
  * @see BinaryTagCodec
  */
-@NullMarked
 public final class JukeboxSongBinaryTagCodec implements BinaryTagCodec<JukeboxSong> {
 
     private static final String SOUND_EVENT_FIELD = "sound_event";
@@ -37,11 +35,11 @@ public final class JukeboxSongBinaryTagCodec implements BinaryTagCodec<JukeboxSo
     private JukeboxSongBinaryTagCodec() {}
 
     @Override
-    public JukeboxSong decode(BinaryTag binaryTag, JetMinecraftServer server) {
-        if (binaryTag instanceof CompoundBinaryTag compound) {
+    public @NotNull JukeboxSong decode(@NotNull BinaryTag encoded) throws Exception {
+        if (encoded instanceof CompoundBinaryTag compound) {
             return new JukeboxSong(
-                    SoundEventBinaryTagCodec.HOLDER_CODEC.decode(requiredTag(SOUND_EVENT_FIELD, compound), server),
-                    ComponentBinaryTagCodec.INSTANCE.decode(requiredTag(DESCRIPTION_FIELD, compound), server),
+                    SoundEventBinaryTagCodec.HOLDER_CODEC.decode(requiredTag(SOUND_EVENT_FIELD, compound)),
+                    ComponentBinaryTagCodec.INSTANCE.decode(requiredTag(DESCRIPTION_FIELD, compound)),
                     requiredTag(LENGTH_IN_SECONDS_FIELD, compound, BinaryTagTypes.FLOAT).value(),
                     requiredTag(COMPARATOR_OUTPUT_FIELD, compound, BinaryTagTypes.INT).value()
             );
@@ -53,12 +51,12 @@ public final class JukeboxSongBinaryTagCodec implements BinaryTagCodec<JukeboxSo
     }
 
     @Override
-    public BinaryTag encode(JukeboxSong value, JetMinecraftServer server) {
+    public @NotNull BinaryTag encode(@NotNull JukeboxSong decoded) throws Exception {
         return CompoundBinaryTag.builder()
-                .put(SOUND_EVENT_FIELD, SoundEventBinaryTagCodec.HOLDER_CODEC.encode(value.soundEvent(), server))
-                .put(DESCRIPTION_FIELD, ComponentBinaryTagCodec.INSTANCE.encode(value.description(), server))
-                .putFloat(LENGTH_IN_SECONDS_FIELD, value.lengthInSeconds())
-                .putInt(COMPARATOR_OUTPUT_FIELD, value.comparatorOutput())
+                .put(SOUND_EVENT_FIELD, SoundEventBinaryTagCodec.HOLDER_CODEC.encode(decoded.soundEvent()))
+                .put(DESCRIPTION_FIELD, ComponentBinaryTagCodec.INSTANCE.encode(decoded.description()))
+                .putFloat(LENGTH_IN_SECONDS_FIELD, decoded.lengthInSeconds())
+                .putInt(COMPARATOR_OUTPUT_FIELD, decoded.comparatorOutput())
                 .build();
     }
 }

@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.world.particle;
 
 import net.hypejet.jet.server.network.codec.NetworkWriter;
-import net.hypejet.jet.server.util.codec.BinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.hypejet.jet.world.particle.Particle;
 import net.hypejet.jet.world.particle.ParticleType;
 import org.jspecify.annotations.NullMarked;

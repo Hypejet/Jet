@@ -1,11 +1,10 @@
 package net.hypejet.jet.server.registry.codecs.util.color;
 
-import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.util.codec.BinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.hypejet.jet.util.color.RGBColor;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.IntBinaryTag;
-import org.jspecify.annotations.NullMarked;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A {@linkplain BinaryTagCodec binary tag codec} of {@linkplain RGBColor RGB colors}.
@@ -14,7 +13,6 @@ import org.jspecify.annotations.NullMarked;
  * @see RGBColor
  * @see BinaryTagCodec
  */
-@NullMarked
 public final class RGBColorBinaryTagCodec implements BinaryTagCodec<RGBColor> {
     /**
      * An instance of the {@linkplain RGBColorBinaryTagCodec RGB color binary-tag codec}.
@@ -26,14 +24,14 @@ public final class RGBColorBinaryTagCodec implements BinaryTagCodec<RGBColor> {
     private RGBColorBinaryTagCodec() {}
 
     @Override
-    public RGBColor decode(BinaryTag binaryTag, JetMinecraftServer server) {
-        if (!(binaryTag instanceof IntBinaryTag intTag))
+    public @NotNull RGBColor decode(@NotNull BinaryTag encoded) {
+        if (!(encoded instanceof IntBinaryTag tag))
             throw new IllegalArgumentException("The encoded tag must be of int type to decode it to a color");
-        return new RGBColor(intTag.value());
+        return new RGBColor(tag.value());
     }
 
     @Override
-    public BinaryTag encode(RGBColor value, JetMinecraftServer server) {
-        return IntBinaryTag.intBinaryTag(value.value());
+    public @NotNull BinaryTag encode(@NotNull RGBColor decoded) {
+        return IntBinaryTag.intBinaryTag(decoded.value());
     }
 }

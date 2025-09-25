@@ -1,13 +1,12 @@
 package net.hypejet.jet.server.registry.codecs.world.biome.effects;
 
-import net.hypejet.jet.server.JetMinecraftServer;
-import net.hypejet.jet.server.util.codec.BinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.world.sound.SoundEventBinaryTagCodec;
 import net.hypejet.jet.world.biome.effects.Music;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import org.jspecify.annotations.NullMarked;
+import org.jetbrains.annotations.NotNull;
 
 import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.booleanValue;
 import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
@@ -19,7 +18,6 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @see Music
  * @see BinaryTagCodec
  */
-@NullMarked
 public final class MusicBinaryTagCodec implements BinaryTagCodec<Music> {
 
     private static final String SOUND_EVENT_FIELD = "sound";
@@ -37,10 +35,10 @@ public final class MusicBinaryTagCodec implements BinaryTagCodec<Music> {
     private MusicBinaryTagCodec() {}
 
     @Override
-    public Music decode(BinaryTag binaryTag, JetMinecraftServer server) {
-        if (binaryTag instanceof CompoundBinaryTag compound) {
+    public @NotNull Music decode(@NotNull BinaryTag encoded) throws Exception {
+        if (encoded instanceof CompoundBinaryTag compound) {
             return new Music(
-                    SoundEventBinaryTagCodec.HOLDER_CODEC.decode(requiredTag(SOUND_EVENT_FIELD, compound), server),
+                    SoundEventBinaryTagCodec.HOLDER_CODEC.decode(requiredTag(SOUND_EVENT_FIELD, compound)),
                     requiredTag(MIN_DELAY_FIELD, compound, BinaryTagTypes.INT).value(),
                     requiredTag(MAX_DELAY_FIELD, compound, BinaryTagTypes.INT).value(),
                     booleanValue(requiredTag(REPLACE_CURRENT_MUSIC_FIELD, compound, BinaryTagTypes.BYTE))
@@ -51,12 +49,12 @@ public final class MusicBinaryTagCodec implements BinaryTagCodec<Music> {
     }
 
     @Override
-    public BinaryTag encode(Music value, JetMinecraftServer server) {
+    public @NotNull BinaryTag encode(@NotNull Music decoded) throws Exception {
         return CompoundBinaryTag.builder()
-                .put(SOUND_EVENT_FIELD, SoundEventBinaryTagCodec.HOLDER_CODEC.encode(value.soundEvent(), server))
-                .putInt(MIN_DELAY_FIELD, value.minDelay())
-                .putInt(MAX_DELAY_FIELD, value.maxDelay())
-                .putBoolean(REPLACE_CURRENT_MUSIC_FIELD, value.replaceCurrentMusic())
+                .put(SOUND_EVENT_FIELD, SoundEventBinaryTagCodec.HOLDER_CODEC.encode(decoded.soundEvent()))
+                .putInt(MIN_DELAY_FIELD, decoded.minDelay())
+                .putInt(MAX_DELAY_FIELD, decoded.maxDelay())
+                .putBoolean(REPLACE_CURRENT_MUSIC_FIELD, decoded.replaceCurrentMusic())
                 .build();
     }
 }
