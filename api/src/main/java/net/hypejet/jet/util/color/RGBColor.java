@@ -41,8 +41,8 @@ public record RGBColor(int value) implements RGBLike {
      * @since 1.0
      */
     public static @NonNull RGBColor fromRGB(int red, int green, int blue) {
-        int value = (red << RED_SHIFT) & MAX_RGB_VALUE;
-        value |= (green << GREEN_SHIFT) & MAX_RGB_VALUE;
+        int value = ((red & MAX_RGB_VALUE) << RED_SHIFT);
+        value |= ((green & MAX_RGB_VALUE) << GREEN_SHIFT);
         value |= blue & MAX_RGB_VALUE;
         return new RGBColor(value);
     }

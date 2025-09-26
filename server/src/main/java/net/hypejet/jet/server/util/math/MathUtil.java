@@ -38,4 +38,16 @@ public final class MathUtil {
 
         return result;
     }
+
+    /**
+     * Gets the greatest {@code int} value that is less or equal to the specified {@code float} value.
+     *
+     * @param value the {@code float} value that the greatest less-or-equal {@code int} value should be created for
+     * @return the created greatest less-or-equal {@code int} value
+     * @since 1.0
+     */
+    public static int floor(float value) {
+        int intValue = (int) value;
+        return value < intValue ? intValue - 1 : intValue;
+    }
 }
