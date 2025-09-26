@@ -8,6 +8,7 @@ import net.hypejet.jet.server.network.codec.game.scoreboard.score.number.NumberF
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateScorePlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -30,13 +31,14 @@ public final class ServerUpdateScorePlayPacketWriter implements NetworkWriter<Se
     private ServerUpdateScorePlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerUpdateScorePlayPacket object) {
-        StringNetworkCodec.INSTANCE.write(buf, object.entityName());
-        StringNetworkCodec.INSTANCE.write(buf, object.objectiveName());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerUpdateScorePlayPacket object) {
+        StringNetworkCodec.INSTANCE.write(buf, registryManager, object.entityName());
+        StringNetworkCodec.INSTANCE.write(buf, registryManager, object.objectiveName());
 
         Score score = object.score();
-        VarIntNetworkCodec.INSTANCE.write(buf, score.score());
-        NetworkUtil.writeOptional(score.displayName(), ComponentNetworkWriter.INSTANCE, buf);
-        NetworkUtil.writeOptional(score.numberFormat(), NumberFormatNetworkWriter.INSTANCE, buf);
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, score.score());
+        NetworkUtil.writeOptional(score.displayName(), ComponentNetworkWriter.INSTANCE, buf, registryManager);
+        NetworkUtil.writeOptional(score.numberFormat(), NumberFormatNetworkWriter.INSTANCE, buf, registryManager);
     }
 }

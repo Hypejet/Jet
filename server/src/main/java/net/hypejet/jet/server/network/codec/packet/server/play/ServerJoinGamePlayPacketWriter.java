@@ -6,6 +6,7 @@ import net.hypejet.jet.server.network.codec.game.key.KeyNetworkCodec;
 import net.hypejet.jet.server.network.codec.game.player.spawn.PlayerSpawnInfoNetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerJoinGamePlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -27,21 +28,22 @@ public final class ServerJoinGamePlayPacketWriter implements NetworkWriter<Serve
     private ServerJoinGamePlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerJoinGamePlayPacket object) {
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerJoinGamePlayPacket object) {
         buf.writeInt(object.entityId());
         buf.writeBoolean(object.hardcore());
 
-        KeyNetworkCodec.COLLECTION_CODEC.write(buf, object.worldKeys());
+        KeyNetworkCodec.COLLECTION_CODEC.write(buf, registryManager, object.worldKeys());
 
-        VarIntNetworkCodec.INSTANCE.write(buf, object.maximumPlayers());
-        VarIntNetworkCodec.INSTANCE.write(buf, object.maximumViewDistance());
-        VarIntNetworkCodec.INSTANCE.write(buf, object.simulationDistance());
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, object.maximumPlayers());
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, object.maximumViewDistance());
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, object.simulationDistance());
 
         buf.writeBoolean(object.reducedDebugInfo());
         buf.writeBoolean(object.enableRespawnScreen());
         buf.writeBoolean(object.showUnlockedRecipesOnly());
 
-        PlayerSpawnInfoNetworkWriter.INSTANCE.write(buf, object.spawnInfo());
+        PlayerSpawnInfoNetworkWriter.INSTANCE.write(buf, registryManager, object.spawnInfo());
         buf.writeBoolean(object.enforcesSecureChat());
     }
 }

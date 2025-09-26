@@ -2,6 +2,7 @@ package net.hypejet.jet.server.network.codec.index;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.kyori.adventure.util.Index;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -34,12 +35,12 @@ public final class IndexNetworkCodec<K, V> implements NetworkCodec<K> {
     }
 
     @Override
-    public @NonNull K read(@NonNull ByteBuf buf) {
-        return this.index.keyOrThrow(this.codec.read(buf));
+    public @NonNull K read(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager) {
+        return this.index.keyOrThrow(this.codec.read(buf, registryManager));
     }
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull K object) {
-        this.codec.write(buf, this.index.valueOrThrow(object));
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager, @NonNull K object) {
+        this.codec.write(buf, registryManager, this.index.valueOrThrow(object));
     }
 }

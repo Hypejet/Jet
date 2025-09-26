@@ -8,6 +8,7 @@ import net.hypejet.jet.entity.player.Player.ParticleStatus;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.index.IndexNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.index.IndexUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -58,11 +59,15 @@ public final class PlayerSettingsReader implements NetworkReader<Player.Settings
     private PlayerSettingsReader() {}
 
     @Override
-    public Player.@NonNull Settings read(@NonNull ByteBuf buf) {
+    public Player.@NonNull Settings read(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager) {
         return new Player.Settings(
-                LocaleNetworkReader.INSTANCE.read(buf), buf.readByte(), CHAT_MODE_CODEC.read(buf), buf.readBoolean(),
-                SkinPartCollectionNetworkReader.INSTANCE.read(buf), HAND_CODEC.read(buf), buf.readBoolean(),
-                buf.readBoolean(), PARTICLE_STATUS_CODEC.read(buf)
+                LocaleNetworkReader.INSTANCE.read(buf, registryManager),
+                buf.readByte(),
+                CHAT_MODE_CODEC.read(buf, registryManager),
+                buf.readBoolean(),
+                SkinPartCollectionNetworkReader.INSTANCE.read(buf, registryManager),
+                HAND_CODEC.read(buf, registryManager), buf.readBoolean(),
+                buf.readBoolean(), PARTICLE_STATUS_CODEC.read(buf, registryManager)
         );
     }
 }

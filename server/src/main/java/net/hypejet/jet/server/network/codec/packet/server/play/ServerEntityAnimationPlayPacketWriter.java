@@ -4,6 +4,7 @@ import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.network.codec.PrimitiveNetworkCodecs;
 import net.hypejet.jet.server.network.codec.index.IndexNetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.index.IndexUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -45,8 +46,9 @@ public final class ServerEntityAnimationPlayPacketWriter implements NetworkWrite
     private ServerEntityAnimationPlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerEntityAnimationPlayPacket object) {
-        VarIntNetworkCodec.INSTANCE.write(buf, object.entityId());
-        ANIMATION_CODEC.write(buf, object.animation());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerEntityAnimationPlayPacket object) {
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, object.entityId());
+        ANIMATION_CODEC.write(buf, registryManager, object.animation());
     }
 }

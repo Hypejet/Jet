@@ -5,6 +5,7 @@ import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.world.coordinate.vector.VectorNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizeEntityPositionPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.world.coordinate.Position;
 import net.hypejet.jet.world.coordinate.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -31,13 +32,14 @@ public final class ServerSynchronizeEntityPositionPlayPacketWriter
     private ServerSynchronizeEntityPositionPlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerSynchronizeEntityPositionPlayPacket object) {
-        VarIntNetworkCodec.INSTANCE.write(buf, object.entityId());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerSynchronizeEntityPositionPlayPacket object) {
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, object.entityId());
 
         // Position in this packet is encoded differently
         Position position = object.position();
-        VectorNetworkCodec.INSTANCE.write(buf, Vector.from(position));
-        VectorNetworkCodec.INSTANCE.write(buf, object.velocity());
+        VectorNetworkCodec.INSTANCE.write(buf, registryManager, Vector.from(position));
+        VectorNetworkCodec.INSTANCE.write(buf, registryManager, object.velocity());
         buf.writeFloat(position.yaw());
         buf.writeFloat(position.pitch());
 

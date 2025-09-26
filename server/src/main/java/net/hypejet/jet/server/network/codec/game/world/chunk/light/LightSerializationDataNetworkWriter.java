@@ -6,6 +6,7 @@ import net.hypejet.jet.server.network.codec.aggregate.array.bytes.ByteArrayNetwo
 import net.hypejet.jet.server.network.codec.aggregate.bitset.BitSetNetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.mapped.MappedValueNetworkWriter;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.world.chunk.light.LightSerializationData;
 import net.hypejet.jet.util.array.NibbleArray;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -35,12 +36,14 @@ public final class LightSerializationDataNetworkWriter implements NetworkWriter<
 
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull LightSerializationData object) {
-        BitSetNetworkWriter.INSTANCE.write(buf, object.skyLightMask().bitSet());
-        BitSetNetworkWriter.INSTANCE.write(buf, object.blockLightMask().bitSet());
-        BitSetNetworkWriter.INSTANCE.write(buf, object.emptySkyLightMask().bitSet());
-        BitSetNetworkWriter.INSTANCE.write(buf, object.emptyBlockLightMask().bitSet());
-        LIGHT_DATA_WRITER.write(buf, object.skyLightData());
-        LIGHT_DATA_WRITER.write(buf, object.blockLightData());
+    public void write(@NonNull ByteBuf buf,
+                      @NonNull JetRegistryManager registryManager,
+                      @NonNull LightSerializationData object) {
+        BitSetNetworkWriter.INSTANCE.write(buf, registryManager, object.skyLightMask().bitSet());
+        BitSetNetworkWriter.INSTANCE.write(buf, registryManager, object.blockLightMask().bitSet());
+        BitSetNetworkWriter.INSTANCE.write(buf, registryManager, object.emptySkyLightMask().bitSet());
+        BitSetNetworkWriter.INSTANCE.write(buf, registryManager, object.emptyBlockLightMask().bitSet());
+        LIGHT_DATA_WRITER.write(buf, registryManager, object.skyLightData());
+        LIGHT_DATA_WRITER.write(buf, registryManager, object.blockLightData());
     }
 }

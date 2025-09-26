@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.codec.game.component;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -32,8 +33,8 @@ public final class JsonComponentNetworkWriter implements NetworkWriter<Component
     }
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull Component object) {
-        StringNetworkCodec.INSTANCE.write(buf, this.serializer.serialize(object));
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager, @NonNull Component object) {
+        StringNetworkCodec.INSTANCE.write(buf, registryManager, this.serializer.serialize(object));
     }
 
     /**

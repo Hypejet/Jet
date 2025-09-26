@@ -5,6 +5,7 @@ import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.array.longs.LongArrayNetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.array.varint.VarIntArrayNetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.DirectChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.IndirectChunkPalette;
@@ -30,17 +31,19 @@ public final class ChunkPaletteNetworkWriter implements NetworkWriter<AbstractCh
     private ChunkPaletteNetworkWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull AbstractChunkPalette<?> object) {
+    public void write(@NonNull ByteBuf buf,
+                      @NonNull JetRegistryManager registryManager,
+                      @NonNull AbstractChunkPalette<?> object) {
         buf.writeByte(object.bitsPerElement());
 
         switch (object) {
             case DirectChunkPalette<?> ignoredPalette -> {}
             case IndirectChunkPalette<?> palette ->
-                    VarIntArrayNetworkWriter.INSTANCE.write(buf, palette.registryIndices());
+                    VarIntArrayNetworkWriter.INSTANCE.write(buf, registryManager, palette.registryIndices());
             case SingleValuedChunkPalette<?> palette ->
-                    VarIntNetworkCodec.INSTANCE.write(buf, palette.elementRegistryIndex());
+                    VarIntNetworkCodec.INSTANCE.write(buf, registryManager, palette.elementRegistryIndex());
         }
 
-        LongArrayNetworkWriter.FIXED_INSTANCE.write(buf, object.data());
+        LongArrayNetworkWriter.FIXED_INSTANCE.write(buf, registryManager, object.data());
     }
 }

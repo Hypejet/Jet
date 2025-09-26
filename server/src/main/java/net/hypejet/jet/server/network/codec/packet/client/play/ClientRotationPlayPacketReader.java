@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.game.world.coordinate.position.PositionFlagsNetworkReader;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientRotationPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -26,10 +27,10 @@ public final class ClientRotationPlayPacketReader implements NetworkReader<Clien
     private ClientRotationPlayPacketReader() {}
 
     @Override
-    public @NonNull ClientRotationPlayPacket read(@NonNull ByteBuf buf) {
+    public @NonNull ClientRotationPlayPacket read(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager) {
         return new ClientRotationPlayPacket(
                 buf.readFloat(), buf.readFloat(),
-                PositionFlagsNetworkReader.INSTANCE.read(buf)
+                PositionFlagsNetworkReader.INSTANCE.read(buf, registryManager)
         );
     }
 }

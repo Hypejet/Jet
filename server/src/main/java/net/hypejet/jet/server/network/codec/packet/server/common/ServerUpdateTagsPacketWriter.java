@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.registry.tag.TagRegistryNetworkWriter;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -15,7 +16,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see NetworkWriter
  */
 public final class ServerUpdateTagsPacketWriter implements NetworkWriter<ServerUpdateTagsPacket> {
-
     /**
      * An instance of the {@linkplain ServerUpdateTagsPacketWriter server update tags packet writer}.
      *
@@ -26,7 +26,9 @@ public final class ServerUpdateTagsPacketWriter implements NetworkWriter<ServerU
     private ServerUpdateTagsPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerUpdateTagsPacket object) {
-        TagRegistryNetworkWriter.COLLECTION_WRITER.write(buf, object.registries());
+    public void write(@NonNull ByteBuf buf,
+                      @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerUpdateTagsPacket object) {
+        TagRegistryNetworkWriter.COLLECTION_WRITER.write(buf, registryManager, object.registries());
     }
 }

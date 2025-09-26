@@ -5,6 +5,7 @@ import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.PrimitiveNetworkCodecs;
 import net.hypejet.jet.server.network.codec.index.IndexNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientChangeDifficultyPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.index.IndexUtil;
 import net.hypejet.jet.world.difficulty.Difficulty;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -42,7 +43,8 @@ public final class ClientChangeDifficultyPlayPacketReader implements NetworkRead
     private ClientChangeDifficultyPlayPacketReader() {}
 
     @Override
-    public @NonNull ClientChangeDifficultyPlayPacket read(@NonNull ByteBuf buf) {
-        return new ClientChangeDifficultyPlayPacket(DIFFICULTY_CODEC.read(buf));
+    public @NonNull ClientChangeDifficultyPlayPacket read(@NonNull ByteBuf buf,
+                                                          @NonNull JetRegistryManager registryManager) {
+        return new ClientChangeDifficultyPlayPacket(DIFFICULTY_CODEC.read(buf, registryManager));
     }
 }

@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.key.KeyNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerPluginMessagePacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -15,7 +16,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see NetworkWriter
  */
 public final class ServerPluginMessagePacketWriter implements NetworkWriter<ServerPluginMessagePacket> {
-
     /**
      * An instance of the {@linkplain ServerPluginMessagePacketWriter server plugin message packet writer}.
      *
@@ -26,8 +26,10 @@ public final class ServerPluginMessagePacketWriter implements NetworkWriter<Serv
     private ServerPluginMessagePacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerPluginMessagePacket object) {
-        KeyNetworkCodec.INSTANCE.write(buf, object.key());
+    public void write(@NonNull ByteBuf buf,
+                      @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerPluginMessagePacket object) {
+        KeyNetworkCodec.INSTANCE.write(buf, registryManager, object.key());
         buf.writeBytes(object.data().array());
     }
 }

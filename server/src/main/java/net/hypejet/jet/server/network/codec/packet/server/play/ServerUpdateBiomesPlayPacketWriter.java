@@ -9,6 +9,7 @@ import net.hypejet.jet.server.network.codec.game.world.chunk.palette.ChunkPalett
 import net.hypejet.jet.server.network.codec.game.world.coordinate.chunk.ChunkPositionNetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateBiomesPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.world.biome.Biome;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -36,8 +37,10 @@ public final class ServerUpdateBiomesPlayPacketWriter implements NetworkWriter<S
     private ServerUpdateBiomesPlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerUpdateBiomesPlayPacket object) {
-        BIOME_DATA_WRITER.write(buf, object.data());
+    public void write(@NonNull ByteBuf buf,
+                      @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerUpdateBiomesPlayPacket object) {
+        BIOME_DATA_WRITER.write(buf, registryManager, object.data());
     }
 
     /**
@@ -51,14 +54,15 @@ public final class ServerUpdateBiomesPlayPacketWriter implements NetworkWriter<S
     private static final class BiomeDataNetworkWriter
             implements NetworkWriter<ServerUpdateBiomesPlayPacket.BiomeData> {
         @Override
-        public void write(@NonNull ByteBuf buf, ServerUpdateBiomesPlayPacket.@NonNull BiomeData object) {
-            ChunkPositionNetworkWriter.INSTANCE.write(buf, object.position());
+        public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                          ServerUpdateBiomesPlayPacket.@NonNull BiomeData object) {
+            ChunkPositionNetworkWriter.INSTANCE.write(buf, registryManager, object.position());
 
             ByteBuf paletteBuf = Unpooled.buffer();
             try {
                 for (AbstractChunkPalette<Holder.Reference<Biome>> palette : object.palettes())
-                    ChunkPaletteNetworkWriter.INSTANCE.write(paletteBuf, palette);
-                VarIntNetworkCodec.INSTANCE.write(buf, paletteBuf.readableBytes());
+                    ChunkPaletteNetworkWriter.INSTANCE.write(paletteBuf, registryManager, palette);
+                VarIntNetworkCodec.INSTANCE.write(buf, registryManager, paletteBuf.readableBytes());
                 buf.writeBytes(paletteBuf);
             } finally {
                 paletteBuf.release();

@@ -9,6 +9,7 @@ import net.hypejet.jet.scoreboard.position.ScoreboardPosition;
 import net.hypejet.jet.scoreboard.position.SidebarScoreboardPosition;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -53,7 +54,9 @@ public final class ScoreboardPositionNetworkWriter implements NetworkWriter<Scor
     private ScoreboardPositionNetworkWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ScoreboardPosition object) {
+    public void write(@NonNull ByteBuf buf,
+                      @NonNull JetRegistryManager registryManager,
+                      @NonNull ScoreboardPosition object) {
         int identifier = switch (object) {
             case PlayerListScoreboardPosition ignored -> 0;
             case BelowNameScoreboardPosition ignored -> 2;
@@ -67,6 +70,6 @@ public final class ScoreboardPositionNetworkWriter implements NetworkWriter<Scor
             }
             default -> throw new IllegalStateException(String.format("Unknown scoreboard position: %s", object));
         };
-        VarIntNetworkCodec.INSTANCE.write(buf, identifier);
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, identifier);
     }
 }

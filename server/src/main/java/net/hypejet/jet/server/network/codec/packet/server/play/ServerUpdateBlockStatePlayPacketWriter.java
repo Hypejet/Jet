@@ -5,6 +5,7 @@ import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.world.coordinate.BlockPositionNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateBlockStatePlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -27,8 +28,9 @@ public final class ServerUpdateBlockStatePlayPacketWriter implements NetworkWrit
     private ServerUpdateBlockStatePlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerUpdateBlockStatePlayPacket object) {
-        BlockPositionNetworkCodec.INSTANCE.write(buf, object.position());
-        VarIntNetworkCodec.INSTANCE.write(buf, object.blockStateIdentifier());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerUpdateBlockStatePlayPacket object) {
+        BlockPositionNetworkCodec.INSTANCE.write(buf, registryManager, object.position());
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, object.blockStateIdentifier());
     }
 }

@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.codec.packet.server.play;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerWorldEventPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.world.event.WorldEventValueProvider;
 import net.hypejet.jet.server.world.event.events.ChangeGameModeWorldEventValueProvider;
 import net.hypejet.jet.server.world.event.events.DemoWorldEventValueProvider;
@@ -69,7 +70,8 @@ public final class ServerWorldEventPlayPacketWriter implements NetworkWriter<Ser
     private ServerWorldEventPlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerWorldEventPlayPacket object) {
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerWorldEventPlayPacket object) {
         WorldEvent worldEvent = object.worldEvent();
         WorldEventType<?> eventType = TYPES.get(worldEvent.getClass());
 

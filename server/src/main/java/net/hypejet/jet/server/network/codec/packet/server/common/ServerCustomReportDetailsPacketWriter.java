@@ -5,6 +5,7 @@ import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerCustomReportDetailsPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.util.game.crash.CrashReportDetails;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -32,8 +33,9 @@ public final class ServerCustomReportDetailsPacketWriter implements NetworkWrite
     private ServerCustomReportDetailsPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerCustomReportDetailsPacket object) {
-        DETAILS_COLLECTION_WRITER.write(buf, object.details());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerCustomReportDetailsPacket object) {
+        DETAILS_COLLECTION_WRITER.write(buf, registryManager, object.details());
     }
 
     /**
@@ -52,9 +54,11 @@ public final class ServerCustomReportDetailsPacketWriter implements NetworkWrite
         private CustomReportDetailsNetworkWriter() {}
 
         @Override
-        public void write(@NonNull ByteBuf buf, @NonNull CrashReportDetails object) {
-            TITLE_CODEC.write(buf, object.title());
-            DESCRIPTION_CODEC.write(buf, object.description());
+        public void write(@NonNull ByteBuf buf,
+                          @NonNull JetRegistryManager registryManager,
+                          @NonNull CrashReportDetails object) {
+            TITLE_CODEC.write(buf, registryManager, object.title());
+            DESCRIPTION_CODEC.write(buf, registryManager, object.description());
         }
     }
 }

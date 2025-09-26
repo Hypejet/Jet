@@ -2,6 +2,7 @@ package net.hypejet.jet.server.network.codec.game.world.coordinate.relative;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.math.MathUtil;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.world.coordinate.chunk.relative.ChunkRelativeBlockPosition;
@@ -28,7 +29,9 @@ public final class ChunkRelativeBlockPositionNetworkWriter implements NetworkWri
     private ChunkRelativeBlockPositionNetworkWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ChunkRelativeBlockPosition object) {
+    public void write(@NonNull ByteBuf buf,
+                      @NonNull JetRegistryManager registryManager,
+                      @NonNull ChunkRelativeBlockPosition object) {
         int bitCount = MathUtil.bitCount(ChunkPaletteType.BLOCK_STATE.maximumCoordinateValue());
 
         byte packedXZ = (byte) (object.relativeX() << bitCount);

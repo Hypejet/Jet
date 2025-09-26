@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.codec.aggregate.collection;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.aggregate.AggregateNetworkReader;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.ArrayList;
@@ -48,10 +49,11 @@ public final class CollectionNetworkReader<E> extends AggregateNetworkReader<Col
     }
 
     @Override
-    protected @NonNull Collection<E> decodeElements(int length, @NonNull ByteBuf buf) {
+    protected @NonNull Collection<E> decodeElements(int length, @NonNull ByteBuf buf,
+                                                    @NonNull JetRegistryManager registryManager) {
         Collection<E> collection = new ArrayList<>();
         for (int index = 0; index < length; index++)
-            collection.add(this.elementReader.read(buf));
+            collection.add(this.elementReader.read(buf, registryManager));
         return List.copyOf(collection);
     }
 }

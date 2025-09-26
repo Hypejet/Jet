@@ -16,6 +16,7 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCo
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.Node;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.RootNode;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket.SuggestionsType;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.index.IndexUtil;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -69,7 +70,8 @@ public final class ServerDeclareCommandsPlayPacketWriter implements NetworkWrite
     private ServerDeclareCommandsPlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerDeclareCommandsPlayPacket object) {
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerDeclareCommandsPlayPacket object) {
         Deque<Node> nodeQueue = new ArrayDeque<>(Collections.singleton(object.rootNode()));
 
         Map<Node, Integer> identifiedNodes = new IdentityHashMap<>();
@@ -91,15 +93,15 @@ public final class ServerDeclareCommandsPlayPacketWriter implements NetworkWrite
                 nodeQueue.add(redirect);
         }
 
-        VarIntNetworkCodec.INSTANCE.write(buf, identifiedNodes.size());
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, identifiedNodes.size());
         for (Node node : order)
-            serializeNode(identifiedNodes, node, buf);
+            serializeNode(identifiedNodes, node, buf, registryManager);
 
-        VarIntNetworkCodec.INSTANCE.write(buf, BEGINNING_NODE_INDEX);
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, BEGINNING_NODE_INDEX);
     }
 
     private static void serializeNode(@NonNull Map<Node, Integer> identifiedNodes, @NonNull Node node,
-                                      @NonNull ByteBuf buf) {
+                                      @NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager) {
         byte flags = 0;
 
         if (node.executable()) {
@@ -132,14 +134,15 @@ public final class ServerDeclareCommandsPlayPacketWriter implements NetworkWrite
             identifiers[currentIndex++] = identifiedNodes.get(child);
         }
 
-        VarIntArrayNetworkWriter.INSTANCE.write(buf, identifiers);
+        VarIntArrayNetworkWriter.INSTANCE.write(buf, registryManager, identifiers);
         if (redirect != null)
-            VarIntNetworkCodec.INSTANCE.write(buf, identifiedNodes.get(redirect));
+            VarIntNetworkCodec.INSTANCE.write(buf, registryManager, identifiedNodes.get(redirect));
 
         switch (node) {
-            case LiteralNode literalNode -> StringNetworkCodec.INSTANCE.write(buf, literalNode.name());
+            case LiteralNode literalNode ->
+                    StringNetworkCodec.INSTANCE.write(buf, registryManager, literalNode.name());
             case ArgumentNode argumentNode -> {
-                StringNetworkCodec.INSTANCE.write(buf, argumentNode.name());
+                StringNetworkCodec.INSTANCE.write(buf, registryManager, argumentNode.name());
 
                 ArgumentType<?> argumentType = argumentNode.argumentType();
                 Class<?> argumentTypeClass = argumentType.getClass();
@@ -152,18 +155,19 @@ public final class ServerDeclareCommandsPlayPacketWriter implements NetworkWrite
                     ));
                 }
 
-                VarIntNetworkCodec.INSTANCE.write(buf, writer.parserId());
-                write(argumentType, buf, writer);
+                VarIntNetworkCodec.INSTANCE.write(buf, registryManager, writer.parserId());
+                write(argumentType, buf, registryManager, writer);
 
                 SuggestionsType suggestionsType = argumentNode.suggestionsType();
-                if (suggestionsType != null) SUGGESTIONS_TYPE_CODEC.write(buf, suggestionsType);
+                if (suggestionsType != null) SUGGESTIONS_TYPE_CODEC.write(buf, registryManager, suggestionsType);
             }
             case RootNode ignored -> {}
         }
     }
 
     private static <A extends ArgumentType<?>> void write(@NonNull ArgumentType<?> type, @NonNull ByteBuf buf,
+                                                          @NonNull JetRegistryManager registryManager,
                                                           @NonNull ArgumentWriter<A> codec) {
-        codec.write(buf, codec.argumentTypeClass().cast(type));
+        codec.write(buf, registryManager, codec.argumentTypeClass().cast(type));
     }
 }

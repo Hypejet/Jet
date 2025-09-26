@@ -2,6 +2,7 @@ package net.hypejet.jet.server.network.codec.game.world.coordinate.position;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.world.coordinate.Position;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -24,12 +25,12 @@ public final class PositionNetworkCodec implements NetworkCodec<Position> {
     private PositionNetworkCodec() {}
 
     @Override
-    public @NonNull Position read(@NonNull ByteBuf buf) {
+    public @NonNull Position read(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager) {
         return new Position(buf.readDouble(), buf.readDouble(), buf.readDouble(), buf.readFloat(), buf.readFloat());
     }
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull Position object) {
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager, @NonNull Position object) {
         buf.writeDouble(object.x());
         buf.writeDouble(object.y());
         buf.writeDouble(object.z());

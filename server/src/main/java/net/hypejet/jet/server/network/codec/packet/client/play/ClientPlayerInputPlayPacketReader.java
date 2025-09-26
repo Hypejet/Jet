@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientPlayerInputPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientPlayerInputPlayPacket.InputFlag;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.EnumMap;
@@ -19,6 +20,7 @@ import java.util.Set;
  * @see NetworkReader
  */
 public final class ClientPlayerInputPlayPacketReader implements NetworkReader<ClientPlayerInputPlayPacket> {
+
     /**
      * An instance of the {@linkplain ClientPlayerInputPlayPacketReader client player input play packet reader}.
      *
@@ -41,7 +43,8 @@ public final class ClientPlayerInputPlayPacketReader implements NetworkReader<Cl
     private ClientPlayerInputPlayPacketReader() {}
 
     @Override
-    public @NonNull ClientPlayerInputPlayPacket read(@NonNull ByteBuf buf) {
+    public @NonNull ClientPlayerInputPlayPacket read(@NonNull ByteBuf buf,
+                                                     @NonNull JetRegistryManager registryManager) {
         short packedFlags = buf.readUnsignedByte();
         Set<InputFlag> inputFlags = EnumSet.noneOf(InputFlag.class);
 

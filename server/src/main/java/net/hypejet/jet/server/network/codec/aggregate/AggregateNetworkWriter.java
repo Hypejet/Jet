@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.codec.aggregate;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -30,7 +31,7 @@ public abstract class AggregateNetworkWriter<A> implements NetworkWriter<A> {
     }
 
     @Override
-    public final void write(@NonNull ByteBuf buf, @NonNull A object) {
+    public final void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager, @NonNull A object) {
         int length = this.length(object);
 
         if (length > this.maxLength) {
@@ -41,8 +42,8 @@ public abstract class AggregateNetworkWriter<A> implements NetworkWriter<A> {
         }
 
         if (this.encodeLength)
-            VarIntNetworkCodec.INSTANCE.write(buf, length);
-        this.encodeElements(object, buf);
+            VarIntNetworkCodec.INSTANCE.write(buf, registryManager, length);
+        this.encodeElements(object, buf, registryManager);
     }
 
     /**
@@ -59,7 +60,9 @@ public abstract class AggregateNetworkWriter<A> implements NetworkWriter<A> {
      *
      * @param aggregate the aggregate
      * @param buf a byte buf to encode the elements to
+     * @param registryManager registry manager of server that the elements are being written for
      * @since 1.0
      */
-    protected abstract void encodeElements(@NonNull A aggregate, @NonNull ByteBuf buf);
+    protected abstract void encodeElements(@NonNull A aggregate, @NonNull ByteBuf buf,
+                                           @NonNull JetRegistryManager registryManager);
 }

@@ -1,22 +1,25 @@
 package net.hypejet.jet.server.network.codec;
 
 import io.netty.buffer.ByteBuf;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Represents a function that writes {@linkplain T an object} to {@linkplain ByteBuf a byte buf}.
+ * Something writing objects with certain type to a {@linkplain ByteBuf byte buf}.
  *
- * @param <T> a type of the object
+ * @param <T> the type of objects that this network writer writes
  * @since 1.0
+ * @see ByteBuf
  */
 @FunctionalInterface
 public interface NetworkWriter<T> {
     /**
-     * Writes {@linkplain T an object} to {@linkplain ByteBuf a byte buf}.
+     * Writes the specified object {@linkplain T object} to the specified {@linkplain ByteBuf byte buf}.
      *
-     * @param buf the byte buf
-     * @param object the object
+     * @param buf the byte buf to write the object to
+     * @param registryManager registry manager of the server that the object is being written for
+     * @param object the object to write
      * @since 1.0
      */
-    void write(@NonNull ByteBuf buf, @NonNull T object);
+    void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager, @NonNull T object);
 }

@@ -2,6 +2,7 @@ package net.hypejet.jet.server.network.codec.other;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.UUID;
@@ -25,12 +26,12 @@ public final class UUIDNetworkCodec implements NetworkCodec<UUID> {
     private UUIDNetworkCodec() {}
 
     @Override
-    public @NonNull UUID read(@NonNull ByteBuf buf) {
+    public @NonNull UUID read(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager) {
         return new UUID(buf.readLong(), buf.readLong());
     }
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull UUID object) {
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager, @NonNull UUID object) {
         buf.writeLong(object.getMostSignificantBits());
         buf.writeLong(object.getLeastSignificantBits());
     }

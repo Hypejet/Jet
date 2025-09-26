@@ -5,6 +5,7 @@ import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.codec.other.UUIDNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.login.ClientLoginRequestLoginPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -16,7 +17,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see NetworkReader
  */
 public final class ClientLoginRequestLoginPacketReader implements NetworkReader<ClientLoginRequestLoginPacket> {
-
     /**
      * An instance of the {@linkplain ClientLoginRequestLoginPacketReader client login request login packet reader}.
      *
@@ -27,10 +27,11 @@ public final class ClientLoginRequestLoginPacketReader implements NetworkReader<
     private ClientLoginRequestLoginPacketReader() {}
 
     @Override
-    public @NonNull ClientLoginRequestLoginPacket read(@NonNull ByteBuf buf) {
+    public @NonNull ClientLoginRequestLoginPacket read(@NonNull ByteBuf buf,
+                                                       @NonNull JetRegistryManager registryManager) {
         return new ClientLoginRequestLoginPacket(
-                StringNetworkCodec.MAX_16_INSTANCE.read(buf),
-                UUIDNetworkCodec.INSTANCE.read(buf)
+                StringNetworkCodec.MAX_16_INSTANCE.read(buf, registryManager),
+                UUIDNetworkCodec.INSTANCE.read(buf, registryManager)
         );
     }
 }

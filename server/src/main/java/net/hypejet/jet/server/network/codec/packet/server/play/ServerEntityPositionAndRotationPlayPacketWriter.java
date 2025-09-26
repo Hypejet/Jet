@@ -5,6 +5,7 @@ import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.world.coordinate.AngleNetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityPositionAndRotationPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -29,13 +30,14 @@ public final class ServerEntityPositionAndRotationPlayPacketWriter
     private ServerEntityPositionAndRotationPlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerEntityPositionAndRotationPlayPacket object) {
-        VarIntNetworkCodec.INSTANCE.write(buf, object.entityId());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerEntityPositionAndRotationPlayPacket object) {
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, object.entityId());
         buf.writeShort(object.deltaX());
         buf.writeShort(object.deltaY());
         buf.writeShort(object.deltaZ());
-        AngleNetworkWriter.INSTANCE.write(buf, object.yaw());
-        AngleNetworkWriter.INSTANCE.write(buf, object.pitch());
+        AngleNetworkWriter.INSTANCE.write(buf, registryManager, object.yaw());
+        AngleNetworkWriter.INSTANCE.write(buf, registryManager, object.pitch());
         buf.writeBoolean(object.onGround());
     }
 }

@@ -23,6 +23,7 @@ import net.hypejet.jet.server.network.codec.number.VarLongNetworkCodec;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.codec.other.UUIDNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityMetadataPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.hypejet.jet.server.util.collection.Object2IntMapBuilder;
 import net.hypejet.jet.server.util.index.IndexUtil;
@@ -151,75 +152,104 @@ public final class ServerEntityMetadataPlayPacketWriter implements NetworkWriter
     );
 
     private static final Map<Class<?>, NetworkWriter<?>> VALUE_WRITERS = new ValueWriterMapBuilder()
-            .put(EntityMetadataValue.Byte.class, (buf, object) -> buf.writeByte(object.value()))
-            .put(EntityMetadataValue.Float.class, (buf, object) -> buf.writeFloat(object.value()))
-            .put(EntityMetadataValue.Boolean.class, (buf, object) -> buf.writeBoolean(object.value()))
-            .put(EntityMetadataValue.PoseValue.class, (buf, object) -> POSE_WRITER.write(buf, object.value()))
+            .put(EntityMetadataValue.Byte.class, (buf, registryManager, object) -> buf.writeByte(object.value()))
+            .put(EntityMetadataValue.Float.class, (buf, registryManager, object) -> buf.writeFloat(object.value()))
+            .put(EntityMetadataValue.Boolean.class, (buf, registryManager, object) -> buf.writeBoolean(object.value()))
             .put(
-                    EntityMetadataValue.Int.class,
-                    (buf, object) -> VarIntNetworkCodec.INSTANCE.write(buf, object.value())
-            )
-            .put(
-                    EntityMetadataValue.Long.class,
-                    (buf, object) -> VarLongNetworkCodec.INSTANCE.write(buf, object.value())
-            )
-            .put(
-                    EntityMetadataValue.StringValue.class,
-                    (buf, object) -> StringNetworkCodec.INSTANCE.write(buf, object.value())
-            )
-            .put(
-                    EntityMetadataValue.ComponentValue.class,
-                    (buf, object) -> ComponentNetworkWriter.INSTANCE.write(buf, object.value())
-            )
-            .put(
-                    EntityMetadataValue.OptionalComponentValue.class,
-                    (buf, object) -> NetworkUtil.writeOptional(object.value(), ComponentNetworkWriter.INSTANCE, buf)
-            )
-            .put(
-                    EntityMetadataValue.RotationsValue.class,
-                    (buf, object) -> RotationsNetworkWriter.INSTANCE.write(buf, object.value())
-            )
-            .put(
-                    EntityMetadataValue.BlockPositionValue.class,
-                    (buf, object) -> BlockPositionNetworkCodec.INSTANCE.write(buf, object.value())
-            )
-            .put(
-                    EntityMetadataValue.OptionalBlockPositionValue.class,
-                    (buf, object) -> NetworkUtil.writeOptional(object.value(), BlockPositionNetworkCodec.INSTANCE, buf)
-            )
-            .put(
-                    EntityMetadataValue.DirectionValue.class,
-                    (buf, object) -> DIRECTION_WRITER.write(buf, object.value())
-            )
-            .put(
-                    EntityMetadataValue.OptionalLivingEntityReference.class,
-                    (buf, object) -> NetworkUtil.writeOptional(object.value(), UUIDNetworkCodec.INSTANCE, buf)
-            )
-            .put(
-                    EntityMetadataValue.CompoundBinaryTagValue.class,
-                    (buf, object) -> BinaryTagNetworkWriter.INSTANCE.write(buf, object.value())
-            )
-            .put(
-                    EntityMetadataValue.ArmadilloStateValue.class,
-                    (buf, object) -> ARMADILLO_STATE_WRITER.write(buf, object.value())
+                    EntityMetadataValue.PoseValue.class,
+                    (buf, registryManager, object) -> POSE_WRITER.write(buf, registryManager, object.value())
             )
             .put(
                     EntityMetadataValue.SnifferStateValue.class,
-                    (buf, object) -> SNIFFER_STATE_WRITER.write(buf, object.value())
+                    (buf, registryManager, object) -> SNIFFER_STATE_WRITER.write(buf, registryManager, object.value())
+            )
+            .put(
+                    EntityMetadataValue.DirectionValue.class,
+                    (buf, registryManager, object) -> DIRECTION_WRITER.write(buf, registryManager, object.value())
+            )
+            .put(
+                    EntityMetadataValue.Int.class,
+                    (buf, registryManager, object) -> VarIntNetworkCodec.INSTANCE.write(
+                            buf, registryManager, object.value()
+                    )
+            )
+            .put(
+                    EntityMetadataValue.Long.class,
+                    (buf, registryManager, object) -> VarLongNetworkCodec.INSTANCE.write(
+                            buf, registryManager, object.value()
+                    )
+            )
+            .put(
+                    EntityMetadataValue.StringValue.class,
+                    (buf, registryManager, object) -> StringNetworkCodec.INSTANCE.write(
+                            buf, registryManager, object.value()
+                    )
+            )
+            .put(
+                    EntityMetadataValue.ComponentValue.class,
+                    (buf, registryManager, object) -> ComponentNetworkWriter.INSTANCE.write(
+                            buf, registryManager, object.value()
+                    )
+            )
+            .put(
+                    EntityMetadataValue.OptionalComponentValue.class,
+                    (buf, registryManager, object) -> NetworkUtil.writeOptional(
+                            object.value(), ComponentNetworkWriter.INSTANCE, buf, registryManager
+                    )
+            )
+            .put(
+                    EntityMetadataValue.RotationsValue.class,
+                    (buf, registryManager, object) -> RotationsNetworkWriter.INSTANCE.write(
+                            buf, registryManager, object.value()
+                    )
+            )
+            .put(
+                    EntityMetadataValue.BlockPositionValue.class,
+                    (buf, registryManager, object) -> BlockPositionNetworkCodec.INSTANCE.write(
+                            buf, registryManager, object.value()
+                    )
+            )
+            .put(
+                    EntityMetadataValue.OptionalBlockPositionValue.class,
+                    (buf, registryManager, object) -> NetworkUtil.writeOptional(
+                            object.value(), BlockPositionNetworkCodec.INSTANCE, buf, registryManager
+                    )
+            )
+            .put(
+                    EntityMetadataValue.OptionalLivingEntityReference.class,
+                    (buf, registryManager, object) -> NetworkUtil.writeOptional(
+                            object.value(), UUIDNetworkCodec.INSTANCE, buf, registryManager
+                    )
+            )
+            .put(
+                    EntityMetadataValue.CompoundBinaryTagValue.class,
+                    (buf, registryManager, object) -> BinaryTagNetworkWriter.INSTANCE.write(
+                            buf, registryManager, object.value()
+                    )
+            )
+            .put(
+                    EntityMetadataValue.ArmadilloStateValue.class,
+                    (buf, registryManager, object) -> ARMADILLO_STATE_WRITER.write(
+                            buf, registryManager, object.value()
+                    )
             )
             .put(
                     EntityMetadataValue.VectorValue.class,
-                    (buf, object) -> FloatVectorNetworkWriter.INSTANCE.write(buf, object.value())
+                    (buf, registryManager, object) -> FloatVectorNetworkWriter.INSTANCE.write(
+                            buf, registryManager, object.value()
+                    )
             )
             .put(
                     EntityMetadataValue.QuaternionValue.class,
-                    (buf, object) -> FloatQuaternionNetworkWriter.INSTANCE.write(buf, object.value())
+                    (buf, registryManager, object) -> FloatQuaternionNetworkWriter.INSTANCE.write(
+                            buf, registryManager, object.value()
+                    )
             )
             .put(
                     EntityMetadataValue.OptionalUnsignedInt.class,
-                    (buf, object) -> {
+                    (buf, registryManager, object) -> {
                         Integer value = object.value();
-                        VarIntNetworkCodec.INSTANCE.write(buf, value == null ? 0 : value + 1);
+                        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, value == null ? 0 : value + 1);
                     }
             )
             .build();
@@ -227,8 +257,9 @@ public final class ServerEntityMetadataPlayPacketWriter implements NetworkWriter
     private ServerEntityMetadataPlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerEntityMetadataPlayPacket object) {
-        UPDATES_WRITER.write(buf, Sets.newHashSet(object.updates().entries()));
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerEntityMetadataPlayPacket object) {
+        UPDATES_WRITER.write(buf, registryManager, Sets.newHashSet(object.updates().entries()));
         buf.writeByte(255); // Mark an end of metadata updates
     }
 
@@ -245,7 +276,8 @@ public final class ServerEntityMetadataPlayPacketWriter implements NetworkWriter
     private static final class MetadataUpdateNetworkWriter
             implements NetworkWriter<IntObjectMap.PrimitiveEntry<EntityMetadataValue>> {
         @Override
-        public void write(@NonNull ByteBuf buf, IntObjectMap.@NonNull PrimitiveEntry<EntityMetadataValue> object) {
+        public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                          IntObjectMap.@NonNull PrimitiveEntry<EntityMetadataValue> object) {
             buf.writeByte(object.key());
 
             EntityMetadataValue metadataValue = object.value();
@@ -267,12 +299,13 @@ public final class ServerEntityMetadataPlayPacketWriter implements NetworkWriter
                 ));
             }
 
-            writeValue(writer, metadataValue, buf);
+            writeValue(writer, metadataValue, buf, registryManager);
         }
 
-        private static <V> void writeValue(NetworkWriter<V> writer, EntityMetadataValue value, ByteBuf buf) {
+        private static <V> void writeValue(NetworkWriter<V> writer, EntityMetadataValue value,
+                                           ByteBuf buf, JetRegistryManager registryManager) {
             // noinspection unchecked ; it is expected that the writer has been correctly retrieved from the map
-            writer.write(buf, (V) value);
+            writer.write(buf, registryManager, (V) value);
         }
     }
 

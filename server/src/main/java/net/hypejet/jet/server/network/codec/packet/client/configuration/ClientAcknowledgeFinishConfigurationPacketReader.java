@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.codec.packet.client.configuration;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.packet.packets.client.configuration.ClientAcknowledgeFinishConfigurationPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -15,7 +16,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class ClientAcknowledgeFinishConfigurationPacketReader
         implements NetworkReader<ClientAcknowledgeFinishConfigurationPacket> {
-
     /**
      * An instance of the {@linkplain ClientAcknowledgeFinishConfigurationPacketReader client acknowledge finish
      * configuration packet reader}.
@@ -31,7 +31,8 @@ public final class ClientAcknowledgeFinishConfigurationPacketReader
     private ClientAcknowledgeFinishConfigurationPacketReader() {}
 
     @Override
-    public @NonNull ClientAcknowledgeFinishConfigurationPacket read(@NonNull ByteBuf buf) {
+    public @NonNull ClientAcknowledgeFinishConfigurationPacket read(@NonNull ByteBuf buf,
+                                                                    @NonNull JetRegistryManager registryManager) {
         return PACKET;
     }
 }

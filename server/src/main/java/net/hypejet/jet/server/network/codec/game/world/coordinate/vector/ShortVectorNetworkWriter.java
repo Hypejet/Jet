@@ -2,6 +2,7 @@ package net.hypejet.jet.server.network.codec.game.world.coordinate.vector;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.world.coordinate.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -22,7 +23,7 @@ public final class ShortVectorNetworkWriter implements NetworkWriter<Vector> {
     private ShortVectorNetworkWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull Vector object) {
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager, @NonNull Vector object) {
         buf.writeShort(wrapAsShort(object.x()));
         buf.writeShort(wrapAsShort(object.y()));
         buf.writeShort(wrapAsShort(object.z()));

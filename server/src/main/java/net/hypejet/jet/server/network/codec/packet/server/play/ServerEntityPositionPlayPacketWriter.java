@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityPositionPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -25,8 +26,9 @@ public final class ServerEntityPositionPlayPacketWriter implements NetworkWriter
     private ServerEntityPositionPlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerEntityPositionPlayPacket object) {
-        VarIntNetworkCodec.INSTANCE.write(buf, object.entityId());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerEntityPositionPlayPacket object) {
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, object.entityId());
         buf.writeShort(object.deltaX());
         buf.writeShort(object.deltaY());
         buf.writeShort(object.deltaZ());

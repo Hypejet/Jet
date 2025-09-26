@@ -2,6 +2,7 @@ package net.hypejet.jet.server.network.codec.game.world.coordinate.position;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.world.coordinate.flag.PositionFlag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -38,7 +39,7 @@ public final class PositionFlagsNetworkReader implements NetworkReader<Collectio
     private PositionFlagsNetworkReader() {}
 
     @Override
-    public @NonNull Collection<PositionFlag> read(@NonNull ByteBuf buf) {
+    public @NonNull Collection<PositionFlag> read(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager) {
         short value = buf.readUnsignedByte();
         Set<PositionFlag> flags = new HashSet<>();
 

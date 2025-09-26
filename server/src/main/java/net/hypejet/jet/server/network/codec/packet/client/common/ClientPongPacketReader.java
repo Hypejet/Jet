@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.codec.packet.client.common;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.packet.packets.client.common.ClientPongPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -14,7 +15,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see NetworkReader
  */
 public final class ClientPongPacketReader implements NetworkReader<ClientPongPacket> {
-
     /**
      * An instance of the {@linkplain ClientPongPacketReader client pong packet reader}.
      *
@@ -25,7 +25,7 @@ public final class ClientPongPacketReader implements NetworkReader<ClientPongPac
     private ClientPongPacketReader() {}
 
     @Override
-    public @NonNull ClientPongPacket read(@NonNull ByteBuf buf) {
+    public @NonNull ClientPongPacket read(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager) {
         return new ClientPongPacket(buf.readInt());
     }
 }

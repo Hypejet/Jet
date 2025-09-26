@@ -6,6 +6,7 @@ import net.hypejet.jet.server.network.codec.index.IndexNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.codec.other.UUIDNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.common.ClientResourcePackStatePacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.index.IndexUtil;
 import net.kyori.adventure.resource.ResourcePackStatus;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -21,7 +22,6 @@ import java.util.Map;
  * @see NetworkReader
  */
 public final class ClientResourcePackStatePacketReader implements NetworkReader<ClientResourcePackStatePacket> {
-
     /**
      * An instance of the {@linkplain ClientResourcePackStatePacketReader resource packet state packet reader}.
      *
@@ -46,7 +46,11 @@ public final class ClientResourcePackStatePacketReader implements NetworkReader<
     private ClientResourcePackStatePacketReader() {}
 
     @Override
-    public @NonNull ClientResourcePackStatePacket read(@NonNull ByteBuf buf) {
-        return new ClientResourcePackStatePacket(UUIDNetworkCodec.INSTANCE.read(buf), STATE_CODEC.read(buf));
+    public @NonNull ClientResourcePackStatePacket read(@NonNull ByteBuf buf,
+                                                       @NonNull JetRegistryManager registryManager) {
+        return new ClientResourcePackStatePacket(
+                UUIDNetworkCodec.INSTANCE.read(buf, registryManager),
+                STATE_CODEC.read(buf, registryManager)
+        );
     }
 }

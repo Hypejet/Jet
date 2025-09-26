@@ -275,12 +275,12 @@ public final class ServerPacketRegistry {
                         .add(
                                 ServerConfigurationPackets.CLIENTBOUND_FINISH_CONFIGURATION,
                                 ServerFinishConfigurationPacket.class,
-                                (buf, object) -> {}
+                                (buf, registryManager, object) -> {}
                         )
                         .add(
                                 ServerConfigurationPackets.CLIENTBOUND_RESET_CHAT,
                                 ServerResetChatConfigurationPacket.class,
-                                (buf, object) -> {}
+                                (buf, registryManager, object) -> {}
                         )
                         .build()
         );
@@ -521,12 +521,12 @@ public final class ServerPacketRegistry {
                         .add(
                                 ServerPlayPackets.CLIENTBOUND_BUNDLE_DELIMITER,
                                 ServerBundleDelimiterPlayPacket.class,
-                                (buf, object) -> {}
+                                (buf, registryManager, object) -> {}
                         )
                         .add(
                                 ServerPlayPackets.CLIENTBOUND_CHUNK_BATCH_START,
                                 ServerChunkBatchStartPlayPacket.class,
-                                (buf, object) -> {}
+                                (buf, registryManager, object) -> {}
                         )
                         .build()
         );

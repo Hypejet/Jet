@@ -2,6 +2,7 @@ package net.hypejet.jet.server.network.codec.aggregate.array.longs;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.aggregate.AggregateNetworkWriter;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -45,7 +46,8 @@ public final class LongArrayNetworkWriter extends AggregateNetworkWriter<long[]>
     }
 
     @Override
-    protected void encodeElements(long @NonNull [] aggregate, @NonNull ByteBuf buf) {
+    protected void encodeElements(long @NonNull [] aggregate, @NonNull ByteBuf buf,
+                                  @NonNull JetRegistryManager registryManager) {
         for (long element : aggregate)
             buf.writeLong(element);
     }

@@ -6,6 +6,7 @@ import net.hypejet.jet.server.network.codec.index.IndexNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientRequestActionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientRequestActionPlayPacket.Action;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.index.IndexUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -39,7 +40,8 @@ public final class ClientRequestActionPlayPacketReader implements NetworkReader<
     private ClientRequestActionPlayPacketReader() {}
 
     @Override
-    public @NonNull ClientRequestActionPlayPacket read(@NonNull ByteBuf buf) {
-        return new ClientRequestActionPlayPacket(ACTION_CODEC.read(buf));
+    public @NonNull ClientRequestActionPlayPacket read(@NonNull ByteBuf buf,
+                                                       @NonNull JetRegistryManager registryManager) {
+        return new ClientRequestActionPlayPacket(ACTION_CODEC.read(buf, registryManager));
     }
 }
