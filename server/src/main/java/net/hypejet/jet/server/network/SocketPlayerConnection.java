@@ -92,7 +92,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     private final ResourcePackHandler resourcePackHandler = new ResourcePackHandler(this);
 
     /**
-     * Constructs the {@link SocketPlayerConnection socket player connection}.
+     * Constructs the {@linkplain SocketPlayerConnection socket player connection}.
      *
      * @param channel a socket channel, which handles the connection
      * @param server a minecraft server owning the connection
