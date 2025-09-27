@@ -36,7 +36,7 @@ public class JetDolphinEntityMetadata extends JetAgeableMobEntityMetadata implem
     }
 
     @Override
-    public int moistureLevel() {
+    public final int moistureLevel() {
         return this.value(DOLPHIN_MOUISTURE_LEVEL_INDEX, EntityMetadataValue.Int.class).value(); 
     }
 

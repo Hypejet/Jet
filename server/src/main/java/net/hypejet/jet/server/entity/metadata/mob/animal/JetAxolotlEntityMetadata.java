@@ -48,18 +48,18 @@ public class JetAxolotlEntityMetadata extends JetAgeableMobEntityMetadata implem
     }
 
     @Override
-    public AxolotlVariant variant() {
+    public final AxolotlVariant variant() {
         int variantId = this.value(AXOLOTL_VARIANT_INDEX, EntityMetadataValue.Int.class).value();
         return AXOLOTL_VARIANT.key(variantId);
     }
 
     @Override
-    public boolean playingDead() {
+    public final boolean playingDead() {
         return this.value(AXOLOTL_PLAYING_DEAD_INDEX, EntityMetadataValue.Boolean.class).value();  
     }
 
     @Override
-    public boolean fromBucket() {
+    public final boolean fromBucket() {
         return this.value(AXOLOTL_FROM_BUCKET_INDEX, EntityMetadataValue.Boolean.class).value();
     }
 

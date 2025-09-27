@@ -45,7 +45,7 @@ public class JetArmadilloEntityMetadata extends JetAgeableMobEntityMetadata impl
     }
 
     @Override
-    public ArmadilloState state() {
+    public final ArmadilloState state() {
         int statusId = this.value(ARMADILLO_STATE_INDEX, EntityMetadataValue.Int.class).value();
         return ARMADILLO_STATE.key(statusId);
     }

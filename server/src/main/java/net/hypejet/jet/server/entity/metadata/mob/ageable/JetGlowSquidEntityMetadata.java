@@ -30,7 +30,7 @@ public class JetGlowSquidEntityMetadata extends JetAgeableMobEntityMetadata impl
     }
 
     @Override
-    public int darkTicksRemaining() {
+    public final int darkTicksRemaining() {
         return this.value(GLOW_SQUID_DARK_TICKS_REMAINING_INDEX, EntityMetadataValue.Int.class).value(); 
     }
 
