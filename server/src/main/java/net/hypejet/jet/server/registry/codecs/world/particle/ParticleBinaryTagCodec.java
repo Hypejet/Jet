@@ -109,7 +109,7 @@ public final class ParticleBinaryTagCodec implements BinaryTagCodec<JetParticle>
         Class<P> particleClass = codecType.particleClass();
         if (!particleClass.isAssignableFrom(particle.getClass())) {
             throw new IllegalArgumentException(String.format(
-                    "The particle with %s type must be of %s class to decode it",
+                    "The particle with %s type must be of %s class to encode it",
                     particle.particleType().key(),
                     particleClass.getName()
             ));
@@ -118,9 +118,10 @@ public final class ParticleBinaryTagCodec implements BinaryTagCodec<JetParticle>
     }
 
     /**
-     * A type of how {@linkplain JetParticle particles} with additional data should be encoded.
+     * A type of how serialization of {@linkplain JetParticle particles} with additional data should be handled.
      *
-     * @param codec the particle additional codec that the additional particle fields should be written with
+     * @param codec the particle additional codec that the additional
+     *              particle fields should be read and written with
      * @param builderFactory a function creating builders of particles (whose serialization
      *                       is handled by the specified particle additional codec) for deserialization purposes
      * @param particleClass the class of particles whose serialization is
@@ -139,7 +140,8 @@ public final class ParticleBinaryTagCodec implements BinaryTagCodec<JetParticle>
         /**
          * Constructs the {@linkplain ParticleCodecType particle codec type}.
          *
-         * @param codec the particle additional codec that the additional particle fields should be written with
+         * @param codec the particle additional codec that the additional
+         *              particle fields should be read and written with
          * @param builderFactory a function that should create builders of particles (whose serialization
          *                       is handled by the specified particle additional codec) for deserialization purposes
          * @param particleClass the class of particles whose serialization is

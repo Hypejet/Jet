@@ -1,32 +1,32 @@
-package net.hypejet.jet.server.world.particle.shirek;
+package net.hypejet.jet.server.world.particle.shriek;
 
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.world.particle.JetParticle;
 import net.hypejet.jet.world.particle.ParticleType;
-import net.hypejet.jet.world.particle.shirek.ShirekParticle;
+import net.hypejet.jet.world.particle.shriek.ShriekParticle;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
 
 /**
- * An implementation of the {@linkplain ShirekParticle shirek particle}.
+ * An implementation of the {@linkplain ShriekParticle shriek particle}.
  *
  * @since 1.0
- * @see ShirekParticle
+ * @see ShriekParticle
  */
 @NullMarked
-public final class JetShirekParticle extends JetParticle implements ShirekParticle {
+public final class JetShriekParticle extends JetParticle implements ShriekParticle {
 
     private final int delay;
 
     /**
-     * Constructs the {@linkplain JetShirekParticle shirek particle implementation}.
+     * Constructs the {@linkplain JetShriekParticle shriek particle implementation}.
      *
      * @param particleType the type of which the particle should be
      * @param delay the time after which the particle should be actually displayed after spawning
      * @since 1.0
      */
-    JetShirekParticle(Holder.Reference<ParticleType> particleType, int delay) {
+    JetShriekParticle(Holder.Reference<ParticleType> particleType, int delay) {
         super(particleType);
         this.delay = delay;
     }
@@ -37,18 +37,18 @@ public final class JetShirekParticle extends JetParticle implements ShirekPartic
     }
 
     /**
-     * An implementation of the {@linkplain ShirekParticle.Builder shirek particle builder}.
+     * An implementation of the {@linkplain ShriekParticle.Builder shriek particle builder}.
      *
      * @since 1.0
-     * @see ShirekParticle.Builder
+     * @see ShriekParticle.Builder
      */
-    public static final class Builder implements ShirekParticle.Builder<JetShirekParticle, Builder> {
+    public static final class Builder implements ShriekParticle.Builder<JetShriekParticle, Builder> {
 
         private final Holder.Reference<ParticleType> particleType;
         private int delay;
 
         /**
-         * Constructs the {@linkplain Builder shirek particle builder implementation}.
+         * Constructs the {@linkplain Builder shriek particle builder implementation}.
          *
          * @param particleType the type of which the particle should be
          * @since 1.0
@@ -64,8 +64,8 @@ public final class JetShirekParticle extends JetParticle implements ShirekPartic
         }
 
         @Override
-        public JetShirekParticle build() {
-            return new JetShirekParticle(this.particleType, this.delay);
+        public JetShriekParticle build() {
+            return new JetShriekParticle(this.particleType, this.delay);
         }
     }
 }
