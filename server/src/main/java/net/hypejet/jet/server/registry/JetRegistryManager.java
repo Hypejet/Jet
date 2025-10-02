@@ -51,6 +51,7 @@ import net.hypejet.jet.server.util.data.JetDataUtil;
 import net.hypejet.jet.server.world.block.JetBlockType;
 import net.hypejet.jet.server.world.block.entity.JetBlockEntityType;
 import net.hypejet.jet.server.world.fluid.JetFluid;
+import net.hypejet.jet.server.world.particle.JetParticleType;
 import net.hypejet.jet.world.event.game.GameEvent;
 import net.hypejet.jet.world.sound.SoundEvent;
 import net.kyori.adventure.key.Key;
@@ -193,6 +194,11 @@ public final class JetRegistryManager implements RegistryManager {
                         RegistryReference.FLUID, Key.key("fluid"),
                         JsonDataResourceFiles.FLUIDS,
                         JsonUnit.class, unit -> JetFluid.INSTANCE
+                )
+                .builtIn(
+                        RegistryReference.PARTICLE_TYPE, Key.key("particle_type"),
+                        JsonDataResourceFiles.PARTICLES,
+                        JsonUnit.class, unit -> JetParticleType.INSTANCE
                 )
                 .builtIn(
                         RegistryReference.SOUND_EVENT, Key.key("sound_event"),
