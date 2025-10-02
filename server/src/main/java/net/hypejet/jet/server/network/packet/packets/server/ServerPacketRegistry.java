@@ -45,6 +45,7 @@ import net.hypejet.jet.server.network.codec.packet.server.play.ServerResetScoreP
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerRespawnPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSetObjectiveDisplayedPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSpawnEntityPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerSpawnParticlePacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizeEntityPositionPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizePositionPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizeRotationPlayPacketWriter;
@@ -107,6 +108,7 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerResetScor
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerRespawnPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSetObjectiveDisplayedPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSpawnEntityPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerSpawnParticlePacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizeEntityPositionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizeRotationPlayPacket;
@@ -517,6 +519,11 @@ public final class ServerPacketRegistry {
                                 ServerPlayPackets.CLIENTBOUND_SET_ENTITY_DATA,
                                 ServerEntityMetadataPlayPacket.class,
                                 ServerEntityMetadataPlayPacketWriter.INSTANCE
+                        )
+                        .add(
+                                ServerPlayPackets.CLIENTBOUND_LEVEL_PARTICLES,
+                                ServerSpawnParticlePacket.class,
+                                ServerSpawnParticlePacketWriter.INSTANCE
                         )
                         .add(
                                 ServerPlayPackets.CLIENTBOUND_BUNDLE_DELIMITER,

@@ -112,6 +112,13 @@ public final class ParticleNetworkWriter implements NetworkWriter<JetParticle> {
             )
     );
 
+    /**
+     * An instance of the {@linkplain ParticleNetworkWriter particle network writer}.
+     *
+     * @since 1.0
+     */
+    public static final ParticleNetworkWriter INSTANCE = new ParticleNetworkWriter();
+
     private ParticleNetworkWriter() {}
 
     @Override
