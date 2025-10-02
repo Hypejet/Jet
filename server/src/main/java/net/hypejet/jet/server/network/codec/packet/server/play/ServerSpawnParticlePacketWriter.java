@@ -34,6 +34,7 @@ public final class ServerSpawnParticlePacketWriter implements NetworkWriter<Serv
         buf.writeBoolean(object.alwaysShow());
         VectorNetworkCodec.INSTANCE.write(buf, registryManager, object.position());
         FloatVectorNetworkWriter.INSTANCE.write(buf, registryManager, object.offset());
+        buf.writeFloat(object.maxSpeed());
         buf.writeInt(object.count());
         ParticleNetworkWriter.INSTANCE.write(buf, registryManager, object.particle());
     }
