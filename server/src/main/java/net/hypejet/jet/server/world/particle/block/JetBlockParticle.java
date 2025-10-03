@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.world.particle.block;
 
 import net.hypejet.jet.registry.holder.Holder;
-import net.hypejet.jet.server.world.block.JetBlockState;
+import net.hypejet.jet.server.world.block.state.JetBlockState;
 import net.hypejet.jet.server.world.particle.JetParticle;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.particle.ParticleType;

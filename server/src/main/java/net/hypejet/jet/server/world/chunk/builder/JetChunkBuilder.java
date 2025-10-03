@@ -3,7 +3,7 @@ package net.hypejet.jet.server.world.chunk.builder;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.hypejet.jet.registry.holder.Holder;
-import net.hypejet.jet.server.world.block.JetBlockState;
+import net.hypejet.jet.server.world.block.state.JetBlockState;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.factory.palette.JetChunkPaletteFactory;
 import net.hypejet.jet.server.world.chunk.light.JetLightSection;

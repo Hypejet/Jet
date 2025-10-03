@@ -5,7 +5,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.test.world.chunk.ChunkTestUtil;
-import net.hypejet.jet.server.world.block.JetBlockState;
+import net.hypejet.jet.server.world.block.state.JetBlockState;
 import net.hypejet.jet.server.world.chunk.builder.JetChunkBuilder;
 import net.hypejet.jet.server.world.chunk.factory.palette.JetChunkPaletteFactory;
 import net.hypejet.jet.server.world.chunk.heightmap.HeightMap;

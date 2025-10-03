@@ -16,7 +16,7 @@ import net.hypejet.jet.entity.villager.VillagerProfession;
 import net.hypejet.jet.entity.villager.VillagerType;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.inventory.item.JetItemStack;
-import net.hypejet.jet.server.world.block.JetBlockState;
+import net.hypejet.jet.server.world.block.state.JetBlockState;
 import net.hypejet.jet.util.range.RangeUtil;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.hypejet.jet.world.coordinate.floats.FloatQuaternion;

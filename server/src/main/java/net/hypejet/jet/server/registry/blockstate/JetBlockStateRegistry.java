@@ -10,7 +10,7 @@ import net.hypejet.jet.data.json.resource.JsonDataResourceFiles;
 import net.hypejet.jet.registry.blockstate.BlockStateRegistry;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.util.data.JetDataUtil;
-import net.hypejet.jet.server.world.block.JetBlockState;
+import net.hypejet.jet.server.world.block.state.JetBlockState;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.block.BlockType;
 import net.kyori.adventure.key.Key;

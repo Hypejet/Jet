@@ -5,7 +5,7 @@ import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.keys.BiomeKeys;
 import net.hypejet.jet.registry.keys.BlockKeys;
 import net.hypejet.jet.server.registry.JetRegistryManager;
-import net.hypejet.jet.server.world.block.JetBlockState;
+import net.hypejet.jet.server.world.block.state.JetBlockState;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.builder.JetChunkBuilder;
 import net.hypejet.jet.server.world.chunk.factory.palette.JetChunkPaletteFactory;

@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.world.chunk.palette.type;
 
-import net.hypejet.jet.server.world.block.JetBlockState;
+import net.hypejet.jet.server.world.block.state.JetBlockState;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.world.biome.Biome;
 

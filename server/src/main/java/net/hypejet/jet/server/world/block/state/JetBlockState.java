@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.world.block;
+package net.hypejet.jet.server.world.block.state;
 
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.world.block.BlockState;

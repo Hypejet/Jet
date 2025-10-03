@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.world.block.state.property;
 
 import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
-import net.hypejet.jet.server.world.block.JetBlockState;
+import net.hypejet.jet.server.world.block.state.JetBlockState;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.StringBinaryTag;
 import org.jspecify.annotations.NullMarked;

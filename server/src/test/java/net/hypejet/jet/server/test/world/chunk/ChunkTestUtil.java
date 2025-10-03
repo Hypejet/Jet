@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.test.world.chunk;
 
 import net.hypejet.jet.registry.holder.Holder;
-import net.hypejet.jet.server.world.block.JetBlockState;
+import net.hypejet.jet.server.world.block.state.JetBlockState;
 import net.hypejet.jet.util.game.number.IntProvider;
 import net.hypejet.jet.world.dimension.DimensionType;
 import net.kyori.adventure.key.Key;

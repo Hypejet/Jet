@@ -2,7 +2,7 @@ package net.hypejet.jet.server.world.chunk.section;
 
 import it.unimi.dsi.fastutil.objects.Object2ShortMap;
 import net.hypejet.jet.registry.holder.Holder;
-import net.hypejet.jet.server.world.block.JetBlockState;
+import net.hypejet.jet.server.world.block.state.JetBlockState;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.chunk.palette.update.ChunkPaletteUpdate;

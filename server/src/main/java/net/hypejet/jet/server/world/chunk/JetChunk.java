@@ -3,7 +3,7 @@ package net.hypejet.jet.server.world.chunk;
 import com.google.common.collect.Maps;
 import it.unimi.dsi.fastutil.objects.Object2ByteMap;
 import net.hypejet.jet.registry.holder.Holder;
-import net.hypejet.jet.server.world.block.JetBlockState;
+import net.hypejet.jet.server.world.block.state.JetBlockState;
 import net.hypejet.jet.server.world.chunk.heightmap.HeightMap;
 import net.hypejet.jet.server.world.chunk.heightmap.HeightMapType;
 import net.hypejet.jet.server.world.chunk.light.JetLightSection;
