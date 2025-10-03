@@ -2,7 +2,7 @@ package net.hypejet.jet.data.json.resource;
 
 import net.hypejet.jet.data.json.model.block.JsonBlock;
 import net.hypejet.jet.data.json.model.block.JsonBlockEntityType;
-import net.hypejet.jet.data.json.model.block.JsonBlockState;
+import net.hypejet.jet.data.json.model.block.state.JsonBlockState;
 import net.hypejet.jet.data.json.model.entity.JsonEntityType;
 import net.hypejet.jet.data.json.model.event.JsonGameEvent;
 import net.hypejet.jet.data.json.model.item.JsonItem;

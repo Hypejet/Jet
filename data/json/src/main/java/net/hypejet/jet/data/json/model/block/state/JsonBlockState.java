@@ -1,4 +1,4 @@
-package net.hypejet.jet.data.json.model.block;
+package net.hypejet.jet.data.json.model.block.state;
 
 import org.jspecify.annotations.NonNull;
 
@@ -8,7 +8,8 @@ import java.util.Objects;
 /**
  * A Minecraft block state.
  *
- * @param properties properties of this block state
+ * @param properties a map associating block state property names with string representations
+ *                   of values that these properties have when using this block state
  * @param isAir whether this block state should be recognised as an air
  * @param hasFluidState whether this block state has a fluid state associated with it, in other words whether
  *                      the block state represents a fluid
@@ -21,7 +22,9 @@ public record JsonBlockState(@NonNull Map<String, String> properties, boolean is
     /**
      * Constructs the {@linkplain JsonBlockState block state}.
      *
-     * @param properties properties of this block state
+     * @param properties a map associating block state property names with string representations
+     *                   of values that these properties should have, these properties will be
+     *                   used when using the constructed block state
      * @param isAir whether this block state should be recognised as an air
      * @param hasFluidState whether this block state has a fluid state associated with it, in other words whether
      *                      the block state represents a fluid

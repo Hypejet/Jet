@@ -5,7 +5,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.hypejet.jet.data.json.entry.JsonRegistryEntry;
 import net.hypejet.jet.data.json.model.block.JsonBlock;
-import net.hypejet.jet.data.json.model.block.JsonBlockState;
+import net.hypejet.jet.data.json.model.block.state.JsonBlockState;
 import net.hypejet.jet.data.json.resource.JsonDataResourceFiles;
 import net.hypejet.jet.registry.blockstate.BlockStateRegistry;
 import net.hypejet.jet.registry.holder.Holder;
