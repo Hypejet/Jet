@@ -19,13 +19,12 @@ public final class IntegerStateProperty extends StateProperty<Integer> {
     /**
      * Constructs the {@linkplain IntegerStateProperty integer state property}.
      *
-     * @param name the name that the state property should have
      * @param min a minimum integer value that the state property should accept
      * @param max a maximum integer value that the state property should accept
      * @since 1.0
      */
-    public IntegerStateProperty(String name, int min, int max) {
-        super(name, Integer.class);
+    public IntegerStateProperty(int min, int max) {
+        super(Integer.class);
         this.min = min;
         this.max = max;
     }

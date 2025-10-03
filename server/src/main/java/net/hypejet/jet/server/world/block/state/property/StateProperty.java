@@ -18,31 +18,17 @@ import java.util.Objects;
 @NullMarked
 public sealed abstract class StateProperty<V> permits BooleanStateProperty, EnumLikeStateProperty, IntegerStateProperty {
 
-    private final String name;
     private final Class<V> valueClass;
-
     private final BinaryTagCodec<V> binaryTagCodec = new ValueBinaryTagCodec();
 
     /**
      * Constructs the {@linkplain StateProperty state property}.
      *
-     * @param name the name that the state property should have
      * @param valueClass the class of values that the state property should accept
      * @since 1.0
      */
-    public StateProperty(String name, Class<V> valueClass) {
-        this.name = Objects.requireNonNull(name, "name");
+    public StateProperty(Class<V> valueClass) {
         this.valueClass = Objects.requireNonNull(valueClass, "value class");
-    }
-
-    /**
-     * Gets the name of this {@linkplain StateProperty state property}.
-     *
-     * @return the state property name
-     * @since 1.0
-     */
-    public final String name() {
-        return this.name;
     }
 
     /**

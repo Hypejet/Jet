@@ -12,13 +12,14 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public final class BooleanStateProperty extends StateProperty<Boolean> {
     /**
-     * Constructs the {@linkplain BooleanStateProperty boolean state property}.
+     * An instance of the {@linkplain BooleanStateProperty boolean state property}.
      *
-     * @param name the name that the state property should have
      * @since 1.0
      */
-    public BooleanStateProperty(String name) {
-        super(name, Boolean.class);
+    public static final BooleanStateProperty INSTANCE = new BooleanStateProperty();
+
+    private BooleanStateProperty() {
+        super(Boolean.class);
     }
 
     @Override

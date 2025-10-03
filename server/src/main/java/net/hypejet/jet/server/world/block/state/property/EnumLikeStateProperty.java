@@ -24,14 +24,13 @@ public final class EnumLikeStateProperty<V> extends StateProperty<V> {
     /**
      * Constructs the {@linkplain EnumLikeStateProperty enum-like state property}.
      *
-     * @param name the name that the state property should have
      * @param objectClass the class of values that the state property should accept
      * @param values a map associating values that should be accepted
      *               by the state property with their string representations
      * @since 1.0
      */
-    public EnumLikeStateProperty(String name, Class<V> objectClass, Map<V, String> values) {
-        super(name, objectClass);
+    public EnumLikeStateProperty(Class<V> objectClass, Map<V, String> values) {
+        super(objectClass);
         this.valueStrings = IndexUtil.fromMap(Objects.requireNonNull(values, "values"));
     }
 
