@@ -7,8 +7,8 @@ import java.util.Objects;
 /**
  * Represents {@linkplain ServerLinkLabel a server link label} that displays a text that is built-in the client.
  *
- * <p>This is not an enum, since it depends on Minecraft. Adding an enum entry could break enum switch cases for
- * example./p>
+ * <p>This is not an enum, since it depends on Minecraft.
+ * Adding an enum entry could break enum switch cases for example./p>
  *
  * @since 1.0
  * @see ServerLinkLabel

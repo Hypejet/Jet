@@ -22,7 +22,7 @@ public enum JsonEnumStatePropertyValueType {
     /**
      * The front-and-top enum.
      *
-     * @since 1.
+     * @since 1.0
      */
     FRONT_AND_TOP,
     /**
