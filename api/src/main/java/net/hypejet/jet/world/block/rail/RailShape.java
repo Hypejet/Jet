@@ -48,6 +48,13 @@ public final class RailShape {
     public static final RailShape SOUTH_WEST = new RailShape("south_west");
 
     /**
+     * A {@linkplain RailShape rail shape} connecting to eastern and western rails.
+     *
+     * @since 1.0
+     */
+    public static final RailShape EAST_WEST = new RailShape("east_west");
+
+    /**
      * A {@linkplain RailShape rail shape} ascending to the northern side.
      *
      * @since 1.0

@@ -26,11 +26,11 @@ public enum JsonEnumStatePropertyValueType {
      */
     FRONT_AND_TOP,
     /**
-     * The attachment face enum.
+     * The block attachment type enum.
      *
      * @since 1.0
      */
-    ATTACHMENT_FACE,
+    ATTACHMENT_TYPE,
     /**
      * The bell attachment type enum.
      *
@@ -38,29 +38,29 @@ public enum JsonEnumStatePropertyValueType {
      */
     BELL_ATTACHMENT_TYPE,
     /**
-     * The wall side enum.
+     * The wall connection type enum.
      *
      * @since 1.0
      */
-    WALL_SIDE,
+    WALL_CONNECTION_TYPE,
     /**
-     * The redstone side enum.
+     * The redstone connection type enum.
      *
      * @since 1.0
      */
-    REDSTONE_SIDE,
+    REDSTONE_CONNECTION_TYPE,
     /**
-     * The block half enum.
+     * The double block half enum.
      *
      * @since 1.0
      */
-    BLOCK_HALF,
+    DOUBLE_BLOCK_HALF,
     /**
-     * The half enum.
+     * The vertical occupancy type enum.
      *
      * @since 1.0
      */
-    HALF,
+    VERTICAL_OCCUPANCY_TYPE,
     /**
      * The rail shape enum.
      *
@@ -74,11 +74,11 @@ public enum JsonEnumStatePropertyValueType {
      */
     BED_PART,
     /**
-     * The chest type enum.
+     * The chest connection type enum.
      *
      * @since 1.0
      */
-    CHEST_TYPE,
+    CHEST_CONNECTION_TYPE,
     /**
      * The comparator mode enum.
      *
@@ -104,11 +104,11 @@ public enum JsonEnumStatePropertyValueType {
      */
     PISTON_TYPE,
     /**
-     * The slab type enum.
+     * The slab occupancy type enum.
      *
      * @since 1.0
      */
-    SLAB_TYPE,
+    SLAB_OCCUPANCY_TYPE,
     /**
      * The stairs shape enum.
      *
@@ -150,7 +150,7 @@ public enum JsonEnumStatePropertyValueType {
      *
      * @since 1.0
      */
-    TRAIL_SPAWNER_STATE,
+    TRIAL_SPAWNER_STATE,
     /**
      * The vault state enum.
      *

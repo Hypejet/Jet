@@ -33,5 +33,5 @@ public interface BlockStateRegistry {
      * @since 1.0
      */
     @NonNull BlockState blockState(Holder.@NonNull Reference<BlockType> blockType,
-                                   @NonNull Map<String, String> properties);
+                                   @NonNull Map<String, Object> properties);
 }

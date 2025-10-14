@@ -6,7 +6,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.Map;
 
 /**
- * Represents a variant of a Minecraft block.
+ * A variant of a Minecraft block.
  *
  * @since 1.0
  */
@@ -25,5 +25,5 @@ public interface BlockState {
      * @return the map
      * @since 1.0
      */
-    @NonNull Map<String, String> properties();
+    @NonNull Map<String, Object> properties();
 }

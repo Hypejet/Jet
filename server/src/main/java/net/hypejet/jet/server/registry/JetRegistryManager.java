@@ -217,7 +217,7 @@ public final class JetRegistryManager implements RegistryManager {
                 )
                 .build();
 
-        this.blockStateRegistry = new JetBlockStateRegistry();
+        this.blockStateRegistry = new JetBlockStateRegistry(this.registry(RegistryReference.BLOCK));
     }
 
     @Override

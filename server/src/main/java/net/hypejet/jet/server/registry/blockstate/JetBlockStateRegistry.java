@@ -9,12 +9,15 @@ import net.hypejet.jet.data.json.model.block.state.JsonBlockState;
 import net.hypejet.jet.data.json.resource.JsonDataResourceFiles;
 import net.hypejet.jet.registry.blockstate.BlockStateRegistry;
 import net.hypejet.jet.registry.holder.Holder;
+import net.hypejet.jet.server.registry.JetMinecraftRegistry;
 import net.hypejet.jet.server.util.data.JetDataUtil;
+import net.hypejet.jet.server.world.block.JetBlockType;
 import net.hypejet.jet.server.world.block.state.JetBlockState;
+import net.hypejet.jet.server.world.block.state.property.StateProperty;
 import net.hypejet.jet.world.block.BlockState;
 import net.hypejet.jet.world.block.BlockType;
 import net.kyori.adventure.key.Key;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,24 +26,27 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Represents an implementation of a {@linkplain BlockStateRegistry block-state registry}.
+ * An implementation of the {@linkplain BlockStateRegistry block-state registry}.
  *
  * @since 1.0
+ * @see BlockStateRegistry
  */
+@NullMarked
 public final class JetBlockStateRegistry implements BlockStateRegistry {
 
     private final List<JetBlockState> blockStates;
     private final Object2IntMap<JetBlockState> blockStateToIndexMap;
 
-    private final Map<Key, Map<Map<String, String>, JetBlockState>> possibleStates;
+    private final Map<Key, Map<Map<String, Object>, JetBlockState>> possibleStates;
     private final Map<Key, JetBlockState> defaultStates;
 
     /**
      * Constructs the {@linkplain BlockStateRegistry block state registry}.
      *
+     * @param blockTypeRegistry a registry containing block types for which the block states should be created
      * @since 1.0
      */
-    public JetBlockStateRegistry() {
+    public JetBlockStateRegistry(JetMinecraftRegistry<BlockType> blockTypeRegistry) {
         List<JsonRegistryEntry<JsonBlockState>> blockStateDataEntries = JetDataUtil.deserializeEntries(
                 JsonDataResourceFiles.BLOCK_STATES,
                 JsonBlockState.class
@@ -58,10 +64,33 @@ public final class JetBlockStateRegistry implements BlockStateRegistry {
             JsonRegistryEntry<JsonBlockState> dataEntry = blockStateDataEntries.get(index);
             JsonBlockState blockState = dataEntry.value();
 
+            Holder.Reference<BlockType> blockTypeReference = new Holder.Reference<>(dataEntry.key());
+            JetBlockType blockType = JetBlockType.cast(blockTypeReference.valueOrThrow(blockTypeRegistry));
+            Map<String, StateProperty<?>> stateProperties = blockType.stateProperties();
+
+            Map<String, Object> convertedProperties = new HashMap<>();
+            for (Map.Entry<String, String> entry : blockState.properties().entrySet()) {
+                String propertyName = entry.getKey();
+                String valueStringRepresentation = entry.getValue();
+
+                StateProperty<?> stateProperty = stateProperties.get(propertyName);
+                if (stateProperty == null) {
+                    throw new IllegalStateException(String.format(
+                            "Block type \"%s\" does not have a block state property with name of \"%s\"",
+                            blockTypeReference.key(),
+                            propertyName
+                    ));
+                }
+
+                convertedProperties.put(propertyName, stateProperty.valueFromString(valueStringRepresentation));
+            }
+
             JetBlockState convertedBlockState = new JetBlockState(
-                    new Holder.Reference<>(dataEntry.key()),
-                    blockState.properties(), blockState.isAir(),
-                    blockState.hasFluidState(), blockState.blocksMotion(),
+                    blockTypeReference,
+                    convertedProperties,
+                    blockState.isAir(),
+                    blockState.hasFluidState(),
+                    blockState.blocksMotion(),
                     blockState.isLeaves()
             );
 
@@ -72,7 +101,7 @@ public final class JetBlockStateRegistry implements BlockStateRegistry {
         this.blockStates = List.copyOf(blockStates);
         this.blockStateToIndexMap = Object2IntMaps.unmodifiable(blockStateToIndexMap);
 
-        Map<Key, Map<Map<String, String>, JetBlockState>> possibleStates = new HashMap<>();
+        Map<Key, Map<Map<String, Object>, JetBlockState>> possibleStates = new HashMap<>();
         Map<Key, JetBlockState> defaultStates = new HashMap<>();
 
         for (JsonRegistryEntry<JsonBlock> blockDataEntry : blockDataEntries) {
@@ -82,7 +111,7 @@ public final class JetBlockStateRegistry implements BlockStateRegistry {
             JetBlockState defaultState = this.byIndex(block.defaultBlockStateId());
             defaultStates.put(blockTypeKey, defaultState);
 
-            Map<Map<String, String>, JetBlockState> propertiesToStateMap = new HashMap<>();
+            Map<Map<String, Object>, JetBlockState> propertiesToStateMap = new HashMap<>();
             block.blockStateIds().forEach(stateIdentifier -> {
                 JetBlockState state = this.byIndex(stateIdentifier);
                 propertiesToStateMap.put(Map.copyOf(state.properties()), state);
@@ -96,7 +125,7 @@ public final class JetBlockStateRegistry implements BlockStateRegistry {
     }
 
     @Override
-    public @NonNull JetBlockState defaultBlockState(Holder.@NonNull Reference<BlockType> blockType) {
+    public JetBlockState defaultBlockState(Holder.Reference<BlockType> blockType) {
         Objects.requireNonNull(blockType, "block type");
 
         Key blockTypeKey = blockType.key();
@@ -113,13 +142,12 @@ public final class JetBlockStateRegistry implements BlockStateRegistry {
     }
 
     @Override
-    public @NonNull JetBlockState blockState(Holder.@NonNull Reference<BlockType> blockType,
-                                             @NonNull Map<String, String> properties) {
+    public JetBlockState blockState(Holder.Reference<BlockType> blockType, Map<String, Object> properties) {
         Objects.requireNonNull(blockType, "block type");
         Objects.requireNonNull(properties, "properties");
 
         Key blockTypeKey = blockType.key();
-        Map<Map<String, String>, JetBlockState> possibleStates = this.possibleStates.get(blockTypeKey);
+        Map<Map<String, Object>, JetBlockState> possibleStates = this.possibleStates.get(blockTypeKey);
 
         if (possibleStates == null) {
             throw new IllegalArgumentException(String.format(
@@ -148,7 +176,7 @@ public final class JetBlockStateRegistry implements BlockStateRegistry {
      *                                  does not provide a registry index for it
      * @since 1.0
      */
-    public int indexOf(@NonNull BlockState blockState) {
+    public int indexOf(BlockState blockState) {
         if (!(blockState instanceof JetBlockState))
             throw new IllegalArgumentException("The specified block state is not a valid block state");
         if (!this.blockStateToIndexMap.containsKey(blockState))
@@ -161,17 +189,10 @@ public final class JetBlockStateRegistry implements BlockStateRegistry {
      *
      * @param index the registry index
      * @return the block state
-     * @throws IllegalArgumentException if no block state with the specified index was registered in this registry
+     * @throws IndexOutOfBoundsException if the specified index is out of bounds of the block state list
      * @since 1.0
      */
-    public @NonNull JetBlockState byIndex(int index) {
-        JetBlockState state = this.blockStates.get(index);
-        if (state == null) {
-            throw new IllegalArgumentException(String.format(
-                    "Block state with %d index has not been registered",
-                    index
-            ));
-        }
-        return state;
+    public JetBlockState byIndex(int index) {
+        return this.blockStates.get(index);
     }
 }

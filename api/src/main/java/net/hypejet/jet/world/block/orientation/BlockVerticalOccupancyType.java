@@ -13,30 +13,30 @@ import java.util.Objects;
  * @since 1.0
  */
 @NullMarked
-public final class BlockVerticalOccupancy {
+public final class BlockVerticalOccupancyType {
     /**
      * The occupancy of the top of the block.
      *
      * @since 1.0
      */
-    public static final BlockVerticalOccupancy TOP = new BlockVerticalOccupancy("top");
+    public static final BlockVerticalOccupancyType TOP = new BlockVerticalOccupancyType("top");
 
     /**
      * The occupancy of the bottom of the block.
      *
      * @since 1.0
      */
-    public static final BlockVerticalOccupancy BOTTOM = new BlockVerticalOccupancy("bottom");
+    public static final BlockVerticalOccupancyType BOTTOM = new BlockVerticalOccupancyType("bottom");
 
     private final String name;
 
-    public BlockVerticalOccupancy(String name) {
+    public BlockVerticalOccupancyType(String name) {
         this.name = Objects.requireNonNull(name, "name");
     }
 
     @Override
     public String toString() {
-        return "BlockVerticalOccupancy{" +
+        return "BlockVerticalOccupancyType{" +
                 "name='" + this.name + '\'' +
                 '}';
     }

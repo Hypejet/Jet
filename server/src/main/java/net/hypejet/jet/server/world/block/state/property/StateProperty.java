@@ -1,12 +1,17 @@
 package net.hypejet.jet.server.world.block.state.property;
 
+import net.hypejet.jet.data.json.model.block.state.property.JsonStateProperty;
 import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.hypejet.jet.server.world.block.state.JetBlockState;
+import net.hypejet.jet.server.world.block.state.property.enums.EnumPropertyValueEquivalents;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.StringBinaryTag;
 import org.jspecify.annotations.NullMarked;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * A property of a {@linkplain JetBlockState block state}.
@@ -72,6 +77,46 @@ public sealed abstract class StateProperty<V> permits BooleanStateProperty, Enum
      * @since 1.0
      */
     public abstract V valueFromString(String valueString);
+
+    /**
+     * Converts the specified {@linkplain JsonStateProperty Jet data state property} to a Jet equivalent.
+     *
+     * @param property the state property to convert
+     * @return the converted state property
+     * @since 1.0
+     */
+    public static StateProperty<?> convert(JsonStateProperty property) {
+        return switch (property) {
+            case JsonStateProperty.Boolean ignored -> BooleanStateProperty.INSTANCE;
+            case JsonStateProperty.Integer castProperty -> new IntegerStateProperty(
+                    castProperty.min(),
+                    castProperty.max()
+            );
+            case JsonStateProperty.Enum castProperty -> convertEnumProperty(
+                    castProperty.acceptedValues(),
+                    EnumPropertyValueEquivalents.equivalentClass(castProperty.valueType())
+            );
+        };
+    }
+
+    private static <V> EnumLikeStateProperty<V> convertEnumProperty(Set<String> acceptedValueStrings,
+                                                                    Class<V> equivalentClass) {
+        Map<String, V> stringRepresentations = EnumPropertyValueEquivalents.stringRepresentations(equivalentClass);
+        Map<V, String> acceptedValues = new HashMap<>();
+
+        for (String acceptedValueString : acceptedValueStrings) {
+            V acceptedValue = stringRepresentations.get(acceptedValueString);
+            if (acceptedValue == null) {
+                throw new IllegalArgumentException(String.format(
+                        "Could not find a value with string representation of \"%s\"",
+                        acceptedValueString
+                ));
+            }
+            acceptedValues.put(acceptedValue, acceptedValueString);
+        }
+
+        return new EnumLikeStateProperty<>(equivalentClass, acceptedValues);
+    }
 
     /**
      * A {@linkplain BinaryTagCodec binary-tag codec} of values

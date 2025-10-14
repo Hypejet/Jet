@@ -37,7 +37,7 @@ final class BlockTest {
                         "lit", JsonStateProperty.Boolean.INSTANCE,
                         "level", new JsonStateProperty.Integer(0, 20),
                         "half", new JsonStateProperty.Enum(
-                                JsonEnumStatePropertyValueType.HALF,
+                                JsonEnumStatePropertyValueType.VERTICAL_OCCUPANCY_TYPE,
                                 Set.of("upper", "lower")
                         )
                 )
