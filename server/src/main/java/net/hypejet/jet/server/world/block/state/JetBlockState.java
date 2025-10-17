@@ -1,7 +1,7 @@
 package net.hypejet.jet.server.world.block.state;
 
 import net.hypejet.jet.registry.holder.Holder;
-import net.hypejet.jet.world.block.BlockState;
+import net.hypejet.jet.world.block.state.BlockState;
 import net.hypejet.jet.world.block.BlockType;
 import org.jspecify.annotations.NullMarked;
 

@@ -3,6 +3,7 @@ package net.hypejet.jet.registry;
 import com.google.common.collect.Multimap;
 import net.hypejet.jet.registry.blockstate.BlockStateRegistry;
 import net.hypejet.jet.registry.reference.RegistryReference;
+import net.hypejet.jet.world.block.state.BlockState;
 import net.kyori.adventure.key.Key;
 import org.jspecify.annotations.NonNull;
 
@@ -28,7 +29,7 @@ public interface RegistryManager {
 
     /**
      * Gets a {@linkplain BlockStateRegistry block state registry} containing all possible
-     * {@linkplain net.hypejet.jet.world.block.BlockState block states} that can be used
+     * {@linkplain BlockState block states} that can be used
      * on the {@linkplain net.hypejet.jet.MinecraftServer server} associated with this registry manager.
      *
      * @return the block state registry

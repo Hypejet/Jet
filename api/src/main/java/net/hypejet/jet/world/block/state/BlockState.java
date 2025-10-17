@@ -1,6 +1,7 @@
-package net.hypejet.jet.world.block;
+package net.hypejet.jet.world.block.state;
 
 import net.hypejet.jet.registry.holder.Holder;
+import net.hypejet.jet.world.block.BlockType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Map;

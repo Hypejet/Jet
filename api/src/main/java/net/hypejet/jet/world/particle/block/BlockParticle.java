@@ -1,27 +1,27 @@
 package net.hypejet.jet.world.particle.block;
 
-import net.hypejet.jet.world.block.BlockState;
+import net.hypejet.jet.world.block.state.BlockStateReference;
 import net.hypejet.jet.world.particle.Particle;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
 /**
- * A {@linkplain Particle particle} containing a {@linkplain BlockState block state} field.
+ * A {@linkplain Particle particle} containing a {@linkplain BlockStateReference block state reference} field.
  *
  * @since 1.0
- * @see BlockState
+ * @see BlockStateReference
  * @see Particle
  */
 @ApiStatus.NonExtendable
 @NullMarked
 public interface BlockParticle extends Particle {
     /**
-     * Gets the {@linkplain BlockState block state} field value of this particle.
+     * Gets the {@linkplain BlockStateReference block state reference} field value of this particle.
      *
-     * @return the block state
+     * @return the block state reference
      * @since 1.0
      */
-    BlockState blockState();
+    BlockStateReference blockState();
 
     /**
      * A {@linkplain Particle.Builder particle builder} of a {@linkplain BlockParticle block particle}.
@@ -34,12 +34,12 @@ public interface BlockParticle extends Particle {
      */
     interface Builder<P extends BlockParticle, B extends Builder<P, B>> extends Particle.Builder<P> {
         /**
-         * Sets the {@linkplain BlockState block state} field value that the particle should have.
+         * Sets the {@linkplain BlockStateReference block state reference} field value that the particle should have.
          *
-         * @param value the block state
+         * @param value the block state reference
          * @return this particle builder
          * @since 1.0
          */
-        B blockState(BlockState value);
+        B blockState(BlockStateReference value);
     }
 }

@@ -14,8 +14,9 @@ import net.hypejet.jet.server.util.data.JetDataUtil;
 import net.hypejet.jet.server.world.block.JetBlockType;
 import net.hypejet.jet.server.world.block.state.JetBlockState;
 import net.hypejet.jet.server.world.block.state.property.StateProperty;
-import net.hypejet.jet.world.block.BlockState;
+import net.hypejet.jet.world.block.state.BlockState;
 import net.hypejet.jet.world.block.BlockType;
+import net.hypejet.jet.world.block.state.BlockStateReference;
 import net.kyori.adventure.key.Key;
 import org.jspecify.annotations.NullMarked;
 
@@ -142,13 +143,13 @@ public final class JetBlockStateRegistry implements BlockStateRegistry {
     }
 
     @Override
-    public JetBlockState blockState(Holder.Reference<BlockType> blockType, Map<String, Object> properties) {
-        Objects.requireNonNull(blockType, "block type");
-        Objects.requireNonNull(properties, "properties");
+    public BlockState blockState(BlockStateReference reference) {
+        Objects.requireNonNull(reference, "reference");
 
-        Key blockTypeKey = blockType.key();
+        Key blockTypeKey = reference.blockType().key();
+        Map<String, Object> properties = reference.properties();
+
         Map<Map<String, Object>, JetBlockState> possibleStates = this.possibleStates.get(blockTypeKey);
-
         if (possibleStates == null) {
             throw new IllegalArgumentException(String.format(
                     "Could not find a map of possible block states for \"%s\" block type",

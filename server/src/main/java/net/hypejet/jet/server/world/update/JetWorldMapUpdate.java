@@ -33,7 +33,7 @@ import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPalet
 import net.hypejet.jet.server.world.coordinate.chunk.section.ChunkSectionPosition;
 import net.hypejet.jet.server.world.handler.ChunkBatchHandler;
 import net.hypejet.jet.world.biome.Biome;
-import net.hypejet.jet.world.block.BlockState;
+import net.hypejet.jet.world.block.state.BlockState;
 import net.hypejet.jet.world.block.BlockType;
 import net.hypejet.jet.world.block.entity.BlockEntityType;
 import net.hypejet.jet.world.coordinate.BlockPosition;
