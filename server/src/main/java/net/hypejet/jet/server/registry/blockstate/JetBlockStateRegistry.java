@@ -143,7 +143,7 @@ public final class JetBlockStateRegistry implements BlockStateRegistry {
     }
 
     @Override
-    public BlockState blockState(BlockStateReference reference) {
+    public JetBlockState blockState(BlockStateReference reference) {
         Objects.requireNonNull(reference, "reference");
 
         Key blockTypeKey = reference.blockType().key();
