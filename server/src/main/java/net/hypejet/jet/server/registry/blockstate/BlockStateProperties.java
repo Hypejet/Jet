@@ -66,7 +66,7 @@ public final class BlockStateProperties {
      *
      * @param blockType a holder referencing to the block type whose state properties are desired
      * @return the map of supported state property names
-     * @throws IllegalArgumentException if no state properties were loaded for the specified block type
+     * @throws IllegalArgumentException if state properties were not loaded for the specified block type
      * @since 1.0
      */
     public static Map<String, StateProperty<?>> properties(Holder.Reference<BlockType> blockType) {
@@ -75,7 +75,7 @@ public final class BlockStateProperties {
 
         if (properties == null) {
             throw new IllegalArgumentException(String.format(
-                    "No state properties were loaded for %s block type",
+                    "State properties were not loaded for %s block type",
                     blockTypeKey
             ));
         }
@@ -89,7 +89,7 @@ public final class BlockStateProperties {
      *
      * @param blockType a holder referencing to the block type whose default state properties are desired
      * @return the map of default state properties
-     * @throws IllegalArgumentException if no default state properties were loaded for the specified block type
+     * @throws IllegalArgumentException if default state properties were not loaded for the specified block type
      * @since 1.0
      */
     public static Map<String, Object> defaultProperties(Holder.Reference<BlockType> blockType) {
@@ -98,7 +98,7 @@ public final class BlockStateProperties {
 
         if (properties == null) {
             throw new IllegalArgumentException(String.format(
-                    "No default state properties were loaded for %s block type",
+                    "Default state properties were not loaded for %s block type",
                     blockTypeKey
             ));
         }
