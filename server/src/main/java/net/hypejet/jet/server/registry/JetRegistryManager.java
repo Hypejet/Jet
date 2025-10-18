@@ -82,7 +82,7 @@ public final class JetRegistryManager implements RegistryManager {
 
     private final NetworkManager networkManager;
     private final Map<RegistryReference<?>, JetMinecraftRegistry<?>> registries;
-    private final JetBlockStateRegistry blockStateRegistry;
+    private final JetBlockStateRegistry blockStateRegistry = new JetBlockStateRegistry();
 
     private final ReadWriteLock tagsLock = new ReentrantReadWriteLock();
 
@@ -216,8 +216,6 @@ public final class JetRegistryManager implements RegistryManager {
                         JsonBlockEntityType.class, JetBlockEntityType::convert
                 )
                 .build();
-
-        this.blockStateRegistry = new JetBlockStateRegistry(this.registry(RegistryReference.BLOCK));
     }
 
     @Override

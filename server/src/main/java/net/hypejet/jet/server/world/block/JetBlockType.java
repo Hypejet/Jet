@@ -1,14 +1,10 @@
 package net.hypejet.jet.server.world.block;
 
 import net.hypejet.jet.data.json.model.block.JsonBlock;
-import net.hypejet.jet.data.json.model.block.state.property.JsonStateProperty;
-import net.hypejet.jet.server.world.block.state.property.StateProperty;
 import net.hypejet.jet.world.block.BlockType;
 import net.kyori.adventure.key.Key;
 import org.jspecify.annotations.NullMarked;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -16,27 +12,19 @@ import java.util.Set;
  * An implementation of the {@linkplain BlockType block type}.
  *
  * @param requiredFeatureFlags a set of feature flag keys required to enable this block type
- * @param stateProperties a map associating block state property names with block state
- *                        properties supported by block states associated with this block type
  * @since 1.0
  */
 @NullMarked
-public record JetBlockType(
-        Set<Key> requiredFeatureFlags,
-        Map<String, StateProperty<?>> stateProperties
-) implements BlockType {
+public record JetBlockType(Set<Key> requiredFeatureFlags) implements BlockType {
     /**
      * Constructs the {@linkplain JetBlockType block type implementation}.
      *
      * @param requiredFeatureFlags a set of feature flag keys that should be
      *                             required to enable the constructed block type
-     * @param stateProperties a map associating block state property names with block state properties supported
-     *                        by block states that are going to be associated with the constructed block type
      * @since 1.0
      */
     public JetBlockType {
         Objects.requireNonNull(requiredFeatureFlags, "required feature flags");
-        stateProperties = Map.copyOf(Objects.requireNonNull(stateProperties, "state properties"));
     }
 
     /**
@@ -48,10 +36,7 @@ public record JetBlockType(
      */
     public static JetBlockType convert(JsonBlock block) {
         Objects.requireNonNull(block, "block");
-        Map<String, StateProperty<?>> convertedStateProperties = new HashMap<>();
-        for (Map.Entry<String, JsonStateProperty> entry : block.blockStateProperties().entrySet())
-            convertedStateProperties.put(entry.getKey(), StateProperty.convert(entry.getValue()));
-        return new JetBlockType(block.requiredFeatureFlags(), convertedStateProperties);
+        return new JetBlockType(block.requiredFeatureFlags());
     }
 
     /**

@@ -9,9 +9,7 @@ import net.hypejet.jet.data.json.model.block.state.JsonBlockState;
 import net.hypejet.jet.data.json.resource.JsonDataResourceFiles;
 import net.hypejet.jet.registry.blockstate.BlockStateRegistry;
 import net.hypejet.jet.registry.holder.Holder;
-import net.hypejet.jet.server.registry.JetMinecraftRegistry;
 import net.hypejet.jet.server.util.data.JetDataUtil;
-import net.hypejet.jet.server.world.block.JetBlockType;
 import net.hypejet.jet.server.world.block.state.JetBlockState;
 import net.hypejet.jet.server.world.block.state.property.StateProperty;
 import net.hypejet.jet.world.block.state.BlockState;
@@ -44,10 +42,9 @@ public final class JetBlockStateRegistry implements BlockStateRegistry {
     /**
      * Constructs the {@linkplain BlockStateRegistry block state registry}.
      *
-     * @param blockTypeRegistry a registry containing block types for which the block states should be created
      * @since 1.0
      */
-    public JetBlockStateRegistry(JetMinecraftRegistry<BlockType> blockTypeRegistry) {
+    public JetBlockStateRegistry() {
         List<JsonRegistryEntry<JsonBlockState>> blockStateDataEntries = JetDataUtil.deserializeEntries(
                 JsonDataResourceFiles.BLOCK_STATES,
                 JsonBlockState.class
@@ -66,8 +63,7 @@ public final class JetBlockStateRegistry implements BlockStateRegistry {
             JsonBlockState blockState = dataEntry.value();
 
             Holder.Reference<BlockType> blockTypeReference = new Holder.Reference<>(dataEntry.key());
-            JetBlockType blockType = JetBlockType.cast(blockTypeReference.valueOrThrow(blockTypeRegistry));
-            Map<String, StateProperty<?>> stateProperties = blockType.stateProperties();
+            Map<String, StateProperty<?>> stateProperties = BlockStateProperties.properties(blockTypeReference);
 
             Map<String, Object> convertedProperties = new HashMap<>();
             for (Map.Entry<String, String> entry : blockState.properties().entrySet()) {
