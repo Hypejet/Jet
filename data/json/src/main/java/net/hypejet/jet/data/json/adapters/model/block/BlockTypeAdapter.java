@@ -29,7 +29,7 @@ import java.util.Set;
 final class BlockTypeAdapter extends TypeAdapter<JsonBlock> {
 
     private static final String REQUIRED_FEATURE_FLAGS_FIELD = "required_feature_flags";
-    private static final String DEFAULT_BLOCK_STATE_ID_FIELD = "default_state";
+    private static final String DEFAULT_BLOCK_STATE_PROPERTIES_FIELD = "default_state_properties";
     private static final String BLOCK_STATE_IDS_FIELD = "states";
     private static final String BLOCK_STATE_PROPERTIES_FIELD = "state_properties";
 
@@ -55,8 +55,11 @@ final class BlockTypeAdapter extends TypeAdapter<JsonBlock> {
             this.gson.toJson(requiredFeatureFlags, DataJsonTypes.KEY_SET, out);
         }
 
-        out.name(DEFAULT_BLOCK_STATE_ID_FIELD);
-        out.value(value.defaultBlockStateId());
+        Map<String, String> defaultBlockStateProperties = value.defaultBlockStateProperties();
+        if (!defaultBlockStateProperties.isEmpty()) {
+            out.name(DEFAULT_BLOCK_STATE_PROPERTIES_FIELD);
+            this.gson.toJson(defaultBlockStateProperties, DataJsonTypes.STRING_TO_STRING_MAP, out);
+        }
 
         out.name(BLOCK_STATE_IDS_FIELD);
         this.gson.toJson(value.blockStateIds(), ImmutableIntArray.class, out);
@@ -75,11 +78,10 @@ final class BlockTypeAdapter extends TypeAdapter<JsonBlock> {
         in.beginObject();
 
         Set<Key> requiredFeatureFlags = Set.of();
-        int defaultBlockStateId = 0;
+        Map<String, String> defaultBlockStateProperties = Map.of();
         ImmutableIntArray blockStateIds = null;
         Map<String, JsonStateProperty> stateProperties = Map.of();
 
-        boolean defaultBlockStateIdInitialized = false;
         while (in.peek() == JsonToken.NAME) {
             switch (in.nextName()) {
                 case REQUIRED_FEATURE_FLAGS_FIELD ->
@@ -88,21 +90,18 @@ final class BlockTypeAdapter extends TypeAdapter<JsonBlock> {
                         blockStateIds = this.gson.fromJson(in, ImmutableIntArray.class);
                 case BLOCK_STATE_PROPERTIES_FIELD ->
                         stateProperties = this.gson.fromJson(in, DataJsonTypes.STRING_TO_STATE_PROPERTY_MAP);
-                case DEFAULT_BLOCK_STATE_ID_FIELD -> {
-                    defaultBlockStateId = in.nextInt();
-                    defaultBlockStateIdInitialized = true;
-                }
+                case DEFAULT_BLOCK_STATE_PROPERTIES_FIELD ->
+                    defaultBlockStateProperties = this.gson.fromJson(in, DataJsonTypes.STRING_TO_STRING_MAP);
+                default -> in.skipValue();
             }
         }
 
         in.endObject();
 
-        if (!defaultBlockStateIdInitialized) {
-            throw new JsonParseException("The default block state id has not been specified");
-        } else if (blockStateIds == null) {
+        if (blockStateIds == null) {
             throw new JsonParseException("The block state ids have not been initialized");
         } else {
-            return new JsonBlock(requiredFeatureFlags, defaultBlockStateId, blockStateIds, stateProperties);
+            return new JsonBlock(requiredFeatureFlags, defaultBlockStateProperties, blockStateIds, stateProperties);
         }
     }
 }
