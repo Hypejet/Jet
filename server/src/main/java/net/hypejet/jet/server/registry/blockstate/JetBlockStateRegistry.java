@@ -11,7 +11,6 @@ import net.hypejet.jet.registry.blockstate.BlockStateRegistry;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.util.data.JetDataUtil;
 import net.hypejet.jet.server.world.block.state.JetBlockState;
-import net.hypejet.jet.server.world.block.state.property.StateProperty;
 import net.hypejet.jet.world.block.state.BlockState;
 import net.hypejet.jet.world.block.BlockType;
 import net.hypejet.jet.world.block.state.BlockStateReference;
@@ -35,9 +34,7 @@ public final class JetBlockStateRegistry implements BlockStateRegistry {
 
     private final List<JetBlockState> blockStates;
     private final Object2IntMap<JetBlockState> blockStateToIndexMap;
-
     private final Map<Key, Map<Map<String, Object>, JetBlockState>> possibleStates;
-    private final Map<Key, JetBlockState> defaultStates;
 
     /**
      * Constructs the {@linkplain BlockStateRegistry block state registry}.
@@ -61,30 +58,11 @@ public final class JetBlockStateRegistry implements BlockStateRegistry {
         for (int index = 0; index < blockStateDataEntries.size(); index++) {
             JsonRegistryEntry<JsonBlockState> dataEntry = blockStateDataEntries.get(index);
             JsonBlockState blockState = dataEntry.value();
-
             Holder.Reference<BlockType> blockTypeReference = new Holder.Reference<>(dataEntry.key());
-            Map<String, StateProperty<?>> stateProperties = BlockStateProperties.properties(blockTypeReference);
-
-            Map<String, Object> convertedProperties = new HashMap<>();
-            for (Map.Entry<String, String> entry : blockState.properties().entrySet()) {
-                String propertyName = entry.getKey();
-                String valueStringRepresentation = entry.getValue();
-
-                StateProperty<?> stateProperty = stateProperties.get(propertyName);
-                if (stateProperty == null) {
-                    throw new IllegalStateException(String.format(
-                            "Block type \"%s\" does not have a block state property with name of \"%s\"",
-                            blockTypeReference.key(),
-                            propertyName
-                    ));
-                }
-
-                convertedProperties.put(propertyName, stateProperty.valueFromString(valueStringRepresentation));
-            }
 
             JetBlockState convertedBlockState = new JetBlockState(
                     blockTypeReference,
-                    convertedProperties,
+                    BlockStateProperties.convertProperties(blockTypeReference, blockState.properties()),
                     blockState.isAir(),
                     blockState.hasFluidState(),
                     blockState.blocksMotion(),
@@ -99,14 +77,9 @@ public final class JetBlockStateRegistry implements BlockStateRegistry {
         this.blockStateToIndexMap = Object2IntMaps.unmodifiable(blockStateToIndexMap);
 
         Map<Key, Map<Map<String, Object>, JetBlockState>> possibleStates = new HashMap<>();
-        Map<Key, JetBlockState> defaultStates = new HashMap<>();
-
         for (JsonRegistryEntry<JsonBlock> blockDataEntry : blockDataEntries) {
             Key blockTypeKey = blockDataEntry.key();
             JsonBlock block = blockDataEntry.value();
-
-            JetBlockState defaultState = this.byIndex(block.defaultBlockStateId());
-            defaultStates.put(blockTypeKey, defaultState);
 
             Map<Map<String, Object>, JetBlockState> propertiesToStateMap = new HashMap<>();
             block.blockStateIds().forEach(stateIdentifier -> {
@@ -118,24 +91,12 @@ public final class JetBlockStateRegistry implements BlockStateRegistry {
         }
 
         this.possibleStates = Map.copyOf(possibleStates);
-        this.defaultStates = Map.copyOf(defaultStates);
     }
 
     @Override
     public JetBlockState defaultBlockState(Holder.Reference<BlockType> blockType) {
         Objects.requireNonNull(blockType, "block type");
-
-        Key blockTypeKey = blockType.key();
-        JetBlockState blockState = this.defaultStates.get(blockTypeKey);
-
-        if (blockState == null) {
-            throw new IllegalArgumentException(String.format(
-                    "Could not find a default block state for \"%s\" block type",
-                    blockTypeKey
-            ));
-        }
-
-        return blockState;
+        return this.blockState(new BlockStateReference(blockType, BlockStateProperties.defaultProperties(blockType)));
     }
 
     @Override

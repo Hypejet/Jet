@@ -1,6 +1,7 @@
 package net.hypejet.jet.data.generator.adapter;
 
 import com.google.common.primitives.ImmutableIntArray;
+import net.hypejet.jet.data.generator.extractor.BlockStateRegistryExtractor;
 import net.hypejet.jet.data.json.model.block.JsonBlock;
 import net.hypejet.jet.data.json.model.block.state.property.JsonStateProperty;
 import net.hypejet.jet.data.json.model.block.state.property.JsonEnumStatePropertyValueType;
@@ -120,7 +121,7 @@ public final class BlockAdapter {
 
         return new JsonBlock(
                 KeyAdapter.convertSet(FeatureFlags.REGISTRY.toNames(block.requiredFeatures())),
-                Block.getId(block.defaultBlockState()),
+                BlockStateRegistryExtractor.stringProperties(block.defaultBlockState()),
                 possibleStateIdsBuilder.build(),
                 stateProperties
         );

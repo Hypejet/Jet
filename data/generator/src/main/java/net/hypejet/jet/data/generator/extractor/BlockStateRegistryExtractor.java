@@ -29,6 +29,7 @@ import java.util.Set;
  */
 @NullMarked
 public final class BlockStateRegistryExtractor implements RegistryExtractor<JsonBlockState> {
+
     /**
      * An instance of the {@linkplain BlockStateRegistryExtractor block state registry extractor}.
      *
@@ -51,16 +52,10 @@ public final class BlockStateRegistryExtractor implements RegistryExtractor<Json
                 );
             }
 
-            Map<String, String> properties = new HashMap<>();
-            for (Map.Entry<Property<?>, Comparable<?>> entry : blockState.getValues().entrySet()) {
-                Property<?> property = entry.getKey();
-                properties.put(property.getName(), propertyValueString(property, entry.getValue()));
-            }
-
             entries.add(new JsonRegistryEntry<>(
                     KeyAdapter.convert(location),
                     new JsonBlockState(
-                            properties,
+                            stringProperties(blockState),
                             blockState.isAir(),
                             !blockState.getFluidState().isEmpty(),
                             blockState.blocksMotion(),
@@ -77,6 +72,25 @@ public final class BlockStateRegistryExtractor implements RegistryExtractor<Json
     @Override
     public Class<JsonBlockState> valueClass() {
         return JsonBlockState.class;
+    }
+
+    /**
+     * Creates a {@linkplain Map map} associating {@linkplain Property state property} names with string
+     * representations of their values assigned in the specified {@linkplain BlockState block state}.
+     *
+     * @param blockState the block state that the property map should be created for
+     * @return the created property map
+     * @since 1.0
+     */
+    public static Map<String, String> stringProperties(BlockState blockState) {
+        Map<String, String> properties = new HashMap<>();
+
+        for (Map.Entry<Property<?>, Comparable<?>> entry : blockState.getValues().entrySet()) {
+            Property<?> property = entry.getKey();
+            properties.put(property.getName(), propertyValueString(property, entry.getValue()));
+        }
+
+        return Map.copyOf(properties);
     }
 
     private static <T extends Comparable<T>> String propertyValueString(Property<T> property, Comparable<?> value) {
