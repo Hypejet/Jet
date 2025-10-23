@@ -48,7 +48,7 @@ public final class JetColorParticle extends JetParticle implements ColorParticle
     public static final class Builder implements ColorParticle.Builder<JetColorParticle, Builder> {
 
         private final Holder.Reference<ParticleType> particleType;
-        private ARGBColor color = ARGBColor.fromRGBA(255, 255, 255, 255);
+        private ARGBColor color = ARGBColor.fromARGB(255, 255, 255, 255);
 
         /**
          * Constructs the {@linkplain Builder color particle builder implementation}.

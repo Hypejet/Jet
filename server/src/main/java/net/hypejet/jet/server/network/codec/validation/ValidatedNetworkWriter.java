@@ -14,7 +14,7 @@ import java.util.function.Predicate;
  * before writing and throws a {@linkplain RuntimeException runtime exception} if the predicate is not satisfied.
  *
  * @param writer the wrapped network writer
- * @param predicate the predicate tests written objects
+ * @param predicate the predicate that tests the written objects
  * @param exceptionProvider a function providing runtime exceptions for objects that do not satisfy the predicate
  * @param <V> the type of objects that this network writer writes
  * @since 1.0

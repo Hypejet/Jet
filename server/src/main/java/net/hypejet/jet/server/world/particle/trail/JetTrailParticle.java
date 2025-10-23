@@ -3,6 +3,7 @@ package net.hypejet.jet.server.world.particle.trail;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.world.particle.JetParticle;
 import net.hypejet.jet.util.color.RGBColor;
+import net.hypejet.jet.util.range.RangeUtil;
 import net.hypejet.jet.world.coordinate.Vector;
 import net.hypejet.jet.world.particle.ParticleType;
 import net.hypejet.jet.world.particle.trail.TrailParticle;
@@ -37,6 +38,7 @@ public final class JetTrailParticle extends JetParticle implements TrailParticle
         this.target = Objects.requireNonNull(target, "target");
         this.color = Objects.requireNonNull(color, "color");
         this.travelDuration = travelDuration;
+        RangeUtil.ensureNotNegative(travelDuration);
     }
 
     @Override

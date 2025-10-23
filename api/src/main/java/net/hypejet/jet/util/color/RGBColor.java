@@ -32,7 +32,7 @@ public record RGBColor(int value) implements RGBLike {
     }
 
     /**
-     * Creates an {@linkplain RGBColor RGB color} from RGB values specified.
+     * Creates an {@linkplain RGBColor RGB color} from the specified RGB values.
      *
      * @param red the red value
      * @param green the green value

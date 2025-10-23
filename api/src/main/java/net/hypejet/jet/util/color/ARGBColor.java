@@ -38,7 +38,7 @@ public record ARGBColor(int value) implements ARGBLike {
     }
 
     /**
-     * Creates an {@linkplain ARGBColor ARGB color} from RGBA values specified.
+     * Creates an {@linkplain ARGBColor ARGB color} from the specified ARGB values.
      *
      * @param alpha the alpha value
      * @param red the red value
@@ -47,7 +47,7 @@ public record ARGBColor(int value) implements ARGBLike {
      * @return the created ARGB color
      * @since 1.0
      */
-    public static @NonNull ARGBColor fromRGBA(int alpha, int red, int green, int blue) {
+    public static @NonNull ARGBColor fromARGB(int alpha, int red, int green, int blue) {
         int value = (alpha << ALPHA_SHIFT) & MAX_RGB_VALUE;
         value |= (red << RED_SHIFT) & MAX_RGB_VALUE;
         value |= (green << GREEN_SHIFT) & MAX_RGB_VALUE;
