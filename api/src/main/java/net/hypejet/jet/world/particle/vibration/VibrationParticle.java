@@ -1,6 +1,6 @@
 package net.hypejet.jet.world.particle.vibration;
 
-import net.hypejet.jet.world.coordinate.source.PositionSource;
+import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.hypejet.jet.world.particle.Particle;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
@@ -15,13 +15,13 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public interface VibrationParticle extends Particle {
     /**
-     * Gets a {@linkplain PositionSource position source} providing the destination
+     * Gets a {@linkplain BlockPosition block position} of the destination
      * that this vibration particle should start travelling to after spawning.
      *
-     * @return the position source
+     * @return the destination block position
      * @since 1.0
      */
-    PositionSource destination();
+    BlockPosition destination();
 
     /**
      * Gets the time that it takes for this vibration particle to travel
@@ -43,14 +43,14 @@ public interface VibrationParticle extends Particle {
      */
     interface Builder<P extends VibrationParticle, B extends Builder<P, B>> extends Particle.Builder<P> {
         /**
-         * Sets the {@linkplain PositionSource position source} providing the destination
+         * Sets the {@linkplain BlockPosition block position} of the destination
          * that the vibration particle should start travelling to after spawning.
          *
-         * @param value the position source providing the destination
+         * @param value the destination block position
          * @return this particle builder
          * @since 1.0
          */
-        B destination(PositionSource value);
+        B destination(BlockPosition value);
 
         /**
          * Sets the time that it should take for the vibration particle

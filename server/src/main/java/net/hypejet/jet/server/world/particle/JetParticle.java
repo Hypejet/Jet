@@ -34,6 +34,22 @@ public class JetParticle implements Particle {
     }
 
     /**
+     * Casts the specified {@linkplain Particle particle} to the {@linkplain JetParticle particle implementation}.
+     * Throws a detailed exception if the specified {@linkplain Particle particle} does not use
+     * the correct implementation.
+     *
+     * @param particle the particle to cast
+     * @return the particle cast to the implementation
+     * @throws IllegalArgumentException if the specified particle uses an invalid implementation
+     * @since 1.0
+     */
+    public static JetParticle cast(Particle particle) {
+        if (!(particle instanceof JetParticle castParticle))
+            throw new IllegalArgumentException("The specified particle is not a valid particle");
+        return castParticle;
+    }
+
+    /**
      * An implementation of the {@linkplain Particle.Builder particle builder}
      * creating {@linkplain Particle particles} without additional options.
      *

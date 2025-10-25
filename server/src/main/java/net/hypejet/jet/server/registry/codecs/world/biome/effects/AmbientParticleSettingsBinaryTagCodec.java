@@ -1,6 +1,8 @@
 package net.hypejet.jet.server.registry.codecs.world.biome.effects;
 
 import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.world.particle.ParticleBinaryTagCodec;
+import net.hypejet.jet.server.world.particle.JetParticle;
 import net.hypejet.jet.world.biome.effects.AmbientParticleSettings;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagTypes;
@@ -34,7 +36,7 @@ public final class AmbientParticleSettingsBinaryTagCodec implements BinaryTagCod
     public AmbientParticleSettings decode(BinaryTag binaryTag) {
         if (binaryTag instanceof CompoundBinaryTag compound) {
             return new AmbientParticleSettings(
-                    requiredTag(OPTIONS_FIELD, compound),
+                    ParticleBinaryTagCodec.INSTANCE.decode(requiredTag(OPTIONS_FIELD, compound)),
                     requiredTag(PROBABILITY_FIELD, compound, BinaryTagTypes.FLOAT).value()
             );
         } else {
@@ -47,7 +49,7 @@ public final class AmbientParticleSettingsBinaryTagCodec implements BinaryTagCod
     @Override
     public BinaryTag encode(AmbientParticleSettings value) {
         return CompoundBinaryTag.builder()
-                .put(OPTIONS_FIELD, value.options())
+                .put(OPTIONS_FIELD, ParticleBinaryTagCodec.INSTANCE.encode(JetParticle.cast(value.particle())))
                 .putFloat(PROBABILITY_FIELD, value.probability())
                 .build();
     }

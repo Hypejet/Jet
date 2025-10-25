@@ -2,14 +2,12 @@ package net.hypejet.jet.server.network.codec.game.world.particle.vibration;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
-import net.hypejet.jet.server.network.codec.game.world.coordinate.source.PositionSourceNetworkWriter;
+import net.hypejet.jet.server.network.codec.game.world.coordinate.BlockPositionNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
-import net.hypejet.jet.server.network.codec.validation.ValidatedNetworkWriter;
 import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.world.particle.vibration.JetVibrationParticle;
-import net.hypejet.jet.world.coordinate.source.EntityPositionSource;
-import net.hypejet.jet.world.coordinate.source.PositionSource;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import net.hypejet.jet.world.coordinate.BlockPosition;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A {@linkplain NetworkWriter network writer} of additional
@@ -19,13 +17,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see JetVibrationParticle
  * @see NetworkWriter
  */
+@NullMarked
 public final class VibrationParticleAdditionalNetworkWriter implements NetworkWriter<JetVibrationParticle> {
-
-    private static final NetworkWriter<PositionSource> VALIDATED_POSITION_SOURCE_WRITER = new ValidatedNetworkWriter<>(
-            PositionSourceNetworkWriter.INSTANCE,
-            positionSource -> !(positionSource instanceof EntityPositionSource),
-            ignored -> new IllegalArgumentException("Entity position sources are not allowed in vibration particles")
-    );
 
     /**
      * An instance of the
@@ -39,10 +32,15 @@ public final class VibrationParticleAdditionalNetworkWriter implements NetworkWr
     private VibrationParticleAdditionalNetworkWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf,
-                      @NonNull JetRegistryManager registryManager,
-                      @NonNull JetVibrationParticle object) {
-        VALIDATED_POSITION_SOURCE_WRITER.write(buf, registryManager, object.destination());
+    public void write(ByteBuf buf, JetRegistryManager registryManager, JetVibrationParticle object) {
+        writeBlockPositionSource(buf, registryManager, object.destination());
         VarIntNetworkCodec.INSTANCE.write(buf, registryManager, object.arrivalDuration());
+    }
+
+    private static void writeBlockPositionSource(ByteBuf buf,
+                                                 JetRegistryManager registryManager,
+                                                 BlockPosition position) {
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, 0); // 0 is block position source type registry index
+        BlockPositionNetworkCodec.INSTANCE.write(buf, registryManager, position);
     }
 }

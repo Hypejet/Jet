@@ -40,9 +40,9 @@ public record JetBlockType(Set<Key> requiredFeatureFlags) implements BlockType {
     }
 
     /**
-     * Casts the specified {@linkplain BlockType blockType} to the {@linkplain JetBlockType block type implementation}.
-     * Throws a detailed exception if the specified {@linkplain BlockType block type} does not use
-     * the correct implementation.
+     * Casts the specified {@linkplain BlockType block type} to
+     * the {@linkplain JetBlockType block type implementation}. Throws a detailed exception
+     * if the specified {@linkplain BlockType block type} does not use the correct implementation.
      *
      * @param blockType the block type to cast
      * @return the block type cast to the implementation
