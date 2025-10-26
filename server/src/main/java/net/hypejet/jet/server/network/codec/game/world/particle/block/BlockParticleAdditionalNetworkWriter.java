@@ -6,17 +6,17 @@ import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.registry.blockstate.JetBlockStateRegistry;
 import net.hypejet.jet.server.world.block.state.JetBlockState;
-import net.hypejet.jet.server.world.particle.block.JetBlockParticle;
+import net.hypejet.jet.world.particle.block.BlockParticle;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * A {@linkplain NetworkWriter network writer} of additional data of {@linkplain JetBlockParticle block particles}.
+ * A {@linkplain NetworkWriter network writer} of additional data of {@linkplain BlockParticle block particles}.
  *
  * @since 1.0
- * @see JetBlockParticle
+ * @see BlockParticle
  * @see NetworkWriter
  */
-public final class BlockParticleAdditionalNetworkWriter implements NetworkWriter<JetBlockParticle> {
+public final class BlockParticleAdditionalNetworkWriter implements NetworkWriter<BlockParticle> {
     /**
      * An instance of the {@linkplain BlockParticleAdditionalNetworkWriter block particle additional network writer}.
      *
@@ -29,9 +29,9 @@ public final class BlockParticleAdditionalNetworkWriter implements NetworkWriter
     @Override
     public void write(@NonNull ByteBuf buf,
                       @NonNull JetRegistryManager registryManager,
-                      @NonNull JetBlockParticle object) {
+                      @NonNull BlockParticle object) {
         JetBlockStateRegistry blockStateRegistry = registryManager.blockStateRegistry();
-        JetBlockState blockState = blockStateRegistry.blockState(object.blockState());
+        JetBlockState blockState = blockStateRegistry.blockState(object.blockStateReference());
         VarIntNetworkCodec.INSTANCE.write(buf, registryManager, blockStateRegistry.indexOf(blockState));
     }
 }

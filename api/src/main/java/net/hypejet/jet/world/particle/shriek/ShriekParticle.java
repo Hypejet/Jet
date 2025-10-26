@@ -1,43 +1,30 @@
 package net.hypejet.jet.world.particle.shriek;
 
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.world.particle.Particle;
-import org.jetbrains.annotations.ApiStatus;
+import net.hypejet.jet.world.particle.ParticleType;
 import org.jspecify.annotations.NullMarked;
+
+import java.util.Objects;
 
 /**
  * A shriek {@linkplain Particle particle}.
  *
+ * @param particleType a holder referencing to a particle type of this particle
+ * @param delay the time after which this particle is actually displayed after spawning, in ticks
  * @since 1.0
  * @see Particle
  */
-@ApiStatus.NonExtendable
 @NullMarked
-public interface ShriekParticle extends Particle {
+public record ShriekParticle(Holder.Reference<ParticleType> particleType, int delay) implements Particle {
     /**
-     * Gets the time after which the particle is actually being displayed after spawning.
+     * Constructs the {@linkplain ShriekParticle shriek particle}.
      *
-     * @return the delay, in ticks
+     * @param particleType a holder referencing to the particle type of which the particle should be
+     * @param delay the time after which the particle should be actually displayed after spawning, in ticks
      * @since 1.0
      */
-    int delay();
-
-    /**
-     * A {@linkplain Particle.Builder particle builder} of a {@linkplain ShriekParticle shriek particle}.
-     *
-     * @param <P> the type of the particle that the builder is going to create
-     * @param <B> the type of this particle builder
-     * @since 1.0
-     * @see ShriekParticle
-     * @see Particle.Builder
-     */
-    interface Builder<P extends ShriekParticle, B extends Builder<P, B>> extends Particle.Builder<P> {
-        /**
-         * Sets the time after which the particle should be actually displayed after spawning.
-         *
-         * @param value the delay, in ticks
-         * @return this particle builder
-         * @since 1.0
-         */
-        B delay(int value);
+    public ShriekParticle {
+        Objects.requireNonNull(particleType, "particle type");
     }
 }

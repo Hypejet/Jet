@@ -1,7 +1,9 @@
 package net.hypejet.jet.server.registry.codecs.world.particle.sculk;
 
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.registry.codecs.world.particle.ParticleAdditionalCodec;
-import net.hypejet.jet.server.world.particle.sculk.JetSculkChargeParticle;
+import net.hypejet.jet.world.particle.ParticleType;
+import net.hypejet.jet.world.particle.sculk.SculkChargeParticle;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.jspecify.annotations.NullMarked;
@@ -10,15 +12,14 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
 
 /**
  * A {@linkplain ParticleAdditionalCodec particle additional codec}
- * of {@linkplain JetSculkChargeParticle sculk charge particles}.
+ * of {@linkplain SculkChargeParticle sculk charge particles}.
  *
  * @since 1.0
- * @see JetSculkChargeParticle
+ * @see SculkChargeParticle
  * @see ParticleAdditionalCodec
  */
 @NullMarked
-public final class SculkChargeParticleAdditionalCodec
-        implements ParticleAdditionalCodec<JetSculkChargeParticle, JetSculkChargeParticle.Builder> {
+public final class SculkChargeParticleAdditionalCodec implements ParticleAdditionalCodec<SculkChargeParticle> {
 
     private static final String ROLL_FIELD = "roll";
 
@@ -30,12 +31,12 @@ public final class SculkChargeParticleAdditionalCodec
     public static final SculkChargeParticleAdditionalCodec INSTANCE = new SculkChargeParticleAdditionalCodec();
 
     @Override
-    public void decode(CompoundBinaryTag compound, JetSculkChargeParticle.Builder particleBuilder) {
-        particleBuilder.roll(requiredTag(ROLL_FIELD, compound, BinaryTagTypes.FLOAT).value());
+    public SculkChargeParticle decode(Holder.Reference<ParticleType> particleType, CompoundBinaryTag compound) {
+        return new SculkChargeParticle(particleType, requiredTag(ROLL_FIELD, compound, BinaryTagTypes.FLOAT).value());
     }
 
     @Override
-    public void encode(JetSculkChargeParticle particle, CompoundBinaryTag.Builder compoundBuilder) {
+    public void encode(SculkChargeParticle particle, CompoundBinaryTag.Builder compoundBuilder) {
         compoundBuilder.putFloat(ROLL_FIELD, particle.roll());
     }
 }

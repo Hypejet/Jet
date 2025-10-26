@@ -16,17 +16,17 @@ import net.hypejet.jet.server.network.codec.game.world.particle.trail.TrailParti
 import net.hypejet.jet.server.network.codec.game.world.particle.vibration.VibrationParticleAdditionalNetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.registry.JetRegistryManager;
-import net.hypejet.jet.server.world.particle.JetParticle;
-import net.hypejet.jet.server.world.particle.block.JetBlockParticle;
-import net.hypejet.jet.server.world.particle.color.JetColorParticle;
-import net.hypejet.jet.server.world.particle.item.JetItemParticle;
-import net.hypejet.jet.server.world.particle.scalable.dust.JetDustParticle;
-import net.hypejet.jet.server.world.particle.scalable.dust.JetDustTransitionParticle;
-import net.hypejet.jet.server.world.particle.sculk.JetSculkChargeParticle;
-import net.hypejet.jet.server.world.particle.shriek.JetShriekParticle;
-import net.hypejet.jet.server.world.particle.trail.JetTrailParticle;
-import net.hypejet.jet.server.world.particle.vibration.JetVibrationParticle;
+import net.hypejet.jet.world.particle.Particle;
 import net.hypejet.jet.world.particle.ParticleType;
+import net.hypejet.jet.world.particle.block.BlockParticle;
+import net.hypejet.jet.world.particle.color.ColorParticle;
+import net.hypejet.jet.world.particle.item.ItemParticle;
+import net.hypejet.jet.world.particle.scalable.dust.DustParticle;
+import net.hypejet.jet.world.particle.scalable.dust.DustTransitionParticle;
+import net.hypejet.jet.world.particle.sculk.SculkChargeParticle;
+import net.hypejet.jet.world.particle.shriek.ShriekParticle;
+import net.hypejet.jet.world.particle.trail.TrailParticle;
+import net.hypejet.jet.world.particle.vibration.VibrationParticle;
 import net.kyori.adventure.key.Key;
 import org.jspecify.annotations.NullMarked;
 
@@ -34,22 +34,22 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * A {@linkplain NetworkWriter network writer} of {@linkplain JetParticle particles}.
+ * A {@linkplain NetworkWriter network writer} of {@linkplain Particle particles}.
  *
  * @since 1.0
- * @see JetParticle
+ * @see Particle
  * @see NetworkWriter
  */
 @NullMarked
-public final class ParticleNetworkWriter implements NetworkWriter<JetParticle> {
+public final class ParticleNetworkWriter implements NetworkWriter<Particle> {
 
-    private static final ParticleWriterType<JetBlockParticle> BLOCK_PARTICLE_WRITER_TYPE = new ParticleWriterType<>(
-            JetBlockParticle.class,
+    private static final ParticleWriterType<BlockParticle> BLOCK_PARTICLE_WRITER_TYPE = new ParticleWriterType<>(
+            BlockParticle.class,
             BlockParticleAdditionalNetworkWriter.INSTANCE
     );
 
-    private static final ParticleWriterType<JetColorParticle> COLOR_PARTICLE_WRITER_TYPE = new ParticleWriterType<>(
-            JetColorParticle.class,
+    private static final ParticleWriterType<ColorParticle> COLOR_PARTICLE_WRITER_TYPE = new ParticleWriterType<>(
+            ColorParticle.class,
             ColorParticleAdditionalNetworkWriter.INSTANCE
     );
 
@@ -64,50 +64,43 @@ public final class ParticleNetworkWriter implements NetworkWriter<JetParticle> {
             Map.entry(
                     ParticleTypeKeys.DUST,
                     new ParticleWriterType<>(
-                            JetDustParticle.class,
-                            DustParticleAdditionalNetworkWriter.INSTANCE
+                            DustParticle.class, DustParticleAdditionalNetworkWriter.INSTANCE
                     )
             ),
             Map.entry(
                     ParticleTypeKeys.DUST_COLOR_TRANSITION,
                     new ParticleWriterType<>(
-                            JetDustTransitionParticle.class,
-                            DustParticleTransitionAdditionalNetworkWriter.INSTANCE
+                            DustTransitionParticle.class, DustParticleTransitionAdditionalNetworkWriter.INSTANCE
                     )
             ),
             Map.entry(
                     ParticleTypeKeys.SCULK_CHARGE,
                     new ParticleWriterType<>(
-                            JetSculkChargeParticle.class,
-                            SculkChargeParticleAdditionalNetworkWriter.INSTANCE
+                            SculkChargeParticle.class, SculkChargeParticleAdditionalNetworkWriter.INSTANCE
                     )
             ),
             Map.entry(
                     ParticleTypeKeys.ITEM,
                     new ParticleWriterType<>(
-                            JetItemParticle.class,
-                            ItemParticleAdditionalNetworkWriter.INSTANCE
+                            ItemParticle.class, ItemParticleAdditionalNetworkWriter.INSTANCE
                     )
             ),
             Map.entry(
                     ParticleTypeKeys.VIBRATION,
                     new ParticleWriterType<>(
-                            JetVibrationParticle.class,
-                            VibrationParticleAdditionalNetworkWriter.INSTANCE
+                            VibrationParticle.class, VibrationParticleAdditionalNetworkWriter.INSTANCE
                     )
             ),
             Map.entry(
                     ParticleTypeKeys.TRAIL,
                     new ParticleWriterType<>(
-                            JetTrailParticle.class,
-                            TrailParticleAdditionalNetworkWriter.INSTANCE
+                            TrailParticle.class, TrailParticleAdditionalNetworkWriter.INSTANCE
                     )
             ),
             Map.entry(
                     ParticleTypeKeys.SHRIEK,
                     new ParticleWriterType<>(
-                            JetShriekParticle.class,
-                            ShriekParticleAdditionalNetworkWriter.INSTANCE
+                            ShriekParticle.class, ShriekParticleAdditionalNetworkWriter.INSTANCE
                     )
             )
     );
@@ -122,7 +115,7 @@ public final class ParticleNetworkWriter implements NetworkWriter<JetParticle> {
     private ParticleNetworkWriter() {}
 
     @Override
-    public void write(ByteBuf buf, JetRegistryManager registryManager, JetParticle object) {
+    public void write(ByteBuf buf, JetRegistryManager registryManager, Particle object) {
         Holder.Reference<ParticleType> particleTypeReference = object.particleType();
 
         VarIntNetworkCodec.INSTANCE.write(
@@ -134,10 +127,8 @@ public final class ParticleNetworkWriter implements NetworkWriter<JetParticle> {
         if (writerType != null) writeAdditional(writerType, buf, registryManager, object);
     }
 
-    private static <P extends JetParticle> void writeAdditional(ParticleWriterType<P> writerType,
-                                                                ByteBuf buf,
-                                                                JetRegistryManager registryManager,
-                                                                JetParticle particle) {
+    private static <P extends Particle> void writeAdditional(ParticleWriterType<P> writerType, ByteBuf buf,
+                                                             JetRegistryManager registryManager, Particle particle) {
         Class<P> particleClass = writerType.particleClass();
         if (!particleClass.isAssignableFrom(particle.getClass())) {
             throw new IllegalArgumentException(String.format(
@@ -150,15 +141,15 @@ public final class ParticleNetworkWriter implements NetworkWriter<JetParticle> {
     }
 
     /**
-     * A type of how {@linkplain JetParticle particles} containing additional data of certain type should be encoded.
+     * A type of how {@linkplain Particle particles} containing additional data of certain type should be encoded.
      *
      * @param particleClass the class of particles whose serialization is handled by the specified network writer
      * @param networkWriter the network writer that the additional particle fields should be written with
      * @param <P> the type of particles whose serialization is handled by the specified network writer
      * @since 1.0
-     * @see JetParticle
+     * @see Particle
      */
-    private record ParticleWriterType<P extends JetParticle>(Class<P> particleClass, NetworkWriter<P> networkWriter) {
+    private record ParticleWriterType<P extends Particle>(Class<P> particleClass, NetworkWriter<P> networkWriter) {
         /**
          * Constructs the {@linkplain ParticleWriterType particle writer type}.
          *

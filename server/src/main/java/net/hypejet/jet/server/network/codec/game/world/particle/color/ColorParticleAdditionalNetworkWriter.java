@@ -4,17 +4,17 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.util.color.ARGBColorNetworkWriter;
 import net.hypejet.jet.server.registry.JetRegistryManager;
-import net.hypejet.jet.server.world.particle.color.JetColorParticle;
+import net.hypejet.jet.world.particle.color.ColorParticle;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * A {@linkplain NetworkWriter network writer} of additional data of {@linkplain JetColorParticle color particles}.
+ * A {@linkplain NetworkWriter network writer} of additional data of {@linkplain ColorParticle color particles}.
  *
  * @since 1.0
- * @see JetColorParticle
+ * @see ColorParticle
  * @see NetworkWriter
  */
-public final class ColorParticleAdditionalNetworkWriter implements NetworkWriter<JetColorParticle> {
+public final class ColorParticleAdditionalNetworkWriter implements NetworkWriter<ColorParticle> {
     /**
      * An instance of the {@linkplain ColorParticleAdditionalNetworkWriter color particle additional network writer}.
      *
@@ -27,7 +27,7 @@ public final class ColorParticleAdditionalNetworkWriter implements NetworkWriter
     @Override
     public void write(@NonNull ByteBuf buf,
                       @NonNull JetRegistryManager registryManager,
-                      @NonNull JetColorParticle object) {
+                      @NonNull ColorParticle object) {
         ARGBColorNetworkWriter.INSTANCE.write(buf, registryManager, object.color());
     }
 }

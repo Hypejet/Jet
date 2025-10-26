@@ -1,63 +1,39 @@
 package net.hypejet.jet.world.particle.scalable.dust;
 
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.util.color.RGBColor;
 import net.hypejet.jet.world.particle.Particle;
+import net.hypejet.jet.world.particle.ParticleType;
 import net.hypejet.jet.world.particle.scalable.ScalableParticle;
-import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
+
+import java.util.Objects;
 
 /**
  * A color-transitioning dust {@linkplain Particle particle}.
  *
+ * @param particleType a holder referencing to a particle type of this particle
+ * @param scale the scale field value of this particle
+ * @param fromColor the initial (before the color transition) color that this particle has
+ * @param toColor the last (after the color transition) color that this particle has
  * @since 1.0
  * @see Particle
  */
-@ApiStatus.NonExtendable
 @NullMarked
-public interface DustTransitionParticle extends ScalableParticle {
+public record DustTransitionParticle(Holder.Reference<ParticleType> particleType,
+                                     float scale, RGBColor fromColor, RGBColor toColor) implements ScalableParticle {
     /**
-     * Gets the initial (before the color transition) color that this dust particle should have.
+     * Constructs the {@linkplain DustTransitionParticle dust transition particle}.
      *
-     * @return the initial color
+     * @param particleType a holder referencing to the particle type of which the particle should be
+     * @param scale the value that the scale field of the particle should have
+     * @param fromColor the initial (before the color transition) color that the particle should have
+     * @param toColor the last (after the color transition) color that the particle should have
      * @since 1.0
      */
-    RGBColor fromColor();
-
-    /**
-     * Gets the last (after the color transition) color that this dust particle should have.
-     *
-     * @return the last color
-     * @since 1.0
-     */
-    RGBColor toColor();
-
-    /**
-     * A {@linkplain Particle.Builder particle builder}
-     * of a {@linkplain DustTransitionParticle dust transition particle}.
-     *
-     * @param <P> the type of the particle that the builder is going to create
-     * @param <B> the type of this particle builder
-     * @since 1.0
-     * @see DustTransitionParticle
-     * @see Particle.Builder
-     */
-    interface Builder<P extends DustTransitionParticle, B extends Builder<P, B>>
-            extends ScalableParticle.Builder<P, B> {
-        /**
-         * Sets the initial (before the color transition) color that the dust particle should have.
-         *
-         * @param value the initial dust particle color
-         * @return this builder
-         * @since 1.0
-         */
-        B fromColor(RGBColor value);
-
-        /**
-         * Sets the last (after the color transition) color that the dust particle should have.
-         *
-         * @return the last color
-         * @since 1.0
-         */
-        B toColor(RGBColor value);
+    public DustTransitionParticle {
+        Objects.requireNonNull(particleType, "particle type");
+        Objects.requireNonNull(fromColor, "from color");
+        Objects.requireNonNull(toColor, "to color");
     }
 }

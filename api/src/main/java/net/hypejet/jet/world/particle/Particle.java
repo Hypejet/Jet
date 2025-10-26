@@ -20,21 +20,4 @@ public interface Particle {
      * @since 1.0
      */
     Holder.Reference<ParticleType> particleType();
-
-    /**
-     * A builder of a {@linkplain Particle particle}.
-     *
-     * @param <P> the type of the particle that this builder is going to create
-     * @since 1.0
-     * @see Particle
-     */
-    interface Builder<P extends Particle> {
-        /**
-         * Builds the {@linkplain Particle particle}.
-         *
-         * @return the created particle
-         * @since 1.0
-         */
-        P build();
-    }
 }

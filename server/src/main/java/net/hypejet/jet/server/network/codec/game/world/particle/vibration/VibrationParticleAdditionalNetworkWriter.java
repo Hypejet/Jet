@@ -5,20 +5,20 @@ import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.world.coordinate.BlockPositionNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.registry.JetRegistryManager;
-import net.hypejet.jet.server.world.particle.vibration.JetVibrationParticle;
 import net.hypejet.jet.world.coordinate.BlockPosition;
+import net.hypejet.jet.world.particle.vibration.VibrationParticle;
 import org.jspecify.annotations.NullMarked;
 
 /**
  * A {@linkplain NetworkWriter network writer} of additional
- * data of {@linkplain JetVibrationParticle vibration particles}.
+ * data of {@linkplain VibrationParticle vibration particles}.
  *
  * @since 1.0
- * @see JetVibrationParticle
+ * @see VibrationParticle
  * @see NetworkWriter
  */
 @NullMarked
-public final class VibrationParticleAdditionalNetworkWriter implements NetworkWriter<JetVibrationParticle> {
+public final class VibrationParticleAdditionalNetworkWriter implements NetworkWriter<VibrationParticle> {
 
     /**
      * An instance of the
@@ -32,7 +32,7 @@ public final class VibrationParticleAdditionalNetworkWriter implements NetworkWr
     private VibrationParticleAdditionalNetworkWriter() {}
 
     @Override
-    public void write(ByteBuf buf, JetRegistryManager registryManager, JetVibrationParticle object) {
+    public void write(ByteBuf buf, JetRegistryManager registryManager, VibrationParticle object) {
         writeBlockPositionSource(buf, registryManager, object.destination());
         VarIntNetworkCodec.INSTANCE.write(buf, registryManager, object.arrivalDuration());
     }

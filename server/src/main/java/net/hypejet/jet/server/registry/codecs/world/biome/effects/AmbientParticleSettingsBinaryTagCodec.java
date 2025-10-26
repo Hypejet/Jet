@@ -2,7 +2,6 @@ package net.hypejet.jet.server.registry.codecs.world.biome.effects;
 
 import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.world.particle.ParticleBinaryTagCodec;
-import net.hypejet.jet.server.world.particle.JetParticle;
 import net.hypejet.jet.world.biome.effects.AmbientParticleSettings;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagTypes;
@@ -49,7 +48,7 @@ public final class AmbientParticleSettingsBinaryTagCodec implements BinaryTagCod
     @Override
     public BinaryTag encode(AmbientParticleSettings value) {
         return CompoundBinaryTag.builder()
-                .put(OPTIONS_FIELD, ParticleBinaryTagCodec.INSTANCE.encode(JetParticle.cast(value.particle())))
+                .put(OPTIONS_FIELD, ParticleBinaryTagCodec.INSTANCE.encode(value.particle()))
                 .putFloat(PROBABILITY_FIELD, value.probability())
                 .build();
     }

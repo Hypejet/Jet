@@ -1,45 +1,33 @@
 package net.hypejet.jet.world.particle.item;
 
 import net.hypejet.jet.inventory.item.ItemStack;
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.world.particle.Particle;
-import org.jetbrains.annotations.ApiStatus;
+import net.hypejet.jet.world.particle.ParticleType;
 import org.jspecify.annotations.NullMarked;
+
+import java.util.Objects;
 
 /**
  * A {@linkplain Particle particle} containing an {@linkplain ItemStack item stack} field.
  *
+ * @param particleType a holder referencing to a particle type of this particle
+ * @param itemStack the item stack field value of this particle
  * @since 1.0
  * @see ItemStack
  * @see Particle
  */
-@ApiStatus.NonExtendable
 @NullMarked
-public interface ItemParticle extends Particle {
+public record ItemParticle(Holder.Reference<ParticleType> particleType, ItemStack itemStack) implements Particle {
     /**
-     * Gets the {@linkplain ItemStack item stack} field value of this particle.
+     * Constructs the {@linkplain ItemParticle item particle}.
      *
-     * @return the item stack
+     * @param particleType a holder referencing to the particle type of which the particle should be
+     * @param itemStack the value that the item stack field of the particle should have
      * @since 1.0
      */
-    ItemStack itemStack();
-
-    /**
-     * A {@linkplain Particle.Builder particle builder} of an {@linkplain ItemParticle item particle}.
-     *
-     * @param <P> the type of the particle that the builder is going to create
-     * @param <B> the type of this particle builder
-     * @since 1.0
-     * @see ItemParticle
-     * @see Particle.Builder
-     */
-    interface Builder<P extends ItemParticle, B extends Builder<P, B>> extends Particle.Builder<P> {
-        /**
-         * Sets the {@linkplain ItemStack item stack} field value that the particle should have.
-         *
-         * @param value the item stack
-         * @return this particle builder
-         * @since 1.0
-         */
-        B itemStack(ItemStack value);
+    public ItemParticle {
+        Objects.requireNonNull(particleType, "particle type");
+        Objects.requireNonNull(itemStack, "item stack");
     }
 }

@@ -1,45 +1,30 @@
 package net.hypejet.jet.world.particle.sculk;
 
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.world.particle.Particle;
-import org.jetbrains.annotations.ApiStatus;
+import net.hypejet.jet.world.particle.ParticleType;
 import org.jspecify.annotations.NullMarked;
+
+import java.util.Objects;
 
 /**
  * A sculk charge {@linkplain Particle particle}.
  *
+ * @param particleType a holder referencing to a particle type of this particle
+ * @param roll the rotation of this particle
  * @since 1.0
  * @see Particle
  */
-@ApiStatus.NonExtendable
 @NullMarked
-public interface SculkChargeParticle extends Particle {
+public record SculkChargeParticle(Holder.Reference<ParticleType> particleType, float roll) implements Particle {
     /**
-     * Gets the rotation of this sculk charge particle.
+     * Constructs the {@linkplain SculkChargeParticle sculk charge particle}.
      *
-     * @return the sculk charge particle rotation
+     * @param particleType a holder referencing to the particle type of which the particle should be
+     * @param roll the rotation that the particle should have
      * @since 1.0
      */
-    float roll();
-
-    /**
-     * A {@linkplain Particle.Builder particle builder}
-     * of a {@linkplain SculkChargeParticle sculk charge particle}.
-     *
-     * @param <P> the type of the particle that the builder is going to create
-     * @param <B> the type of this particle builder
-     * @since 1.0
-     * @see SculkChargeParticle
-     * @see Particle.Builder
-     */
-    interface Builder<P extends SculkChargeParticle, B extends Builder<P, B>>
-            extends Particle.Builder<P> {
-        /**
-         * Sets the rotation that the sculk charge particle should have.
-         *
-         * @param value the rotation
-         * @return this particle builder
-         * @since 1.0
-         */
-        B roll(float value);
+    public SculkChargeParticle {
+        Objects.requireNonNull(particleType, "particle type");
     }
 }

@@ -1,45 +1,33 @@
 package net.hypejet.jet.world.particle.color;
 
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.util.color.ARGBColor;
 import net.hypejet.jet.world.particle.Particle;
-import org.jetbrains.annotations.ApiStatus;
+import net.hypejet.jet.world.particle.ParticleType;
 import org.jspecify.annotations.NullMarked;
 
+import java.util.Objects;
+
 /**
- * A {@linkplain Particle particle} containing an {@linkplain ARGBColor ARGB color}.
+ * A {@linkplain Particle particle} containing an {@linkplain ARGBColor ARGB color} field.
  *
+ * @param particleType a holder referencing to a particle type of this particle
+ * @param color the ARGB color field value of this particle
  * @since 1.0
  * @see ARGBColor
  * @see Particle
  */
-@ApiStatus.NonExtendable
 @NullMarked
-public interface ColorParticle extends Particle {
+public record ColorParticle(Holder.Reference<ParticleType> particleType, ARGBColor color) implements Particle {
     /**
-     * Gets the {@linkplain ARGBColor ARGB color} of this particle.
+     * Constructs the {@linkplain ColorParticle color particle}.
      *
-     * @return the ARGB color
+     * @param particleType a holder referencing to the particle type of which the particle should be
+     * @param color the value that the ARGB color field of the particle should have
      * @since 1.0
      */
-    ARGBColor color();
-
-    /**
-     * A {@linkplain Particle.Builder particle builder} of a {@linkplain ColorParticle color particle}.
-     *
-     * @param <P> the type of the particle that the builder is going to create
-     * @param <B> the type of this particle builder
-     * @since 1.0
-     * @see ColorParticle
-     * @see Particle.Builder
-     */
-    interface Builder<P extends ColorParticle, B extends Builder<P, B>> extends Particle.Builder<P> {
-        /**
-         * Sets {@linkplain ARGBColor ARGB color} that the particle should have.
-         *
-         * @param value the ARGB color
-         * @return this particle builder
-         * @since 1.0
-         */
-        B color(ARGBColor value);
+    public ColorParticle {
+        Objects.requireNonNull(particleType, "particle type");
+        Objects.requireNonNull(color, "color");
     }
 }

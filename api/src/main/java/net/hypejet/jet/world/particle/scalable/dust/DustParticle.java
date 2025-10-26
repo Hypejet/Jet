@@ -1,46 +1,36 @@
 package net.hypejet.jet.world.particle.scalable.dust;
 
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.util.color.RGBColor;
 import net.hypejet.jet.world.particle.Particle;
+import net.hypejet.jet.world.particle.ParticleType;
 import net.hypejet.jet.world.particle.scalable.ScalableParticle;
-import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
+
+import java.util.Objects;
 
 /**
  * A dust {@linkplain Particle particle}.
  *
+ * @param particleType a holder referencing to a particle type of this particle
+ * @param scale the scale field value of this particle
+ * @param color the color of this particle
  * @since 1.0
  * @see Particle
  */
-@ApiStatus.NonExtendable
 @NullMarked
-public interface DustParticle extends ScalableParticle {
+public record DustParticle(Holder.Reference<ParticleType> particleType, float scale, RGBColor color)
+        implements ScalableParticle {
     /**
-     * Gets color of this dust particle.
+     * Constructs the {@linkplain DustParticle dust particle}.
      *
-     * @return the dust particle color
+     * @param particleType a holder referencing to the particle type of which the particle should be
+     * @param scale the value that scale field of the particle should have
+     * @param color the color that the particle should have
      * @since 1.0
      */
-    RGBColor color();
-
-    /**
-     * A {@linkplain Particle.Builder particle builder} of a {@linkplain DustParticle dust particle}.
-     *
-     * @param <P> the type of the particle that the builder is going to create
-     * @param <B> the type of this particle builder
-     * @since 1.0
-     * @see DustParticle
-     * @see Particle.Builder
-     */
-    interface Builder<P extends DustParticle, B extends Builder<P, B>>
-            extends ScalableParticle.Builder<P, B> {
-        /**
-         * Sets color that the dust particle should have.
-         *
-         * @param value the dust particle color
-         * @return this particle builder
-         * @since 1.0
-         */
-        B color(RGBColor value);
+    public DustParticle {
+        Objects.requireNonNull(particleType, "particle type");
+        Objects.requireNonNull(color, "color");
     }
 }

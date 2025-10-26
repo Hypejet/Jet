@@ -1,10 +1,12 @@
 package net.hypejet.jet.server.registry.codecs.world.particle.vibration;
 
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.registry.codecs.adventure.KeyBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.world.coordinate.BlockPositionBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.world.particle.ParticleAdditionalCodec;
-import net.hypejet.jet.server.world.particle.vibration.JetVibrationParticle;
 import net.hypejet.jet.world.coordinate.BlockPosition;
+import net.hypejet.jet.world.particle.ParticleType;
+import net.hypejet.jet.world.particle.vibration.VibrationParticle;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
@@ -14,15 +16,14 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
 
 /**
  * A {@linkplain ParticleAdditionalCodec particle additional codec}
- * of {@linkplain JetVibrationParticle vibration particles}.
+ * of {@linkplain VibrationParticle vibration particles}.
  *
  * @since 1.0
- * @see JetVibrationParticle
+ * @see VibrationParticle
  * @see ParticleAdditionalCodec
  */
 @NullMarked
-public final class VibrationParticleAdditionalCodec
-        implements ParticleAdditionalCodec<JetVibrationParticle, JetVibrationParticle.Builder> {
+public final class VibrationParticleAdditionalCodec implements ParticleAdditionalCodec<VibrationParticle> {
 
     private static final String DESTINATION_FIELD = "destination";
     private static final String ARRIVAL_IN_TICKS_FIELD = "arrival_in_ticks";
@@ -42,15 +43,16 @@ public final class VibrationParticleAdditionalCodec
     private VibrationParticleAdditionalCodec() {}
 
     @Override
-    public void decode(CompoundBinaryTag compound, JetVibrationParticle.Builder particleBuilder) {
-        particleBuilder.destination(decodeDestination(
-                requiredTag(DESTINATION_FIELD, compound, BinaryTagTypes.COMPOUND)
-        ));
-        particleBuilder.arrivalDuration(requiredTag(ARRIVAL_IN_TICKS_FIELD, compound, BinaryTagTypes.INT).value());
+    public VibrationParticle decode(Holder.Reference<ParticleType> particleType, CompoundBinaryTag compound) {
+        return new VibrationParticle(
+                particleType,
+                decodeDestination(requiredTag(DESTINATION_FIELD, compound, BinaryTagTypes.COMPOUND)),
+                requiredTag(ARRIVAL_IN_TICKS_FIELD, compound, BinaryTagTypes.INT).value()
+        );
     }
 
     @Override
-    public void encode(JetVibrationParticle particle, CompoundBinaryTag.Builder compoundBuilder) {
+    public void encode(VibrationParticle particle, CompoundBinaryTag.Builder compoundBuilder) {
         compoundBuilder.put(DESTINATION_FIELD, encodeDestination(particle.destination()));
         compoundBuilder.putInt(ARRIVAL_IN_TICKS_FIELD, particle.arrivalDuration());
     }

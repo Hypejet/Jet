@@ -1,32 +1,32 @@
 package net.hypejet.jet.server.registry.codecs.world.particle;
 
-import net.hypejet.jet.server.world.particle.JetParticle;
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.world.particle.Particle;
+import net.hypejet.jet.world.particle.ParticleType;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.jspecify.annotations.NullMarked;
 
 /**
- * Something handling serialization of additional fields of certain {@linkplain JetParticle particles}.
+ * Something handling serialization of additional fields of certain {@linkplain Particle particles}.
  *
  * @param <P> the type of particles whose additional-field serialization is handled by this codec
- * @param <B> the type of particle builder creating particles whose serialization is handled by this codec
  * @since 1.0
- * @see JetParticle
+ * @see Particle
  */
 @NullMarked
-public interface ParticleAdditionalCodec<P extends JetParticle, B extends Particle.Builder<P>> {
+public interface ParticleAdditionalCodec<P extends Particle> {
     /**
-     * Reads the additional particle fields from the specified {@linkplain CompoundBinaryTag compound binary tag}
-     * and applies them to the specified {@linkplain Particle.Builder particle builder}.
+     * Creates a {@linkplain Particle particle} by reading the additional particle
+     * fields from the specified {@linkplain CompoundBinaryTag compound binary tag}.
      *
+     * @param particleType the particle type of which the particle should be
      * @param compound the compound that contains the additional particle fields
-     * @param particleBuilder the particle builder that the decoded particle fields should be applied to
      * @since 1.0
      */
-    void decode(CompoundBinaryTag compound, B particleBuilder);
+    P decode(Holder.Reference<ParticleType> particleType, CompoundBinaryTag compound);
 
     /**
-     * Writes additional particle fields of the specified {@linkplain JetParticle particle}
+     * Writes additional particle fields of the specified {@linkplain Particle particle}
      * to the specified {@linkplain CompoundBinaryTag.Builder compound binary tag builder}.
      *
      * @param particle the particle whose additional particle fields should be written
