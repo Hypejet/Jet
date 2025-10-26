@@ -16,7 +16,7 @@ import java.util.Objects;
  *                        minimal particle spawning strategy in settings
  * @param alwaysShow whether the particle should have a chance of being displayed even when
  *                   player has selected minimal or decreased particle spawning strategy in settings
- * @param position a position to spawn the particle at
+ * @param position the position to spawn the particle at
  * @param offset size of a cuboid region (centered with the particle original position) that
  *               the particle should spawn in, 1 unit represents 6 blocks
  * @param maxSpeed speed that the particle should move with
@@ -39,7 +39,7 @@ public record ServerSpawnParticlePacket(
      *                        minimal particle spawning strategy in settings
      * @param alwaysShow whether the particle should have a chance of being displayed even when
      *                   player has selected minimal or decreased particle spawning strategy in settings
-     * @param position a position to spawn the particle at
+     * @param position the position to spawn the particle at
      * @param offset size of a cuboid region (centered with the particle original position) that
      *               the particle should spawn in, 1 unit represents 6 blocks
      * @param maxSpeed speed that the particle should move with

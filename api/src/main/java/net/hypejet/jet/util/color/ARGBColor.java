@@ -48,9 +48,9 @@ public record ARGBColor(int value) implements ARGBLike {
      * @since 1.0
      */
     public static @NonNull ARGBColor fromARGB(int alpha, int red, int green, int blue) {
-        int value = (alpha << ALPHA_SHIFT) & MAX_RGB_VALUE;
-        value |= (red << RED_SHIFT) & MAX_RGB_VALUE;
-        value |= (green << GREEN_SHIFT) & MAX_RGB_VALUE;
+        int value = (alpha & MAX_RGB_VALUE) << ALPHA_SHIFT;
+        value |= (red & MAX_RGB_VALUE) << RED_SHIFT;
+        value |= (green & MAX_RGB_VALUE) << GREEN_SHIFT;
         value |= blue & MAX_RGB_VALUE;
         return new ARGBColor(value);
     }

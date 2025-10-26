@@ -5,7 +5,11 @@ import net.hypejet.jet.entity.Entity.Event;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityAnimationPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityEventPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerSpawnParticlePacket;
 import net.hypejet.jet.util.game.audience.PlayerAudience;
+import net.hypejet.jet.world.coordinate.Vector;
+import net.hypejet.jet.world.coordinate.floats.FloatVector;
+import net.hypejet.jet.world.particle.Particle;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
@@ -36,5 +40,19 @@ public interface PacketReceivingPlayerAudience extends PacketReceivingCommonAudi
         if (!(entity instanceof JetEntity validatedEntity))
             throw new IllegalArgumentException("The specified entity is not a valid entity");
         this.sendPacket(new ServerEntityEventPlayPacket(validatedEntity.entityId(), event));
+    }
+
+    @Override
+    default void spawnParticle(Vector position, Particle particle) {
+        this.spawnParticle(false, false, position, FloatVector.ZERO, 0f, 1, particle);
+    }
+
+    @Override
+    default void spawnParticle(boolean overrideLimiter, boolean alwaysShow, Vector position,
+                               FloatVector offset, float maxSpeed, int count, Particle particle) {
+        this.sendPacket(new ServerSpawnParticlePacket(
+                overrideLimiter, alwaysShow, position,
+                offset, maxSpeed, count, particle
+        ));
     }
 }

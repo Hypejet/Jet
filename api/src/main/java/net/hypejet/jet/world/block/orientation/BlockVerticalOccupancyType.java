@@ -30,7 +30,7 @@ public final class BlockVerticalOccupancyType {
 
     private final String name;
 
-    public BlockVerticalOccupancyType(String name) {
+    private BlockVerticalOccupancyType(String name) {
         this.name = Objects.requireNonNull(name, "name");
     }
 
