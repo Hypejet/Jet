@@ -25,6 +25,7 @@ import net.hypejet.jet.world.particle.scalable.dust.DustParticle;
 import net.hypejet.jet.world.particle.scalable.dust.DustTransitionParticle;
 import net.hypejet.jet.world.particle.sculk.SculkChargeParticle;
 import net.hypejet.jet.world.particle.shriek.ShriekParticle;
+import net.hypejet.jet.world.particle.simple.SimpleParticle;
 import net.hypejet.jet.world.particle.trail.TrailParticle;
 import net.hypejet.jet.world.particle.vibration.VibrationParticle;
 import net.kyori.adventure.key.Key;
@@ -124,7 +125,16 @@ public final class ParticleNetworkWriter implements NetworkWriter<Particle> {
         );
 
         ParticleWriterType<?> writerType = WRITER_TYPES.get(particleTypeReference.key());
-        if (writerType != null) writeAdditional(writerType, buf, registryManager, object);
+        if (writerType == null) {
+            if (!(object instanceof SimpleParticle)) {
+                throw new IllegalArgumentException(String.format(
+                        "Particles without additional data must use %s implementation",
+                        SimpleParticle.class.getName()
+                ));
+            }
+        } else {
+            writeAdditional(writerType, buf, registryManager, object);
+        }
     }
 
     private static <P extends Particle> void writeAdditional(ParticleWriterType<P> writerType, ByteBuf buf,

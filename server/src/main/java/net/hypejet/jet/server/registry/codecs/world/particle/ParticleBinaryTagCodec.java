@@ -144,7 +144,17 @@ public final class ParticleBinaryTagCodec implements BinaryTagCodec<Particle> {
 
         tagBuilder.put(TYPE_FIELD, KeyBinaryTagCodec.INSTANCE.encode(particleTypeKey));
         ParticleCodecType<?> codecType = PARTICLE_CODEC_TYPES.get(particleTypeKey);
-        if (codecType != null) encodeAdditional(value, codecType, tagBuilder);
+
+        if (codecType == null) {
+            if (!(value instanceof SimpleParticle)) {
+                throw new IllegalArgumentException(String.format(
+                        "Particles without additional data must use %s implementation",
+                        SimpleParticle.class.getName()
+                ));
+            }
+        } else {
+            encodeAdditional(value, codecType, tagBuilder);
+        }
 
         return tagBuilder.build();
     }
