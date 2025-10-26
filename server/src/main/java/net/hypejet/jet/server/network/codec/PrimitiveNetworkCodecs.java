@@ -20,8 +20,8 @@ public final class PrimitiveNetworkCodecs {
      * @since 1.0
      */
     public static final NetworkCodec<Byte> BYTE = new CombinedNetworkCodec<>(
-            ByteBuf::readByte,
-            (buf, object) -> buf.writeByte(object)
+            (buf, registryManager) -> buf.readByte(),
+            (buf, registryManager, object) -> buf.writeByte(object)
     );
 
     private PrimitiveNetworkCodecs() {}

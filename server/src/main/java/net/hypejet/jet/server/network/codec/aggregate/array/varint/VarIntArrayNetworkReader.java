@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.codec.aggregate.array.varint;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.aggregate.AggregateNetworkReader;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -33,10 +34,11 @@ public final class VarIntArrayNetworkReader extends AggregateNetworkReader<int[]
     }
 
     @Override
-    protected int @NonNull [] decodeElements(int length, @NonNull ByteBuf buf) {
+    protected int @NonNull [] decodeElements(int length, @NonNull ByteBuf buf,
+                                             @NonNull JetRegistryManager registryManager) {
         int[] integers = new int[length];
         for (int index = 0; index < length; index++)
-            integers[index] = VarIntNetworkCodec.INSTANCE.read(buf);
+            integers[index] = VarIntNetworkCodec.INSTANCE.read(buf, registryManager);
         return integers;
     }
 }

@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.world.coordinate.chunk.ChunkPositionNetworkWriter;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerInvalidateChunkPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -26,7 +27,8 @@ public final class ServerInvalidateChunkPlayPacketWriter implements NetworkWrite
     private ServerInvalidateChunkPlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerInvalidateChunkPlayPacket object) {
-        ChunkPositionNetworkWriter.INSTANCE.write(buf, object.chunkPosition());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerInvalidateChunkPlayPacket object) {
+        ChunkPositionNetworkWriter.INSTANCE.write(buf, registryManager, object.chunkPosition());
     }
 }

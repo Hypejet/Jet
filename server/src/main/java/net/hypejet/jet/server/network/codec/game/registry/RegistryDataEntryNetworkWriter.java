@@ -6,6 +6,7 @@ import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetwo
 import net.hypejet.jet.server.network.codec.game.key.KeyNetworkCodec;
 import net.hypejet.jet.server.network.codec.game.miscellaneous.BinaryTagNetworkWriter;
 import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerRegistryDataConfigurationPacket.Entry;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -36,8 +37,8 @@ public final class RegistryDataEntryNetworkWriter implements NetworkWriter<Entry
     private RegistryDataEntryNetworkWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull Entry object) {
-        KeyNetworkCodec.INSTANCE.write(buf, object.key());
-        NetworkUtil.writeOptional(object.data(), BinaryTagNetworkWriter.INSTANCE, buf);
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager, @NonNull Entry object) {
+        KeyNetworkCodec.INSTANCE.write(buf, registryManager, object.key());
+        NetworkUtil.writeOptional(object.data(), BinaryTagNetworkWriter.INSTANCE, buf, registryManager);
     }
 }

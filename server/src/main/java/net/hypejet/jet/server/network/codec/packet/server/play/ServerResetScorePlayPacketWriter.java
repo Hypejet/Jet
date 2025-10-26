@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerResetScorePlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -26,8 +27,9 @@ public final class ServerResetScorePlayPacketWriter implements NetworkWriter<Ser
     private ServerResetScorePlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerResetScorePlayPacket object) {
-        StringNetworkCodec.INSTANCE.write(buf, object.entityName());
-        NetworkUtil.writeOptional(object.objectiveName(), StringNetworkCodec.INSTANCE, buf);
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerResetScorePlayPacket object) {
+        StringNetworkCodec.INSTANCE.write(buf, registryManager, object.entityName());
+        NetworkUtil.writeOptional(object.objectiveName(), StringNetworkCodec.INSTANCE, buf, registryManager);
     }
 }

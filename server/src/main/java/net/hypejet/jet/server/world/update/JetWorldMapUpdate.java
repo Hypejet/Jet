@@ -21,7 +21,7 @@ import net.hypejet.jet.server.util.coordinate.AbsolutePositionUtil;
 import net.hypejet.jet.server.util.coordinate.ChunkPositionUtil;
 import net.hypejet.jet.server.util.coordinate.ChunkRelativePositionUtil;
 import net.hypejet.jet.server.world.acquisition.worldmap.WriteWorldMapAcquisitionImpl;
-import net.hypejet.jet.server.world.block.JetBlockState;
+import net.hypejet.jet.server.world.block.state.JetBlockState;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.light.LightSectionList;
 import net.hypejet.jet.server.world.chunk.light.LightSerializationData;
@@ -33,7 +33,7 @@ import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPalet
 import net.hypejet.jet.server.world.coordinate.chunk.section.ChunkSectionPosition;
 import net.hypejet.jet.server.world.handler.ChunkBatchHandler;
 import net.hypejet.jet.world.biome.Biome;
-import net.hypejet.jet.world.block.BlockState;
+import net.hypejet.jet.world.block.state.BlockState;
 import net.hypejet.jet.world.block.BlockType;
 import net.hypejet.jet.world.block.entity.BlockEntityType;
 import net.hypejet.jet.world.coordinate.BlockPosition;

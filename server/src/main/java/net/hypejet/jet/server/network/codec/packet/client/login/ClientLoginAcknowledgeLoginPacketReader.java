@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.codec.packet.client.login;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.packet.packets.client.login.ClientLoginAcknowledgeLoginPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -15,7 +16,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class ClientLoginAcknowledgeLoginPacketReader
         implements NetworkReader<ClientLoginAcknowledgeLoginPacket> {
-
     /**
      * An instance of the {@linkplain ClientLoginAcknowledgeLoginPacketReader client login acknowledge login packet
      * reader}.
@@ -28,7 +28,8 @@ public final class ClientLoginAcknowledgeLoginPacketReader
     private ClientLoginAcknowledgeLoginPacketReader() {}
 
     @Override
-    public @NonNull ClientLoginAcknowledgeLoginPacket read(@NonNull ByteBuf buf) {
+    public @NonNull ClientLoginAcknowledgeLoginPacket read(@NonNull ByteBuf buf,
+                                                           @NonNull JetRegistryManager registryManager) {
         return new ClientLoginAcknowledgeLoginPacket();
     }
 }

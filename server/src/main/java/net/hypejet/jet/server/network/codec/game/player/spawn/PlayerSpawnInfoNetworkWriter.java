@@ -6,6 +6,7 @@ import net.hypejet.jet.server.entity.player.spawn.PlayerSpawnInfo;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.key.KeyNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.hypejet.jet.server.util.game.gamemode.GameModeUtil;
 import net.hypejet.jet.world.data.WorldData;
@@ -29,9 +30,11 @@ public final class PlayerSpawnInfoNetworkWriter implements NetworkWriter<PlayerS
     private PlayerSpawnInfoNetworkWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull PlayerSpawnInfo object) {
-        VarIntNetworkCodec.INSTANCE.write(buf, object.dimensionTypeIdentifier());
-        KeyNetworkCodec.INSTANCE.write(buf, object.dimensionTypeKey());
+    public void write(@NonNull ByteBuf buf,
+                      @NonNull JetRegistryManager registryManager,
+                      @NonNull PlayerSpawnInfo object) {
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, object.dimensionTypeIdentifier());
+        KeyNetworkCodec.INSTANCE.write(buf, registryManager, object.dimensionTypeKey());
 
         WorldData worldData = object.worldData();
         buf.writeLong(Hashing.sha256().hashLong(worldData.seed()).asLong());
@@ -42,9 +45,13 @@ public final class PlayerSpawnInfoNetworkWriter implements NetworkWriter<PlayerS
         buf.writeBoolean(false); // The debug field, we always write false since it makes no sense to use with Jet
         buf.writeBoolean(worldData.flat());
 
-        NetworkUtil.writeOptional(object.lastDeathLocation(), DeathLocationNetworkWriter.INSTANCE, buf);
+        NetworkUtil.writeOptional(
+                object.lastDeathLocation(),
+                DeathLocationNetworkWriter.INSTANCE,
+                buf, registryManager
+        );
 
-        VarIntNetworkCodec.INSTANCE.write(buf, object.portalCooldown());
-        VarIntNetworkCodec.INSTANCE.write(buf, worldData.seaLevel());
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, object.portalCooldown());
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, worldData.seaLevel());
     }
 }

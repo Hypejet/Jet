@@ -6,7 +6,7 @@ import net.hypejet.jet.world.block.banner.BannerPattern;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
 
@@ -17,6 +17,7 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @see BannerPattern
  * @see BinaryTagCodec
  */
+@NullMarked
 public final class BannerPatternBinaryTagCodec implements BinaryTagCodec<BannerPattern> {
 
     private static final String ASSET_FIELD = "asset_id";
@@ -32,8 +33,8 @@ public final class BannerPatternBinaryTagCodec implements BinaryTagCodec<BannerP
     private BannerPatternBinaryTagCodec() {}
 
     @Override
-    public @NotNull BannerPattern decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof CompoundBinaryTag compound) {
+    public BannerPattern decode(BinaryTag binaryTag) {
+        if (binaryTag instanceof CompoundBinaryTag compound) {
             return new BannerPattern(
                     KeyBinaryTagCodec.INSTANCE.decode(requiredTag(ASSET_FIELD, compound)),
                     requiredTag(TRANSLATION_KEY_FIELD, compound, BinaryTagTypes.STRING).value()
@@ -46,10 +47,10 @@ public final class BannerPatternBinaryTagCodec implements BinaryTagCodec<BannerP
     }
 
     @Override
-    public @NotNull BinaryTag encode(@NotNull BannerPattern decoded) throws Exception {
+    public BinaryTag encode(BannerPattern value) {
         return CompoundBinaryTag.builder()
-                .put(ASSET_FIELD, KeyBinaryTagCodec.INSTANCE.encode(decoded.asset()))
-                .putString(TRANSLATION_KEY_FIELD, decoded.translationKey())
+                .put(ASSET_FIELD, KeyBinaryTagCodec.INSTANCE.encode(value.asset()))
+                .putString(TRANSLATION_KEY_FIELD, value.translationKey())
                 .build();
     }
 }

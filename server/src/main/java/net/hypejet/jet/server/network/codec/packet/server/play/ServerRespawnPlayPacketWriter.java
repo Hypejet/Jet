@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.player.spawn.PlayerSpawnInfoNetworkWriter;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerRespawnPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -29,7 +30,9 @@ public final class ServerRespawnPlayPacketWriter implements NetworkWriter<Server
     private ServerRespawnPlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerRespawnPlayPacket object) {
+    public void write(@NonNull ByteBuf buf,
+                      @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerRespawnPlayPacket object) {
         byte packedDataToKeep = 0;
 
         if (object.keepAttributes())
@@ -37,7 +40,7 @@ public final class ServerRespawnPlayPacketWriter implements NetworkWriter<Server
         if (object.keepMetadata())
             packedDataToKeep |= KEEP_METADATA_BIT_MASK;
 
-        PlayerSpawnInfoNetworkWriter.INSTANCE.write(buf, object.spawnInfo());
+        PlayerSpawnInfoNetworkWriter.INSTANCE.write(buf, registryManager, object.spawnInfo());
         buf.writeByte(packedDataToKeep);
     }
 }

@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.link.ServerLinkNetworkWriter;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerCustomLinksPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -15,7 +16,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see NetworkWriter
  */
 public final class ServerCustomLinksPacketWriter implements NetworkWriter<ServerCustomLinksPacket> {
-
     /**
      * An instance of the {@linkplain ServerCustomLinksPacketWriter server custom links packet writer}.
      *
@@ -26,7 +26,9 @@ public final class ServerCustomLinksPacketWriter implements NetworkWriter<Server
     private ServerCustomLinksPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerCustomLinksPacket object) {
-        ServerLinkNetworkWriter.COLLECTION_WRITER.write(buf, object.serverLinks());
+    public void write(@NonNull ByteBuf buf,
+                      @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerCustomLinksPacket object) {
+        ServerLinkNetworkWriter.COLLECTION_WRITER.write(buf, registryManager, object.serverLinks());
     }
 }

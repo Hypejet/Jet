@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.common.value.qual.IntRange;
 
@@ -43,8 +44,8 @@ public final class StringNetworkCodec implements NetworkCodec<String> {
     }
 
     @Override
-    public @NonNull String read(@NonNull ByteBuf buf) {
-        int length = VarIntNetworkCodec.INSTANCE.read(buf);
+    public @NonNull String read(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager) {
+        int length = VarIntNetworkCodec.INSTANCE.read(buf, registryManager);
 
         if (length < 0 || length > this.maxStringSize)
             throw invalidLengthException(length);
@@ -63,13 +64,13 @@ public final class StringNetworkCodec implements NetworkCodec<String> {
     }
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull String object) {
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager, @NonNull String object) {
         int length = ByteBufUtil.utf8Bytes(object);
 
         if (length < 0 || length > this.maxStringSize)
             throw invalidLengthException(length);
 
-        VarIntNetworkCodec.INSTANCE.write(buf, length);
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, length);
         buf.writeCharSequence(object, StandardCharsets.UTF_8);
     }
 

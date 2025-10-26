@@ -35,6 +35,7 @@ import net.hypejet.jet.server.network.packet.reader.ClientPacketReader;
 import net.hypejet.jet.server.network.session.Session;
 import net.hypejet.jet.server.network.session.pack.ResourcePackHandler;
 import net.hypejet.jet.server.network.session.task.HandshakeSessionTask;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.hypejet.jet.server.util.acquisition.NotNullObjectMappedAcquisition;
 import net.hypejet.jet.server.util.unit.Unit;
@@ -91,7 +92,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     private final ResourcePackHandler resourcePackHandler = new ResourcePackHandler(this);
 
     /**
-     * Constructs the {@link SocketPlayerConnection socket player connection}.
+     * Constructs the {@linkplain SocketPlayerConnection socket player connection}.
      *
      * @param channel a socket channel, which handles the connection
      * @param server a minecraft server owning the connection
@@ -244,7 +245,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
     public void sendPacket(@NonNull ServerPacket packet,
                            @Nullable CompletableFuture<? super PacketSendResult> resultFuture) {
         try (NotNullObjectAcquisition<ProtocolState> protocolStateAcquisition = this.protocolState()) {
-            RawPacket rawPacket = encode(packet, protocolStateAcquisition.get());
+            RawPacket rawPacket = encode(packet, protocolStateAcquisition.get(), this.server.registryManager());
 
             ChannelPromise promise = resultFuture == null ? this.channel.voidPromise() : this.channel.newPromise();
             ChannelFuture channelFuture = this.channel.writeAndFlush(rawPacket, promise);
@@ -391,7 +392,9 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
         this.sendPacket(DELIMITER_PACKET);
     }
 
-    private static @NonNull RawPacket encode(@NonNull ServerPacket packet, @NonNull ProtocolState state) {
+    private static @NonNull RawPacket encode(@NonNull ServerPacket packet,
+                                             @NonNull ProtocolState state,
+                                             @NonNull JetRegistryManager registryManager) {
         Class<? extends ServerPacket> packetClass = packet.getClass();
         PacketSpecification<?> specification = ServerPacketRegistry.specificationFor(state, packetClass);
 
@@ -404,7 +407,7 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
 
         ByteBuf buf = Unpooled.buffer();
         try {
-            write(specification, buf, packet); // Write the packet body with java generics
+            write(specification, buf, registryManager, packet); // Write the packet body with java generics
             return new RawPacket(specification.packetIdentifier(), NetworkUtil.readRemainingBytes(buf));
         } finally {
             buf.release();
@@ -413,9 +416,9 @@ public final class SocketPlayerConnection implements PlayerConnection, Thread.Un
 
     private static <P extends ServerPacket> void write(
             ServerPacketRegistry.@NonNull PacketSpecification<P> specification,
-            @NonNull ByteBuf buf, @NonNull ServerPacket packet
+            @NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager, @NonNull ServerPacket packet
     ) {
-        specification.packetWriter().write(buf, specification.packetClass().cast(packet));
+        specification.packetWriter().write(buf, registryManager, specification.packetClass().cast(packet));
     }
 
     /**

@@ -2,7 +2,7 @@ package net.hypejet.jet.entity.metadata;
 
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.world.coordinate.BlockPosition;
-import net.hypejet.jet.world.particle.ParticleEffect;
+import net.hypejet.jet.world.particle.Particle;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -57,16 +57,16 @@ public interface LivingEntityMetadata extends EntityMetadata {
     float health();
 
     /**
-     * Gets a {@linkplain List list} of {@linkplain ParticleEffect particle effects}
+     * Gets a {@linkplain List list} of {@linkplain Particle particles}
      * that should be played around the {@linkplain Entity entity}.
      *
      * @return the particle effect list
      * @since 1.0
      */
-    List<ParticleEffect> particleEffects();
+    List<Particle> particleEffects();
 
     /**
-     * Gets whether the number of {@linkplain ParticleEffect particle effects}
+     * Gets whether the number of {@linkplain Particle particles}
      * played around the {@linkplain Entity entity} should be decreased.
      *
      * @return {@code true} if the number of particle effects should be decreased, {@code false} otherwise
@@ -149,17 +149,17 @@ public interface LivingEntityMetadata extends EntityMetadata {
         U health(float value);
 
         /**
-         * Sets a {@linkplain List list} of {@linkplain ParticleEffect particle effects}
+         * Sets a {@linkplain List list} of {@linkplain Particle particles}
          * that should be played around the {@linkplain Entity entity}.
          *
          * @param value the particle effect list
          * @return this update builder
          * @since 1.0
          */
-        U particleEffects(List<ParticleEffect> value);
+        U particleEffects(List<Particle> value);
 
         /**
-         * Sets whether the number of {@linkplain ParticleEffect particle effects}
+         * Sets whether the number of {@linkplain Particle particles}
          * played around the {@linkplain Entity entity} should be decreased.
          *
          * @param value {@code true} if the number of particle effects should be decreased, {@code false} otherwise

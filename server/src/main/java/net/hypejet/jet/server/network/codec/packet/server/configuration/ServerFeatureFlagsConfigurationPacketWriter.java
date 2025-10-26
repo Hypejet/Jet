@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.key.KeyNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerFeatureFlagsConfigurationPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -16,7 +17,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class ServerFeatureFlagsConfigurationPacketWriter
         implements NetworkWriter<ServerFeatureFlagsConfigurationPacket> {
-
     /**
      * An instance of the {@linkplain ServerFeatureFlagsConfigurationPacketWriter server feature flags configuration
      * packet writer}.
@@ -29,7 +29,8 @@ public final class ServerFeatureFlagsConfigurationPacketWriter
     private ServerFeatureFlagsConfigurationPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerFeatureFlagsConfigurationPacket object) {
-        KeyNetworkCodec.COLLECTION_CODEC.write(buf, object.featureFlags());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerFeatureFlagsConfigurationPacket object) {
+        KeyNetworkCodec.COLLECTION_CODEC.write(buf, registryManager, object.featureFlags());
     }
 }

@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.codec.packet.server.common;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerPingPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -14,7 +15,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see NetworkWriter
  */
 public final class ServerPingPacketWriter implements NetworkWriter<ServerPingPacket> {
-
     /**
      * An instance of the {@linkplain ServerPingPacketWriter server ping packet writer}.
      *
@@ -25,7 +25,9 @@ public final class ServerPingPacketWriter implements NetworkWriter<ServerPingPac
     private ServerPingPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerPingPacket object) {
+    public void write(@NonNull ByteBuf buf,
+                      @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerPingPacket object) {
         buf.writeInt(object.identifier());
     }
 }

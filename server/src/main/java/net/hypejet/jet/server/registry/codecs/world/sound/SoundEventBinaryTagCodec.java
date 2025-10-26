@@ -8,7 +8,8 @@ import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.FloatBinaryTag;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
+
 
 import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.optionalTag;
 import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
@@ -20,6 +21,7 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @see SoundEvent
  * @see BinaryTagCodec
  */
+@NullMarked
 public final class SoundEventBinaryTagCodec implements BinaryTagCodec<SoundEvent> {
     /**
      * An instance of the {@linkplain SoundEventBinaryTagCodec sound event binary tag codec}.
@@ -43,8 +45,8 @@ public final class SoundEventBinaryTagCodec implements BinaryTagCodec<SoundEvent
     private SoundEventBinaryTagCodec() {}
 
     @Override
-    public @NotNull SoundEvent decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof CompoundBinaryTag compound) {
+    public SoundEvent decode(BinaryTag binaryTag) {
+        if (binaryTag instanceof CompoundBinaryTag compound) {
             FloatBinaryTag rangeTag = optionalTag(RANGE_FIELD, compound, BinaryTagTypes.FLOAT);
             return new SoundEvent(
                     KeyBinaryTagCodec.INSTANCE.decode(requiredTag(SOUND_KEY_FIELD, compound)),
@@ -58,11 +60,11 @@ public final class SoundEventBinaryTagCodec implements BinaryTagCodec<SoundEvent
     }
 
     @Override
-    public @NotNull BinaryTag encode(@NotNull SoundEvent decoded) throws Exception {
+    public BinaryTag encode(SoundEvent value) {
         CompoundBinaryTag.Builder builder = CompoundBinaryTag.builder()
-                .put(SOUND_KEY_FIELD, KeyBinaryTagCodec.INSTANCE.encode(decoded.sound()));
+                .put(SOUND_KEY_FIELD, KeyBinaryTagCodec.INSTANCE.encode(value.sound()));
 
-        Float range = decoded.range();
+        Float range = value.range();
         if (range != null) {
             builder.putFloat(RANGE_FIELD, range);
         }

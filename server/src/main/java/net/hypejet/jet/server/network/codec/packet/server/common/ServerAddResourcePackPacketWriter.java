@@ -6,6 +6,7 @@ import net.hypejet.jet.server.network.codec.game.component.ComponentNetworkWrite
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.codec.other.UUIDNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerAddResourcePackPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -31,11 +32,12 @@ public final class ServerAddResourcePackPacketWriter implements NetworkWriter<Se
     private ServerAddResourcePackPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerAddResourcePackPacket object) {
-        UUIDNetworkCodec.INSTANCE.write(buf, object.uniqueId());
-        StringNetworkCodec.INSTANCE.write(buf, object.url());
-        HASH_CODEC.write(buf, object.hash());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerAddResourcePackPacket object) {
+        UUIDNetworkCodec.INSTANCE.write(buf, registryManager, object.uniqueId());
+        StringNetworkCodec.INSTANCE.write(buf, registryManager, object.url());
+        HASH_CODEC.write(buf, registryManager, object.hash());
         buf.writeBoolean(object.forced());
-        NetworkUtil.writeOptional(object.prompt(), ComponentNetworkWriter.INSTANCE, buf);
+        NetworkUtil.writeOptional(object.prompt(), ComponentNetworkWriter.INSTANCE, buf, registryManager);
     }
 }

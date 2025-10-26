@@ -7,6 +7,7 @@ import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkReader;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -42,18 +43,18 @@ public final class KnownPackNetworkCodec implements NetworkCodec<KnownPack> {
     private KnownPackNetworkCodec() {}
 
     @Override
-    public @NonNull KnownPack read(@NonNull ByteBuf buf) {
+    public @NonNull KnownPack read(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager) {
         return new KnownPack(
-                StringNetworkCodec.INSTANCE.read(buf),
-                StringNetworkCodec.INSTANCE.read(buf),
-                StringNetworkCodec.INSTANCE.read(buf)
+                StringNetworkCodec.INSTANCE.read(buf, registryManager),
+                StringNetworkCodec.INSTANCE.read(buf, registryManager),
+                StringNetworkCodec.INSTANCE.read(buf, registryManager)
         );
     }
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull KnownPack object) {
-        StringNetworkCodec.INSTANCE.write(buf, object.namespace());
-        StringNetworkCodec.INSTANCE.write(buf, object.path());
-        StringNetworkCodec.INSTANCE.write(buf, object.version());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager, @NonNull KnownPack object) {
+        StringNetworkCodec.INSTANCE.write(buf, registryManager, object.namespace());
+        StringNetworkCodec.INSTANCE.write(buf, registryManager, object.path());
+        StringNetworkCodec.INSTANCE.write(buf, registryManager, object.version());
     }
 }

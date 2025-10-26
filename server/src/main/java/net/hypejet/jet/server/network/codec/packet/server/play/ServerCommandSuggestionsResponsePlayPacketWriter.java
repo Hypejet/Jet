@@ -8,6 +8,7 @@ import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerCommandSuggestionsResponsePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerCommandSuggestionsResponsePlayPacket.Suggestion;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -37,11 +38,12 @@ public final class ServerCommandSuggestionsResponsePlayPacketWriter
     private ServerCommandSuggestionsResponsePlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerCommandSuggestionsResponsePlayPacket object) {
-        VarIntNetworkCodec.INSTANCE.write(buf, object.transactionId());
-        VarIntNetworkCodec.INSTANCE.write(buf, object.start());
-        VarIntNetworkCodec.INSTANCE.write(buf, object.length());
-        SUGGESTIONS_WRITER.write(buf, object.suggestions());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerCommandSuggestionsResponsePlayPacket object) {
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, object.transactionId());
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, object.start());
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, object.length());
+        SUGGESTIONS_WRITER.write(buf, registryManager, object.suggestions());
     }
 
     /**
@@ -53,9 +55,11 @@ public final class ServerCommandSuggestionsResponsePlayPacketWriter
      */
     private static final class SuggestionWriter implements NetworkWriter<Suggestion> {
         @Override
-        public void write(@NonNull ByteBuf buf, @NonNull Suggestion object) {
-            StringNetworkCodec.INSTANCE.write(buf, object.text());
-            NetworkUtil.writeOptional(object.tooltip(), ComponentNetworkWriter.INSTANCE, buf);
+        public void write(@NonNull ByteBuf buf,
+                          @NonNull JetRegistryManager registryManager,
+                          @NonNull Suggestion object) {
+            StringNetworkCodec.INSTANCE.write(buf, registryManager, object.text());
+            NetworkUtil.writeOptional(object.tooltip(), ComponentNetworkWriter.INSTANCE, buf, registryManager);
         }
     }
 }

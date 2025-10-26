@@ -32,6 +32,8 @@ import net.minecraft.SharedConstants;
 import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
@@ -266,6 +268,11 @@ final class Generators {
                 .add(
                         Registries.POINT_OF_INTEREST_TYPE, ignored -> JsonUnit.INSTANCE, PoiTypes.class,
                         PoiType.class, JsonUnit.class, JsonDataResourceFiles.POI_TYPES, "PointOfInterestTypeKeys"
+                )
+                .add(
+                        Registries.PARTICLE_TYPE, type -> JsonUnit.INSTANCE,
+                        ParticleTypes.class, ParticleType.class, JsonUnit.class,
+                        JsonDataResourceFiles.PARTICLES, "ParticleTypeKeys"
                 )
                 .add(
                         Registries.ENTITY_TYPE, value -> EntityTypeAdapter.convert(value, level),

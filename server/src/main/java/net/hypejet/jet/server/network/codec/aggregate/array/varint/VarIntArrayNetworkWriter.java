@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.codec.aggregate.array.varint;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.aggregate.AggregateNetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -39,8 +40,9 @@ public final class VarIntArrayNetworkWriter extends AggregateNetworkWriter<int[]
     }
 
     @Override
-    protected void encodeElements(int @NonNull [] aggregate, @NonNull ByteBuf buf) {
+    protected void encodeElements(int @NonNull [] aggregate, @NonNull ByteBuf buf,
+                                  @NonNull JetRegistryManager registryManager) {
         for (int element : aggregate)
-            VarIntNetworkCodec.INSTANCE.write(buf, element);
+            VarIntNetworkCodec.INSTANCE.write(buf, registryManager, element);
     }
 }

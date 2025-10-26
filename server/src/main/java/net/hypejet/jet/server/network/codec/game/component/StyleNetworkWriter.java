@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.codec.game.component;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.miscellaneous.BinaryTagNetworkWriter;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.serializer.nbt.NBTComponentSerializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -37,7 +38,7 @@ public final class StyleNetworkWriter implements NetworkWriter<Style> {
     }
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull Style object) {
-        BinaryTagNetworkWriter.INSTANCE.write(buf, this.serializer.serializeStyle(object));
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager, @NonNull Style object) {
+        BinaryTagNetworkWriter.INSTANCE.write(buf, registryManager, this.serializer.serializeStyle(object));
     }
 }

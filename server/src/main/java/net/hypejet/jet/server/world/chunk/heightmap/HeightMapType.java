@@ -1,6 +1,6 @@
 package net.hypejet.jet.server.world.chunk.heightmap;
 
-import net.hypejet.jet.server.world.block.JetBlockState;
+import net.hypejet.jet.server.world.block.state.JetBlockState;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

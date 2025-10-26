@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.component.ComponentNetworkWriter;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSystemMessagePlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -28,8 +29,9 @@ public final class ServerSystemMessagePlayPacketWriter implements NetworkWriter<
     private ServerSystemMessagePlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerSystemMessagePlayPacket object) {
-        ComponentNetworkWriter.INSTANCE.write(buf, object.message());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerSystemMessagePlayPacket object) {
+        ComponentNetworkWriter.INSTANCE.write(buf, registryManager, object.message());
         if (buf.readableBytes() > MAX_MESSAGE_SIZE)
             throw new IllegalArgumentException("The message size is higher than allowed");
         buf.writeBoolean(object.overlay());

@@ -45,6 +45,7 @@ import net.hypejet.jet.server.network.codec.packet.server.play.ServerResetScoreP
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerRespawnPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSetObjectiveDisplayedPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSpawnEntityPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerSpawnParticlePacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizeEntityPositionPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizePositionPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizeRotationPlayPacketWriter;
@@ -107,6 +108,7 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerResetScor
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerRespawnPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSetObjectiveDisplayedPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSpawnEntityPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerSpawnParticlePacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizeEntityPositionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizeRotationPlayPacket;
@@ -275,12 +277,12 @@ public final class ServerPacketRegistry {
                         .add(
                                 ServerConfigurationPackets.CLIENTBOUND_FINISH_CONFIGURATION,
                                 ServerFinishConfigurationPacket.class,
-                                (buf, object) -> {}
+                                (buf, registryManager, object) -> {}
                         )
                         .add(
                                 ServerConfigurationPackets.CLIENTBOUND_RESET_CHAT,
                                 ServerResetChatConfigurationPacket.class,
-                                (buf, object) -> {}
+                                (buf, registryManager, object) -> {}
                         )
                         .build()
         );
@@ -519,14 +521,19 @@ public final class ServerPacketRegistry {
                                 ServerEntityMetadataPlayPacketWriter.INSTANCE
                         )
                         .add(
+                                ServerPlayPackets.CLIENTBOUND_LEVEL_PARTICLES,
+                                ServerSpawnParticlePacket.class,
+                                ServerSpawnParticlePacketWriter.INSTANCE
+                        )
+                        .add(
                                 ServerPlayPackets.CLIENTBOUND_BUNDLE_DELIMITER,
                                 ServerBundleDelimiterPlayPacket.class,
-                                (buf, object) -> {}
+                                (buf, registryManager, object) -> {}
                         )
                         .add(
                                 ServerPlayPackets.CLIENTBOUND_CHUNK_BATCH_START,
                                 ServerChunkBatchStartPlayPacket.class,
-                                (buf, object) -> {}
+                                (buf, registryManager, object) -> {}
                         )
                         .build()
         );

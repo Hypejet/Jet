@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.codec.aggregate;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -27,15 +28,15 @@ public abstract class AggregateNetworkReader<A> implements NetworkReader<A> {
     }
 
     @Override
-    public @NonNull A read(@NonNull ByteBuf buf) {
-        int length = VarIntNetworkCodec.INSTANCE.read(buf);
+    public @NonNull A read(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager) {
+        int length = VarIntNetworkCodec.INSTANCE.read(buf, registryManager);
         if (length > this.maxLength) {
             throw new IllegalArgumentException(String.format(
                     "The aggregate is long than allowed (%s > %s).",
                     length, this.maxLength
             ));
         }
-        return this.decodeElements(length, buf);
+        return this.decodeElements(length, buf, registryManager);
     }
 
     /**
@@ -43,8 +44,10 @@ public abstract class AggregateNetworkReader<A> implements NetworkReader<A> {
      *
      * @param length an amount of elements that the aggregate should have
      * @param buf a byte buf to decode elements from
+     * @param registryManager registry manager of server that the elements are being decoded for
      * @return the aggregate created
      * @since 1.0
      */
-    protected abstract @NonNull A decodeElements(int length, @NonNull ByteBuf buf);
+    protected abstract @NonNull A decodeElements(int length, @NonNull ByteBuf buf,
+                                                 @NonNull JetRegistryManager registryManager);
 }

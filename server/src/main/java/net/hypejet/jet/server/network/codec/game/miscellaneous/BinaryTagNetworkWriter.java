@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.codec.game.miscellaneous;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagType;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -28,7 +29,7 @@ public final class BinaryTagNetworkWriter implements NetworkWriter<BinaryTag> {
     private BinaryTagNetworkWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull BinaryTag object) {
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager, @NonNull BinaryTag object) {
         try (ByteBufOutputStream outputStream = new ByteBufOutputStream(buf)) {
             BinaryTagType type = object.type();
             buf.writeByte(type.id());

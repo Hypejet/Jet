@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.game.world.coordinate.position.PositionFlagsNetworkReader;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientPositionFlagsPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -15,7 +16,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see NetworkReader
  */
 public final class ClientPositionFlagsPlayPacketReader implements NetworkReader<ClientPositionFlagsPlayPacket> {
-
     /**
      * An instance of the {@linkplain ClientPositionFlagsPlayPacketReader client position flags play packet reader}.
      *
@@ -26,7 +26,8 @@ public final class ClientPositionFlagsPlayPacketReader implements NetworkReader<
     private ClientPositionFlagsPlayPacketReader() {}
 
     @Override
-    public @NonNull ClientPositionFlagsPlayPacket read(@NonNull ByteBuf buf) {
-        return new ClientPositionFlagsPlayPacket(PositionFlagsNetworkReader.INSTANCE.read(buf));
+    public @NonNull ClientPositionFlagsPlayPacket read(@NonNull ByteBuf buf,
+                                                       @NonNull JetRegistryManager registryManager) {
+        return new ClientPositionFlagsPlayPacket(PositionFlagsNetworkReader.INSTANCE.read(buf, registryManager));
     }
 }

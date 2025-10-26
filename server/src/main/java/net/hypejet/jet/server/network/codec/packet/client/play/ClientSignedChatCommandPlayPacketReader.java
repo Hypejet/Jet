@@ -7,6 +7,7 @@ import net.hypejet.jet.server.network.codec.game.signing.SeenMessagesNetworkRead
 import net.hypejet.jet.server.network.codec.game.signing.SignedArgumentNetworkReader;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientSignedChatCommandPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.game.signing.SignedArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -36,13 +37,14 @@ public final class ClientSignedChatCommandPlayPacketReader
     private ClientSignedChatCommandPlayPacketReader() {}
 
     @Override
-    public @NonNull ClientSignedChatCommandPlayPacket read(@NonNull ByteBuf buf) {
+    public @NonNull ClientSignedChatCommandPlayPacket read(@NonNull ByteBuf buf,
+                                                           @NonNull JetRegistryManager registryManager) {
         return new ClientSignedChatCommandPlayPacket(
-                StringNetworkCodec.INSTANCE.read(buf),
+                StringNetworkCodec.INSTANCE.read(buf, registryManager),
                 buf.readLong(),
                 buf.readLong(),
-                ARGUMENTS_READER.read(buf),
-                SeenMessagesNetworkReader.INSTANCE.read(buf)
+                ARGUMENTS_READER.read(buf, registryManager),
+                SeenMessagesNetworkReader.INSTANCE.read(buf, registryManager)
         );
     }
 }

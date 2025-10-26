@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.codec.packet.client.play;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientPlayerLoadedPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -28,7 +29,8 @@ public final class ClientPlayerLoadedPlayPacketReader implements NetworkReader<C
     private ClientPlayerLoadedPlayPacketReader() {}
 
     @Override
-    public @NonNull ClientPlayerLoadedPlayPacket read(@NonNull ByteBuf buf) {
+    public @NonNull ClientPlayerLoadedPlayPacket read(@NonNull ByteBuf buf,
+                                                      @NonNull JetRegistryManager registryManager) {
         return PACKET;
     }
 }

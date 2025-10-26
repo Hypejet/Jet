@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.codec.packet.client.common;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.packet.packets.client.common.ClientKeepAlivePacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -14,7 +15,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see NetworkReader
  */
 public final class ClientKeepAlivePacketReader implements NetworkReader<ClientKeepAlivePacket> {
-
     /**
      * An instance of the {@linkplain ClientKeepAlivePacketReader client keep alive packet reader}.
      *
@@ -25,7 +25,7 @@ public final class ClientKeepAlivePacketReader implements NetworkReader<ClientKe
     private ClientKeepAlivePacketReader() {}
 
     @Override
-    public @NonNull ClientKeepAlivePacket read(@NonNull ByteBuf buf) {
+    public @NonNull ClientKeepAlivePacket read(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager) {
         return new ClientKeepAlivePacket(buf.readLong());
     }
 }

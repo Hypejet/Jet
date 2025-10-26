@@ -3,6 +3,7 @@ package net.hypejet.jet.server.command.argument.writers;
 import com.mojang.brigadier.arguments.ArgumentType;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.command.argument.ArgumentWriter;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Objects;
@@ -58,7 +59,7 @@ public final class NumberArgumentWriter<N extends Number, A extends ArgumentType
     }
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull A object) {
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager, @NonNull A object) {
         byte flags = 0;
 
         N minValue = this.minimumValueGetter.apply(object);

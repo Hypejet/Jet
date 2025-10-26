@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.codec.packet.server.play;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizeRotationPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -27,7 +28,8 @@ public final class ServerSynchronizeRotationPlayPacketWriter
     private ServerSynchronizeRotationPlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerSynchronizeRotationPlayPacket object) {
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerSynchronizeRotationPlayPacket object) {
         buf.writeFloat(object.yaw());
         buf.writeFloat(object.pitch());
     }

@@ -2,7 +2,7 @@ package net.hypejet.jet.data.json.resource;
 
 import net.hypejet.jet.data.json.model.block.JsonBlock;
 import net.hypejet.jet.data.json.model.block.JsonBlockEntityType;
-import net.hypejet.jet.data.json.model.block.JsonBlockState;
+import net.hypejet.jet.data.json.model.block.state.JsonBlockState;
 import net.hypejet.jet.data.json.model.entity.JsonEntityType;
 import net.hypejet.jet.data.json.model.event.JsonGameEvent;
 import net.hypejet.jet.data.json.model.item.JsonItem;
@@ -194,6 +194,14 @@ public final class JsonDataResourceFiles {
      * @since 1.0
      */
     public static final String POI_TYPES = resourceClasspath("poi_types.json");
+
+    /**
+     * A resource-directory-relative classpath where
+     * particle registry entries are written to.
+     *
+     * @since 1.0
+     */
+    public static final String PARTICLES = resourceClasspath("particles.json");
 
     /**
      * A resource-directory-relative classpath where {@linkplain JsonBlockEntityType block-entity-type}

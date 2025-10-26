@@ -2,7 +2,7 @@ package net.hypejet.jet.world.chunk.factory;
 
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.world.biome.Biome;
-import net.hypejet.jet.world.block.BlockState;
+import net.hypejet.jet.world.block.state.BlockState;
 import net.hypejet.jet.world.chunk.Chunk;
 import net.hypejet.jet.world.chunk.builder.ChunkBuilder;
 import net.hypejet.jet.world.chunk.light.LightSection;

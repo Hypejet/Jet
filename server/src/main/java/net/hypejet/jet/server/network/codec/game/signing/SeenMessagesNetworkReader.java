@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.aggregate.bitset.FixedBitSetNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.game.signing.SeenMessages;
 import net.hypejet.jet.util.bitset.UnmodifiableBitSet;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -31,10 +32,10 @@ public final class SeenMessagesNetworkReader implements NetworkReader<SeenMessag
     private SeenMessagesNetworkReader() {}
 
     @Override
-    public @NonNull SeenMessages read(@NonNull ByteBuf buf) {
+    public @NonNull SeenMessages read(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager) {
         return new SeenMessages(
-                VarIntNetworkCodec.INSTANCE.read(buf),
-                new UnmodifiableBitSet(ACKNOWLEDGED_CODEC.read(buf)),
+                VarIntNetworkCodec.INSTANCE.read(buf, registryManager),
+                new UnmodifiableBitSet(ACKNOWLEDGED_CODEC.read(buf, registryManager)),
                 buf.readByte()
         );
     }

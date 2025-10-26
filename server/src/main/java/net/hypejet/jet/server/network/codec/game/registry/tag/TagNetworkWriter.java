@@ -6,6 +6,7 @@ import net.hypejet.jet.server.network.codec.aggregate.array.varint.VarIntArrayNe
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.key.KeyNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerUpdateTagsPacket.Tag;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -35,8 +36,8 @@ public final class TagNetworkWriter implements NetworkWriter<Tag> {
     private TagNetworkWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull Tag object) {
-        KeyNetworkCodec.INSTANCE.write(buf, object.key());
-        VarIntArrayNetworkWriter.INSTANCE.write(buf, object.entries().toArray());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager, @NonNull Tag object) {
+        KeyNetworkCodec.INSTANCE.write(buf, registryManager, object.key());
+        VarIntArrayNetworkWriter.INSTANCE.write(buf, registryManager, object.entries().toArray());
     }
 }

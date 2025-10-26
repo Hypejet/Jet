@@ -34,7 +34,7 @@ public final class PacketLengthEncoder extends MessageToByteEncoder<ByteBuf> {
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) {
         try {
-            VarIntNetworkCodec.INSTANCE.write(out, msg.readableBytes());
+            VarIntNetworkCodec.INSTANCE.write(out, this.connection.server().registryManager(), msg.readableBytes());
             out.writeBytes(msg);
         } catch (Throwable throwable) {
             this.connection.uncaughtException(Thread.currentThread(), throwable);

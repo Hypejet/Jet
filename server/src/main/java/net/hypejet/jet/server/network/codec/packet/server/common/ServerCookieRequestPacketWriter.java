@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.key.KeyNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerCookieRequestPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -15,7 +16,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see NetworkWriter
  */
 public final class ServerCookieRequestPacketWriter implements NetworkWriter<ServerCookieRequestPacket> {
-
     /**
      * An instance of the {@linkplain ServerCookieRequestPacketWriter server cookie request packet writer}.
      *
@@ -26,7 +26,9 @@ public final class ServerCookieRequestPacketWriter implements NetworkWriter<Serv
     private ServerCookieRequestPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerCookieRequestPacket object) {
-        KeyNetworkCodec.INSTANCE.write(buf, object.key());
+    public void write(@NonNull ByteBuf buf,
+                      @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerCookieRequestPacket object) {
+        KeyNetworkCodec.INSTANCE.write(buf, registryManager, object.key());
     }
 }

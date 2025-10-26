@@ -5,6 +5,7 @@ import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.world.coordinate.vector.ShortVectorNetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityVelocityPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -26,8 +27,9 @@ public final class ServerEntityVelocityPlayPacketWriter implements NetworkWriter
     private ServerEntityVelocityPlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerEntityVelocityPlayPacket object) {
-        VarIntNetworkCodec.INSTANCE.write(buf, object.entityId());
-        ShortVectorNetworkWriter.INSTANCE.write(buf, object.velocity());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerEntityVelocityPlayPacket object) {
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, object.entityId());
+        ShortVectorNetworkWriter.INSTANCE.write(buf, registryManager, object.velocity());
     }
 }

@@ -3,7 +3,9 @@ package net.hypejet.jet.data.json.test;
 import com.google.common.primitives.ImmutableIntArray;
 import net.hypejet.jet.data.json.model.block.JsonBlock;
 import net.hypejet.jet.data.json.model.block.JsonBlockEntityType;
-import net.hypejet.jet.data.json.model.block.JsonBlockState;
+import net.hypejet.jet.data.json.model.block.state.JsonBlockState;
+import net.hypejet.jet.data.json.model.block.state.property.JsonEnumStatePropertyValueType;
+import net.hypejet.jet.data.json.model.block.state.property.JsonStateProperty;
 import net.kyori.adventure.key.Key;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +32,15 @@ final class BlockTest {
     void testBlock() {
         TestUtil.test(new JsonBlock(
                 Set.of(Key.key("vanilla"), Key.key("hypejet", "pack")),
-                3, ImmutableIntArray.of(3, 4, 5, 6, 7, 8, 9, 10)
+                3, ImmutableIntArray.of(3, 4, 5, 6, 7, 8, 9, 10),
+                Map.of(
+                        "lit", JsonStateProperty.Boolean.INSTANCE,
+                        "level", new JsonStateProperty.Integer(0, 20),
+                        "half", new JsonStateProperty.Enum(
+                                JsonEnumStatePropertyValueType.VERTICAL_OCCUPANCY_TYPE,
+                                Set.of("upper", "lower")
+                        )
+                )
         ));
     }
 }

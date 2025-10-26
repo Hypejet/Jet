@@ -14,6 +14,7 @@ import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerObjectiveActionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerObjectiveActionPlayPacket.Action;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -48,8 +49,9 @@ public final class ServerObjectiveActionPlayPacketWriter implements NetworkWrite
     }
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerObjectiveActionPlayPacket object) {
-        StringNetworkCodec.INSTANCE.write(buf, object.objectiveName());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerObjectiveActionPlayPacket object) {
+        StringNetworkCodec.INSTANCE.write(buf, registryManager, object.objectiveName());
 
         Action action = object.action();
         Class<? extends Action> actionClass = action.getClass();
@@ -65,13 +67,18 @@ public final class ServerObjectiveActionPlayPacketWriter implements NetworkWrite
         };
 
         if (objectiveData == null) return;
-        ComponentNetworkWriter.INSTANCE.write(buf, objectiveData.displayName());
+        ComponentNetworkWriter.INSTANCE.write(buf, registryManager, objectiveData.displayName());
 
         RenderType renderType = objectiveData.renderType();
         if (!RENDER_TYPE_IDENTIFIERS.containsKey(renderType))
             throw new IllegalArgumentException(String.format("Unknown render type: %s", renderType));
 
-        VarIntNetworkCodec.INSTANCE.write(buf, RENDER_TYPE_IDENTIFIERS.getInt(renderType));
-        NetworkUtil.writeOptional(objectiveData.numberFormat(), NumberFormatNetworkWriter.INSTANCE, buf);
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, RENDER_TYPE_IDENTIFIERS.getInt(renderType));
+
+        NetworkUtil.writeOptional(
+                objectiveData.numberFormat(),
+                NumberFormatNetworkWriter.INSTANCE,
+                buf, registryManager
+        );
     }
 }

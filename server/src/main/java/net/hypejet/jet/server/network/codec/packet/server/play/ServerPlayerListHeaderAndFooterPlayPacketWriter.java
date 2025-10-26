@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.component.ComponentNetworkWriter;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -29,8 +30,9 @@ public final class ServerPlayerListHeaderAndFooterPlayPacketWriter
     private ServerPlayerListHeaderAndFooterPlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerPlayerListHeaderAndFooterPlayPacket object) {
-        ComponentNetworkWriter.INSTANCE.write(buf, object.headerText());
-        ComponentNetworkWriter.INSTANCE.write(buf, object.footerText());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerPlayerListHeaderAndFooterPlayPacket object) {
+        ComponentNetworkWriter.INSTANCE.write(buf, registryManager, object.headerText());
+        ComponentNetworkWriter.INSTANCE.write(buf, registryManager, object.footerText());
     }
 }

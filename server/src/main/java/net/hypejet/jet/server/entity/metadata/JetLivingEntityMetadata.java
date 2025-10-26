@@ -6,7 +6,7 @@ import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.util.collection.IntObjectMapBuilder;
 import net.hypejet.jet.server.util.number.ByteUtil;
 import net.hypejet.jet.world.coordinate.BlockPosition;
-import net.hypejet.jet.world.particle.ParticleEffect;
+import net.hypejet.jet.world.particle.Particle;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -66,7 +66,7 @@ public class JetLivingEntityMetadata extends JetEntityMetadata implements Living
     }
 
     @Override
-    public final List<ParticleEffect> particleEffects() {
+    public final List<Particle> particleEffects() {
         return List.of(); // TODO
     }
 
@@ -152,7 +152,7 @@ public class JetLivingEntityMetadata extends JetEntityMetadata implements Living
         }
 
         @Override
-        public final U particleEffects(List<ParticleEffect> value) {
+        public final U particleEffects(List<Particle> value) {
             // TODO: Implement this method
             throw new UnsupportedOperationException("Not implemented yet");
         }

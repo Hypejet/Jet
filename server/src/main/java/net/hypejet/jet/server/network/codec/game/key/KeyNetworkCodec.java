@@ -6,6 +6,7 @@ import net.hypejet.jet.server.network.codec.NetworkCodec;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkReader;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -41,12 +42,12 @@ public final class KeyNetworkCodec implements NetworkCodec<Key> {
     private KeyNetworkCodec() {}
 
     @Override
-    public @NonNull Key read(@NonNull ByteBuf buf) {
-        return Key.key(StringNetworkCodec.INSTANCE.read(buf));
+    public @NonNull Key read(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager) {
+        return Key.key(StringNetworkCodec.INSTANCE.read(buf, registryManager));
     }
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull Key object) {
-        StringNetworkCodec.INSTANCE.write(buf, object.asString());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager, @NonNull Key object) {
+        StringNetworkCodec.INSTANCE.write(buf, registryManager, object.asString());
     }
 }

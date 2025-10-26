@@ -11,6 +11,7 @@ import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.component.ComponentNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.component.StyleNetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -40,7 +41,9 @@ public final class NumberFormatNetworkWriter implements NetworkWriter<NumberForm
     private NumberFormatNetworkWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull NumberFormat object) {
+    public void write(@NonNull ByteBuf buf,
+                      @NonNull JetRegistryManager registryManager,
+                      @NonNull NumberFormat object) {
         Class<? extends NumberFormat> formatClass = object.getClass();
         if (!IDENTIFIERS.containsKey(formatClass)) {
             throw new IllegalArgumentException(String.format(
@@ -50,12 +53,14 @@ public final class NumberFormatNetworkWriter implements NetworkWriter<NumberForm
         }
 
         int identifier = IDENTIFIERS.getInt(formatClass);
-        VarIntNetworkCodec.INSTANCE.write(buf, identifier);
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, identifier);
 
         switch (object) {
             case BlankNumberFormat ignored -> {}
-            case StyledNumberFormat format -> StyleNetworkWriter.INSTANCE.write(buf, format.style());
-            case FixedNumberFormat format -> ComponentNetworkWriter.INSTANCE.write(buf, format.placeholder());
+            case StyledNumberFormat format ->
+                    StyleNetworkWriter.INSTANCE.write(buf, registryManager, format.style());
+            case FixedNumberFormat format ->
+                    ComponentNetworkWriter.INSTANCE.write(buf, registryManager, format.placeholder());
             default -> throw new IllegalStateException(String.format("Unknown number format: %s", object));
         }
     }

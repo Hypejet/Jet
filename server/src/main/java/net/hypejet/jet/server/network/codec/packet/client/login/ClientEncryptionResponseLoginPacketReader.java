@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.aggregate.array.bytes.ByteArrayNetworkReader;
 import net.hypejet.jet.server.network.packet.packets.client.login.ClientEncryptionResponseLoginPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -16,7 +17,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class ClientEncryptionResponseLoginPacketReader
         implements NetworkReader<ClientEncryptionResponseLoginPacket> {
-
     /**
      * An instance o the {@linkplain ClientEncryptionResponseLoginPacketReader client encryption response packet
      * reader}.
@@ -29,10 +29,11 @@ public final class ClientEncryptionResponseLoginPacketReader
     private ClientEncryptionResponseLoginPacketReader() {}
 
     @Override
-    public @NonNull ClientEncryptionResponseLoginPacket read(@NonNull ByteBuf buf) {
+    public @NonNull ClientEncryptionResponseLoginPacket read(@NonNull ByteBuf buf,
+                                                             @NonNull JetRegistryManager registryManager) {
         return new ClientEncryptionResponseLoginPacket(
-                ByteArrayNetworkReader.INSTANCE.read(buf),
-                ByteArrayNetworkReader.INSTANCE.read(buf)
+                ByteArrayNetworkReader.INSTANCE.read(buf, registryManager),
+                ByteArrayNetworkReader.INSTANCE.read(buf, registryManager)
         );
     }
 }

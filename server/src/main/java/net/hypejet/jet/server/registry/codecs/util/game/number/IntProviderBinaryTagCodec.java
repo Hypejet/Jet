@@ -13,7 +13,7 @@ import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.IntBinaryTag;
 import net.kyori.adventure.util.Index;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.List;
 import java.util.Map;
@@ -27,6 +27,7 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @see IntProvider
  * @see BinaryTagCodec
  */
+@NullMarked
 public final class IntProviderBinaryTagCodec implements BinaryTagCodec<IntProvider> {
 
     /**
@@ -63,11 +64,11 @@ public final class IntProviderBinaryTagCodec implements BinaryTagCodec<IntProvid
     private IntProviderBinaryTagCodec() {}
 
     @Override
-    public @NonNull IntProvider decode(@NonNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof IntBinaryTag tag)
+    public IntProvider decode(BinaryTag binaryTag) {
+        if (binaryTag instanceof IntBinaryTag tag)
             return new IntProvider.Constant(tag.value());
 
-        if (!(encoded instanceof CompoundBinaryTag compound)) {
+        if (!(binaryTag instanceof CompoundBinaryTag compound)) {
             throw new IllegalArgumentException(
                     "The encoded tag must be of either int or compound type to decode it to an int provider"
             );
@@ -111,15 +112,15 @@ public final class IntProviderBinaryTagCodec implements BinaryTagCodec<IntProvid
     }
 
     @Override
-    public @NonNull BinaryTag encode(@NonNull IntProvider decoded) throws Exception {
-        if (decoded instanceof IntProvider.Constant(int value))
-            return IntBinaryTag.intBinaryTag(value);
+    public BinaryTag encode(IntProvider value) {
+        if (value instanceof IntProvider.Constant(int intValue))
+            return IntBinaryTag.intBinaryTag(intValue);
 
-        Class<? extends IntProvider> providerClass = decoded.getClass();
+        Class<? extends IntProvider> providerClass = value.getClass();
         CompoundBinaryTag.Builder builder = CompoundBinaryTag.builder();
         builder.put(TYPE_FIELD, KeyBinaryTagCodec.INSTANCE.encode(KEY_INDEX.keyOrThrow(providerClass)));
 
-        switch (decoded) {
+        switch (value) {
             case IntProvider.Uniform(int minimum, int maximum) -> {
                 builder.putInt(MINIMUM_FIELD, minimum);
                 builder.putInt(MAXIMUM_FIELD, maximum);
@@ -147,7 +148,7 @@ public final class IntProviderBinaryTagCodec implements BinaryTagCodec<IntProvid
         return builder.build();
     }
 
-    private static @NonNull IllegalArgumentException unknownProviderClass(@NonNull Class<?> providerClass) {
+    private static IllegalArgumentException unknownProviderClass(Class<?> providerClass) {
         return new IllegalArgumentException("Unknown int provider class: " + providerClass.getSimpleName());
     }
 }

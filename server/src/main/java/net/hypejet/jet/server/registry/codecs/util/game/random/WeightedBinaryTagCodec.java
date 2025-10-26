@@ -5,8 +5,7 @@ import net.hypejet.jet.util.game.random.Weighted;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
 
@@ -18,6 +17,7 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @param <V> the value type of weighted whose serialization is handled by this binary tag codec
  * @since 1.0
  */
+@NullMarked
 public final class WeightedBinaryTagCodec<V> implements BinaryTagCodec<Weighted<V>> {
 
     private static final String WEIGHT_FIELD = "weight";
@@ -31,13 +31,13 @@ public final class WeightedBinaryTagCodec<V> implements BinaryTagCodec<Weighted<
      * @param valueCodec a binary tag codec that should handle serialization of weighted values
      * @since 1.0
      */
-    public WeightedBinaryTagCodec(@NonNull BinaryTagCodec<V> valueCodec) {
+    public WeightedBinaryTagCodec(BinaryTagCodec<V> valueCodec) {
         this.valueCodec = Objects.requireNonNull(valueCodec, "value codec");
     }
 
     @Override
-    public @NotNull Weighted<V> decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof CompoundBinaryTag compound) {
+    public Weighted<V> decode(BinaryTag binaryTag) {
+        if (binaryTag instanceof CompoundBinaryTag compound) {
             return new Weighted<>(
                     this.valueCodec.decode(requiredTag(DATA_FIELD, compound)),
                     requiredTag(WEIGHT_FIELD, compound, BinaryTagTypes.INT).value()
@@ -48,10 +48,10 @@ public final class WeightedBinaryTagCodec<V> implements BinaryTagCodec<Weighted<
     }
 
     @Override
-    public @NotNull BinaryTag encode(@NotNull Weighted<V> decoded) throws Exception {
+    public BinaryTag encode(Weighted<V> value) {
         return CompoundBinaryTag.builder()
-                .put(DATA_FIELD, this.valueCodec.encode(decoded.value()))
-                .putInt(WEIGHT_FIELD, decoded.weight())
+                .put(DATA_FIELD, this.valueCodec.encode(value.value()))
+                .putInt(WEIGHT_FIELD, value.weight())
                 .build();
     }
 }

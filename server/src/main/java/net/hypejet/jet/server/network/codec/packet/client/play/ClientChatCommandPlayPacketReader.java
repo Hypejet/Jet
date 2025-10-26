@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientChatCommandPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -15,7 +16,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see NetworkReader
  */
 public final class ClientChatCommandPlayPacketReader implements NetworkReader<ClientChatCommandPlayPacket> {
-
     /**
      * An instance of the {@linkplain ClientChatCommandPlayPacket client chat command play packet reader}.
      *
@@ -26,7 +26,8 @@ public final class ClientChatCommandPlayPacketReader implements NetworkReader<Cl
     private ClientChatCommandPlayPacketReader() {}
 
     @Override
-    public @NonNull ClientChatCommandPlayPacket read(@NonNull ByteBuf buf) {
-        return new ClientChatCommandPlayPacket(StringNetworkCodec.INSTANCE.read(buf));
+    public @NonNull ClientChatCommandPlayPacket read(@NonNull ByteBuf buf,
+                                                     @NonNull JetRegistryManager registryManager) {
+        return new ClientChatCommandPlayPacket(StringNetworkCodec.INSTANCE.read(buf, registryManager));
     }
 }

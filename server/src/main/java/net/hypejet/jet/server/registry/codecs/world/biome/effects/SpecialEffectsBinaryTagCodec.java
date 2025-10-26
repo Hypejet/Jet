@@ -5,11 +5,11 @@ import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.adventure.IndexBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.primitive.ListBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.primitive.StringBinaryTagCodec;
-import net.hypejet.jet.server.registry.codecs.util.color.ColorBinaryTagCodec;
+import net.hypejet.jet.server.registry.codecs.util.color.RGBColorBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.util.game.random.WeightedBinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.world.sound.SoundEventBinaryTagCodec;
 import net.hypejet.jet.server.util.index.IndexUtil;
-import net.hypejet.jet.util.color.Color;
+import net.hypejet.jet.util.color.RGBColor;
 import net.hypejet.jet.util.game.random.Weighted;
 import net.hypejet.jet.world.biome.effects.AmbientAdditionsSettings;
 import net.hypejet.jet.world.biome.effects.AmbientMoodSettings;
@@ -21,7 +21,7 @@ import net.hypejet.jet.world.sound.SoundEvent;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.List;
 import java.util.Map;
@@ -35,6 +35,7 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @see SpecialEffects
  * @see BinaryTagCodec
  */
+@NullMarked
 public final class SpecialEffectsBinaryTagCodec implements BinaryTagCodec<SpecialEffects> {
 
     private static final String FOG_COLOR_FIELD = "fog_color";
@@ -75,8 +76,8 @@ public final class SpecialEffectsBinaryTagCodec implements BinaryTagCodec<Specia
     private SpecialEffectsBinaryTagCodec() {}
 
     @Override
-    public @NotNull SpecialEffects decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof CompoundBinaryTag compound) {
+    public SpecialEffects decode(BinaryTag binaryTag) {
+        if (binaryTag instanceof CompoundBinaryTag compound) {
             BinaryTag foliageColorTag = compound.get(FOLIAGE_COLOR_FIELD);
             BinaryTag dryFoliageColorTag = compound.get(DRY_FOLIAGE_COLOR_FIELD);
             BinaryTag grassColorTag = compound.get(GRASS_COLOR_FIELD);
@@ -87,19 +88,19 @@ public final class SpecialEffectsBinaryTagCodec implements BinaryTagCodec<Specia
             BinaryTag ambientAdditionsSettingsTag = compound.get(AMBIENT_ADDITIONS_SOUND_FIELD);
             BinaryTag backgroundMusicTag = compound.get(BACKGROUND_MUSIC_FIELD);
             return new SpecialEffects(
-                    ColorBinaryTagCodec.INSTANCE.decode(requiredTag(FOG_COLOR_FIELD, compound)),
-                    ColorBinaryTagCodec.INSTANCE.decode(requiredTag(WATER_COLOR_FIELD, compound)),
-                    ColorBinaryTagCodec.INSTANCE.decode(requiredTag(WATER_FOG_COLOR_FIELD, compound)),
-                    ColorBinaryTagCodec.INSTANCE.decode(requiredTag(SKY_COLOR_FIELD, compound)),
+                    RGBColorBinaryTagCodec.INSTANCE.decode(requiredTag(FOG_COLOR_FIELD, compound)),
+                    RGBColorBinaryTagCodec.INSTANCE.decode(requiredTag(WATER_COLOR_FIELD, compound)),
+                    RGBColorBinaryTagCodec.INSTANCE.decode(requiredTag(WATER_FOG_COLOR_FIELD, compound)),
+                    RGBColorBinaryTagCodec.INSTANCE.decode(requiredTag(SKY_COLOR_FIELD, compound)),
                     foliageColorTag == null
                             ? null
-                            : ColorBinaryTagCodec.INSTANCE.decode(foliageColorTag),
+                            : RGBColorBinaryTagCodec.INSTANCE.decode(foliageColorTag),
                     dryFoliageColorTag == null
                             ? null
-                            : ColorBinaryTagCodec.INSTANCE.decode(dryFoliageColorTag),
+                            : RGBColorBinaryTagCodec.INSTANCE.decode(dryFoliageColorTag),
                     grassColorTag == null
                             ? null
-                            : ColorBinaryTagCodec.INSTANCE.decode(grassColorTag),
+                            : RGBColorBinaryTagCodec.INSTANCE.decode(grassColorTag),
                     grassColorModifierTag == null
                             ? GrassColorModifier.NONE
                             : GRASS_COLOR_MODIFIER_CODEC.decode(requiredTag(GRASS_COLOR_MODIFIER_FIELD, compound)),
@@ -128,50 +129,50 @@ public final class SpecialEffectsBinaryTagCodec implements BinaryTagCodec<Specia
     }
 
     @Override
-    public @NotNull BinaryTag encode(@NotNull SpecialEffects decoded) throws Exception {
+    public BinaryTag encode(SpecialEffects value) {
         CompoundBinaryTag.Builder builder = CompoundBinaryTag.builder()
-                .put(FOG_COLOR_FIELD, ColorBinaryTagCodec.INSTANCE.encode(decoded.fogColor()))
-                .put(WATER_COLOR_FIELD, ColorBinaryTagCodec.INSTANCE.encode(decoded.waterColor()))
-                .put(WATER_FOG_COLOR_FIELD, ColorBinaryTagCodec.INSTANCE.encode(decoded.waterFogColor()))
-                .put(SKY_COLOR_FIELD, ColorBinaryTagCodec.INSTANCE.encode(decoded.skyColor()))
-                .putFloat(BACKGROUND_MUSIC_VOLUME_FIELD, decoded.backgroundMusicVolume());
+                .put(FOG_COLOR_FIELD, RGBColorBinaryTagCodec.INSTANCE.encode(value.fogColor()))
+                .put(WATER_COLOR_FIELD, RGBColorBinaryTagCodec.INSTANCE.encode(value.waterColor()))
+                .put(WATER_FOG_COLOR_FIELD, RGBColorBinaryTagCodec.INSTANCE.encode(value.waterFogColor()))
+                .put(SKY_COLOR_FIELD, RGBColorBinaryTagCodec.INSTANCE.encode(value.skyColor()))
+                .putFloat(BACKGROUND_MUSIC_VOLUME_FIELD, value.backgroundMusicVolume());
 
-        Color foliageColor = decoded.foliageColor();
+        RGBColor foliageColor = value.foliageColor();
         if (foliageColor != null) {
-            builder.put(FOLIAGE_COLOR_FIELD, ColorBinaryTagCodec.INSTANCE.encode(foliageColor));
+            builder.put(FOLIAGE_COLOR_FIELD, RGBColorBinaryTagCodec.INSTANCE.encode(foliageColor));
         }
 
-        Color dryFoliageColor = decoded.dryFoliageColor();
+        RGBColor dryFoliageColor = value.dryFoliageColor();
         if (dryFoliageColor != null) {
-            builder.put(DRY_FOLIAGE_COLOR_FIELD, ColorBinaryTagCodec.INSTANCE.encode(dryFoliageColor));
+            builder.put(DRY_FOLIAGE_COLOR_FIELD, RGBColorBinaryTagCodec.INSTANCE.encode(dryFoliageColor));
         }
 
-        Color grassColor = decoded.grassColor();
+        RGBColor grassColor = value.grassColor();
         if (grassColor != null) {
-            builder.put(GRASS_COLOR_FIELD, ColorBinaryTagCodec.INSTANCE.encode(decoded.grassColor()));
+            builder.put(GRASS_COLOR_FIELD, RGBColorBinaryTagCodec.INSTANCE.encode(value.grassColor()));
         }
 
-        GrassColorModifier grassColorModifier = decoded.grassColorModifier();
+        GrassColorModifier grassColorModifier = value.grassColorModifier();
         if (grassColorModifier != GrassColorModifier.NONE) {
             builder.put(GRASS_COLOR_MODIFIER_FIELD, GRASS_COLOR_MODIFIER_CODEC.encode(grassColorModifier));
         }
 
-        AmbientParticleSettings particle = decoded.ambientParticleSettings();
+        AmbientParticleSettings particle = value.ambientParticleSettings();
         if (particle != null) {
             builder.put(PARTICLE_SETTINGS_FIELD, AmbientParticleSettingsBinaryTagCodec.INSTANCE.encode(particle));
         }
 
-        Holder<SoundEvent> ambientLoopSoundEvent = decoded.ambientLoopSoundEvent();
+        Holder<SoundEvent> ambientLoopSoundEvent = value.ambientLoopSoundEvent();
         if (ambientLoopSoundEvent != null) {
             builder.put(AMBIENT_LOOP_SOUND_FIELD, SoundEventBinaryTagCodec.HOLDER_CODEC.encode(ambientLoopSoundEvent));
         }
 
-        AmbientMoodSettings moodSettings = decoded.ambientMoodSettings();
+        AmbientMoodSettings moodSettings = value.ambientMoodSettings();
         if (moodSettings != null) {
             builder.put(AMBIENT_MOOD_SETTINGS_FIELD, AmbientMoodSettingsBinaryTagCodec.INSTANCE.encode(moodSettings));
         }
 
-        AmbientAdditionsSettings additionsSettings = decoded.ambientAdditionsSettings();
+        AmbientAdditionsSettings additionsSettings = value.ambientAdditionsSettings();
         if (additionsSettings != null) {
             builder.put(
                     AMBIENT_ADDITIONS_SOUND_FIELD,
@@ -179,7 +180,7 @@ public final class SpecialEffectsBinaryTagCodec implements BinaryTagCodec<Specia
             );
         }
 
-        List<Weighted<Music>> backgroundMusic = decoded.backgroundMusic();
+        List<Weighted<Music>> backgroundMusic = value.backgroundMusic();
         if (backgroundMusic != null) {
             builder.put(BACKGROUND_MUSIC_FIELD, MUSIC_WEIGHTED_LIST_CODEC.encode(backgroundMusic));
         }

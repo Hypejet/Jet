@@ -2,6 +2,7 @@ package net.hypejet.jet.server.network.codec.game.world.coordinate;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.math.MathUtil;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -35,7 +36,7 @@ public final class BlockPositionNetworkCodec implements NetworkCodec<BlockPositi
     private BlockPositionNetworkCodec() {}
 
     @Override
-    public @NonNull BlockPosition read(@NonNull ByteBuf buf) {
+    public @NonNull BlockPosition read(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager) {
         long value = buf.readLong();
 
         int x = (int) (value >>> X_AND_Y_BITS);
@@ -46,7 +47,9 @@ public final class BlockPositionNetworkCodec implements NetworkCodec<BlockPositi
     }
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull BlockPosition object) {
+    public void write(@NonNull ByteBuf buf,
+                      @NonNull JetRegistryManager registryManager,
+                      @NonNull BlockPosition object) {
         long value = (long) (object.blockX() & X_OR_Z_MASK) << X_AND_Y_BITS;
         value |= object.blockY() & Y_MASK;
         value |= (long) (object.blockZ() & X_OR_Z_MASK) << Y_BITS;

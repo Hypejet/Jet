@@ -9,7 +9,7 @@ import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.IntBinaryTag;
 import net.kyori.adventure.nbt.LongBinaryTag;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.booleanValue;
 import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.optionalTag;
@@ -22,6 +22,7 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @see DimensionType
  * @see BinaryTagCodec
  */
+@NullMarked
 public final class DimensionTypeBinaryTagCodec implements BinaryTagCodec<DimensionType> {
 
     private static final String FIXED_TIME_FIELD = "fixed_time";
@@ -54,8 +55,8 @@ public final class DimensionTypeBinaryTagCodec implements BinaryTagCodec<Dimensi
     private DimensionTypeBinaryTagCodec() {}
 
     @Override
-    public @NotNull DimensionType decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof CompoundBinaryTag compound) {
+    public DimensionType decode(BinaryTag binaryTag) {
+        if (binaryTag instanceof CompoundBinaryTag compound) {
             LongBinaryTag fixedTimeTag = optionalTag(FIXED_TIME_FIELD, compound, BinaryTagTypes.LONG);
             IntBinaryTag cloudHeightTag = optionalTag(CLOUD_HEIGHT_FIELD, compound, BinaryTagTypes.INT);
             return new DimensionType(
@@ -89,22 +90,22 @@ public final class DimensionTypeBinaryTagCodec implements BinaryTagCodec<Dimensi
     }
 
     @Override
-    public @NotNull BinaryTag encode(@NotNull DimensionType decoded) throws Exception {
-        DimensionType.MonsterSettings monsterSettings = decoded.monsterSettings();
+    public BinaryTag encode(DimensionType value) {
+        DimensionType.MonsterSettings monsterSettings = value.monsterSettings();
         CompoundBinaryTag.Builder builder = CompoundBinaryTag.builder()
-                .putBoolean(HAS_SKYLIGHT_FIELD, decoded.hasSkyLight())
-                .putBoolean(HAS_CEILING_FIELD, decoded.hasCeiling())
-                .putBoolean(ULTRA_WARM_FIELD, decoded.ultraWarm())
-                .putBoolean(NATURAL_FIELD, decoded.natural())
-                .putDouble(COORDINATE_SCALE_FIELD, decoded.coordinateScale())
-                .putBoolean(BED_WORKS_FIELD, decoded.bedWorks())
-                .putBoolean(RESPAWN_ANCHOR_WORKS_FIELD, decoded.respawnAnchorWorks())
-                .putInt(MIN_Y_FIELD, decoded.minY())
-                .putInt(HEIGHT_FIELD, decoded.height())
-                .putInt(LOGICAL_HEIGHT_FIELD, decoded.logicalHeight())
-                .put(INFINIBURN_FIELD, KeyBinaryTagCodec.HASHED_INSTANCE.encode(decoded.infiniburn()))
-                .put(EFFECTS_FIELD, KeyBinaryTagCodec.INSTANCE.encode(decoded.effects()))
-                .putFloat(AMBIENT_LIGHT_FIELD, decoded.ambientLight())
+                .putBoolean(HAS_SKYLIGHT_FIELD, value.hasSkyLight())
+                .putBoolean(HAS_CEILING_FIELD, value.hasCeiling())
+                .putBoolean(ULTRA_WARM_FIELD, value.ultraWarm())
+                .putBoolean(NATURAL_FIELD, value.natural())
+                .putDouble(COORDINATE_SCALE_FIELD, value.coordinateScale())
+                .putBoolean(BED_WORKS_FIELD, value.bedWorks())
+                .putBoolean(RESPAWN_ANCHOR_WORKS_FIELD, value.respawnAnchorWorks())
+                .putInt(MIN_Y_FIELD, value.minY())
+                .putInt(HEIGHT_FIELD, value.height())
+                .putInt(LOGICAL_HEIGHT_FIELD, value.logicalHeight())
+                .put(INFINIBURN_FIELD, KeyBinaryTagCodec.HASHED_INSTANCE.encode(value.infiniburn()))
+                .put(EFFECTS_FIELD, KeyBinaryTagCodec.INSTANCE.encode(value.effects()))
+                .putFloat(AMBIENT_LIGHT_FIELD, value.ambientLight())
                 .putBoolean(PIGLIN_SAFE_FIELD, monsterSettings.piglinSafe())
                 .putBoolean(HAS_RAIDS_FIELD, monsterSettings.hasRaids())
                 .put(
@@ -113,12 +114,12 @@ public final class DimensionTypeBinaryTagCodec implements BinaryTagCodec<Dimensi
                 )
                 .putInt(SPAWN_BLOCK_LIGHT_LIMIT_FIELD, monsterSettings.spawnBlockLightLimit());
 
-        Long fixedTime = decoded.fixedTime();
+        Long fixedTime = value.fixedTime();
         if (fixedTime != null) {
             builder.putLong(FIXED_TIME_FIELD, fixedTime);
         }
 
-        Integer cloudHeight = decoded.cloudHeight();
+        Integer cloudHeight = value.cloudHeight();
         if (cloudHeight != null) {
             builder.putInt(CLOUD_HEIGHT_FIELD, cloudHeight);
         }

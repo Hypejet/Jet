@@ -5,7 +5,7 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import net.hypejet.jet.data.json.model.block.JsonBlockState;
+import net.hypejet.jet.data.json.model.block.state.JsonBlockState;
 import net.hypejet.jet.data.json.token.DataJsonTypes;
 import org.jspecify.annotations.NonNull;
 

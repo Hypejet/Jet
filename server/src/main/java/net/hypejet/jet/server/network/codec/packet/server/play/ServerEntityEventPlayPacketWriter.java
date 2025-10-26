@@ -2,6 +2,7 @@ package net.hypejet.jet.server.network.codec.packet.server.play;
 
 import java.util.Map;
 
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.jspecify.annotations.NonNull;
 
 import io.netty.buffer.ByteBuf;
@@ -93,8 +94,9 @@ public final class ServerEntityEventPlayPacketWriter implements NetworkWriter<Se
     private ServerEntityEventPlayPacketWriter() {};
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerEntityEventPlayPacket object) {
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerEntityEventPlayPacket object) {
         buf.writeInt(object.entityId());  
-        EVENT_CODEC.write(buf, object.event());
+        EVENT_CODEC.write(buf, registryManager, object.event());
     }
 }

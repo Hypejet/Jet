@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.component.ComponentNetworkWriter;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerDisconnectPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -15,7 +16,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see NetworkWriter
  */
 public final class ServerDisconnectPacketWriter implements NetworkWriter<ServerDisconnectPacket> {
-
     /**
      * An instance of the {@linkplain ServerDisconnectPacketWriter server disconnect packet writer}.
      *
@@ -26,7 +26,9 @@ public final class ServerDisconnectPacketWriter implements NetworkWriter<ServerD
     private ServerDisconnectPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerDisconnectPacket object) {
-        ComponentNetworkWriter.INSTANCE.write(buf, object.reason());
+    public void write(@NonNull ByteBuf buf,
+                      @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerDisconnectPacket object) {
+        ComponentNetworkWriter.INSTANCE.write(buf, registryManager, object.reason());
     }
 }

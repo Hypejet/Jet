@@ -283,4 +283,19 @@ public class JetEntity implements Entity, JetViewable {
                 this.velocity
         );
     }
+
+    /**
+     * Cast the specified {@linkplain Entity entity} to the {@linkplain JetEntity entity implementation}.
+     * Throws a detailed exception if the specified {@linkplain Entity entity} does not use the correct implementation.
+     *
+     * @param entity the entity to cast
+     * @return the entity cast to the implementation
+     * @throws IllegalArgumentException if the specified entity uses an invalid implementation
+     * @since 1.0
+     */
+    public static JetEntity cast(Entity entity) {
+        if (!(entity instanceof JetEntity castEntity))
+            throw new IllegalArgumentException("The specified entity is not a valid entity");
+        return castEntity;
+    }
 }

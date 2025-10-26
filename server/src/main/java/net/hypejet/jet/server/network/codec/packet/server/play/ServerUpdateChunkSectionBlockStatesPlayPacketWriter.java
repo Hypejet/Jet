@@ -7,6 +7,7 @@ import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetwo
 import net.hypejet.jet.server.network.codec.game.world.coordinate.chunk.section.ChunkSectionPositionNetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarLongNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerUpdateChunkSectionBlockStatesPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.math.MathUtil;
 import net.hypejet.jet.server.world.chunk.palette.type.ChunkPaletteType;
 import net.hypejet.jet.server.world.coordinate.chunk.palette.relative.ChunkPaletteRelativePosition;
@@ -38,9 +39,10 @@ public final class ServerUpdateChunkSectionBlockStatesPlayPacketWriter
     private ServerUpdateChunkSectionBlockStatesPlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerUpdateChunkSectionBlockStatesPlayPacket object) {
-        ChunkSectionPositionNetworkWriter.INSTANCE.write(buf, object.position());
-        UPDATES_WRITER.write(buf, object.updates().object2IntEntrySet());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerUpdateChunkSectionBlockStatesPlayPacket object) {
+        ChunkSectionPositionNetworkWriter.INSTANCE.write(buf, registryManager, object.position());
+        UPDATES_WRITER.write(buf, registryManager, object.updates().object2IntEntrySet());
     }
 
     /**
@@ -61,7 +63,8 @@ public final class ServerUpdateChunkSectionBlockStatesPlayPacketWriter
         private static final int POSITION_VALUE_BITS = MathUtil.bitCount(CHUNK_PALETTE_TYPE.axisLength() - 1);
 
         @Override
-        public void write(@NonNull ByteBuf buf, Object2IntMap.@NonNull Entry<ChunkPaletteRelativePosition> object) {
+        public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                          Object2IntMap.@NonNull Entry<ChunkPaletteRelativePosition> object) {
             ChunkPaletteRelativePosition position = object.getKey();
             if (position.paletteType() != CHUNK_PALETTE_TYPE) {
                 throw new IllegalArgumentException(
@@ -74,7 +77,7 @@ public final class ServerUpdateChunkSectionBlockStatesPlayPacketWriter
             packedValue |= (long) position.x() << POSITION_VALUE_BITS * 2;
             packedValue |= (long) object.getIntValue() << POSITION_VALUE_BITS * 3;
 
-            VarLongNetworkCodec.INSTANCE.write(buf, packedValue);
+            VarLongNetworkCodec.INSTANCE.write(buf, registryManager, packedValue);
         }
     }
 }

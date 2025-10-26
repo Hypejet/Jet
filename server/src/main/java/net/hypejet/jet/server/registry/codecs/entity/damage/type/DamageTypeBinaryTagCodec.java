@@ -11,7 +11,7 @@ import net.hypejet.jet.server.util.index.IndexUtil;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Map;
 
@@ -24,6 +24,7 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @see DamageType
  * @see BinaryTagCodec
  */
+@NullMarked
 public final class DamageTypeBinaryTagCodec implements BinaryTagCodec<DamageType> {
 
     private static final String MESSAGE_ID_FIELD = "message_id";
@@ -72,8 +73,8 @@ public final class DamageTypeBinaryTagCodec implements BinaryTagCodec<DamageType
     private DamageTypeBinaryTagCodec() {}
 
     @Override
-    public @NotNull DamageType decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof CompoundBinaryTag compound) {
+    public DamageType decode(BinaryTag binaryTag) {
+        if (binaryTag instanceof CompoundBinaryTag compound) {
             BinaryTag effectsTag = compound.get(EFFECTS_FIELD);
             BinaryTag deathMessageTypeTag = compound.get(DEATH_MESSAGE_TYPE_FIELD);
             return new DamageType(
@@ -95,18 +96,18 @@ public final class DamageTypeBinaryTagCodec implements BinaryTagCodec<DamageType
     }
 
     @Override
-    public @NotNull BinaryTag encode(@NotNull DamageType decoded) throws Exception {
+    public BinaryTag encode(DamageType value) {
         CompoundBinaryTag.Builder builder = CompoundBinaryTag.builder()
-                .putString(MESSAGE_ID_FIELD, decoded.messageId())
-                .put(SCALING_TYPE_FIELD, SCALING_TYPE_CODEC.encode(decoded.scalingType()))
-                .putFloat(EXHAUSTION_FIELD, decoded.exhaustion());
+                .putString(MESSAGE_ID_FIELD, value.messageId())
+                .put(SCALING_TYPE_FIELD, SCALING_TYPE_CODEC.encode(value.scalingType()))
+                .putFloat(EXHAUSTION_FIELD, value.exhaustion());
 
-        DamageEffects effects = decoded.effects();
+        DamageEffects effects = value.effects();
         if (effects != DamageEffects.HURT) {
             builder.put(EFFECTS_FIELD, DAMAGE_EFFECTS_CODEC.encode(effects));
         }
 
-        DeathMessageType deathMessageType = decoded.deathMessageType();
+        DeathMessageType deathMessageType = value.deathMessageType();
         if (deathMessageType != DeathMessageType.DEFAULT) {
             builder.put(DEATH_MESSAGE_TYPE_FIELD, DEATH_MESSAGE_TYPE_CODEC.encode(deathMessageType));
         }
