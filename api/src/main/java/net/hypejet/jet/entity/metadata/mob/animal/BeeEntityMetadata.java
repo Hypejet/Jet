@@ -34,7 +34,7 @@ public interface BeeEntityMetadata extends AgeableMobEntityMetadata {
      * @return {@code true} if the bee has stung, {@code false} otherwise
      * @since 1.0
      */
-    boolean stung();
+    boolean hasStung();
 
     /**
      * Gets whether the bee {@linkplain Entity entity} has nectar.
@@ -42,7 +42,7 @@ public interface BeeEntityMetadata extends AgeableMobEntityMetadata {
      * @return {@code true} if the bee has nectar, {@code false} otherwise
      * @since 1.0
      */
-    boolean nectar();
+    boolean hasNectar();
 
     /**
      * Gets the anger time of the bee {@linkplain Entity entity}.

@@ -41,12 +41,12 @@ public class JetBeeEntityMetadata extends JetAgeableMobEntityMetadata implements
     }
 
     @Override
-    public final boolean stung() {
+    public final boolean hasStung() {
         return this.value(BEE_FLAGS_INDEX, EntityMetadataValue.Byte.class).value() == FLAGS_STUNG;
     }
 
     @Override
-    public final boolean nectar() {
+    public final boolean hasNectar() {
         return this.value(BEE_FLAGS_INDEX, EntityMetadataValue.Byte.class).value() == FLAGS_NECTAR;
     }
 
