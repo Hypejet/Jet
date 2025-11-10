@@ -38,13 +38,13 @@ tasks {
         val generatorMainSourceSet = dataGeneratorProject.sourceSets.main.get()
 
         inputs.files(generatorMainSourceSet.allSource.srcDirs)
-        inputs.files(dataGeneratorProject.configurations.runtimeClasspath.get().resolvedConfiguration.files)
+        inputs.files(dataGeneratorProject.configurations.runtimeClasspath.get().resolve())
         outputs.dir(generatedJavaPath)
 
         dependsOn(dataGeneratorProject.tasks.build)
 
         doLast {
-            dataGeneratorProject.javaexec {
+            dataGeneratorProject.providers.javaexec {
                 classpath = generatorMainSourceSet.runtimeClasspath
                 mainClass = "net.hypejet.jet.data.generator.GeneratorMain"
                 args("--api=" + generatedJavaPath.asFile.absolutePath)
