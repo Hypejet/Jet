@@ -2,7 +2,6 @@ package net.hypejet.jet.server.entity;
 
 import net.hypejet.jet.data.json.model.entity.JsonEntityType;
 import net.hypejet.jet.entity.EntityType;
-import net.hypejet.jet.server.world.block.entity.JetBlockEntityType;
 import net.kyori.adventure.key.Key;
 import org.jspecify.annotations.NonNull;
 
@@ -18,7 +17,7 @@ import java.util.Set;
  */
 public record JetEntityType(@NonNull Set<Key> requiredFeatureFlags, int maxAirSupply) implements EntityType {
     /**
-     * Constructs the {@linkplain JetBlockEntityType block entity type}.
+     * Constructs the {@linkplain JetEntityType entity type implementation}.
      *
      * @param requiredFeatureFlags a set of feature flag keys that should be
      *                             required to enable the constructed entity type
@@ -38,5 +37,21 @@ public record JetEntityType(@NonNull Set<Key> requiredFeatureFlags, int maxAirSu
      */
     public static @NonNull JetEntityType convert(@NonNull JsonEntityType entityType) {
         return new JetEntityType(entityType.requiredFeatureFlags(), entityType.maxAirSupply());
+    }
+
+    /**
+     * Casts the specified {@linkplain EntityType entity type} to
+     * the {@linkplain JetEntityType entity type implementation}. Throws a detailed exception
+     * if the specified {@linkplain EntityType entity type} does not use the correct implementation.
+     *
+     * @param entityType the entity type to cast
+     * @return the entity type cast to the implementation
+     * @throws IllegalArgumentException if the specified entity type uses an invalid implementation
+     * @since 1.0
+     */
+    public static @NonNull JetEntityType cast(@NonNull EntityType entityType) {
+        if (!(entityType instanceof JetEntityType castEntityType))
+            throw new IllegalArgumentException("The specified entity type is not a valid entity type");
+        return castEntityType;
     }
 }

@@ -4,6 +4,7 @@ import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
 import net.hypejet.jet.entity.EntityType;
 import net.hypejet.jet.registry.holder.Holder;
+import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
 import org.jspecify.annotations.NullMarked;
 
@@ -23,11 +24,12 @@ public final class EntityMetadata {
     /**
      * Constructs the {@linkplain EntityMetadata entity metadata}.
      *
-     * @param entityType the type of entity that the entity metadata is being constructed for
+     * @param server the server of the entity that the entity metadata is being constructed for
+     * @param entityType the type of the entity that the entity metadata is being constructed for
      * @since 1.0
      */
-    public EntityMetadata(Holder.Reference<EntityType> entityType) {
-        this.values.putAll(EntityMetadataDefaults.defaultsFor(entityType));
+    public EntityMetadata(JetMinecraftServer server, Holder.Reference<EntityType> entityType) {
+        this.values.putAll(EntityMetadataDefaults.defaultsFor(server, entityType));
     }
 
     /**

@@ -33,6 +33,12 @@ public final class EntityDataComponentRegistry {
                     .putBitFlag(EntityDataComponent.INVISIBLE, 0, 5)
                     .putBitFlag(EntityDataComponent.GLOWING, 0, 6)
                     .putBitFlag(EntityDataComponent.GLIDING, 0, 7)
+                    // Other components that are used by all kind of entities
+                    .put(
+                            EntityDataComponent.AIR_SUPPLY, 1, EntityMetadataValue.Int.class,
+                            entityType -> true, EntityMetadataValue.Int::value,
+                            (value, metadataValue) -> new EntityMetadataValue.Int(value)
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}

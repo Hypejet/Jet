@@ -72,6 +72,14 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<Boolean> GLIDING = new EntityDataComponent<>("gliding");
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * remaining air supply of an {@linkplain Entity entity}.
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Integer> AIR_SUPPLY = new EntityDataComponent<>("air_supply");
+
     private final String name;
 
     private EntityDataComponent(String name) {

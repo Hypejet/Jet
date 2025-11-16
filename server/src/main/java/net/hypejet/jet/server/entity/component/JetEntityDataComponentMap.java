@@ -4,6 +4,7 @@ import net.hypejet.jet.entity.EntityType;
 import net.hypejet.jet.entity.component.EntityDataComponent;
 import net.hypejet.jet.entity.component.EntityDataComponentMap;
 import net.hypejet.jet.registry.holder.Holder;
+import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.metadata.EntityMetadata;
 import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
 import org.jspecify.annotations.NullMarked;
@@ -27,12 +28,13 @@ public final class JetEntityDataComponentMap implements EntityDataComponentMap {
     /**
      * Constructs the {@linkplain JetEntityDataComponentMap entity data component map implementation}.
      *
-     * @param entityType the entity type of entity that the entity data component map is being constructed for
+     * @param server the server of the entity that the entity data component map is being constructed for
+     * @param entityType the entity type of the entity that the entity data component map is being constructed for
      * @since 1.0
      */
-    public JetEntityDataComponentMap(Holder.Reference<EntityType> entityType) {
-        this.entityType = Objects.requireNonNull(entityType, "entity type");
-        this.entityMetadata = new EntityMetadata(entityType);
+    public JetEntityDataComponentMap(JetMinecraftServer server, Holder.Reference<EntityType> entityType) {
+        this.entityType = entityType;
+        this.entityMetadata = new EntityMetadata(server, entityType);
     }
 
     @Override
