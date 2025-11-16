@@ -13,7 +13,7 @@ public final class ByteUtil {
      * Gets whether the bit at the specified bit index of the specified {@code byte} value is set to {@code 1}.
      *
      * @param value the byte value
-     * @param bitIndex the bit index
+     * @param bitIndex the bit index, where {@code 0} is the least significant bit
      * @return {@code true} if the bit is set to {@code 1}, {@code false} otherwise
      * @since 1.0
      */
@@ -26,7 +26,7 @@ public final class ByteUtil {
      * value with bit at the specified index set to the specified value.
      *
      * @param value the byte value that should be copied
-     * @param bitIndex the index of the bit to set to the specified value
+     * @param bitIndex the index of the bit to set to the specified value, where {@code 0} is the least significant bit
      * @param setBit {@code true} if the bit at the specified index should be set to {@code 1},
      *               {@code false} if it should be set to {@code 0}
      * @return the copied byte value with the bit change acknowledged

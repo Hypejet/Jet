@@ -4,6 +4,7 @@ import net.hypejet.jet.entity.EntityType;
 import net.hypejet.jet.entity.component.EntityDataComponent;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
+import net.hypejet.jet.server.util.number.ByteUtil;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.HashMap;
@@ -24,6 +25,14 @@ public final class EntityDataComponentRegistry {
 
     private static final Map<EntityDataComponent<?>, EntityDataComponentRegistration<?, ?>> REGISTRATIONS =
             new RegistrationsBuilder()
+                    // Shared entity flags
+                    .putBitFlag(EntityDataComponent.ON_FIRE, 0, 0)
+                    .putBitFlag(EntityDataComponent.SNEAKING, 0, 1)
+                    .putBitFlag(EntityDataComponent.SPRINTING, 0, 3)
+                    .putBitFlag(EntityDataComponent.SWIMMING, 0, 4)
+                    .putBitFlag(EntityDataComponent.INVISIBLE, 0, 5)
+                    .putBitFlag(EntityDataComponent.GLOWING, 0, 6)
+                    .putBitFlag(EntityDataComponent.GLIDING, 0, 7)
                     .build();
 
     private EntityDataComponentRegistry() {}
@@ -94,6 +103,57 @@ public final class EntityDataComponentRegistry {
                     metadataValueToValueFunction, updatedMetadataValueFunction
             ));
             return this;
+        }
+
+        /**
+         * Registers the specified {@linkplain Boolean boolean} {@linkplain EntityDataComponent entity data component}.
+         *
+         * <p>Updating the specified component will update a single bit of
+         * a {@linkplain EntityMetadataValue.Byte byte entity metadata value} - {@code true} value
+         * sets a bit, {@code false} value unsets a bit.</p>
+         *
+         * @param component the entity data component to register
+         * @param metadataIndex entity metadata index where entity metadata values that are
+         *                      associated with the specified entity data component should be put at
+         * @param entityTypePredicate a predicate that should check whether entities with entity type provided during
+         *                            predicate testing should support the specified entity data component
+         * @param flagIndex the index of the bit that the entity data component should update,
+         *                  where {@code 0} is the least significant bit
+         * @return this builder
+         * @since 1.0
+         */
+        private RegistrationsBuilder putBitFlag(EntityDataComponent<Boolean> component, int metadataIndex,
+                                                Predicate<Holder.Reference<EntityType>> entityTypePredicate,
+                                                int flagIndex) {
+            return this.put(
+                    component, metadataIndex, EntityMetadataValue.Byte.class, entityTypePredicate,
+                    metadataValue -> ByteUtil.bitSet(metadataValue.value(), flagIndex),
+                    (value, metadataValue) ->
+                            new EntityMetadataValue.Byte(ByteUtil.withBit(metadataValue.value(), flagIndex, value))
+            );
+        }
+
+        /**
+         * Registers the specified {@linkplain Boolean boolean} {@linkplain EntityDataComponent entity data component}.
+         *
+         * <p>Updating the specified component will update a single bit of
+         * a {@linkplain EntityMetadataValue.Byte byte entity metadata value} - {@code true} value
+         * sets a bit, {@code false} value unsets a bit.</p>
+         *
+         * <p>The {@linkplain EntityDataComponent entity data component} is going
+         * to be supported by all {@linkplain EntityType entity types}.</p>
+         *
+         * @param component the entity data component to register
+         * @param metadataIndex entity metadata index where entity metadata values that are
+         *                      associated with the specified entity data component should be put at
+         * @param flagIndex the index of the bit that the entity data component should update,
+         *                  where {@code 0} is the least significant bit
+         * @return this builder
+         * @since 1.0
+         */
+        private RegistrationsBuilder putBitFlag(EntityDataComponent<Boolean> component,
+                                                int metadataIndex, int flagIndex) {
+            return this.putBitFlag(component, metadataIndex, entityType -> true, flagIndex);
         }
 
         /**

@@ -16,6 +16,62 @@ import java.util.Objects;
 @NullMarked
 public final class EntityDataComponent<V> {
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component} defining
+     * whether an {@linkplain Entity entity} plays a burning effect.
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> ON_FIRE = new EntityDataComponent<>("on_fire");
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} defining whether
+     * name tag of an {@linkplain Entity entity} is hidden due to sneaking.
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> SNEAKING = new EntityDataComponent<>("sneaking");
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} defining
+     * whether an {@linkplain Entity entity} plays sprinting particles.
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> SPRINTING = new EntityDataComponent<>("sprinting");
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * defining whether an {@linkplain Entity entity} is swimming.
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> SWIMMING = new EntityDataComponent<>("swimming");
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * defining whether an {@linkplain Entity entity} is invisible.
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> INVISIBLE = new EntityDataComponent<>("invisible");
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} defining
+     * whether an {@linkplain Entity entity} has a glowing effect.
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> GLOWING = new EntityDataComponent<>("glowing");
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * defining whether an {@linkplain Entity entity} is gliding.
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> GLIDING = new EntityDataComponent<>("gliding");
+
     private final String name;
 
     private EntityDataComponent(String name) {

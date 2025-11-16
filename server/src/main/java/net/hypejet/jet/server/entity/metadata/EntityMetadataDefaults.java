@@ -23,7 +23,9 @@ import java.util.function.Predicate;
 @NullMarked
 public final class EntityMetadataDefaults {
 
-    private static final Set<DefaultsEntry> ENTRIES = Set.of();
+    private static final Set<DefaultsEntry> ENTRIES = Set.of(
+            new DefaultsEntry(0, new EntityMetadataValue.Byte((byte) 0)) // Shared entity flags
+    );
 
     private EntityMetadataDefaults() {}
 
