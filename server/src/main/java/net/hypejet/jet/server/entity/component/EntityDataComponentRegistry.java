@@ -1,0 +1,110 @@
+package net.hypejet.jet.server.entity.component;
+
+import net.hypejet.jet.entity.EntityType;
+import net.hypejet.jet.entity.component.EntityDataComponent;
+import net.hypejet.jet.registry.holder.Holder;
+import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
+import org.jspecify.annotations.NullMarked;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
+/**
+ * A registry of {@linkplain EntityDataComponent entity data components}.
+ *
+ * @since 1.0
+ * @see EntityDataComponent
+ * @see EntityDataComponentRegistration
+ */
+@NullMarked
+public final class EntityDataComponentRegistry {
+
+    private static final Map<EntityDataComponent<?>, EntityDataComponentRegistration<?, ?>> REGISTRATIONS =
+            new RegistrationsBuilder()
+                    .build();
+
+    private EntityDataComponentRegistry() {}
+
+    /**
+     * Gets a registration data of the specified {@linkplain EntityDataComponent entity data component}.
+     *
+     * @param component the entity data component whose registration data should be returned
+     * @return the entity data component registration data
+     * @param <V> the value type of the entity data component whose registration data should be returned
+     * @throws IllegalArgumentException if the specified entity data component was not registered
+     * @since 1.0
+     */
+    public static <V> EntityDataComponentRegistration<V, ?> registration(EntityDataComponent<V> component) {
+        EntityDataComponentRegistration<?, ?> registration = REGISTRATIONS.get(component);
+        if (registration == null)
+            throw new IllegalArgumentException("Unregistered entity data component: " + component);
+        // noinspection unchecked ; the registration was safely created via the registrations builder
+        return (EntityDataComponentRegistration<V, ?>) registration;
+    }
+
+    /**
+     * A builder of a {@linkplain Map map} associating {@linkplain EntityDataComponent entity data components}
+     * with their {@linkplain EntityDataComponentRegistration registrations}.
+     *
+     * @since 1.0
+     * @see EntityDataComponent
+     * @see EntityDataComponentRegistration
+     * @see Map
+     */
+    private static final class RegistrationsBuilder {
+
+        private final Map<EntityDataComponent<?>, EntityDataComponentRegistration<?, ?>> registrations = new HashMap<>();
+
+        /**
+         * Associates the specified {@linkplain EntityDataComponent entity data component}
+         * with an {@linkplain EntityDataComponentRegistration entity data component registration}
+         * with the specified data.
+         *
+         * @param component the entity data component to be associated with the entity data component registration
+         * @param metadataIndex entity metadata index where entity metadata values that are
+         *                      associated with the specified entity data component should be put at
+         * @param metadataValueClass the class of entity metadata values that should be able
+         *                           to be associated with the specified entity data component
+         * @param entityTypePredicate a predicate that should check whether entities with entity type provided during
+         *                            predicate testing should support the specified entity data component
+         * @param metadataValueToValueFunction a function that should convert an entity metadata value to a value
+         *                                     supported by the specified entity data component
+         * @param updatedMetadataValueFunction a function that should provide a value that the current entity metadata
+         *                                     value should be replaced with when the value of the specified entity
+         *                                     data component gets updated, the function accepts the new entity data
+         *                                     component value and the current entity metadata value
+         * @return this builder
+         * @param <V> the type of values that the specified entity data component supports
+         * @param <MV> the type of entity metadata values that can contain
+         *             values of the specified entity data component
+         * @since 1.0
+         */
+        private <V, MV extends EntityMetadataValue> RegistrationsBuilder put(
+                EntityDataComponent<V> component,
+                int metadataIndex, Class<MV> metadataValueClass,
+                Predicate<Holder.Reference<EntityType>> entityTypePredicate,
+                Function<MV, V> metadataValueToValueFunction,
+                BiFunction<V, MV, MV> updatedMetadataValueFunction
+        ) {
+            this.registrations.put(component, new EntityDataComponentRegistration<>(
+                    metadataIndex, metadataValueClass, entityTypePredicate,
+                    metadataValueToValueFunction, updatedMetadataValueFunction
+            ));
+            return this;
+        }
+
+        /**
+         * Builds the {@linkplain EntityDataComponentRegistration entity data component registration}
+         * {@linkplain Map map}.
+         *
+         * @return the created map
+         * @since 1.0
+         */
+        private Map<EntityDataComponent<?>, EntityDataComponentRegistration<?, ?>> build() {
+            return Map.copyOf(this.registrations);
+        }
+    }
+}

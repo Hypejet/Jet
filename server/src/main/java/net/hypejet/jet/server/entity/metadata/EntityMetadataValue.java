@@ -35,10 +35,10 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
- * A value that is bound to a specific index of {@linkplain JetEntityMetadata entity metadata}.
+ * A single value of an {@linkplain EntityMetadata entity metadata}.
  * 
  * @since 1.0
- * @see JetEntityMetadata
+ * @see EntityMetadata
  */
 @NullMarked
 // TODO: Implement all possible values
