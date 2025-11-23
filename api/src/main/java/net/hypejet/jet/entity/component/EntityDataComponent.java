@@ -22,7 +22,7 @@ public final class EntityDataComponent<V> {
      *
      * @since 1.0
      */
-    public static final EntityDataComponent<Boolean> ON_FIRE = new EntityDataComponent<>("on_fire");
+    public static final EntityDataComponent<Boolean> ON_FIRE = new EntityDataComponent<>("on_fire", false);
 
     /**
      * An {@linkplain EntityDataComponent entity data component} defining whether
@@ -30,7 +30,7 @@ public final class EntityDataComponent<V> {
      *
      * @since 1.0
      */
-    public static final EntityDataComponent<Boolean> SNEAKING = new EntityDataComponent<>("sneaking");
+    public static final EntityDataComponent<Boolean> SNEAKING = new EntityDataComponent<>("sneaking", false);
 
     /**
      * An {@linkplain EntityDataComponent entity data component} defining
@@ -38,7 +38,7 @@ public final class EntityDataComponent<V> {
      *
      * @since 1.0
      */
-    public static final EntityDataComponent<Boolean> SPRINTING = new EntityDataComponent<>("sprinting");
+    public static final EntityDataComponent<Boolean> SPRINTING = new EntityDataComponent<>("sprinting", false);
 
     /**
      * An {@linkplain EntityDataComponent entity data component}
@@ -46,7 +46,7 @@ public final class EntityDataComponent<V> {
      *
      * @since 1.0
      */
-    public static final EntityDataComponent<Boolean> SWIMMING = new EntityDataComponent<>("swimming");
+    public static final EntityDataComponent<Boolean> SWIMMING = new EntityDataComponent<>("swimming", false);
 
     /**
      * An {@linkplain EntityDataComponent entity data component}
@@ -54,7 +54,7 @@ public final class EntityDataComponent<V> {
      *
      * @since 1.0
      */
-    public static final EntityDataComponent<Boolean> INVISIBLE = new EntityDataComponent<>("invisible");
+    public static final EntityDataComponent<Boolean> INVISIBLE = new EntityDataComponent<>("invisible", false);
 
     /**
      * An {@linkplain EntityDataComponent entity data component} defining
@@ -62,7 +62,7 @@ public final class EntityDataComponent<V> {
      *
      * @since 1.0
      */
-    public static final EntityDataComponent<Boolean> GLOWING = new EntityDataComponent<>("glowing");
+    public static final EntityDataComponent<Boolean> GLOWING = new EntityDataComponent<>("glowing", false);
 
     /**
      * An {@linkplain EntityDataComponent entity data component}
@@ -70,7 +70,7 @@ public final class EntityDataComponent<V> {
      *
      * @since 1.0
      */
-    public static final EntityDataComponent<Boolean> GLIDING = new EntityDataComponent<>("gliding");
+    public static final EntityDataComponent<Boolean> GLIDING = new EntityDataComponent<>("gliding", false);
 
     /**
      * An {@linkplain EntityDataComponent entity data component} representing
@@ -78,12 +78,34 @@ public final class EntityDataComponent<V> {
      *
      * @since 1.0
      */
-    public static final EntityDataComponent<Integer> AIR_SUPPLY = new EntityDataComponent<>("air_supply");
+    public static final EntityDataComponent<Integer> AIR_SUPPLY = new EntityDataComponent<>("air_supply", false);
 
     private final String name;
+    private final boolean nullable;
 
-    private EntityDataComponent(String name) {
+    private EntityDataComponent(String name, boolean nullable) {
         this.name = Objects.requireNonNull(name, "name");
+        this.nullable = nullable;
+    }
+
+    /**
+     * Gets a display name of this {@linkplain EntityDataComponent entity data component}.
+     *
+     * @return the component display name
+     * @since 1.0
+     */
+    public String name() {
+        return this.name;
+    }
+
+    /**
+     * Gets whether this {@linkplain EntityDataComponent entity data component} allows {@code null} values.
+     *
+     * @return {@code true} if this component allows {@code null} values, {@code false} otherwise
+     * @since 1.0
+     */
+    public boolean nullable() {
+        return this.nullable;
     }
 
     @Override

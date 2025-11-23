@@ -9,8 +9,7 @@ import org.jspecify.annotations.NullMarked;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.function.Function;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
@@ -37,7 +36,7 @@ public final class EntityDataComponentRegistry {
                     .put(
                             EntityDataComponent.AIR_SUPPLY, 1, EntityMetadataValue.Int.class,
                             entityType -> true, EntityMetadataValue.Int::value,
-                            (value, metadataValue) -> new EntityMetadataValue.Int(value)
+                            (currentMetadataValue, value) -> new EntityMetadataValue.Int(Objects.requireNonNull(value))
                     )
                     .build();
 
@@ -85,12 +84,12 @@ public final class EntityDataComponentRegistry {
          *                           to be associated with the specified entity data component
          * @param entityTypePredicate a predicate that should check whether entities with entity type provided during
          *                            predicate testing should support the specified entity data component
-         * @param metadataValueToValueFunction a function that should convert an entity metadata value to a value
-         *                                     supported by the specified entity data component
-         * @param updatedMetadataValueFunction a function that should provide a value that the current entity metadata
-         *                                     value should be replaced with when the value of the specified entity
-         *                                     data component gets updated, the function accepts the new entity data
-         *                                     component value and the current entity metadata value
+         * @param componentValueDecoder a function that should convert entity metadata values
+         *                              to values supported by the specified entity data component
+         * @param componentValueEncoder a function that should provide a value that the current entity metadata value
+         *                              should be replaced with when the value of the specified entity data component
+         *                              gets updated, the function accepts the new entity data component value
+         *                              and the current entity metadata value
          * @return this builder
          * @param <V> the type of values that the specified entity data component supports
          * @param <MV> the type of entity metadata values that can contain
@@ -101,12 +100,12 @@ public final class EntityDataComponentRegistry {
                 EntityDataComponent<V> component,
                 int metadataIndex, Class<MV> metadataValueClass,
                 Predicate<Holder.Reference<EntityType>> entityTypePredicate,
-                Function<MV, V> metadataValueToValueFunction,
-                BiFunction<V, MV, MV> updatedMetadataValueFunction
+                ComponentValueDecoder<MV, V> componentValueDecoder,
+                ComponentValueEncoder<MV, V> componentValueEncoder
         ) {
             this.registrations.put(component, new EntityDataComponentRegistration<>(
                     metadataIndex, metadataValueClass, entityTypePredicate,
-                    metadataValueToValueFunction, updatedMetadataValueFunction
+                    componentValueDecoder, componentValueEncoder
             ));
             return this;
         }
@@ -118,7 +117,7 @@ public final class EntityDataComponentRegistry {
          * a {@linkplain EntityMetadataValue.Byte byte entity metadata value} - {@code true} value
          * sets a bit, {@code false} value unsets a bit.</p>
          *
-         * @param component the entity data component to register
+         * @param component the entity data component to register, must not be nullable
          * @param metadataIndex entity metadata index where entity metadata values that are
          *                      associated with the specified entity data component should be put at
          * @param entityTypePredicate a predicate that should check whether entities with entity type provided during
@@ -126,16 +125,22 @@ public final class EntityDataComponentRegistry {
          * @param flagIndex the index of the bit that the entity data component should update,
          *                  where {@code 0} is the least significant bit
          * @return this builder
+         * @throws IllegalArgumentException if the specified entity data component is nullable
          * @since 1.0
          */
         private RegistrationsBuilder putBitFlag(EntityDataComponent<Boolean> component, int metadataIndex,
                                                 Predicate<Holder.Reference<EntityType>> entityTypePredicate,
                                                 int flagIndex) {
+            if (component.nullable())
+                throw new IllegalArgumentException("Nullable components cannot be registered as bit flag components");
+
             return this.put(
                     component, metadataIndex, EntityMetadataValue.Byte.class, entityTypePredicate,
                     metadataValue -> ByteUtil.bitSet(metadataValue.value(), flagIndex),
-                    (value, metadataValue) ->
-                            new EntityMetadataValue.Byte(ByteUtil.withBit(metadataValue.value(), flagIndex, value))
+                    (metadataValue, value) -> new EntityMetadataValue.Byte(ByteUtil.withBit(
+                            metadataValue.value(), flagIndex,
+                            Objects.requireNonNull(value)
+                    ))
             );
         }
 

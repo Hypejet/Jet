@@ -8,6 +8,7 @@ import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.metadata.EntityMetadata;
 import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -38,20 +39,38 @@ public final class JetEntityDataComponentMap implements EntityDataComponentMap {
     }
 
     @Override
-    public <V> V value(EntityDataComponent<V> component) {
+    public <V> @Nullable V value(EntityDataComponent<V> component) {
         Objects.requireNonNull(component, "component");
-        return this.value(ensureSupported(this.entityType, component));
+
+        V value = this.value(ensureSupported(this.entityType, component));
+        if (value == null && !component.nullable()) {
+            throw new IllegalStateException(String.format(
+                    "Registration for entity data component \"%s\" returned null while the component is not nullable",
+                    component.name()
+            ));
+        }
+
+        return value;
     }
 
     @Override
-    public <V> void value(EntityDataComponent<V> component, V value) {
+    public <V> void value(EntityDataComponent<V> component, @Nullable V value) {
         Objects.requireNonNull(component, "component");
-        Objects.requireNonNull(value, "value");
+
+        if (value == null && !component.nullable()) {
+            throw new IllegalArgumentException(String.format(
+                    "The specified value is null, but the specified entity data component \"%s\" is not nullable",
+                    component.name()
+            ));
+        }
+
         this.value(ensureSupported(this.entityType, component), value);
     }
 
-    private <V, MV extends EntityMetadataValue> V value(EntityDataComponentRegistration<V, MV> componentRegistration) {
-        return componentRegistration.metadataValueToValueFunction().apply(this.entityMetadata.value(
+    private <V, MV extends EntityMetadataValue> @Nullable V value(
+            EntityDataComponentRegistration<V, MV> componentRegistration
+    ) {
+        return componentRegistration.componentValueDecoder().decode(this.entityMetadata.value(
                 componentRegistration.metadataIndex(),
                 componentRegistration.metadataValueClass()
         ));
@@ -59,12 +78,12 @@ public final class JetEntityDataComponentMap implements EntityDataComponentMap {
 
     private <V, MV extends EntityMetadataValue> void value(
             EntityDataComponentRegistration<V, MV> componentRegistration,
-            V value
+            @Nullable V value
     ) {
         this.entityMetadata.value(
                 componentRegistration.metadataIndex(),
                 componentRegistration.metadataValueClass(),
-                metadataValue -> componentRegistration.updatedMetadataValueFunction().apply(value, metadataValue)
+                metadataValue -> componentRegistration.componentValueEncoder().encode(metadataValue, value)
         );
     }
 
