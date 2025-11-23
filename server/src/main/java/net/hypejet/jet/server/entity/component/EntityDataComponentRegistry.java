@@ -33,11 +33,21 @@ public final class EntityDataComponentRegistry {
                     .putBitFlag(EntityDataComponent.GLOWING, 0, 6)
                     .putBitFlag(EntityDataComponent.GLIDING, 0, 7)
                     // Other components that are used by all kind of entities
+                    .putInt(EntityDataComponent.AIR_SUPPLY, 1, entityType -> true)
                     .put(
-                            EntityDataComponent.AIR_SUPPLY, 1, EntityMetadataValue.Int.class,
-                            entityType -> true, EntityMetadataValue.Int::value,
-                            (currentMetadataValue, value) -> new EntityMetadataValue.Int(Objects.requireNonNull(value))
+                            EntityDataComponent.CUSTOM_NAME, 2, EntityMetadataValue.OptionalComponentValue.class,
+                            entityType -> true, EntityMetadataValue.OptionalComponentValue::value,
+                            (ignored, value) -> new EntityMetadataValue.OptionalComponentValue(value)
                     )
+                    .putBoolean(EntityDataComponent.CUSTOM_NAME_VISIBLE, 3, entityType -> true)
+                    .putBoolean(EntityDataComponent.SILENT, 4, entityType -> true)
+                    .putBoolean(EntityDataComponent.NO_GRAVITY, 5, entityType -> true)
+                    .put(
+                            EntityDataComponent.POSE, 6, EntityMetadataValue.PoseValue.class,
+                            entityType -> true, EntityMetadataValue.PoseValue::value,
+                            (ignored, value) -> new EntityMetadataValue.PoseValue(Objects.requireNonNull(value))
+                    )
+                    .putInt(EntityDataComponent.TICKS_FROZEN, 7, entityType -> true)
                     .build();
 
     private EntityDataComponentRegistry() {}
@@ -108,6 +118,60 @@ public final class EntityDataComponentRegistry {
                     componentValueDecoder, componentValueEncoder
             ));
             return this;
+        }
+
+        /**
+         * Registers the specified {@linkplain Boolean boolean} {@linkplain EntityDataComponent entity data component}.
+         *
+         * <p>The component is going to be backed by
+         * a {@linkplain EntityMetadataValue.Boolean boolean entity metadata value}.</p>
+         *
+         * @param component the entity data component to register, must not be nullable
+         * @param metadataIndex entity metadata index where entity metadata values that are
+         *                      associated with the specified entity data component should be put at
+         * @param entityTypePredicate a predicate that should check whether entities with entity type provided during
+         *                            predicate testing should support the specified entity data component
+         * @return this builder
+         * @throws IllegalArgumentException if the specified entity data component is nullable
+         * @since 1.0
+         */
+        private RegistrationsBuilder putBoolean(EntityDataComponent<Boolean> component, int metadataIndex,
+                                                Predicate<Holder.Reference<EntityType>> entityTypePredicate) {
+            if (component.nullable())
+                throw new IllegalArgumentException("The entity data component must not be nullable");
+
+            return this.put(
+                    component, metadataIndex, EntityMetadataValue.Boolean.class,
+                    entityTypePredicate, EntityMetadataValue.Boolean::value,
+                    (ignored, value) -> new EntityMetadataValue.Boolean(Objects.requireNonNull(value))
+            );
+        }
+
+        /**
+         * Registers the specified {@linkplain Integer integer} {@linkplain EntityDataComponent entity data component}.
+         *
+         * <p>The component is going to be backed by
+         * an {@linkplain EntityMetadataValue.Int int entity metadata value}.</p>
+         *
+         * @param component the entity data component to register, must not be nullable
+         * @param metadataIndex entity metadata index where entity metadata values that are
+         *                      associated with the specified entity data component should be put at
+         * @param entityTypePredicate a predicate that should check whether entities with entity type provided during
+         *                            predicate testing should support the specified entity data component
+         * @return this builder
+         * @throws IllegalArgumentException if the specified entity data component is nullable
+         * @since 1.0
+         */
+        private RegistrationsBuilder putInt(EntityDataComponent<Integer> component, int metadataIndex,
+                                            Predicate<Holder.Reference<EntityType>> entityTypePredicate) {
+            if (component.nullable())
+                throw new IllegalArgumentException("The entity data component must not be nullable");
+
+            return this.put(
+                    component, metadataIndex, EntityMetadataValue.Int.class,
+                    entityTypePredicate, EntityMetadataValue.Int::value,
+                    (ignored, value) -> new EntityMetadataValue.Int(Objects.requireNonNull(value))
+            );
         }
 
         /**

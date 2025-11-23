@@ -1,6 +1,8 @@
 package net.hypejet.jet.entity.component;
 
 import net.hypejet.jet.entity.Entity;
+import net.hypejet.jet.entity.pose.Pose;
+import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
@@ -79,6 +81,57 @@ public final class EntityDataComponent<V> {
      * @since 1.0
      */
     public static final EntityDataComponent<Integer> AIR_SUPPLY = new EntityDataComponent<>("air_supply", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing a custom name of an {@linkplain Entity entity}.
+     *
+     * <p>This component is nullable and {@code null} values mean that an entity does not have a custom name.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Component> CUSTOM_NAME = new EntityDataComponent<>("custom_name", true);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} defining whether
+     * custom name of an {@linkplain Entity entity} should be visible.
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> CUSTOM_NAME_VISIBLE = new EntityDataComponent<>("custom_name_visible", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} defining whether
+     * an {@linkplain Entity entity} is silent, meaning that it does not play any sounds.
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> SILENT = new EntityDataComponent<>("silent", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} defining whether
+     * gravity is <strong>not</strong> applied to an {@linkplain Entity entity}.
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> NO_GRAVITY = new EntityDataComponent<>("no_gravity", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * a {@linkplain Pose pose} of an {@linkplain Entity entity}.
+     *
+     * @since 1.0
+     * @see Pose
+     */
+    public static final EntityDataComponent<Pose> POSE = new EntityDataComponent<>("pose", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * a number of ticks for which an {@linkplain Entity entity} is frozen.
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Integer> TICKS_FROZEN = new EntityDataComponent<>("ticks_frozen", false);
 
     private final String name;
     private final boolean nullable;

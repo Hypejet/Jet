@@ -3,6 +3,7 @@ package net.hypejet.jet.server.entity.metadata;
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
 import net.hypejet.jet.entity.EntityType;
+import net.hypejet.jet.entity.pose.Pose;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.server.JetMinecraftServer;
@@ -31,7 +32,13 @@ public final class EntityMetadataDefaults {
                     JetEntityType.cast(
                             entityType.valueOrThrow(server.registryManager().registry(RegistryReference.ENTITY_TYPE))
                     ).maxAirSupply()
-            )) // Air supply
+            )), // Air supply
+            new DefaultsEntry(2, new EntityMetadataValue.OptionalComponentValue(null)), // Custom name
+            new DefaultsEntry(3, new EntityMetadataValue.Boolean(false)), // Custom name visible
+            new DefaultsEntry(4, new EntityMetadataValue.Boolean(false)), // Silent
+            new DefaultsEntry(5, new EntityMetadataValue.Boolean(false)), // No gravity
+            new DefaultsEntry(6, new EntityMetadataValue.PoseValue(Pose.STANDING)), // Pose
+            new DefaultsEntry(7, new EntityMetadataValue.Int(0)) // Ticks frozen
     );
 
     private EntityMetadataDefaults() {}
