@@ -25,6 +25,7 @@ final class EntityTypeTypeAdapter extends TypeAdapter<JsonEntityType> {
 
     private static final String REQUIRED_FEATURE_FLAGS_FIELD = "required_features";
     private static final String MAX_AIR_SUPPLY_FIELD = "max_air_supply";
+    private static final String LIVING_FIELD = "living";
 
     private static final int DEFAULT_MAX_AIR_SUPPLY = 300;
 
@@ -53,6 +54,11 @@ final class EntityTypeTypeAdapter extends TypeAdapter<JsonEntityType> {
             out.value(value.maxAirSupply());
         }
 
+        if (value.living()) {
+            out.name(LIVING_FIELD);
+            out.value(true);
+        }
+
         out.endObject();
     }
 
@@ -62,12 +68,15 @@ final class EntityTypeTypeAdapter extends TypeAdapter<JsonEntityType> {
 
         Set<Key> requiredFeatureFlags = null;
         int maxAirSupply = DEFAULT_MAX_AIR_SUPPLY;
+        boolean living = false;
 
         while (in.peek() == JsonToken.NAME) {
             switch (in.nextName()) {
                 case REQUIRED_FEATURE_FLAGS_FIELD ->
                         requiredFeatureFlags = this.gson.fromJson(in, DataJsonTypes.KEY_SET);
                 case MAX_AIR_SUPPLY_FIELD -> maxAirSupply = in.nextInt();
+                case LIVING_FIELD -> living = in.nextBoolean();
+                default -> in.skipValue();
             }
         }
 
@@ -76,7 +85,7 @@ final class EntityTypeTypeAdapter extends TypeAdapter<JsonEntityType> {
         if (requiredFeatureFlags == null) {
             throw new IllegalArgumentException("The required feature flags have not been specified");
         } else {
-            return new JsonEntityType(requiredFeatureFlags, maxAirSupply);
+            return new JsonEntityType(requiredFeatureFlags, maxAirSupply, living);
         }
     }
 }

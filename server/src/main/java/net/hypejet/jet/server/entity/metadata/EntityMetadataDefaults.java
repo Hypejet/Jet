@@ -9,11 +9,11 @@ import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.JetEntityType;
+import net.hypejet.jet.server.util.game.entity.EntityTypePredicate;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Predicate;
 
 /**
  * Something providing default {@linkplain EntityMetadataValue entity metadata values}
@@ -57,7 +57,7 @@ public final class EntityMetadataDefaults {
                                                                 Holder.Reference<EntityType> entityType) {
         IntObjectMap<EntityMetadataValue> defaultValues = new IntObjectHashMap<>();
         for (DefaultsEntry entry : ENTRIES) {
-            if (!entry.entityTypePredicate().test(entityType)) continue;
+            if (!EntityTypePredicate.test(entry.entityTypePredicate(), entityType, server)) continue;
             defaultValues.put(entry.index(), entry.defaultValueProvider().provide(server, entityType));
         }
         return defaultValues;
@@ -78,7 +78,7 @@ public final class EntityMetadataDefaults {
      * @see JetEntity
      */
     private record DefaultsEntry(int index, DefaultValueProvider defaultValueProvider,
-                                 Predicate<Holder.Reference<EntityType>> entityTypePredicate) {
+                                 EntityTypePredicate entityTypePredicate) {
         /**
          * Constructs the {@linkplain DefaultsEntry defaults entry} that is going
          * to be used by all kind of {@linkplain JetEntity entities}.
@@ -103,7 +103,7 @@ public final class EntityMetadataDefaults {
          * @since 1.0
          */
         private DefaultsEntry(int index, EntityMetadataValue defaultValue,
-                              Predicate<Holder.Reference<EntityType>> entityTypePredicate) {
+                              EntityTypePredicate entityTypePredicate) {
             // TODO: JDK 25 pre-"this" nullability check
             this(index, (server, entityType) -> defaultValue, entityTypePredicate);
         }
@@ -117,7 +117,7 @@ public final class EntityMetadataDefaults {
          * @since 1.0
          */
         private DefaultsEntry(int index, DefaultValueProvider defaultValueProvider) {
-            this(index, defaultValueProvider, entityType -> true);
+            this(index, defaultValueProvider, EntityTypePredicate.TRUE);
         }
 
         /**

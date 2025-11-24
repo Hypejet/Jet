@@ -5,6 +5,7 @@ import net.hypejet.jet.data.json.model.entity.JsonEntityType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.level.GameType;
@@ -48,7 +49,8 @@ public final class EntityTypeAdapter {
 
         return new JsonEntityType(
                 KeyAdapter.convertSet(FeatureFlags.REGISTRY.toNames(type.requiredFeatures())),
-                entity.getMaxAirSupply()
+                entity.getMaxAirSupply(),
+                entity instanceof LivingEntity
         );
     }
 

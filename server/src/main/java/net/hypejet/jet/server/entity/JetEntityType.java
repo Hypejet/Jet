@@ -13,15 +13,18 @@ import java.util.Set;
  *
  * @param requiredFeatureFlags a set of feature flag keys required to enable this entity type
  * @param maxAirSupply a maximum air supply that entities of this type have
+ * @param living whether this is a type of living entity
  * @since 1.0
  */
-public record JetEntityType(@NonNull Set<Key> requiredFeatureFlags, int maxAirSupply) implements EntityType {
+public record JetEntityType(@NonNull Set<Key> requiredFeatureFlags, int maxAirSupply, boolean living)
+        implements EntityType {
     /**
      * Constructs the {@linkplain JetEntityType entity type implementation}.
      *
      * @param requiredFeatureFlags a set of feature flag keys that should be
      *                             required to enable the constructed entity type
      * @param maxAirSupply a maximum air supply that entities of the constructed entity type should have
+     * @param living whether the entity type should be a type of living entity
      * @since 1.0
      */
     public JetEntityType {
@@ -36,7 +39,7 @@ public record JetEntityType(@NonNull Set<Key> requiredFeatureFlags, int maxAirSu
      * @since 1.0
      */
     public static @NonNull JetEntityType convert(@NonNull JsonEntityType entityType) {
-        return new JetEntityType(entityType.requiredFeatureFlags(), entityType.maxAirSupply());
+        return new JetEntityType(entityType.requiredFeatureFlags(), entityType.maxAirSupply(), entityType.living());
     }
 
     /**

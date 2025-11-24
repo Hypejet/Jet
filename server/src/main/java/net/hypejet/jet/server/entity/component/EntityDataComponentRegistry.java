@@ -2,15 +2,14 @@ package net.hypejet.jet.server.entity.component;
 
 import net.hypejet.jet.entity.EntityType;
 import net.hypejet.jet.entity.component.EntityDataComponent;
-import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
+import net.hypejet.jet.server.util.game.entity.EntityTypePredicate;
 import net.hypejet.jet.server.util.number.ByteUtil;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Predicate;
 
 /**
  * A registry of {@linkplain EntityDataComponent entity data components}.
@@ -33,21 +32,21 @@ public final class EntityDataComponentRegistry {
                     .putBitFlag(EntityDataComponent.GLOWING, 0, 6)
                     .putBitFlag(EntityDataComponent.GLIDING, 0, 7)
                     // Other components that are used by all kind of entities
-                    .putInt(EntityDataComponent.AIR_SUPPLY, 1, entityType -> true)
+                    .putInt(EntityDataComponent.AIR_SUPPLY, 1, EntityTypePredicate.TRUE)
                     .put(
                             EntityDataComponent.CUSTOM_NAME, 2, EntityMetadataValue.OptionalComponentValue.class,
-                            entityType -> true, EntityMetadataValue.OptionalComponentValue::value,
+                            EntityTypePredicate.TRUE, EntityMetadataValue.OptionalComponentValue::value,
                             (ignored, value) -> new EntityMetadataValue.OptionalComponentValue(value)
                     )
-                    .putBoolean(EntityDataComponent.CUSTOM_NAME_VISIBLE, 3, entityType -> true)
-                    .putBoolean(EntityDataComponent.SILENT, 4, entityType -> true)
-                    .putBoolean(EntityDataComponent.NO_GRAVITY, 5, entityType -> true)
+                    .putBoolean(EntityDataComponent.CUSTOM_NAME_VISIBLE, 3, EntityTypePredicate.TRUE)
+                    .putBoolean(EntityDataComponent.SILENT, 4, EntityTypePredicate.TRUE)
+                    .putBoolean(EntityDataComponent.NO_GRAVITY, 5, EntityTypePredicate.TRUE)
                     .put(
                             EntityDataComponent.POSE, 6, EntityMetadataValue.PoseValue.class,
-                            entityType -> true, EntityMetadataValue.PoseValue::value,
+                            EntityTypePredicate.TRUE, EntityMetadataValue.PoseValue::value,
                             (ignored, value) -> new EntityMetadataValue.PoseValue(Objects.requireNonNull(value))
                     )
-                    .putInt(EntityDataComponent.TICKS_FROZEN, 7, entityType -> true)
+                    .putInt(EntityDataComponent.TICKS_FROZEN, 7, EntityTypePredicate.TRUE)
                     .build();
 
     private EntityDataComponentRegistry() {}
@@ -109,7 +108,7 @@ public final class EntityDataComponentRegistry {
         private <V, MV extends EntityMetadataValue> RegistrationsBuilder put(
                 EntityDataComponent<V> component,
                 int metadataIndex, Class<MV> metadataValueClass,
-                Predicate<Holder.Reference<EntityType>> entityTypePredicate,
+                EntityTypePredicate entityTypePredicate,
                 ComponentValueDecoder<MV, V> componentValueDecoder,
                 ComponentValueEncoder<MV, V> componentValueEncoder
         ) {
@@ -136,7 +135,7 @@ public final class EntityDataComponentRegistry {
          * @since 1.0
          */
         private RegistrationsBuilder putBoolean(EntityDataComponent<Boolean> component, int metadataIndex,
-                                                Predicate<Holder.Reference<EntityType>> entityTypePredicate) {
+                                                EntityTypePredicate entityTypePredicate) {
             if (component.nullable())
                 throw new IllegalArgumentException("The entity data component must not be nullable");
 
@@ -163,7 +162,7 @@ public final class EntityDataComponentRegistry {
          * @since 1.0
          */
         private RegistrationsBuilder putInt(EntityDataComponent<Integer> component, int metadataIndex,
-                                            Predicate<Holder.Reference<EntityType>> entityTypePredicate) {
+                                            EntityTypePredicate entityTypePredicate) {
             if (component.nullable())
                 throw new IllegalArgumentException("The entity data component must not be nullable");
 
@@ -184,17 +183,16 @@ public final class EntityDataComponentRegistry {
          * @param component the entity data component to register, must not be nullable
          * @param metadataIndex entity metadata index where entity metadata values that are
          *                      associated with the specified entity data component should be put at
-         * @param entityTypePredicate a predicate that should check whether entities with entity type provided during
-         *                            predicate testing should support the specified entity data component
          * @param flagIndex the index of the bit that the entity data component should update,
          *                  where {@code 0} is the least significant bit
+         * @param entityTypePredicate a predicate that should check whether entities with entity type provided during
+         *                            predicate testing should support the specified entity data component
          * @return this builder
          * @throws IllegalArgumentException if the specified entity data component is nullable
          * @since 1.0
          */
         private RegistrationsBuilder putBitFlag(EntityDataComponent<Boolean> component, int metadataIndex,
-                                                Predicate<Holder.Reference<EntityType>> entityTypePredicate,
-                                                int flagIndex) {
+                                                int flagIndex, EntityTypePredicate entityTypePredicate) {
             if (component.nullable())
                 throw new IllegalArgumentException("Nullable components cannot be registered as bit flag components");
 
@@ -228,7 +226,7 @@ public final class EntityDataComponentRegistry {
          */
         private RegistrationsBuilder putBitFlag(EntityDataComponent<Boolean> component,
                                                 int metadataIndex, int flagIndex) {
-            return this.putBitFlag(component, metadataIndex, entityType -> true, flagIndex);
+            return this.putBitFlag(component, metadataIndex, flagIndex, EntityTypePredicate.TRUE);
         }
 
         /**

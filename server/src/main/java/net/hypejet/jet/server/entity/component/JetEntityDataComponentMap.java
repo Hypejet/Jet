@@ -7,6 +7,7 @@ import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.metadata.EntityMetadata;
 import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
+import net.hypejet.jet.server.util.game.entity.EntityTypePredicate;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -24,6 +25,7 @@ import java.util.Objects;
 public final class JetEntityDataComponentMap implements EntityDataComponentMap {
 
     private final Holder.Reference<EntityType> entityType;
+    private final JetMinecraftServer server;
     private final EntityMetadata entityMetadata;
 
     /**
@@ -35,6 +37,7 @@ public final class JetEntityDataComponentMap implements EntityDataComponentMap {
      */
     public JetEntityDataComponentMap(JetMinecraftServer server, Holder.Reference<EntityType> entityType) {
         this.entityType = entityType;
+        this.server = server;
         this.entityMetadata = new EntityMetadata(server, entityType);
     }
 
@@ -42,7 +45,7 @@ public final class JetEntityDataComponentMap implements EntityDataComponentMap {
     public <V> @Nullable V value(EntityDataComponent<V> component) {
         Objects.requireNonNull(component, "component");
 
-        V value = this.value(ensureSupported(this.entityType, component));
+        V value = this.value(this.ensureSupported(component));
         if (value == null && !component.nullable()) {
             throw new IllegalStateException(String.format(
                     "Registration for entity data component \"%s\" returned null while the component is not nullable",
@@ -64,7 +67,7 @@ public final class JetEntityDataComponentMap implements EntityDataComponentMap {
             ));
         }
 
-        this.value(ensureSupported(this.entityType, component), value);
+        this.value(this.ensureSupported(component), value);
     }
 
     private <V, MV extends EntityMetadataValue> @Nullable V value(
@@ -87,13 +90,12 @@ public final class JetEntityDataComponentMap implements EntityDataComponentMap {
         );
     }
 
-    private static <V> EntityDataComponentRegistration<V, ?> ensureSupported(Holder.Reference<EntityType> entityType,
-                                                                             EntityDataComponent<V> component) {
+    private <V> EntityDataComponentRegistration<V, ?> ensureSupported(EntityDataComponent<V> component) {
         EntityDataComponentRegistration<V, ?> registration = EntityDataComponentRegistry.registration(component);
-        if (!registration.entityTypePredicate().test(entityType)) {
+        if (!EntityTypePredicate.test(registration.entityTypePredicate(), this.entityType, this.server)) {
             throw new IllegalArgumentException(String.format(
                     "Entity type \"%s\" does not support \"%s\" entity data component",
-                    entityType, component
+                    this.entityType, component
             ));
         }
         return registration;

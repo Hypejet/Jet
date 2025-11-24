@@ -13,6 +13,6 @@ import java.util.Set;
 final class EntityTest {
     @Test
     void testEntityType() {
-        TestUtil.test(new JsonEntityType(Set.of(Key.key("vanilla"), Key.key("some-update")), 300)); //i don't know but i added this because i am getting compile error (maxAirSupply)
+        TestUtil.test(new JsonEntityType(Set.of(Key.key("vanilla"), Key.key("some-update")), 300, true));
     }
 }

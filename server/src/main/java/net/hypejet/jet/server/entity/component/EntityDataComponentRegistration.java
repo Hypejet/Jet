@@ -1,13 +1,11 @@
 package net.hypejet.jet.server.entity.component;
 
-import net.hypejet.jet.entity.EntityType;
 import net.hypejet.jet.entity.component.EntityDataComponent;
-import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
+import net.hypejet.jet.server.util.game.entity.EntityTypePredicate;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
-import java.util.function.Predicate;
 
 /**
  * A data of an {@linkplain EntityDataComponent entity data component} registration
@@ -34,7 +32,7 @@ import java.util.function.Predicate;
 @NullMarked
 public record EntityDataComponentRegistration<V, MV extends EntityMetadataValue>(
         int metadataIndex, Class<MV> metadataValueClass,
-        Predicate<Holder.Reference<EntityType>> entityTypePredicate,
+        EntityTypePredicate entityTypePredicate,
         ComponentValueDecoder<MV, V> componentValueDecoder,
         ComponentValueEncoder<MV, V> componentValueEncoder
 ) {
