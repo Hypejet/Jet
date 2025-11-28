@@ -32,6 +32,14 @@ public interface EntityTypePredicate extends BiPredicate<Holder.Reference<Entity
     EntityTypePredicate LIVING = (holder, value) -> value.living();
 
     /**
+     * An {@linkplain EntityTypePredicate entity type predicate} that is
+     * satisfied only by mob {@linkplain JetEntityType entity types}.
+     *
+     * @since 1.0
+     */
+    EntityTypePredicate MOB = (holder, value) -> value.mob();
+
+    /**
      * Evaluates this predicate on the specified {@linkplain JetEntityType entity type}.
      *
      * @param holder the holder referencing to the entity type that should be tested

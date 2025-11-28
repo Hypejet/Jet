@@ -12,9 +12,11 @@ import java.util.Set;
  * @param requiredFeatureFlags a set of keys of required feature flags to enable this entity type
  * @param maxAirSupply a maximum air supply that entities of this type have
  * @param living whether this is a type of living entity
+ * @param mob whether this is a type of mob entity
  * @since 1.0
  */
-public record JsonEntityType(@NonNull Set<Key> requiredFeatureFlags, int maxAirSupply, boolean living) {
+public record JsonEntityType(@NonNull Set<Key> requiredFeatureFlags,
+                             int maxAirSupply, boolean living, boolean mob) {
     /**
      * Constructs the {@linkplain JsonEntityType entity type}.
      *
@@ -22,6 +24,7 @@ public record JsonEntityType(@NonNull Set<Key> requiredFeatureFlags, int maxAirS
      *                             to enable the entity type that is being constructed
      * @param maxAirSupply a maximum air supply that entities of the constructed entity type should have
      * @param living whether the entity type should be a type of living entity
+     * @param mob whether the entity type should be a type of mob entity
      * @since 1.0
      */
     public JsonEntityType {

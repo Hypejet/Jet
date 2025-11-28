@@ -96,8 +96,8 @@ public final class EntityDataComponent<V> {
     public static final EntityDataComponent<Component> CUSTOM_NAME = new EntityDataComponent<>("custom_name", true);
 
     /**
-     * An {@linkplain EntityDataComponent entity data component} defining whether
-     * custom name of an {@linkplain Entity entity} should be visible.
+     * An {@linkplain EntityDataComponent entity data component} defining
+     * whether custom name of an {@linkplain Entity entity} is visible.
      *
      * @since 1.0
      */
@@ -178,7 +178,7 @@ public final class EntityDataComponent<V> {
 
     /**
      * An {@linkplain EntityDataComponent entity data component} representing a {@linkplain List list}
-     * of potion {@linkplain Particle particles} that should be displayed around an {@linkplain Entity entity}.
+     * of potion {@linkplain Particle particles} that are displayed around an {@linkplain Entity entity}.
      *
      * <p>This component can be used on living entities only.</p>
      *
@@ -188,7 +188,7 @@ public final class EntityDataComponent<V> {
 
     /**
      * An {@linkplain EntityDataComponent entity data component} defining whether amount of potion
-     * {@linkplain Particle particles} displayed around an {@linkplain Entity entity} should be reduced.
+     * {@linkplain Particle particles} displayed around an {@linkplain Entity entity} is reduced.
      *
      * <p>This component can be used on living entities only.</p>
      *
@@ -226,6 +226,36 @@ public final class EntityDataComponent<V> {
      * @since 1.0
      */
     public static final EntityDataComponent<BlockPosition> SLEEPING_POSITION = new EntityDataComponent<>("sleeping_position", true);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * defining whether AI of an {@linkplain Entity entity} is enabled.
+     *
+     * <p>This component can be used on mob entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> NO_AI = new EntityDataComponent<>("no_ai", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * defining whether an {@linkplain Entity entity} is left-handed.
+     *
+     * <p>This component can be used on mob entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> LEFT_HANDED = new EntityDataComponent<>("left_handed", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} defining
+     * whether an {@linkplain Entity entity} is currently aggressive.
+     *
+     * <p>This component can be used on mob entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> AGGRESSIVE = new EntityDataComponent<>("aggressive", false);
 
     private final String name;
     private final boolean nullable;

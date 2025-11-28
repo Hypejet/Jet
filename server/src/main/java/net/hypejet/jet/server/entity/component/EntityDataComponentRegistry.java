@@ -26,9 +26,7 @@ public final class EntityDataComponentRegistry {
 
     private static final Map<EntityDataComponent<?>, EntityDataComponentRegistration<?, ?>> REGISTRATIONS =
             new RegistrationsBuilder()
-
                     /* ---------------- Entity components applicable to all kind of entities ---------------- */
-
                     .putBitFlag(EntityDataComponent.ON_FIRE, 0, 0)
                     .putBitFlag(EntityDataComponent.SNEAKING, 0, 1)
                     .putBitFlag(EntityDataComponent.SPRINTING, 0, 3)
@@ -53,7 +51,6 @@ public final class EntityDataComponentRegistry {
                     .putInt(EntityDataComponent.TICKS_FROZEN, 7, EntityTypePredicate.TRUE)
 
                     /* ---------------- Entity components applicable to living entities ---------------- */
-
                     .putBitFlag(EntityDataComponent.USING_ITEM, 8, 0, EntityTypePredicate.LIVING)
                     .putBitFlag(
                             EntityDataComponent.USED_ITEM_HAND, 8, 1, EntityTypePredicate.LIVING,
@@ -76,6 +73,11 @@ public final class EntityDataComponentRegistry {
                             EntityTypePredicate.LIVING, EntityMetadataValue.OptionalBlockPositionValue::value,
                             (ignored, value) -> new EntityMetadataValue.OptionalBlockPositionValue(value)
                     )
+
+                    /* ---------------- Entity components applicable to mob entities ---------------- */
+                    .putBitFlag(EntityDataComponent.NO_AI, 15, 0, EntityTypePredicate.MOB)
+                    .putBitFlag(EntityDataComponent.LEFT_HANDED, 15, 1, EntityTypePredicate.MOB)
+                    .putBitFlag(EntityDataComponent.AGGRESSIVE, 15, 2, EntityTypePredicate.MOB)
                     .build();
 
     private EntityDataComponentRegistry() {}
