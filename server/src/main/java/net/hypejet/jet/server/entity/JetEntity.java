@@ -206,23 +206,6 @@ public class JetEntity implements Entity, JetViewable {
     }
 
     /**
-     * Gets a validated value of {@linkplain JetEntityType entity type} of this {@linkplain JetEntity entity}.
-     *
-     * @return the validated entity type value
-     * @since 1.0
-     */
-    public final JetEntityType entityTypeValue() {
-        EntityType entityType = this.entityType.value(this.server()
-                .registryManager()
-                .registry(RegistryReference.ENTITY_TYPE));
-
-        if (!(entityType instanceof JetEntityType validatedEntityType))
-            throw new IllegalArgumentException("Entity type of this entity is not a valid entity type");
-
-        return validatedEntityType;
-    }
-
-    /**
      * Updates a {@linkplain Position position} and a velocity {@linkplain Vector vector}
      * of this {@linkplain JetEntity entity} without sending any updates to clients.
      *
