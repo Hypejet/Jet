@@ -3,6 +3,7 @@ package net.hypejet.jet.server.entity.component;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.EntityType;
 import net.hypejet.jet.entity.component.EntityDataComponent;
+import net.hypejet.jet.registry.keys.EntityTypeKeys;
 import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
 import net.hypejet.jet.server.util.game.entity.EntityTypePredicate;
 import net.hypejet.jet.server.util.number.ByteUtil;
@@ -78,6 +79,9 @@ public final class EntityDataComponentRegistry {
                     .putBitFlag(EntityDataComponent.NO_AI, 15, 0, EntityTypePredicate.MOB)
                     .putBitFlag(EntityDataComponent.LEFT_HANDED, 15, 1, EntityTypePredicate.MOB)
                     .putBitFlag(EntityDataComponent.AGGRESSIVE, 15, 2, EntityTypePredicate.MOB)
+
+                    /* ---------------- Entity components applicable to ghast entities ---------------- */
+                    .putBoolean(EntityDataComponent.FIREBALL_CHARGING, 16, EntityTypePredicate.typed(EntityTypeKeys.GHAST))
                     .build();
 
     private EntityDataComponentRegistry() {}

@@ -5,6 +5,7 @@ import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntityType;
+import net.kyori.adventure.key.Key;
 
 import java.util.function.BiPredicate;
 
@@ -65,5 +66,17 @@ public interface EntityTypePredicate extends BiPredicate<Holder.Reference<Entity
                         JetMinecraftServer server) {
         EntityType entityType = holder.valueOrThrow(server.registryManager().registry(RegistryReference.ENTITY_TYPE));
         return predicate.test(holder, JetEntityType.cast(entityType));
+    }
+
+    /**
+     * Creates an {@linkplain EntityTypePredicate entity type predicate}
+     * which is satisfied only by the specified entity type.
+     *
+     * @param entityTypeKey the key of the entity type that should satisfy the predicate
+     * @return the created entity type predicate
+     * @since 1.0
+     */
+    static EntityTypePredicate typed(Key entityTypeKey) {
+        return (holder, value) -> entityTypeKey.equals(holder.key());
     }
 }

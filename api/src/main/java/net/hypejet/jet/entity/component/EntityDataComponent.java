@@ -257,6 +257,16 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<Boolean> AGGRESSIVE = new EntityDataComponent<>("aggressive", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component} defining
+     * whether an {@linkplain Entity entity} is preparing to shoot a fireball.
+     *
+     * <p>This component can be used on ghast entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> FIREBALL_CHARGING = new EntityDataComponent<>("fireball_charging", false);
+
     private final String name;
     private final boolean nullable;
 

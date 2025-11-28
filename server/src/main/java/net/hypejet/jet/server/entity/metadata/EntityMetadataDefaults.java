@@ -5,6 +5,7 @@ import io.netty.util.collection.IntObjectMap;
 import net.hypejet.jet.entity.EntityType;
 import net.hypejet.jet.entity.pose.Pose;
 import net.hypejet.jet.registry.holder.Holder;
+import net.hypejet.jet.registry.keys.EntityTypeKeys;
 import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
@@ -52,7 +53,10 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(14, new EntityMetadataValue.OptionalBlockPositionValue(null), EntityTypePredicate.LIVING), // Sleeping position
 
             /* --------------------- Defaults for mob entities --------------------- */
-            new DefaultsEntry(15, new EntityMetadataValue.Byte((byte) 0), EntityTypePredicate.MOB) // Mob flags
+            new DefaultsEntry(15, new EntityMetadataValue.Byte((byte) 0), EntityTypePredicate.MOB), // Mob flags
+
+            /* --------------------- Defaults for ghast entities --------------------- */
+            new DefaultsEntry(16, new EntityMetadataValue.Boolean(false), EntityTypePredicate.typed(EntityTypeKeys.GHAST)) // Fireball charging
     );
 
     private EntityMetadataDefaults() {}
