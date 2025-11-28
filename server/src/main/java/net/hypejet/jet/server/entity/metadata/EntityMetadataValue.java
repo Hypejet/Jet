@@ -23,7 +23,7 @@ import net.hypejet.jet.world.coordinate.floats.FloatQuaternion;
 import net.hypejet.jet.world.coordinate.floats.FloatVector;
 import net.hypejet.jet.world.coordinate.rotation.Rotations;
 import net.hypejet.jet.world.direction.Direction;
-import net.kyori.adventure.nbt.BinaryTag;
+import net.hypejet.jet.world.particle.Particle;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Range;
@@ -193,40 +193,40 @@ public sealed interface EntityMetadataValue {
     record OptionalBlockStateValue(@Nullable JetBlockState value) implements EntityMetadataValue {}
 
     /**
-     * An {@linkplain EntityMetadataValue entity metadata value} representing a particle.
+     * An {@linkplain EntityMetadataValue entity metadata value} representing a {@linkplain Particle particle}.
      *
-     * @param value the particle that this entity metadata value represents, serialized as a binary tag
      * @since 1.0
+     * @see Particle
      * @see EntityMetadataValue
      */
     // TODO: Replace the value with particle type
-    record Particle(BinaryTag value) implements EntityMetadataValue {
+    record ParticleValue(Particle value) implements EntityMetadataValue {
         /**
          * Constructs the {@linkplain Particle particle entity metadata value}.
          *
-         * @param value the particle that the constructed entity metadata value
-         *              should represent, serialized as a binary tag
+         * @param value the particle that the constructed entity metadata value should represent
          * @since 1.0
          */
-        public Particle {
+        public ParticleValue {
             Objects.requireNonNull(value, "value");
         }
     }
 
     /**
-     * An {@linkplain EntityMetadataValue entity metadata value} representing a {@linkplain List list} of particles.
+     * An {@linkplain EntityMetadataValue entity metadata value} representing
+     * a {@linkplain List list} of {@linkplain Particle particles}.
      *
-     * @param value the list of serialized particles that this entity metadata value represents
+     * @param value the list of particles that this entity metadata value represents
      * @since 1.0
      * @see List
+     * @see Particle
      * @see EntityMetadataValue
      */
-    // TODO: Replace the value with particle type
-    record ParticleList(List<BinaryTag> value) implements EntityMetadataValue {
+    record ParticleList(List<Particle> value) implements EntityMetadataValue {
         /**
          * Constructs the {@linkplain ParticleList particle list entity metadata value}.
          *
-         * @param value the list of serialized particles that the constructed entity metadata value should represent
+         * @param value the list of particles that the constructed entity metadata value should represent
          * @since 1.0
          */
         public ParticleList {

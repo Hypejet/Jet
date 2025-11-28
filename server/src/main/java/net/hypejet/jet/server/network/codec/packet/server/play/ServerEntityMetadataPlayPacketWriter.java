@@ -7,8 +7,8 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.hypejet.jet.entity.armadillo.ArmadilloState;
 import net.hypejet.jet.entity.pose.Pose;
 import net.hypejet.jet.entity.sniffer.SnifferState;
+import net.hypejet.jet.server.entity.metadata.EntityMetadata;
 import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
-import net.hypejet.jet.server.entity.metadata.JetEntityMetadata;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.component.ComponentNetworkWriter;
@@ -17,6 +17,7 @@ import net.hypejet.jet.server.network.codec.game.world.coordinate.BlockPositionN
 import net.hypejet.jet.server.network.codec.game.world.coordinate.floats.FloatQuaternionNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.world.coordinate.floats.FloatVectorNetworkWriter;
 import net.hypejet.jet.server.network.codec.game.world.coordinate.rotations.RotationsNetworkWriter;
+import net.hypejet.jet.server.network.codec.game.world.particle.ParticleNetworkWriter;
 import net.hypejet.jet.server.network.codec.index.IndexNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarLongNetworkCodec;
@@ -28,9 +29,11 @@ import net.hypejet.jet.server.util.NetworkUtil;
 import net.hypejet.jet.server.util.collection.Object2IntMapBuilder;
 import net.hypejet.jet.server.util.index.IndexUtil;
 import net.hypejet.jet.world.direction.Direction;
+import net.hypejet.jet.world.particle.Particle;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jspecify.annotations.NullMarked;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -72,7 +75,7 @@ public final class ServerEntityMetadataPlayPacketWriter implements NetworkWriter
             .put(EntityMetadataValue.BlockStateValue.class, 14)
             .put(EntityMetadataValue.OptionalBlockStateValue.class, 15)
             .put(EntityMetadataValue.CompoundBinaryTagValue.class, 16)
-            .put(EntityMetadataValue.Particle.class, 17)
+            .put(EntityMetadataValue.ParticleValue.class, 17)
             .put(EntityMetadataValue.ParticleList.class, 18)
             .put(EntityMetadataValue.VillagerData.class, 19)
             .put(EntityMetadataValue.OptionalUnsignedInt.class, 20)
@@ -151,6 +154,9 @@ public final class ServerEntityMetadataPlayPacketWriter implements NetworkWriter
             VarIntNetworkCodec.INSTANCE
     );
 
+    private static final NetworkWriter<Collection<Particle>>
+            PARTICLE_LIST_WRITER = new CollectionNetworkWriter<>(ParticleNetworkWriter.INSTANCE);
+
     private static final Map<Class<?>, NetworkWriter<?>> VALUE_WRITERS = new ValueWriterMapBuilder()
             .put(EntityMetadataValue.Byte.class, (buf, registryManager, object) -> buf.writeByte(object.value()))
             .put(EntityMetadataValue.Float.class, (buf, registryManager, object) -> buf.writeFloat(object.value()))
@@ -166,6 +172,10 @@ public final class ServerEntityMetadataPlayPacketWriter implements NetworkWriter
             .put(
                     EntityMetadataValue.DirectionValue.class,
                     (buf, registryManager, object) -> DIRECTION_WRITER.write(buf, registryManager, object.value())
+            )
+            .put(
+                    EntityMetadataValue.ParticleList.class,
+                    (buf, registryManager, object) -> PARTICLE_LIST_WRITER.write(buf, registryManager, object.value())
             )
             .put(
                     EntityMetadataValue.Int.class,
@@ -246,6 +256,12 @@ public final class ServerEntityMetadataPlayPacketWriter implements NetworkWriter
                     )
             )
             .put(
+                    EntityMetadataValue.ParticleValue.class,
+                    (buf, registryManager, object) -> ParticleNetworkWriter.INSTANCE.write(
+                            buf, registryManager, object.value()
+                    )
+            )
+            .put(
                     EntityMetadataValue.OptionalUnsignedInt.class,
                     (buf, registryManager, object) -> {
                         Integer value = object.value();
@@ -266,11 +282,11 @@ public final class ServerEntityMetadataPlayPacketWriter implements NetworkWriter
     /**
      * A {@linkplain NetworkWriter network writer}
      * of {@linkplain IntObjectMap.PrimitiveEntry int-object map primitive entries}
-     * associating {@linkplain JetEntityMetadata entity metadata} indices
+     * associating {@linkplain EntityMetadata entity metadata} indices
      * with {@linkplain EntityMetadataValue entity metadata values} bound to them.
      *
      * @since 1.0
-     * @see JetEntityMetadata
+     * @see EntityMetadata
      * @see NetworkWriter
      */
     private static final class MetadataUpdateNetworkWriter

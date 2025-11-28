@@ -12,6 +12,7 @@ import net.hypejet.jet.server.entity.JetEntityType;
 import net.hypejet.jet.server.util.game.entity.EntityTypePredicate;
 import org.jspecify.annotations.NullMarked;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -27,6 +28,9 @@ import java.util.Set;
 public final class EntityMetadataDefaults {
 
     private static final Set<DefaultsEntry> ENTRIES = Set.of(
+
+            /* --------------------- Defaults for living entities --------------------- */
+
             new DefaultsEntry(0, new EntityMetadataValue.Byte((byte) 0)), // Shared entity flags
             new DefaultsEntry(1, (server, entityType) -> new EntityMetadataValue.Int(
                     JetEntityType.cast(
@@ -38,7 +42,17 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(4, new EntityMetadataValue.Boolean(false)), // Silent
             new DefaultsEntry(5, new EntityMetadataValue.Boolean(false)), // No gravity
             new DefaultsEntry(6, new EntityMetadataValue.PoseValue(Pose.STANDING)), // Pose
-            new DefaultsEntry(7, new EntityMetadataValue.Int(0)) // Ticks frozen
+            new DefaultsEntry(7, new EntityMetadataValue.Int(0)), // Ticks frozen
+
+            /* --------------------- Defaults for living entities --------------------- */
+
+            new DefaultsEntry(8, new EntityMetadataValue.Byte((byte) 0), EntityTypePredicate.LIVING), // Living entity flags
+            new DefaultsEntry(9, new EntityMetadataValue.Float(1f), EntityTypePredicate.LIVING), // Health
+            new DefaultsEntry(10, new EntityMetadataValue.ParticleList(List.of()), EntityTypePredicate.LIVING), // Potion particle effects
+            new DefaultsEntry(11, new EntityMetadataValue.Boolean(false), EntityTypePredicate.LIVING), // Reduce potion particle effects
+            new DefaultsEntry(12, new EntityMetadataValue.Int(0), EntityTypePredicate.LIVING), // Arrow count
+            new DefaultsEntry(13, new EntityMetadataValue.Int(0), EntityTypePredicate.LIVING), // Stinger count
+            new DefaultsEntry(14, new EntityMetadataValue.OptionalBlockPositionValue(null), EntityTypePredicate.LIVING) // Sleeping position
     );
 
     private EntityMetadataDefaults() {}

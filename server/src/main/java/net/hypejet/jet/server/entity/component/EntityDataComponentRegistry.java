@@ -1,5 +1,6 @@
 package net.hypejet.jet.server.entity.component;
 
+import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.EntityType;
 import net.hypejet.jet.entity.component.EntityDataComponent;
 import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
@@ -10,6 +11,8 @@ import org.jspecify.annotations.NullMarked;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * A registry of {@linkplain EntityDataComponent entity data components}.
@@ -23,7 +26,9 @@ public final class EntityDataComponentRegistry {
 
     private static final Map<EntityDataComponent<?>, EntityDataComponentRegistration<?, ?>> REGISTRATIONS =
             new RegistrationsBuilder()
-                    // Shared entity flags
+
+                    /* ---------------- Entity components applicable to all kind of entities ---------------- */
+
                     .putBitFlag(EntityDataComponent.ON_FIRE, 0, 0)
                     .putBitFlag(EntityDataComponent.SNEAKING, 0, 1)
                     .putBitFlag(EntityDataComponent.SPRINTING, 0, 3)
@@ -31,7 +36,6 @@ public final class EntityDataComponentRegistry {
                     .putBitFlag(EntityDataComponent.INVISIBLE, 0, 5)
                     .putBitFlag(EntityDataComponent.GLOWING, 0, 6)
                     .putBitFlag(EntityDataComponent.GLIDING, 0, 7)
-                    // Other components that are used by all kind of entities
                     .putInt(EntityDataComponent.AIR_SUPPLY, 1, EntityTypePredicate.TRUE)
                     .put(
                             EntityDataComponent.CUSTOM_NAME, 2, EntityMetadataValue.OptionalComponentValue.class,
@@ -47,6 +51,31 @@ public final class EntityDataComponentRegistry {
                             (ignored, value) -> new EntityMetadataValue.PoseValue(Objects.requireNonNull(value))
                     )
                     .putInt(EntityDataComponent.TICKS_FROZEN, 7, EntityTypePredicate.TRUE)
+
+                    /* ---------------- Entity components applicable to living entities ---------------- */
+
+                    .putBitFlag(EntityDataComponent.USING_ITEM, 8, 0, EntityTypePredicate.LIVING)
+                    .putBitFlag(
+                            EntityDataComponent.USED_ITEM_HAND, 8, 1, EntityTypePredicate.LIVING,
+                            value -> value ? Entity.InteractionHand.OFFHAND : Entity.InteractionHand.MAIN_HAND,
+                            value -> value == Entity.InteractionHand.OFFHAND
+                    )
+                    .putBitFlag(EntityDataComponent.AUTO_SPIN_ATTACK, 8, 2, EntityTypePredicate.LIVING)
+                    .putFloat(EntityDataComponent.HEALTH, 9, EntityTypePredicate.LIVING)
+                    .put(
+                            EntityDataComponent.POTION_PARTICLES, 10, EntityMetadataValue.ParticleList.class,
+                            EntityTypePredicate.LIVING, EntityMetadataValue.ParticleList::value,
+                            (ignored, value) -> new EntityMetadataValue.ParticleList(Objects.requireNonNull(value))
+                    )
+                    .putBoolean(EntityDataComponent.REDUCE_POTION_PARTICLES, 11, EntityTypePredicate.LIVING)
+                    .putInt(EntityDataComponent.ARROW_COUNT, 12, EntityTypePredicate.LIVING)
+                    .putInt(EntityDataComponent.STINGER_COUNT, 13, EntityTypePredicate.LIVING)
+                    .put(
+                            EntityDataComponent.SLEEPING_POSITION, 14,
+                            EntityMetadataValue.OptionalBlockPositionValue.class,
+                            EntityTypePredicate.LIVING, EntityMetadataValue.OptionalBlockPositionValue::value,
+                            (ignored, value) -> new EntityMetadataValue.OptionalBlockPositionValue(value)
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}
@@ -174,6 +203,73 @@ public final class EntityDataComponentRegistry {
         }
 
         /**
+         * Registers the specified {@linkplain Float float} {@linkplain EntityDataComponent entity data component}.
+         *
+         * <p>The component is going to be backed by
+         * an {@linkplain EntityMetadataValue.Float float entity metadata value}.</p>
+         *
+         * @param component the entity data component to register, must not be nullable
+         * @param metadataIndex entity metadata index where entity metadata values that are
+         *                      associated with the specified entity data component should be put at
+         * @param entityTypePredicate a predicate that should check whether entities with entity type provided during
+         *                            predicate testing should support the specified entity data component
+         * @return this builder
+         * @throws IllegalArgumentException if the specified entity data component is nullable
+         * @since 1.0
+         */
+        private RegistrationsBuilder putFloat(EntityDataComponent<Float> component, int metadataIndex,
+                                              EntityTypePredicate entityTypePredicate) {
+            if (component.nullable())
+                throw new IllegalArgumentException("The entity data component must not be nullable");
+
+            return this.put(
+                    component, metadataIndex, EntityMetadataValue.Float.class,
+                    entityTypePredicate, EntityMetadataValue.Float::value,
+                    (ignored, value) -> new EntityMetadataValue.Float(Objects.requireNonNull(value))
+            );
+        }
+
+        /**
+         * Registers the specified {@linkplain EntityDataComponent entity data component}.
+         *
+         * <p>Updating the specified component will update a single bit of
+         * a {@linkplain EntityMetadataValue.Byte byte entity metadata value}.
+         * The component value is converted to/from a {@code boolean}, which represents whether the bit is set.</p>
+         *
+         * @param component the entity data component to register, must not be nullable
+         * @param metadataIndex entity metadata index where entity metadata values that are
+         *                      associated with the specified entity data component should be put at
+         * @param flagIndex the index of the bit that the entity data component should update,
+         *                  where {@code 0} is the least significant bit
+         * @param entityTypePredicate a predicate that should check whether entities with entity type provided during
+         *                            predicate testing should support the specified entity data component
+         * @param flagToValueFunction a function converting states of the bit to values
+         *                            compatible with the specified entity data component
+         * @param valueToFlagFunction a function converting values compatible with the specified
+         *                            entity data component to states that the bit should have
+         * @return this builder
+         * @param <V> the value type of the specified entity data component
+         * @throws IllegalArgumentException if the specified entity data component is nullable
+         * @since 1.0
+         */
+        private <V> RegistrationsBuilder putBitFlag(EntityDataComponent<V> component, int metadataIndex,
+                                                    int flagIndex, EntityTypePredicate entityTypePredicate,
+                                                    Function<Boolean, V> flagToValueFunction,
+                                                    Predicate<V> valueToFlagFunction) {
+            if (component.nullable())
+                throw new IllegalArgumentException("Nullable components cannot be registered as bit flag components");
+
+            return this.put(
+                    component, metadataIndex, EntityMetadataValue.Byte.class, entityTypePredicate,
+                    metadataValue -> flagToValueFunction.apply(ByteUtil.bitSet(metadataValue.value(), flagIndex)),
+                    (metadataValue, value) -> new EntityMetadataValue.Byte(ByteUtil.withBit(
+                            metadataValue.value(), flagIndex,
+                            valueToFlagFunction.test(Objects.requireNonNull(value))
+                    ))
+            );
+        }
+
+        /**
          * Registers the specified {@linkplain Boolean boolean} {@linkplain EntityDataComponent entity data component}.
          *
          * <p>Updating the specified component will update a single bit of
@@ -193,16 +289,9 @@ public final class EntityDataComponentRegistry {
          */
         private RegistrationsBuilder putBitFlag(EntityDataComponent<Boolean> component, int metadataIndex,
                                                 int flagIndex, EntityTypePredicate entityTypePredicate) {
-            if (component.nullable())
-                throw new IllegalArgumentException("Nullable components cannot be registered as bit flag components");
-
-            return this.put(
-                    component, metadataIndex, EntityMetadataValue.Byte.class, entityTypePredicate,
-                    metadataValue -> ByteUtil.bitSet(metadataValue.value(), flagIndex),
-                    (metadataValue, value) -> new EntityMetadataValue.Byte(ByteUtil.withBit(
-                            metadataValue.value(), flagIndex,
-                            Objects.requireNonNull(value)
-                    ))
+            return this.putBitFlag(
+                    component, metadataIndex, flagIndex, entityTypePredicate,
+                    Function.identity(), Boolean::booleanValue
             );
         }
 

@@ -2,9 +2,12 @@ package net.hypejet.jet.entity.component;
 
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.pose.Pose;
+import net.hypejet.jet.world.coordinate.BlockPosition;
+import net.hypejet.jet.world.particle.Particle;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NullMarked;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -132,6 +135,97 @@ public final class EntityDataComponent<V> {
      * @since 1.0
      */
     public static final EntityDataComponent<Integer> TICKS_FROZEN = new EntityDataComponent<>("ticks_frozen", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * defining whether an {@linkplain Entity entity} is using an item.
+     *
+     * <p>This component can be used on living entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> USING_ITEM = new EntityDataComponent<>("using_item", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing an {@linkplain Entity.InteractionHand interaction hand}
+     * that an {@linkplain Entity entity} is using an item with.
+     *
+     * <p>This component can be used on living entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Entity.InteractionHand> USED_ITEM_HAND = new EntityDataComponent<>("used_item_hand", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} defining whether an {@linkplain Entity entity}
+     * is currently in an auto-spin attack, meaning that it is attacking using a trident with riptide enchantment.
+     *
+     * <p>This component can be used on living entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> AUTO_SPIN_ATTACK = new EntityDataComponent<>("auto_spin_attack", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing health of an {@linkplain Entity entity}.
+     *
+     * <p>This component can be used on living entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Float> HEALTH = new EntityDataComponent<>("health", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing a {@linkplain List list}
+     * of potion {@linkplain Particle particles} that should be displayed around an {@linkplain Entity entity}.
+     *
+     * <p>This component can be used on living entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<List<Particle>> POTION_PARTICLES = new EntityDataComponent<>("potion_particles", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} defining whether amount of potion
+     * {@linkplain Particle particles} displayed around an {@linkplain Entity entity} should be reduced.
+     *
+     * <p>This component can be used on living entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> REDUCE_POTION_PARTICLES = new EntityDataComponent<>("reduce_potion_particles", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * a number of arrows attached to an {@linkplain Entity entity}.
+     *
+     * <p>This component can be used on living entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Integer> ARROW_COUNT = new EntityDataComponent<>("arrow_count", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * a number of bee stingers attached to an {@linkplain Entity entity}.
+     *
+     * <p>This component can be used on living entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Integer> STINGER_COUNT = new EntityDataComponent<>("stinger_count", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing a {@linkplain BlockPosition block position} of the bed
+     * that an {@linkplain Entity entity} is currently sleeping in.
+     *
+     * <p>This component can be used on living entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<BlockPosition> SLEEPING_POSITION = new EntityDataComponent<>("sleeping_position", true);
 
     private final String name;
     private final boolean nullable;
