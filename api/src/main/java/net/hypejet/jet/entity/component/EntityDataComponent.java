@@ -300,6 +300,35 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<Boolean> SHOW_BOTTOM = new EntityDataComponent<>("show_bottom", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing radius of an area effect cloud.
+     *
+     * <p>This component can be used on area effect cloud entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Float> EFFECT_RADIUS = new EntityDataComponent<>("effect_radius", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing whether
+     * an area effect cloud ignores the radius and displays the effect as a single point.
+     *
+     * <p>This component can be used on area effect cloud entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> EFFECT_WAITING = new EntityDataComponent<>("effect_waiting", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * a {@linkplain Particle particle} that an area effect cloud entity plays.
+     *
+     * <p>This component can be used on area effect cloud entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Particle> EFFECT_PARTICLE = new EntityDataComponent<>("effect_particle", false);
+
     private final String name;
     private final boolean nullable;
 

@@ -6,11 +6,14 @@ import net.hypejet.jet.entity.EntityType;
 import net.hypejet.jet.entity.pose.Pose;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.keys.EntityTypeKeys;
+import net.hypejet.jet.registry.keys.ParticleTypeKeys;
 import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.JetEntityType;
 import net.hypejet.jet.server.util.game.entity.EntityTypePredicate;
+import net.hypejet.jet.util.color.ARGBColor;
+import net.hypejet.jet.world.particle.color.ColorParticle;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.List;
@@ -73,7 +76,25 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     9, new EntityMetadataValue.Boolean(true),
                     EntityTypePredicate.typed(EntityTypeKeys.END_CRYSTAL)
-            ) // Show bottom
+            ), // Show bottom
+
+            /* --------------------- Defaults for area effect cloud entities --------------------- */
+            new DefaultsEntry(
+                    8, new EntityMetadataValue.Float(3f),
+                    EntityTypePredicate.typed(EntityTypeKeys.AREA_EFFECT_CLOUD)
+            ), // Radius
+            new DefaultsEntry(
+                    9, new EntityMetadataValue.Boolean(false),
+                    EntityTypePredicate.typed(EntityTypeKeys.AREA_EFFECT_CLOUD)
+            ), // Waiting
+            new DefaultsEntry(
+                    10,
+                    new EntityMetadataValue.ParticleValue(new ColorParticle(
+                            new Holder.Reference<>(ParticleTypeKeys.ENTITY_EFFECT),
+                            ARGBColor.fromARGB(255, 255, 255, 255)
+                    )),
+                    EntityTypePredicate.typed(EntityTypeKeys.AREA_EFFECT_CLOUD)
+            ) // Particle
     );
 
     private EntityMetadataDefaults() {}

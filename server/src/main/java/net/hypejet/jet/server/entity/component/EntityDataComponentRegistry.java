@@ -101,6 +101,24 @@ public final class EntityDataComponentRegistry {
                             EntityDataComponent.SHOW_BOTTOM, 9,
                             EntityTypePredicate.typed(EntityTypeKeys.END_CRYSTAL)
                     )
+
+                    /* ---------------- Entity components applicable to area effect cloud entities ---------------- */
+                    .putFloat(
+                            EntityDataComponent.EFFECT_RADIUS, 8,
+                            EntityTypePredicate.typed(EntityTypeKeys.AREA_EFFECT_CLOUD)
+                    )
+                    .putBoolean(
+                            EntityDataComponent.EFFECT_WAITING, 9,
+                            EntityTypePredicate.typed(EntityTypeKeys.AREA_EFFECT_CLOUD)
+                    )
+                    .put(
+                            EntityDataComponent.EFFECT_PARTICLE, 10,
+                            EntityMetadataValue.ParticleValue.class,
+                            EntityTypePredicate.typed(EntityTypeKeys.AREA_EFFECT_CLOUD),
+                            EntityMetadataValue.ParticleValue::value,
+                            (currentMetadataValue, value) ->
+                                    new EntityMetadataValue.ParticleValue(Objects.requireNonNull(value))
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}
