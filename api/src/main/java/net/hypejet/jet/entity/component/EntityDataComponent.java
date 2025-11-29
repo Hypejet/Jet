@@ -267,6 +267,15 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<Boolean> FIREBALL_CHARGING = new EntityDataComponent<>("fireball_charging", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing size of an {@linkplain Entity entity}.
+     *
+     * <p>This component can be used on phantom only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Integer> SIZE = new EntityDataComponent<>("size", false);
+
     private final String name;
     private final boolean nullable;
 

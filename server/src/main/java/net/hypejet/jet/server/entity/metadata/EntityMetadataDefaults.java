@@ -56,7 +56,10 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(15, new EntityMetadataValue.Byte((byte) 0), EntityTypePredicate.MOB), // Mob flags
 
             /* --------------------- Defaults for ghast entities --------------------- */
-            new DefaultsEntry(16, new EntityMetadataValue.Boolean(false), EntityTypePredicate.typed(EntityTypeKeys.GHAST)) // Fireball charging
+            new DefaultsEntry(16, new EntityMetadataValue.Boolean(false), EntityTypePredicate.typed(EntityTypeKeys.GHAST)), // Fireball charging
+
+            /* --------------------- Defaults for phantom entities --------------------- */
+            new DefaultsEntry(16, new EntityMetadataValue.Int(0), EntityTypePredicate.typed(EntityTypeKeys.PHANTOM)) // Size
     );
 
     private EntityMetadataDefaults() {}

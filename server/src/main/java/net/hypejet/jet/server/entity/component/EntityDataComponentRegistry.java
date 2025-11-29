@@ -82,6 +82,9 @@ public final class EntityDataComponentRegistry {
 
                     /* ---------------- Entity components applicable to ghast entities ---------------- */
                     .putBoolean(EntityDataComponent.FIREBALL_CHARGING, 16, EntityTypePredicate.typed(EntityTypeKeys.GHAST))
+
+                    /* ---------------- Entity components applicable to phantom entities ---------------- */
+                    .putInt(EntityDataComponent.SIZE, 16, EntityTypePredicate.typed(EntityTypeKeys.PHANTOM))
                     .build();
 
     private EntityDataComponentRegistry() {}
