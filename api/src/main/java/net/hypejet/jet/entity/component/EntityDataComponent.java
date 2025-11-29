@@ -223,6 +223,9 @@ public final class EntityDataComponent<V> {
      *
      * <p>This component can be used on living entities only.</p>
      *
+     * <p>This component is nullable and {@code null} values mean
+     * that an entity does not have a sleeping position set.</p>
+     *
      * @since 1.0
      */
     public static final EntityDataComponent<BlockPosition> SLEEPING_POSITION = new EntityDataComponent<>("sleeping_position", true);
@@ -275,6 +278,27 @@ public final class EntityDataComponent<V> {
      * @since 1.0
      */
     public static final EntityDataComponent<Integer> SIZE = new EntityDataComponent<>("size", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * a {@linkplain BlockPosition block position} that beam of an {@linkplain Entity entity} targets to.
+     *
+     * <p>This component can be used on end crystal entities only.</p>
+     * <p>This component is nullable and {@code null} values mean that an entity has the beam disabled.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<BlockPosition> BEAM_TARGET = new EntityDataComponent<>("beam_target", true);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} defining
+     * whether a bedrock plate is shown underneath an {@linkplain Entity entity}.
+     *
+     * <p>This component can be used on end crystal entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> SHOW_BOTTOM = new EntityDataComponent<>("show_bottom", false);
 
     private final String name;
     private final boolean nullable;

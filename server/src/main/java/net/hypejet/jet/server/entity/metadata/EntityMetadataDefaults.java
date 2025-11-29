@@ -29,7 +29,7 @@ import java.util.Set;
 public final class EntityMetadataDefaults {
 
     private static final Set<DefaultsEntry> ENTRIES = Set.of(
-            /* --------------------- Defaults for living entities --------------------- */
+            /* --------------------- Defaults for all entities --------------------- */
             new DefaultsEntry(0, new EntityMetadataValue.Byte((byte) 0)), // Shared entity flags
             new DefaultsEntry(1, (server, entityType) -> new EntityMetadataValue.Int(
                     JetEntityType.cast(
@@ -63,7 +63,17 @@ public final class EntityMetadataDefaults {
                     16,
                     (server, entityType) -> new EntityMetadataValue.Int(entityType.key().equals(EntityTypeKeys.PHANTOM) ? 0 : 1),
                     EntityTypePredicate.typed(EntityTypeKeys.PHANTOM, EntityTypeKeys.SLIME, EntityTypeKeys.MAGMA_CUBE)
-            ) // Size
+            ), // Size
+
+            /* --------------------- Defaults for end crystal entities --------------------- */
+            new DefaultsEntry(
+                    8, new EntityMetadataValue.OptionalBlockPositionValue(null),
+                    EntityTypePredicate.typed(EntityTypeKeys.END_CRYSTAL)
+            ), // Beam target
+            new DefaultsEntry(
+                    9, new EntityMetadataValue.Boolean(true),
+                    EntityTypePredicate.typed(EntityTypeKeys.END_CRYSTAL)
+            ) // Show bottom
     );
 
     private EntityMetadataDefaults() {}

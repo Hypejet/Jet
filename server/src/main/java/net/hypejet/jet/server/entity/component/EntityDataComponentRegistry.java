@@ -7,6 +7,7 @@ import net.hypejet.jet.registry.keys.EntityTypeKeys;
 import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
 import net.hypejet.jet.server.util.game.entity.EntityTypePredicate;
 import net.hypejet.jet.server.util.number.ByteUtil;
+import net.hypejet.jet.world.coordinate.BlockPosition;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.HashMap;
@@ -68,12 +69,7 @@ public final class EntityDataComponentRegistry {
                     .putBoolean(EntityDataComponent.REDUCE_POTION_PARTICLES, 11, EntityTypePredicate.LIVING)
                     .putInt(EntityDataComponent.ARROW_COUNT, 12, EntityTypePredicate.LIVING)
                     .putInt(EntityDataComponent.STINGER_COUNT, 13, EntityTypePredicate.LIVING)
-                    .put(
-                            EntityDataComponent.SLEEPING_POSITION, 14,
-                            EntityMetadataValue.OptionalBlockPositionValue.class,
-                            EntityTypePredicate.LIVING, EntityMetadataValue.OptionalBlockPositionValue::value,
-                            (ignored, value) -> new EntityMetadataValue.OptionalBlockPositionValue(value)
-                    )
+                    .putOptionalBlockPos(EntityDataComponent.SLEEPING_POSITION, 14, EntityTypePredicate.LIVING)
 
                     /* ---------------- Entity components applicable to mob entities ---------------- */
                     .putBitFlag(EntityDataComponent.NO_AI, 15, 0, EntityTypePredicate.MOB)
@@ -81,7 +77,10 @@ public final class EntityDataComponentRegistry {
                     .putBitFlag(EntityDataComponent.AGGRESSIVE, 15, 2, EntityTypePredicate.MOB)
 
                     /* ---------------- Entity components applicable to ghast entities ---------------- */
-                    .putBoolean(EntityDataComponent.FIREBALL_CHARGING, 16, EntityTypePredicate.typed(EntityTypeKeys.GHAST))
+                    .putBoolean(
+                            EntityDataComponent.FIREBALL_CHARGING, 16,
+                            EntityTypePredicate.typed(EntityTypeKeys.GHAST)
+                    )
 
                     /* ---------- Entity components applicable to phantom, slime and magma cube entities ---------- */
                     .putInt(
@@ -91,6 +90,16 @@ public final class EntityDataComponentRegistry {
                                     EntityTypeKeys.SLIME,
                                     EntityTypeKeys.MAGMA_CUBE
                             )
+                    )
+
+                    /* ---------------- Entity components applicable to end crystal entities ---------------- */
+                    .putOptionalBlockPos(
+                            EntityDataComponent.BEAM_TARGET, 8,
+                            EntityTypePredicate.typed(EntityTypeKeys.END_CRYSTAL)
+                    )
+                    .putBoolean(
+                            EntityDataComponent.SHOW_BOTTOM, 9,
+                            EntityTypePredicate.typed(EntityTypeKeys.END_CRYSTAL)
                     )
                     .build();
 
@@ -242,6 +251,35 @@ public final class EntityDataComponentRegistry {
                     component, metadataIndex, EntityMetadataValue.Float.class,
                     entityTypePredicate, EntityMetadataValue.Float::value,
                     (ignored, value) -> new EntityMetadataValue.Float(Objects.requireNonNull(value))
+            );
+        }
+
+        /**
+         * Registers the specified nullable {@linkplain BlockPosition block-position}
+         * {@linkplain EntityDataComponent entity data component}.
+         *
+         * <p>The component is going to be backed by
+         * an {@linkplain EntityMetadataValue.OptionalBlockPositionValue optional
+         * block-position entity metadata value}.</p>
+         *
+         * @param component the entity data component to register, must be nullable
+         * @param metadataIndex entity metadata index where entity metadata values that are
+         *                      associated with the specified entity data component should be put at
+         * @param entityTypePredicate a predicate that should check whether entities with entity type provided during
+         *                            predicate testing should support the specified entity data component
+         * @return this builder
+         * @throws IllegalArgumentException if the specified entity data component is <strong>NOT</strong> nullable
+         * @since 1.0
+         */
+        private RegistrationsBuilder putOptionalBlockPos(EntityDataComponent<BlockPosition> component,
+                                                         int metadataIndex, EntityTypePredicate entityTypePredicate) {
+            if (!component.nullable())
+                throw new IllegalArgumentException("The entity data component must be nullable");
+
+            return this.put(
+                    component, metadataIndex, EntityMetadataValue.OptionalBlockPositionValue.class,
+                    entityTypePredicate, EntityMetadataValue.OptionalBlockPositionValue::value,
+                    (currentMetadataValue, value) -> new EntityMetadataValue.OptionalBlockPositionValue(value)
             );
         }
 
