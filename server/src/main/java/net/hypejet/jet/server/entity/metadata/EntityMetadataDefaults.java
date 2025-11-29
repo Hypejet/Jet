@@ -58,8 +58,12 @@ public final class EntityMetadataDefaults {
             /* --------------------- Defaults for ghast entities --------------------- */
             new DefaultsEntry(16, new EntityMetadataValue.Boolean(false), EntityTypePredicate.typed(EntityTypeKeys.GHAST)), // Fireball charging
 
-            /* --------------------- Defaults for phantom entities --------------------- */
-            new DefaultsEntry(16, new EntityMetadataValue.Int(0), EntityTypePredicate.typed(EntityTypeKeys.PHANTOM)) // Size
+            /* --------------------- Defaults for phantom, slime and magma cube entities --------------------- */
+            new DefaultsEntry(
+                    16,
+                    (server, entityType) -> new EntityMetadataValue.Int(entityType.key().equals(EntityTypeKeys.PHANTOM) ? 0 : 1),
+                    EntityTypePredicate.typed(EntityTypeKeys.PHANTOM, EntityTypeKeys.SLIME, EntityTypeKeys.MAGMA_CUBE)
+            ) // Size
     );
 
     private EntityMetadataDefaults() {}

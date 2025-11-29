@@ -270,7 +270,7 @@ public final class EntityDataComponent<V> {
     /**
      * An {@linkplain EntityDataComponent entity data component} representing size of an {@linkplain Entity entity}.
      *
-     * <p>This component can be used on phantom only.</p>
+     * <p>This component can be used on phantom, slime and magma cube entities only.</p>
      *
      * @since 1.0
      */

@@ -6,7 +6,9 @@ import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntityType;
 import net.kyori.adventure.key.Key;
+import org.jspecify.annotations.NullMarked;
 
+import java.util.Set;
 import java.util.function.BiPredicate;
 
 /**
@@ -15,6 +17,7 @@ import java.util.function.BiPredicate;
  * @since 1.0
  * @see JetEntityType
  */
+@NullMarked
 @FunctionalInterface
 public interface EntityTypePredicate extends BiPredicate<Holder.Reference<EntityType>, JetEntityType> {
     /**
@@ -70,13 +73,14 @@ public interface EntityTypePredicate extends BiPredicate<Holder.Reference<Entity
 
     /**
      * Creates an {@linkplain EntityTypePredicate entity type predicate}
-     * which is satisfied only by the specified entity type.
+     * which is satisfied only by the specified entity types.
      *
-     * @param entityTypeKey the key of the entity type that should satisfy the predicate
+     * @param entityTypeKeys keys of the entity types that should satisfy the predicate
      * @return the created entity type predicate
      * @since 1.0
      */
-    static EntityTypePredicate typed(Key entityTypeKey) {
-        return (holder, value) -> entityTypeKey.equals(holder.key());
+    static EntityTypePredicate typed(Key... entityTypeKeys) {
+        Set<Key> keySet = Set.of(entityTypeKeys);
+        return (holder, value) -> keySet.contains(holder.key());
     }
 }
