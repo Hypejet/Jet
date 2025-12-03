@@ -191,6 +191,9 @@ public final class EntityDataComponentRegistry {
                             EntityDataComponent.CREAKING_HEART_POSITION, 19,
                             EntityTypePredicate.typed(EntityTypeKeys.CREAKING)
                     )
+
+                    /* ---------------- Entity components applicable to blaze entities ---------------- */
+                    .putBitFlag(EntityDataComponent.CHARGED, 16, 0, EntityTypePredicate.typed(EntityTypeKeys.BLAZE))
                     .build();
 
     private EntityDataComponentRegistry() {}

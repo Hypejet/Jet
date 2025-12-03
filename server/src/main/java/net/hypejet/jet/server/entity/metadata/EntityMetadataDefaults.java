@@ -167,7 +167,13 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     19, new EntityMetadataValue.OptionalBlockPositionValue(null),
                     EntityTypePredicate.typed(EntityTypeKeys.CREAKING)
-            ) // Creaking heart position
+            ), // Creaking heart position
+
+            /* --------------------- Defaults for blaze entities --------------------- */
+            new DefaultsEntry(
+                    16, new EntityMetadataValue.Byte((byte) 0),
+                    EntityTypePredicate.typed(EntityTypeKeys.BLAZE)
+            ) // Blaze flags
     );
 
     private EntityMetadataDefaults() {}
