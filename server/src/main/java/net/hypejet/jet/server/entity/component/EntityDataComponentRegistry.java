@@ -4,6 +4,7 @@ import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.EntityType;
 import net.hypejet.jet.entity.component.EntityDataComponent;
 import net.hypejet.jet.registry.keys.EntityTypeKeys;
+import net.hypejet.jet.server.entity.enderdragon.EnderDragonPhaseRegistry;
 import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
 import net.hypejet.jet.server.util.game.entity.EntityTypePredicate;
 import net.hypejet.jet.server.util.number.ByteUtil;
@@ -161,6 +162,16 @@ public final class EntityDataComponentRegistry {
                     .putRotations(
                             EntityDataComponent.RIGHT_LEG_POSE, 21,
                             EntityTypePredicate.typed(EntityTypeKeys.ARMOR_STAND)
+                    )
+
+                    /* ---------------- Entity components applicable to ender dragon entities ---------------- */
+                    .put(
+                            EntityDataComponent.ENDER_DRAGON_PHASE, 16, EntityMetadataValue.Int.class,
+                            EntityTypePredicate.typed(EntityTypeKeys.ENDER_DRAGON),
+                            metadataValue -> EnderDragonPhaseRegistry.phaseById(metadataValue.value()),
+                            (currentMetadataValue, value) -> new EntityMetadataValue.Int(
+                                    EnderDragonPhaseRegistry.phaseId(Objects.requireNonNull(value))
+                            )
                     )
                     .build();
 

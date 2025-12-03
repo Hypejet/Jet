@@ -15,7 +15,7 @@ import net.hypejet.jet.entity.Entity;
  */
 public final class EnderDragonPhase {
     /**
-     * An circling phase.
+     * A circling phase.
      *
      * @since 1.0
      */

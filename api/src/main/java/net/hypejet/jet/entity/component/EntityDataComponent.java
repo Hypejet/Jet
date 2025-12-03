@@ -1,6 +1,7 @@
 package net.hypejet.jet.entity.component;
 
 import net.hypejet.jet.entity.Entity;
+import net.hypejet.jet.entity.enderdragon.EnderDragonPhase;
 import net.hypejet.jet.entity.pose.Pose;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.hypejet.jet.world.coordinate.rotation.Rotations;
@@ -427,6 +428,15 @@ public final class EntityDataComponent<V> {
      * @since 1.0
      */
     public static final EntityDataComponent<Rotations> RIGHT_LEG_POSE = new EntityDataComponent<>("right_leg_pose", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing a phase of an ender dragon entity.
+     *
+     * <p>This component can be used on ender dragon entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<EnderDragonPhase> ENDER_DRAGON_PHASE = new EntityDataComponent<>("ender_dragon_phase", false);
 
     private final String name;
     private final boolean nullable;
