@@ -173,7 +173,13 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     16, new EntityMetadataValue.Byte((byte) 0),
                     EntityTypePredicate.typed(EntityTypeKeys.BLAZE)
-            ) // Blaze flags
+            ), // Blaze flags
+
+            /* --------------------- Defaults for spider entities --------------------- */
+            new DefaultsEntry(
+                    16, new EntityMetadataValue.Byte((byte) 0),
+                    EntityTypePredicate.typed(EntityTypeKeys.SPIDER, EntityTypeKeys.CAVE_SPIDER)
+            ) // Spider flags
     );
 
     private EntityMetadataDefaults() {}

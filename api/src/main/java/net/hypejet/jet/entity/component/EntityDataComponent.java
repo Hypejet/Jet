@@ -518,6 +518,15 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<Boolean> CHARGED = new EntityDataComponent<>("charged", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing whether a spider entity is climbing.
+     *
+     * <p>This component can be used on spider entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> CLIMBING = new EntityDataComponent<>("climbing", false);
+
     private final String name;
     private final boolean nullable;
 

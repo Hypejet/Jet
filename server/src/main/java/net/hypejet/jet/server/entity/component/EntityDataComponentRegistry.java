@@ -194,6 +194,12 @@ public final class EntityDataComponentRegistry {
 
                     /* ---------------- Entity components applicable to blaze entities ---------------- */
                     .putBitFlag(EntityDataComponent.CHARGED, 16, 0, EntityTypePredicate.typed(EntityTypeKeys.BLAZE))
+
+                    /* ---------------- Entity components applicable to spider entities ---------------- */
+                    .putBitFlag(
+                            EntityDataComponent.CLIMBING, 16, 0,
+                            EntityTypePredicate.typed(EntityTypeKeys.SPIDER, EntityTypeKeys.CAVE_SPIDER)
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}
