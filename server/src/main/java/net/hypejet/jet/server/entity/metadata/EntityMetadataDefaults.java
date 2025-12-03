@@ -133,7 +133,17 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     16, new EntityMetadataValue.Int(EnderDragonPhaseRegistry.phaseId(EnderDragonPhase.HOVERING)),
                     EntityTypePredicate.typed(EntityTypeKeys.ENDER_DRAGON)
-            ) // Ender dragon phase
+            ), // Ender dragon phase
+
+            /* --------------------- Defaults for allay entities --------------------- */
+            new DefaultsEntry(
+                    16, new EntityMetadataValue.Boolean(false),
+                    EntityTypePredicate.typed(EntityTypeKeys.ALLAY)
+            ), // Dancing
+            new DefaultsEntry(
+                    17, new EntityMetadataValue.Boolean(true),
+                    EntityTypePredicate.typed(EntityTypeKeys.ALLAY)
+            ) // Can duplicate
     );
 
     private EntityMetadataDefaults() {}

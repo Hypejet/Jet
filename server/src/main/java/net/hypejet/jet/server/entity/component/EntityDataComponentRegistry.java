@@ -173,6 +173,10 @@ public final class EntityDataComponentRegistry {
                                     EnderDragonPhaseRegistry.phaseId(Objects.requireNonNull(value))
                             )
                     )
+
+                    /* ---------------- Entity components applicable to allay entities ---------------- */
+                    .putBoolean(EntityDataComponent.DANCING, 16, EntityTypePredicate.typed(EntityTypeKeys.ALLAY))
+                    .putBoolean(EntityDataComponent.CAN_DUPLICATE, 17, EntityTypePredicate.typed(EntityTypeKeys.ALLAY))
                     .build();
 
     private EntityDataComponentRegistry() {}
