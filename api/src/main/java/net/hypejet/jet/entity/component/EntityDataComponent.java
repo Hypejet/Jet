@@ -444,7 +444,6 @@ public final class EntityDataComponent<V> {
      * <p>This component can be used on allay entities only.</p>
      *
      * @since 1.0
-     * @see EntityDataComponent
      */
     public static final EntityDataComponent<Boolean> DANCING = new EntityDataComponent<>("dancing", false);
 
@@ -454,7 +453,6 @@ public final class EntityDataComponent<V> {
      * <p>This component can be used on allay entities only.</p>
      *
      * @since 1.0
-     * @see EntityDataComponent
      */
     public static final EntityDataComponent<Boolean> CAN_DUPLICATE = new EntityDataComponent<>("can_duplicate", false);
 
@@ -464,9 +462,51 @@ public final class EntityDataComponent<V> {
      * <p>This component can be used on bat entities only.</p>
      *
      * @since 1.0
-     * @see EntityDataComponent
      */
     public static final EntityDataComponent<Boolean> RESTING = new EntityDataComponent<>("resting", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing whether a creaking entity can move.
+     *
+     * <p>This component can be used on creaking entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> CAN_MOVE = new EntityDataComponent<>("can_move", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing whether
+     * a creaking entity is active, meaning that it is able to attack players.
+     *
+     * <p>This component can be used on creaking entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> ACTIVE = new EntityDataComponent<>("active", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing whether a creaking entity is tearing down.
+     *
+     * <p>This component can be used on creaking entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> TEARING_DOWN = new EntityDataComponent<>("tearing_down", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * a {@linkplain BlockPosition block position} of the creaking heart block
+     * linked with a creaking entity.
+     *
+     * <p>This component can be used on creaking entities only.</p>
+     *
+     * <p>This component is nullable and {@code null} values mean
+     * that an entity is not linked with any creaking heart.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<BlockPosition> CREAKING_HEART_POSITION = new EntityDataComponent<>("creaking_heart_position", true);
 
     private final String name;
     private final boolean nullable;

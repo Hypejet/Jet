@@ -180,6 +180,17 @@ public final class EntityDataComponentRegistry {
 
                     /* ---------------- Entity components applicable to bat entities ---------------- */
                     .putBitFlag(EntityDataComponent.RESTING, 16, 0, EntityTypePredicate.typed(EntityTypeKeys.BAT))
+
+                    /* ---------------- Entity components applicable to creaking entities ---------------- */
+                    .putBoolean(EntityDataComponent.CAN_MOVE, 16, EntityTypePredicate.typed(EntityTypeKeys.CREAKING))
+                    .putBoolean(EntityDataComponent.ACTIVE, 17, EntityTypePredicate.typed(EntityTypeKeys.CREAKING))
+                    .putBoolean(
+                            EntityDataComponent.TEARING_DOWN, 18,
+                            EntityTypePredicate.typed(EntityTypeKeys.CREAKING)
+                    ).putOptionalBlockPos(
+                            EntityDataComponent.CREAKING_HEART_POSITION, 19,
+                            EntityTypePredicate.typed(EntityTypeKeys.CREAKING)
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}

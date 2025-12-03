@@ -149,7 +149,25 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     16, new EntityMetadataValue.Byte((byte) 0),
                     EntityTypePredicate.typed(EntityTypeKeys.BAT)
-            ) // Bat flags
+            ), // Bat flags
+
+            /* --------------------- Defaults for creaking entities --------------------- */
+            new DefaultsEntry(
+                    16, new EntityMetadataValue.Boolean(true),
+                    EntityTypePredicate.typed(EntityTypeKeys.CREAKING)
+            ), // Can move
+            new DefaultsEntry(
+                    17, new EntityMetadataValue.Boolean(false),
+                    EntityTypePredicate.typed(EntityTypeKeys.CREAKING)
+            ), // Active
+            new DefaultsEntry(
+                    18, new EntityMetadataValue.Boolean(false),
+                    EntityTypePredicate.typed(EntityTypeKeys.CREAKING)
+            ), // Tearing down
+            new DefaultsEntry(
+                    19, new EntityMetadataValue.OptionalBlockPositionValue(null),
+                    EntityTypePredicate.typed(EntityTypeKeys.CREAKING)
+            ) // Creaking heart position
     );
 
     private EntityMetadataDefaults() {}
