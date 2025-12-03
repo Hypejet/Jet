@@ -177,6 +177,9 @@ public final class EntityDataComponentRegistry {
                     /* ---------------- Entity components applicable to allay entities ---------------- */
                     .putBoolean(EntityDataComponent.DANCING, 16, EntityTypePredicate.typed(EntityTypeKeys.ALLAY))
                     .putBoolean(EntityDataComponent.CAN_DUPLICATE, 17, EntityTypePredicate.typed(EntityTypeKeys.ALLAY))
+
+                    /* ---------------- Entity components applicable to bat entities ---------------- */
+                    .putBitFlag(EntityDataComponent.RESTING, 16, 0, EntityTypePredicate.typed(EntityTypeKeys.BAT))
                     .build();
 
     private EntityDataComponentRegistry() {}

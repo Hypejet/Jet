@@ -439,7 +439,7 @@ public final class EntityDataComponent<V> {
     public static final EntityDataComponent<EnderDragonPhase> ENDER_DRAGON_PHASE = new EntityDataComponent<>("ender_dragon_phase", false);
 
     /**
-     * An {@linkplain EntityDataComponent entity data component} defining whether an allay entity dances.
+     * An {@linkplain EntityDataComponent entity data component} defining whether an allay entity is dancing.
      *
      * <p>This component can be used on allay entities only.</p>
      *
@@ -457,6 +457,16 @@ public final class EntityDataComponent<V> {
      * @see EntityDataComponent
      */
     public static final EntityDataComponent<Boolean> CAN_DUPLICATE = new EntityDataComponent<>("can_duplicate", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} defining whether a bat entity is resting.
+     *
+     * <p>This component can be used on bat entities only.</p>
+     *
+     * @since 1.0
+     * @see EntityDataComponent
+     */
+    public static final EntityDataComponent<Boolean> RESTING = new EntityDataComponent<>("resting", false);
 
     private final String name;
     private final boolean nullable;

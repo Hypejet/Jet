@@ -143,7 +143,13 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     17, new EntityMetadataValue.Boolean(true),
                     EntityTypePredicate.typed(EntityTypeKeys.ALLAY)
-            ) // Can duplicate
+            ), // Can duplicate
+
+            /* --------------------- Defaults for bat entities --------------------- */
+            new DefaultsEntry(
+                    16, new EntityMetadataValue.Byte((byte) 0),
+                    EntityTypePredicate.typed(EntityTypeKeys.BAT)
+            ) // Bat flags
     );
 
     private EntityMetadataDefaults() {}
