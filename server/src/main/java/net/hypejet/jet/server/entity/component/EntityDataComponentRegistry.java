@@ -8,6 +8,7 @@ import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
 import net.hypejet.jet.server.util.game.entity.EntityTypePredicate;
 import net.hypejet.jet.server.util.number.ByteUtil;
 import net.hypejet.jet.world.coordinate.BlockPosition;
+import net.hypejet.jet.world.coordinate.rotation.Rotations;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.HashMap;
@@ -118,6 +119,48 @@ public final class EntityDataComponentRegistry {
                             EntityMetadataValue.ParticleValue::value,
                             (currentMetadataValue, value) ->
                                     new EntityMetadataValue.ParticleValue(Objects.requireNonNull(value))
+                    )
+
+                    /* ---------------- Entity components applicable to armor stand entities ---------------- */
+                    .putBitFlag(
+                            EntityDataComponent.SMALL, 15, 0,
+                            EntityTypePredicate.typed(EntityTypeKeys.ARMOR_STAND)
+                    )
+                    .putBitFlag(
+                            EntityDataComponent.SHOW_ARMS, 15, 2,
+                            EntityTypePredicate.typed(EntityTypeKeys.ARMOR_STAND)
+                    )
+                    .putBitFlag(
+                            EntityDataComponent.HIDE_BASE_PLATE, 15, 3,
+                            EntityTypePredicate.typed(EntityTypeKeys.ARMOR_STAND)
+                    )
+                    .putBitFlag(
+                            EntityDataComponent.MARKER, 15, 4,
+                            EntityTypePredicate.typed(EntityTypeKeys.ARMOR_STAND)
+                    )
+                    .putRotations(
+                            EntityDataComponent.HEAD_POSE, 16,
+                            EntityTypePredicate.typed(EntityTypeKeys.ARMOR_STAND)
+                    )
+                    .putRotations(
+                            EntityDataComponent.BODY_POSE, 17,
+                            EntityTypePredicate.typed(EntityTypeKeys.ARMOR_STAND)
+                    )
+                    .putRotations(
+                            EntityDataComponent.LEFT_ARM_POSE, 18,
+                            EntityTypePredicate.typed(EntityTypeKeys.ARMOR_STAND)
+                    )
+                    .putRotations(
+                            EntityDataComponent.RIGHT_ARM_POSE, 19,
+                            EntityTypePredicate.typed(EntityTypeKeys.ARMOR_STAND)
+                    )
+                    .putRotations(
+                            EntityDataComponent.LEFT_LEG_POSE, 20,
+                            EntityTypePredicate.typed(EntityTypeKeys.ARMOR_STAND)
+                    )
+                    .putRotations(
+                            EntityDataComponent.RIGHT_LEG_POSE, 21,
+                            EntityTypePredicate.typed(EntityTypeKeys.ARMOR_STAND)
                     )
                     .build();
 
@@ -298,6 +341,34 @@ public final class EntityDataComponentRegistry {
                     component, metadataIndex, EntityMetadataValue.OptionalBlockPositionValue.class,
                     entityTypePredicate, EntityMetadataValue.OptionalBlockPositionValue::value,
                     (currentMetadataValue, value) -> new EntityMetadataValue.OptionalBlockPositionValue(value)
+            );
+        }
+
+        /**
+         * Registers the specified {@linkplain Rotations rotations}
+         * {@linkplain EntityDataComponent entity data component}.
+         *
+         * <p>The component is going to be backed by
+         * an {@linkplain EntityMetadataValue.RotationsValue rotations entity metadata value}.</p>
+         *
+         * @param component the entity data component to register, must not be nullable
+         * @param metadataIndex entity metadata index where entity metadata values that are
+         *                      associated with the specified entity data component should be put at
+         * @param entityTypePredicate a predicate that should check whether entities with entity type provided during
+         *                            predicate testing should support the specified entity data component
+         * @return this builder
+         * @throws IllegalArgumentException if the specified entity data component is nullable
+         * @since 1.0
+         */
+        private RegistrationsBuilder putRotations(EntityDataComponent<Rotations> component,
+                                                  int metadataIndex, EntityTypePredicate entityTypePredicate) {
+            if (component.nullable())
+                throw new IllegalArgumentException("The entity data component must not be nullable");
+
+            return this.put(
+                    component, metadataIndex, EntityMetadataValue.RotationsValue.class,
+                    entityTypePredicate, EntityMetadataValue.RotationsValue::value,
+                    (ignored, value) -> new EntityMetadataValue.RotationsValue(Objects.requireNonNull(value))
             );
         }
 

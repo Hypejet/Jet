@@ -13,6 +13,7 @@ import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.JetEntityType;
 import net.hypejet.jet.server.util.game.entity.EntityTypePredicate;
 import net.hypejet.jet.util.color.ARGBColor;
+import net.hypejet.jet.world.coordinate.rotation.Rotations;
 import net.hypejet.jet.world.particle.color.ColorParticle;
 import org.jspecify.annotations.NullMarked;
 
@@ -94,7 +95,37 @@ public final class EntityMetadataDefaults {
                             ARGBColor.fromARGB(255, 255, 255, 255)
                     )),
                     EntityTypePredicate.typed(EntityTypeKeys.AREA_EFFECT_CLOUD)
-            ) // Particle
+            ), // Particle
+
+            /* --------------------- Defaults for armor stand entities --------------------- */
+            new DefaultsEntry(
+                    15, new EntityMetadataValue.Byte((byte) 0),
+                    EntityTypePredicate.typed(EntityTypeKeys.ARMOR_STAND)
+            ), // Client flags
+            new DefaultsEntry(
+                    16, new EntityMetadataValue.RotationsValue(new Rotations(0f, 0f, 0f)),
+                    EntityTypePredicate.typed(EntityTypeKeys.ARMOR_STAND)
+            ), // Head pose
+            new DefaultsEntry(
+                    17, new EntityMetadataValue.RotationsValue(new Rotations(0f, 0f, 0f)),
+                    EntityTypePredicate.typed(EntityTypeKeys.ARMOR_STAND)
+            ), // Body pose
+            new DefaultsEntry(
+                    18, new EntityMetadataValue.RotationsValue(new Rotations(-10f, 0f, -10f)),
+                    EntityTypePredicate.typed(EntityTypeKeys.ARMOR_STAND)
+            ), // Left arm pose
+            new DefaultsEntry(
+                    19, new EntityMetadataValue.RotationsValue(new Rotations(-15f, 0f, 10f)),
+                    EntityTypePredicate.typed(EntityTypeKeys.ARMOR_STAND)
+            ), // Right arm pose
+            new DefaultsEntry(
+                    20, new EntityMetadataValue.RotationsValue(new Rotations(-1f, 0f, -1f)),
+                    EntityTypePredicate.typed(EntityTypeKeys.ARMOR_STAND)
+            ), // Left leg pose
+            new DefaultsEntry(
+                    21, new EntityMetadataValue.RotationsValue(new Rotations(1f, 0f, 1f)),
+                    EntityTypePredicate.typed(EntityTypeKeys.ARMOR_STAND)
+            ) // Right leg pose
     );
 
     private EntityMetadataDefaults() {}

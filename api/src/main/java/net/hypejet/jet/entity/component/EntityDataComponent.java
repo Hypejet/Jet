@@ -3,6 +3,7 @@ package net.hypejet.jet.entity.component;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.pose.Pose;
 import net.hypejet.jet.world.coordinate.BlockPosition;
+import net.hypejet.jet.world.coordinate.rotation.Rotations;
 import net.hypejet.jet.world.particle.Particle;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NullMarked;
@@ -328,6 +329,104 @@ public final class EntityDataComponent<V> {
      * @since 1.0
      */
     public static final EntityDataComponent<Particle> EFFECT_PARTICLE = new EntityDataComponent<>("effect_particle", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} defining whether an armor stand is small.
+     *
+     * <p>This component can be used on armor stand entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> SMALL = new EntityDataComponent<>("small", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} defining whether arms of an armor stand are visible.
+     *
+     * <p>This component can be used on armor stand entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> SHOW_ARMS = new EntityDataComponent<>("show_arms", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * defining whether the plate underneath an armor stand is hidden.
+     *
+     * <p>This component can be used on armor stand entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> HIDE_BASE_PLATE = new EntityDataComponent<>("hide_base_plate", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} defining whether an armor
+     * stand is a marker, meaning it is invulnerable to all kind of attacks and physics.
+     *
+     * <p>This component can be used on armor stand entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> MARKER = new EntityDataComponent<>("marker", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * head {@linkplain Rotations rotations} of an armor stand.
+     *
+     * <p>This component can be used on armor stand entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Rotations> HEAD_POSE = new EntityDataComponent<>("head_pose", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * body {@linkplain Rotations rotations} of an armor stand.
+     *
+     * <p>This component can be used on armor stand entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Rotations> BODY_POSE = new EntityDataComponent<>("body_pose", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * left arm {@linkplain Rotations rotations} of an armor stand.
+     *
+     * <p>This component can be used on armor stand entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Rotations> LEFT_ARM_POSE = new EntityDataComponent<>("left_arm_pose", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * right arm {@linkplain Rotations rotations} of an armor stand.
+     *
+     * <p>This component can be used on armor stand entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Rotations> RIGHT_ARM_POSE = new EntityDataComponent<>("right_arm_pose", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * left leg {@linkplain Rotations rotations} of an armor stand.
+     *
+     * <p>This component can be used on armor stand entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Rotations> LEFT_LEG_POSE = new EntityDataComponent<>("left_leg_pose", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * right leg {@linkplain Rotations rotations} of an armor stand.
+     *
+     * <p>This component can be used on armor stand entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Rotations> RIGHT_LEG_POSE = new EntityDataComponent<>("right_leg_pose", false);
 
     private final String name;
     private final boolean nullable;
