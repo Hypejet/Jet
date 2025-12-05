@@ -169,10 +169,10 @@ public final class EntityMetadataDefaults {
                     EntityTypePredicate.typed(EntityTypeKeys.CREAKING)
             ), // Creaking heart position
 
-            /* --------------------- Defaults for blaze entities --------------------- */
+            /* --------------------- Defaults for blaze and vex entities --------------------- */
             new DefaultsEntry(
                     16, new EntityMetadataValue.Byte((byte) 0),
-                    EntityTypePredicate.typed(EntityTypeKeys.BLAZE)
+                    EntityTypePredicate.typed(EntityTypeKeys.BLAZE, EntityTypeKeys.VEX)
             ), // Blaze flags
 
             /* --------------------- Defaults for spider entities --------------------- */

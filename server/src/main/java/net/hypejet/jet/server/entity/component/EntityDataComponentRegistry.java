@@ -192,8 +192,11 @@ public final class EntityDataComponentRegistry {
                             EntityTypePredicate.typed(EntityTypeKeys.CREAKING)
                     )
 
-                    /* ---------------- Entity components applicable to blaze entities ---------------- */
-                    .putBitFlag(EntityDataComponent.CHARGED, 16, 0, EntityTypePredicate.typed(EntityTypeKeys.BLAZE))
+                    /* ---------------- Entity components applicable to blaze and vex entities ---------------- */
+                    .putBitFlag(
+                            EntityDataComponent.CHARGED, 16, 0,
+                            EntityTypePredicate.typed(EntityTypeKeys.BLAZE, EntityTypeKeys.VEX)
+                    )
 
                     /* ---------------- Entity components applicable to spider entities ---------------- */
                     .putBitFlag(

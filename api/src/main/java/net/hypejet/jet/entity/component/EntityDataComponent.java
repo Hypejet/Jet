@@ -509,10 +509,10 @@ public final class EntityDataComponent<V> {
     public static final EntityDataComponent<BlockPosition> CREAKING_HEART_POSITION = new EntityDataComponent<>("creaking_heart_position", true);
 
     /**
-     * An {@linkplain EntityDataComponent entity data component} representing whether
-     * a blaze entity has charged the fireball attack and is ready to use it.
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * whether an entity has charged its attack and is ready to use it.
      *
-     * <p>This component can be used on blaze entities only.</p>
+     * <p>This component can be used on blaze and vex entities only.</p>
      *
      * @since 1.0
      */
