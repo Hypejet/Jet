@@ -527,6 +527,16 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<Boolean> CLIMBING = new EntityDataComponent<>("climbing", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * an anger level that a warden entity currently has on its current target.
+     *
+     * <p>This component can be used on warden entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Integer> ANGER_LEVEL = new EntityDataComponent<>("anger_level", false);
+
     private final String name;
     private final boolean nullable;
 

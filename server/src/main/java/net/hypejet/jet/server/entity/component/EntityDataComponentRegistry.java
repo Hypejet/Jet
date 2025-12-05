@@ -200,6 +200,9 @@ public final class EntityDataComponentRegistry {
                             EntityDataComponent.CLIMBING, 16, 0,
                             EntityTypePredicate.typed(EntityTypeKeys.SPIDER, EntityTypeKeys.CAVE_SPIDER)
                     )
+
+                    /* ---------------- Entity components applicable to warden entities ---------------- */
+                    .putInt(EntityDataComponent.ANGER_LEVEL, 16, EntityTypePredicate.typed(EntityTypeKeys.WARDEN))
                     .build();
 
     private EntityDataComponentRegistry() {}

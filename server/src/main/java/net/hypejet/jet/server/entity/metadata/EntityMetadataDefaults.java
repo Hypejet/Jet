@@ -179,7 +179,13 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     16, new EntityMetadataValue.Byte((byte) 0),
                     EntityTypePredicate.typed(EntityTypeKeys.SPIDER, EntityTypeKeys.CAVE_SPIDER)
-            ) // Spider flags
+            ), // Spider flags
+
+            /* --------------------- Defaults for warden entities --------------------- */
+            new DefaultsEntry(
+                    16, new EntityMetadataValue.Int(0),
+                    EntityTypePredicate.typed(EntityTypeKeys.WARDEN)
+            )
     );
 
     private EntityMetadataDefaults() {}
