@@ -8,6 +8,8 @@ import net.hypejet.jet.server.entity.enderdragon.EnderDragonPhaseRegistry;
 import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
 import net.hypejet.jet.server.util.game.entity.EntityTypePredicate;
 import net.hypejet.jet.server.util.number.ByteUtil;
+import net.hypejet.jet.server.world.block.state.JetBlockState;
+import net.hypejet.jet.world.block.state.BlockState;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.hypejet.jet.world.coordinate.rotation.Rotations;
 import org.jspecify.annotations.NullMarked;
@@ -206,6 +208,14 @@ public final class EntityDataComponentRegistry {
 
                     /* ---------------- Entity components applicable to warden entities ---------------- */
                     .putInt(EntityDataComponent.ANGER_LEVEL, 16, EntityTypePredicate.typed(EntityTypeKeys.WARDEN))
+
+                    /* ---------------- Entity components applicable to enderman entities ---------------- */
+                    .putOptionalBlockState(
+                            EntityDataComponent.CARRIED_BLOCK, 16,
+                            EntityTypePredicate.typed(EntityTypeKeys.ENDERMAN)
+                    )
+                    .putBoolean(EntityDataComponent.SCREAMING, 17, EntityTypePredicate.typed(EntityTypeKeys.ENDERMAN))
+                    .putBoolean(EntityDataComponent.STARED_AT, 18, EntityTypePredicate.typed(EntityTypeKeys.ENDERMAN))
                     .build();
 
     private EntityDataComponentRegistry() {}
@@ -365,7 +375,7 @@ public final class EntityDataComponentRegistry {
          *
          * <p>The component is going to be backed by
          * an {@linkplain EntityMetadataValue.OptionalBlockPositionValue optional
-         * block-position entity metadata value}.</p>
+         * block position entity metadata value}.</p>
          *
          * @param component the entity data component to register, must be nullable
          * @param metadataIndex entity metadata index where entity metadata values that are
@@ -385,6 +395,49 @@ public final class EntityDataComponentRegistry {
                     component, metadataIndex, EntityMetadataValue.OptionalBlockPositionValue.class,
                     entityTypePredicate, EntityMetadataValue.OptionalBlockPositionValue::value,
                     (currentMetadataValue, value) -> new EntityMetadataValue.OptionalBlockPositionValue(value)
+            );
+        }
+
+        /**
+         * Registers the specified nullable {@linkplain BlockState block-state}
+         * {@linkplain EntityDataComponent entity data component}.
+         *
+         * <p>The component is going to be backed by
+         * an {@linkplain EntityMetadataValue.OptionalBlockStateValue optional
+         * block state entity metadata value}.</p>
+         *
+         * @param component the entity data component to register, must be nullable
+         * @param metadataIndex entity metadata index where entity metadata values that are
+         *                      associated with the specified entity data component should be put at
+         * @param entityTypePredicate a predicate that should check whether entities with entity type provided during
+         *                            predicate testing should support the specified entity data component
+         * @return this builder
+         * @throws IllegalArgumentException if the specified entity data component is <strong>NOT</strong> nullable
+         * @since 1.0
+         */
+        private RegistrationsBuilder putOptionalBlockState(
+                EntityDataComponent<BlockState> component,
+                int metadataIndex, EntityTypePredicate entityTypePredicate
+        ) {
+            if (!component.nullable())
+                throw new IllegalArgumentException("The entity data component must be nullable");
+
+            return this.put(
+                    component, metadataIndex, EntityMetadataValue.OptionalBlockStateValue.class,
+                    entityTypePredicate, EntityMetadataValue.OptionalBlockStateValue::value,
+                    (currentMetadataValue, value) -> {
+                        JetBlockState validatedBlockState;
+
+                        if (value == null) {
+                            validatedBlockState = null;
+                        } else if (value instanceof JetBlockState) {
+                            validatedBlockState = (JetBlockState) value;
+                        } else {
+                            throw new IllegalArgumentException("The specified block state is not a valid block state");
+                        }
+
+                        return new EntityMetadataValue.OptionalBlockStateValue(validatedBlockState);
+                    }
             );
         }
 

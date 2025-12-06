@@ -173,7 +173,7 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     16, new EntityMetadataValue.Byte((byte) 0),
                     EntityTypePredicate.typed(EntityTypeKeys.BLAZE, EntityTypeKeys.VEX)
-            ), // Blaze flags
+            ), // Blaze flags and vex flags
 
             /* --------------------- Defaults for spider entities --------------------- */
             new DefaultsEntry(
@@ -185,7 +185,21 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     16, new EntityMetadataValue.Int(0),
                     EntityTypePredicate.typed(EntityTypeKeys.WARDEN)
-            )
+            ), // Anger level
+
+            /* --------------------- Defaults for enderman entities --------------------- */
+            new DefaultsEntry(
+                    16, new EntityMetadataValue.OptionalBlockStateValue(null),
+                    EntityTypePredicate.typed(EntityTypeKeys.ENDERMAN)
+            ), // Carried block state
+            new DefaultsEntry(
+                    17, new EntityMetadataValue.Boolean(false),
+                    EntityTypePredicate.typed(EntityTypeKeys.ENDERMAN)
+            ), // Screaming
+            new DefaultsEntry(
+                    18, new EntityMetadataValue.Boolean(false),
+                    EntityTypePredicate.typed(EntityTypeKeys.ENDERMAN)
+            ) // Stared at
     );
 
     private EntityMetadataDefaults() {}

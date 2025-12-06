@@ -3,6 +3,7 @@ package net.hypejet.jet.entity.component;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.enderdragon.EnderDragonPhase;
 import net.hypejet.jet.entity.pose.Pose;
+import net.hypejet.jet.world.block.state.BlockState;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.hypejet.jet.world.coordinate.rotation.Rotations;
 import net.hypejet.jet.world.particle.Particle;
@@ -536,6 +537,38 @@ public final class EntityDataComponent<V> {
      * @since 1.0
      */
     public static final EntityDataComponent<Integer> ANGER_LEVEL = new EntityDataComponent<>("anger_level", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * a {@linkplain BlockState block state} carried by an enderman entity.
+     *
+     * <p>This component can be used on enderman entities only.</p>
+     *
+     * <p>This component is nullable and {@code null} values mean
+     * that an enderman entity does not carry any block state.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<BlockState> CARRIED_BLOCK = new EntityDataComponent<>("carried_block", true);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing whether an enderman entity is screaming.
+     *
+     * <p>This component can be used on enderman entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> SCREAMING = new EntityDataComponent<>("screaming", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing whether an enderman
+     * entity has been stared at. This causes nearby players to hear an ambient sound.
+     *
+     * <p>This component can be used on enderman entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> STARED_AT = new EntityDataComponent<>("stared_at", false);
 
     private final String name;
     private final boolean nullable;
