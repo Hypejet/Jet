@@ -570,6 +570,17 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<Boolean> STARED_AT = new EntityDataComponent<>("stared_at", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing whether a piglin entity is immune
+     * to zombification, meaning that it does not convert to a zombified piglin in dimensions where such kind
+     * of behaviour is enabled.
+     *
+     * <p>This component can be used on piglin and piglin brute entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> IMMUNE_TO_ZOMBIFICATION = new EntityDataComponent<>("immune_to_zombification", false);
+
     private final String name;
     private final boolean nullable;
 

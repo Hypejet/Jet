@@ -216,6 +216,12 @@ public final class EntityDataComponentRegistry {
                     )
                     .putBoolean(EntityDataComponent.SCREAMING, 17, EntityTypePredicate.typed(EntityTypeKeys.ENDERMAN))
                     .putBoolean(EntityDataComponent.STARED_AT, 18, EntityTypePredicate.typed(EntityTypeKeys.ENDERMAN))
+
+                    /* ---------------- Entity components applicable to piglin entities ---------------- */
+                    .putBoolean(
+                            EntityDataComponent.IMMUNE_TO_ZOMBIFICATION, 16,
+                            EntityTypePredicate.typed(EntityTypeKeys.PIGLIN, EntityTypeKeys.PIGLIN_BRUTE)
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}

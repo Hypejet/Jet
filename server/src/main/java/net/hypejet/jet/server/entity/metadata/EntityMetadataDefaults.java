@@ -199,7 +199,13 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     18, new EntityMetadataValue.Boolean(false),
                     EntityTypePredicate.typed(EntityTypeKeys.ENDERMAN)
-            ) // Stared at
+            ), // Stared at
+
+            /* --------------------- Defaults for piglin entities --------------------- */
+            new DefaultsEntry(
+                    16, new EntityMetadataValue.Boolean(false),
+                    EntityTypePredicate.typed(EntityTypeKeys.PIGLIN, EntityTypeKeys.PIGLIN_BRUTE)
+            ) // Immune to zombification
     );
 
     private EntityMetadataDefaults() {}
