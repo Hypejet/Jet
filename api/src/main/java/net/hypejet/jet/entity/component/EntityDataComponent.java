@@ -581,6 +581,15 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<Boolean> IMMUNE_TO_ZOMBIFICATION = new EntityDataComponent<>("immune_to_zombification", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing whether an entity uses a baby model.
+     *
+     * <p>This component can be used on zoglin entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> BABY = new EntityDataComponent<>("baby", false);
+
     private final String name;
     private final boolean nullable;
 

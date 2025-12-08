@@ -222,6 +222,9 @@ public final class EntityDataComponentRegistry {
                             EntityDataComponent.IMMUNE_TO_ZOMBIFICATION, 16,
                             EntityTypePredicate.typed(EntityTypeKeys.PIGLIN, EntityTypeKeys.PIGLIN_BRUTE)
                     )
+
+                    /* ---------------- Entity components applicable to zoglin entities ---------------- */
+                    .putBoolean(EntityDataComponent.BABY, 16, EntityTypePredicate.typed(EntityTypeKeys.ZOGLIN))
                     .build();
 
     private EntityDataComponentRegistry() {}

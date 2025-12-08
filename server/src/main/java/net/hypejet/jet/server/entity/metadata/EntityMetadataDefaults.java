@@ -205,7 +205,13 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     16, new EntityMetadataValue.Boolean(false),
                     EntityTypePredicate.typed(EntityTypeKeys.PIGLIN, EntityTypeKeys.PIGLIN_BRUTE)
-            ) // Immune to zombification
+            ), // Immune to zombification
+
+            /* --------------------- Defaults for zoglin entities --------------------- */
+            new DefaultsEntry(
+                    16, new EntityMetadataValue.Boolean(false),
+                    EntityTypePredicate.typed(EntityTypeKeys.ZOGLIN)
+            ) // Baby
     );
 
     private EntityMetadataDefaults() {}
