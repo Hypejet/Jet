@@ -207,11 +207,18 @@ public final class EntityMetadataDefaults {
                     EntityTypePredicate.typed(EntityTypeKeys.PIGLIN, EntityTypeKeys.PIGLIN_BRUTE)
             ), // Immune to zombification
 
-            /* --------------------- Defaults for zoglin entities --------------------- */
+            /* --------------------- Defaults for entities with baby variants --------------------- */
             new DefaultsEntry(
                     16, new EntityMetadataValue.Boolean(false),
-                    EntityTypePredicate.typed(EntityTypeKeys.ZOGLIN)
-            ) // Baby
+                    EntityTypePredicate.and(
+                            EntityTypePredicate.typed(EntityTypeKeys.ZOGLIN),
+                            EntityTypePredicate.ZOMBIE
+                    )
+            ), // Baby
+
+            /* ------------------- Defaults for zombie-like entities ------------------- */
+            new DefaultsEntry(17, new EntityMetadataValue.Int(0), EntityTypePredicate.ZOMBIE), // Legacy type field, in modern versions it always remains 0
+            new DefaultsEntry(18, new EntityMetadataValue.Boolean(false), EntityTypePredicate.ZOMBIE) // Converting to drowned
     );
 
     private EntityMetadataDefaults() {}

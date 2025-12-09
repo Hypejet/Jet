@@ -2,6 +2,7 @@ package net.hypejet.jet.server.util.game.entity;
 
 import net.hypejet.jet.entity.EntityType;
 import net.hypejet.jet.registry.holder.Holder;
+import net.hypejet.jet.registry.keys.EntityTypeKeys;
 import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntityType;
@@ -44,6 +45,17 @@ public interface EntityTypePredicate extends BiPredicate<Holder.Reference<Entity
     EntityTypePredicate MOB = (holder, value) -> value.mob();
 
     /**
+     * An {@linkplain EntityTypePredicate entity type predicate} that is
+     * satisfied only by zombie-like {@linkplain JetEntityType entity types}.
+     *
+     * @since 1.0
+     */
+    EntityTypePredicate ZOMBIE = typed(
+            EntityTypeKeys.ZOMBIE, EntityTypeKeys.DROWNED, EntityTypeKeys.ZOMBIE_VILLAGER,
+            EntityTypeKeys.ZOMBIFIED_PIGLIN, EntityTypeKeys.HUSK
+    );
+
+    /**
      * Evaluates this predicate on the specified {@linkplain JetEntityType entity type}.
      *
      * @param holder the holder referencing to the entity type that should be tested
@@ -82,5 +94,24 @@ public interface EntityTypePredicate extends BiPredicate<Holder.Reference<Entity
     static EntityTypePredicate typed(Key... entityTypeKeys) {
         Set<Key> keySet = Set.of(entityTypeKeys);
         return (holder, value) -> keySet.contains(holder.key());
+    }
+
+    /**
+     * Creates an {@linkplain EntityTypePredicate entity type predicate} which is satisfied
+     * only if the specified {@linkplain EntityTypePredicate entity type predicates} are satisfied.
+     *
+     * <p>If no predicates are specified, the created predicate always returns {@code true}.</p>
+     *
+     * @param predicates the predicates that should be satisfied to satisfy the predicate that is being created
+     * @return the created entity type predicate
+     * @since 1.0
+     */
+    static EntityTypePredicate and(EntityTypePredicate... predicates) {
+        if (predicates.length == 0) return TRUE;
+        return (holder, value) -> {
+            for (EntityTypePredicate predicate : predicates)
+                if (!predicate.test(holder, value)) return false;
+            return true;
+        };
     }
 }

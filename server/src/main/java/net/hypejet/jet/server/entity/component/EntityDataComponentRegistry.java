@@ -223,8 +223,18 @@ public final class EntityDataComponentRegistry {
                             EntityTypePredicate.typed(EntityTypeKeys.PIGLIN, EntityTypeKeys.PIGLIN_BRUTE)
                     )
 
-                    /* ---------------- Entity components applicable to zoglin entities ---------------- */
-                    .putBoolean(EntityDataComponent.BABY, 16, EntityTypePredicate.typed(EntityTypeKeys.ZOGLIN))
+                    /* ----------- Entity components applicable to entities with baby variants ----------- */
+                    .putBoolean(
+                            EntityDataComponent.BABY, 16,
+                            EntityTypePredicate.and(
+                                    EntityTypePredicate.typed(EntityTypeKeys.ZOGLIN),
+                                    EntityTypePredicate.ZOMBIE
+                            )
+                    )
+
+                    /* -------------- Entity components applicable to zombie-like entities -------------- */
+                    // 17 index is reserved for legacy type field, but in modern versions it remains 0, therefore there is no need for a component
+                    .putBoolean(EntityDataComponent.CONVERTING_TO_DROWNED, 18, EntityTypePredicate.ZOMBIE)
                     .build();
 
     private EntityDataComponentRegistry() {}
