@@ -24,6 +24,7 @@ import net.hypejet.jet.world.coordinate.floats.FloatVector;
 import net.hypejet.jet.world.coordinate.rotation.Rotations;
 import net.hypejet.jet.world.direction.Direction;
 import net.hypejet.jet.world.particle.Particle;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Range;
@@ -353,6 +354,17 @@ public sealed interface EntityMetadataValue {
      */
     record VillagerData(Holder<VillagerType> type, Holder<VillagerProfession> profession, int level)
             implements EntityMetadataValue {
+        /**
+         * A default {@linkplain VillagerData villager data} used by entity metadata in vanilla.
+         *
+         * @since 1.0
+         */
+        public static final VillagerData DEFAULT = new VillagerData(
+                new Holder.Reference<>(Key.key("plains")), // TODO: Auto-generate villager types
+                new Holder.Reference<>(Key.key("none")), // TODO: Auto-generate villager professions
+                1
+        );
+
         /**
          * Constructs the {@linkplain VillagerData villager data entity metadata value}.
          *

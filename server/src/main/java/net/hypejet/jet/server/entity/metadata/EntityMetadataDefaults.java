@@ -218,7 +218,17 @@ public final class EntityMetadataDefaults {
 
             /* ------------------- Defaults for zombie-like entities ------------------- */
             new DefaultsEntry(17, new EntityMetadataValue.Int(0), EntityTypePredicate.ZOMBIE), // Legacy type field, in modern versions it always remains 0
-            new DefaultsEntry(18, new EntityMetadataValue.Boolean(false), EntityTypePredicate.ZOMBIE) // Converting to drowned
+            new DefaultsEntry(18, new EntityMetadataValue.Boolean(false), EntityTypePredicate.ZOMBIE), // Converting to drowned
+
+            /* ------------------- Defaults for zombie villager entities ------------------- */
+            new DefaultsEntry(
+                    19, new EntityMetadataValue.Boolean(false),
+                    EntityTypePredicate.typed(EntityTypeKeys.ZOMBIE_VILLAGER)
+            ), // Recovering
+            new DefaultsEntry(
+                    20, EntityMetadataValue.VillagerData.DEFAULT,
+                    EntityTypePredicate.typed(EntityTypeKeys.ZOMBIE_VILLAGER)
+            ) // Villager data (type, profession, level)
     );
 
     private EntityMetadataDefaults() {}

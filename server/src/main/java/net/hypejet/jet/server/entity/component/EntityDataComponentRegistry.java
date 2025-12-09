@@ -235,6 +235,42 @@ public final class EntityDataComponentRegistry {
                     /* -------------- Entity components applicable to zombie-like entities -------------- */
                     // 17 index is reserved for legacy type field, but in modern versions it remains 0, therefore there is no need for a component
                     .putBoolean(EntityDataComponent.CONVERTING_TO_DROWNED, 18, EntityTypePredicate.ZOMBIE)
+
+                    /* -------------- Entity components applicable to zombie villager entities -------------- */
+                    .putBoolean(
+                            EntityDataComponent.RECOVERING, 19,
+                            EntityTypePredicate.typed(EntityTypeKeys.ZOMBIE_VILLAGER)
+                    )
+                    .put(
+                            EntityDataComponent.VILLAGER_TYPE, 20, EntityMetadataValue.VillagerData.class,
+                            EntityTypePredicate.typed(EntityTypeKeys.ZOMBIE_VILLAGER),
+                            EntityMetadataValue.VillagerData::type,
+                            (currentMetadataValue, value) -> new EntityMetadataValue.VillagerData(
+                                    Objects.requireNonNull(value),
+                                    currentMetadataValue.profession(),
+                                    currentMetadataValue.level()
+                            )
+                    )
+                    .put(
+                            EntityDataComponent.VILLAGER_PROFESSION, 20, EntityMetadataValue.VillagerData.class,
+                            EntityTypePredicate.typed(EntityTypeKeys.ZOMBIE_VILLAGER),
+                            EntityMetadataValue.VillagerData::profession,
+                            (currentMetadataValue, value) -> new EntityMetadataValue.VillagerData(
+                                    currentMetadataValue.type(),
+                                    Objects.requireNonNull(value),
+                                    currentMetadataValue.level()
+                            )
+                    )
+                    .put(
+                            EntityDataComponent.VILLAGER_LEVEL, 20, EntityMetadataValue.VillagerData.class,
+                            EntityTypePredicate.typed(EntityTypeKeys.ZOMBIE_VILLAGER),
+                            EntityMetadataValue.VillagerData::level,
+                            (currentMetadataValue, value) -> new EntityMetadataValue.VillagerData(
+                                    currentMetadataValue.type(),
+                                    currentMetadataValue.profession(),
+                                    Objects.requireNonNull(value)
+                            )
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}
