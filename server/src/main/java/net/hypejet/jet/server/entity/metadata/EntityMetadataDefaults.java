@@ -230,11 +230,15 @@ public final class EntityMetadataDefaults {
                     EntityTypePredicate.typed(EntityTypeKeys.ZOMBIE_VILLAGER)
             ), // Villager data (type, profession, level)
 
-            /* ------------------- Defaults for skeleton entities ------------------- */
+            /* ------------------- Defaults for skeleton-like entities ------------------- */
             new DefaultsEntry(
                     16, new EntityMetadataValue.Boolean(false),
                     EntityTypePredicate.typed(EntityTypeKeys.SKELETON)
-            ) // Converting to stray
+            ), // Converting to stray
+            new DefaultsEntry(
+                    16, new EntityMetadataValue.Boolean(false),
+                    EntityTypePredicate.typed(EntityTypeKeys.BOGGED)
+            ) // Mushroom-sheared
     );
 
     private EntityMetadataDefaults() {}

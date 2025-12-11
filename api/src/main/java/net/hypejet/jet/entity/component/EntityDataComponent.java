@@ -649,6 +649,16 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<Boolean> CONVERTING_TO_STRAY = new EntityDataComponent<>("converting_to_stray", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing whether a bogged entity is sheared from mushrooms.
+     *
+     * <p>This component can be used on bogged entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> MUSHROOM_SHEARED = new EntityDataComponent<>("mushroom_sheared", false);
+
     private final String name;
     private final boolean nullable;
 

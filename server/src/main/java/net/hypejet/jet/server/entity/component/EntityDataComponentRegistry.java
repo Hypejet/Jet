@@ -272,10 +272,14 @@ public final class EntityDataComponentRegistry {
                             )
                     )
 
-                    /* -------------- Entity components applicable to skeleton entities -------------- */
+                    /* -------------- Entity components applicable to skeleton-like entities -------------- */
                     .putBoolean(
                             EntityDataComponent.CONVERTING_TO_STRAY, 16,
                             EntityTypePredicate.typed(EntityTypeKeys.SKELETON)
+                    )
+                    .putBoolean(
+                            EntityDataComponent.MUSHROOM_SHEARED, 16,
+                            EntityTypePredicate.typed(EntityTypeKeys.BOGGED)
                     )
                     .build();
 
