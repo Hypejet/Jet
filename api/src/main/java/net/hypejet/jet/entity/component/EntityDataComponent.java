@@ -659,6 +659,35 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<Boolean> MUSHROOM_SHEARED = new EntityDataComponent<>("mushroom_sheared", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing whether a creeper entity is swelling.
+     *
+     * <p>This component can be used on creeper entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> SWELLING = new EntityDataComponent<>("swelling", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * whether a creeper entity is powered, meaning that it has an "aura" effect.
+     *
+     * <p>This component can be used on creeper entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> POWERED = new EntityDataComponent<>("powered", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing whether a creeper entity was manually ignited.
+     *
+     * <p>This component can be used on creeper entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> IGNITED = new EntityDataComponent<>("ignited", false);
+
     private final String name;
     private final boolean nullable;
 

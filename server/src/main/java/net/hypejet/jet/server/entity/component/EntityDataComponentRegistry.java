@@ -281,6 +281,17 @@ public final class EntityDataComponentRegistry {
                             EntityDataComponent.MUSHROOM_SHEARED, 16,
                             EntityTypePredicate.typed(EntityTypeKeys.BOGGED)
                     )
+
+                    /* -------------- Entity components applicable to creeper entities -------------- */
+                    .put(
+                            EntityDataComponent.SWELLING, 16, EntityMetadataValue.Int.class,
+                            EntityTypePredicate.typed(EntityTypeKeys.CREEPER),
+                            metadataValue -> metadataValue.value() == 1,
+                            (currentMetadataValue, value) ->
+                                    new EntityMetadataValue.Int(Objects.requireNonNull(value) ? 1 : -1)
+                    )
+                    .putBoolean(EntityDataComponent.POWERED, 17, EntityTypePredicate.typed(EntityTypeKeys.CREEPER))
+                    .putBoolean(EntityDataComponent.IGNITED, 18, EntityTypePredicate.typed(EntityTypeKeys.CREEPER))
                     .build();
 
     private EntityDataComponentRegistry() {}
