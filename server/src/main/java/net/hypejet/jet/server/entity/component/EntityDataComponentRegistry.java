@@ -271,6 +271,12 @@ public final class EntityDataComponentRegistry {
                                     Objects.requireNonNull(value)
                             )
                     )
+
+                    /* -------------- Entity components applicable to skeleton entities -------------- */
+                    .putBoolean(
+                            EntityDataComponent.CONVERTING_TO_STRAY, 16,
+                            EntityTypePredicate.typed(EntityTypeKeys.SKELETON)
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}

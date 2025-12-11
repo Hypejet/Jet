@@ -639,6 +639,16 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<Integer> VILLAGER_LEVEL = new EntityDataComponent<>("villager_level", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing whether a skeleton entity is converting to a stray.
+     *
+     * <p>This component can be used on skeleton entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> CONVERTING_TO_STRAY = new EntityDataComponent<>("converting_to_stray", false);
+
     private final String name;
     private final boolean nullable;
 
