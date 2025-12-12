@@ -2,6 +2,7 @@ package net.hypejet.jet.entity.component;
 
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.enderdragon.EnderDragonPhase;
+import net.hypejet.jet.entity.illager.IllagerSpellType;
 import net.hypejet.jet.entity.pose.Pose;
 import net.hypejet.jet.entity.villager.VillagerProfession;
 import net.hypejet.jet.entity.villager.VillagerType;
@@ -717,6 +718,16 @@ public final class EntityDataComponent<V> {
      * @since 1.0
      */
     public static final EntityDataComponent<Boolean> CHARGING_CROSSBOW = new EntityDataComponent<>("charging_crossbow", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * the type of spell performed by a spellcaster illager.
+     *
+     * <p>This component can be used on spellcaster illager entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<IllagerSpellType> PERFORMED_SPELL = new EntityDataComponent<>("performed_spell", false);
 
     private final String name;
     private final boolean nullable;

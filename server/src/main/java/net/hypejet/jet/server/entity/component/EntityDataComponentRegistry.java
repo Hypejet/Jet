@@ -5,6 +5,7 @@ import net.hypejet.jet.entity.EntityType;
 import net.hypejet.jet.entity.component.EntityDataComponent;
 import net.hypejet.jet.registry.keys.EntityTypeKeys;
 import net.hypejet.jet.server.entity.enderdragon.EnderDragonPhaseRegistry;
+import net.hypejet.jet.server.entity.illager.IllagerSpellTypeRegistry;
 import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
 import net.hypejet.jet.server.util.game.entity.EntityTypePredicate;
 import net.hypejet.jet.server.util.number.ByteUtil;
@@ -302,6 +303,14 @@ public final class EntityDataComponentRegistry {
                     .putBoolean(
                             EntityDataComponent.CHARGING_CROSSBOW, 17,
                             EntityTypePredicate.typed(EntityTypeKeys.PILLAGER)
+                    )
+                    .put(
+                            EntityDataComponent.PERFORMED_SPELL, 17, EntityMetadataValue.Byte.class,
+                            EntityTypePredicate.typed(EntityTypeKeys.ILLUSIONER, EntityTypeKeys.EVOKER),
+                            metadataValue -> IllagerSpellTypeRegistry.spellTypeById(metadataValue.value()),
+                            (currentMetadataValue, value) -> new EntityMetadataValue.Byte(
+                                    IllagerSpellTypeRegistry.spellTypeId(Objects.requireNonNull(value))
+                            )
                     )
                     .build();
 

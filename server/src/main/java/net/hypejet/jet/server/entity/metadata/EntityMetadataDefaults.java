@@ -4,6 +4,7 @@ import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
 import net.hypejet.jet.entity.EntityType;
 import net.hypejet.jet.entity.enderdragon.EnderDragonPhase;
+import net.hypejet.jet.entity.illager.IllagerSpellType;
 import net.hypejet.jet.entity.pose.Pose;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.keys.EntityTypeKeys;
@@ -13,6 +14,7 @@ import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.JetEntityType;
 import net.hypejet.jet.server.entity.enderdragon.EnderDragonPhaseRegistry;
+import net.hypejet.jet.server.entity.illager.IllagerSpellTypeRegistry;
 import net.hypejet.jet.server.util.game.entity.EntityTypePredicate;
 import net.hypejet.jet.util.color.ARGBColor;
 import net.hypejet.jet.world.coordinate.rotation.Rotations;
@@ -263,7 +265,11 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     17, new EntityMetadataValue.Boolean(false),
                     EntityTypePredicate.typed(EntityTypeKeys.PILLAGER)
-            ) // Charging crossbow
+            ), // Charging crossbow
+            new DefaultsEntry(
+                    17, new EntityMetadataValue.Byte(IllagerSpellTypeRegistry.spellTypeId(IllagerSpellType.NONE)),
+                    EntityTypePredicate.typed(EntityTypeKeys.ILLUSIONER, EntityTypeKeys.EVOKER)
+            ) // Performed spell
     );
 
     private EntityMetadataDefaults() {}
