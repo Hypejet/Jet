@@ -292,6 +292,9 @@ public final class EntityDataComponentRegistry {
                     )
                     .putBoolean(EntityDataComponent.POWERED, 17, EntityTypePredicate.typed(EntityTypeKeys.CREEPER))
                     .putBoolean(EntityDataComponent.IGNITED, 18, EntityTypePredicate.typed(EntityTypeKeys.CREEPER))
+
+                    /* -------------- Entity components applicable to raider entities -------------- */
+                    .putBoolean(EntityDataComponent.CELEBRATING, 16, EntityTypePredicate.RAIDER)
                     .build();
 
     private EntityDataComponentRegistry() {}

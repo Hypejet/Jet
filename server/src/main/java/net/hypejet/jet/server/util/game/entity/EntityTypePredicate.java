@@ -56,6 +56,17 @@ public interface EntityTypePredicate extends BiPredicate<Holder.Reference<Entity
     );
 
     /**
+     * An {@linkplain EntityTypePredicate entity type predicate} that is
+     * satisfied only by raider {@linkplain JetEntityType entity types}.
+     *
+     * @since 1.0
+     */
+    EntityTypePredicate RAIDER = typed(
+            EntityTypeKeys.WITCH, EntityTypeKeys.RAVAGER, EntityTypeKeys.PILLAGER,
+            EntityTypeKeys.ILLUSIONER, EntityTypeKeys.EVOKER, EntityTypeKeys.VINDICATOR
+    );
+
+    /**
      * Evaluates this predicate on the specified {@linkplain JetEntityType entity type}.
      *
      * @param holder the holder referencing to the entity type that should be tested

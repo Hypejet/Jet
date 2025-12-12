@@ -688,6 +688,16 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<Boolean> IGNITED = new EntityDataComponent<>("ignited", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * whether a celebrating animation is playing on an entity.
+     *
+     * <p>This component can be used on raider entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> CELEBRATING = new EntityDataComponent<>("celebrating", false);
+
     private final String name;
     private final boolean nullable;
 

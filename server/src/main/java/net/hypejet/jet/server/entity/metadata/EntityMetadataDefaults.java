@@ -241,7 +241,10 @@ public final class EntityMetadataDefaults {
             ), // Mushroom-sheared
 
             /* ---------------------- Defaults for creeper entities ---------------------- */
-            new DefaultsEntry(16, new EntityMetadataValue.Int(-1), EntityTypePredicate.typed(EntityTypeKeys.CREEPER)), // Swelling
+            new DefaultsEntry(
+                    16, new EntityMetadataValue.Int(-1),
+                    EntityTypePredicate.typed(EntityTypeKeys.CREEPER)
+            ), // Swelling
             new DefaultsEntry(
                     17, new EntityMetadataValue.Boolean(false),
                     EntityTypePredicate.typed(EntityTypeKeys.CREEPER)
@@ -249,7 +252,10 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     18, new EntityMetadataValue.Boolean(false),
                     EntityTypePredicate.typed(EntityTypeKeys.CREEPER)
-            ) // Ignited
+            ), // Ignited
+
+            /* ---------------------- Defaults for raider entities ---------------------- */
+            new DefaultsEntry(16, new EntityMetadataValue.Boolean(false), EntityTypePredicate.RAIDER) // Celebrating
     );
 
     private EntityMetadataDefaults() {}
