@@ -295,6 +295,10 @@ public final class EntityDataComponentRegistry {
 
                     /* -------------- Entity components applicable to raider entities -------------- */
                     .putBoolean(EntityDataComponent.CELEBRATING, 16, EntityTypePredicate.RAIDER)
+                    .putBoolean(
+                            EntityDataComponent.DRINKING_POTION, 17,
+                            EntityTypePredicate.typed(EntityTypeKeys.WITCH)
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}

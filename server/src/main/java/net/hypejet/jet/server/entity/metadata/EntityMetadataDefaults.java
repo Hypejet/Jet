@@ -255,7 +255,11 @@ public final class EntityMetadataDefaults {
             ), // Ignited
 
             /* ---------------------- Defaults for raider entities ---------------------- */
-            new DefaultsEntry(16, new EntityMetadataValue.Boolean(false), EntityTypePredicate.RAIDER) // Celebrating
+            new DefaultsEntry(16, new EntityMetadataValue.Boolean(false), EntityTypePredicate.RAIDER), // Celebrating
+            new DefaultsEntry(
+                    17, new EntityMetadataValue.Boolean(false),
+                    EntityTypePredicate.typed(EntityTypeKeys.WITCH)
+            ) // Drinking potion
     );
 
     private EntityMetadataDefaults() {}

@@ -698,6 +698,16 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<Boolean> CELEBRATING = new EntityDataComponent<>("celebrating", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing whether a witch entity is drinking a potion.
+     *
+     * <p>This component can be used on witch entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> DRINKING_POTION = new EntityDataComponent<>("drinking_potion", false);
+
     private final String name;
     private final boolean nullable;
 
