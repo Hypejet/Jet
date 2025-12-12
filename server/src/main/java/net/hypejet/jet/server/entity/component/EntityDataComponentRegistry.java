@@ -299,6 +299,10 @@ public final class EntityDataComponentRegistry {
                             EntityDataComponent.DRINKING_POTION, 17,
                             EntityTypePredicate.typed(EntityTypeKeys.WITCH)
                     )
+                    .putBoolean(
+                            EntityDataComponent.CHARGING_CROSSBOW, 17,
+                            EntityTypePredicate.typed(EntityTypeKeys.PILLAGER)
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}

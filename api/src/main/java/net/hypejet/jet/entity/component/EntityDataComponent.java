@@ -708,6 +708,16 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<Boolean> DRINKING_POTION = new EntityDataComponent<>("drinking_potion", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing whether an entity is charging their crossbow.
+     *
+     * <p>This component can be used on pillager entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> CHARGING_CROSSBOW = new EntityDataComponent<>("charging_crossbow", false);
+
     private final String name;
     private final boolean nullable;
 

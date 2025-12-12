@@ -259,7 +259,11 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     17, new EntityMetadataValue.Boolean(false),
                     EntityTypePredicate.typed(EntityTypeKeys.WITCH)
-            ) // Drinking potion
+            ), // Drinking potion
+            new DefaultsEntry(
+                    17, new EntityMetadataValue.Boolean(false),
+                    EntityTypePredicate.typed(EntityTypeKeys.PILLAGER)
+            ) // Charging crossbow
     );
 
     private EntityMetadataDefaults() {}
