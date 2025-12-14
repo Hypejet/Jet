@@ -27,6 +27,7 @@ final class EntityTypeTypeAdapter extends TypeAdapter<JsonEntityType> {
     private static final String MAX_AIR_SUPPLY_FIELD = "max_air_supply";
     private static final String LIVING_FIELD = "living";
     private static final String MOB_FIELD = "mob";
+    private static final String AGEABLE_MOB_FIELD = "ageable_mob";
 
     private static final int DEFAULT_MAX_AIR_SUPPLY = 300;
 
@@ -65,6 +66,11 @@ final class EntityTypeTypeAdapter extends TypeAdapter<JsonEntityType> {
             out.value(true);
         }
 
+        if (value.ageableMob()) {
+            out.name(AGEABLE_MOB_FIELD);
+            out.value(true);
+        }
+
         out.endObject();
     }
 
@@ -76,6 +82,7 @@ final class EntityTypeTypeAdapter extends TypeAdapter<JsonEntityType> {
         int maxAirSupply = DEFAULT_MAX_AIR_SUPPLY;
         boolean living = false;
         boolean mob = false;
+        boolean ageableMob = false;
 
         while (in.peek() == JsonToken.NAME) {
             switch (in.nextName()) {
@@ -84,6 +91,7 @@ final class EntityTypeTypeAdapter extends TypeAdapter<JsonEntityType> {
                 case MAX_AIR_SUPPLY_FIELD -> maxAirSupply = in.nextInt();
                 case LIVING_FIELD -> living = in.nextBoolean();
                 case MOB_FIELD -> mob = in.nextBoolean();
+                case AGEABLE_MOB_FIELD -> ageableMob = in.nextBoolean();
                 default -> in.skipValue();
             }
         }
@@ -93,7 +101,7 @@ final class EntityTypeTypeAdapter extends TypeAdapter<JsonEntityType> {
         if (requiredFeatureFlags == null) {
             throw new IllegalArgumentException("The required feature flags have not been specified");
         } else {
-            return new JsonEntityType(requiredFeatureFlags, maxAirSupply, living, mob);
+            return new JsonEntityType(requiredFeatureFlags, maxAirSupply, living, mob, ageableMob);
         }
     }
 }

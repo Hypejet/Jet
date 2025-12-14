@@ -108,21 +108,21 @@ public interface EntityTypePredicate extends BiPredicate<Holder.Reference<Entity
     }
 
     /**
-     * Creates an {@linkplain EntityTypePredicate entity type predicate} which is satisfied
-     * only if the specified {@linkplain EntityTypePredicate entity type predicates} are satisfied.
+     * Creates an {@linkplain EntityTypePredicate entity type predicate} which is satisfied only if
+     * at least one of the specified {@linkplain EntityTypePredicate entity type predicates} is satisfied.
      *
      * <p>If no predicates are specified, the created predicate always returns {@code true}.</p>
      *
-     * @param predicates the predicates that should be satisfied to satisfy the predicate that is being created
+     * @param predicates the predicates that the "alternative" predicate should be created with
      * @return the created entity type predicate
      * @since 1.0
      */
-    static EntityTypePredicate and(EntityTypePredicate... predicates) {
+    static EntityTypePredicate or(EntityTypePredicate... predicates) {
         if (predicates.length == 0) return TRUE;
         return (holder, value) -> {
             for (EntityTypePredicate predicate : predicates)
-                if (!predicate.test(holder, value)) return false;
-            return true;
+                if (predicate.test(holder, value)) return true;
+            return false;
         };
     }
 }

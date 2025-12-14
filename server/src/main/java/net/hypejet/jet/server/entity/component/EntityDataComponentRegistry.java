@@ -227,7 +227,8 @@ public final class EntityDataComponentRegistry {
                     /* ----------- Entity components applicable to entities with baby variants ----------- */
                     .putBoolean(
                             EntityDataComponent.BABY, 16,
-                            EntityTypePredicate.and(
+                            EntityTypePredicate.or(
+                                    (holder, value) -> value.ageableMob(),
                                     EntityTypePredicate.typed(EntityTypeKeys.ZOGLIN),
                                     EntityTypePredicate.ZOMBIE
                             )

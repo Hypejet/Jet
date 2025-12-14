@@ -2,6 +2,7 @@ package net.hypejet.jet.data.generator.adapter;
 
 import com.mojang.authlib.GameProfile;
 import net.hypejet.jet.data.json.model.entity.JsonEntityType;
+import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
@@ -52,7 +53,8 @@ public final class EntityTypeAdapter {
                 KeyAdapter.convertSet(FeatureFlags.REGISTRY.toNames(type.requiredFeatures())),
                 entity.getMaxAirSupply(),
                 entity instanceof LivingEntity,
-                entity instanceof Mob
+                entity instanceof Mob,
+                entity instanceof AgeableMob
         );
     }
 

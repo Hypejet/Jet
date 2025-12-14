@@ -212,7 +212,8 @@ public final class EntityMetadataDefaults {
             /* --------------------- Defaults for entities with baby variants --------------------- */
             new DefaultsEntry(
                     16, new EntityMetadataValue.Boolean(false),
-                    EntityTypePredicate.and(
+                    EntityTypePredicate.or(
+                            (holder, value) -> value.ageableMob(),
                             EntityTypePredicate.typed(EntityTypeKeys.ZOGLIN),
                             EntityTypePredicate.ZOMBIE
                     )

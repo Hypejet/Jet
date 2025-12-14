@@ -15,10 +15,11 @@ import java.util.Set;
  * @param maxAirSupply a maximum air supply that entities of this type have
  * @param living whether this is a type of living entity
  * @param mob whether this is a type of mob entity
+ * @param ageableMob whether this is a type of ageable mob entity
  * @since 1.0
  */
 public record JetEntityType(@NonNull Set<Key> requiredFeatureFlags, int maxAirSupply,
-                            boolean living, boolean mob) implements EntityType {
+                            boolean living, boolean mob, boolean ageableMob) implements EntityType {
     /**
      * Constructs the {@linkplain JetEntityType entity type implementation}.
      *
@@ -27,6 +28,7 @@ public record JetEntityType(@NonNull Set<Key> requiredFeatureFlags, int maxAirSu
      * @param maxAirSupply a maximum air supply that entities of the constructed entity type should have
      * @param living whether the entity type should be a type of living entity
      * @param mob whether the entity type should be a type of mob entity
+     * @param ageableMob whether the entity type should be a type of ageable mob entity
      * @since 1.0
      */
     public JetEntityType {
@@ -43,7 +45,7 @@ public record JetEntityType(@NonNull Set<Key> requiredFeatureFlags, int maxAirSu
     public static @NonNull JetEntityType convert(@NonNull JsonEntityType entityType) {
         return new JetEntityType(
                 entityType.requiredFeatureFlags(), entityType.maxAirSupply(),
-                entityType.living(), entityType.mob()
+                entityType.living(), entityType.mob(), entityType.ageableMob()
         );
     }
 

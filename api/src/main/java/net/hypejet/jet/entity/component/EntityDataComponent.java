@@ -588,7 +588,7 @@ public final class EntityDataComponent<V> {
     /**
      * An {@linkplain EntityDataComponent entity data component} representing whether an entity uses a baby model.
      *
-     * <p>This component can be used on zoglin and zombie-like entities only.</p>
+     * <p>This component can be used on zoglin, zombie-like and ageable-mob entities only.</p>
      *
      * @since 1.0
      */
