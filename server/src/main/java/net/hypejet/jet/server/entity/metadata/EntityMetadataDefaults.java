@@ -270,7 +270,13 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     17, new EntityMetadataValue.Byte(IllagerSpellTypeRegistry.spellTypeId(IllagerSpellType.NONE)),
                     EntityTypePredicate.typed(EntityTypeKeys.ILLUSIONER, EntityTypeKeys.EVOKER)
-            ) // Performed spell
+            ), // Performed spell
+
+            /* ---------------------- Defaults for glow squid entities ---------------------- */
+            new DefaultsEntry(
+                    17, new EntityMetadataValue.Int(0),
+                    EntityTypePredicate.typed(EntityTypeKeys.GLOW_SQUID)
+            ) // Remaining dark ticks
     );
 
     private EntityMetadataDefaults() {}

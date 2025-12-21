@@ -313,6 +313,12 @@ public final class EntityDataComponentRegistry {
                                     IllagerSpellTypeRegistry.spellTypeId(Objects.requireNonNull(value))
                             )
                     )
+
+                    /* -------------- Entity components applicable to glow squid entities -------------- */
+                    .putInt(
+                            EntityDataComponent.REMAINING_DARK_TICKS, 17,
+                            EntityTypePredicate.typed(EntityTypeKeys.GLOW_SQUID)
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}
