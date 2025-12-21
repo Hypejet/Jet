@@ -319,6 +319,10 @@ public final class EntityDataComponentRegistry {
                             EntityDataComponent.REMAINING_DARK_TICKS, 17,
                             EntityTypePredicate.typed(EntityTypeKeys.GLOW_SQUID)
                     )
+
+                    /* -------------- Entity components applicable to dolphin entities -------------- */
+                    .putBoolean(EntityDataComponent.GOT_FISH, 17, EntityTypePredicate.typed(EntityTypeKeys.DOLPHIN))
+                    .putInt(EntityDataComponent.MOISTNESS_LEVEL, 18, EntityTypePredicate.typed(EntityTypeKeys.DOLPHIN))
                     .build();
 
     private EntityDataComponentRegistry() {}

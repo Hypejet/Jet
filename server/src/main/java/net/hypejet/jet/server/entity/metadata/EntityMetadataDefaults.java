@@ -276,7 +276,17 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     17, new EntityMetadataValue.Int(0),
                     EntityTypePredicate.typed(EntityTypeKeys.GLOW_SQUID)
-            ) // Remaining dark ticks
+            ), // Remaining dark ticks
+
+            /* ---------------------- Defaults for dolphin entities ---------------------- */
+            new DefaultsEntry(
+                    17, new EntityMetadataValue.Boolean(false),
+                    EntityTypePredicate.typed(EntityTypeKeys.DOLPHIN)
+            ), // Got fish
+            new DefaultsEntry(
+                    18, new EntityMetadataValue.Int(2400),
+                    EntityTypePredicate.typed(EntityTypeKeys.DOLPHIN)
+            )
     );
 
     private EntityMetadataDefaults() {}

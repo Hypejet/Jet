@@ -739,6 +739,26 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<Integer> REMAINING_DARK_TICKS = new EntityDataComponent<>("remaining_dark_ticks", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing whether a dolphin entity got a fish from a player.
+     *
+     * <p>This component can be used on dolphin entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> GOT_FISH = new EntityDataComponent<>("got_fish", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing how moist a dolphin entity is.
+     *
+     * <p>This component can be used on dolphin entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Integer> MOISTNESS_LEVEL = new EntityDataComponent<>("moistness_level", false);
+
     private final String name;
     private final boolean nullable;
 
