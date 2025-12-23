@@ -4,6 +4,7 @@ import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.enderdragon.EnderDragonPhase;
 import net.hypejet.jet.entity.illager.IllagerSpellType;
 import net.hypejet.jet.entity.pose.Pose;
+import net.hypejet.jet.entity.variant.pig.PigVariant;
 import net.hypejet.jet.entity.villager.VillagerProfession;
 import net.hypejet.jet.entity.villager.VillagerType;
 import net.hypejet.jet.registry.holder.Holder;
@@ -758,6 +759,25 @@ public final class EntityDataComponent<V> {
      * @since 1.0
      */
     public static final EntityDataComponent<Integer> MOISTNESS_LEVEL = new EntityDataComponent<>("moistness_level", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing for how
+     * many ticks steering an entity with an item should be boosted with additional speed.
+     *
+     * <p>This component can be used on pig entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Integer> ITEM_STEERING_BOOST_TICKS = new EntityDataComponent<>("item_steering_boost_ticks", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing variant of a pig entity.
+     *
+     * <p>This component can be used on pig entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Holder<PigVariant>> PIG_VARIANT = new EntityDataComponent<>("pig_variant", false);
 
     private final String name;
     private final boolean nullable;

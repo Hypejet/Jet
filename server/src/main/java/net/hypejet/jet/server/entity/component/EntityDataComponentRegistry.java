@@ -3,6 +3,8 @@ package net.hypejet.jet.server.entity.component;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.EntityType;
 import net.hypejet.jet.entity.component.EntityDataComponent;
+import net.hypejet.jet.entity.variant.pig.PigVariant;
+import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.keys.EntityTypeKeys;
 import net.hypejet.jet.server.entity.enderdragon.EnderDragonPhaseRegistry;
 import net.hypejet.jet.server.entity.illager.IllagerSpellTypeRegistry;
@@ -323,6 +325,23 @@ public final class EntityDataComponentRegistry {
                     /* -------------- Entity components applicable to dolphin entities -------------- */
                     .putBoolean(EntityDataComponent.GOT_FISH, 17, EntityTypePredicate.typed(EntityTypeKeys.DOLPHIN))
                     .putInt(EntityDataComponent.MOISTNESS_LEVEL, 18, EntityTypePredicate.typed(EntityTypeKeys.DOLPHIN))
+
+                    /* -------------- Entity components applicable to pig entities -------------- */
+                    .putInt(
+                            EntityDataComponent.ITEM_STEERING_BOOST_TICKS,
+                            17, EntityTypePredicate.typed(EntityTypeKeys.PIG)
+                    )
+                    .put(
+                            EntityDataComponent.PIG_VARIANT, 18,
+                            EntityMetadataValue.PigVariantValue.class,
+                            EntityTypePredicate.typed(EntityTypeKeys.PIG),
+                            EntityMetadataValue.PigVariantValue::value,
+                            (currentMetadataValue, value) -> {
+                                if (!(value instanceof Holder.Reference<PigVariant> reference))
+                                    throw new IllegalArgumentException("Direct pig variant holders are not allowed");
+                                return new EntityMetadataValue.PigVariantValue(reference);
+                            }
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}

@@ -148,6 +148,23 @@ public final class JetMinecraftRegistry<V> implements MinecraftRegistry<V> {
     }
 
     /**
+     * Gets a {@linkplain Holder.Reference holder referencing} to a registry entry associated with the specified
+     * {@linkplain Key key}. If such a registry entry does not exist, entry from {@code 0} index is used.
+     *
+     * @param defaultKey the key that the expected registry entry is associated with
+     * @return the holder reference
+     * @throws IllegalStateException if this registry is empty
+     * @since 1.0
+     */
+    public Holder.Reference<V> defaultOrAny(Key defaultKey) {
+        if (this.get(defaultKey) != null)
+            return new Holder.Reference<>(defaultKey);
+        if (this.registrationInfos.isEmpty())
+            throw new IllegalStateException("The registry is empty");
+        return new Holder.Reference<>(this.registrationInfos.getFirst().key());
+    }
+
+    /**
      * Updates tags of this {@linkplain JetMinecraftRegistry registry}
      * with the specified {@linkplain Multimap multimap} associating {@linkplain Key keys} of tags
      * with {@linkplain Key keys} of registry values that should be associated with these tags.

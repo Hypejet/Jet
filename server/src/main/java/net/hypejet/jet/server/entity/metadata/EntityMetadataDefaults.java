@@ -9,6 +9,7 @@ import net.hypejet.jet.entity.pose.Pose;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.keys.EntityTypeKeys;
 import net.hypejet.jet.registry.keys.ParticleTypeKeys;
+import net.hypejet.jet.registry.keys.PigVariantKeys;
 import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
@@ -286,7 +287,18 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     18, new EntityMetadataValue.Int(2400),
                     EntityTypePredicate.typed(EntityTypeKeys.DOLPHIN)
-            )
+            ), // Moistness level
+
+            /* ---------------------- Defaults for pig entities ---------------------- */
+            new DefaultsEntry(
+                    17, new EntityMetadataValue.Int(0),
+                    EntityTypePredicate.typed(EntityTypeKeys.PIG)
+            ), // Item steering boost ticks
+            new DefaultsEntry(18, (server, entityType) -> new EntityMetadataValue.PigVariantValue(
+                    server.registryManager()
+                            .registry(RegistryReference.PIG_VARIANT)
+                            .defaultOrAny(PigVariantKeys.TEMPERATE)
+            ), EntityTypePredicate.typed(EntityTypeKeys.PIG)) // Pig variant
     );
 
     private EntityMetadataDefaults() {}
