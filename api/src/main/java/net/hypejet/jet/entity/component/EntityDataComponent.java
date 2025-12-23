@@ -788,6 +788,15 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<Boolean> SUFFOCATING = new EntityDataComponent<>("suffocating", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing whether an entity trusts players.
+     *
+     * <p>This component can be used on ocelot entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> TRUSTING = new EntityDataComponent<>("trusting", false);
+
     private final String name;
     private final boolean nullable;
 

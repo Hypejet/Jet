@@ -302,7 +302,13 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     18, new EntityMetadataValue.Boolean(false),
                     EntityTypePredicate.typed(EntityTypeKeys.STRIDER)
-            ) // Suffocating
+            ), // Suffocating
+
+            /* ---------------------- Defaults for ocelot entities ---------------------- */
+            new DefaultsEntry(
+                    17, new EntityMetadataValue.Boolean(false),
+                    EntityTypePredicate.typed(EntityTypeKeys.OCELOT)
+            ) // Trusting
     );
 
     private EntityMetadataDefaults() {}

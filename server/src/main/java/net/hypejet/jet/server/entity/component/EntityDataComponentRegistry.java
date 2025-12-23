@@ -343,6 +343,9 @@ public final class EntityDataComponentRegistry {
                             }
                     )
                     .putBoolean(EntityDataComponent.SUFFOCATING, 18, EntityTypePredicate.typed(EntityTypeKeys.STRIDER))
+
+                    /* -------------- Entity components applicable to ocelot entities -------------- */
+                    .putBoolean(EntityDataComponent.TRUSTING, 17, EntityTypePredicate.typed(EntityTypeKeys.OCELOT))
                     .build();
 
     private EntityDataComponentRegistry() {}
