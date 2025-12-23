@@ -6,7 +6,9 @@ import net.hypejet.jet.entity.EntityType;
 import net.hypejet.jet.entity.enderdragon.EnderDragonPhase;
 import net.hypejet.jet.entity.illager.IllagerSpellType;
 import net.hypejet.jet.entity.pose.Pose;
+import net.hypejet.jet.entity.variant.cow.MushroomCowVariant;
 import net.hypejet.jet.registry.holder.Holder;
+import net.hypejet.jet.registry.keys.CowVariantKeys;
 import net.hypejet.jet.registry.keys.EntityTypeKeys;
 import net.hypejet.jet.registry.keys.ParticleTypeKeys;
 import net.hypejet.jet.registry.keys.PigVariantKeys;
@@ -14,6 +16,7 @@ import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.JetEntityType;
+import net.hypejet.jet.server.entity.cow.MushroomCowVariantRegistry;
 import net.hypejet.jet.server.entity.enderdragon.EnderDragonPhaseRegistry;
 import net.hypejet.jet.server.entity.illager.IllagerSpellTypeRegistry;
 import net.hypejet.jet.server.util.game.entity.EntityTypePredicate;
@@ -308,7 +311,18 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     17, new EntityMetadataValue.Boolean(false),
                     EntityTypePredicate.typed(EntityTypeKeys.OCELOT)
-            ) // Trusting
+            ), // Trusting
+
+            /* ---------------------- Defaults for cow-like entities ---------------------- */
+            new DefaultsEntry(17, (server, entityType) -> new EntityMetadataValue.CowVariantValue(
+                    server.registryManager()
+                            .registry(RegistryReference.COW_VARIANT)
+                            .defaultOrAny(CowVariantKeys.TEMPERATE)
+            ), EntityTypePredicate.typed(EntityTypeKeys.COW)), // Cow variant
+            new DefaultsEntry(
+                    17, new EntityMetadataValue.Int(MushroomCowVariantRegistry.variantId(MushroomCowVariant.RED)),
+                    EntityTypePredicate.typed(EntityTypeKeys.MOOSHROOM)
+            ) // Mushroom cow variant
     );
 
     private EntityMetadataDefaults() {}

@@ -3,9 +3,11 @@ package net.hypejet.jet.server.entity.component;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.EntityType;
 import net.hypejet.jet.entity.component.EntityDataComponent;
+import net.hypejet.jet.entity.variant.cow.CowVariant;
 import net.hypejet.jet.entity.variant.pig.PigVariant;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.keys.EntityTypeKeys;
+import net.hypejet.jet.server.entity.cow.MushroomCowVariantRegistry;
 import net.hypejet.jet.server.entity.enderdragon.EnderDragonPhaseRegistry;
 import net.hypejet.jet.server.entity.illager.IllagerSpellTypeRegistry;
 import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
@@ -346,6 +348,28 @@ public final class EntityDataComponentRegistry {
 
                     /* -------------- Entity components applicable to ocelot entities -------------- */
                     .putBoolean(EntityDataComponent.TRUSTING, 17, EntityTypePredicate.typed(EntityTypeKeys.OCELOT))
+
+                    /* -------------- Entity components applicable to cow-like entities -------------- */
+                    .put(
+                            EntityDataComponent.COW_VARIANT, 17,
+                            EntityMetadataValue.CowVariantValue.class,
+                            EntityTypePredicate.typed(EntityTypeKeys.COW),
+                            EntityMetadataValue.CowVariantValue::value,
+                            (currentMetadataValue, value) -> {
+                                if (!(value instanceof Holder.Reference<CowVariant> reference))
+                                    throw new IllegalArgumentException("Direct cow variant holders are not allowed");
+                                return new EntityMetadataValue.CowVariantValue(reference);
+                            }
+                    )
+                    .put(
+                            EntityDataComponent.MUSHROOM_COW_VARIANT, 17,
+                            EntityMetadataValue.Int.class,
+                            EntityTypePredicate.typed(EntityTypeKeys.MOOSHROOM),
+                            metadataValue -> MushroomCowVariantRegistry.variantById(metadataValue.value()),
+                            (currentMetadataValue, value) -> new EntityMetadataValue.Int(
+                                    MushroomCowVariantRegistry.variantId(Objects.requireNonNull(value))
+                            )
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}

@@ -4,6 +4,8 @@ import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.enderdragon.EnderDragonPhase;
 import net.hypejet.jet.entity.illager.IllagerSpellType;
 import net.hypejet.jet.entity.pose.Pose;
+import net.hypejet.jet.entity.variant.cow.CowVariant;
+import net.hypejet.jet.entity.variant.cow.MushroomCowVariant;
 import net.hypejet.jet.entity.variant.pig.PigVariant;
 import net.hypejet.jet.entity.villager.VillagerProfession;
 import net.hypejet.jet.entity.villager.VillagerType;
@@ -796,6 +798,24 @@ public final class EntityDataComponent<V> {
      * @since 1.0
      */
     public static final EntityDataComponent<Boolean> TRUSTING = new EntityDataComponent<>("trusting", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing variant of a cow entity.
+     *
+     * <p>This component can be used on cow entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Holder<CowVariant>> COW_VARIANT = new EntityDataComponent<>("cow_variant", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing variant of a mushroom cow entity.
+     *
+     * <p>This component can be used on mushroom cow entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<MushroomCowVariant> MUSHROOM_COW_VARIANT = new EntityDataComponent<>("mushroom_cow_variant", false);
 
     private final String name;
     private final boolean nullable;
