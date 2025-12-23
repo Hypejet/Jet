@@ -764,7 +764,7 @@ public final class EntityDataComponent<V> {
      * An {@linkplain EntityDataComponent entity data component} representing for how
      * many ticks steering an entity with an item should be boosted with additional speed.
      *
-     * <p>This component can be used on pig entities only.</p>
+     * <p>This component can be used on pig and strider entities only.</p>
      *
      * @since 1.0
      */
@@ -778,6 +778,15 @@ public final class EntityDataComponent<V> {
      * @since 1.0
      */
     public static final EntityDataComponent<Holder<PigVariant>> PIG_VARIANT = new EntityDataComponent<>("pig_variant", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing whether an entity is suffocating.
+     *
+     * <p>This component can be used on strider entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> SUFFOCATING = new EntityDataComponent<>("suffocating", false);
 
     private final String name;
     private final boolean nullable;

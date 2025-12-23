@@ -326,10 +326,10 @@ public final class EntityDataComponentRegistry {
                     .putBoolean(EntityDataComponent.GOT_FISH, 17, EntityTypePredicate.typed(EntityTypeKeys.DOLPHIN))
                     .putInt(EntityDataComponent.MOISTNESS_LEVEL, 18, EntityTypePredicate.typed(EntityTypeKeys.DOLPHIN))
 
-                    /* -------------- Entity components applicable to pig entities -------------- */
+                    /* -------------- Entity components applicable to item-steerable entities -------------- */
                     .putInt(
                             EntityDataComponent.ITEM_STEERING_BOOST_TICKS,
-                            17, EntityTypePredicate.typed(EntityTypeKeys.PIG)
+                            17, EntityTypePredicate.typed(EntityTypeKeys.PIG, EntityTypeKeys.STRIDER)
                     )
                     .put(
                             EntityDataComponent.PIG_VARIANT, 18,
@@ -342,6 +342,7 @@ public final class EntityDataComponentRegistry {
                                 return new EntityMetadataValue.PigVariantValue(reference);
                             }
                     )
+                    .putBoolean(EntityDataComponent.SUFFOCATING, 18, EntityTypePredicate.typed(EntityTypeKeys.STRIDER))
                     .build();
 
     private EntityDataComponentRegistry() {}
