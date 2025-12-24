@@ -817,6 +817,36 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<MushroomCowVariant> MUSHROOM_COW_VARIANT = new EntityDataComponent<>("mushroom_cow_variant", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing whether a goat entity is of the screaming variant.
+     *
+     * <p>This component can be used on goat entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> SCREAMING_GOAT = new EntityDataComponent<>("screaming_goat", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing whether a goat entity has the left horn.
+     *
+     * <p>This component can be used on goat entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> HAS_LEFT_HORN = new EntityDataComponent<>("has_left_horn", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing whether a goat entity has the right horn.
+     *
+     * <p>This component can be used on goat entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> HAS_RIGHT_HORN = new EntityDataComponent<>("has_right_horn", false);
+
     private final String name;
     private final boolean nullable;
 

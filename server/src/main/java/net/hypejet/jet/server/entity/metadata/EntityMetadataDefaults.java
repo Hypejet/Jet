@@ -322,7 +322,21 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     17, new EntityMetadataValue.Int(MushroomCowVariantRegistry.variantId(MushroomCowVariant.RED)),
                     EntityTypePredicate.typed(EntityTypeKeys.MOOSHROOM)
-            ) // Mushroom cow variant
+            ), // Mushroom cow variant
+
+            /* ---------------------- Defaults for goat entities ---------------------- */
+            new DefaultsEntry(
+                    17, new EntityMetadataValue.Boolean(false),
+                    EntityTypePredicate.typed(EntityTypeKeys.GOAT)
+            ), // Goat variant (true for screaming, false for regular)
+            new DefaultsEntry(
+                    18, new EntityMetadataValue.Boolean(true),
+                    EntityTypePredicate.typed(EntityTypeKeys.GOAT)
+            ), // Has left horn
+            new DefaultsEntry(
+                    19, new EntityMetadataValue.Boolean(true),
+                    EntityTypePredicate.typed(EntityTypeKeys.GOAT)
+            ) // Has right horn
     );
 
     private EntityMetadataDefaults() {}

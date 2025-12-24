@@ -370,6 +370,11 @@ public final class EntityDataComponentRegistry {
                                     MushroomCowVariantRegistry.variantId(Objects.requireNonNull(value))
                             )
                     )
+
+                    /* -------------- Entity components applicable to goat entities -------------- */
+                    .putBoolean(EntityDataComponent.SCREAMING_GOAT, 17, EntityTypePredicate.typed(EntityTypeKeys.GOAT))
+                    .putBoolean(EntityDataComponent.HAS_LEFT_HORN, 18, EntityTypePredicate.typed(EntityTypeKeys.GOAT))
+                    .putBoolean(EntityDataComponent.HAS_RIGHT_HORN, 19, EntityTypePredicate.typed(EntityTypeKeys.GOAT))
                     .build();
 
     private EntityDataComponentRegistry() {}
