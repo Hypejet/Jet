@@ -887,6 +887,45 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<Holder<ChickenVariant>> CHICKEN_VARIANT = new EntityDataComponent<>("chicken_variant", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * whether a bee entity plays the rolling/stinging animation.
+     *
+     * <p>This component can be used on bee entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> STINGING = new EntityDataComponent<>("stinging", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing whether a bee
+     * entity has stung another entity, meaning that it does not have the stinger anymore.
+     *
+     * <p>This component can be used on bee entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> HAS_STUNG = new EntityDataComponent<>("has_stung", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing whether a bee entity is carrying nectar.
+     *
+     * <p>This component can be used on bee entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> HAS_NECTAR = new EntityDataComponent<>("has_nectar", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing remaining time (in ticks) of an entity being angry.
+     *
+     * <p>This component can be used on bee entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Integer> REMAINING_ANGER_TIME = new EntityDataComponent<>("remaining_anger_time", false);
+
     private final String name;
     private final boolean nullable;
 

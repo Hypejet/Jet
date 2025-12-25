@@ -421,6 +421,15 @@ public final class EntityDataComponentRegistry {
                                 return new EntityMetadataValue.ChickenVariantValue(reference);
                             }
                     )
+
+                    /* -------------- Entity components applicable to bee entities -------------- */
+                    .putBitFlag(EntityDataComponent.STINGING, 17, 1, EntityTypePredicate.typed(EntityTypeKeys.BEE))
+                    .putBitFlag(EntityDataComponent.HAS_STUNG, 17, 2, EntityTypePredicate.typed(EntityTypeKeys.BEE))
+                    .putBitFlag(EntityDataComponent.HAS_NECTAR, 17, 3, EntityTypePredicate.typed(EntityTypeKeys.BEE))
+                    .putInt(
+                            EntityDataComponent.REMAINING_ANGER_TIME, 18,
+                            EntityTypePredicate.typed(EntityTypeKeys.BEE)
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}

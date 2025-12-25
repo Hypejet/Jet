@@ -358,7 +358,17 @@ public final class EntityMetadataDefaults {
                     server.registryManager()
                             .registry(RegistryReference.CHICKEN_VARIANT)
                             .defaultOrAny(ChickenVariantKeys.TEMPERATE)
-            ), EntityTypePredicate.typed(EntityTypeKeys.CHICKEN)) // Chicken variant
+            ), EntityTypePredicate.typed(EntityTypeKeys.CHICKEN)), // Chicken variant
+
+            /* ---------------------- Defaults for bee entities ---------------------- */
+            new DefaultsEntry(
+                    17, new EntityMetadataValue.Byte((byte) 0),
+                    EntityTypePredicate.typed(EntityTypeKeys.BEE)
+            ), // Bee flags
+            new DefaultsEntry(
+                    18, new EntityMetadataValue.Int(0),
+                    EntityTypePredicate.typed(EntityTypeKeys.BEE)
+            ) // Remaining anger time
     );
 
     private EntityMetadataDefaults() {}
