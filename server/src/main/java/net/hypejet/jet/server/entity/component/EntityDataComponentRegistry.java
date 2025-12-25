@@ -11,6 +11,7 @@ import net.hypejet.jet.server.entity.cow.MushroomCowVariantRegistry;
 import net.hypejet.jet.server.entity.enderdragon.EnderDragonPhaseRegistry;
 import net.hypejet.jet.server.entity.illager.IllagerSpellTypeRegistry;
 import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
+import net.hypejet.jet.server.util.game.color.DyeColorRegistry;
 import net.hypejet.jet.server.util.game.entity.EntityTypePredicate;
 import net.hypejet.jet.server.util.number.ByteUtil;
 import net.hypejet.jet.server.world.block.state.JetBlockState;
@@ -375,6 +376,22 @@ public final class EntityDataComponentRegistry {
                     .putBoolean(EntityDataComponent.SCREAMING_GOAT, 17, EntityTypePredicate.typed(EntityTypeKeys.GOAT))
                     .putBoolean(EntityDataComponent.HAS_LEFT_HORN, 18, EntityTypePredicate.typed(EntityTypeKeys.GOAT))
                     .putBoolean(EntityDataComponent.HAS_RIGHT_HORN, 19, EntityTypePredicate.typed(EntityTypeKeys.GOAT))
+
+                    /* -------------- Entity components applicable to sheep entities -------------- */
+                    .put(
+                            EntityDataComponent.WOOL_COLOR, 17,
+                            EntityMetadataValue.Byte.class,
+                            EntityTypePredicate.typed(EntityTypeKeys.SHEEP),
+                            metadataValue -> DyeColorRegistry.dyeColor(metadataValue.value() & 15),
+                            (currentMetadataValue, value) -> new EntityMetadataValue.Byte(
+                                    (byte) ((currentMetadataValue.value() & 240)
+                                            | (DyeColorRegistry.dyeColorId(Objects.requireNonNull(value)) & 15))
+                            )
+                    )
+                    .putBitFlag(
+                            EntityDataComponent.WOOL_SHEARED, 17, 4,
+                            EntityTypePredicate.typed(EntityTypeKeys.SHEEP)
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}

@@ -336,7 +336,13 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     19, new EntityMetadataValue.Boolean(true),
                     EntityTypePredicate.typed(EntityTypeKeys.GOAT)
-            ) // Has right horn
+            ), // Has right horn
+
+            /* ---------------------- Defaults for sheep entities ---------------------- */
+            new DefaultsEntry(
+                    17, new EntityMetadataValue.Byte((byte) 0),
+                    EntityTypePredicate.typed(EntityTypeKeys.SHEEP)
+            ) // Sheep wool flags
     );
 
     private EntityMetadataDefaults() {}

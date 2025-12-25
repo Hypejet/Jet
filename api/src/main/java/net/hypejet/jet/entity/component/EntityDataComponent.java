@@ -10,6 +10,7 @@ import net.hypejet.jet.entity.variant.pig.PigVariant;
 import net.hypejet.jet.entity.villager.VillagerProfession;
 import net.hypejet.jet.entity.villager.VillagerType;
 import net.hypejet.jet.registry.holder.Holder;
+import net.hypejet.jet.util.game.color.DyeColor;
 import net.hypejet.jet.world.block.state.BlockState;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.hypejet.jet.world.coordinate.rotation.Rotations;
@@ -846,6 +847,25 @@ public final class EntityDataComponent<V> {
      * @since 1.0
      */
     public static final EntityDataComponent<Boolean> HAS_RIGHT_HORN = new EntityDataComponent<>("has_right_horn", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing wool color of a sheep entity.
+     *
+     * <p>This component can be used on sheep entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<DyeColor> WOOL_COLOR = new EntityDataComponent<>("wool_color", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing whether wool of a sheep entity is sheared.
+     *
+     * <p>This component can be used on sheep entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> WOOL_SHEARED = new EntityDataComponent<>("wool_sheared", false);
 
     private final String name;
     private final boolean nullable;
