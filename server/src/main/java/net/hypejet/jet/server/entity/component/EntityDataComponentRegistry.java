@@ -430,6 +430,13 @@ public final class EntityDataComponentRegistry {
                             EntityDataComponent.REMAINING_ANGER_TIME, 18,
                             EntityTypePredicate.typed(EntityTypeKeys.BEE)
                     )
+
+                    /* -------------- Entity components applicable to horse-like entities -------------- */
+                    .putBitFlag(EntityDataComponent.TAMED, 17, 1, EntityTypePredicate.HORSE_LIKE)
+                    .putBitFlag(EntityDataComponent.BRED, 17, 3, EntityTypePredicate.HORSE_LIKE)
+                    .putBitFlag(EntityDataComponent.EATING, 17, 4, EntityTypePredicate.HORSE_LIKE)
+                    .putBitFlag(EntityDataComponent.STANDING, 17, 5, EntityTypePredicate.HORSE_LIKE)
+                    .putBitFlag(EntityDataComponent.MOUTH_OPEN, 17, 6, EntityTypePredicate.HORSE_LIKE)
                     .build();
 
     private EntityDataComponentRegistry() {}

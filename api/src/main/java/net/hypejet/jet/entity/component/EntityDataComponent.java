@@ -926,6 +926,57 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<Integer> REMAINING_ANGER_TIME = new EntityDataComponent<>("remaining_anger_time", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing whether a horse-like entity has been tamed.
+     *
+     * <p>This component can be used on horse-like entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> TAMED = new EntityDataComponent<>("tamed", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} with unknown functionality.
+     * It has no visual effect, and it never gets updated on vanilla servers. However, if it is manually
+     * updated, it makes a horse-like entity follow their parent if the entity is of baby variant.
+     *
+     * <p>This component can be used on horse-like entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> BRED = new EntityDataComponent<>("bred", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing whether a horse-like is playing the eating animation.
+     *
+     * <p>This component can be used on horse-like entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> EATING = new EntityDataComponent<>("eating", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing whether a horse-like entity is standing.
+     *
+     * <p>This component can be used on horse-like entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> STANDING = new EntityDataComponent<>("standing", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing whether a horse-like entity has its mouth open.
+     *
+     * <p>This component can be used on horse-like entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> MOUTH_OPEN = new EntityDataComponent<>("mouth_open", false);
+
     private final String name;
     private final boolean nullable;
 

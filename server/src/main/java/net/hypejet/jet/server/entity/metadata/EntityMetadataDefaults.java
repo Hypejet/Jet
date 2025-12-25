@@ -368,7 +368,13 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     18, new EntityMetadataValue.Int(0),
                     EntityTypePredicate.typed(EntityTypeKeys.BEE)
-            ) // Remaining anger time
+            ), // Remaining anger time
+
+            /* ---------------------- Defaults for horse-like entities ---------------------- */
+            new DefaultsEntry(
+                    17, new EntityMetadataValue.Byte((byte) 0),
+                    EntityTypePredicate.HORSE_LIKE
+            ) // Horse flags
     );
 
     private EntityMetadataDefaults() {}
