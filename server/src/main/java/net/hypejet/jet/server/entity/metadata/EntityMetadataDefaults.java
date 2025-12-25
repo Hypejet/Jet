@@ -9,6 +9,7 @@ import net.hypejet.jet.entity.pose.Pose;
 import net.hypejet.jet.entity.variant.cow.MushroomCowVariant;
 import net.hypejet.jet.entity.variant.rabbit.RabbitVariant;
 import net.hypejet.jet.registry.holder.Holder;
+import net.hypejet.jet.registry.keys.ChickenVariantKeys;
 import net.hypejet.jet.registry.keys.CowVariantKeys;
 import net.hypejet.jet.registry.keys.EntityTypeKeys;
 import net.hypejet.jet.registry.keys.ParticleTypeKeys;
@@ -350,7 +351,14 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     17, new EntityMetadataValue.Int(RabbitVariantRegistry.rabbitVariantId(RabbitVariant.BROWN)),
                     EntityTypePredicate.typed(EntityTypeKeys.RABBIT)
-            ) // Rabbit variant
+            ), // Rabbit variant
+
+            /* ---------------------- Defaults for chicken entities ---------------------- */
+            new DefaultsEntry(17, (server, entityType) -> new EntityMetadataValue.ChickenVariantValue(
+                    server.registryManager()
+                            .registry(RegistryReference.CHICKEN_VARIANT)
+                            .defaultOrAny(ChickenVariantKeys.TEMPERATE)
+            ), EntityTypePredicate.typed(EntityTypeKeys.CHICKEN)) // Chicken variant
     );
 
     private EntityMetadataDefaults() {}

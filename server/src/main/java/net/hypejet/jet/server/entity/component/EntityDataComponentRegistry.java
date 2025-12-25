@@ -3,6 +3,7 @@ package net.hypejet.jet.server.entity.component;
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.EntityType;
 import net.hypejet.jet.entity.component.EntityDataComponent;
+import net.hypejet.jet.entity.variant.chicken.ChickenVariant;
 import net.hypejet.jet.entity.variant.cow.CowVariant;
 import net.hypejet.jet.entity.variant.pig.PigVariant;
 import net.hypejet.jet.registry.holder.Holder;
@@ -403,6 +404,22 @@ public final class EntityDataComponentRegistry {
                             (currentMetadataValue, value) -> new EntityMetadataValue.Int(
                                     RabbitVariantRegistry.rabbitVariantId(Objects.requireNonNull(value))
                             )
+                    )
+
+                    /* -------------- Entity components applicable to chicken entities -------------- */
+                    .put(
+                            EntityDataComponent.CHICKEN_VARIANT, 17,
+                            EntityMetadataValue.ChickenVariantValue.class,
+                            EntityTypePredicate.typed(EntityTypeKeys.CHICKEN),
+                            EntityMetadataValue.ChickenVariantValue::value,
+                            (currentMetadataValue, value) -> {
+                                if (!(value instanceof Holder.Reference<ChickenVariant> reference)) {
+                                    throw new IllegalArgumentException(
+                                            "Direct chicken variant holders are not allowed"
+                                    );
+                                }
+                                return new EntityMetadataValue.ChickenVariantValue(reference);
+                            }
                     )
                     .build();
 

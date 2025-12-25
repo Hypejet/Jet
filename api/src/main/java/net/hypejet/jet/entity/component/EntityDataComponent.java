@@ -4,6 +4,7 @@ import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.enderdragon.EnderDragonPhase;
 import net.hypejet.jet.entity.illager.IllagerSpellType;
 import net.hypejet.jet.entity.pose.Pose;
+import net.hypejet.jet.entity.variant.chicken.ChickenVariant;
 import net.hypejet.jet.entity.variant.cow.CowVariant;
 import net.hypejet.jet.entity.variant.cow.MushroomCowVariant;
 import net.hypejet.jet.entity.variant.pig.PigVariant;
@@ -876,6 +877,15 @@ public final class EntityDataComponent<V> {
      * @since 1.0
      */
     public static final EntityDataComponent<RabbitVariant> RABBIT_VARIANT = new EntityDataComponent<>("rabbit_variant", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing variant of a chicken entity.
+     *
+     * <p>This component can be used on chicken entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Holder<ChickenVariant>> CHICKEN_VARIANT = new EntityDataComponent<>("chicken_variant", false);
 
     private final String name;
     private final boolean nullable;
