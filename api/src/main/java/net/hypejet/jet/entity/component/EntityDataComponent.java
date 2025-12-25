@@ -7,6 +7,7 @@ import net.hypejet.jet.entity.pose.Pose;
 import net.hypejet.jet.entity.variant.cow.CowVariant;
 import net.hypejet.jet.entity.variant.cow.MushroomCowVariant;
 import net.hypejet.jet.entity.variant.pig.PigVariant;
+import net.hypejet.jet.entity.variant.rabbit.RabbitVariant;
 import net.hypejet.jet.entity.villager.VillagerProfession;
 import net.hypejet.jet.entity.villager.VillagerType;
 import net.hypejet.jet.registry.holder.Holder;
@@ -866,6 +867,15 @@ public final class EntityDataComponent<V> {
      * @since 1.0
      */
     public static final EntityDataComponent<Boolean> WOOL_SHEARED = new EntityDataComponent<>("wool_sheared", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing variant of a rabbit entity.
+     *
+     * <p>This component can be used on rabbit entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<RabbitVariant> RABBIT_VARIANT = new EntityDataComponent<>("rabbit_variant", false);
 
     private final String name;
     private final boolean nullable;

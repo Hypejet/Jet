@@ -7,10 +7,11 @@ import net.hypejet.jet.entity.variant.cow.CowVariant;
 import net.hypejet.jet.entity.variant.pig.PigVariant;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.keys.EntityTypeKeys;
-import net.hypejet.jet.server.entity.cow.MushroomCowVariantRegistry;
+import net.hypejet.jet.server.entity.variant.MushroomCowVariantRegistry;
 import net.hypejet.jet.server.entity.enderdragon.EnderDragonPhaseRegistry;
 import net.hypejet.jet.server.entity.illager.IllagerSpellTypeRegistry;
 import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
+import net.hypejet.jet.server.entity.variant.RabbitVariantRegistry;
 import net.hypejet.jet.server.util.game.color.DyeColorRegistry;
 import net.hypejet.jet.server.util.game.entity.EntityTypePredicate;
 import net.hypejet.jet.server.util.number.ByteUtil;
@@ -391,6 +392,17 @@ public final class EntityDataComponentRegistry {
                     .putBitFlag(
                             EntityDataComponent.WOOL_SHEARED, 17, 4,
                             EntityTypePredicate.typed(EntityTypeKeys.SHEEP)
+                    )
+
+                    /* -------------- Entity components applicable to rabbit entities -------------- */
+                    .put(
+                            EntityDataComponent.RABBIT_VARIANT, 17,
+                            EntityMetadataValue.Int.class,
+                            EntityTypePredicate.typed(EntityTypeKeys.RABBIT),
+                            metadataValue -> RabbitVariantRegistry.rabbitVariant(metadataValue.value()),
+                            (currentMetadataValue, value) -> new EntityMetadataValue.Int(
+                                    RabbitVariantRegistry.rabbitVariantId(Objects.requireNonNull(value))
+                            )
                     )
                     .build();
 

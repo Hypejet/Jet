@@ -1,4 +1,4 @@
-package net.hypejet.jet.server.entity.cow;
+package net.hypejet.jet.server.entity.variant;
 
 import net.hypejet.jet.entity.variant.cow.MushroomCowVariant;
 import net.hypejet.jet.server.util.index.IndexUtil;

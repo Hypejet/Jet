@@ -7,6 +7,7 @@ import net.hypejet.jet.entity.enderdragon.EnderDragonPhase;
 import net.hypejet.jet.entity.illager.IllagerSpellType;
 import net.hypejet.jet.entity.pose.Pose;
 import net.hypejet.jet.entity.variant.cow.MushroomCowVariant;
+import net.hypejet.jet.entity.variant.rabbit.RabbitVariant;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.keys.CowVariantKeys;
 import net.hypejet.jet.registry.keys.EntityTypeKeys;
@@ -16,9 +17,10 @@ import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.JetEntityType;
-import net.hypejet.jet.server.entity.cow.MushroomCowVariantRegistry;
+import net.hypejet.jet.server.entity.variant.MushroomCowVariantRegistry;
 import net.hypejet.jet.server.entity.enderdragon.EnderDragonPhaseRegistry;
 import net.hypejet.jet.server.entity.illager.IllagerSpellTypeRegistry;
+import net.hypejet.jet.server.entity.variant.RabbitVariantRegistry;
 import net.hypejet.jet.server.util.game.entity.EntityTypePredicate;
 import net.hypejet.jet.util.color.ARGBColor;
 import net.hypejet.jet.world.coordinate.rotation.Rotations;
@@ -342,7 +344,13 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     17, new EntityMetadataValue.Byte((byte) 0),
                     EntityTypePredicate.typed(EntityTypeKeys.SHEEP)
-            ) // Sheep wool flags
+            ), // Sheep wool flags
+
+            /* ---------------------- Defaults for rabbit entities ---------------------- */
+            new DefaultsEntry(
+                    17, new EntityMetadataValue.Int(RabbitVariantRegistry.rabbitVariantId(RabbitVariant.BROWN)),
+                    EntityTypePredicate.typed(EntityTypeKeys.RABBIT)
+            ) // Rabbit variant
     );
 
     private EntityMetadataDefaults() {}
