@@ -997,6 +997,26 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<HorseMarkings> HORSE_MARKINGS = new EntityDataComponent<>("horse_markings", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing whether a camel entity is dashing.
+     *
+     * <p>This component can be used on camel entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> DASHING = new EntityDataComponent<>("dashing", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing number of the last game tick
+     * during which pose of a camel entity has been changed. The component takes positive values when the camel
+     * is standing and negative values for when the camel is sitting.
+     *
+     * <p>This component can be used on camel entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Long> LAST_POSE_CHANGE_TICK = new EntityDataComponent<>("last_pose_change_ticks", false);
+
     private final String name;
     private final boolean nullable;
 

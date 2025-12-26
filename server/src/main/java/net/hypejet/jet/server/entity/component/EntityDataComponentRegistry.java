@@ -458,6 +458,14 @@ public final class EntityDataComponentRegistry {
                                     & -65281
                                     | ((HorseMarkingsRegistry.horseMarkingsId(Objects.requireNonNull(value)) & 0xFF) << Byte.SIZE))
                     )
+                    .putBoolean(EntityDataComponent.DASHING, 18, EntityTypePredicate.typed(EntityTypeKeys.CAMEL))
+                    .put(
+                            EntityDataComponent.LAST_POSE_CHANGE_TICK, 19,
+                            EntityMetadataValue.Long.class,
+                            EntityTypePredicate.typed(EntityTypeKeys.CAMEL),
+                            EntityMetadataValue.Long::value,
+                            (ignore, value) -> new EntityMetadataValue.Long(Objects.requireNonNull(value))
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}

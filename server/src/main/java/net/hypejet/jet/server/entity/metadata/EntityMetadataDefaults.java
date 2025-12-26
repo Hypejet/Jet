@@ -378,7 +378,15 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     18, new EntityMetadataValue.Int(0),
                     EntityTypePredicate.typed(EntityTypeKeys.HORSE)
-            ) // Horse variant and markings
+            ), // Horse variant and markings
+            new DefaultsEntry(
+                    18, new EntityMetadataValue.Boolean(false),
+                    EntityTypePredicate.typed(EntityTypeKeys.CAMEL)
+            ), // Dashing
+            new DefaultsEntry(
+                    19, new EntityMetadataValue.Long(0),
+                    EntityTypePredicate.typed(EntityTypeKeys.CAMEL)
+            ) // Last pose change tick
     );
 
     private EntityMetadataDefaults() {}
