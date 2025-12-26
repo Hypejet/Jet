@@ -386,7 +386,11 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     19, new EntityMetadataValue.Long(0),
                     EntityTypePredicate.typed(EntityTypeKeys.CAMEL)
-            ) // Last pose change tick
+            ), // Last pose change tick
+            new DefaultsEntry(
+                    18, new EntityMetadataValue.Boolean(false),
+                    EntityTypePredicate.CHESTED_HORSE
+            ) // Has chest
     );
 
     private EntityMetadataDefaults() {}

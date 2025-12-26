@@ -79,6 +79,17 @@ public interface EntityTypePredicate extends BiPredicate<Holder.Reference<Entity
     );
 
     /**
+     * An {@linkplain EntityTypePredicate entity type predicate} that is
+     * satisfied only by chested horse-like {@linkplain EntityType entity types}.
+     *
+     * @since 1.0
+     */
+    EntityTypePredicate CHESTED_HORSE = typed(
+            EntityTypeKeys.MULE, EntityTypeKeys.LLAMA,
+            EntityTypeKeys.TRADER_LLAMA, EntityTypeKeys.DONKEY
+    );
+
+    /**
      * Evaluates this predicate on the specified {@linkplain JetEntityType entity type}.
      *
      * @param holder the holder referencing to the entity type that should be tested

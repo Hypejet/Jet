@@ -1017,6 +1017,16 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<Long> LAST_POSE_CHANGE_TICK = new EntityDataComponent<>("last_pose_change_ticks", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing whether a chested horse-like entity has a chest.
+     *
+     * <p>This component can be used on chested horse-like entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> HAS_CHEST = new EntityDataComponent<>("has_chest", false);
+
     private final String name;
     private final boolean nullable;
 

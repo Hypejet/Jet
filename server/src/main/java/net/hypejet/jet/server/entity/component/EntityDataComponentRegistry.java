@@ -466,6 +466,7 @@ public final class EntityDataComponentRegistry {
                             EntityMetadataValue.Long::value,
                             (ignore, value) -> new EntityMetadataValue.Long(Objects.requireNonNull(value))
                     )
+                    .putBoolean(EntityDataComponent.HAS_CHEST, 18, EntityTypePredicate.CHESTED_HORSE)
                     .build();
 
     private EntityDataComponentRegistry() {}
