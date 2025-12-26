@@ -374,7 +374,11 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     17, new EntityMetadataValue.Byte((byte) 0),
                     EntityTypePredicate.HORSE_LIKE
-            ) // Horse flags
+            ), // Horse flags
+            new DefaultsEntry(
+                    18, new EntityMetadataValue.Int(0),
+                    EntityTypePredicate.typed(EntityTypeKeys.HORSE)
+            ) // Horse variant and markings
     );
 
     private EntityMetadataDefaults() {}

@@ -8,6 +8,8 @@ import net.hypejet.jet.entity.variant.cow.CowVariant;
 import net.hypejet.jet.entity.variant.pig.PigVariant;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.keys.EntityTypeKeys;
+import net.hypejet.jet.server.entity.horse.HorseMarkingsRegistry;
+import net.hypejet.jet.server.entity.variant.HorseVariantRegistry;
 import net.hypejet.jet.server.entity.variant.MushroomCowVariantRegistry;
 import net.hypejet.jet.server.entity.enderdragon.EnderDragonPhaseRegistry;
 import net.hypejet.jet.server.entity.illager.IllagerSpellTypeRegistry;
@@ -437,6 +439,25 @@ public final class EntityDataComponentRegistry {
                     .putBitFlag(EntityDataComponent.EATING, 17, 4, EntityTypePredicate.HORSE_LIKE)
                     .putBitFlag(EntityDataComponent.STANDING, 17, 5, EntityTypePredicate.HORSE_LIKE)
                     .putBitFlag(EntityDataComponent.MOUTH_OPEN, 17, 6, EntityTypePredicate.HORSE_LIKE)
+                    .put(
+                            EntityDataComponent.HORSE_VARIANT, 18,
+                            EntityMetadataValue.Int.class,
+                            EntityTypePredicate.typed(EntityTypeKeys.HORSE),
+                            metadataValue -> HorseVariantRegistry.horseVariant(metadataValue.value() & 0xFF),
+                            (currentMetadataValue, value) -> new EntityMetadataValue.Int(currentMetadataValue.value()
+                                    & -256
+                                    | (HorseVariantRegistry.horseVariantId(Objects.requireNonNull(value)) & 0xFF))
+                    )
+                    .put(
+                            EntityDataComponent.HORSE_MARKINGS, 18,
+                            EntityMetadataValue.Int.class,
+                            EntityTypePredicate.typed(EntityTypeKeys.HORSE),
+                            metadataValue ->
+                                    HorseMarkingsRegistry.horseMarkings((metadataValue.value() & 0xFF00) >> Byte.SIZE),
+                            (currentMetadataValue, value) -> new EntityMetadataValue.Int(currentMetadataValue.value()
+                                    & -65281
+                                    | ((HorseMarkingsRegistry.horseMarkingsId(Objects.requireNonNull(value)) & 0xFF) << Byte.SIZE))
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}
