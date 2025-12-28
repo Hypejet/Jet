@@ -7,6 +7,7 @@ import net.hypejet.jet.entity.enderdragon.EnderDragonPhase;
 import net.hypejet.jet.entity.illager.IllagerSpellType;
 import net.hypejet.jet.entity.pose.Pose;
 import net.hypejet.jet.entity.variant.cow.MushroomCowVariant;
+import net.hypejet.jet.entity.variant.llama.LlamaVariant;
 import net.hypejet.jet.entity.variant.rabbit.RabbitVariant;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.keys.ChickenVariantKeys;
@@ -18,6 +19,7 @@ import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.JetEntityType;
+import net.hypejet.jet.server.entity.variant.LlamaVariantRegistry;
 import net.hypejet.jet.server.entity.variant.MushroomCowVariantRegistry;
 import net.hypejet.jet.server.entity.enderdragon.EnderDragonPhaseRegistry;
 import net.hypejet.jet.server.entity.illager.IllagerSpellTypeRegistry;
@@ -390,7 +392,15 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     18, new EntityMetadataValue.Boolean(false),
                     EntityTypePredicate.CHESTED_HORSE
-            ) // Has chest
+            ), // Has chest
+            new DefaultsEntry(
+                    19, new EntityMetadataValue.Int(0),
+                    EntityTypePredicate.typed(EntityTypeKeys.LLAMA, EntityTypeKeys.TRADER_LLAMA)
+            ), // Strength
+            new DefaultsEntry(
+                    20, new EntityMetadataValue.Int(LlamaVariantRegistry.llamaVariantId(LlamaVariant.CREAMY)),
+                    EntityTypePredicate.typed(EntityTypeKeys.LLAMA, EntityTypeKeys.TRADER_LLAMA)
+            ) // Llama variant
     );
 
     private EntityMetadataDefaults() {}

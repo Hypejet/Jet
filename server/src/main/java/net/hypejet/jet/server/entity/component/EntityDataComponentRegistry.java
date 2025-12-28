@@ -10,6 +10,7 @@ import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.keys.EntityTypeKeys;
 import net.hypejet.jet.server.entity.horse.HorseMarkingsRegistry;
 import net.hypejet.jet.server.entity.variant.HorseVariantRegistry;
+import net.hypejet.jet.server.entity.variant.LlamaVariantRegistry;
 import net.hypejet.jet.server.entity.variant.MushroomCowVariantRegistry;
 import net.hypejet.jet.server.entity.enderdragon.EnderDragonPhaseRegistry;
 import net.hypejet.jet.server.entity.illager.IllagerSpellTypeRegistry;
@@ -467,6 +468,19 @@ public final class EntityDataComponentRegistry {
                             (ignore, value) -> new EntityMetadataValue.Long(Objects.requireNonNull(value))
                     )
                     .putBoolean(EntityDataComponent.HAS_CHEST, 18, EntityTypePredicate.CHESTED_HORSE)
+                    .putInt(
+                            EntityDataComponent.STRENGTH, 19,
+                            EntityTypePredicate.typed(EntityTypeKeys.LLAMA, EntityTypeKeys.TRADER_LLAMA)
+                    )
+                    .put(
+                            EntityDataComponent.LLAMA_VARIANT, 20,
+                            EntityMetadataValue.Int.class,
+                            EntityTypePredicate.typed(EntityTypeKeys.LLAMA, EntityTypeKeys.TRADER_LLAMA),
+                            metadataValue -> LlamaVariantRegistry.llamaVariant(metadataValue.value()),
+                            (currentMetadataValue, value) -> new EntityMetadataValue.Int(
+                                    LlamaVariantRegistry.llamaVariantId(Objects.requireNonNull(value))
+                            )
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}

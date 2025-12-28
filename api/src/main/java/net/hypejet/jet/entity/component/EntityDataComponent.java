@@ -9,6 +9,7 @@ import net.hypejet.jet.entity.variant.chicken.ChickenVariant;
 import net.hypejet.jet.entity.variant.cow.CowVariant;
 import net.hypejet.jet.entity.variant.cow.MushroomCowVariant;
 import net.hypejet.jet.entity.variant.horse.HorseVariant;
+import net.hypejet.jet.entity.variant.llama.LlamaVariant;
 import net.hypejet.jet.entity.variant.pig.PigVariant;
 import net.hypejet.jet.entity.variant.rabbit.RabbitVariant;
 import net.hypejet.jet.entity.villager.VillagerProfession;
@@ -1026,6 +1027,24 @@ public final class EntityDataComponent<V> {
      * @since 1.0
      */
     public static final EntityDataComponent<Boolean> HAS_CHEST = new EntityDataComponent<>("has_chest", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing strength of a llama entity.
+     *
+     * <p>This component can be used on llama and trader llama entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Integer> STRENGTH = new EntityDataComponent<>("strength", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing variant of a llama entity.
+     *
+     * <p>This component can be used on llama and trader llama entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<LlamaVariant> LLAMA_VARIANT = new EntityDataComponent<>("llama_variant", false);
 
     private final String name;
     private final boolean nullable;
