@@ -505,6 +505,17 @@ public final class EntityDataComponentRegistry {
                             EntityDataComponent.FROM_BUCKET, 19,
                             EntityTypePredicate.typed(EntityTypeKeys.AXOLOTL)
                     )
+
+                    /* -------------- Entity components applicable to armadillo entities -------------- */
+                    .put(
+                            EntityDataComponent.ARMADILLO_STATE, 17,
+                            EntityMetadataValue.ArmadilloStateValue.class,
+                            EntityTypePredicate.typed(EntityTypeKeys.ARMADILLO),
+                            EntityMetadataValue.ArmadilloStateValue::value,
+                            (currentMetadataValue, value) -> new EntityMetadataValue.ArmadilloStateValue(
+                                    Objects.requireNonNull(value)
+                            )
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}

@@ -3,6 +3,7 @@ package net.hypejet.jet.server.entity.metadata;
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
 import net.hypejet.jet.entity.EntityType;
+import net.hypejet.jet.entity.armadillo.ArmadilloState;
 import net.hypejet.jet.entity.enderdragon.EnderDragonPhase;
 import net.hypejet.jet.entity.illager.IllagerSpellType;
 import net.hypejet.jet.entity.pose.Pose;
@@ -426,7 +427,13 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     19, new EntityMetadataValue.Boolean(false),
                     EntityTypePredicate.typed(EntityTypeKeys.AXOLOTL)
-            ) // From bucket
+            ), // From bucket
+
+            /* ---------------------- Defaults for armadillo entities ---------------------- */
+            new DefaultsEntry(
+                    17, new EntityMetadataValue.ArmadilloStateValue(ArmadilloState.IDLE),
+                    EntityTypePredicate.typed(EntityTypeKeys.ARMADILLO)
+            ) // Armadillo state
     );
 
     private EntityMetadataDefaults() {}

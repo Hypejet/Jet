@@ -1,6 +1,7 @@
 package net.hypejet.jet.entity.component;
 
 import net.hypejet.jet.entity.Entity;
+import net.hypejet.jet.entity.armadillo.ArmadilloState;
 import net.hypejet.jet.entity.enderdragon.EnderDragonPhase;
 import net.hypejet.jet.entity.horse.HorseMarkings;
 import net.hypejet.jet.entity.illager.IllagerSpellType;
@@ -1094,6 +1095,15 @@ public final class EntityDataComponent<V> {
      * @since 1.0
      */
     public static final EntityDataComponent<Boolean> FROM_BUCKET = new EntityDataComponent<>("from_bucket", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing current state of an armadillo entity.
+     *
+     * <p>This component can be used on armadillo entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<ArmadilloState> ARMADILLO_STATE = new EntityDataComponent<>("armadillo_state", false);
 
     private final String name;
     private final boolean nullable;
