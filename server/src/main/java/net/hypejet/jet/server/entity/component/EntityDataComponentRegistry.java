@@ -9,6 +9,7 @@ import net.hypejet.jet.entity.variant.pig.PigVariant;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.keys.EntityTypeKeys;
 import net.hypejet.jet.server.entity.horse.HorseMarkingsRegistry;
+import net.hypejet.jet.server.entity.variant.AxolotlVariantRegistry;
 import net.hypejet.jet.server.entity.variant.HorseVariantRegistry;
 import net.hypejet.jet.server.entity.variant.LlamaVariantRegistry;
 import net.hypejet.jet.server.entity.variant.MushroomCowVariantRegistry;
@@ -485,6 +486,25 @@ public final class EntityDataComponentRegistry {
                     /* -------------- Entity components applicable to turtle entities -------------- */
                     .putBoolean(EntityDataComponent.HAS_EGG, 17, EntityTypePredicate.typed(EntityTypeKeys.TURTLE))
                     .putBoolean(EntityDataComponent.LAYING_EGG, 18, EntityTypePredicate.typed(EntityTypeKeys.TURTLE))
+
+                    /* -------------- Entity components applicable to axolotl entities -------------- */
+                    .put(
+                            EntityDataComponent.AXOLOTL_VARIANT, 17,
+                            EntityMetadataValue.Int.class,
+                            EntityTypePredicate.typed(EntityTypeKeys.AXOLOTL),
+                            metadataValue -> AxolotlVariantRegistry.axolotlVariant(metadataValue.value()),
+                            (currentMetadataValue, value) -> new EntityMetadataValue.Int(
+                                    AxolotlVariantRegistry.axolotlVariantId(Objects.requireNonNull(value))
+                            )
+                    )
+                    .putBoolean(
+                            EntityDataComponent.PLAYING_DEAD, 18,
+                            EntityTypePredicate.typed(EntityTypeKeys.AXOLOTL)
+                    )
+                    .putBoolean(
+                            EntityDataComponent.FROM_BUCKET, 19,
+                            EntityTypePredicate.typed(EntityTypeKeys.AXOLOTL)
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}

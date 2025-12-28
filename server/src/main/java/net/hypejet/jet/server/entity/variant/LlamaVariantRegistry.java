@@ -26,7 +26,7 @@ public final class LlamaVariantRegistry {
     private LlamaVariantRegistry() {}
 
     /**
-     * Gets a registered {@linkplain LlamaVariant llama variant} with the specified numeric identifier.
+     * Gets a registered {@linkplain LlamaVariant llama variant} by its numeric identifier.
      *
      * @param id the numeric identifier
      * @return the llama variant

@@ -6,6 +6,7 @@ import net.hypejet.jet.entity.EntityType;
 import net.hypejet.jet.entity.enderdragon.EnderDragonPhase;
 import net.hypejet.jet.entity.illager.IllagerSpellType;
 import net.hypejet.jet.entity.pose.Pose;
+import net.hypejet.jet.entity.variant.axolotl.AxolotlVariant;
 import net.hypejet.jet.entity.variant.cow.MushroomCowVariant;
 import net.hypejet.jet.entity.variant.llama.LlamaVariant;
 import net.hypejet.jet.entity.variant.rabbit.RabbitVariant;
@@ -19,6 +20,7 @@ import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
 import net.hypejet.jet.server.entity.JetEntityType;
+import net.hypejet.jet.server.entity.variant.AxolotlVariantRegistry;
 import net.hypejet.jet.server.entity.variant.LlamaVariantRegistry;
 import net.hypejet.jet.server.entity.variant.MushroomCowVariantRegistry;
 import net.hypejet.jet.server.entity.enderdragon.EnderDragonPhaseRegistry;
@@ -410,7 +412,21 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     18, new EntityMetadataValue.Boolean(false),
                     EntityTypePredicate.typed(EntityTypeKeys.TURTLE)
-            ) // Laying egg
+            ), // Laying egg
+
+            /* ---------------------- Defaults for axolotl entities ---------------------- */
+            new DefaultsEntry(
+                    17, new EntityMetadataValue.Int(AxolotlVariantRegistry.axolotlVariantId(AxolotlVariant.LUCY)),
+                    EntityTypePredicate.typed(EntityTypeKeys.AXOLOTL)
+            ), // Axolotl variant
+            new DefaultsEntry(
+                    18, new EntityMetadataValue.Boolean(false),
+                    EntityTypePredicate.typed(EntityTypeKeys.AXOLOTL)
+            ), // Playing dead
+            new DefaultsEntry(
+                    19, new EntityMetadataValue.Boolean(false),
+                    EntityTypePredicate.typed(EntityTypeKeys.AXOLOTL)
+            ) // From bucket
     );
 
     private EntityMetadataDefaults() {}

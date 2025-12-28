@@ -5,6 +5,7 @@ import net.hypejet.jet.entity.enderdragon.EnderDragonPhase;
 import net.hypejet.jet.entity.horse.HorseMarkings;
 import net.hypejet.jet.entity.illager.IllagerSpellType;
 import net.hypejet.jet.entity.pose.Pose;
+import net.hypejet.jet.entity.variant.axolotl.AxolotlVariant;
 import net.hypejet.jet.entity.variant.chicken.ChickenVariant;
 import net.hypejet.jet.entity.variant.cow.CowVariant;
 import net.hypejet.jet.entity.variant.cow.MushroomCowVariant;
@@ -1064,6 +1065,35 @@ public final class EntityDataComponent<V> {
      * @since 1.0
      */
     public static final EntityDataComponent<Boolean> LAYING_EGG = new EntityDataComponent<>("laying_egg", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing variant of an axolotl entity.
+     *
+     * <p>This component can be used on axolotl entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<AxolotlVariant> AXOLOTL_VARIANT = new EntityDataComponent<>("axolotl_variant", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing whether an axolotl entity is playing dead.
+     *
+     * <p>This component can be used on axolotl entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> PLAYING_DEAD = new EntityDataComponent<>("playing_dead", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing whether an entity was spawned from bucket.
+     *
+     * <p>This component can be used on axolotl entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> FROM_BUCKET = new EntityDataComponent<>("from_bucket", false);
 
     private final String name;
     private final boolean nullable;
