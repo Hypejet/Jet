@@ -481,6 +481,10 @@ public final class EntityDataComponentRegistry {
                                     LlamaVariantRegistry.llamaVariantId(Objects.requireNonNull(value))
                             )
                     )
+
+                    /* -------------- Entity components applicable to turtle entities -------------- */
+                    .putBoolean(EntityDataComponent.HAS_EGG, 17, EntityTypePredicate.typed(EntityTypeKeys.TURTLE))
+                    .putBoolean(EntityDataComponent.LAYING_EGG, 18, EntityTypePredicate.typed(EntityTypeKeys.TURTLE))
                     .build();
 
     private EntityDataComponentRegistry() {}

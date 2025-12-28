@@ -1046,6 +1046,25 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<LlamaVariant> LLAMA_VARIANT = new EntityDataComponent<>("llama_variant", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing whether a turtle entity is pregnant.
+     *
+     * <p>This component can be used on turtle entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> HAS_EGG = new EntityDataComponent<>("has_egg", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing whether a turtle entity is laying their egg.
+     *
+     * <p>This component can be used on turtle entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> LAYING_EGG = new EntityDataComponent<>("laying_egg", false);
+
     private final String name;
     private final boolean nullable;
 

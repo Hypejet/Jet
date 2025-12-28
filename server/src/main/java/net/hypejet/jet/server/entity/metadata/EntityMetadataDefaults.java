@@ -400,7 +400,17 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     20, new EntityMetadataValue.Int(LlamaVariantRegistry.llamaVariantId(LlamaVariant.CREAMY)),
                     EntityTypePredicate.typed(EntityTypeKeys.LLAMA, EntityTypeKeys.TRADER_LLAMA)
-            ) // Llama variant
+            ), // Llama variant
+
+            /* ---------------------- Defaults for turtle entities ---------------------- */
+            new DefaultsEntry(
+                    17, new EntityMetadataValue.Boolean(false),
+                    EntityTypePredicate.typed(EntityTypeKeys.TURTLE)
+            ), // Has egg
+            new DefaultsEntry(
+                    18, new EntityMetadataValue.Boolean(false),
+                    EntityTypePredicate.typed(EntityTypeKeys.TURTLE)
+            ) // Laying egg
     );
 
     private EntityMetadataDefaults() {}
