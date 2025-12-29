@@ -1145,6 +1145,16 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<Boolean> PLAYER_CREATED = new EntityDataComponent<>("player_created", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing whether a snow golem entity has pumpkin on its head.
+     *
+     * <p>This component can be used on snow golem entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> HAS_PUMPKIN = new EntityDataComponent<>("has_pumpkin", false);
+
     private final String name;
     private final boolean nullable;
 

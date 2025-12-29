@@ -537,6 +537,10 @@ public final class EntityDataComponentRegistry {
                             EntityDataComponent.PLAYER_CREATED, 16, 0,
                             EntityTypePredicate.typed(EntityTypeKeys.IRON_GOLEM)
                     )
+                    .putBitFlag(
+                            EntityDataComponent.HAS_PUMPKIN, 16, 4,
+                            EntityTypePredicate.typed(EntityTypeKeys.SNOW_GOLEM)
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}

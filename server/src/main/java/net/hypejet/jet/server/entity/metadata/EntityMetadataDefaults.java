@@ -456,7 +456,11 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     16, new EntityMetadataValue.Byte((byte) 0),
                     EntityTypePredicate.typed(EntityTypeKeys.IRON_GOLEM)
-            ) // Iron golem flags
+            ), // Iron golem flags
+            new DefaultsEntry(
+                    16, new EntityMetadataValue.Byte((byte) 16),
+                    EntityTypePredicate.typed(EntityTypeKeys.SNOW_GOLEM)
+            ) // Snow golem flags
     );
 
     private EntityMetadataDefaults() {}
