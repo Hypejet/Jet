@@ -516,6 +516,18 @@ public final class EntityDataComponentRegistry {
                                     Objects.requireNonNull(value)
                             )
                     )
+
+                    /* -------------- Entity components applicable to sniffer entities -------------- */
+                    .put(
+                            EntityDataComponent.SNIFFER_STATE, 17,
+                            EntityMetadataValue.SnifferStateValue.class,
+                            EntityTypePredicate.typed(EntityTypeKeys.SNIFFER),
+                            EntityMetadataValue.SnifferStateValue::value,
+                            (currentMetadataValue, value) -> new EntityMetadataValue.SnifferStateValue(
+                                    Objects.requireNonNull(value)
+                            )
+                    )
+                    .putInt(EntityDataComponent.DROP_SEED_TICK, 18, EntityTypePredicate.typed(EntityTypeKeys.SNIFFER))
                     .build();
 
     private EntityDataComponentRegistry() {}

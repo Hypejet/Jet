@@ -7,6 +7,7 @@ import net.hypejet.jet.entity.armadillo.ArmadilloState;
 import net.hypejet.jet.entity.enderdragon.EnderDragonPhase;
 import net.hypejet.jet.entity.illager.IllagerSpellType;
 import net.hypejet.jet.entity.pose.Pose;
+import net.hypejet.jet.entity.sniffer.SnifferState;
 import net.hypejet.jet.entity.variant.axolotl.AxolotlVariant;
 import net.hypejet.jet.entity.variant.cow.MushroomCowVariant;
 import net.hypejet.jet.entity.variant.llama.LlamaVariant;
@@ -433,7 +434,17 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     17, new EntityMetadataValue.ArmadilloStateValue(ArmadilloState.IDLE),
                     EntityTypePredicate.typed(EntityTypeKeys.ARMADILLO)
-            ) // Armadillo state
+            ), // Armadillo state
+
+            /* ---------------------- Defaults for sniffer entities ---------------------- */
+            new DefaultsEntry(
+                    17, new EntityMetadataValue.SnifferStateValue(SnifferState.IDLING),
+                    EntityTypePredicate.typed(EntityTypeKeys.SNIFFER)
+            ), // Sniffer state
+            new DefaultsEntry(
+                    18, new EntityMetadataValue.Int(0),
+                    EntityTypePredicate.typed(EntityTypeKeys.SNIFFER)
+            ) // Drop seed tick
     );
 
     private EntityMetadataDefaults() {}

@@ -6,6 +6,7 @@ import net.hypejet.jet.entity.enderdragon.EnderDragonPhase;
 import net.hypejet.jet.entity.horse.HorseMarkings;
 import net.hypejet.jet.entity.illager.IllagerSpellType;
 import net.hypejet.jet.entity.pose.Pose;
+import net.hypejet.jet.entity.sniffer.SnifferState;
 import net.hypejet.jet.entity.variant.axolotl.AxolotlVariant;
 import net.hypejet.jet.entity.variant.chicken.ChickenVariant;
 import net.hypejet.jet.entity.variant.cow.CowVariant;
@@ -1104,6 +1105,25 @@ public final class EntityDataComponent<V> {
      * @since 1.0
      */
     public static final EntityDataComponent<ArmadilloState> ARMADILLO_STATE = new EntityDataComponent<>("armadillo_state", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing state of a sniffer entity.
+     *
+     * <p>This component can be used on sniffer entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<SnifferState> SNIFFER_STATE = new EntityDataComponent<>("sniffer_state", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * number of entity tick during which a sniffer entity should drop a seed.
+     *
+     * <p>This component can be used on sniffer entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Integer> DROP_SEED_TICK = new EntityDataComponent<>("drop_seed_tick", false);
 
     private final String name;
     private final boolean nullable;
