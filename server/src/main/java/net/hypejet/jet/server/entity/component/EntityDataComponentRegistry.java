@@ -531,6 +531,12 @@ public final class EntityDataComponentRegistry {
 
                     /* -------------- Entity components applicable to villager-like entities -------------- */
                     .putInt(EntityDataComponent.UNHAPPY_COUNTER, 17, EntityTypePredicate.VILLAGER_LIKE)
+
+                    /* -------------- Entity components applicable to golem entities -------------- */
+                    .putBitFlag(
+                            EntityDataComponent.PLAYER_CREATED, 16, 0,
+                            EntityTypePredicate.typed(EntityTypeKeys.IRON_GOLEM)
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}

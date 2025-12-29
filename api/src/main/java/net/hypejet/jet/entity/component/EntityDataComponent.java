@@ -1135,6 +1135,16 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<Integer> UNHAPPY_COUNTER = new EntityDataComponent<>("unhappy_counter", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * whether an iron golem entity was spawned by player using blocks.
+     *
+     * <p>This component can be used on iron golem entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Boolean> PLAYER_CREATED = new EntityDataComponent<>("player_created", false);
+
     private final String name;
     private final boolean nullable;
 

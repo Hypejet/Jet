@@ -450,7 +450,13 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     17, new EntityMetadataValue.Int(0),
                     EntityTypePredicate.VILLAGER_LIKE
-            ) // Unhappy counter
+            ), // Unhappy counter
+
+            /* ---------------------- Defaults for golem entities ---------------------- */
+            new DefaultsEntry(
+                    16, new EntityMetadataValue.Byte((byte) 0),
+                    EntityTypePredicate.typed(EntityTypeKeys.IRON_GOLEM)
+            ) // Iron golem flags
     );
 
     private EntityMetadataDefaults() {}
