@@ -444,7 +444,13 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     18, new EntityMetadataValue.Int(0),
                     EntityTypePredicate.typed(EntityTypeKeys.SNIFFER)
-            ) // Drop seed tick
+            ), // Drop seed tick
+
+            /* ---------------------- Defaults for villager-like entities ---------------------- */
+            new DefaultsEntry(
+                    17, new EntityMetadataValue.Int(0),
+                    EntityTypePredicate.VILLAGER_LIKE
+            ) // Unhappy counter
     );
 
     private EntityMetadataDefaults() {}

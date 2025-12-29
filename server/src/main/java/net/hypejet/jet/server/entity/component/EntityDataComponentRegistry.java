@@ -528,6 +528,9 @@ public final class EntityDataComponentRegistry {
                             )
                     )
                     .putInt(EntityDataComponent.DROP_SEED_TICK, 18, EntityTypePredicate.typed(EntityTypeKeys.SNIFFER))
+
+                    /* -------------- Entity components applicable to villager-like entities -------------- */
+                    .putInt(EntityDataComponent.UNHAPPY_COUNTER, 17, EntityTypePredicate.VILLAGER_LIKE)
                     .build();
 
     private EntityDataComponentRegistry() {}

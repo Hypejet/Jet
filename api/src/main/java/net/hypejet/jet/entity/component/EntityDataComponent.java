@@ -1125,6 +1125,16 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<Integer> DROP_SEED_TICK = new EntityDataComponent<>("drop_seed_tick", false);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing
+     * how many ticks remain for a villager-like entity to be unhappy.
+     *
+     * <p>This component can be used on villager and wandering trader entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Integer> UNHAPPY_COUNTER = new EntityDataComponent<>("unhappy_counter", false);
+
     private final String name;
     private final boolean nullable;
 
