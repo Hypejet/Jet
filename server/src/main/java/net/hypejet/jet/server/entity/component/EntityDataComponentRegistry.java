@@ -24,6 +24,7 @@ import net.hypejet.jet.server.world.block.state.JetBlockState;
 import net.hypejet.jet.world.block.state.BlockState;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.hypejet.jet.world.coordinate.rotation.Rotations;
+import net.hypejet.jet.world.direction.Direction;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.HashMap;
@@ -541,6 +542,23 @@ public final class EntityDataComponentRegistry {
                             EntityDataComponent.HAS_PUMPKIN, 16, 4,
                             EntityTypePredicate.typed(EntityTypeKeys.SNOW_GOLEM)
                     )
+                    .putDirection(
+                            EntityDataComponent.ATTACH_FACE, 16,
+                            EntityTypePredicate.typed(EntityTypeKeys.SHULKER)
+                    )
+                    .putByte(EntityDataComponent.SHULKER_PEEK, 17, EntityTypePredicate.typed(EntityTypeKeys.SHULKER))
+                    .put(
+                            EntityDataComponent.SHULKER_COLOR, 18,
+                            EntityMetadataValue.Byte.class,
+                            EntityTypePredicate.typed(EntityTypeKeys.SHULKER),
+                            metadataValue -> {
+                                byte byteValue = metadataValue.value();
+                                return byteValue == 16 ? null : DyeColorRegistry.dyeColor(byteValue);
+                            },
+                            (currentMetadataValue, value) -> new EntityMetadataValue.Byte(
+                                    value == null ? 16 : (byte) DyeColorRegistry.dyeColorId(value)
+                            )
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}
@@ -614,6 +632,33 @@ public final class EntityDataComponentRegistry {
         }
 
         /**
+         * Registers the specified {@linkplain Byte byte} {@linkplain EntityDataComponent entity data component}.
+         *
+         * <p>The component is going to be backed by
+         * a {@linkplain EntityMetadataValue.Byte byte entity metadata value}.</p>
+         *
+         * @param component the entity data component to register, must not be nullable
+         * @param metadataIndex entity metadata index where entity metadata values that are
+         *                      associated with the specified entity data component should be put at
+         * @param entityTypePredicate a predicate that should check whether entities with entity type provided during
+         *                            predicate testing should support the specified entity data component
+         * @return this builder
+         * @throws IllegalArgumentException if the specified entity data component is nullable
+         * @since 1.0
+         */
+        private RegistrationsBuilder putByte(EntityDataComponent<Byte> component, int metadataIndex,
+                                             EntityTypePredicate entityTypePredicate) {
+            if (component.nullable())
+                throw new IllegalArgumentException("The entity data component must not be nullable");
+
+            return this.put(
+                    component, metadataIndex, EntityMetadataValue.Byte.class,
+                    entityTypePredicate, EntityMetadataValue.Byte::value,
+                    (ignored, value) -> new EntityMetadataValue.Byte(Objects.requireNonNull(value))
+            );
+        }
+
+        /**
          * Registers the specified {@linkplain Boolean boolean} {@linkplain EntityDataComponent entity data component}.
          *
          * <p>The component is going to be backed by
@@ -671,7 +716,7 @@ public final class EntityDataComponentRegistry {
          * Registers the specified {@linkplain Float float} {@linkplain EntityDataComponent entity data component}.
          *
          * <p>The component is going to be backed by
-         * an {@linkplain EntityMetadataValue.Float float entity metadata value}.</p>
+         * a {@linkplain EntityMetadataValue.Float float entity metadata value}.</p>
          *
          * @param component the entity data component to register, must not be nullable
          * @param metadataIndex entity metadata index where entity metadata values that are
@@ -771,7 +816,7 @@ public final class EntityDataComponentRegistry {
          * {@linkplain EntityDataComponent entity data component}.
          *
          * <p>The component is going to be backed by
-         * an {@linkplain EntityMetadataValue.RotationsValue rotations entity metadata value}.</p>
+         * a {@linkplain EntityMetadataValue.RotationsValue rotations entity metadata value}.</p>
          *
          * @param component the entity data component to register, must not be nullable
          * @param metadataIndex entity metadata index where entity metadata values that are
@@ -791,6 +836,34 @@ public final class EntityDataComponentRegistry {
                     component, metadataIndex, EntityMetadataValue.RotationsValue.class,
                     entityTypePredicate, EntityMetadataValue.RotationsValue::value,
                     (ignored, value) -> new EntityMetadataValue.RotationsValue(Objects.requireNonNull(value))
+            );
+        }
+
+        /**
+         * Registers the specified {@linkplain Direction direction}
+         * {@linkplain EntityDataComponent entity data component}.
+         *
+         * <p>The component is going to be backed by
+         * a {@linkplain EntityMetadataValue.DirectionValue direction entity metadata value}.</p>
+         *
+         * @param component the entity data component to register, must not be nullable
+         * @param metadataIndex entity metadata index where entity metadata values that are
+         *                      associated with the specified entity data component should be put at
+         * @param entityTypePredicate a predicate that should check whether entities with entity type provided during
+         *                            predicate testing should support the specified entity data component
+         * @return this builder
+         * @throws IllegalArgumentException if the specified entity data component is nullable
+         * @since 1.0
+         */
+        private RegistrationsBuilder putDirection(EntityDataComponent<Direction> component,
+                                                  int metadataIndex, EntityTypePredicate entityTypePredicate) {
+            if (component.nullable())
+                throw new IllegalArgumentException("The entity data component must not be nullable");
+
+            return this.put(
+                    component, metadataIndex, EntityMetadataValue.DirectionValue.class,
+                    entityTypePredicate, EntityMetadataValue.DirectionValue::value,
+                    (ignored, value) -> new EntityMetadataValue.DirectionValue(Objects.requireNonNull(value))
             );
         }
 

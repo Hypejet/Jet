@@ -31,6 +31,7 @@ import net.hypejet.jet.server.entity.variant.RabbitVariantRegistry;
 import net.hypejet.jet.server.util.game.entity.EntityTypePredicate;
 import net.hypejet.jet.util.color.ARGBColor;
 import net.hypejet.jet.world.coordinate.rotation.Rotations;
+import net.hypejet.jet.world.direction.Direction;
 import net.hypejet.jet.world.particle.color.ColorParticle;
 import org.jspecify.annotations.NullMarked;
 
@@ -460,7 +461,19 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     16, new EntityMetadataValue.Byte((byte) 16),
                     EntityTypePredicate.typed(EntityTypeKeys.SNOW_GOLEM)
-            ) // Snow golem flags
+            ), // Snow golem flags
+            new DefaultsEntry(
+                    16, new EntityMetadataValue.DirectionValue(Direction.DOWN),
+                    EntityTypePredicate.typed(EntityTypeKeys.SHULKER)
+            ), // Attach face
+            new DefaultsEntry(
+                    17, new EntityMetadataValue.Byte((byte) 0),
+                    EntityTypePredicate.typed(EntityTypeKeys.SHULKER)
+            ), // Shulker peek
+            new DefaultsEntry(
+                    18, new EntityMetadataValue.Byte((byte) 16),
+                    EntityTypePredicate.typed(EntityTypeKeys.SHULKER)
+            ) // Shulker color
     );
 
     private EntityMetadataDefaults() {}

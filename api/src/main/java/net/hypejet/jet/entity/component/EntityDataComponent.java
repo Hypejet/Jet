@@ -22,6 +22,7 @@ import net.hypejet.jet.util.game.color.DyeColor;
 import net.hypejet.jet.world.block.state.BlockState;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.hypejet.jet.world.coordinate.rotation.Rotations;
+import net.hypejet.jet.world.direction.Direction;
 import net.hypejet.jet.world.particle.Particle;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NullMarked;
@@ -1154,6 +1155,37 @@ public final class EntityDataComponent<V> {
      * @since 1.0
      */
     public static final EntityDataComponent<Boolean> HAS_PUMPKIN = new EntityDataComponent<>("has_pumpkin", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing which block a shulker entity
+     * is attached to. This component takes {@linkplain Direction direction} values. The first block
+     * from the shulker in the specified direction is the block that the entity is attached to.
+     *
+     * <p>This component can be used on shulker entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Direction> ATTACH_FACE = new EntityDataComponent<>("attach_face", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing how much shell
+     * of a shulker entity is opened. The higher the value of the component, the more open the shell is.
+     *
+     * <p>This component can be used on shulker entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Byte> SHULKER_PEEK = new EntityDataComponent<>("shulker_peek", false);
+
+    /**
+     * An {@linkplain EntityDataComponent entity data component} representing color of a shulker entity.
+     *
+     * <p>This component can be used on shulker entities only.</p>
+     * <p>This component is nullable and {@code null} values mean that the shulker uses its default color.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<DyeColor> SHULKER_COLOR = new EntityDataComponent<>("shulker_color", true);
 
     private final String name;
     private final boolean nullable;
