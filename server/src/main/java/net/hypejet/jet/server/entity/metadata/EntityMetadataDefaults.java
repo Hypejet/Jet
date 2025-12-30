@@ -473,7 +473,13 @@ public final class EntityMetadataDefaults {
             new DefaultsEntry(
                     18, new EntityMetadataValue.Byte((byte) 16),
                     EntityTypePredicate.typed(EntityTypeKeys.SHULKER)
-            ) // Shulker color
+            ), // Shulker color
+
+            /* ---------------------- Defaults for experience orb entities ---------------------- */
+            new DefaultsEntry(
+                    8, new EntityMetadataValue.Int(0),
+                    EntityTypePredicate.typed(EntityTypeKeys.EXPERIENCE_ORB)
+            ) // Value
     );
 
     private EntityMetadataDefaults() {}

@@ -1187,6 +1187,16 @@ public final class EntityDataComponent<V> {
      */
     public static final EntityDataComponent<DyeColor> SHULKER_COLOR = new EntityDataComponent<>("shulker_color", true);
 
+    /**
+     * An {@linkplain EntityDataComponent entity data component}
+     * representing how much experience an experience orb entity contains.
+     *
+     * <p>This component can be used on experience orb entities only.</p>
+     *
+     * @since 1.0
+     */
+    public static final EntityDataComponent<Integer> EXPERIENCE_VALUE = new EntityDataComponent<>("experience_value", false);
+
     private final String name;
     private final boolean nullable;
 

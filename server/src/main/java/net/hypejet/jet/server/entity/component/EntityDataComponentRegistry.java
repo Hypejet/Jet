@@ -559,6 +559,12 @@ public final class EntityDataComponentRegistry {
                                     value == null ? 16 : (byte) DyeColorRegistry.dyeColorId(value)
                             )
                     )
+
+                    /* -------------- Entity components applicable to experience orb entities -------------- */
+                    .putInt(
+                            EntityDataComponent.EXPERIENCE_VALUE, 8,
+                            EntityTypePredicate.typed(EntityTypeKeys.EXPERIENCE_ORB)
+                    )
                     .build();
 
     private EntityDataComponentRegistry() {}
