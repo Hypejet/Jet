@@ -1,7 +1,8 @@
 # ✈️ Jet
 
 > [!WARNING]
-> Jet is still under development and it is not recommended to use it by normal servers yet.
+> Jet is not finished, nor maintained anymore.</p>
+> You can see the list of reasons of abandoning it by joining our Discord server and reading [this message](https://discord.com/channels/1066346611539722380/1142756158394863676).
 
 A high performance, multithreaded Minecraft server software which aims on high customizability without need to manually use packets. Designed for servers with custom behaviour, such as minigame servers.
 
