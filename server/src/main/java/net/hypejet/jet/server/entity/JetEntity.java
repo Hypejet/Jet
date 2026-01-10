@@ -2,12 +2,19 @@ package net.hypejet.jet.server.entity;
 
 import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.entity.EntityType;
+import net.hypejet.jet.entity.component.EntityDataComponent;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.server.JetMinecraftServer;
+import net.hypejet.jet.server.entity.component.EntityDataComponentRegistration;
+import net.hypejet.jet.server.entity.component.EntityDataComponentRegistry;
+import net.hypejet.jet.server.entity.metadata.EntityMetadata;
+import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerRemoveEntitiesPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSpawnEntityPlayPacket;
+import net.hypejet.jet.server.util.game.entity.EntityTypePredicate;
 import net.hypejet.jet.server.util.viewable.JetViewable;
 import net.hypejet.jet.world.coordinate.flag.RelativeFlag;
 import net.hypejet.jet.server.entity.player.JetPlayer;
@@ -18,8 +25,11 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.pointer.Pointers;
 import net.kyori.adventure.text.event.HoverEvent;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -39,6 +49,7 @@ public class JetEntity implements Entity, JetViewable {
 
     private final Holder.Reference<EntityType> entityType;
     private final int entityId;
+    private final EntityMetadata entityMetadata;
 
     private final Identity identity;
     private final Pointers pointers;
@@ -82,6 +93,7 @@ public class JetEntity implements Entity, JetViewable {
                      Pointers pointers, Position position, JetMinecraftServer server) {
         this.entityType = Objects.requireNonNull(entityType, "entity type");
         this.entityId = server.nextEntityId();
+        this.entityMetadata = new EntityMetadata(server, entityType, this.entityId, this::sendPacketToViewersAndSelf);
         this.identity = Identity.identity(Objects.requireNonNull(uniqueId, "unique identifier"));
         this.pointers = Objects.requireNonNull(pointers, "pointers");
         this.position = Objects.requireNonNull(position, "position");
@@ -123,6 +135,30 @@ public class JetEntity implements Entity, JetViewable {
     }
 
     @Override
+    public <V> @Nullable V component(EntityDataComponent<V> component) {
+        V value = this.component(this.ensureComponentSupported(component));
+        if (!component.nullable() && value == null) {
+            throw new IllegalStateException(String.format(
+                    "Entity data component \"%s\" is not nullable, but its value is null",
+                    component.name()
+            ));
+        }
+        return value;
+    }
+
+    @Override
+    public <V> void component(EntityDataComponent<V> component, @Nullable V value) {
+        this.server.ticker().ensureRunsInTickLoop();
+        if (!component.nullable() && value == null) {
+            throw new IllegalArgumentException(String.format(
+                    "Entity data component \"%s\" cannot take null values",
+                    component.name()
+            ));
+        }
+        this.component(this.ensureComponentSupported(component), value);
+    }
+
+    @Override
     public final String scoreboardName() {
         // TODO: Check entity type instead of the entity being an instance of player
         return this instanceof JetPlayer player ? player.username() : this.uniqueId().toString();
@@ -146,9 +182,16 @@ public class JetEntity implements Entity, JetViewable {
 
         if (!this.viewers.add(castPlayer))
             return false;
-
         castPlayer.addViewedObject(this);
-        castPlayer.sendPacket(this.spawnPacket());
+
+        List<ServerPacket> packetBundle = new ArrayList<>();
+        packetBundle.add(this.spawnPacket());
+
+        ServerPacket metadataInitializationPacket = this.entityMetadata.createInitializationPacket();
+        if (metadataInitializationPacket != null)
+            packetBundle.add(metadataInitializationPacket);
+
+        castPlayer.connection().sendPacketBundle(packetBundle.toArray(ServerPacket[]::new));
         return true;
     }
 
@@ -265,6 +308,44 @@ public class JetEntity implements Entity, JetViewable {
                 0 /* TODO */,
                 this.velocity
         );
+    }
+
+    private <V, MV extends EntityMetadataValue> @Nullable V component(
+            EntityDataComponentRegistration<V, MV> registration
+    ) {
+        MV metadataValue = this.entityMetadata.value(registration.metadataIndex(), registration.metadataValueClass());
+        return registration.componentValueDecoder().decode(metadataValue);
+    }
+
+    private <V, MV extends EntityMetadataValue> void component(
+            EntityDataComponentRegistration<V, MV> registration,
+            @Nullable V value
+    ) {
+        this.entityMetadata.value(
+                registration.metadataIndex(), registration.metadataValueClass(),
+                currentMetadataValue -> registration.componentValueEncoder().encode(currentMetadataValue, value)
+        );
+    }
+
+    private <V> EntityDataComponentRegistration<V, ?> ensureComponentSupported(EntityDataComponent<V> component) {
+        Objects.requireNonNull(component, "component");
+        EntityDataComponentRegistration<V, ?> registration = EntityDataComponentRegistry.registration(component);
+
+        if (!EntityTypePredicate.test(registration.entityTypePredicate(), this.entityType, this.server)) {
+            throw new IllegalArgumentException(String.format(
+                    "Entity data component \"%s\" is unsupported by \"%s\" entity types",
+                    component.name(), this.entityType.key()
+            ));
+        }
+
+        return registration;
+    }
+
+    private void sendPacketToViewersAndSelf(ServerPacket packet) {
+        // TODO: Cache the packet
+        if (this instanceof JetPlayer player)
+            player.sendPacket(packet);
+        this.viewers.forEach(player -> player.sendPacket(packet));
     }
 
     /**

@@ -35,7 +35,6 @@ import java.util.Objects;
  *
  * @param <V> the type of values that the field accepts
  * @since 1.0
- * @see EntityDataComponentMap
  * @see Entity
  */
 @NullMarked

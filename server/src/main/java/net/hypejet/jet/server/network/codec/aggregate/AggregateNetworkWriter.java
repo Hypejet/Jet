@@ -36,7 +36,7 @@ public abstract class AggregateNetworkWriter<A> implements NetworkWriter<A> {
 
         if (length > this.maxLength) {
             throw new IllegalArgumentException(String.format(
-                    "The aggregate is long than allowed (%s > %s).",
+                    "The aggregate is longer than allowed (%s > %s).",
                     length, this.maxLength
             ));
         }

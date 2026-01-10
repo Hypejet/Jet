@@ -1,5 +1,6 @@
 package net.hypejet.jet.server.entity.metadata;
 
+import io.netty.util.collection.IntCollections;
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
 import net.hypejet.jet.entity.EntityType;
@@ -501,7 +502,7 @@ public final class EntityMetadataDefaults {
             if (!EntityTypePredicate.test(entry.entityTypePredicate(), entityType, server)) continue;
             defaultValues.put(entry.index(), entry.defaultValueProvider().provide(server, entityType));
         }
-        return defaultValues;
+        return IntCollections.unmodifiableMap(defaultValues);
     }
 
     /**

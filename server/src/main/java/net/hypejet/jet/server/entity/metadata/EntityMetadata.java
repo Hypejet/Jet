@@ -6,8 +6,13 @@ import net.hypejet.jet.entity.EntityType;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.server.JetMinecraftServer;
 import net.hypejet.jet.server.entity.JetEntity;
+import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityMetadataPlayPacket;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
 /**
@@ -19,17 +24,27 @@ import java.util.function.UnaryOperator;
 @NullMarked
 public final class EntityMetadata {
 
-    private final IntObjectMap<EntityMetadataValue> values = new IntObjectHashMap<>();
+    private final int entityId;
+    private final Consumer<ServerPacket> updatePacketSender;
+    private final IntObjectMap<EntityMetadataValue> defaultValues;
+
+    private final IntObjectMap<EntityMetadataValue> networkValues = new IntObjectHashMap<>();
 
     /**
      * Constructs the {@linkplain EntityMetadata entity metadata}.
      *
      * @param server the server of the entity that the entity metadata is being constructed for
      * @param entityType the type of the entity that the entity metadata is being constructed for
+     * @param entityId numeric identifier of the entity that the entity metadata is being constructed for
+     * @param updatePacketSender a consumer consuming metadata update packets and sending them to the entity itself
+     *                           and viewers of the entity that the entity metadata is being constructed for
      * @since 1.0
      */
-    public EntityMetadata(JetMinecraftServer server, Holder.Reference<EntityType> entityType) {
-        this.values.putAll(EntityMetadataDefaults.defaultsFor(server, entityType));
+    public EntityMetadata(JetMinecraftServer server, Holder.Reference<EntityType> entityType,
+                          int entityId, Consumer<ServerPacket> updatePacketSender) {
+        this.entityId = entityId;
+        this.updatePacketSender = updatePacketSender;
+        this.defaultValues = EntityMetadataDefaults.defaultsFor(server, entityType);
     }
 
     /**
@@ -44,7 +59,9 @@ public final class EntityMetadata {
      * @since 1.0
      */
     public <V extends EntityMetadataValue> V value(int index, Class<V> valueType) {
-        EntityMetadataValue value = this.values.get(index);
+        EntityMetadataValue value = this.networkValues.get(index);
+        if (value == null) value = this.defaultValues.get(index);
+
         if (value == null) {
             throw new IllegalArgumentException(String.format(
                     "No entity metadata value was defined at %d index",
@@ -56,6 +73,7 @@ public final class EntityMetadata {
                     index, value.getClass().getSimpleName(), valueType.getSimpleName()
             ));
         }
+
         return valueType.cast(value);
     }
 
@@ -77,12 +95,40 @@ public final class EntityMetadata {
                                                       UnaryOperator<V> updatedValueProvider) {
         V currentValue = this.value(index, valueType);
         V newValue = updatedValueProvider.apply(currentValue);
+
         if (!valueType.isInstance(newValue)) {
             throw new IllegalArgumentException(String.format(
                     "Entity metadata value at index %d expects %s type instead of %s",
                     index, valueType.getSimpleName(), newValue.getClass().getSimpleName()
             ));
         }
-        this.values.put(index, newValue);
+
+        if (currentValue.equals(newValue)) return;
+
+        EntityMetadataValue defaultValue = this.defaultValues.get(index);
+        if (defaultValue.equals(newValue)) {
+            this.networkValues.remove(index);
+        } else {
+            this.networkValues.put(index, newValue);
+        }
+
+        // TODO: Send updates at the end of entity tick instead, like vanilla does
+        this.updatePacketSender.accept(new ServerEntityMetadataPlayPacket(
+                this.entityId,
+                Set.of(new ServerEntityMetadataPlayPacket.Update(index, newValue))
+        ));
+    }
+
+    /**
+     * Creates a server packet initializing this entity metadata.
+     *
+     * @return the created initializing server packet, {@code null} if this
+     *         entity metadata has no changes from the default entity metadata
+     * @since 1.0
+     */
+    // TODO: Cache the packet
+    public @Nullable ServerEntityMetadataPlayPacket createInitializationPacket() {
+        if (this.networkValues.isEmpty()) return null;
+        return ServerEntityMetadataPlayPacket.create(this.entityId, this.networkValues);
     }
 }

@@ -1,6 +1,7 @@
 package net.hypejet.jet.entity;
 
 import net.hypejet.jet.MinecraftServer;
+import net.hypejet.jet.entity.component.EntityDataComponent;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.util.view.Viewable;
 import net.hypejet.jet.world.coordinate.flag.RelativeFlag;
@@ -14,6 +15,7 @@ import net.kyori.adventure.pointer.Pointered;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.event.HoverEventSource;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -104,6 +106,30 @@ public interface Entity extends Identified, Pointered, Keyed, Viewable, HoverEve
      * @since 1.0
      */
     void updatePosition(Position position, Vector velocity, Collection<RelativeFlag> flags);
+
+    /**
+     * Gets the value of the specified {@linkplain EntityDataComponent entity data component} for this entity.
+     *
+     * @param component the entity data component whose value should be returned
+     * @return the entity data component value, can be {@code null} only if the component is nullable
+     * @param <V> the type of returned value
+     * @throws IllegalArgumentException if this entity does not support the specified component
+     * @since 1.0
+     */
+    <V> @Nullable V component(EntityDataComponent<V> component);
+
+    /**
+     * Sets the value of the specified {@linkplain EntityDataComponent entity data component} for this entity.
+     *
+     * @param component the entity data component whose value should be set
+     * @param value the value that the entity data component should have for this entity,
+     *              may be {@code null} only if the component is nullable
+     * @param <V> the value type of the specified entity data component
+     * @throws IllegalArgumentException if this entity does not support the specified component or the specified
+     *                                  component is not nullable but the specified value is null
+     * @since 1.0
+     */
+    <V> void component(EntityDataComponent<V> component, @Nullable V value);
 
     /**
      * Represents a hand of an entity.

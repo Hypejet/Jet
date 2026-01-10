@@ -7,7 +7,7 @@ checker-framework-plugin = "0.6.39"
 jspecify = "1.0.0"
 
 # Networking
-netty = "4.1.110.Final"
+netty = "4.2.9.Final"
 
 # Logging
 slf4j = "2.0.13"
@@ -45,7 +45,7 @@ javapoet = "0.7.0"
 picocli = "4.7.7"
 
 # Utilities
-guava = "33.4.8-jre"
+guava = "33.5.0-jre"
 
 [libraries]
 # Networking

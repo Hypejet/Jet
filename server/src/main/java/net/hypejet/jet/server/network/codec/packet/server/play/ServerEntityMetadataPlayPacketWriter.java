@@ -1,13 +1,10 @@
 package net.hypejet.jet.server.network.codec.packet.server.play;
 
-import com.google.common.collect.Sets;
 import io.netty.buffer.ByteBuf;
-import io.netty.util.collection.IntObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.hypejet.jet.entity.armadillo.ArmadilloState;
 import net.hypejet.jet.entity.pose.Pose;
 import net.hypejet.jet.entity.sniffer.SnifferState;
-import net.hypejet.jet.server.entity.metadata.EntityMetadata;
 import net.hypejet.jet.server.entity.metadata.EntityMetadataValue;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetworkWriter;
@@ -47,7 +44,7 @@ import java.util.Map;
  */
 public final class ServerEntityMetadataPlayPacketWriter implements NetworkWriter<ServerEntityMetadataPlayPacket> {
 
-    private static final CollectionNetworkWriter<IntObjectMap.PrimitiveEntry<EntityMetadataValue>>
+    private static final CollectionNetworkWriter<ServerEntityMetadataPlayPacket.Update>
             UPDATES_WRITER = new CollectionNetworkWriter<>(false, new MetadataUpdateNetworkWriter());
 
     /**
@@ -275,26 +272,24 @@ public final class ServerEntityMetadataPlayPacketWriter implements NetworkWriter
     @Override
     public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
                       @NonNull ServerEntityMetadataPlayPacket object) {
-        UPDATES_WRITER.write(buf, registryManager, Sets.newHashSet(object.updates().entries()));
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, object.entityId());
+        UPDATES_WRITER.write(buf, registryManager, object.updates());
         buf.writeByte(255); // Mark an end of metadata updates
     }
 
     /**
      * A {@linkplain NetworkWriter network writer}
-     * of {@linkplain IntObjectMap.PrimitiveEntry int-object map primitive entries}
-     * associating {@linkplain EntityMetadata entity metadata} indices
-     * with {@linkplain EntityMetadataValue entity metadata values} bound to them.
+     * of {@linkplain ServerEntityMetadataPlayPacket.Update entity metadata updates}.
      *
      * @since 1.0
-     * @see EntityMetadata
      * @see NetworkWriter
      */
     private static final class MetadataUpdateNetworkWriter
-            implements NetworkWriter<IntObjectMap.PrimitiveEntry<EntityMetadataValue>> {
+            implements NetworkWriter<ServerEntityMetadataPlayPacket.Update> {
         @Override
         public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
-                          IntObjectMap.@NonNull PrimitiveEntry<EntityMetadataValue> object) {
-            buf.writeByte(object.key());
+                          ServerEntityMetadataPlayPacket.@NonNull Update object) {
+            buf.writeByte(object.index());
 
             EntityMetadataValue metadataValue = object.value();
             Class<? extends EntityMetadataValue> valueClass = metadataValue.getClass();
@@ -305,7 +300,7 @@ public final class ServerEntityMetadataPlayPacketWriter implements NetworkWriter
                                 + valueClass.getSimpleName()
                 ));
             }
-            buf.writeInt(DATA_TYPE_IDS.getInt(valueClass));
+            VarIntNetworkCodec.INSTANCE.write(buf, registryManager, DATA_TYPE_IDS.getInt(valueClass));
 
             NetworkWriter<?> writer = VALUE_WRITERS.get(valueClass);
             if (writer == null) {
