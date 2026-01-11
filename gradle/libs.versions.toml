@@ -1,6 +1,6 @@
 [versions]
 # Fat jar compilation
-shadow = "8.1.7"
+shadow = "9.3.1"
 
 # Nullability
 checker-framework-plugin = "0.6.39"
@@ -104,6 +104,6 @@ adventure = [
 ]
 
 [plugins]
-shadow = { id = "io.github.goooler.shadow", version.ref = "shadow" } # Fat jar compilation
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" } # Fat jar compilation
 checker-framework = { id = "org.checkerframework", version.ref = "checker-framework-plugin" }
 vanillaGradle = { id = "org.spongepowered.gradle.vanilla", version.ref = "vanillaGradle" }
