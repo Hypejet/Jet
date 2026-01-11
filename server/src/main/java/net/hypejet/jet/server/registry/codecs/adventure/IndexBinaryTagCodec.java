@@ -3,8 +3,7 @@ package net.hypejet.jet.server.registry.codecs.adventure;
 import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.util.Index;
-import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
 
@@ -18,6 +17,7 @@ import java.util.Objects;
  * @see Index
  * @see BinaryTagCodec
  */
+@NullMarked
 public final class IndexBinaryTagCodec<K, V> implements BinaryTagCodec<K> {
 
     private final Index<K, V> index;
@@ -30,18 +30,18 @@ public final class IndexBinaryTagCodec<K, V> implements BinaryTagCodec<K> {
      * @param valueCodec the codec to write index values with
      * @since 1.0
      */
-    public IndexBinaryTagCodec(@NonNull Index<K, V> index, @NonNull BinaryTagCodec<V> valueCodec) {
+    public IndexBinaryTagCodec(Index<K, V> index, BinaryTagCodec<V> valueCodec) {
         this.index = Objects.requireNonNull(index, "index");
         this.valueCodec = Objects.requireNonNull(valueCodec, "value codec");
     }
 
     @Override
-    public @NotNull K decode(@NotNull BinaryTag encoded) throws Exception {
-        return this.index.keyOrThrow(this.valueCodec.decode(encoded));
+    public K decode(BinaryTag binaryTag) {
+        return this.index.keyOrThrow(this.valueCodec.decode(binaryTag));
     }
 
     @Override
-    public @NotNull BinaryTag encode(@NotNull K decoded) throws Exception {
-        return this.valueCodec.encode(this.index.valueOrThrow(decoded));
+    public BinaryTag encode(K value) {
+        return this.valueCodec.encode(this.index.valueOrThrow(value));
     }
 }

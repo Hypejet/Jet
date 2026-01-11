@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.codec.game.settings;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.server.network.codec.NetworkReader;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.ArrayList;
@@ -41,7 +42,8 @@ public final class SkinPartCollectionNetworkReader implements NetworkReader<Coll
     private SkinPartCollectionNetworkReader() {}
 
     @Override
-    public @NonNull Collection<Player.SkinPart> read(@NonNull ByteBuf buf) {
+    public @NonNull Collection<Player.SkinPart> read(@NonNull ByteBuf buf,
+                                                     @NonNull JetRegistryManager registryManager) {
         byte skinPartsByte = buf.readByte();
         List<Player.SkinPart> skinParts = new ArrayList<>();
 

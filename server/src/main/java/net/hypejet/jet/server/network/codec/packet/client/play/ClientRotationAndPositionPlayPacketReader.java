@@ -2,9 +2,10 @@ package net.hypejet.jet.server.network.codec.packet.client.play;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
-import net.hypejet.jet.server.network.codec.game.world.coordinate.PositionFlagsNetworkReader;
-import net.hypejet.jet.server.network.codec.game.world.coordinate.PositionNetworkCodec;
+import net.hypejet.jet.server.network.codec.game.world.coordinate.position.PositionFlagsNetworkReader;
+import net.hypejet.jet.server.network.codec.game.world.coordinate.position.PositionNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientRotationAndPositionPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -30,10 +31,11 @@ public final class ClientRotationAndPositionPlayPacketReader
     private ClientRotationAndPositionPlayPacketReader() {}
 
     @Override
-    public @NonNull ClientRotationAndPositionPlayPacket read(@NonNull ByteBuf buf) {
+    public @NonNull ClientRotationAndPositionPlayPacket read(@NonNull ByteBuf buf,
+                                                             @NonNull JetRegistryManager registryManager) {
         return new ClientRotationAndPositionPlayPacket(
-                PositionNetworkCodec.INSTANCE.read(buf),
-                PositionFlagsNetworkReader.INSTANCE.read(buf)
+                PositionNetworkCodec.INSTANCE.read(buf, registryManager),
+                PositionFlagsNetworkReader.INSTANCE.read(buf, registryManager)
         );
     }
 }

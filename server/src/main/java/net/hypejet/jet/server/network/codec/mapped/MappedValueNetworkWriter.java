@@ -2,6 +2,7 @@ package net.hypejet.jet.server.network.codec.mapped;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Objects;
@@ -32,7 +33,7 @@ public record MappedValueNetworkWriter<O, M>(@NonNull Function<O, M> mapper,
     }
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull O object) {
-        this.mappedValueWriter.write(buf, this.mapper.apply(object));
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager, @NonNull O object) {
+        this.mappedValueWriter.write(buf, registryManager, this.mapper.apply(object));
     }
 }

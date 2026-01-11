@@ -2,6 +2,7 @@ package net.hypejet.jet.server.network.codec.aggregate.bitset;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -33,12 +34,12 @@ public final class FixedBitSetNetworkCodec implements NetworkCodec<BitSet> {
     }
 
     @Override
-    public @NonNull BitSet read(@NonNull ByteBuf buf) {
+    public @NonNull BitSet read(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager) {
         return BitSet.valueOf(NetworkUtil.readBytes(buf, this.fixedByteSize));
     }
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull BitSet object) {
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager, @NonNull BitSet object) {
         if (object.length() > this.fixedSize) {
             throw new IllegalArgumentException(String.format(
                     "The size of the bitset should not be higher than %s", this.fixedSize

@@ -12,6 +12,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.status.ServerListResponseStatusPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.util.game.ping.ServerListPing;
 import net.hypejet.jet.util.json.UnmodifiableJsonObject;
 import net.kyori.adventure.text.Component;
@@ -43,8 +44,9 @@ public final class ServerListResponseStatusPacketWriter implements NetworkWriter
     private ServerListResponseStatusPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerListResponseStatusPacket object) {
-        SERVER_LIST_PING_WRITER.write(buf, object.ping());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerListResponseStatusPacket object) {
+        SERVER_LIST_PING_WRITER.write(buf, registryManager, object.ping());
     }
 
     /**
@@ -69,8 +71,10 @@ public final class ServerListResponseStatusPacketWriter implements NetworkWriter
         private ServerListPingNetworkWriter() {}
 
         @Override
-        public void write(@NonNull ByteBuf buf, @NonNull ServerListPing object) {
-            StringNetworkCodec.INSTANCE.write(buf, GSON.toJson(object));
+        public void write(@NonNull ByteBuf buf,
+                          @NonNull JetRegistryManager registryManager,
+                          @NonNull ServerListPing object) {
+            StringNetworkCodec.INSTANCE.write(buf, registryManager, GSON.toJson(object));
         }
     }
 

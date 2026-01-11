@@ -1,18 +1,18 @@
 package net.hypejet.jet.registry.blockstate;
 
 import net.hypejet.jet.registry.holder.Holder;
-import net.hypejet.jet.world.block.BlockState;
+import net.hypejet.jet.world.block.state.BlockState;
 import net.hypejet.jet.world.block.BlockType;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.Map;
+import net.hypejet.jet.world.block.state.BlockStateReference;
+import org.jspecify.annotations.NullMarked;
 
 /**
- * Represents a registry of {@linkplain BlockState block states}.
+ * A registry of {@linkplain BlockState block states}.
  *
  * @since 1.0
  * @see BlockState
  */
+@NullMarked
 public interface BlockStateRegistry {
     /**
      * Gets a default {@linkplain BlockState block state} of the specified {@linkplain BlockType block type}.
@@ -21,17 +21,17 @@ public interface BlockStateRegistry {
      * @return the block state
      * @since 1.0
      */
-    @NonNull BlockState defaultBlockState(Holder.@NonNull Reference<BlockType> blockType);
+    BlockState defaultBlockState(Holder.Reference<BlockType> blockType);
 
     /**
-     * Gets a {@linkplain BlockState block state} (which belongs to the specified {@linkplain BlockType block type})
-     * with the specified properties.
+     * Gets a {@linkplain BlockState block state} that the specified
+     * {@linkplain BlockStateReference block state reference} references to.
      *
-     * @param blockType the holder referencing to the block type
-     * @param properties the properties
-     * @return the block state
+     * @param reference the block state reference
+     * @return the referenced block state
+     * @throws IllegalArgumentException if there is no block state that matches with
+     *                                  data of the specified block state reference
      * @since 1.0
      */
-    @NonNull BlockState blockState(Holder.@NonNull Reference<BlockType> blockType,
-                                   @NonNull Map<String, String> properties);
+    BlockState blockState(BlockStateReference reference);
 }

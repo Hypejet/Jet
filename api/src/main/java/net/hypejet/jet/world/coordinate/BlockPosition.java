@@ -91,6 +91,16 @@ public record BlockPosition(int blockX, int blockY, int blockZ) implements Coord
         return new BlockPosition(x, y, z);
     }
 
+    /**
+     * Gets a {@linkplain BlockPosition block position} instance with all axis values set to {@code 0}.
+     *
+     * @return the block position
+     * @since 1.0
+     */
+    public static @NonNull BlockPosition zero() {
+        return ZERO;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

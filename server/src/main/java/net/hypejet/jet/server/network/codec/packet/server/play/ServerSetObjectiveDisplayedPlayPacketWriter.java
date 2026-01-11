@@ -5,6 +5,7 @@ import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.scoreboard.position.ScoreboardPositionNetworkWriter;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSetObjectiveDisplayedPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -30,9 +31,10 @@ public final class ServerSetObjectiveDisplayedPlayPacketWriter
     private ServerSetObjectiveDisplayedPlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerSetObjectiveDisplayedPlayPacket object) {
-        ScoreboardPositionNetworkWriter.INSTANCE.write(buf, object.position());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerSetObjectiveDisplayedPlayPacket object) {
+        ScoreboardPositionNetworkWriter.INSTANCE.write(buf, registryManager, object.position());
         String name = object.name();
-        StringNetworkCodec.INSTANCE.write(buf, name == null ? "" : name);
+        StringNetworkCodec.INSTANCE.write(buf, registryManager, name == null ? "" : name);
     }
 }

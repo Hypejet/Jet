@@ -10,8 +10,7 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.StringBinaryTag;
-import net.kyori.adventure.util.Codec;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Map;
 
@@ -24,6 +23,7 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @see TrimMaterial
  * @see BinaryTagCodec
  */
+@NullMarked
 public final class TrimMaterialBinaryTagCodec implements BinaryTagCodec<TrimMaterial> {
 
     private static final String BASE_ASSET_FIELD = "asset_name";
@@ -31,7 +31,8 @@ public final class TrimMaterialBinaryTagCodec implements BinaryTagCodec<TrimMate
     private static final String DESCRIPTION_FIELD = "description";
 
     private static final MapBinaryTagCodec<Key, MaterialAssetGroup.Asset> OVERRIDES_CODEC = new MapBinaryTagCodec<>(
-            Codec.codec(Key::key, Key::asString),
+            Key::asString,
+            Key::key,
             AssetBinaryTagCodec.INSTANCE
     );
 
@@ -46,8 +47,8 @@ public final class TrimMaterialBinaryTagCodec implements BinaryTagCodec<TrimMate
     private TrimMaterialBinaryTagCodec() {}
 
     @Override
-    public @NotNull TrimMaterial decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof CompoundBinaryTag compound) {
+    public TrimMaterial decode(BinaryTag binaryTag) {
+        if (binaryTag instanceof CompoundBinaryTag compound) {
             BinaryTag overridesTag = compound.get(OVERRIDES_FIELD);
             return new TrimMaterial(
                     new MaterialAssetGroup(
@@ -64,11 +65,11 @@ public final class TrimMaterialBinaryTagCodec implements BinaryTagCodec<TrimMate
     }
 
     @Override
-    public @NotNull BinaryTag encode(@NotNull TrimMaterial decoded) throws Exception {
-        MaterialAssetGroup assets = decoded.assets();
+    public BinaryTag encode(TrimMaterial value) {
+        MaterialAssetGroup assets = value.assets();
         CompoundBinaryTag.Builder builder = CompoundBinaryTag.builder()
                 .put(BASE_ASSET_FIELD, AssetBinaryTagCodec.INSTANCE.encode(assets.baseAsset()))
-                .put(DESCRIPTION_FIELD, ComponentBinaryTagCodec.INSTANCE.encode(decoded.description()));
+                .put(DESCRIPTION_FIELD, ComponentBinaryTagCodec.INSTANCE.encode(value.description()));
 
         Map<Key, MaterialAssetGroup.Asset> overrides = assets.overrides();
         if (!overrides.isEmpty()) {
@@ -97,8 +98,8 @@ public final class TrimMaterialBinaryTagCodec implements BinaryTagCodec<TrimMate
         private AssetBinaryTagCodec() {}
 
         @Override
-        public @NotNull MaterialAssetGroup.Asset decode(@NotNull BinaryTag encoded) {
-            if (encoded instanceof StringBinaryTag tag) {
+        public MaterialAssetGroup.Asset decode(BinaryTag binaryTag) {
+            if (binaryTag instanceof StringBinaryTag tag) {
                 return new MaterialAssetGroup.Asset(tag.value());
             } else {
                 throw new IllegalArgumentException("The encoded tag must be of string type to decode it to a asset");
@@ -106,8 +107,8 @@ public final class TrimMaterialBinaryTagCodec implements BinaryTagCodec<TrimMate
         }
 
         @Override
-        public @NotNull BinaryTag encode(MaterialAssetGroup.@NotNull Asset decoded) {
-            return StringBinaryTagCodec.INSTANCE.encode(decoded.value());
+        public BinaryTag encode(MaterialAssetGroup.Asset value) {
+            return StringBinaryTagCodec.INSTANCE.encode(value.value());
         }
     }
 }

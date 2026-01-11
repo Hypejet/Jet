@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.codec.game.world.coordinate.chunk;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -25,8 +26,10 @@ public final class VarIntChunkPositionNetworkWriter implements NetworkWriter<Chu
     private VarIntChunkPositionNetworkWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ChunkPosition object) {
-        VarIntNetworkCodec.INSTANCE.write(buf, object.chunkX());
-        VarIntNetworkCodec.INSTANCE.write(buf, object.chunkZ());
+    public void write(@NonNull ByteBuf buf,
+                      @NonNull JetRegistryManager registryManager,
+                      @NonNull ChunkPosition object) {
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, object.chunkX());
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, object.chunkZ());
     }
 }

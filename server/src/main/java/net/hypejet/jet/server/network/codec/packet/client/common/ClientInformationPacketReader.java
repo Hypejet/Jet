@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.game.settings.PlayerSettingsReader;
 import net.hypejet.jet.server.network.packet.packets.client.common.ClientInformationPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -15,7 +16,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see NetworkReader
  */
 public final class ClientInformationPacketReader implements NetworkReader<ClientInformationPacket> {
-
     /**
      * An instance of the {@linkplain ClientInformationPacketReader client information packet reader}.
      *
@@ -26,7 +26,7 @@ public final class ClientInformationPacketReader implements NetworkReader<Client
     private ClientInformationPacketReader() {}
 
     @Override
-    public @NonNull ClientInformationPacket read(@NonNull ByteBuf buf) {
-        return new ClientInformationPacket(PlayerSettingsReader.INSTANCE.read(buf));
+    public @NonNull ClientInformationPacket read(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager) {
+        return new ClientInformationPacket(PlayerSettingsReader.INSTANCE.read(buf, registryManager));
     }
 }

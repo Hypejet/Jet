@@ -2,7 +2,7 @@ package net.hypejet.jet.world.acquisition.worldmap;
 
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.world.biome.Biome;
-import net.hypejet.jet.world.block.BlockState;
+import net.hypejet.jet.world.block.state.BlockState;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.hypejet.jet.world.coordinate.biome.BiomePosition;
 import net.hypejet.jet.world.update.WorldMapUpdate;

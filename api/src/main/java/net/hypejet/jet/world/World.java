@@ -71,15 +71,6 @@ public interface World {
     WriteWorldMapAcquisition acquireWorldMapWrite();
 
     /**
-     * Gets a copy of a {@linkplain Set set} of {@linkplain Entity entities}
-     * that are currently in this {@linkplain World world}.
-     *
-     * @return the entity set copy
-     * @since 1.0
-     */
-    Set<? extends Entity> entities();
-
-    /**
      * Gets a copy of a {@linkplain Set set} of {@linkplain Player players}
      * that are currently in this {@linkplain World world}.
      *

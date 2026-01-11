@@ -5,6 +5,7 @@ import net.hypejet.jet.server.entity.player.spawn.DeathLocation;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.key.KeyNetworkCodec;
 import net.hypejet.jet.server.network.codec.game.world.coordinate.BlockPositionNetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -25,8 +26,10 @@ public final class DeathLocationNetworkWriter implements NetworkWriter<DeathLoca
     private DeathLocationNetworkWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull DeathLocation object) {
-        KeyNetworkCodec.INSTANCE.write(buf, object.deathDimensionTypeKey());
-        BlockPositionNetworkCodec.INSTANCE.write(buf, object.deathPosition());
+    public void write(@NonNull ByteBuf buf,
+                      @NonNull JetRegistryManager registryManager,
+                      @NonNull DeathLocation object) {
+        KeyNetworkCodec.INSTANCE.write(buf, registryManager, object.deathDimensionTypeKey());
+        BlockPositionNetworkCodec.INSTANCE.write(buf, registryManager, object.deathPosition());
     }
 }

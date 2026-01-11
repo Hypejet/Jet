@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.key.KeyNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerStoreCookiePacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -28,12 +29,14 @@ public final class ServerStoreCookiePacketWriter implements NetworkWriter<Server
     private ServerStoreCookiePacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerStoreCookiePacket object) {
+    public void write(@NonNull ByteBuf buf,
+                      @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerStoreCookiePacket object) {
         byte[] data = object.data().array();
         if (data.length > MAX_COOKIE_LENGTH)
             throw new IllegalArgumentException(String.format("The max length of a cookie is %s", MAX_COOKIE_LENGTH));
 
-        KeyNetworkCodec.INSTANCE.write(buf, object.key());
+        KeyNetworkCodec.INSTANCE.write(buf, registryManager, object.key());
         buf.writeBytes(data);
     }
 }

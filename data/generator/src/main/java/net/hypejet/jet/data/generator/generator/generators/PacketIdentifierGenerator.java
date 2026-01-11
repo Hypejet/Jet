@@ -4,7 +4,7 @@ import com.palantir.javapoet.CodeBlock;
 import com.palantir.javapoet.FieldSpec;
 import com.palantir.javapoet.MethodSpec;
 import com.palantir.javapoet.TypeSpec;
-import net.hypejet.jet.data.generator.adpater.KeyAdapter;
+import net.hypejet.jet.data.generator.adapter.KeyAdapter;
 import net.hypejet.jet.data.generator.generator.CodeGenerator;
 import net.kyori.adventure.key.Key;
 import net.minecraft.network.ProtocolInfo;

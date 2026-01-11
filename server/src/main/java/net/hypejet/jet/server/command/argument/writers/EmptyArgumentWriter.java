@@ -3,6 +3,7 @@ package net.hypejet.jet.server.command.argument.writers;
 import com.mojang.brigadier.arguments.ArgumentType;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.command.argument.ArgumentWriter;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -26,7 +27,7 @@ public final class EmptyArgumentWriter<A extends ArgumentType<?>> extends Argume
     }
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull A object) {
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager, @NonNull A object) {
         // NOOP
     }
 }

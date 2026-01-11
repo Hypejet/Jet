@@ -5,7 +5,7 @@ import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.hypejet.jet.server.registry.codecs.world.sound.SoundEventBinaryTagCodec;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
 
@@ -16,6 +16,7 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @see WolfSoundVariant
  * @see BinaryTagCodec
  */
+@NullMarked
 public final class WolfSoundVariantBinaryTagCodec implements BinaryTagCodec<WolfSoundVariant> {
 
     private static final String AMBIENT_SOUND_FIELD = "ambient_sound";
@@ -35,8 +36,8 @@ public final class WolfSoundVariantBinaryTagCodec implements BinaryTagCodec<Wolf
     private WolfSoundVariantBinaryTagCodec() {}
 
     @Override
-    public @NotNull WolfSoundVariant decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof CompoundBinaryTag compound) {
+    public WolfSoundVariant decode(BinaryTag binaryTag) {
+        if (binaryTag instanceof CompoundBinaryTag compound) {
             return new WolfSoundVariant(
                     SoundEventBinaryTagCodec.HOLDER_CODEC.decode(requiredTag(AMBIENT_SOUND_FIELD, compound)),
                     SoundEventBinaryTagCodec.HOLDER_CODEC.decode(requiredTag(DEATH_SOUND_FIELD, compound)),
@@ -53,14 +54,14 @@ public final class WolfSoundVariantBinaryTagCodec implements BinaryTagCodec<Wolf
     }
 
     @Override
-    public @NotNull BinaryTag encode(@NotNull WolfSoundVariant decoded) throws Exception {
+    public BinaryTag encode(WolfSoundVariant value) {
         return CompoundBinaryTag.builder()
-                .put(AMBIENT_SOUND_FIELD, SoundEventBinaryTagCodec.HOLDER_CODEC.encode(decoded.ambientSound()))
-                .put(DEATH_SOUND_FIELD, SoundEventBinaryTagCodec.HOLDER_CODEC.encode(decoded.deathSound()))
-                .put(GROWL_SOUND_FIELD, SoundEventBinaryTagCodec.HOLDER_CODEC.encode(decoded.growlSound()))
-                .put(HURT_SOUND_FIELD, SoundEventBinaryTagCodec.HOLDER_CODEC.encode(decoded.hurtSound()))
-                .put(PANT_SOUND_FIELD, SoundEventBinaryTagCodec.HOLDER_CODEC.encode(decoded.pantSound()))
-                .put(WHINE_SOUND_FIELD, SoundEventBinaryTagCodec.HOLDER_CODEC.encode(decoded.whineSound()))
+                .put(AMBIENT_SOUND_FIELD, SoundEventBinaryTagCodec.HOLDER_CODEC.encode(value.ambientSound()))
+                .put(DEATH_SOUND_FIELD, SoundEventBinaryTagCodec.HOLDER_CODEC.encode(value.deathSound()))
+                .put(GROWL_SOUND_FIELD, SoundEventBinaryTagCodec.HOLDER_CODEC.encode(value.growlSound()))
+                .put(HURT_SOUND_FIELD, SoundEventBinaryTagCodec.HOLDER_CODEC.encode(value.hurtSound()))
+                .put(PANT_SOUND_FIELD, SoundEventBinaryTagCodec.HOLDER_CODEC.encode(value.pantSound()))
+                .put(WHINE_SOUND_FIELD, SoundEventBinaryTagCodec.HOLDER_CODEC.encode(value.whineSound()))
                 .build();
     }
 }

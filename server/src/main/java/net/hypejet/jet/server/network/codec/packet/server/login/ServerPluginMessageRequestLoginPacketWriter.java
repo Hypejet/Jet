@@ -5,6 +5,7 @@ import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.key.KeyNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.login.ServerPluginMessageRequestLoginPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -17,7 +18,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class ServerPluginMessageRequestLoginPacketWriter
         implements NetworkWriter<ServerPluginMessageRequestLoginPacket> {
-
     /**
      * An instance of the {@linkplain ServerPluginMessageRequestLoginPacketWriter server plugin message request login
      * packet writer}.
@@ -30,9 +30,10 @@ public final class ServerPluginMessageRequestLoginPacketWriter
     private ServerPluginMessageRequestLoginPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerPluginMessageRequestLoginPacket object) {
-        VarIntNetworkCodec.INSTANCE.write(buf, object.messageId());
-        KeyNetworkCodec.INSTANCE.write(buf, object.channel());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerPluginMessageRequestLoginPacket object) {
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, object.messageId());
+        KeyNetworkCodec.INSTANCE.write(buf, registryManager, object.channel());
         buf.writeBytes(object.data().array());
     }
 }

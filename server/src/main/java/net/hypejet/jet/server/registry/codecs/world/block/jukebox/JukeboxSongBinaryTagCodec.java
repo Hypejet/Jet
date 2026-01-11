@@ -7,7 +7,7 @@ import net.hypejet.jet.world.block.jukebox.JukeboxSong;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
 
@@ -18,6 +18,7 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @see JukeboxSong
  * @see BinaryTagCodec
  */
+@NullMarked
 public final class JukeboxSongBinaryTagCodec implements BinaryTagCodec<JukeboxSong> {
 
     private static final String SOUND_EVENT_FIELD = "sound_event";
@@ -35,8 +36,8 @@ public final class JukeboxSongBinaryTagCodec implements BinaryTagCodec<JukeboxSo
     private JukeboxSongBinaryTagCodec() {}
 
     @Override
-    public @NotNull JukeboxSong decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof CompoundBinaryTag compound) {
+    public JukeboxSong decode(BinaryTag binaryTag) {
+        if (binaryTag instanceof CompoundBinaryTag compound) {
             return new JukeboxSong(
                     SoundEventBinaryTagCodec.HOLDER_CODEC.decode(requiredTag(SOUND_EVENT_FIELD, compound)),
                     ComponentBinaryTagCodec.INSTANCE.decode(requiredTag(DESCRIPTION_FIELD, compound)),
@@ -51,12 +52,12 @@ public final class JukeboxSongBinaryTagCodec implements BinaryTagCodec<JukeboxSo
     }
 
     @Override
-    public @NotNull BinaryTag encode(@NotNull JukeboxSong decoded) throws Exception {
+    public BinaryTag encode(JukeboxSong value) {
         return CompoundBinaryTag.builder()
-                .put(SOUND_EVENT_FIELD, SoundEventBinaryTagCodec.HOLDER_CODEC.encode(decoded.soundEvent()))
-                .put(DESCRIPTION_FIELD, ComponentBinaryTagCodec.INSTANCE.encode(decoded.description()))
-                .putFloat(LENGTH_IN_SECONDS_FIELD, decoded.lengthInSeconds())
-                .putInt(COMPARATOR_OUTPUT_FIELD, decoded.comparatorOutput())
+                .put(SOUND_EVENT_FIELD, SoundEventBinaryTagCodec.HOLDER_CODEC.encode(value.soundEvent()))
+                .put(DESCRIPTION_FIELD, ComponentBinaryTagCodec.INSTANCE.encode(value.description()))
+                .putFloat(LENGTH_IN_SECONDS_FIELD, value.lengthInSeconds())
+                .putInt(COMPARATOR_OUTPUT_FIELD, value.comparatorOutput())
                 .build();
     }
 }

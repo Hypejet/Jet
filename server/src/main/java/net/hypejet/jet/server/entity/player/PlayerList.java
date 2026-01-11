@@ -72,7 +72,7 @@ public final class PlayerList {
         this.players.add(player);
 
         // TODO: Send other world data
-        player.world().addEntity(player);
+        player.world().addPlayer(player);
         player.chunkBatchHandler().resetChunkView();
         this.eventNode.call(new PlayerJoinEvent(player));
     }
@@ -86,5 +86,6 @@ public final class PlayerList {
     public void unregisterPlayer(@NonNull JetPlayer player) {
         this.ticker.ensureRunsInTickLoop();
         this.players.remove(player);
+        player.handleRemoval();
     }
 }

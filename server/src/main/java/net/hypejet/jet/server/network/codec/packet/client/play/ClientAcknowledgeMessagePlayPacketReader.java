@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientAcknowledgeMessagePlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -16,7 +17,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class ClientAcknowledgeMessagePlayPacketReader
         implements NetworkReader<ClientAcknowledgeMessagePlayPacket> {
-
     /**
      * An instance of the {@linkplain ClientAcknowledgeMessagePlayPacketReader client acknowledge message play packet
      * reader}.
@@ -29,7 +29,8 @@ public final class ClientAcknowledgeMessagePlayPacketReader
     private ClientAcknowledgeMessagePlayPacketReader() {}
 
     @Override
-    public @NonNull ClientAcknowledgeMessagePlayPacket read(@NonNull ByteBuf buf) {
-        return new ClientAcknowledgeMessagePlayPacket(VarIntNetworkCodec.INSTANCE.read(buf));
+    public @NonNull ClientAcknowledgeMessagePlayPacket read(@NonNull ByteBuf buf,
+                                                            @NonNull JetRegistryManager registryManager) {
+        return new ClientAcknowledgeMessagePlayPacket(VarIntNetworkCodec.INSTANCE.read(buf, registryManager));
     }
 }

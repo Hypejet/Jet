@@ -1,6 +1,7 @@
 package net.hypejet.jet.server.network.codec;
 
 import io.netty.buffer.ByteBuf;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Objects;
@@ -33,12 +34,12 @@ public final class CombinedNetworkCodec<T> implements NetworkCodec<T> {
     }
 
     @Override
-    public @NonNull T read(@NonNull ByteBuf buf) {
-        return this.reader.read(buf);
+    public @NonNull T read(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager) {
+        return this.reader.read(buf, registryManager);
     }
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull T object) {
-        this.writer.write(buf, object);
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager, @NonNull T object) {
+        this.writer.write(buf, registryManager, object);
     }
 }

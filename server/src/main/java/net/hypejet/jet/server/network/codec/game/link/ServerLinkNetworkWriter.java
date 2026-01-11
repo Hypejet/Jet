@@ -7,6 +7,7 @@ import net.hypejet.jet.server.network.codec.game.component.ComponentNetworkWrite
 import net.hypejet.jet.server.network.codec.index.IndexNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.index.IndexUtil;
 import net.hypejet.jet.util.game.link.ServerLink;
 import net.hypejet.jet.util.game.link.label.BuiltinLabel;
@@ -61,16 +62,18 @@ public final class ServerLinkNetworkWriter implements NetworkWriter<ServerLink> 
     private ServerLinkNetworkWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerLink object) {
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager, @NonNull ServerLink object) {
         ServerLinkLabel label = object.label();
         buf.writeBoolean(label instanceof BuiltinLabel);
 
         switch (label) {
-            case BuiltinLabel builtinLabel -> BUILT_IN_LABEL_CODEC.write(buf, builtinLabel);
-            case ComponentLabel (Component component) -> ComponentNetworkWriter.INSTANCE.write(buf, component);
+            case BuiltinLabel builtinLabel ->
+                    BUILT_IN_LABEL_CODEC.write(buf, registryManager, builtinLabel);
+            case ComponentLabel (Component component) ->
+                    ComponentNetworkWriter.INSTANCE.write(buf, registryManager, component);
             default -> throw new IllegalStateException(String.format("Unknown server link label: %s", label));
         }
 
-        StringNetworkCodec.INSTANCE.write(buf, object.url());
+        StringNetworkCodec.INSTANCE.write(buf, registryManager, object.url());
     }
 }

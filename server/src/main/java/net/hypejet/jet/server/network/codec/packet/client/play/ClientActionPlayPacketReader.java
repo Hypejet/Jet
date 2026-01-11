@@ -6,6 +6,7 @@ import net.hypejet.jet.server.network.codec.index.IndexNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientActionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientActionPlayPacket.Action;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.index.IndexUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -49,11 +50,11 @@ public final class ClientActionPlayPacketReader implements NetworkReader<ClientA
     private ClientActionPlayPacketReader() {}
 
     @Override
-    public @NonNull ClientActionPlayPacket read(@NonNull ByteBuf buf) {
-        int entityId = VarIntNetworkCodec.INSTANCE.read(buf);
-        Action action = ACTION_CODEC.read(buf);
+    public @NonNull ClientActionPlayPacket read(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager) {
+        int entityId = VarIntNetworkCodec.INSTANCE.read(buf, registryManager);
+        Action action = ACTION_CODEC.read(buf, registryManager);
 
-        int jumpBoost = VarIntNetworkCodec.INSTANCE.read(buf);
+        int jumpBoost = VarIntNetworkCodec.INSTANCE.read(buf, registryManager);
         if (jumpBoost > MAX_JUMP_BOOST || jumpBoost < MIN_JUMP_BOOST) {
             throw new IllegalArgumentException(String.format(
                     "The jump boost is out of allowed range, got %d while maximum allowed is %d and minimum allowed" +

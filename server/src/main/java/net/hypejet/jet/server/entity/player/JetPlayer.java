@@ -11,6 +11,10 @@ import net.hypejet.concurrency.primitive.booleans.WriteBooleanAcquisition;
 import net.hypejet.jet.entity.acquisition.gamemode.GameModeAcquisition;
 import net.hypejet.jet.entity.acquisition.gamemode.WriteGameModeAcquisition;
 import net.hypejet.jet.entity.player.Player;
+import net.hypejet.jet.event.events.entity.player.PlayerPreWorldChangeEvent;
+import net.hypejet.jet.event.events.entity.player.PlayerWorldChangeEvent;
+import net.hypejet.jet.registry.holder.Holder;
+import net.hypejet.jet.registry.keys.EntityTypeKeys;
 import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.scoreboard.Scoreboard;
 import net.hypejet.jet.server.JetMinecraftServer;
@@ -36,10 +40,12 @@ import net.hypejet.jet.server.network.session.data.ConfigurationData;
 import net.hypejet.jet.server.network.session.data.LoginData;
 import net.hypejet.jet.server.network.session.pack.ResourcePackHandler;
 import net.hypejet.jet.server.scoreboard.JetScoreboard;
-import net.hypejet.jet.server.util.game.audience.PacketReceivingCommonAudience;
+import net.hypejet.jet.server.util.game.audience.PacketReceivingPlayerAudience;
+import net.hypejet.jet.server.util.viewable.JetViewable;
 import net.hypejet.jet.server.world.JetWorld;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.handler.ChunkBatchHandler;
+import net.hypejet.jet.world.World;
 import net.hypejet.jet.world.coordinate.Position;
 import net.hypejet.jet.world.coordinate.Vector;
 import net.hypejet.jet.world.coordinate.flag.RelativeFlag;
@@ -55,6 +61,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -67,9 +75,8 @@ import java.util.concurrent.CompletableFuture;
  * @see Player
  */
 public final class JetPlayer extends JetEntity implements Player, NetworkDisconnectionHandler,
-        PacketReceivingCommonAudience {
+        PacketReceivingPlayerAudience {
 
-    private static final Key ENTITY_TYPE = Key.key("player");
     private static final Logger LOGGER = LoggerFactory.getLogger(JetPlayer.class);
 
     private final SocketPlayerConnection connection;
@@ -83,7 +90,9 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     private final BooleanAcquirable respawnScreenEnabled;
 
     private final NullableObjectAcquirable<DeathLocation> lastDeathLocation = new NullableObjectAcquirable<>(); // TODO: Updating
+    private final Set<JetViewable> viewedObjects = new HashSet<>();
 
+    private @NonNull JetWorld world;
     private @NonNull JetScoreboard scoreboard;
     private @NonNull Settings settings;
 
@@ -107,15 +116,16 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
                       @NonNull JetWorld world, @NonNull Position position, boolean enableRespawnScreen,
                       @Nullable GameMode previousGameMode, @NonNull GameMode gameMode, @NonNull Settings settings,
                       @NonNull String clientBrand, @NonNull JetScoreboard initialScoreboard) {
-        super(ENTITY_TYPE, uniqueId, Pointers.builder()
+        super(new Holder.Reference<>(EntityTypeKeys.PLAYER), uniqueId, Pointers.builder()
                 .withStatic(Identity.UUID, Objects.requireNonNull(uniqueId, "unique identifier"))
                 .withStatic(Identity.NAME, Objects.requireNonNull(username, "username"))
-                .build(), position, world, connection.server());
+                .build(), position, connection.server());
         this.connection = Objects.requireNonNull(connection, "connection");
         this.settings = Objects.requireNonNull(settings, "settings");
         this.clientBrand = new NotNullObjectAcquirable<>(Objects.requireNonNull(clientBrand, "client brand"));
         this.gameMode = new GameModeAcquirable(this, gameMode, previousGameMode);
         this.respawnScreenEnabled = new BooleanAcquirable(enableRespawnScreen);
+        this.world = Objects.requireNonNull(world, "world");
         this.scoreboard = Objects.requireNonNull(initialScoreboard, "initial scoreboard");
         this.chunkBatchHandler = new ChunkBatchHandler(this, position);
     }
@@ -183,6 +193,55 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     }
 
     @Override
+    public JetWorld world() {
+        return this.world;
+    }
+
+    @Override
+    public void teleport(World world) {
+        Objects.requireNonNull(world, "world");
+        this.teleport(world, world.defaultSpawnPosition());
+    }
+
+    @Override
+    public void teleport(World world, Position position) {
+        this.teleport(world, position, true, true);
+    }
+
+    @Override
+    public void teleport(World world, Position position, boolean keepAttributes, boolean keepMetadata) {
+        // TODO: Ensure integrity with vanilla
+        Objects.requireNonNull(world, "world");
+        Objects.requireNonNull(position, "position");
+
+        if (!(world instanceof JetWorld validatedWorld))
+            throw new IllegalArgumentException("The specified world is not a valid world");
+        JetWorld initialWorld = this.world;
+
+        PlayerPreWorldChangeEvent preChangeEvent = new PlayerPreWorldChangeEvent(this, this.world, position);
+        this.server().eventNode().call(preChangeEvent);
+
+        if (preChangeEvent.world() instanceof JetWorld validatedEventWorld) {
+            validatedWorld = validatedEventWorld;
+        } else {
+            LOGGER.warn("An invalid world has been specified in an entity" +
+                    " pre-world-change event, falling back to the initially specified world");
+        }
+
+        this.world.removePlayer(this);
+        this.world = validatedWorld;
+
+        // TODO: Handle "keepAttributes" and "keepMetadata" fields when entity system is implemented
+
+        this.sendRespawnPacket(this.world, keepAttributes, keepMetadata);
+        this.movementSynchronizer.synchronize(preChangeEvent.getStartingPosition(), Vector.zero(), Set.of());
+        this.chunkBatchHandler.resetChunkView();
+
+        this.world.addPlayer(this);
+        this.server().eventNode().call(new PlayerWorldChangeEvent(this, initialWorld));
+    }
+
+    @Override
     public @NonNull JetScoreboard getScoreboard() {
         return this.scoreboard;
     }
@@ -242,14 +301,6 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     @Override
     public void sendPacket(@NonNull ServerPacket packet) {
         this.connection.sendPacket(packet);
-    }
-
-    @Override
-    protected void postWorldChange(@NonNull JetWorld previousWorld, @NonNull Position initialPosition,
-                                   boolean keepAttributes, boolean keepMetadata) {
-        this.sendRespawnPacket(this.world(), keepAttributes, keepMetadata);
-        this.movementSynchronizer.synchronize(initialPosition, Vector.zero(), Set.of());
-        this.chunkBatchHandler().resetChunkView();
     }
 
     /**
@@ -401,6 +452,55 @@ public final class JetPlayer extends JetEntity implements Player, NetworkDisconn
     public void handlePositionFromClient(@NonNull Position position) {
         this.updateRawPosition(position);
         this.chunkBatchHandler.updateChunkView();
+    }
+
+    /**
+     * Adds the specified {@linkplain JetViewable viewable object} to a {@linkplain Set set}
+     * of {@linkplain JetViewable viewable objects} viewed by this {@linkplain JetPlayer player}.
+     *
+     * @param viewable the viewable object to add to the viewed object set
+     * @throws IllegalStateException if the viewed object set already contains the specified viewable object
+     * @since 1.0
+     */
+    public void addViewedObject(@NonNull JetViewable viewable) {
+        this.server().ticker().ensureRunsInTickLoop();
+        if (!this.viewedObjects.add(viewable))
+            throw new IllegalStateException("This player is already a viewer of the viewable object");
+    }
+
+    /**
+     * Removes the specified {@linkplain JetViewable viewable object} from a {@linkplain Set set}
+     * of {@linkplain JetViewable viewable objects} viewed by this {@linkplain JetPlayer player}.
+     *
+     * @param viewable the viewable object to remove from the viewed object set
+     * @throws IllegalStateException if the viewed object set already does not contain the specified viewable object
+     * @since 1.0
+     */
+    public void removeViewedObject(@NonNull JetViewable viewable) {
+        this.server().ticker().ensureRunsInTickLoop();
+        if (!this.viewedObjects.remove(viewable))
+            throw new IllegalStateException("This player is already not a viewer of the specified viewable object");
+    }
+
+    /**
+     * Handles a removal of this {@linkplain JetPlayer player}
+     * from the {@linkplain JetMinecraftServer server} associated with it.
+     *
+     * @since 1.0
+     */
+    public void handleRemoval() {
+        this.server().ticker().ensureRunsInTickLoop();
+
+        Iterator<JetViewable> viewedObjectsIterator = this.viewedObjects.iterator();
+        while (viewedObjectsIterator.hasNext()) {
+            JetViewable viewedObject = viewedObjectsIterator.next();
+            viewedObject.handleViewerRemoval(this);
+            viewedObjectsIterator.remove();
+        }
+
+        this.world.removePlayer(this);
+        this.scoreboard.removeViewer(this);
+        // TODO: Use a field to mark this player as removed
     }
 
     /**

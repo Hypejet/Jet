@@ -9,7 +9,7 @@ import net.hypejet.jet.server.world.chunk.light.LightType;
 import net.hypejet.jet.server.world.update.JetWorldMapUpdate;
 import net.hypejet.jet.world.acquisition.worldmap.WriteWorldMapAcquisition;
 import net.hypejet.jet.world.biome.Biome;
-import net.hypejet.jet.world.block.BlockState;
+import net.hypejet.jet.world.block.state.BlockState;
 import net.hypejet.jet.world.coordinate.BlockPosition;
 import net.hypejet.jet.world.coordinate.biome.BiomePosition;
 import net.hypejet.jet.world.coordinate.chunk.ChunkPosition;

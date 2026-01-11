@@ -2,7 +2,6 @@ package net.hypejet.jet.server.entity;
 
 import net.hypejet.jet.data.json.model.entity.JsonEntityType;
 import net.hypejet.jet.entity.EntityType;
-import net.hypejet.jet.server.world.block.entity.JetBlockEntityType;
 import net.kyori.adventure.key.Key;
 import org.jspecify.annotations.NonNull;
 
@@ -13,14 +12,23 @@ import java.util.Set;
  * An implementation of the {@linkplain EntityType entity type}.
  *
  * @param requiredFeatureFlags a set of feature flag keys required to enable this entity type
+ * @param maxAirSupply a maximum air supply that entities of this type have
+ * @param living whether this is a type of living entity
+ * @param mob whether this is a type of mob entity
+ * @param ageableMob whether this is a type of ageable mob entity
  * @since 1.0
  */
-public record JetEntityType(@NonNull Set<Key> requiredFeatureFlags) implements EntityType {
+public record JetEntityType(@NonNull Set<Key> requiredFeatureFlags, int maxAirSupply,
+                            boolean living, boolean mob, boolean ageableMob) implements EntityType {
     /**
-     * Constructs the {@linkplain JetBlockEntityType block entity type}.
+     * Constructs the {@linkplain JetEntityType entity type implementation}.
      *
      * @param requiredFeatureFlags a set of feature flag keys that should be
      *                             required to enable the constructed entity type
+     * @param maxAirSupply a maximum air supply that entities of the constructed entity type should have
+     * @param living whether the entity type should be a type of living entity
+     * @param mob whether the entity type should be a type of mob entity
+     * @param ageableMob whether the entity type should be a type of ageable mob entity
      * @since 1.0
      */
     public JetEntityType {
@@ -35,6 +43,25 @@ public record JetEntityType(@NonNull Set<Key> requiredFeatureFlags) implements E
      * @since 1.0
      */
     public static @NonNull JetEntityType convert(@NonNull JsonEntityType entityType) {
-        return new JetEntityType(entityType.requiredFeatureFlags());
+        return new JetEntityType(
+                entityType.requiredFeatureFlags(), entityType.maxAirSupply(),
+                entityType.living(), entityType.mob(), entityType.ageableMob()
+        );
+    }
+
+    /**
+     * Casts the specified {@linkplain EntityType entity type} to
+     * the {@linkplain JetEntityType entity type implementation}. Throws a detailed exception
+     * if the specified {@linkplain EntityType entity type} does not use the correct implementation.
+     *
+     * @param entityType the entity type to cast
+     * @return the entity type cast to the implementation
+     * @throws IllegalArgumentException if the specified entity type uses an invalid implementation
+     * @since 1.0
+     */
+    public static @NonNull JetEntityType cast(@NonNull EntityType entityType) {
+        if (!(entityType instanceof JetEntityType castEntityType))
+            throw new IllegalArgumentException("The specified entity type is not a valid entity type");
+        return castEntityType;
     }
 }

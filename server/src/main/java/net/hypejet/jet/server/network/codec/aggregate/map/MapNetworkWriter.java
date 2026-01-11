@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.codec.aggregate.map;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.AggregateNetworkWriter;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Map;
@@ -54,10 +55,11 @@ public final class MapNetworkWriter<K, V> extends AggregateNetworkWriter<Map<K, 
     }
 
     @Override
-    protected void encodeElements(@NonNull Map<K, V> aggregate, @NonNull ByteBuf buf) {
+    protected void encodeElements(@NonNull Map<K, V> aggregate, @NonNull ByteBuf buf,
+                                  @NonNull JetRegistryManager registryManager) {
         aggregate.forEach((key, value) -> {
-            this.keyWriter.write(buf, key);
-            this.valueWriter.write(buf, value);
+            this.keyWriter.write(buf, registryManager, key);
+            this.valueWriter.write(buf, registryManager, value);
         });
     }
 }

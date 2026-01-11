@@ -5,7 +5,7 @@ import net.hypejet.jet.registry.reference.RegistryReference;
 import net.hypejet.jet.server.network.packet.packets.server.ServerPacket;
 import net.hypejet.jet.server.registry.JetMinecraftRegistry;
 import net.hypejet.jet.server.registry.JetRegistryManager;
-import net.hypejet.jet.server.world.block.JetBlockState;
+import net.hypejet.jet.server.world.block.state.JetBlockState;
 import net.hypejet.jet.server.world.chunk.JetChunk;
 import net.hypejet.jet.server.world.chunk.heightmap.HeightMap;
 import net.hypejet.jet.server.world.chunk.light.LightSerializationData;

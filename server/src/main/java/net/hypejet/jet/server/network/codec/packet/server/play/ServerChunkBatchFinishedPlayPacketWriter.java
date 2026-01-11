@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkBatchFinishedPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -28,7 +29,8 @@ public final class ServerChunkBatchFinishedPlayPacketWriter
     private ServerChunkBatchFinishedPlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerChunkBatchFinishedPlayPacket object) {
-        VarIntNetworkCodec.INSTANCE.write(buf, object.batchSize());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerChunkBatchFinishedPlayPacket object) {
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, object.batchSize());
     }
 }

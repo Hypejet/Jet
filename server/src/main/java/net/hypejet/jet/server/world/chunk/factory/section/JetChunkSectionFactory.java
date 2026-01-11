@@ -6,7 +6,7 @@ import net.hypejet.jet.server.world.chunk.light.storage.AbstractLightStorage;
 import net.hypejet.jet.server.world.chunk.palette.AbstractChunkPalette;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import net.hypejet.jet.world.biome.Biome;
-import net.hypejet.jet.world.block.BlockState;
+import net.hypejet.jet.world.block.state.BlockState;
 import net.hypejet.jet.world.chunk.factory.section.ChunkSectionFactory;
 import net.hypejet.jet.world.chunk.light.LightStorage;
 import net.hypejet.jet.world.chunk.section.ChunkPalette;

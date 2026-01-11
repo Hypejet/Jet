@@ -51,6 +51,7 @@ import net.hypejet.jet.server.util.data.JetDataUtil;
 import net.hypejet.jet.server.world.block.JetBlockType;
 import net.hypejet.jet.server.world.block.entity.JetBlockEntityType;
 import net.hypejet.jet.server.world.fluid.JetFluid;
+import net.hypejet.jet.server.world.particle.JetParticleType;
 import net.hypejet.jet.world.event.game.GameEvent;
 import net.hypejet.jet.world.sound.SoundEvent;
 import net.kyori.adventure.key.Key;
@@ -81,7 +82,7 @@ public final class JetRegistryManager implements RegistryManager {
 
     private final NetworkManager networkManager;
     private final Map<RegistryReference<?>, JetMinecraftRegistry<?>> registries;
-    private final JetBlockStateRegistry blockStateRegistry;
+    private final JetBlockStateRegistry blockStateRegistry = new JetBlockStateRegistry();
 
     private final ReadWriteLock tagsLock = new ReentrantReadWriteLock();
 
@@ -195,6 +196,11 @@ public final class JetRegistryManager implements RegistryManager {
                         JsonUnit.class, unit -> JetFluid.INSTANCE
                 )
                 .builtIn(
+                        RegistryReference.PARTICLE_TYPE, Key.key("particle_type"),
+                        JsonDataResourceFiles.PARTICLES,
+                        JsonUnit.class, unit -> JetParticleType.INSTANCE
+                )
+                .builtIn(
                         RegistryReference.SOUND_EVENT, Key.key("sound_event"),
                         JsonDataResourceFiles.SOUND_EVENTS,
                         JsonSoundEvent.class, soundEvent -> new SoundEvent(soundEvent.sound(), soundEvent.range())
@@ -210,8 +216,6 @@ public final class JetRegistryManager implements RegistryManager {
                         JsonBlockEntityType.class, JetBlockEntityType::convert
                 )
                 .build();
-
-        this.blockStateRegistry = new JetBlockStateRegistry();
     }
 
     @Override

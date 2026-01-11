@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.login.ServerEnableCompressionLoginPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -16,7 +17,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class ServerEnableCompressionLoginPacketWriter
         implements NetworkWriter<ServerEnableCompressionLoginPacket> {
-
     /**
      * An instance of the {@linkplain ServerEnableCompressionLoginPacketWriter server enable compression login packet
      * writer}.
@@ -29,7 +29,8 @@ public final class ServerEnableCompressionLoginPacketWriter
     private ServerEnableCompressionLoginPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerEnableCompressionLoginPacket object) {
-        VarIntNetworkCodec.INSTANCE.write(buf, object.compressionThreshold());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerEnableCompressionLoginPacket object) {
+        VarIntNetworkCodec.INSTANCE.write(buf, registryManager, object.compressionThreshold());
     }
 }

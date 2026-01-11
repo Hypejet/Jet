@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.game.registry.feature.KnownPackNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.configuration.ClientKnownPacksConfigurationPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
@@ -18,7 +19,6 @@ import java.util.List;
  */
 public final class ClientKnownPacksConfigurationPacketReader
         implements NetworkReader<ClientKnownPacksConfigurationPacket> {
-
     /**
      * An instance of the {@linkplain ClientKnownPacksConfigurationPacketReader client known packs configuration packet
      * reader}.
@@ -31,7 +31,10 @@ public final class ClientKnownPacksConfigurationPacketReader
     private ClientKnownPacksConfigurationPacketReader() {}
 
     @Override
-    public @NonNull ClientKnownPacksConfigurationPacket read(@NonNull ByteBuf buf) {
-        return new ClientKnownPacksConfigurationPacket(List.copyOf(KnownPackNetworkCodec.COLLECTION_CODEC.read(buf)));
+    public @NonNull ClientKnownPacksConfigurationPacket read(@NonNull ByteBuf buf,
+                                                             @NonNull JetRegistryManager registryManager) {
+        return new ClientKnownPacksConfigurationPacket(
+                List.copyOf(KnownPackNetworkCodec.COLLECTION_CODEC.read(buf, registryManager))
+        );
     }
 }

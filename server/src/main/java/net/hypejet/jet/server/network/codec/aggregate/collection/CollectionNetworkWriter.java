@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.codec.aggregate.collection;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.AggregateNetworkWriter;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -76,7 +77,8 @@ public final class CollectionNetworkWriter<E> extends AggregateNetworkWriter<Col
     }
 
     @Override
-    protected void encodeElements(@NonNull Collection<E> aggregate, @NonNull ByteBuf buf) {
-        aggregate.forEach(element -> this.elementWriter.write(buf, element));
+    protected void encodeElements(@NonNull Collection<E> aggregate, @NonNull ByteBuf buf,
+                                  @NonNull JetRegistryManager registryManager) {
+        aggregate.forEach(element -> this.elementWriter.write(buf, registryManager, element));
     }
 }

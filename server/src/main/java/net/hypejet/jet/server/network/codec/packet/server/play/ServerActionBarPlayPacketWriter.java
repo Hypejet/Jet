@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.component.ComponentNetworkWriter;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerActionBarPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -15,7 +16,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see NetworkWriter
  */
 public final class ServerActionBarPlayPacketWriter implements NetworkWriter<ServerActionBarPlayPacket> {
-
     /**
      * An instance of the {@linkplain ServerActionBarPlayPacketWriter server action bar play packet writer}.
      *
@@ -26,7 +26,8 @@ public final class ServerActionBarPlayPacketWriter implements NetworkWriter<Serv
     private ServerActionBarPlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerActionBarPlayPacket object) {
-        ComponentNetworkWriter.INSTANCE.write(buf, object.text());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerActionBarPlayPacket object) {
+        ComponentNetworkWriter.INSTANCE.write(buf, registryManager, object.text());
     }
 }

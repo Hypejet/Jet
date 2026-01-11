@@ -38,7 +38,7 @@ public final class RawPacketDecoder extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         if (!ctx.channel().isActive()) return; // The connection has been closed
 
-        int identifier = VarIntNetworkCodec.INSTANCE.read(in);
+        int identifier = VarIntNetworkCodec.INSTANCE.read(in, this.connection.server().registryManager());
         byte[] body = NetworkUtil.readRemainingBytes(in);
 
         out.add(new RawPacket(identifier, body));

@@ -2,6 +2,7 @@ package net.hypejet.jet;
 
 import net.hypejet.jet.command.CommandManager;
 import net.hypejet.jet.configuration.ServerConfiguration;
+import net.hypejet.jet.entity.EntityManager;
 import net.hypejet.jet.entity.player.Player;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.plugin.PluginManager;
@@ -97,6 +98,14 @@ public interface MinecraftServer {
      * @since 1.0
      */
     @NonNull WorldManager worldManager();
+
+    /**
+     * Gets a {@linkplain EntityManager entity manager} of this {@linkplain MinecraftServer server}.
+     *
+     * @return the entity manager
+     * @since 1.0
+     */
+    @NonNull EntityManager entityManager();
 
     /**
      * Gets {@linkplain ScoreboardManager a scoreboard manager} of the server.

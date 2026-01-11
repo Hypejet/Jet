@@ -2,6 +2,7 @@ package net.hypejet.jet.server.network.codec.aggregate.bitset;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.aggregate.AggregateNetworkReader;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.BitSet;
@@ -35,7 +36,8 @@ public final class BitSetNetworkReader extends AggregateNetworkReader<BitSet> {
     }
 
     @Override
-    protected @NonNull BitSet decodeElements(int length, @NonNull ByteBuf buf) {
+    protected @NonNull BitSet decodeElements(int length, @NonNull ByteBuf buf,
+                                             @NonNull JetRegistryManager registryManager) {
         long[] longs = new long[length];
         for (int index = 0; index < length; index++)
             longs[index] = buf.readLong();

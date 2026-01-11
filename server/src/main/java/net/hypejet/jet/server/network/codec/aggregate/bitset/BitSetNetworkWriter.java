@@ -2,6 +2,7 @@ package net.hypejet.jet.server.network.codec.aggregate.bitset;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.aggregate.AggregateNetworkWriter;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.BitSet;
@@ -41,7 +42,8 @@ public final class BitSetNetworkWriter extends AggregateNetworkWriter<BitSet> {
     }
 
     @Override
-    protected void encodeElements(@NonNull BitSet aggregate, @NonNull ByteBuf buf) {
+    protected void encodeElements(@NonNull BitSet aggregate, @NonNull ByteBuf buf,
+                                  @NonNull JetRegistryManager registryManager) {
         for (long element : aggregate.toLongArray())
             buf.writeLong(element);
     }

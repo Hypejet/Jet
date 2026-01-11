@@ -1,12 +1,14 @@
 package net.hypejet.jet.server;
 
 import net.hypejet.jet.MinecraftServer;
+import net.hypejet.jet.entity.Entity;
 import net.hypejet.jet.event.events.lifecycle.ServerInitializedEvent;
 import net.hypejet.jet.event.events.lifecycle.ServerReadyEvent;
 import net.hypejet.jet.event.events.lifecycle.ServerShutdownEvent;
 import net.hypejet.jet.event.node.EventNode;
 import net.hypejet.jet.server.command.JetCommandManager;
 import net.hypejet.jet.server.configuration.JetServerConfiguration;
+import net.hypejet.jet.server.entity.JetEntityManager;
 import net.hypejet.jet.server.entity.player.JetPlayer;
 import net.hypejet.jet.server.entity.player.PlayerList;
 import net.hypejet.jet.server.network.NetworkManager;
@@ -23,6 +25,7 @@ import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * An implementation of the {@linkplain MinecraftServer Minecraft server}.
@@ -46,10 +49,13 @@ public final class JetMinecraftServer implements MinecraftServer {
     private final JetRegistryManager registryManager;
     private final JetPluginManager pluginManager;
     private final JetWorldManager worldManager;
+    private final JetEntityManager entityManager;
     private final JetScoreboardManager scoreboardManager;
 
     private final CompletableFuture<Void> serverReadyFuture = new CompletableFuture<>();
     private final Thread shutdownThread = this.createShutdownThread();
+
+    private final AtomicInteger entityIdCounter = new AtomicInteger();
 
     /**
      * Constructs the {@linkplain JetMinecraftServer Minecraft server}.
@@ -65,6 +71,7 @@ public final class JetMinecraftServer implements MinecraftServer {
         this.commandManager = new JetCommandManager(this.eventNode, this.playerList);
         this.registryManager = new JetRegistryManager(this.eventNode, this.networkManager);
         this.worldManager = new JetWorldManager(this.registryManager);
+        this.entityManager = new JetEntityManager(this);
         this.scoreboardManager = new JetScoreboardManager();
 
         try {
@@ -132,6 +139,11 @@ public final class JetMinecraftServer implements MinecraftServer {
     }
 
     @Override
+    public @NonNull JetEntityManager entityManager() {
+        return this.entityManager;
+    }
+
+    @Override
     public @NonNull JetScoreboardManager scoreboardManager() {
         return this.scoreboardManager;
     }
@@ -173,6 +185,16 @@ public final class JetMinecraftServer implements MinecraftServer {
      */
     public @NonNull PlayerList playerList() {
         return this.playerList;
+    }
+
+    /**
+     * Gets a next available identifier to be associated with an {@linkplain Entity entity}.
+     *
+     * @return the entity identifier
+     * @since 1.0
+     */
+    public int nextEntityId() {
+        return this.entityIdCounter.getAndIncrement();
     }
 
     private @NonNull Thread createShutdownThread() {

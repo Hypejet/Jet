@@ -2,12 +2,12 @@ package net.hypejet.jet.data.generator;
 
 import com.mojang.serialization.Codec;
 import com.palantir.javapoet.JavaFile;
-import net.hypejet.jet.data.generator.adpater.BlockAdapter;
-import net.hypejet.jet.data.generator.adpater.BlockEntityTypeAdapter;
-import net.hypejet.jet.data.generator.adpater.EntityTypeAdapter;
-import net.hypejet.jet.data.generator.adpater.GameEventAdapter;
-import net.hypejet.jet.data.generator.adpater.ItemAdapter;
-import net.hypejet.jet.data.generator.adpater.SoundEventAdapter;
+import net.hypejet.jet.data.generator.adapter.BlockAdapter;
+import net.hypejet.jet.data.generator.adapter.BlockEntityTypeAdapter;
+import net.hypejet.jet.data.generator.adapter.EntityTypeAdapter;
+import net.hypejet.jet.data.generator.adapter.GameEventAdapter;
+import net.hypejet.jet.data.generator.adapter.ItemAdapter;
+import net.hypejet.jet.data.generator.adapter.SoundEventAdapter;
 import net.hypejet.jet.data.generator.extractor.BlockStateRegistryExtractor;
 import net.hypejet.jet.data.generator.extractor.ConverterRegistryExtractor;
 import net.hypejet.jet.data.generator.generator.CodeGenerator;
@@ -17,6 +17,7 @@ import net.hypejet.jet.data.generator.generator.generators.KeyDefinitionGenerato
 import net.hypejet.jet.data.generator.generator.generators.PacketIdentifierGenerator;
 import net.hypejet.jet.data.generator.generator.generators.RegistryExtractorResourceGenerator;
 import net.hypejet.jet.data.generator.generator.generators.VersionInfoGenerator;
+import net.hypejet.jet.data.generator.level.MockLevel;
 import net.hypejet.jet.data.generator.util.FileUtils;
 import net.hypejet.jet.data.json.model.block.JsonBlock;
 import net.hypejet.jet.data.json.model.block.JsonBlockEntityType;
@@ -31,6 +32,8 @@ import net.minecraft.SharedConstants;
 import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
@@ -97,6 +100,7 @@ import net.minecraft.world.item.equipment.trim.TrimMaterials;
 import net.minecraft.world.item.equipment.trim.TrimPattern;
 import net.minecraft.world.item.equipment.trim.TrimPatterns;
 import net.minecraft.world.level.DataPackConfig;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldDataConfiguration;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
@@ -160,6 +164,9 @@ final class Generators {
 
         PackRepository packRepository = createPackRepository();
         RegistryAccess registryAccess = createRegistryAccess(packRepository);
+
+        // noinspection resource ; mock levels do not have anything to close
+        Level level = new MockLevel(registryAccess, packRepository.getRequestedFeatureFlags());
 
         Set<Generator> generators = new GeneratorsBuilder(registryAccess)
                 .add(VersionInfoGenerator.INSTANCE)
@@ -247,10 +254,6 @@ final class Generators {
                         Block.class, JsonBlock.class, JsonDataResourceFiles.BLOCKS, "BlockKeys"
                 )
                 .add(
-                        Registries.ENTITY_TYPE, EntityTypeAdapter::convert, EntityType.class,
-                        EntityType.class, JsonEntityType.class, JsonDataResourceFiles.ENTITY_TYPES, "EntityTypeKeys"
-                )
-                .add(
                         Registries.GAME_EVENT, GameEventAdapter::convert, GameEvent.class,
                         GameEvent.class, JsonGameEvent.class, JsonDataResourceFiles.GAME_EVENTS, "GameEventKeys"
                 )
@@ -265,6 +268,16 @@ final class Generators {
                 .add(
                         Registries.POINT_OF_INTEREST_TYPE, ignored -> JsonUnit.INSTANCE, PoiTypes.class,
                         PoiType.class, JsonUnit.class, JsonDataResourceFiles.POI_TYPES, "PointOfInterestTypeKeys"
+                )
+                .add(
+                        Registries.PARTICLE_TYPE, type -> JsonUnit.INSTANCE,
+                        ParticleTypes.class, ParticleType.class, JsonUnit.class,
+                        JsonDataResourceFiles.PARTICLES, "ParticleTypeKeys"
+                )
+                .add(
+                        Registries.ENTITY_TYPE, value -> EntityTypeAdapter.convert(value, level),
+                        EntityType.class, EntityType.class, JsonEntityType.class,
+                        JsonDataResourceFiles.ENTITY_TYPES, "EntityTypeKeys"
                 )
                 .add(
                         Registries.BLOCK_ENTITY_TYPE, value -> BlockEntityTypeAdapter.convert(value, registryAccess),

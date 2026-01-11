@@ -14,6 +14,7 @@ import net.hypejet.jet.server.network.packet.handler.NetworkDisconnectionHandler
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacket;
 import net.hypejet.jet.server.network.packet.packets.client.ClientPacketRegistry;
 import net.hypejet.jet.server.network.session.Session;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.unit.Unit;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
@@ -141,11 +142,19 @@ public final class ClientPacketReader implements NetworkDisconnectionHandler {
 
         try (NotNullObjectAcquisition<Session> acquisition = this.sessionAcquirable.acquireRead()) {
             Session session = acquisition.get();
-            handlePacket(decodeBody(rawPacket, session.protocolState()), session);
+            handlePacket(
+                    decodeBody(
+                            rawPacket, session.protocolState(),
+                            this.connection.server().registryManager()
+                    ),
+                    session
+            );
         }
     }
 
-    private static @NonNull ClientPacket decodeBody(@NonNull RawPacket rawPacket, @NonNull ProtocolState state) {
+    private static @NonNull ClientPacket decodeBody(@NonNull RawPacket rawPacket,
+                                                    @NonNull ProtocolState state,
+                                                    @NonNull JetRegistryManager registryManager) {
         int identifier = rawPacket.identifier();
         NetworkReader<? extends ClientPacket> reader = ClientPacketRegistry.readerFor(identifier, state);
 
@@ -158,7 +167,7 @@ public final class ClientPacketReader implements NetworkDisconnectionHandler {
 
         ByteBuf buf = Unpooled.copiedBuffer(rawPacket.body().array());
         try {
-            ClientPacket packet = reader.read(buf);
+            ClientPacket packet = reader.read(buf, registryManager);
 
             int readableBytes = buf.readableBytes();
             if (readableBytes > 0) {

@@ -3,7 +3,7 @@ package net.hypejet.jet.world;
 import net.hypejet.jet.MinecraftServer;
 import net.hypejet.jet.registry.holder.Holder;
 import net.hypejet.jet.world.biome.Biome;
-import net.hypejet.jet.world.block.BlockState;
+import net.hypejet.jet.world.block.state.BlockState;
 import net.hypejet.jet.world.chunk.ChunkLoader;
 import net.hypejet.jet.world.chunk.factory.ChunkFactory;
 import net.hypejet.jet.world.chunk.factory.light.LightStorageFactory;

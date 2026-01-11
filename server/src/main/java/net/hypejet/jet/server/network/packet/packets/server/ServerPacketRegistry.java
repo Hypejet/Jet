@@ -29,13 +29,24 @@ import net.hypejet.jet.server.network.codec.packet.server.play.ServerChunkAndLig
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerChunkBatchFinishedPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerCommandSuggestionsResponsePlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerDeclareCommandsPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityAnimationPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityEventPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityMetadataPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityPositionAndRotationPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityPositionPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityRotationPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityVelocityPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerInvalidateChunkPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerJoinGamePlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerObjectiveActionPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerPlayerListHeaderAndFooterPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerRemoveEntitiesPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerResetScorePlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerRespawnPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSetObjectiveDisplayedPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerSpawnEntityPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerSpawnParticlePacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizeEntityPositionPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizePositionPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSynchronizeRotationPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerSystemMessagePlayPacketWriter;
@@ -74,19 +85,31 @@ import net.hypejet.jet.server.network.packet.packets.server.login.ServerEncrypti
 import net.hypejet.jet.server.network.packet.packets.server.login.ServerLoginSuccessLoginPacket;
 import net.hypejet.jet.server.network.packet.packets.server.login.ServerPluginMessageRequestLoginPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerActionBarPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerBundleDelimiterPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerCenterChunkPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkAndLightDataPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkBatchFinishedPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkBatchStartPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerCommandSuggestionsResponsePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerDeclareCommandsPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityAnimationPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityEventPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityMetadataPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityPositionAndRotationPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityPositionPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityRotationPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityVelocityPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerInvalidateChunkPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerJoinGamePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerObjectiveActionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerPlayerListHeaderAndFooterPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerRemoveEntitiesPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerResetScorePlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerRespawnPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSetObjectiveDisplayedPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerSpawnEntityPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerSpawnParticlePacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizeEntityPositionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizePositionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSynchronizeRotationPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerSystemMessagePlayPacket;
@@ -254,12 +277,12 @@ public final class ServerPacketRegistry {
                         .add(
                                 ServerConfigurationPackets.CLIENTBOUND_FINISH_CONFIGURATION,
                                 ServerFinishConfigurationPacket.class,
-                                (buf, object) -> {}
+                                (buf, registryManager, object) -> {}
                         )
                         .add(
                                 ServerConfigurationPackets.CLIENTBOUND_RESET_CHAT,
                                 ServerResetChatConfigurationPacket.class,
-                                (buf, object) -> {}
+                                (buf, registryManager, object) -> {}
                         )
                         .build()
         );
@@ -448,9 +471,69 @@ public final class ServerPacketRegistry {
                                 ServerUpdateChunkSectionBlockStatesPlayPacketWriter.INSTANCE
                         )
                         .add(
+                                ServerPlayPackets.CLIENTBOUND_ANIMATE,
+                                ServerEntityAnimationPlayPacket.class,
+                                ServerEntityAnimationPlayPacketWriter.INSTANCE
+                        )
+                        .add(
+                                ServerPlayPackets.CLIENTBOUND_ADD_ENTITY,
+                                ServerSpawnEntityPlayPacket.class,
+                                ServerSpawnEntityPlayPacketWriter.INSTANCE
+                        )
+                        .add(
+                                ServerPlayPackets.CLIENTBOUND_ENTITY_EVENT,
+                                ServerEntityEventPlayPacket.class,
+                                ServerEntityEventPlayPacketWriter.INSTANCE
+                        )
+                        .add(
+                                ServerPlayPackets.CLIENTBOUND_ENTITY_POSITION_SYNC,
+                                ServerSynchronizeEntityPositionPlayPacket.class,
+                                ServerSynchronizeEntityPositionPlayPacketWriter.INSTANCE
+                        )
+                        .add(
+                                ServerPlayPackets.CLIENTBOUND_MOVE_ENTITY_POS,
+                                ServerEntityPositionPlayPacket.class,
+                                ServerEntityPositionPlayPacketWriter.INSTANCE
+                        )
+                        .add(
+                                ServerPlayPackets.CLIENTBOUND_MOVE_ENTITY_POS_ROT,
+                                ServerEntityPositionAndRotationPlayPacket.class,
+                                ServerEntityPositionAndRotationPlayPacketWriter.INSTANCE
+                        )
+                        .add(
+                                ServerPlayPackets.CLIENTBOUND_MOVE_ENTITY_ROT,
+                                ServerEntityRotationPlayPacket.class,
+                                ServerEntityRotationPlayPacketWriter.INSTANCE
+                        )
+                        .add(
+                                ServerPlayPackets.CLIENTBOUND_SET_ENTITY_MOTION,
+                                ServerEntityVelocityPlayPacket.class,
+                                ServerEntityVelocityPlayPacketWriter.INSTANCE
+                        )
+                        .add(
+                                ServerPlayPackets.CLIENTBOUND_REMOVE_ENTITIES,
+                                ServerRemoveEntitiesPlayPacket.class,
+                                ServerRemoveEntitiesPlayPacketWriter.INSTANCE
+                        )
+                        .add(
+                                ServerPlayPackets.CLIENTBOUND_SET_ENTITY_DATA,
+                                ServerEntityMetadataPlayPacket.class,
+                                ServerEntityMetadataPlayPacketWriter.INSTANCE
+                        )
+                        .add(
+                                ServerPlayPackets.CLIENTBOUND_LEVEL_PARTICLES,
+                                ServerSpawnParticlePacket.class,
+                                ServerSpawnParticlePacketWriter.INSTANCE
+                        )
+                        .add(
+                                ServerPlayPackets.CLIENTBOUND_BUNDLE_DELIMITER,
+                                ServerBundleDelimiterPlayPacket.class,
+                                (buf, registryManager, object) -> {}
+                        )
+                        .add(
                                 ServerPlayPackets.CLIENTBOUND_CHUNK_BATCH_START,
                                 ServerChunkBatchStartPlayPacket.class,
-                                (buf, object) -> {}
+                                (buf, registryManager, object) -> {}
                         )
                         .build()
         );

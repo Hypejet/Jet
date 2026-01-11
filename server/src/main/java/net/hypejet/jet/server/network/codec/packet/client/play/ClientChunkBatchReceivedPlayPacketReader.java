@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.codec.packet.client.play;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientChunkBatchReceivedPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -27,7 +28,8 @@ public final class ClientChunkBatchReceivedPlayPacketReader
     private ClientChunkBatchReceivedPlayPacketReader() {}
 
     @Override
-    public @NonNull ClientChunkBatchReceivedPlayPacket read(@NonNull ByteBuf buf) {
+    public @NonNull ClientChunkBatchReceivedPlayPacket read(@NonNull ByteBuf buf,
+                                                            @NonNull JetRegistryManager registryManager) {
         return new ClientChunkBatchReceivedPlayPacket(buf.readFloat());
     }
 }

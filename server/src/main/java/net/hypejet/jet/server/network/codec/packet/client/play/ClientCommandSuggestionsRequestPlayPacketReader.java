@@ -5,6 +5,7 @@ import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientCommandSuggestionsRequestPlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -32,10 +33,11 @@ public final class ClientCommandSuggestionsRequestPlayPacketReader
     private ClientCommandSuggestionsRequestPlayPacketReader() {}
 
     @Override
-    public @NonNull ClientCommandSuggestionsRequestPlayPacket read(@NonNull ByteBuf buf) {
+    public @NonNull ClientCommandSuggestionsRequestPlayPacket read(@NonNull ByteBuf buf,
+                                                                   @NonNull JetRegistryManager registryManager) {
         return new ClientCommandSuggestionsRequestPlayPacket(
-                VarIntNetworkCodec.INSTANCE.read(buf),
-                TEXT_CODEC.read(buf)
+                VarIntNetworkCodec.INSTANCE.read(buf, registryManager),
+                TEXT_CODEC.read(buf, registryManager)
         );
     }
 }

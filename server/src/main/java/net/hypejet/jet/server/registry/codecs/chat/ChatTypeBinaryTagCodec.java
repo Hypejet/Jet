@@ -4,7 +4,7 @@ import net.hypejet.jet.chat.ChatType;
 import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
 
@@ -15,6 +15,7 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @see ChatType
  * @see BinaryTagCodec
  */
+@NullMarked
 public final class ChatTypeBinaryTagCodec implements BinaryTagCodec<ChatType> {
 
     private static final String CHAT_FIELD = "chat";
@@ -30,8 +31,8 @@ public final class ChatTypeBinaryTagCodec implements BinaryTagCodec<ChatType> {
     private ChatTypeBinaryTagCodec() {}
 
     @Override
-    public @NotNull ChatType decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof CompoundBinaryTag compound) {
+    public ChatType decode(BinaryTag binaryTag) {
+        if (binaryTag instanceof CompoundBinaryTag compound) {
             return new ChatType(
                     ChatTypeDecorationBinaryTagCodec.INSTANCE.decode(requiredTag(CHAT_FIELD, compound)),
                     ChatTypeDecorationBinaryTagCodec.INSTANCE.decode(requiredTag(NARRATION_FIELD, compound))
@@ -42,10 +43,10 @@ public final class ChatTypeBinaryTagCodec implements BinaryTagCodec<ChatType> {
     }
 
     @Override
-    public @NotNull BinaryTag encode(@NotNull ChatType decoded) throws Exception {
+    public BinaryTag encode(ChatType value) {
         return CompoundBinaryTag.builder()
-                .put(CHAT_FIELD, ChatTypeDecorationBinaryTagCodec.INSTANCE.encode(decoded.chat()))
-                .put(NARRATION_FIELD, ChatTypeDecorationBinaryTagCodec.INSTANCE.encode(decoded.narration()))
+                .put(CHAT_FIELD, ChatTypeDecorationBinaryTagCodec.INSTANCE.encode(value.chat()))
+                .put(NARRATION_FIELD, ChatTypeDecorationBinaryTagCodec.INSTANCE.encode(value.narration()))
                 .build();
     }
 }

@@ -2,6 +2,7 @@ package net.hypejet.jet.server.network.codec.number;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -27,7 +28,7 @@ public final class VarIntNetworkCodec implements NetworkCodec<Integer> {
     private VarIntNetworkCodec() {}
 
     @Override
-    public @NonNull Integer read(@NonNull ByteBuf buf) {
+    public @NonNull Integer read(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager) {
         int value = 0;
         int position = 0;
 
@@ -52,7 +53,7 @@ public final class VarIntNetworkCodec implements NetworkCodec<Integer> {
     }
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull Integer object) {
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager, @NonNull Integer object) {
         int value = object;
         while (true) {
             if ((value & ~SEGMENT_BITS) == 0) {

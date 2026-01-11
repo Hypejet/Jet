@@ -5,6 +5,7 @@ import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.key.KeyNetworkCodec;
 import net.hypejet.jet.server.network.codec.game.registry.RegistryDataEntryNetworkWriter;
 import net.hypejet.jet.server.network.packet.packets.server.configuration.ServerRegistryDataConfigurationPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -17,7 +18,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class ServerRegistryDataConfigurationPacketWriter
         implements NetworkWriter<ServerRegistryDataConfigurationPacket> {
-
     /**
      * An instance of the {@linkplain ServerRegistryDataConfigurationPacketWriter server registry data configuration
      * packet writer}.
@@ -30,8 +30,9 @@ public final class ServerRegistryDataConfigurationPacketWriter
     private ServerRegistryDataConfigurationPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerRegistryDataConfigurationPacket object) {
-        KeyNetworkCodec.INSTANCE.write(buf, object.registry());
-        RegistryDataEntryNetworkWriter.COLLECTION_WRITER.write(buf, object.entries());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerRegistryDataConfigurationPacket object) {
+        KeyNetworkCodec.INSTANCE.write(buf, registryManager, object.registry());
+        RegistryDataEntryNetworkWriter.COLLECTION_WRITER.write(buf, registryManager, object.entries());
     }
 }

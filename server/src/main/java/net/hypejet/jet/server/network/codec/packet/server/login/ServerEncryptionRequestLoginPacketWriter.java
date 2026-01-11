@@ -5,6 +5,7 @@ import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.aggregate.array.bytes.ByteArrayNetworkWriter;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.login.ServerEncryptionRequestLoginPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -17,7 +18,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class ServerEncryptionRequestLoginPacketWriter
         implements NetworkWriter<ServerEncryptionRequestLoginPacket> {
-
     /**
      * An instance of the {@linkplain ServerEncryptionRequestLoginPacketWriter server encryption request login packet
      * writer}.
@@ -32,10 +32,11 @@ public final class ServerEncryptionRequestLoginPacketWriter
     private ServerEncryptionRequestLoginPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerEncryptionRequestLoginPacket object) {
-        SERVER_ID_CODEC.write(buf, object.serverId());
-        ByteArrayNetworkWriter.INSTANCE.write(buf, object.publicKey().array());
-        ByteArrayNetworkWriter.INSTANCE.write(buf, object.verifyToken().array());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerEncryptionRequestLoginPacket object) {
+        SERVER_ID_CODEC.write(buf, registryManager, object.serverId());
+        ByteArrayNetworkWriter.INSTANCE.write(buf, registryManager, object.publicKey().array());
+        ByteArrayNetworkWriter.INSTANCE.write(buf, registryManager, object.verifyToken().array());
         buf.writeBoolean(object.shouldAuthenticate());
     }
 }

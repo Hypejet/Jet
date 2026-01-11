@@ -3,8 +3,7 @@ package net.hypejet.jet.server.registry.codecs.primitive;
 import net.hypejet.jet.server.registry.codecs.BinaryTagCodec;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.ListBinaryTag;
-import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +17,7 @@ import java.util.Objects;
  * @see List
  * @see BinaryTagCodec
  */
+@NullMarked
 public final class ListBinaryTagCodec<V> implements BinaryTagCodec<List<V>> {
 
     private final BinaryTagCodec<V> valueCodec;
@@ -29,7 +29,7 @@ public final class ListBinaryTagCodec<V> implements BinaryTagCodec<List<V>> {
      * @param valueCodec a binary-tag codec that should handle serialization of list values
      * @since 1.0
      */
-    public ListBinaryTagCodec(@NonNull BinaryTagCodec<V> valueCodec) {
+    public ListBinaryTagCodec(BinaryTagCodec<V> valueCodec) {
         this(valueCodec, false);
     }
 
@@ -40,15 +40,15 @@ public final class ListBinaryTagCodec<V> implements BinaryTagCodec<List<V>> {
      * @param compact whether the codec should support direct value serialization if the list has only one element
      * @since 1.0
      */
-    public ListBinaryTagCodec(@NonNull BinaryTagCodec<V> valueCodec, boolean compact) {
+    public ListBinaryTagCodec(BinaryTagCodec<V> valueCodec, boolean compact) {
         this.valueCodec = Objects.requireNonNull(valueCodec, "value codec");
         this.compact = compact;
     }
 
     @Override
-    public @NotNull List<V> decode(@NotNull BinaryTag encoded) throws Exception {
+    public List<V> decode(BinaryTag binaryTag) {
         try {
-            ListBinaryTag tag = ((ListBinaryTag) encoded).unwrapHeterogeneity();
+            ListBinaryTag tag = ((ListBinaryTag) binaryTag).unwrapHeterogeneity();
             List<V> list = new ArrayList<>();
             for (BinaryTag valueTag : tag.unwrapHeterogeneity())
                 list.add(this.valueCodec.decode(valueTag));
@@ -58,7 +58,7 @@ public final class ListBinaryTagCodec<V> implements BinaryTagCodec<List<V>> {
                 throw new IllegalArgumentException("The encoded tag must be of list type to decode it to a list");
 
             try {
-                return List.of(this.valueCodec.decode(encoded));
+                return List.of(this.valueCodec.decode(binaryTag));
             } catch (Exception valueDecodeException) {
                 throw new IllegalArgumentException("Failed to decode the compact list");
             }
@@ -66,13 +66,13 @@ public final class ListBinaryTagCodec<V> implements BinaryTagCodec<List<V>> {
     }
 
     @Override
-    public @NotNull BinaryTag encode(@NotNull List<V> decoded) throws Exception {
-        if (this.compact && decoded.size() == 1) {
-            return this.valueCodec.encode(decoded.getFirst());
+    public BinaryTag encode(List<V> value) {
+        if (this.compact && value.size() == 1) {
+            return this.valueCodec.encode(value.getFirst());
         } else {
             ListBinaryTag.Builder<BinaryTag> builder = ListBinaryTag.heterogeneousListBinaryTag();
-            for (V value : decoded)
-                builder.add(this.valueCodec.encode(value));
+            for (V listValue : value)
+                builder.add(this.valueCodec.encode(listValue));
             return builder.build().wrapHeterogeneity();
         }
     }

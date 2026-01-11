@@ -5,6 +5,7 @@ import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.aggregate.array.bytes.ByteArrayNetworkReader;
 import net.hypejet.jet.server.network.codec.other.UUIDNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.client.play.ClientChatSessionUpdatePlayPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -33,10 +34,11 @@ public final class ClientChatSessionUpdatePlayPacketReader
     private ClientChatSessionUpdatePlayPacketReader() {}
 
     @Override
-    public @NonNull ClientChatSessionUpdatePlayPacket read(@NonNull ByteBuf buf) {
+    public @NonNull ClientChatSessionUpdatePlayPacket read(@NonNull ByteBuf buf,
+                                                           @NonNull JetRegistryManager registryManager) {
         return new ClientChatSessionUpdatePlayPacket(
-                UUIDNetworkCodec.INSTANCE.read(buf), buf.readLong(),
-                PUBLIC_KEY_READER.read(buf), KEY_SIGNATURE_READER.read(buf)
+                UUIDNetworkCodec.INSTANCE.read(buf, registryManager), buf.readLong(),
+                PUBLIC_KEY_READER.read(buf, registryManager), KEY_SIGNATURE_READER.read(buf, registryManager)
         );
     }
 }

@@ -3,6 +3,7 @@ package net.hypejet.jet.server.network.codec.game.world.chunk.section;
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.game.world.chunk.palette.ChunkPaletteNetworkWriter;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -24,9 +25,11 @@ public final class ChunkSectionNetworkWriter implements NetworkWriter<JetChunkSe
     private ChunkSectionNetworkWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull JetChunkSection object) {
+    public void write(@NonNull ByteBuf buf,
+                      @NonNull JetRegistryManager registryManager,
+                      @NonNull JetChunkSection object) {
         buf.writeShort(object.nonAirBlockCount());
-        ChunkPaletteNetworkWriter.INSTANCE.write(buf, object.blockStatePalette());
-        ChunkPaletteNetworkWriter.INSTANCE.write(buf, object.biomePalette());
+        ChunkPaletteNetworkWriter.INSTANCE.write(buf, registryManager, object.blockStatePalette());
+        ChunkPaletteNetworkWriter.INSTANCE.write(buf, registryManager, object.biomePalette());
     }
 }

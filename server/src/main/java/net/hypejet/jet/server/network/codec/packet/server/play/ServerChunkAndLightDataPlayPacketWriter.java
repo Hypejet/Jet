@@ -14,6 +14,7 @@ import net.hypejet.jet.server.network.codec.mapped.MappedValueNetworkWriter;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkAndLightDataPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerChunkAndLightDataPlayPacket.BlockEntity;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.storage.BitStorage;
 import net.hypejet.jet.server.world.chunk.heightmap.HeightMapType;
 import net.hypejet.jet.server.world.chunk.section.JetChunkSection;
@@ -34,6 +35,7 @@ import java.util.Map;
  */
 public final class ServerChunkAndLightDataPlayPacketWriter
         implements NetworkWriter<ServerChunkAndLightDataPlayPacket> {
+
     /**
      * An instance of the {@linkplain ServerChunkAndLightDataPlayPacketWriter server chunk and light data play packet
      * writer}.
@@ -56,7 +58,8 @@ public final class ServerChunkAndLightDataPlayPacketWriter
     private ServerChunkAndLightDataPlayPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerChunkAndLightDataPlayPacket object) {
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerChunkAndLightDataPlayPacket object) {
         // Chunk positions in this packet are encoded differently
         ChunkPosition position = object.chunkPosition();
         buf.writeInt(position.chunkX());
@@ -64,19 +67,19 @@ public final class ServerChunkAndLightDataPlayPacketWriter
 
         Map<HeightMapType, BitStorage> heightMaps = new EnumMap<>(HeightMapType.class);
         object.heightMaps().forEach(heightMap -> heightMaps.put(heightMap.type(), heightMap.data()));
-        HEIGHT_MAPS_WRITER.write(buf, heightMaps);
+        HEIGHT_MAPS_WRITER.write(buf, registryManager, heightMaps);
 
         ByteBuf sectionBuf = Unpooled.buffer();
         try {
-            SECTIONS_WRITER.write(sectionBuf, object.chunkSectionList().sections());
-            VarIntNetworkCodec.INSTANCE.write(buf, sectionBuf.readableBytes());
+            SECTIONS_WRITER.write(sectionBuf, registryManager, object.chunkSectionList().sections());
+            VarIntNetworkCodec.INSTANCE.write(buf, registryManager, sectionBuf.readableBytes());
             buf.writeBytes(sectionBuf);
         } finally {
             sectionBuf.release();
         }
 
-        BLOCK_ENTITY_ENTRIES_WRITER.write(buf, object.blockEntities().entrySet());
-        LightSerializationDataNetworkWriter.INSTANCE.write(buf, object.lightSerializationData());
+        BLOCK_ENTITY_ENTRIES_WRITER.write(buf, registryManager, object.blockEntities().entrySet());
+        LightSerializationDataNetworkWriter.INSTANCE.write(buf, registryManager, object.lightSerializationData());
     }
 
     /**
@@ -94,13 +97,14 @@ public final class ServerChunkAndLightDataPlayPacketWriter
     private static final class BlockEntityEntryNetworkWriter
             implements NetworkWriter<Map.Entry<ChunkRelativeBlockPosition, BlockEntity>> {
         @Override
-        public void write(@NonNull ByteBuf buf, Map.@NonNull Entry<ChunkRelativeBlockPosition, BlockEntity> object) {
+        public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                          Map.@NonNull Entry<ChunkRelativeBlockPosition, BlockEntity> object) {
             ChunkRelativeBlockPosition position = object.getKey();
-            ChunkRelativeBlockPositionNetworkWriter.INSTANCE.write(buf, position);
+            ChunkRelativeBlockPositionNetworkWriter.INSTANCE.write(buf, registryManager, position);
 
             BlockEntity blockEntity = object.getValue();
-            VarIntNetworkCodec.INSTANCE.write(buf, blockEntity.typeRegistryIndex());
-            BinaryTagNetworkWriter.INSTANCE.write(buf, blockEntity.data());
+            VarIntNetworkCodec.INSTANCE.write(buf, registryManager, blockEntity.typeRegistryIndex());
+            BinaryTagNetworkWriter.INSTANCE.write(buf, registryManager, blockEntity.data());
         }
     }
 }

@@ -6,6 +6,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.command.argument.ArgumentWriter;
 import net.hypejet.jet.server.network.codec.index.IndexNetworkCodec;
 import net.hypejet.jet.server.network.codec.number.VarIntNetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.index.IndexUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -42,7 +43,9 @@ public final class StringArgumentWriter extends ArgumentWriter<StringArgumentTyp
     }
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull StringArgumentType object) {
-        STRING_TYPE_CODEC.write(buf, object.getType());
+    public void write(@NonNull ByteBuf buf,
+                      @NonNull JetRegistryManager registryManager,
+                      @NonNull StringArgumentType object) {
+        STRING_TYPE_CODEC.write(buf, registryManager, object.getType());
     }
 }

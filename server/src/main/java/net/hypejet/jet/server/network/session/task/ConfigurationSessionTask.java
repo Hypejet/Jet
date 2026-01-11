@@ -336,7 +336,8 @@ public final class ConfigurationSessionTask implements SessionTask, Configuratio
     private void sendServerBrand() {
         ByteBuf buf = Unpooled.buffer();
         try {
-            StringNetworkCodec.INSTANCE.write(buf, this.connection.server().brandName());
+            JetMinecraftServer server = this.connection.server();
+            StringNetworkCodec.INSTANCE.write(buf, server.registryManager(), server.brandName());
             byte[] messageData = NetworkUtil.readRemainingBytes(buf);
             this.sendPluginMessage(SERVER_BRAND_PLUGIN_MESSAGE_KEY, messageData);
         } finally {

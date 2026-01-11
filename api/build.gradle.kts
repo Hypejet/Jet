@@ -26,31 +26,17 @@ publishing {
     }
 }
 
-val generatedJavaPath = layout.projectDirectory.dir("src").dir("generated").dir("java")
+private val generatedJavaPath = layout.projectDirectory.dir("src").dir("generated").dir("java")
 
 sourceSets.main {
     java.srcDirs(generatedJavaPath)
 }
 
 tasks {
-    val generateSourcesTask = register("generateSources") {
-        val dataGeneratorProject = project(":data:generator")
-        val generatorMainSourceSet = dataGeneratorProject.sourceSets.main.get()
-
-        inputs.files(generatorMainSourceSet.allSource.srcDirs)
-        inputs.files(dataGeneratorProject.configurations.runtimeClasspath.get().resolvedConfiguration.files)
-        outputs.dir(generatedJavaPath)
-
-        dependsOn(dataGeneratorProject.tasks.build)
-
-        doLast {
-            dataGeneratorProject.javaexec {
-                classpath = generatorMainSourceSet.runtimeClasspath
-                mainClass = "net.hypejet.jet.data.generator.GeneratorMain"
-                args("--api=" + generatedJavaPath.asFile.absolutePath)
-            }
-        }
-    }
+    val generateSourcesTask = register<GenerateSourcesTask>(
+        "generateSources",
+        generatedJavaPath
+    )
     withType<AbstractCompile> {
         dependsOn(generateSourcesTask)
     }
@@ -59,5 +45,34 @@ tasks {
     }
     jar {
         manifest.attributes("Automatic-Module-Name" to "net.hypejet.jet.api")
+    }
+}
+
+@CacheableTask
+abstract class GenerateSourcesTask @Inject constructor(
+    private val generatedJavaPath: Directory,
+    private val execOperations: ExecOperations
+) : DefaultTask() {
+
+    private val generatorMainSourceSet: SourceSet
+
+    init {
+        val dataGeneratorProject = project.project(":data:generator")
+        generatorMainSourceSet = dataGeneratorProject.sourceSets.main.get()
+
+        inputs.files(generatorMainSourceSet.allSource.srcDirs)
+        inputs.files(dataGeneratorProject.configurations.runtimeClasspath.get().resolve())
+        outputs.dir(generatedJavaPath)
+
+        dependsOn(dataGeneratorProject.tasks.build)
+    }
+
+    @TaskAction
+    fun run() {
+        execOperations.javaexec {
+            classpath = generatorMainSourceSet.runtimeClasspath
+            mainClass = "net.hypejet.jet.data.generator.GeneratorMain"
+            args("--api=" + generatedJavaPath.asFile.absolutePath)
+        }
     }
 }

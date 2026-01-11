@@ -6,6 +6,7 @@ import net.hypejet.jet.server.network.codec.aggregate.collection.CollectionNetwo
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
 import net.hypejet.jet.server.network.codec.other.UUIDNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.login.ServerLoginSuccessLoginPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.NetworkUtil;
 import net.hypejet.jet.session.login.profile.GameProfileProperty;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -33,10 +34,11 @@ public final class ServerLoginSuccessLoginPacketWriter implements NetworkWriter<
     private ServerLoginSuccessLoginPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerLoginSuccessLoginPacket object) {
-        UUIDNetworkCodec.INSTANCE.write(buf, object.uniqueId());
-        StringNetworkCodec.MAX_16_INSTANCE.write(buf, object.username());
-        GAME_PROFILE_PROPERTIES_WRITER.write(buf, object.properties());
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerLoginSuccessLoginPacket object) {
+        UUIDNetworkCodec.INSTANCE.write(buf, registryManager, object.uniqueId());
+        StringNetworkCodec.MAX_16_INSTANCE.write(buf, registryManager, object.username());
+        GAME_PROFILE_PROPERTIES_WRITER.write(buf, registryManager, object.properties());
     }
 
     /**
@@ -49,10 +51,11 @@ public final class ServerLoginSuccessLoginPacketWriter implements NetworkWriter<
      */
     private static final class GameProfilePropertyWriter implements NetworkWriter<GameProfileProperty> {
         @Override
-        public void write(@NonNull ByteBuf buf, @NonNull GameProfileProperty object) {
-            StringNetworkCodec.INSTANCE.write(buf, object.name());
-            StringNetworkCodec.INSTANCE.write(buf, object.value());
-            NetworkUtil.writeOptional(object.signature(), StringNetworkCodec.INSTANCE, buf);
+        public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                          @NonNull GameProfileProperty object) {
+            StringNetworkCodec.INSTANCE.write(buf, registryManager, object.name());
+            StringNetworkCodec.INSTANCE.write(buf, registryManager, object.value());
+            NetworkUtil.writeOptional(object.signature(), StringNetworkCodec.INSTANCE, buf, registryManager);
         }
     }
 }

@@ -25,6 +25,7 @@ import net.hypejet.jet.world.block.jukebox.JukeboxSong;
 import net.hypejet.jet.world.dimension.DimensionType;
 import net.hypejet.jet.world.event.game.GameEvent;
 import net.hypejet.jet.world.fluid.Fluid;
+import net.hypejet.jet.world.particle.ParticleType;
 import net.hypejet.jet.world.sound.Instrument;
 import net.hypejet.jet.world.sound.SoundEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -222,6 +223,14 @@ public final class RegistryReference<V> {
      * @see Fluid
      */
     public static final RegistryReference<Fluid> FLUID = create("fluid");
+
+    /**
+     * A reference to a {@linkplain ParticleType particle type} registry.
+     *
+     * @since 1.0
+     * @see ParticleType
+     */
+    public static final RegistryReference<ParticleType> PARTICLE_TYPE = create("particle_type");
 
     /**
      * A reference to a {@linkplain SoundEvent sound-event} registry.

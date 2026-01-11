@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkReader;
 import net.hypejet.jet.server.network.codec.aggregate.array.bytes.FixedByteArrayNetworkReader;
 import net.hypejet.jet.server.network.codec.other.StringNetworkCodec;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.game.signing.SignedArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -28,10 +29,10 @@ public final class SignedArgumentNetworkReader implements NetworkReader<SignedAr
     private SignedArgumentNetworkReader() {}
 
     @Override
-    public @NonNull SignedArgument read(@NonNull ByteBuf buf) {
+    public @NonNull SignedArgument read(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager) {
         return new SignedArgument(
-                StringNetworkCodec.MAX_16_INSTANCE.read(buf),
-                SIGNATURE_READER.read(buf)
+                StringNetworkCodec.MAX_16_INSTANCE.read(buf, registryManager),
+                SIGNATURE_READER.read(buf, registryManager)
         );
     }
 }

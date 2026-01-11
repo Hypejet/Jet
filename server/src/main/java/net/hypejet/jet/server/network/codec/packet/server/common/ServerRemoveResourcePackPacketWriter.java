@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.NetworkWriter;
 import net.hypejet.jet.server.network.codec.other.UUIDNetworkCodec;
 import net.hypejet.jet.server.network.packet.packets.server.common.ServerRemoveResourcePackPacket;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import net.hypejet.jet.server.util.NetworkUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -16,7 +17,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @see NetworkWriter
  */
 public final class ServerRemoveResourcePackPacketWriter implements NetworkWriter<ServerRemoveResourcePackPacket> {
-
     /**
      * An instance of the {@linkplain ServerRemoveResourcePackPacketWriter server remove resource pack packet writer}.
      *
@@ -27,7 +27,8 @@ public final class ServerRemoveResourcePackPacketWriter implements NetworkWriter
     private ServerRemoveResourcePackPacketWriter() {}
 
     @Override
-    public void write(@NonNull ByteBuf buf, @NonNull ServerRemoveResourcePackPacket object) {
-        NetworkUtil.writeOptional(object.uniqueId(), UUIDNetworkCodec.INSTANCE, buf);
+    public void write(@NonNull ByteBuf buf, @NonNull JetRegistryManager registryManager,
+                      @NonNull ServerRemoveResourcePackPacket object) {
+        NetworkUtil.writeOptional(object.uniqueId(), UUIDNetworkCodec.INSTANCE, buf, registryManager);
     }
 }

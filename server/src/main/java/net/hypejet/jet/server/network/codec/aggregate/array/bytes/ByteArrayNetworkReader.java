@@ -2,6 +2,7 @@ package net.hypejet.jet.server.network.codec.aggregate.array.bytes;
 
 import io.netty.buffer.ByteBuf;
 import net.hypejet.jet.server.network.codec.aggregate.AggregateNetworkReader;
+import net.hypejet.jet.server.registry.JetRegistryManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -31,7 +32,8 @@ public final class ByteArrayNetworkReader extends AggregateNetworkReader<byte[]>
     }
 
     @Override
-    protected byte @NonNull [] decodeElements(int length, @NonNull ByteBuf buf) {
+    protected byte @NonNull [] decodeElements(int length, @NonNull ByteBuf buf,
+                                              @NonNull JetRegistryManager registryManager) {
         byte[] bytes = new byte[length];
         for (int index = 0; index < length; index++)
             bytes[index] = buf.readByte();

@@ -35,7 +35,7 @@ public final class RawPacketEncoder extends MessageToByteEncoder<RawPacket> {
     @Override
     protected void encode(ChannelHandlerContext ctx, RawPacket msg, ByteBuf out) {
         try {
-            VarIntNetworkCodec.INSTANCE.write(out, msg.identifier());
+            VarIntNetworkCodec.INSTANCE.write(out, this.connection.server().registryManager(), msg.identifier());
             out.writeBytes(msg.body().array());
         } catch (Throwable throwable) {
             this.connection.uncaughtException(Thread.currentThread(), throwable);

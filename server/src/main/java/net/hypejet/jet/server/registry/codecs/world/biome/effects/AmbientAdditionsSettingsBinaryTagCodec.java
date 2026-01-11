@@ -6,7 +6,7 @@ import net.hypejet.jet.world.biome.effects.AmbientAdditionsSettings;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
 
@@ -17,6 +17,7 @@ import static net.hypejet.jet.server.util.nbt.BinaryTagUtil.requiredTag;
  * @see AmbientAdditionsSettings
  * @see BinaryTagCodec
  */
+@NullMarked
 public final class AmbientAdditionsSettingsBinaryTagCodec implements BinaryTagCodec<AmbientAdditionsSettings> {
 
     private static final String SOUND_EVENT_FIELD = "sound";
@@ -33,8 +34,8 @@ public final class AmbientAdditionsSettingsBinaryTagCodec implements BinaryTagCo
     private AmbientAdditionsSettingsBinaryTagCodec() {}
 
     @Override
-    public @NotNull AmbientAdditionsSettings decode(@NotNull BinaryTag encoded) throws Exception {
-        if (encoded instanceof CompoundBinaryTag compound) {
+    public AmbientAdditionsSettings decode(BinaryTag binaryTag) {
+        if (binaryTag instanceof CompoundBinaryTag compound) {
             return new AmbientAdditionsSettings(
                     SoundEventBinaryTagCodec.HOLDER_CODEC.decode(requiredTag(SOUND_EVENT_FIELD, compound)),
                     requiredTag(TICK_CHANCE_FIELD, compound, BinaryTagTypes.DOUBLE).value()
@@ -47,10 +48,10 @@ public final class AmbientAdditionsSettingsBinaryTagCodec implements BinaryTagCo
     }
 
     @Override
-    public @NotNull BinaryTag encode(@NotNull AmbientAdditionsSettings decoded) throws Exception {
+    public BinaryTag encode(AmbientAdditionsSettings value) {
         return CompoundBinaryTag.builder()
-                .put(SOUND_EVENT_FIELD, SoundEventBinaryTagCodec.HOLDER_CODEC.encode(decoded.soundEvent()))
-                .putDouble(TICK_CHANCE_FIELD, decoded.tickChance())
+                .put(SOUND_EVENT_FIELD, SoundEventBinaryTagCodec.HOLDER_CODEC.encode(value.soundEvent()))
+                .putDouble(TICK_CHANCE_FIELD, value.tickChance())
                 .build();
     }
 }

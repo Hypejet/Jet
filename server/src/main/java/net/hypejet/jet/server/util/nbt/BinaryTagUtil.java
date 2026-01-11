@@ -1,9 +1,12 @@
 package net.hypejet.jet.server.util.nbt;
 
+import net.hypejet.jet.server.util.math.MathUtil;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagType;
 import net.kyori.adventure.nbt.ByteBinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.kyori.adventure.nbt.FloatBinaryTag;
+import net.kyori.adventure.nbt.ListBinaryTag;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -90,5 +93,21 @@ public final class BinaryTagUtil {
      */
     public static boolean booleanValue(@NonNull ByteBinaryTag tag) {
         return tag.value() != 0; // != might seem weird, but that is what Minecraft does
+    }
+
+    /**
+     * Gets the element placed at the specified index in the specified {@linkplain ListBinaryTag list binary tag},
+     * casts it to a {@code float}, multiplies it by {@code 255} and rounds it down.
+     *
+     * @param index the index
+     * @param listTag the list binary tag
+     * @return the final {@code float} result
+     * @throws IllegalArgumentException if the element at the specified index is not of float type
+     * @since 1.0
+     */
+    public static int colorComponent(int index, ListBinaryTag listTag) {
+        if (!(listTag.get(index) instanceof FloatBinaryTag floatTag))
+            throw new IllegalArgumentException("The binary tag at index " + index + " is not of the float type");
+        return MathUtil.floor(floatTag.value() * 255f);
     }
 }
