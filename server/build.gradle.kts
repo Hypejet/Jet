@@ -22,9 +22,9 @@ application {
     mainClass.set("net.hypejet.jet.server.JetMinecraftServer")
 }
 
-val generatedSourcesRoot = layout.projectDirectory.dir("src").dir("generated")
-val generatedJavaPath = generatedSourcesRoot.dir("java")
-val generatedResourcesPath = generatedSourcesRoot.dir("resources")
+private val generatedSourcesRoot = layout.projectDirectory.dir("src").dir("generated")
+private val generatedJavaPath = generatedSourcesRoot.dir("java")
+private val generatedResourcesPath = generatedSourcesRoot.dir("resources")
 
 sourceSets.main {
     java.srcDirs(generatedJavaPath)
@@ -32,29 +32,11 @@ sourceSets.main {
 }
 
 tasks {
-    val generateSourcesTask = register("generateSources") {
-        val dataGeneratorProject = project(":data:generator")
-        val generatorMainSourceSet = dataGeneratorProject.sourceSets.main.get()
-
-        inputs.files(generatorMainSourceSet.allSource.srcDirs)
-        inputs.files(dataGeneratorProject.configurations.runtimeClasspath.get().resolve())
-
-        outputs.dir(generatedJavaPath)
-        outputs.dir(generatedResourcesPath)
-
-        dependsOn(dataGeneratorProject.tasks.build)
-
-        doLast {
-            dataGeneratorProject.providers.javaexec {
-                classpath = generatorMainSourceSet.runtimeClasspath
-                mainClass = "net.hypejet.jet.data.generator.GeneratorMain"
-                args(
-                    "--server=" + generatedJavaPath.asFile.absolutePath,
-                    "--resources=" + generatedResourcesPath.asFile.absolutePath
-                )
-            }
-        }
-    }
+    val generateSourcesTask = register<GenerateSourcesTask>(
+        "generateSources",
+        generatedJavaPath,
+        generatedResourcesPath
+    )
     sourcesJar {
         dependsOn(generateSourcesTask)
     }
@@ -68,6 +50,41 @@ tasks {
         minimize {
             exclude(project(":api")) // Dependencies of the API may be used by plugins
             exclude(dependency(libs.logback.get())) // Minimizing logback causes problems with finding an SLF4J provider
+        }
+    }
+}
+
+@CacheableTask
+abstract class GenerateSourcesTask @Inject constructor(
+    private val generatedJavaPath: Directory,
+    private val generatedResourcesPath: Directory,
+    private val execOperations: ExecOperations
+) : DefaultTask() {
+
+    private val generatorMainSourceSet: SourceSet
+
+    init {
+        val dataGeneratorProject = project.project(":data:generator")
+        generatorMainSourceSet = dataGeneratorProject.sourceSets.main.get()
+
+        inputs.files(generatorMainSourceSet.allSource.srcDirs)
+        inputs.files(dataGeneratorProject.configurations.runtimeClasspath.get().resolve())
+
+        outputs.dir(generatedJavaPath)
+        outputs.dir(generatedResourcesPath)
+
+        dependsOn(dataGeneratorProject.tasks.build)
+    }
+
+    @TaskAction
+    fun run() {
+        execOperations.javaexec {
+            classpath = generatorMainSourceSet.runtimeClasspath
+            mainClass = "net.hypejet.jet.data.generator.GeneratorMain"
+            args(
+                "--server=" + generatedJavaPath.asFile.absolutePath,
+                "--resources=" + generatedResourcesPath.asFile.absolutePath
+            )
         }
     }
 }

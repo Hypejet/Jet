@@ -6,7 +6,7 @@ build/
 
 ### Code Generation ###
 */src/generated
-/data/generator/logs
+*/logs
 
 ### IntelliJ IDEA ###
 .idea
