@@ -13,6 +13,6 @@ import java.util.Set;
 final class EntityTest {
     @Test
     void testEntityType() {
-        TestUtil.test(new JsonEntityType(Set.of(Key.key("vanilla"), Key.key("some-update")), 300, true));
+        TestUtil.test(new JsonEntityType(Set.of(Key.key("vanilla"), Key.key("some-update")), 300, true, true, true));
     }
 }
