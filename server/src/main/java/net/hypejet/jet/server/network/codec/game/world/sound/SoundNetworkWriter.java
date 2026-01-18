@@ -31,6 +31,6 @@ public final class SoundNetworkWriter implements NetworkWriter<Sound> {
         VarIntNetworkCodec.INSTANCE.write(buf, registryManager, object.source().ordinal());
         buf.writeFloat(object.volume());
         buf.writeFloat(object.pitch());
-        buf.writeFloat(object.seed().orElse(0L));
+        buf.writeLong(object.seed().orElse(0L));
     }
 }
