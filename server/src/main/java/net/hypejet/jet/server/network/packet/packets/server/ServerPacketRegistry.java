@@ -35,6 +35,7 @@ import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityMetad
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityPositionAndRotationPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityPositionPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityRotationPlayPacketWriter;
+import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntitySoundEffectPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerEntityVelocityPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerInvalidateChunkPlayPacketWriter;
 import net.hypejet.jet.server.network.codec.packet.server.play.ServerJoinGamePlayPacketWriter;
@@ -98,6 +99,7 @@ import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityMet
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityPositionAndRotationPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityPositionPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityRotationPlayPacket;
+import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntitySoundEffectPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerEntityVelocityPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerInvalidateChunkPlayPacket;
 import net.hypejet.jet.server.network.packet.packets.server.play.ServerJoinGamePlayPacket;
@@ -534,6 +536,11 @@ public final class ServerPacketRegistry {
                                 ServerPlayPackets.CLIENTBOUND_CHUNK_BATCH_START,
                                 ServerChunkBatchStartPlayPacket.class,
                                 (buf, registryManager, object) -> {}
+                        )
+                        .add(
+                                ServerPlayPackets.CLIENTBOUND_SOUND_ENTITY,
+                                ServerEntitySoundEffectPlayPacket.class,
+                                ServerEntitySoundEffectPlayPacketWriter.INSTANCE
                         )
                         .build()
         );
